@@ -15,39 +15,38 @@
  */
 package se.avanzabank.service.suite.context;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class AstrixContext {
 	
-	private AstrixObjectSerializerFactory objectSerializerFactory = AstrixObjectSerializerFactory.Default.noSerializationSupport();
-	private AstrixFaultTolerance faultTolerance = AstrixFaultTolerance.Factory.noFaultTolerance();
-	private List<AstrixServiceProviderPlugin<?>> serviceProviderPlugins = Arrays.<AstrixServiceProviderPlugin<?>>asList(new AstrixLibraryProviderPlugin());
+	private final ConcurrentMap<Class<?>, List<?>> providersByType = new ConcurrentHashMap<Class<?>, List<?>>();
 	
-	public List<AstrixServiceProviderPlugin<?>> getServiceProviderPlugins() {
-		return serviceProviderPlugins;
+	public <T> T getProvider(Class<T> type) {
+		List<T> providers = (List<T>) providersByType.get(type);
+		if (providers == null) {
+			throw new IllegalArgumentException("No provider registered for type: " + type);
+		}
+		if (providers.size() != 1) {
+			throw new IllegalArgumentException("Expected one provider for: " + type + " fount: + "+ providers);
+		}
+		return providers.get(0);
 	}
 	
-	public AstrixObjectSerializerFactory getObjectSerializerFactory() {
-		return objectSerializerFactory;
-	}
-	
-	public AstrixFaultTolerance getFaultTolerancePlugin() {
-		return faultTolerance;
+	public <T> List<T> getProviders(Class<T> type) {
+		List<T> providers = (List<T>) providersByType.get(type);
+		if (providers == null) {
+			throw new IllegalArgumentException("No provider registered for type: " + type);
+		}
+		return providers;
 	}
 
-	public void registerFalutTolerancePlugin(AstrixFaultTolerance faultTolerance) {
-		this.faultTolerance = faultTolerance;
+	public <T> void register(Class<T> type, T provider) {
+		this.providersByType.putIfAbsent(type, new ArrayList<>());
+		List<T> providers = (List<T>) this.providersByType.get(type);
+		providers.add(provider);
 	}
-
-	public void registerObjectSerializerPlugin(AstrixObjectSerializerFactory objectSerializerFactory) {
-		this.objectSerializerFactory = objectSerializerFactory;
-	}
-
-	public void registerServiceProviderPlugins(List<AstrixServiceProviderPlugin<?>> serviceProviderPlugins) {
-		this.serviceProviderPlugins = serviceProviderPlugins;
-	}
-	
-	
 
 }

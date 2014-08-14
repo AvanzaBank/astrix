@@ -16,7 +16,6 @@
 package se.avanzabank.service.suite.context;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -25,13 +24,13 @@ import java.util.concurrent.ConcurrentMap;
 
 public class AstrixServiceProviderFactory {
 	
-	private ConcurrentMap<Class<? extends Annotation>, AstrixServiceProviderPlugin<?>> pluginByAnnotationType = new ConcurrentHashMap<>();
+	private ConcurrentMap<Class<? extends Annotation>, AstrixServiceProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	
-	public AstrixServiceProviderFactory(AstrixContext plugins, Astrix astrix) {
-		for (AstrixServiceProviderPlugin<?> plugin : plugins.getServiceProviderPlugins()) {
-			plugin.setPlugins(plugins);
+	public AstrixServiceProviderFactory(AstrixContext context, Astrix astrix) {
+		for (AstrixServiceProviderPlugin plugin : context.getProviders(AstrixServiceProviderPlugin.class)) {
+			plugin.setPlugins(context);
 			plugin.setAstrix(astrix);
-			AstrixServiceProviderPlugin<?> previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
+			AstrixServiceProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
 				// TODO: warning, multiple provders for same annotation type..
 			}
@@ -45,12 +44,12 @@ public class AstrixServiceProviderFactory {
 	
 	public AstrixServiceProvider create(Class<?> descriptor) {
 		// TODO: descriptor is not the actual annotation type, but rather the class holding the given annotation
-		AstrixServiceProviderPlugin<?> providerFactoryPlugin = getProviderFactoryPlugin(descriptor);
+		AstrixServiceProviderPlugin providerFactoryPlugin = getProviderFactoryPlugin(descriptor);
 		return providerFactoryPlugin.create(descriptor);
 	}
 
-	private AstrixServiceProviderPlugin<?> getProviderFactoryPlugin(Class<?> descriptor) {
-		for (AstrixServiceProviderPlugin<?> factoryPlugin : pluginByAnnotationType.values()) {
+	private AstrixServiceProviderPlugin getProviderFactoryPlugin(Class<?> descriptor) {
+		for (AstrixServiceProviderPlugin factoryPlugin : pluginByAnnotationType.values()) {
 			if (descriptor.isAnnotationPresent(factoryPlugin.getProviderAnnotationType())) {
 				return factoryPlugin;
 			}

@@ -15,6 +15,7 @@
  */
 package se.avanzabank.service.suite.context;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ import se.avanzabank.service.suite.provider.library.AstrixExport;
 import se.avanzabank.service.suite.provider.library.AstrixLibraryProvider;
 
 @MetaInfServices
-public class AstrixLibraryProviderPlugin implements AstrixServiceProviderPlugin<AstrixLibraryProvider> {
+public class AstrixLibraryProviderPlugin implements AstrixServiceProviderPlugin {
 	
 	private Astrix astrix;
 	
@@ -53,7 +54,7 @@ public class AstrixLibraryProviderPlugin implements AstrixServiceProviderPlugin<
 	}
 
 	@Override
-	public Class<AstrixLibraryProvider> getProviderAnnotationType() {
+	public Class<? extends Annotation> getProviderAnnotationType() {
 		return AstrixLibraryProvider.class;
 	}
 

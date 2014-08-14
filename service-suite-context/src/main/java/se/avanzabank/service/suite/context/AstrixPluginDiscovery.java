@@ -20,13 +20,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import javax.imageio.spi.ServiceRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AstrixPluginDiscovery {
 	
-	public static List<AstrixServiceProviderPlugin<?>> discoverServiceProviderPlugins() {
+	private static final Logger log = LoggerFactory.getLogger(AstrixPluginDiscovery.class);
+	
+	public static List<AstrixServiceProviderPlugin> discoverServiceProviderPlugins() {
 		Iterator<AstrixServiceProviderPlugin> serviceProviderPlugins = ServiceLoader.load(AstrixServiceProviderPlugin.class).iterator();
-		List<AstrixServiceProviderPlugin<?>> result = new ArrayList<>();
+		List<AstrixServiceProviderPlugin> result = new ArrayList<>();
 		while (serviceProviderPlugins.hasNext()) {
 			AstrixServiceProviderPlugin serviceProviderPlugin = serviceProviderPlugins.next();
 			result.add(serviceProviderPlugin);
@@ -42,28 +45,52 @@ public class AstrixPluginDiscovery {
 		return serializerFactory.next();
 	}
 	
-	public static AstrixFaultTolerance discoverAstrixFaultTolerance() {
-		Iterator<AstrixFaultTolerance> faultTolerance = ServiceLoader.load(AstrixFaultTolerance.class).iterator();		
-		if (!faultTolerance.hasNext()) {
-			return null;
-		}
-		return faultTolerance.next(); // TODO: detect config error... 
+	public static AstrixContext discoverPlugins(AstrixContext context) {
+		discoverPlugin(context, AstrixFaultTolerance.class, AstrixFaultTolerance.Factory.noFaultTolerance());
+		discoverPlugin(context, AstrixObjectSerializerFactory.class, AstrixObjectSerializerFactory.Default.noSerializationSupport());
+		discoverPlugins(context, AstrixServiceProviderPlugin.class, new AstrixLibraryProviderPlugin());
+		return context;
 	}
 
-	public static AstrixContext discoverPlugins() {
-		AstrixContext plugins = new AstrixContext();
-		AstrixFaultTolerance faultTolerancePlugin = discoverAstrixFaultTolerance();
-		if (faultTolerancePlugin != null) {
-			plugins.registerFalutTolerancePlugin(faultTolerancePlugin);
+	private static <T> void discoverPlugins(AstrixContext context, Class<T> type, T defaultProvider) {
+		List<T> plugins = discoverPlugins(type);
+		if (plugins.isEmpty()) {
+			log.debug("No plugin discovered for {}, using default {}", type.getName(), defaultProvider.getClass().getName());
+			plugins.add(defaultProvider);
 		}
-		AstrixObjectSerializerFactory objectSerializerPlugin = discoverObjectSerializerFactory();
-		if (objectSerializerPlugin != null) {
-			plugins.registerObjectSerializerPlugin(objectSerializerPlugin);
+		for (T plugin : plugins) {
+			log.debug("Found plugin for {}, provider={}", type.getName(), plugin.getClass().getName());
+			context.register(type, plugin);
 		}
-		plugins.registerServiceProviderPlugins(discoverServiceProviderPlugins());
-		return plugins;
+	}
+
+	private static <T> void discoverPlugin(AstrixContext context, Class<T> type, T defaultProvider) {
+		T plugin = discoverPlugin(type);
+		if (plugin == null) {
+			log.debug("No plugin discovered for {}, using default {}", type.getName(), defaultProvider.getClass().getName());
+			context.register(type, defaultProvider);
+		} else {
+			log.debug("Found plugin for {}, using {}", type.getName(), plugin.getClass().getName());
+			context.register(type, plugin);
+		}
 	}
 	
+	public static <T> T discoverPlugin(Class<T> type) {
+		Iterator<T> plugins = ServiceLoader.load(type).iterator();		
+		if (!plugins.hasNext()) {
+			return null;
+		}
+		return plugins.next(); // TODO: detect config error... 
+	}
+	
+	public static <T> List<T> discoverPlugins(Class<T> type) {
+		Iterator<T> plugins = ServiceLoader.load(type).iterator();		
+		List<T> result = new ArrayList<>();
+		while (plugins.hasNext()) {
+			result.add(plugins.next());
+		}
+		return result; 
+	}
 	
 
 }

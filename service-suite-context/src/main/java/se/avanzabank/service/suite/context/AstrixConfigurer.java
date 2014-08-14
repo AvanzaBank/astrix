@@ -20,16 +20,22 @@ import java.util.List;
 public class AstrixConfigurer {
 	
 
+	AstrixContext context = new AstrixContext();
+	
 	public Astrix configure() {
-		AstrixContext astrixPlugins = AstrixPluginDiscovery.discoverPlugins();
+		AstrixPluginDiscovery.discoverPlugins(context);
 		AstrixImpl astrix = new AstrixImpl();
-		AstrixServiceProviderFactory serviceProviderFactory = new AstrixServiceProviderFactory(astrixPlugins, astrix);
+		AstrixServiceProviderFactory serviceProviderFactory = new AstrixServiceProviderFactory(context, astrix);
 		
 		List<AstrixServiceProvider> serviceProviders = new AstrixServiceProviderScanner("se.avanzabank", serviceProviderFactory).scan();
 		for (AstrixServiceProvider serviceProvider : serviceProviders) {
 			astrix.registerServiceProvider(serviceProvider);
 		}
 		return astrix;
+	}
+
+	public <T> void register(Class<T> type, T provider) {
+		context.register(type, provider);
 	}
 
 }

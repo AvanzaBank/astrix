@@ -15,21 +15,25 @@
  */
 package se.avanzabank.service.suite.remoting.plugin;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.service.suite.context.Astrix;
-import se.avanzabank.service.suite.context.AstrixObjectSerializer;
 import se.avanzabank.service.suite.context.AstrixContext;
+import se.avanzabank.service.suite.context.AstrixObjectSerializer;
+import se.avanzabank.service.suite.context.AstrixObjectSerializerFactory;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
 import se.avanzabank.service.suite.context.AstrixServiceProvider;
 import se.avanzabank.service.suite.context.AstrixServiceProviderPlugin;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
+import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
+import se.avanzabank.space.SpaceLocator;
 
-@MetaInfServices
-public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin<AstrixRemoteApiDescriptor> {
+@MetaInfServices(AstrixServiceProviderPlugin.class)
+public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin {
 
 	private AstrixContext context;
 
@@ -39,8 +43,14 @@ public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin<AstrixR
 		String targetSpace = remoteApiDescriptor.targetSpaceName();
 		Class<?>[] exportedApis = remoteApiDescriptor.exportedApis();
 		List<AstrixServiceFactory<?>> serviceFactories = new ArrayList<>();
-		AstrixRemotingTransportFactory remotingTransportFactory = null;
-		AstrixObjectSerializer objectSerializer = context.getObjectSerializerFactory().create(descriptorHolder);
+		AstrixObjectSerializer objectSerializer = context.getProvider(AstrixObjectSerializerFactory.class).create(descriptorHolder);
+		final SpaceLocator spaceLocator = context.getProvider(SpaceLocator.class);
+		AstrixRemotingTransportFactory remotingTransportFactory = new AstrixRemotingTransportFactory() {
+			@Override
+			public AstrixRemotingTransport createRemotingTransport(String targetSpaceName) {
+				return AstrixRemotingTransport.remoteSpace(spaceLocator.createClusteredProxy(targetSpaceName)); // TODO: caching of created proxies, fault tolerance?
+			}
+		};
 		for (Class<?> api : exportedApis) {
 			serviceFactories.add(
 					new AstrixRemotingServiceFactory<>(api, remotingTransportFactory, targetSpace, objectSerializer));
@@ -49,7 +59,7 @@ public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin<AstrixR
 	}
 
 	@Override
-	public Class<AstrixRemoteApiDescriptor> getProviderAnnotationType() {
+	public Class<? extends Annotation> getProviderAnnotationType() {
 		return AstrixRemoteApiDescriptor.class;
 	}
 

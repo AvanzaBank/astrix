@@ -19,11 +19,11 @@ import java.lang.annotation.Annotation;
 
 
 
-public interface AstrixServiceProviderPlugin<T extends Annotation> {
+public interface AstrixServiceProviderPlugin {
 	
 	AstrixServiceProvider create(Class<?> descriptor);
 	
-	Class<T> getProviderAnnotationType();
+	Class<? extends Annotation> getProviderAnnotationType();
 	
 	// TODO: how to avoid circular api creation when injecting astrix instance into each plugin??
 	void setAstrix(Astrix astrix);
