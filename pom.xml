@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>maven-parent</artifactId>
+		<groupId>se.avanzabank.maven</groupId>
+		<version>DEVEL-SNAPSHOT</version>
+	</parent>
+	<groupId>se.avanzabank.service</groupId>
+	<artifactId>service-suite-parent</artifactId>
+	<version>DEVEL-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<modules>
+		<module>service-suite-core</module>
+		<module>service-suite-provider</module>
+		<module>service-suite-remoting</module>
+		<module>service-suite-context</module>
+		<module>service-suite-versioning</module>
+		<module>service-suite-common</module>
+		<module>service-suite-fault-tolerance</module>
+	</modules>
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>se.avanzabank.maven</groupId>
+				<artifactId>maven-third-party-dependencies</artifactId>
+				<version>DEVEL-SNAPSHOT</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>
