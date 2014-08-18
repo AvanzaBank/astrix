@@ -26,9 +26,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import se.avanzabank.service.suite.context.AstrixObjectSerializer;
-import se.avanzabank.service.suite.context.AstrixObjectSerializerFactory;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
 import se.avanzabank.service.suite.provider.versioning.AstrixVersioned;
+import se.avanzabank.service.suite.versioning.plugin.VersionJacksonAstrixObjectSerializer;
 
 public class AstrixRemotingArgumentSerializerFactory implements ApplicationContextAware {
 	
@@ -38,9 +38,9 @@ public class AstrixRemotingArgumentSerializerFactory implements ApplicationConte
 	public AstrixObjectSerializer create() {
 		if (apiDescriptorHolder.getClass().isAnnotationPresent(AstrixVersioned.class)) {
 			AstrixVersioned versioned = apiDescriptorHolder.getClass().getAnnotation(AstrixVersioned.class);
-//			return AstrixObjectSerializerFactory.
+			return new VersionJacksonAstrixObjectSerializer(versioned);
 		}
-		return new AstrixObjectSerializer.NoSerializationSupport(); 
+		return new AstrixObjectSerializer.NoVersioningSupport(); 
 	}
 	
 	@PostConstruct

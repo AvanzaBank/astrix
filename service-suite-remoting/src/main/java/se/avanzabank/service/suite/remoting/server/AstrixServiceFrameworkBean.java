@@ -19,6 +19,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 
@@ -59,6 +60,7 @@ public class AstrixServiceFrameworkBean implements  BeanDefinitionRegistryPostPr
 		
 		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixObjectSerializer.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
+		beanDefinition.setScope(AbstractBeanDefinition.SCOPE_SINGLETON);
 		beanDefinition.setFactoryBeanName("_astrixRemotingArgumentSerializerFactory");
 		beanDefinition.setFactoryMethodName("create");
 		registry.registerBeanDefinition("_astrixRemotingArgumentSerializer", beanDefinition);

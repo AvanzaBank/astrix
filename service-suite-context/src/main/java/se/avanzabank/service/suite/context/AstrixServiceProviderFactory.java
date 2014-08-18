@@ -32,7 +32,7 @@ public class AstrixServiceProviderFactory {
 			plugin.setAstrix(astrix);
 			AstrixServiceProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
-				// TODO: warning, multiple provders for same annotation type..
+				// TODO: warning, multiple providers for same annotation type..
 			}
 		}
 	}
@@ -42,19 +42,19 @@ public class AstrixServiceProviderFactory {
 	}
 	
 	
-	public AstrixServiceProvider create(Class<?> descriptor) {
+	public AstrixServiceProvider create(Class<?> descriptorHolder) {
 		// TODO: descriptor is not the actual annotation type, but rather the class holding the given annotation
-		AstrixServiceProviderPlugin providerFactoryPlugin = getProviderFactoryPlugin(descriptor);
-		return providerFactoryPlugin.create(descriptor);
+		AstrixServiceProviderPlugin providerFactoryPlugin = getProviderFactoryPlugin(descriptorHolder);
+		return providerFactoryPlugin.create(descriptorHolder);
 	}
 
-	private AstrixServiceProviderPlugin getProviderFactoryPlugin(Class<?> descriptor) {
+	private AstrixServiceProviderPlugin getProviderFactoryPlugin(Class<?> descriptorHolder) {
 		for (AstrixServiceProviderPlugin factoryPlugin : pluginByAnnotationType.values()) {
-			if (descriptor.isAnnotationPresent(factoryPlugin.getProviderAnnotationType())) {
+			if (descriptorHolder.isAnnotationPresent(factoryPlugin.getProviderAnnotationType())) {
 				return factoryPlugin;
 			}
 		}
-		throw new IllegalArgumentException("No plugin registered that can handle descriptor: " + descriptor);
+		throw new IllegalArgumentException("No plugin registered that can handle descriptor: " + descriptorHolder);
 	}
 	
 }

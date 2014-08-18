@@ -17,14 +17,14 @@ package se.avanzabank.service.suite.context;
 
 public interface AstrixFaultTolerance {
 	
-	<T> T addFaultTolerance(T api);
+	<T> T addFaultTolerance(Class<T> api, T provider);
 	
 	public static class Factory {
 		public static AstrixFaultTolerance noFaultTolerance() {
 			return new AstrixFaultTolerance() {
 				@Override
-				public <T> T addFaultTolerance(T api) {
-					return api;
+				public <T> T addFaultTolerance(Class<T> api, T provider) {
+					return provider;
 				}
 			};
 		}

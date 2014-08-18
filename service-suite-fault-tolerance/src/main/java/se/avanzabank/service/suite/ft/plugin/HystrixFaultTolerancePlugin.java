@@ -13,28 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.service.suite.context;
+package se.avanzabank.service.suite.ft.plugin;
 
-public interface AstrixObjectSerializer {
+import org.kohsuke.MetaInfServices;
 
-	<T> T deserialize(Object element, Class<T> type, int version);
+import se.avanzabank.service.suite.context.AstrixFaultTolerance;
+import se.avanzabank.service.suite.ft.HystrixAdapter;
 
-	Object serialize(Object element, int version);
-	
-	int version();
 
-	public static class NoVersioningSupport implements AstrixObjectSerializer {
-		@Override
-		public <T> T deserialize(Object element, Class<T> type, int version) {
-			return type.cast(element);
-		}
-		@Override
-		public Object serialize(Object element, int version) {
-			return element;
-		}
-		@Override
-		public int version() {
-			return 0;
-		}
+@MetaInfServices(value = AstrixFaultTolerance.class)
+public class HystrixFaultTolerancePlugin implements AstrixFaultTolerance {
+
+	@Override
+	public <T> T addFaultTolerance(Class<T> api, T provider) {
+		return HystrixAdapter.create(api, provider);
 	}
+
 }

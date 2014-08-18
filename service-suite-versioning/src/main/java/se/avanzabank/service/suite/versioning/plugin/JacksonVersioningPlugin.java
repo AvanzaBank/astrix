@@ -18,18 +18,18 @@ package se.avanzabank.service.suite.versioning.plugin;
 import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.service.suite.context.AstrixObjectSerializer;
-import se.avanzabank.service.suite.context.AstrixObjectSerializerFactory;
+import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
 import se.avanzabank.service.suite.provider.versioning.AstrixVersioned;
 
-@MetaInfServices
-public class VersionedJacksonAstrixObjectSerializerFactory implements AstrixObjectSerializerFactory {
+@MetaInfServices(AstrixVersioningPlugin.class)
+public class JacksonVersioningPlugin implements AstrixVersioningPlugin {
 	@Override
 	public AstrixObjectSerializer create(Class<?> astrixApiDescriptorHolder) {
 		if (astrixApiDescriptorHolder.isAnnotationPresent(AstrixVersioned.class)) {
 			AstrixVersioned versioningInfo = astrixApiDescriptorHolder.getAnnotation(AstrixVersioned.class);
 			return new VersionJacksonAstrixObjectSerializer(versioningInfo);
 		}
-		return new AstrixObjectSerializer.NoSerializationSupport();
+		return new AstrixObjectSerializer.NoVersioningSupport();
 	}
 
 }

@@ -43,7 +43,7 @@ public class AstrixContext {
 		return providers;
 	}
 
-	public <T> void register(Class<T> type, T provider) {
+	public <T> void registerProvider(Class<T> type, T provider) {
 		this.providersByType.putIfAbsent(type, new ArrayList<>());
 		List<T> providers = (List<T>) this.providersByType.get(type);
 		providers.add(provider);

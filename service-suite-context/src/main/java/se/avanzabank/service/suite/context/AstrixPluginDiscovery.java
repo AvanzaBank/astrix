@@ -37,8 +37,8 @@ public class AstrixPluginDiscovery {
 		return result;
 	}
 	
-	public static AstrixObjectSerializerFactory discoverObjectSerializerFactory() {
-		Iterator<AstrixObjectSerializerFactory> serializerFactory = ServiceLoader.load(AstrixObjectSerializerFactory.class).iterator();
+	public static AstrixVersioningPlugin discoverObjectSerializerFactory() {
+		Iterator<AstrixVersioningPlugin> serializerFactory = ServiceLoader.load(AstrixVersioningPlugin.class).iterator();
 		if (!serializerFactory.hasNext()) {
 			return null;
 		}
@@ -46,8 +46,8 @@ public class AstrixPluginDiscovery {
 	}
 	
 	public static AstrixContext discoverPlugins(AstrixContext context) {
-		discoverPlugin(context, AstrixFaultTolerance.class, AstrixFaultTolerance.Factory.noFaultTolerance());
-		discoverPlugin(context, AstrixObjectSerializerFactory.class, AstrixObjectSerializerFactory.Default.noSerializationSupport());
+//		discoverPlugin(context, AstrixFaultTolerance.class, AstrixFaultTolerance.Factory.noFaultTolerance());
+//		discoverPlugin(context, AstrixObjectSerializerPlugin.class, AstrixObjectSerializerPlugin.Factory.noSerializationSupport());
 		discoverPlugins(context, AstrixServiceProviderPlugin.class, new AstrixLibraryProviderPlugin());
 		return context;
 	}
@@ -60,27 +60,37 @@ public class AstrixPluginDiscovery {
 		}
 		for (T plugin : plugins) {
 			log.debug("Found plugin for {}, provider={}", type.getName(), plugin.getClass().getName());
-			context.register(type, plugin);
+			context.registerProvider(type, plugin);
 		}
 	}
 
-	private static <T> void discoverPlugin(AstrixContext context, Class<T> type, T defaultProvider) {
+	static <T> void discoverPlugin(AstrixContext context, Class<T> type, T defaultProvider) {
 		T plugin = discoverPlugin(type);
 		if (plugin == null) {
 			log.debug("No plugin discovered for {}, using default {}", type.getName(), defaultProvider.getClass().getName());
-			context.register(type, defaultProvider);
+			context.registerProvider(type, defaultProvider);
 		} else {
 			log.debug("Found plugin for {}, using {}", type.getName(), plugin.getClass().getName());
-			context.register(type, plugin);
+			context.registerProvider(type, plugin);
 		}
 	}
+	
+	static <T> void discoverPlugin(AstrixContext context, Class<T> type) {
+		T plugin = discoverPlugin(type);
+		if (plugin == null) {
+			throw new IllegalStateException("No provider found on classpath for: " + type + ". This typically means that you forgot to put the providing jar on the classpath.");
+		}
+		log.debug("Found plugin for {}, using {}", type.getName(), plugin.getClass().getName());
+		context.registerProvider(type, plugin);
+	}
+	
 	
 	public static <T> T discoverPlugin(Class<T> type) {
 		Iterator<T> plugins = ServiceLoader.load(type).iterator();		
 		if (!plugins.hasNext()) {
 			return null;
 		}
-		return plugins.next(); // TODO: detect config error... 
+		return plugins.next(); // TODO: detect config error (more than one provider)... 
 	}
 	
 	public static <T> List<T> discoverPlugins(Class<T> type) {

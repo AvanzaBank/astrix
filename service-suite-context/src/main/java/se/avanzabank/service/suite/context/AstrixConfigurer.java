@@ -35,7 +35,23 @@ public class AstrixConfigurer {
 	}
 
 	public <T> void register(Class<T> type, T provider) {
-		context.register(type, provider);
+		context.registerProvider(type, provider);
+	}
+
+	public void useFaultTolerance(boolean useFaultTolerance) {
+		if (useFaultTolerance) {
+			AstrixPluginDiscovery.discoverPlugin(context, AstrixFaultTolerance.class);
+		} else {
+			context.registerProvider(AstrixFaultTolerance.class, AstrixFaultTolerance.Factory.noFaultTolerance());
+		}
+	}
+
+	public void enableVersioning(boolean enableVersioning) {
+		if (enableVersioning) {
+			AstrixPluginDiscovery.discoverPlugin(context, AstrixVersioningPlugin.class);
+		} else {
+			context.registerProvider(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Factory.noSerializationSupport());
+		}
 	}
 
 }

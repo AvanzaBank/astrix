@@ -15,6 +15,7 @@
  */
 package se.avanzabank.service.suite.remoting.plugin;
 
+import se.avanzabank.service.suite.context.AstrixFaultTolerance;
 import se.avanzabank.service.suite.context.AstrixObjectSerializer;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
 import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
@@ -26,20 +27,24 @@ public class AstrixRemotingServiceFactory<T> implements AstrixServiceFactory<T> 
 	private AstrixRemotingTransportFactory astrixRemotingTransportFactory;
 	private String targetSpaceName;
 	private AstrixObjectSerializer objectSerializer;
+	private AstrixFaultTolerance faultTolerance;
 	
 	public AstrixRemotingServiceFactory(Class<T> serviceApi,
 			AstrixRemotingTransportFactory astrixRemotingTransportFactory,
-			String targetSpaceName, AstrixObjectSerializer objectSerializer) {
+			String targetSpaceName, AstrixObjectSerializer objectSerializer, AstrixFaultTolerance faultTolerance) {
 		this.serviceApi = serviceApi;
 		this.astrixRemotingTransportFactory = astrixRemotingTransportFactory;
 		this.targetSpaceName = targetSpaceName;
 		this.objectSerializer = objectSerializer;
+		this.faultTolerance = faultTolerance;
 	}
 
 	@Override
 	public T create() {
 		AstrixRemotingTransport remotingTransport = astrixRemotingTransportFactory.createRemotingTransport(targetSpaceName);
-		return AstrixServiceProxy.create(serviceApi, remotingTransport, objectSerializer);
+		T proxy = AstrixServiceProxy.create(serviceApi, remotingTransport, objectSerializer);
+		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(serviceApi, proxy);
+		return proxyWithFaultTolerance;
 	}
 
 	@Override
