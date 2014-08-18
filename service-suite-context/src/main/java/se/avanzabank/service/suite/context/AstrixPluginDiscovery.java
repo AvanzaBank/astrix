@@ -45,14 +45,7 @@ public class AstrixPluginDiscovery {
 		return serializerFactory.next();
 	}
 	
-	public static AstrixContext discoverPlugins(AstrixContext context) {
-//		discoverPlugin(context, AstrixFaultTolerance.class, AstrixFaultTolerance.Factory.noFaultTolerance());
-//		discoverPlugin(context, AstrixObjectSerializerPlugin.class, AstrixObjectSerializerPlugin.Factory.noSerializationSupport());
-		discoverPlugins(context, AstrixServiceProviderPlugin.class, new AstrixLibraryProviderPlugin());
-		return context;
-	}
-
-	private static <T> void discoverPlugins(AstrixContext context, Class<T> type, T defaultProvider) {
+	static <T> void discoverAllPlugins(AstrixContext context, Class<T> type, T defaultProvider) {
 		List<T> plugins = discoverPlugins(type);
 		if (plugins.isEmpty()) {
 			log.debug("No plugin discovered for {}, using default {}", type.getName(), defaultProvider.getClass().getName());
@@ -75,7 +68,7 @@ public class AstrixPluginDiscovery {
 		}
 	}
 	
-	static <T> void discoverPlugin(AstrixContext context, Class<T> type) {
+	static <T> void discoverOnePlugin(AstrixContext context, Class<T> type) {
 		T plugin = discoverPlugin(type);
 		if (plugin == null) {
 			throw new IllegalStateException("No provider found on classpath for: " + type + ". This typically means that you forgot to put the providing jar on the classpath.");

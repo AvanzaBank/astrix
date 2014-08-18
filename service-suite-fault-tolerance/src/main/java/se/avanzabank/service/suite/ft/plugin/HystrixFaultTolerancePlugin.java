@@ -17,12 +17,12 @@ package se.avanzabank.service.suite.ft.plugin;
 
 import org.kohsuke.MetaInfServices;
 
-import se.avanzabank.service.suite.context.AstrixFaultTolerance;
+import se.avanzabank.service.suite.context.AstrixFaultTolerancePlugin;
 import se.avanzabank.service.suite.ft.HystrixAdapter;
 
 
-@MetaInfServices(value = AstrixFaultTolerance.class)
-public class HystrixFaultTolerancePlugin implements AstrixFaultTolerance {
+@MetaInfServices(value = AstrixFaultTolerancePlugin.class)
+public class HystrixFaultTolerancePlugin implements AstrixFaultTolerancePlugin {
 
 	@Override
 	public <T> T addFaultTolerance(Class<T> api, T provider) {

@@ -23,7 +23,7 @@ import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.service.suite.context.Astrix;
 import se.avanzabank.service.suite.context.AstrixContext;
-import se.avanzabank.service.suite.context.AstrixFaultTolerance;
+import se.avanzabank.service.suite.context.AstrixFaultTolerancePlugin;
 import se.avanzabank.service.suite.context.AstrixObjectSerializer;
 import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
@@ -46,7 +46,7 @@ public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin {
 		List<AstrixServiceFactory<?>> serviceFactories = new ArrayList<>();
 		AstrixObjectSerializer objectSerializer = context.getProvider(AstrixVersioningPlugin.class).create(descriptorHolder);
 		final SpaceLocator spaceLocator = context.getProvider(SpaceLocator.class);
-		AstrixFaultTolerance faultTolerance = context.getProvider(AstrixFaultTolerance.class);
+		AstrixFaultTolerancePlugin faultTolerance = context.getProvider(AstrixFaultTolerancePlugin.class);
 		AstrixRemotingTransportFactory remotingTransportFactory = new AstrixRemotingTransportFactory() {
 			@Override
 			public AstrixRemotingTransport createRemotingTransport(String targetSpaceName) {

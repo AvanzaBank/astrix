@@ -18,12 +18,15 @@ package se.avanzabank.service.suite.context;
 import java.util.List;
 
 public class AstrixConfigurer {
-	
 
-	AstrixContext context = new AstrixContext();
+	private boolean useFaultTolerance = false;
+	private boolean enableVersioning = false;
+	private AstrixContext context = new AstrixContext();
 	
 	public Astrix configure() {
-		AstrixPluginDiscovery.discoverPlugins(context);
+		configureFaultTolerance(context);
+		configureVersioning(context);
+		configureLibrarySupport(context);
 		AstrixImpl astrix = new AstrixImpl();
 		AstrixServiceProviderFactory serviceProviderFactory = new AstrixServiceProviderFactory(context, astrix);
 		
@@ -33,25 +36,38 @@ public class AstrixConfigurer {
 		}
 		return astrix;
 	}
+	
+	public void useFaultTolerance(boolean useFaultTolerance) {
+		this.useFaultTolerance  = useFaultTolerance;
+	}
+	
+	public void enableVersioning(boolean enableVersioning) {
+		this.enableVersioning = enableVersioning;
+	}
+
+	private void configureLibrarySupport(AstrixContext context) {
+		AstrixPluginDiscovery.discoverAllPlugins(context, AstrixServiceProviderPlugin.class, new AstrixLibraryProviderPlugin());
+	}
+	
+	private void configureVersioning(AstrixContext context) {
+		if (enableVersioning) {
+			AstrixPluginDiscovery.discoverOnePlugin(context, AstrixVersioningPlugin.class);
+		} else {
+			context.registerProvider(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Factory.noSerializationSupport());
+		}
+	}
+
+	private void configureFaultTolerance(AstrixContext context) {
+		if (useFaultTolerance) {
+			AstrixPluginDiscovery.discoverOnePlugin(context, AstrixFaultTolerancePlugin.class);
+		} else {
+			context.registerProvider(AstrixFaultTolerancePlugin.class, AstrixFaultTolerancePlugin.Factory.noFaultTolerance());
+		}
+	}
 
 	public <T> void register(Class<T> type, T provider) {
 		context.registerProvider(type, provider);
 	}
 
-	public void useFaultTolerance(boolean useFaultTolerance) {
-		if (useFaultTolerance) {
-			AstrixPluginDiscovery.discoverPlugin(context, AstrixFaultTolerance.class);
-		} else {
-			context.registerProvider(AstrixFaultTolerance.class, AstrixFaultTolerance.Factory.noFaultTolerance());
-		}
-	}
-
-	public void enableVersioning(boolean enableVersioning) {
-		if (enableVersioning) {
-			AstrixPluginDiscovery.discoverPlugin(context, AstrixVersioningPlugin.class);
-		} else {
-			context.registerProvider(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Factory.noSerializationSupport());
-		}
-	}
 
 }
