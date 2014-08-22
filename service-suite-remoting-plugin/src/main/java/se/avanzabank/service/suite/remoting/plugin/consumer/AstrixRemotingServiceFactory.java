@@ -13,36 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.service.suite.remoting.plugin;
+package se.avanzabank.service.suite.remoting.plugin.consumer;
 
 import se.avanzabank.service.suite.context.AstrixFaultTolerancePlugin;
-import se.avanzabank.service.suite.context.AstrixObjectSerializer;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
+import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
-import se.avanzabank.service.suite.remoting.client.AstrixServiceProxy;
+import se.avanzabank.service.suite.remoting.client.AstrixRemotingProxy;
 
 public class AstrixRemotingServiceFactory<T> implements AstrixServiceFactory<T> {
 	
 	private Class<T> serviceApi;
 	private AstrixRemotingTransportFactory astrixRemotingTransportFactory;
-	private String targetSpaceName;
 	private AstrixObjectSerializer objectSerializer;
 	private AstrixFaultTolerancePlugin faultTolerance;
 	
 	public AstrixRemotingServiceFactory(Class<T> serviceApi,
-			AstrixRemotingTransportFactory astrixRemotingTransportFactory,
-			String targetSpaceName, AstrixObjectSerializer objectSerializer, AstrixFaultTolerancePlugin faultTolerance) {
+										AstrixRemotingTransportFactory astrixRemotingTransportFactory, 
+										AstrixObjectSerializer objectSerializer, 
+										AstrixFaultTolerancePlugin faultTolerance) {
 		this.serviceApi = serviceApi;
 		this.astrixRemotingTransportFactory = astrixRemotingTransportFactory;
-		this.targetSpaceName = targetSpaceName;
 		this.objectSerializer = objectSerializer;
 		this.faultTolerance = faultTolerance;
 	}
 
 	@Override
 	public T create() {
-		AstrixRemotingTransport remotingTransport = astrixRemotingTransportFactory.createRemotingTransport(targetSpaceName);
-		T proxy = AstrixServiceProxy.create(serviceApi, remotingTransport, objectSerializer);
+		AstrixRemotingTransport remotingTransport = astrixRemotingTransportFactory.createRemotingTransport();
+		T proxy = AstrixRemotingProxy.create(serviceApi, remotingTransport, objectSerializer);
 		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(serviceApi, proxy);
 		return proxyWithFaultTolerance;
 	}

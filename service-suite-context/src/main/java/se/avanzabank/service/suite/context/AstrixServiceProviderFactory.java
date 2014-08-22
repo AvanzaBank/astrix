@@ -26,10 +26,9 @@ public class AstrixServiceProviderFactory {
 	
 	private ConcurrentMap<Class<? extends Annotation>, AstrixServiceProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	
-	public AstrixServiceProviderFactory(AstrixContext context, Astrix astrix) {
-		for (AstrixServiceProviderPlugin plugin : context.getProviders(AstrixServiceProviderPlugin.class)) {
-			plugin.setPlugins(context);
-			plugin.setAstrix(astrix);
+	public AstrixServiceProviderFactory(AstrixContext context) {
+		for (AstrixServiceProviderPlugin plugin : context.getPlugins(AstrixServiceProviderPlugin.class)) {
+			plugin.setContext(context);
 			AstrixServiceProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
 				// TODO: warning, multiple providers for same annotation type..

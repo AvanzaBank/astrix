@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.service.suite.context.AstrixObjectSerializer;
+import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 import se.avanzabank.service.suite.remoting.client.AstrixMissingServiceException;
 import se.avanzabank.service.suite.remoting.client.AstrixMissingServiceMethodException;
 import se.avanzabank.service.suite.remoting.client.AstrixServiceInvocationRequest;
@@ -65,18 +65,12 @@ public class AstrixServiceActivator {
 	}
 	
 	private final ConcurrentMap<String, PublishedService<?>> serviceByType = new ConcurrentHashMap<>();
-//	private final JsonObjectMapper objectMapper;
 	private final AstrixObjectSerializer remotingArgumentSerializer;
 	
 	@Autowired
 	public AstrixServiceActivator(AstrixObjectSerializer remotingRequestInterceptor) {
 		this.remotingArgumentSerializer = remotingRequestInterceptor;
 	}
-
-//	@Autowired
-//	public AstrixServiceActivator(JsonObjectMapper jsonObjectMapper) {
-//		this.objectMapper = jsonObjectMapper;
-//	}
 
 	public void register(Object provider, Class<?>... publishedApis) {
 		PublishedService<?> publishedService = new PublishedService<>(provider, publishedApis);
@@ -124,7 +118,6 @@ public class AstrixServiceActivator {
 		Object result = serviceMethod.invoke(publishedService.service, arguments);
 		AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
 		if (!serviceMethod.getReturnType().equals(Void.TYPE)) {
-//			invocationResponse.setResponseBody(objectMapper.serialize(result, version));
 			invocationResponse.setResponseBody(remotingArgumentSerializer.serialize(result, version));
 		}
 		return invocationResponse;
@@ -134,7 +127,6 @@ public class AstrixServiceActivator {
 		Object[] result = new Object[elements.length];
 		for (int i = 0; i < result.length; i++) {
 			result[i] = remotingArgumentSerializer.deserialize(elements[i], types[i], version);
-//			result[i] = objectMapper.deserialize(elements[i], types[i], version); 
 		}
 		return result;
 	}

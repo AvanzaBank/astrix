@@ -20,12 +20,18 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.annotation.PostConstruct;
+
 public class AstrixContext {
 	
-	private final ConcurrentMap<Class<?>, List<?>> providersByType = new ConcurrentHashMap<Class<?>, List<?>>();
+	private final ConcurrentMap<Class<?>, List<?>> pluginsByType = new ConcurrentHashMap<Class<?>, List<?>>();
+	private AstrixImpl astrix = new AstrixImpl();
 	
-	public <T> T getProvider(Class<T> type) {
-		List<T> providers = (List<T>) providersByType.get(type);
+	public AstrixContext() {
+	}
+	
+	public <T> T getPlugin(Class<T> type) {
+		List<T> providers = (List<T>) pluginsByType.get(type);
 		if (providers == null) {
 			throw new IllegalArgumentException("No provider registered for type: " + type);
 		}
@@ -35,18 +41,44 @@ public class AstrixContext {
 		return providers.get(0);
 	}
 	
-	public <T> List<T> getProviders(Class<T> type) {
-		List<T> providers = (List<T>) providersByType.get(type);
+	public <T> List<T> getPlugins(Class<T> type) {
+		List<T> providers = (List<T>) pluginsByType.get(type);
 		if (providers == null) {
 			throw new IllegalArgumentException("No provider registered for type: " + type);
 		}
 		return providers;
 	}
 
-	public <T> void registerProvider(Class<T> type, T provider) {
-		this.providersByType.putIfAbsent(type, new ArrayList<>());
-		List<T> providers = (List<T>) this.providersByType.get(type);
+	public <T> void registerPlugin(Class<T> type, T provider) {
+		this.pluginsByType.putIfAbsent(type, new ArrayList<>());
+		List<T> providers = (List<T>) this.pluginsByType.get(type);
 		providers.add(provider);
 	}
+	
+	@PostConstruct
+	public void discoverPlugins() {
+		AstrixPluginDiscovery.discoverAllPlugins(this, AstrixServiceProviderPlugin.class, new AstrixLibraryProviderPlugin());
+		AstrixPluginDiscovery.discoverOnePlugin(this, AstrixVersioningPlugin.class);
+		AstrixPluginDiscovery.discoverOnePlugin(this, AstrixFaultTolerancePlugin.class);
+	}
 
+	public void registerServiceProvider(AstrixServiceProvider serviceProvider) {
+		this.astrix.registerServiceProvider(serviceProvider);
+	}
+
+	public Astrix getAstrix() {
+		return this.astrix;
+	}
+
+	/**
+	 * Looks up a service in the local service registry. <p>
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public <T> T getService(Class<T> type) {
+		return this.astrix.getService(type);
+	}
+	
+	
 }

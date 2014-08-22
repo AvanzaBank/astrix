@@ -18,7 +18,7 @@ package se.avanzabank.service.suite.versioning.plugin;
 import java.util.ArrayList;
 import java.util.List;
 
-import se.avanzabank.service.suite.context.AstrixObjectSerializer;
+import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 import se.avanzabank.service.suite.provider.versioning.AstrixJsonApiMigration;
 import se.avanzabank.service.suite.provider.versioning.AstrixObjectMapperConfigurer;
 import se.avanzabank.service.suite.provider.versioning.AstrixVersioned;

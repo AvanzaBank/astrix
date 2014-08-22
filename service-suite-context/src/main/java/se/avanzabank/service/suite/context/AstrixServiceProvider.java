@@ -23,10 +23,8 @@ import java.util.concurrent.ConcurrentMap;
 public class AstrixServiceProvider {
 	
 	private ConcurrentMap<Class<?>, AstrixServiceFactory<?>> serviceFactoryByProvidedService = new ConcurrentHashMap<>();
-	private Class<?> descriptorHolder; // Or descriptor instance???
 	
 	public AstrixServiceProvider(List<AstrixServiceFactory<?>> factories, Class<?> descriptor) {
-		this.descriptorHolder = descriptor;
 		for (AstrixServiceFactory<?> factory : factories) {
 			AstrixServiceFactory<?> previous = this.serviceFactoryByProvidedService.putIfAbsent(factory.getServiceType(), factory);
 			if (previous != null) {

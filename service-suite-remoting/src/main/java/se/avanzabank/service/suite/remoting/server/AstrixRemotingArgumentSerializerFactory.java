@@ -25,22 +25,20 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import se.avanzabank.service.suite.context.AstrixObjectSerializer;
+import se.avanzabank.service.suite.context.AstrixPluginDiscovery;
+import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
+import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
-import se.avanzabank.service.suite.provider.versioning.AstrixVersioned;
-import se.avanzabank.service.suite.versioning.plugin.VersionJacksonAstrixObjectSerializer;
 
 public class AstrixRemotingArgumentSerializerFactory implements ApplicationContextAware {
 	
-	private Object apiDescriptorHolder;
+	private Object apiDescriptorHolderInstance;
 	private ApplicationContext applicationContext;
 
 	public AstrixObjectSerializer create() {
-		if (apiDescriptorHolder.getClass().isAnnotationPresent(AstrixVersioned.class)) {
-			AstrixVersioned versioned = apiDescriptorHolder.getClass().getAnnotation(AstrixVersioned.class);
-			return new VersionJacksonAstrixObjectSerializer(versioned);
-		}
-		return new AstrixObjectSerializer.NoVersioningSupport(); 
+		AstrixVersioningPlugin versioningPlugin = AstrixPluginDiscovery.discoverPlugin(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Default.create());
+		Class<? extends Object> descriptorClass = apiDescriptorHolderInstance.getClass();
+		return versioningPlugin.create(descriptorClass);
 	}
 	
 	@PostConstruct
@@ -53,7 +51,7 @@ public class AstrixRemotingArgumentSerializerFactory implements ApplicationConte
 			}
 			throw new IllegalStateException("Exactly one bean annotated with @AstrixRemoteApiDescriptor should exists in application context. found: " + remoteServiceDescriptorTypes);
 		}
-		this.apiDescriptorHolder = remoteServiceDescriptors.iterator().next();
+		this.apiDescriptorHolderInstance = remoteServiceDescriptors.iterator().next();
 	}
 
 	@Override

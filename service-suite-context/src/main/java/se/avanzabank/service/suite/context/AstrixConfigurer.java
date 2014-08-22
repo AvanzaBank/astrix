@@ -15,6 +15,7 @@
  */
 package se.avanzabank.service.suite.context;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class AstrixConfigurer {
@@ -27,14 +28,13 @@ public class AstrixConfigurer {
 		configureFaultTolerance(context);
 		configureVersioning(context);
 		configureLibrarySupport(context);
-		AstrixImpl astrix = new AstrixImpl();
-		AstrixServiceProviderFactory serviceProviderFactory = new AstrixServiceProviderFactory(context, astrix);
+		AstrixServiceProviderFactory serviceProviderFactory = new AstrixServiceProviderFactory(context);
 		
 		List<AstrixServiceProvider> serviceProviders = new AstrixServiceProviderScanner("se.avanzabank", serviceProviderFactory).scan();
 		for (AstrixServiceProvider serviceProvider : serviceProviders) {
-			astrix.registerServiceProvider(serviceProvider);
+			context.registerServiceProvider(serviceProvider);
 		}
-		return astrix;
+		return context.getAstrix();
 	}
 	
 	public void useFaultTolerance(boolean useFaultTolerance) {
@@ -53,7 +53,7 @@ public class AstrixConfigurer {
 		if (enableVersioning) {
 			AstrixPluginDiscovery.discoverOnePlugin(context, AstrixVersioningPlugin.class);
 		} else {
-			context.registerProvider(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Factory.noSerializationSupport());
+			context.registerPlugin(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Default.create());
 		}
 	}
 
@@ -61,13 +61,39 @@ public class AstrixConfigurer {
 		if (useFaultTolerance) {
 			AstrixPluginDiscovery.discoverOnePlugin(context, AstrixFaultTolerancePlugin.class);
 		} else {
-			context.registerProvider(AstrixFaultTolerancePlugin.class, AstrixFaultTolerancePlugin.Factory.noFaultTolerance());
+			context.registerPlugin(AstrixFaultTolerancePlugin.class, AstrixFaultTolerancePlugin.Factory.noFaultTolerance());
 		}
 	}
 
-	public <T> void register(Class<T> type, T provider) {
-		context.registerProvider(type, provider);
+	// TODO: should registering a service be part of api??? or provide some other way to configure Astrix
+	public <T> void registerService(Class<T> type, T provider) {
+		AstrixServiceProvider serviceProvider = new AstrixServiceProvider(
+				Arrays.<AstrixServiceFactory<?>>asList(new SingleInstanceServiceFactory<T>(provider, type)), null);
+		context.registerServiceProvider(serviceProvider);
 	}
+	
+	private static class SingleInstanceServiceFactory<T> implements AstrixServiceFactory<T> {
+		
+		private final T instance;
+		private final Class<T> serviceType;
 
+		public SingleInstanceServiceFactory(T instance, Class<T> serviceType) {
+			this.instance = instance;
+			this.serviceType = serviceType;
+		}
 
+		@Override
+		public T create() {
+			return instance;
+		}
+
+		@Override
+		public Class<T> getServiceType() {
+			return this.serviceType;
+		}
+		
+		
+		
+	}
+	
 }

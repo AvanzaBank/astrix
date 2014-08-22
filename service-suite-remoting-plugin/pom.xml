@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>se.avanzabank.service</groupId>
+    <artifactId>service-suite-parent</artifactId>
+    <version>DEVEL-SNAPSHOT</version>
+  </parent>
+  <artifactId>service-suite-remoting-plugin</artifactId>
+  <dependencies>
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
+  		<artifactId>service-suite-remoting</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
+  		<artifactId>service-suite-context</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
+  		<artifactId>service-suite-provider-context</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  </dependencies>
+</project>

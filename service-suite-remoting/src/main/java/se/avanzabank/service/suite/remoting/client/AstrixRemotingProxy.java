@@ -15,7 +15,6 @@
  */
 package se.avanzabank.service.suite.remoting.client;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -30,23 +29,19 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import se.avanzabank.service.suite.context.AstrixObjectSerializer;
 import se.avanzabank.service.suite.core.AstrixBroadcast;
+import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 import se.avanzabank.service.suite.core.AstrixRemoteResult;
 import se.avanzabank.service.suite.core.AstrixRemoteResultReducer;
 /**
- * Client side component.
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceProxy implements InvocationHandler {
+public class AstrixRemotingProxy implements InvocationHandler {
 	
 	private final int apiVersion;
 	private final String serviceApi;
@@ -56,7 +51,7 @@ public class AstrixServiceProxy implements InvocationHandler {
 	private final boolean isObservableApi;
 	private final boolean isAsyncApi;
 	
-	private AstrixServiceProxy(Class<?> serviceApi,
+	private AstrixRemotingProxy(Class<?> serviceApi,
 							  AstrixObjectSerializer objectSerializer,
 							  AstrixRemotingTransport astrixServiceTransport) {
 		this.apiVersion = objectSerializer.version();
@@ -85,8 +80,8 @@ public class AstrixServiceProxy implements InvocationHandler {
 	}
 
 	public static <T> T create(Class<T> service, AstrixRemotingTransport transport, AstrixObjectSerializer objectSerializer) {
-		AstrixServiceProxy handler = new AstrixServiceProxy(service, objectSerializer, transport);
-		T serviceProxy = (T) Proxy.newProxyInstance(AstrixServiceProxy.class.getClassLoader(), new Class[]{service}, handler);
+		AstrixRemotingProxy handler = new AstrixRemotingProxy(service, objectSerializer, transport);
+		T serviceProxy = (T) Proxy.newProxyInstance(AstrixRemotingProxy.class.getClassLoader(), new Class[]{service}, handler);
 		return serviceProxy;
 	}
 	
@@ -251,7 +246,7 @@ public class AstrixServiceProxy implements InvocationHandler {
 		});
 	}
 	
-	private Object[] marshall(Object[] elements) throws JsonGenerationException, JsonMappingException, IOException {
+	private Object[] marshall(Object[] elements) {
 		Object[] result = new Object[elements.length];
 		for (int i = 0; i < result.length; i++) {
 			result[i] = this.objectSerializer.serialize(elements[i], apiVersion);

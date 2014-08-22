@@ -17,6 +17,8 @@ package se.avanzabank.service.suite.context;
 
 public class AstrixImpl implements Astrix {
 	
+	// TODO: is this abstraction neccessary? Or can AstrixContext implement Astrix and contain this code?
+	
 	private final AstrixServiceRegistry serviceRegistry = new AstrixServiceRegistry();
 	
 	@Override

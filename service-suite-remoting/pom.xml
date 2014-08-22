@@ -20,20 +20,25 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>service-suite-common</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
 			<artifactId>service-suite-context</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- TODO: how to avoid remoting module depending on versionin??? -->
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>service-suite-versioning</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>${project.groupId}</groupId> -->
+<!-- 			<artifactId>service-suite-provider-context</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>${project.groupId}</groupId> -->
+<!-- 			<artifactId>service-suite-gs</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 		</dependency> -->
+<!-- 		TODO: how to avoid remoting module depending on versioning??? -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>${project.groupId}</groupId> -->
+<!-- 			<artifactId>service-suite-versioning</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>se.avanzabank.space</groupId>
 			<artifactId>space-core</artifactId>

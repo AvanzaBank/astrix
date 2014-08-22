@@ -18,6 +18,12 @@
 		<module>service-suite-versioning</module>
 		<module>service-suite-common</module>
 		<module>service-suite-fault-tolerance</module>
+		<module>service-suite-bus</module>
+		<module>service-suite-gs</module>
+		<module>service-suite-integration-tests</module>
+		<module>service-suite-bus-pu</module>
+		<module>service-suite-provider-context</module>
+		<module>service-suite-remoting-plugin</module>
 	</modules>
 	
 	<dependencyManagement>

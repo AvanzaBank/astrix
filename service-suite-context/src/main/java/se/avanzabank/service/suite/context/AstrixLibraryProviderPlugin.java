@@ -28,7 +28,7 @@ import se.avanzabank.service.suite.provider.library.AstrixLibraryProvider;
 @MetaInfServices
 public class AstrixLibraryProviderPlugin implements AstrixServiceProviderPlugin {
 	
-	private Astrix astrix;
+	private AstrixContext context;
 	
 	public AstrixLibraryProviderPlugin() {
 	}
@@ -39,7 +39,7 @@ public class AstrixLibraryProviderPlugin implements AstrixServiceProviderPlugin 
 		List<AstrixServiceFactory<?>> result = new ArrayList<>();
 		for (Method m : descriptorHolder.getMethods()) {
 			if (m.isAnnotationPresent(AstrixExport.class)) {
-				result.add(new AstrixLibraryFactory<>(libraryProviderInstance, m, astrix));
+				result.add(new AstrixLibraryFactory<>(libraryProviderInstance, m, context.getAstrix()));
 			}
 		}
 		return new AstrixServiceProvider(result, descriptorHolder);
@@ -59,13 +59,8 @@ public class AstrixLibraryProviderPlugin implements AstrixServiceProviderPlugin 
 	}
 
 	@Override
-	public void setAstrix(Astrix astrix) {
-		this.astrix = astrix;
-	}
-
-	@Override
-	public void setPlugins(AstrixContext plugins) {
-		
+	public void setContext(AstrixContext context) {
+		this.context = context;
 	}
 
 }

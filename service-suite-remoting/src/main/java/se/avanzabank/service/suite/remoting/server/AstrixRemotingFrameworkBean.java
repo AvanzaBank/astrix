@@ -23,7 +23,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 
-import se.avanzabank.service.suite.context.AstrixObjectSerializer;
+import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 
 /**
  * Server side component responsible of loading astrix service framework by populating the BeanDefinitionRegistry
@@ -32,7 +32,9 @@ import se.avanzabank.service.suite.context.AstrixObjectSerializer;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceFrameworkBean implements  BeanDefinitionRegistryPostProcessor {
+public class AstrixRemotingFrameworkBean implements  BeanDefinitionRegistryPostProcessor {
+	
+	// TODO: rename to AstrixRemotingFrameworkBean or AstrixRemotingServerBean
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
@@ -64,16 +66,6 @@ public class AstrixServiceFrameworkBean implements  BeanDefinitionRegistryPostPr
 		beanDefinition.setFactoryBeanName("_astrixRemotingArgumentSerializerFactory");
 		beanDefinition.setFactoryMethodName("create");
 		registry.registerBeanDefinition("_astrixRemotingArgumentSerializer", beanDefinition);
-		
-//		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixJsonObjectMapperFactory.class);
-//		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-//		registry.registerBeanDefinition("_astrixJsonObjectMapperFactory", beanDefinition);
-		
-//		beanDefinition = new AnnotatedGenericBeanDefinition(JsonObjectMapper.class);
-//		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-//		beanDefinition.setFactoryBeanName("_astrixJsonObjectMapperFactory");
-//		beanDefinition.setFactoryMethodName("create");
-//		registry.registerBeanDefinition("_astrixJsonObjectMapper", beanDefinition);
 	}
 
 	@Override

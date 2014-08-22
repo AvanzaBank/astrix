@@ -17,8 +17,8 @@ package se.avanzabank.service.suite.versioning.plugin;
 
 import org.kohsuke.MetaInfServices;
 
-import se.avanzabank.service.suite.context.AstrixObjectSerializer;
 import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
+import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 import se.avanzabank.service.suite.provider.versioning.AstrixVersioned;
 
 @MetaInfServices(AstrixVersioningPlugin.class)

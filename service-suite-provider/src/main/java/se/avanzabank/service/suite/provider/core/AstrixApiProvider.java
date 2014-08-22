@@ -20,4 +20,6 @@ package se.avanzabank.service.suite.provider.core;
  * @author Elias Lindholm (elilin)
  */
 public interface AstrixApiProvider {
+	
+	// TODO: remove?
 }

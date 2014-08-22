@@ -34,6 +34,6 @@ public @interface AstrixRemoteApiDescriptor {
 	
 	Class<?>[] exportedApis();
 
-	String targetSpaceName();
+	String targetSpaceName() default ""; // TODO: default?
 
 }

@@ -15,7 +15,8 @@
  */
 package se.avanzabank.service.suite.context;
 
-import se.avanzabank.service.suite.context.AstrixObjectSerializer.NoVersioningSupport;
+import se.avanzabank.service.suite.core.AstrixObjectSerializer;
+import se.avanzabank.service.suite.core.AstrixObjectSerializer.NoVersioningSupport;
 
 
 public interface AstrixVersioningPlugin {
@@ -24,8 +25,8 @@ public interface AstrixVersioningPlugin {
 	
 	public AstrixObjectSerializer create(Class<?> astrixApiDescriptorHolder);
 	
-	public static class Factory {
-		public static AstrixVersioningPlugin noSerializationSupport() {
+	public static class Default {
+		public static AstrixVersioningPlugin create() {
 			return new AstrixVersioningPlugin() {
 				@Override
 				public AstrixObjectSerializer create(Class<?> astrixApiDescriptorHolder) {

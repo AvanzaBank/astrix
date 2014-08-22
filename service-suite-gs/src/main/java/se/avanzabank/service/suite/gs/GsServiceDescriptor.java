@@ -13,28 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.service.suite.context;
+package se.avanzabank.service.suite.gs;
 
-public interface AstrixObjectSerializer {
+import se.avanzabank.service.suite.bus.client.AstrixServiceBus;
+import se.avanzabank.service.suite.provider.library.AstrixExport;
+import se.avanzabank.service.suite.provider.library.AstrixLibraryProvider;
 
-	<T> T deserialize(Object element, Class<T> type, int version);
-
-	Object serialize(Object element, int version);
+@AstrixLibraryProvider
+public class GsServiceDescriptor {
 	
-	int version();
-
-	public static class NoVersioningSupport implements AstrixObjectSerializer {
-		@Override
-		public <T> T deserialize(Object element, Class<T> type, int version) {
-			return type.cast(element);
-		}
-		@Override
-		public Object serialize(Object element, int version) {
-			return element;
-		}
-		@Override
-		public int version() {
-			return 0;
-		}
+	@AstrixExport
+	public GigaSpaceRegistry createGigaSpaceRegistry(AstrixServiceBus serviceBus) {
+		return new GigaSpaceRegistryImpl(serviceBus);
 	}
+
 }

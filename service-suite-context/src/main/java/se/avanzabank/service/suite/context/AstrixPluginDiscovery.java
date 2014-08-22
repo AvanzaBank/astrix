@@ -53,35 +53,57 @@ public class AstrixPluginDiscovery {
 		}
 		for (T plugin : plugins) {
 			log.debug("Found plugin for {}, provider={}", type.getName(), plugin.getClass().getName());
-			context.registerProvider(type, plugin);
+			context.registerPlugin(type, plugin);
 		}
 	}
 
 	static <T> void discoverPlugin(AstrixContext context, Class<T> type, T defaultProvider) {
-		T plugin = discoverPlugin(type);
-		if (plugin == null) {
+		List<T> plugins = discoverPlugins(type);
+		if (plugins.isEmpty()) {
 			log.debug("No plugin discovered for {}, using default {}", type.getName(), defaultProvider.getClass().getName());
-			context.registerProvider(type, defaultProvider);
-		} else {
-			log.debug("Found plugin for {}, using {}", type.getName(), plugin.getClass().getName());
-			context.registerProvider(type, plugin);
+			context.registerPlugin(type, defaultProvider);
+			return;
 		}
+		if (plugins.size() > 1) {
+			throw new IllegalStateException("Multiple providers found for plugin: " + type + ". Plugins: " + plugins);
+		}
+		T provider = plugins.get(0);
+		log.debug("Found plugin for {}, using {}", type.getName(), provider.getClass().getName());
+		context.registerPlugin(type, provider);
+	}
+	
+	public static <T> T discoverPlugin(Class<T> type, T defaultProvider) {
+		List<T> plugins = discoverPlugins(type);
+		if (plugins.isEmpty()) {
+			log.debug("No plugin discovered for {}, using default {}", type.getName(), defaultProvider.getClass().getName());
+			return defaultProvider;
+		}
+		if (plugins.size() > 1) {
+			throw new IllegalStateException("Multiple providers found for plugin: " + type + ". Plugins: " + plugins);
+		}
+		T provider = plugins.get(0);
+		log.debug("Found plugin for {}, using {}", type.getName(), provider.getClass().getName());
+		return provider;
 	}
 	
 	static <T> void discoverOnePlugin(AstrixContext context, Class<T> type) {
-		T plugin = discoverPlugin(type);
-		if (plugin == null) {
+		List<T> plugins = discoverPlugins(type);
+		if (plugins.isEmpty()) {
 			throw new IllegalStateException("No provider found on classpath for: " + type + ". This typically means that you forgot to put the providing jar on the classpath.");
 		}
-		log.debug("Found plugin for {}, using {}", type.getName(), plugin.getClass().getName());
-		context.registerProvider(type, plugin);
+		if (plugins.size() > 1) {
+			throw new IllegalStateException("Multiple providers found for plugin: " + type + ". Plugins: " + plugins);
+		}
+		T provider = plugins.get(0);
+		log.debug("Found plugin for {}, using {}", type.getName(), provider.getClass().getName());
+		context.registerPlugin(type, provider);
 	}
 	
 	
 	public static <T> T discoverPlugin(Class<T> type) {
 		Iterator<T> plugins = ServiceLoader.load(type).iterator();		
 		if (!plugins.hasNext()) {
-			return null;
+			throw new RuntimeException("No plugin found for type: " + type);
 		}
 		return plugins.next(); // TODO: detect config error (more than one provider)... 
 	}

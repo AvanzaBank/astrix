@@ -13,12 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.service.suite.remoting.plugin;
+package se.avanzabank.service.suite.core;
 
-import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
+public interface AstrixObjectSerializer {
 
-public interface AstrixRemotingTransportFactory {
+	<T> T deserialize(Object element, Class<T> type, int version);
+
+	Object serialize(Object element, int version);
 	
-	AstrixRemotingTransport createRemotingTransport(String targetSpaceName);
+	int version();
 
+	public static class NoVersioningSupport implements AstrixObjectSerializer {
+		@Override
+		public <T> T deserialize(Object element, Class<T> type, int version) {
+			return type.cast(element);
+		}
+		@Override
+		public Object serialize(Object element, int version) {
+			return element;
+		}
+		@Override
+		public int version() {
+			return 0;
+		}
+	}
 }
