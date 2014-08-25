@@ -15,13 +15,20 @@
  */
 package se.avanzabank.service.suite.context;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class AstrixPlugins {
+	
+	private static final Logger log = LoggerFactory.getLogger(AstrixPlugins.class);
 	
 	private final ConcurrentMap<Class<?>, Plugin<?>> pluginsByType = new ConcurrentHashMap<>();
 	private final boolean autodiscover = true;
@@ -30,17 +37,6 @@ public class AstrixPlugins {
 	public <T> T getPlugin(Class<T> type) {
 		Plugin<T> plugin = getPluginInstance(type);
 		return plugin.getOne();
-	}
-
-	private <T> Plugin<T> getPluginInstance(Class<T> type) {
-		 Plugin<T> plugin = (Plugin<T>) pluginsByType.get(type);
-		 if (plugin != null) {
-			 return plugin;
-		 }
-		 if (autodiscover) {
-			this.pluginsByType.put(type, new Plugin(type, AstrixPluginDiscovery.discoverPlugins(type))); 
-		 }
-		 return (Plugin<T>) pluginsByType.get(type);
 	}
 	
 	public <T> List<T> getPlugins(Class<T> type) {
@@ -54,6 +50,16 @@ public class AstrixPlugins {
 		plugin.add(provider);
 	}
 	
+	private <T> Plugin<T> getPluginInstance(Class<T> type) {
+		 Plugin<T> plugin = (Plugin<T>) pluginsByType.get(type);
+		 if (plugin != null) {
+			 return plugin;
+		 }
+		 if (autodiscover) {
+			this.pluginsByType.put(type, Plugin.autoDiscover(type)); 
+		 }
+		 return (Plugin<T>) pluginsByType.get(type);
+	}
 	
 	static class Plugin<T> {
 		private Class<T> type;
@@ -66,6 +72,36 @@ public class AstrixPlugins {
 		public Plugin(Class<T> type, List<T> discoverPlugins) {
 			this.type = type;
 			this.providers = discoverPlugins;
+		}
+		
+		public static <T> Plugin<T> autoDiscover(Class<T> type) {
+			List<T> plugins = AstrixPluginDiscovery.discoverPlugins(type);
+			if (plugins.isEmpty()) {
+				Method defaultFactory = getDefaultFactory(type);
+				if (defaultFactory != null) {
+					try {
+						log.debug("Plugin not found {}.", type);
+						plugins.add((T) defaultFactory.invoke(null));
+					} catch (Exception e) {
+						log.warn("Failed to create default plugin for type=" + type, e);
+					}
+				}
+			}
+			return new Plugin(type, plugins);
+		}
+		
+		// Look for inner factory class with name 'Default' and a factory method named 'create'
+		private static Method getDefaultFactory(Class<?> pluginType) {
+			try {
+				for (Class<?> defaultFactoryCandidate : pluginType.getDeclaredClasses()) {
+					if (defaultFactoryCandidate.getName().endsWith("Default")) {
+						return defaultFactoryCandidate.getMethod("create");
+					}
+				}
+			} catch (Exception e) {
+				log.info("Failed to find default factory for plugin= " + pluginType, e);
+			}
+			return null;
 		}
 
 		public T getOne() {

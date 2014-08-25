@@ -22,22 +22,29 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import se.avanzabank.service.suite.context.AstrixPluginDiscovery;
+import se.avanzabank.service.suite.context.AstrixPlugins;
 import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
 import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
 
 public class AstrixRemotingArgumentSerializerFactory implements ApplicationContextAware {
 	
-	private Object apiDescriptorHolderInstance;
+	private Class<?> apiDescriptorHolder;
 	private ApplicationContext applicationContext;
+	private AstrixPlugins plugins;
+
+	@Autowired
+	public AstrixRemotingArgumentSerializerFactory(AstrixPlugins plugins) {
+		this.plugins = plugins;
+	}
 
 	public AstrixObjectSerializer create() {
-		AstrixVersioningPlugin versioningPlugin = AstrixPluginDiscovery.discoverPlugin(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Default.create());
-		Class<? extends Object> descriptorClass = apiDescriptorHolderInstance.getClass();
+		AstrixVersioningPlugin versioningPlugin = plugins.getPlugin(AstrixVersioningPlugin.class);
+		Class<? extends Object> descriptorClass = apiDescriptorHolder;
 		return versioningPlugin.create(descriptorClass);
 	}
 	
@@ -51,7 +58,7 @@ public class AstrixRemotingArgumentSerializerFactory implements ApplicationConte
 			}
 			throw new IllegalStateException("Exactly one bean annotated with @AstrixRemoteApiDescriptor should exists in application context. found: " + remoteServiceDescriptorTypes);
 		}
-		this.apiDescriptorHolderInstance = remoteServiceDescriptors.iterator().next();
+		this.apiDescriptorHolder = remoteServiceDescriptors.iterator().next().getClass();
 	}
 
 	@Override

@@ -24,7 +24,10 @@ import org.springframework.context.ApplicationContextAware;
 
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteServiceExport;
 /**
- * This bean is internal to the service framework and should not be used directly. <p>
+ * This bean makes all beans annotated with AstrixRemoteServiceExport invokable using the remoting 
+ * framework. 
+ * 
+ * Note that this bean does not publish any services onto the service bus.  
  * 
  * @author Elias Lindholm (elilin)
  *

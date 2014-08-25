@@ -19,8 +19,8 @@ public interface AstrixFaultTolerancePlugin {
 	
 	<T> T addFaultTolerance(Class<T> api, T provider);
 	
-	public static class Factory {
-		public static AstrixFaultTolerancePlugin noFaultTolerance() {
+	public static class Default {
+		public static AstrixFaultTolerancePlugin create() {
 			return new AstrixFaultTolerancePlugin() {
 				@Override
 				public <T> T addFaultTolerance(Class<T> api, T provider) {

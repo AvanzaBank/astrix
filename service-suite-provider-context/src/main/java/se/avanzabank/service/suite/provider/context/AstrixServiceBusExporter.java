@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import se.avanzabank.service.suite.bus.client.AstrixServiceBus;
 import se.avanzabank.service.suite.bus.client.AstrixServiceProperties;
-import se.avanzabank.service.suite.context.AstrixPluginDiscovery;
+import se.avanzabank.service.suite.context.AstrixPlugins;
 import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
 import se.avanzabank.service.suite.provider.core.AstrixServiceBusApi;
 import se.avanzabank.service.suite.remoting.client.AstrixRemotingProxy;
@@ -45,8 +45,9 @@ public class AstrixServiceBusExporter extends Thread {
 	@Autowired
 	public AstrixServiceBusExporter(
 			List<ServiceExporter> serviceProvideres,
-			SpaceLocator sl) {
-		AstrixVersioningPlugin versioningPlugin = AstrixPluginDiscovery.discoverPlugin(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Default.create());
+			SpaceLocator sl,
+			AstrixPlugins astrixPlugins) {
+		AstrixVersioningPlugin versioningPlugin = astrixPlugins.getPlugin(AstrixVersioningPlugin.class);
 		GigaSpace serviceBusSpace = sl.createClusteredProxy("service-bus-space"); // TODO: fault tolerance, connection mannagment, etc.
 		this.serviceBus = AstrixRemotingProxy.create(AstrixServiceBus.class, AstrixRemotingTransport.remoteSpace(serviceBusSpace), versioningPlugin.create(AstrixServiceBusApi.class));
 		this.serviceProvideres = serviceProvideres;

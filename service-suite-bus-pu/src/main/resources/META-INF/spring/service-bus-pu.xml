@@ -12,6 +12,7 @@
     <os-core:giga-space id="gigaSpace" space="space"/>
     
     <bean class="se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean"/>
+    <bean class="se.avanzabank.service.suite.context.AstrixPlugins"/>
     
     <!-- weird: somehow the service-bus must export it's api... it uses a... ehh... remote-service-descriptor! -->
     <bean class="se.avanzabank.service.suite.bus.client.AstrixServiceBusApiDescriptor"/>

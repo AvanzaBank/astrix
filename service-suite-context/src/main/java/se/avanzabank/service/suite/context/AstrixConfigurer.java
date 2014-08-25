@@ -61,7 +61,7 @@ public class AstrixConfigurer {
 		if (useFaultTolerance) {
 			AstrixPluginDiscovery.discoverOnePlugin(context, AstrixFaultTolerancePlugin.class);
 		} else {
-			context.registerPlugin(AstrixFaultTolerancePlugin.class, AstrixFaultTolerancePlugin.Factory.noFaultTolerance());
+			context.registerPlugin(AstrixFaultTolerancePlugin.class, AstrixFaultTolerancePlugin.Default.create());
 		}
 	}
 

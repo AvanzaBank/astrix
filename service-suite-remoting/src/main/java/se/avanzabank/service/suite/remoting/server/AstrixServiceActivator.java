@@ -65,11 +65,15 @@ public class AstrixServiceActivator {
 	}
 	
 	private final ConcurrentMap<String, PublishedService<?>> serviceByType = new ConcurrentHashMap<>();
-	private final AstrixObjectSerializer remotingArgumentSerializer;
+	private final AstrixObjectSerializer objectSerializer;
+
+	public AstrixServiceActivator(AstrixObjectSerializer objectSerializer) {
+		this.objectSerializer = objectSerializer;
+	}
 	
 	@Autowired
-	public AstrixServiceActivator(AstrixObjectSerializer remotingRequestInterceptor) {
-		this.remotingArgumentSerializer = remotingRequestInterceptor;
+	public AstrixServiceActivator(AstrixRemotingArgumentSerializerFactory objectSerializerFactory) {
+		this.objectSerializer = objectSerializerFactory.create();
 	}
 
 	public void register(Object provider, Class<?>... publishedApis) {
@@ -118,7 +122,7 @@ public class AstrixServiceActivator {
 		Object result = serviceMethod.invoke(publishedService.service, arguments);
 		AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
 		if (!serviceMethod.getReturnType().equals(Void.TYPE)) {
-			invocationResponse.setResponseBody(remotingArgumentSerializer.serialize(result, version));
+			invocationResponse.setResponseBody(objectSerializer.serialize(result, version));
 		}
 		return invocationResponse;
 	}
@@ -126,7 +130,7 @@ public class AstrixServiceActivator {
 	private Object[] unmarshal(Object[] elements, Class<?>[] types, int version) {
 		Object[] result = new Object[elements.length];
 		for (int i = 0; i < result.length; i++) {
-			result[i] = remotingArgumentSerializer.deserialize(elements[i], types[i], version);
+			result[i] = objectSerializer.deserialize(elements[i], types[i], version);
 		}
 		return result;
 	}

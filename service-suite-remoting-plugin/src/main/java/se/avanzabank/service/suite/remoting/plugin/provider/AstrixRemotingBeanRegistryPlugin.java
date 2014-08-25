@@ -19,14 +19,14 @@ import org.kohsuke.MetaInfServices;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
-import se.avanzabank.service.suite.provider.context.AstrixBeanRegistryPlugin;
+import se.avanzabank.service.suite.context.AstrixBeanRegistryPlugin;
 import se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean;
 
 @MetaInfServices(AstrixBeanRegistryPlugin.class)
 public class AstrixRemotingBeanRegistryPlugin implements AstrixBeanRegistryPlugin {
 
 	@Override
-	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+	public void registerBeanDefinitions(BeanDefinitionRegistry registry) throws BeansException {
 		new AstrixRemotingFrameworkBean().postProcessBeanDefinitionRegistry(registry);
 	}
 

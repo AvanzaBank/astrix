@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.service.suite.provider.context;
+package se.avanzabank.service.suite.context;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 public interface AstrixBeanRegistryPlugin {
 	
-	void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException;
+	void registerBeanDefinitions(BeanDefinitionRegistry registry) throws BeansException;
 }

@@ -11,8 +11,8 @@
     <os-core:space id="space" url="/./service-demo-space" mirror="false"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
     
-    <!-- Bootstraps Astrix service provider framework -->
-	<bean id="astrixServiceProviderFrameworkBean" class="se.avanzabank.service.suite.provider.context.AstrixServiceProviderFrameworkBean"/>
+    <!-- Bootstraps Astrix service framework (provider and consumer) -->
+	<bean id="astrixServiceFrameworkBean" class="se.avanzabank.service.suite.context.AstrixServiceFrameworkBean"/>
 	
 <!-- 	Service bus requires SpaceLocator to locate service bus, this dependency is implicit. -->
 	<bean id="spaceLocator" class="se.avanzabank.space.UsesJndiLookupSpaceLocator"/>

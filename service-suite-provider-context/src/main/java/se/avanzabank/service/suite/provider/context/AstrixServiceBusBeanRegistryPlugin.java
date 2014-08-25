@@ -22,19 +22,20 @@ import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.service.suite.bus.client.AstrixServiceBus;
+import se.avanzabank.service.suite.context.AstrixBeanRegistryPlugin;
 
 @MetaInfServices(AstrixBeanRegistryPlugin.class)
 public class AstrixServiceBusBeanRegistryPlugin implements AstrixBeanRegistryPlugin {
 
 	@Override
-	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+	public void registerBeanDefinitions(BeanDefinitionRegistry registry) throws BeansException {
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceBusExporter.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_astrixServiceBusExporter", beanDefinition);
-
-		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceBus.class);
-		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-		registry.registerBeanDefinition("_astrixServiceExporterBean", beanDefinition);
+		
+//		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceBus.class);
+//		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
+//		registry.registerBeanDefinition("_astrixServiceExporterBean", beanDefinition);
 	}
 
 }
