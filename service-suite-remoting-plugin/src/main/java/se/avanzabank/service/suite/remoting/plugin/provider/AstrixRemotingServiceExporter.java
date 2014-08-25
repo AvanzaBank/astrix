@@ -48,7 +48,6 @@ public class AstrixRemotingServiceExporter implements ServiceExporter, Applicati
 	@Override
 	public List<AstrixServiceProperties> getProvidedServices() {
 		List<AstrixServiceProperties> result = new ArrayList<>();
-		
 		for (Object service : applicationContext.getBeansWithAnnotation(AstrixRemoteServiceExport.class).values()) {
 			AstrixRemoteServiceExport remoteServiceExport = service.getClass().getAnnotation(AstrixRemoteServiceExport.class);
 			for (Class<?> providedApi : remoteServiceExport.value()) {
@@ -63,9 +62,7 @@ public class AstrixRemotingServiceExporter implements ServiceExporter, Applicati
 				}
 				serviceProperties.setApi(providedApi);
 				serviceProperties.setProperty(SPACE_NAME_PROPERTY, gigaSpace.getSpace().getName());
-//				serviceProperties.setQualifier(gigaSpace.getSpace().getName()); // TODO: only set qualifier and skip 'space' property?
 				result.add(serviceProperties);
-				// TODO: space-name and locator information: who provides it???
 			}
 		}
 		return result;

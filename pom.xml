@@ -16,7 +16,6 @@
 		<module>service-suite-remoting</module>
 		<module>service-suite-context</module>
 		<module>service-suite-versioning</module>
-		<module>service-suite-common</module>
 		<module>service-suite-fault-tolerance</module>
 		<module>service-suite-bus</module>
 		<module>service-suite-gs</module>

@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
 
 public class AstrixPluginDiscovery {
 	
+	// TODO: cache discovered plugins by type?
+	
 	private static final Logger log = LoggerFactory.getLogger(AstrixPluginDiscovery.class);
 	
 	public static List<AstrixServiceProviderPlugin> discoverServiceProviderPlugins() {

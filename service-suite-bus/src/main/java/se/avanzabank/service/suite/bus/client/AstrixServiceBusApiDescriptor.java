@@ -17,7 +17,14 @@ package se.avanzabank.service.suite.bus.client;
 
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
 
-
+/**
+ * The serivce-bus-api uses astrix-remoting to export its service. Note that
+ * it doesn't use the service-bus to bind to the providers, but rather uses a
+ * SpaceLocator and the space-name provided here. 
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 @AstrixRemoteApiDescriptor (
 	exportedApis = {
 		AstrixServiceBus.class,

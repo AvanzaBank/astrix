@@ -48,7 +48,7 @@ import se.avanzabank.space.junit.pu.RunningPu;
  * @author Elias Lindholm (elilin)
  *
  */
-public class ServiceDemoIntegrationTest {
+public class ServiceSuiteIntegrationTest {
 	
 	public static RunningPu pu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)

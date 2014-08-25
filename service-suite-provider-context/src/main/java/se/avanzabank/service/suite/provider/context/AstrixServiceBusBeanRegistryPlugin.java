@@ -15,28 +15,26 @@
  */
 package se.avanzabank.service.suite.provider.context;
 
+import org.kohsuke.MetaInfServices;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
+import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 
-import se.avanzabank.service.suite.context.AstrixPluginDiscovery;
+import se.avanzabank.service.suite.bus.client.AstrixServiceBus;
 
-/**
- * @author Elias Lindholm (elilin)
- */
-public class AstrixServiceProviderFrameworkBean implements BeanDefinitionRegistryPostProcessor {
+@MetaInfServices(AstrixBeanRegistryPlugin.class)
+public class AstrixServiceBusBeanRegistryPlugin implements AstrixBeanRegistryPlugin {
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-		for (AstrixBeanRegistryPlugin beanRegistryPlugin :
-			AstrixPluginDiscovery.discoverPlugins(AstrixBeanRegistryPlugin.class)) {
-			beanRegistryPlugin.postProcessBeanDefinitionRegistry(registry);
-		}
+		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceBusExporter.class);
+		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
+		registry.registerBeanDefinition("_astrixServiceBusExporter", beanDefinition);
+
+		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceBus.class);
+		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
+		registry.registerBeanDefinition("_astrixServiceExporterBean", beanDefinition);
 	}
 
-	@Override
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		// intentionally empty, inherited from BeanDefinitionRegistryPostProcessor
-	}
 }

@@ -21,6 +21,8 @@ import org.openspaces.remoting.Routing;
 
 public interface AstrixServiceBus {
 	
+	// TODO: use separate interface for providers and consumers?
+	
 	<T> AstrixServiceProperties lookup(@Routing Class<T> type);
 	
 	<T> AstrixServiceProperties lookup(@Routing Class<T> type, String qualifier);

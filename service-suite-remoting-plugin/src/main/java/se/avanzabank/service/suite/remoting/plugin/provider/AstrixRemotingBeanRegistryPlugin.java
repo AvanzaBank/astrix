@@ -13,30 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.service.suite.provider.context;
+package se.avanzabank.service.suite.remoting.plugin.provider;
 
+import org.kohsuke.MetaInfServices;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 
-import se.avanzabank.service.suite.context.AstrixPluginDiscovery;
+import se.avanzabank.service.suite.provider.context.AstrixBeanRegistryPlugin;
+import se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean;
 
-/**
- * @author Elias Lindholm (elilin)
- */
-public class AstrixServiceProviderFrameworkBean implements BeanDefinitionRegistryPostProcessor {
+@MetaInfServices(AstrixBeanRegistryPlugin.class)
+public class AstrixRemotingBeanRegistryPlugin implements AstrixBeanRegistryPlugin {
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-		for (AstrixBeanRegistryPlugin beanRegistryPlugin :
-			AstrixPluginDiscovery.discoverPlugins(AstrixBeanRegistryPlugin.class)) {
-			beanRegistryPlugin.postProcessBeanDefinitionRegistry(registry);
-		}
+		new AstrixRemotingFrameworkBean().postProcessBeanDefinitionRegistry(registry);
 	}
 
-	@Override
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		// intentionally empty, inherited from BeanDefinitionRegistryPostProcessor
-	}
 }

@@ -36,7 +36,6 @@ import se.avanzabank.service.suite.provider.versioning.AstrixVersioned;
 	exportedApis = {
 		LunchService.class
 	}
-//	,targetSpaceName = "service-demo-space"
 )
 public class LunchApiDescriptor {
 	
