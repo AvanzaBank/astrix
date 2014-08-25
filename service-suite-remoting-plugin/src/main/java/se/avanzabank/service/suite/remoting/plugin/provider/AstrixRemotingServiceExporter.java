@@ -25,10 +25,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import se.avanzabank.service.suite.bus.client.AstrixServiceProperties;
-import se.avanzabank.service.suite.provider.context.ServiceExporter;
+import se.avanzabank.service.suite.provider.context.ServiceBusExporter;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteServiceExport;
 
-public class AstrixRemotingServiceExporter implements ServiceExporter, ApplicationContextAware {
+public class AstrixRemotingServiceExporter implements ServiceBusExporter, ApplicationContextAware {
 	
 	public static final String SPACE_NAME_PROPERTY = "space";
 	

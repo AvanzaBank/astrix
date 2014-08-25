@@ -25,7 +25,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceFrameworkBean implements  BeanDefinitionRegistryPostProcessor {
+public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostProcessor {
 	
 
 	@Override

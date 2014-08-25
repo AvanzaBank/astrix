@@ -11,6 +11,7 @@
     <os-core:space id="space" url="/./service-bus-space" mirror="false"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
     
+<!--     <bean class="se.avanzabank.service.suite.context.AstrixServiceFrameworkBean"/> -->
     <bean class="se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean"/>
     <bean class="se.avanzabank.service.suite.context.AstrixPlugins"/>
     

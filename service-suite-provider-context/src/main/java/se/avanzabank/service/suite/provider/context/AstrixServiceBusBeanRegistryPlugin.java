@@ -29,7 +29,7 @@ public class AstrixServiceBusBeanRegistryPlugin implements AstrixBeanRegistryPlu
 
 	@Override
 	public void registerBeanDefinitions(BeanDefinitionRegistry registry) throws BeansException {
-		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceBusExporter.class);
+		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceBusExporterWorker.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_astrixServiceBusExporter", beanDefinition);
 		

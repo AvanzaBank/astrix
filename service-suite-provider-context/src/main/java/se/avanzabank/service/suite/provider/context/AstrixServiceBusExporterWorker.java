@@ -36,15 +36,15 @@ import se.avanzabank.space.SpaceLocator;
  * Responsible for continiously publishing all exported services from this application on the service bus.
  * 
  */
-public class AstrixServiceBusExporter extends Thread {
+public class AstrixServiceBusExporterWorker extends Thread {
 
-	private List<ServiceExporter> serviceProvideres;
+	private List<ServiceBusExporter> serviceProvideres;
 	private final AstrixServiceBus serviceBus;
-	private final Logger log = LoggerFactory.getLogger(AstrixServiceBusExporter.class);
+	private final Logger log = LoggerFactory.getLogger(AstrixServiceBusExporterWorker.class);
 
 	@Autowired
-	public AstrixServiceBusExporter(
-			List<ServiceExporter> serviceProvideres,
+	public AstrixServiceBusExporterWorker(
+			List<ServiceBusExporter> serviceProvideres,
 			SpaceLocator sl,
 			AstrixPlugins astrixPlugins) {
 		AstrixVersioningPlugin versioningPlugin = astrixPlugins.getPlugin(AstrixVersioningPlugin.class);
@@ -73,7 +73,7 @@ public class AstrixServiceBusExporter extends Thread {
 	}
 
 	private void exportProvidedServcies() {
-		for (ServiceExporter provider : serviceProvideres) {
+		for (ServiceBusExporter provider : serviceProvideres) {
 			for (AstrixServiceProperties serviceProperties : provider.getProvidedServices()) {
 				log.debug("Exporting on service bus. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 				serviceBus.register(serviceProperties.getApi(), serviceProperties);

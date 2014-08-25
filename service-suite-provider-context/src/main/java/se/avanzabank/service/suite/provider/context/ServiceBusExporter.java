@@ -19,7 +19,7 @@ import java.util.List;
 
 import se.avanzabank.service.suite.bus.client.AstrixServiceProperties;
 
-public interface ServiceExporter {
+public interface ServiceBusExporter {
 	
 	// TODO: avoid name conflict between this interface and worker thread 
 	
