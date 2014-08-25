@@ -28,7 +28,7 @@ import se.avanzabank.service.suite.bus.client.AstrixServiceProperties;
 import se.avanzabank.service.suite.provider.context.ServiceBusExporter;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteServiceExport;
 
-public class AstrixRemotingServiceExporter implements ServiceBusExporter, ApplicationContextAware {
+public class AstrixRemotingServiceBusExporter implements ServiceBusExporter, ApplicationContextAware {
 	
 	public static final String SPACE_NAME_PROPERTY = "space";
 	
@@ -36,7 +36,7 @@ public class AstrixRemotingServiceExporter implements ServiceBusExporter, Applic
 	private GigaSpace gigaSpace;
 	
 	@Autowired
-	public AstrixRemotingServiceExporter(GigaSpace gigaSpace) {
+	public AstrixRemotingServiceBusExporter(GigaSpace gigaSpace) {
 		this.gigaSpace = gigaSpace;
 	}
 	

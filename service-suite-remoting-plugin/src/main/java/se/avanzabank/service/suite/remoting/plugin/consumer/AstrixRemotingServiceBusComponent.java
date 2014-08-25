@@ -30,7 +30,7 @@ import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 import se.avanzabank.service.suite.gs.GigaSpaceRegistry;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
 import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
-import se.avanzabank.service.suite.remoting.plugin.provider.AstrixRemotingServiceExporter;
+import se.avanzabank.service.suite.remoting.plugin.provider.AstrixRemotingServiceBusExporter;
 
 @MetaInfServices(AstrixServiceBusComponent.class)
 public class AstrixRemotingServiceBusComponent implements AstrixServiceBusComponent {
@@ -48,7 +48,7 @@ public class AstrixRemotingServiceBusComponent implements AstrixServiceBusCompon
 		
 		// TODO: is GigaSpaceRegistry really a service???
 		final GigaSpaceRegistry registry = context.getService(GigaSpaceRegistry.class); // TODO: behöver den här klassen verkligen känna till space-namnet? Kan inte det abstraheras bort av AstrixServiceContext???
-		final String targetSpace = serviceProperties.getProperty(AstrixRemotingServiceExporter.SPACE_NAME_PROPERTY);
+		final String targetSpace = serviceProperties.getProperty(AstrixRemotingServiceBusExporter.SPACE_NAME_PROPERTY);
 		AstrixRemotingTransportFactory remotingTransportFactory = new AstrixRemotingTransportFactory() {
 			@Override
 			public AstrixRemotingTransport createRemotingTransport() {

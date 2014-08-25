@@ -21,8 +21,8 @@
 <!-- 	<bean id="astrixRemotingFrameworkBean" class="se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean"/> -->
 	
 	<!-- TODO: autodiscover all ServiceExporter's? -->
-	<bean id="astrixRemotingServiceExporter" class="se.avanzabank.service.suite.remoting.plugin.provider.AstrixRemotingServiceExporter"/>
-	<bean id="gsServiceExporter" class="se.avanzabank.service.suite.gs.GigaSpaceServiceExporter"/>
+	<bean id="astrixRemotingServiceExporter" class="se.avanzabank.service.suite.remoting.plugin.provider.AstrixRemotingServiceBusExporter"/>
+	<bean id="gsServiceExporter" class="se.avanzabank.service.suite.gs.GigaSpaceServiceBusExporter"/>
     
     
     

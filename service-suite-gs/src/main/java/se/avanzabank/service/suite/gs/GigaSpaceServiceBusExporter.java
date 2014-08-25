@@ -24,12 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import se.avanzabank.service.suite.bus.client.AstrixServiceProperties;
 import se.avanzabank.service.suite.provider.context.ServiceBusExporter;
 
-public class GigaSpaceServiceExporter implements ServiceBusExporter {
+public class GigaSpaceServiceBusExporter implements ServiceBusExporter {
 	
 	private final GigaSpace space;
 
 	@Autowired
-	public GigaSpaceServiceExporter(GigaSpace space) {
+	public GigaSpaceServiceBusExporter(GigaSpace space) {
 		this.space = space;
 	}
 
