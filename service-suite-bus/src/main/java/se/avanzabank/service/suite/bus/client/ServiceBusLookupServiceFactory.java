@@ -26,10 +26,11 @@ public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T
 	private AstrixContext context;
 	
 
-	public ServiceBusLookupServiceFactory(Class<T> api,
-			Class<?> descriptorHolder,
+	public ServiceBusLookupServiceFactory(Class<?> descriptorHolder,
+			Class<T> api,
 			AstrixServiceBusComponent serviceBusComponent,
 			AstrixContext context) {
+		this.descriptorHolder = descriptorHolder;
 		this.api = api;
 		this.serviceBusComponent = serviceBusComponent;
 		this.context = context;
@@ -40,7 +41,10 @@ public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T
 		// TODO: always return a proxy-instance, no matter in which of the steps below that the lookup fails
 		AstrixServiceBus serviceBus = context.getService(AstrixServiceBus.class);
 		AstrixServiceProperties serviceProperties = serviceBus.lookup(api); // TODO: might fail
-		// TODO: build service context, how?
+		if (serviceProperties == null) {
+			// TODO: manage non discovered services
+			throw new RuntimeException("Did not discover: " + api);
+		}
 		return serviceBusComponent.createService(descriptorHolder, api, serviceProperties, context);
 	}
 

@@ -23,7 +23,10 @@ public interface AstrixServiceProviderPlugin {
 	
 	AstrixServiceProvider create(Class<?> descriptorHolder);
 	
+	@Deprecated // TODO: remove
 	Class<? extends Annotation> getProviderAnnotationType();
+	
+	boolean consumes(Class<?> descriptorHolder);
 	
 	// TODO: how to avoid circular api creation when injecting astrix instance into each plugin??
 //	void setAstrix(Astrix astrix);

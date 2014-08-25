@@ -19,10 +19,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class AstrixServiceRegistry {
 	
 	private final InstanceCache instanceCache = new InstanceCache();
 	private final ConcurrentMap<Class<?>, AstrixServiceProvider> serviceProviderByProvidedService = new ConcurrentHashMap<>();
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	public <T> T getService(Class<T> type) {
 		T instance = instanceCache.get(type);
@@ -53,6 +57,7 @@ public class AstrixServiceRegistry {
 	public void registerProvider(AstrixServiceProvider serviceProvider) {
 		for (Class<?> providedService : serviceProvider.providedServices()) {
 			AstrixServiceProvider duplicateProvider = serviceProviderByProvidedService.putIfAbsent(providedService, serviceProvider);
+			log.debug("Registering provider. service={} provider={}", providedService.getName(), serviceProvider.getDescriptorHolder().getName());
 			if (duplicateProvider != null) {
 				throw new IllegalStateException(String.format("Multiple providers discovered for service=%s. %s and %s",
 													 		  providedService.getClass().getName(), 

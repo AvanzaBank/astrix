@@ -48,9 +48,9 @@ public class AstrixServiceProviderFactory {
 	}
 
 	private AstrixServiceProviderPlugin getProviderFactoryPlugin(Class<?> descriptorHolder) {
-		for (AstrixServiceProviderPlugin factoryPlugin : pluginByAnnotationType.values()) {
-			if (descriptorHolder.isAnnotationPresent(factoryPlugin.getProviderAnnotationType())) {
-				return factoryPlugin;
+		for (AstrixServiceProviderPlugin plugin : pluginByAnnotationType.values()) {
+			if (plugin.consumes(descriptorHolder)) {
+				return plugin;
 			}
 		}
 		throw new IllegalArgumentException("No plugin registered that can handle descriptor: " + descriptorHolder);

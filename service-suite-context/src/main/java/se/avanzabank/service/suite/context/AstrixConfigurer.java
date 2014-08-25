@@ -27,7 +27,7 @@ public class AstrixConfigurer {
 	public Astrix configure() {
 		configureFaultTolerance(context);
 		configureVersioning(context);
-		configureLibrarySupport(context);
+		discoverServiceProviderPlugins(context);
 		AstrixServiceProviderFactory serviceProviderFactory = new AstrixServiceProviderFactory(context);
 		
 		List<AstrixServiceProvider> serviceProviders = new AstrixServiceProviderScanner("se.avanzabank", serviceProviderFactory).scan();
@@ -45,7 +45,7 @@ public class AstrixConfigurer {
 		this.enableVersioning = enableVersioning;
 	}
 
-	private void configureLibrarySupport(AstrixContext context) {
+	private void discoverServiceProviderPlugins(AstrixContext context) {
 		AstrixPluginDiscovery.discoverAllPlugins(context, AstrixServiceProviderPlugin.class, new AstrixLibraryProviderPlugin());
 	}
 	
@@ -68,7 +68,7 @@ public class AstrixConfigurer {
 	// TODO: should registering a service be part of api??? or provide some other way to configure Astrix
 	public <T> void registerService(Class<T> type, T provider) {
 		AstrixServiceProvider serviceProvider = new AstrixServiceProvider(
-				Arrays.<AstrixServiceFactory<?>>asList(new SingleInstanceServiceFactory<T>(provider, type)), null);
+				Arrays.<AstrixServiceFactory<?>>asList(new SingleInstanceServiceFactory<T>(provider, type)), provider.getClass());
 		context.registerServiceProvider(serviceProvider);
 	}
 	

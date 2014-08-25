@@ -28,6 +28,7 @@ import se.avanzabank.service.suite.context.AstrixServiceProvider;
 import se.avanzabank.service.suite.context.AstrixServiceProviderPlugin;
 import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
 import se.avanzabank.service.suite.core.AstrixObjectSerializer;
+import se.avanzabank.service.suite.provider.core.AstrixServiceBusApi;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
 import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
 import se.avanzabank.space.SpaceLocator;
@@ -72,6 +73,12 @@ public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin {
 	@Override
 	public void setContext(AstrixContext context) {
 		this.context = context;
+	}
+	
+	@Override
+	public boolean consumes(Class<?> descriptorHolder) {
+		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType()) 
+				&& !descriptorHolder.isAnnotationPresent(AstrixServiceBusApi.class);
 	}
 	
 }

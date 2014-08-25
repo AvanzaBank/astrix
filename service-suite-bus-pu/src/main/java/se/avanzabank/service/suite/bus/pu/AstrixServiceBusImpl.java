@@ -41,6 +41,9 @@ public class AstrixServiceBusImpl implements AstrixServiceBus {
 	@Override
 	public <T> AstrixServiceProperties lookup(@Routing Class<T> type, String qualifier) {
 		ServiceProperitesInfo info = gigaSpace.readById(ServiceProperitesInfo.class, new ServiceKey(type.getName(), qualifier));
+		if (info == null) {
+			return null; // TODO: hande non registered servies
+		}
 		return info.getProperties();
 	}
 

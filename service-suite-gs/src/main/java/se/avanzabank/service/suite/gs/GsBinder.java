@@ -15,23 +15,62 @@
  */
 package se.avanzabank.service.suite.gs;
 
+import net.jini.core.discovery.LookupLocator;
+
+import org.openspaces.core.GigaSpace;
+
 import se.avanzabank.service.suite.bus.client.AstrixServiceProperties;
 import se.avanzabank.space.UsesLookupGroupsSpaceLocator;
 import se.avanzabank.space.UsesLookupLocatorsSpaceLocator;
 
+import com.j_spaces.core.client.SpaceURL;
+
 
 public class GsBinder {
 	
-	public GsFactory createGsFactory(AstrixServiceProperties properties, String targetSpace) {
-		String lookupType = properties.getProperty("lookupType");
-		String lookupName = properties.getProperty("lookupName");
-		if (lookupType.equals("locators")) {
-			return new GsFactory(new UsesLookupLocatorsSpaceLocator(lookupName), targetSpace);
+	public static GsFactory createGsFactory(AstrixServiceProperties properties, String targetSpace) {
+//		String lookupType = properties.getProperty("lookupType");
+//		String lookupType = properties.getProperty("lookupType");
+		String locators = properties.getProperty("locators");
+		String groups = properties.getProperty("groups");
+		if (locators != null) {
+			return new GsFactory(new UsesLookupLocatorsSpaceLocator(locators), targetSpace);
 		}
-		if (lookupType.equals("groups")) {
-			return new GsFactory(new UsesLookupGroupsSpaceLocator(lookupName), targetSpace);
+		if (groups != null) {
+			return new GsFactory(new UsesLookupGroupsSpaceLocator(groups), targetSpace);
 		}
 		throw new IllegalArgumentException("Cannot create GSFactory from properties: " + properties);
+	}
+	
+	public static AstrixServiceProperties createProperties(GigaSpace space) {
+		AstrixServiceProperties result = new AstrixServiceProperties();
+		result.setApi(GigaSpace.class);
+		result.setQualifier(space.getSpace().getName()); // TODO: note that gigaSpace.getName returns "GigaSpace" on embedded space
+		SpaceURL finderURL = space.getSpace().getFinderURL();
+		LookupLocator[] locators = finderURL.getLookupLocators();
+		if (locators != null) {
+			StringBuilder locatorsString = new StringBuilder();
+			for (LookupLocator locator : locators) {
+				if (locatorsString.length() > 0) {
+					locatorsString.append(",");
+					
+				}
+				// TODO: how to convert locator to string?
+				locatorsString.append(locator.getHost());
+			}
+			result.setProperty("locators", locatorsString.toString()); 
+		} else {
+			StringBuilder groupsString = new StringBuilder();
+			for (String group : finderURL.getLookupGroups()) {
+				if (groupsString.length() > 0) {
+					groupsString.append(",");
+					
+				}
+				groupsString.append(group);
+			}
+			result.setProperty("groups", groupsString.toString());
+		}
+		return result;
 	}
 
 }

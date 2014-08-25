@@ -20,8 +20,10 @@
 	<!-- Bootstraps Astrix remoting framework TODO: this should not be necessary. Declaring a AstrixServiceProviderFrameworkBean should be enough -->
 	<bean id="astrixRemotingFrameworkBean" class="se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean"/>
 	
-	<!-- TODO: this class should be autodiscovered by AstrixRemotingFrameworkBean or AstrixServiceProviderFrameworkBean -->
+	<!-- TODO: how to autodiscover all ServiceExporter's? -->
 	<bean id="astrixRemotingServiceExporter" class="se.avanzabank.service.suite.remoting.plugin.provider.AstrixRemotingServiceExporter"/>
+	<bean id="gsServiceExporter" class="se.avanzabank.service.suite.provider.context.GigaSpaceServiceExporter"/>
+	
     
     <!-- Api descriptor (for remoting api), contains versioning info, maybe it should be a property on AstrixServiceProviderFrameworkBean? -->
     <bean id="lunchApiDescriptor" class="se.avanzabank.service.suite.integration.tests.domain.apiruntime.LunchApiDescriptor"/>

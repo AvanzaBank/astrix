@@ -18,14 +18,11 @@ package se.avanzabank.service.suite.provider.context;
 import java.util.Arrays;
 import java.util.List;
 
-import net.jini.core.discovery.LookupLocator;
-
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import se.avanzabank.service.suite.bus.client.AstrixServiceProperties;
-
-import com.j_spaces.core.client.SpaceURL;
+import se.avanzabank.service.suite.gs.GsBinder;
 
 public class GigaSpaceServiceExporter implements ServiceExporter {
 	
@@ -38,34 +35,7 @@ public class GigaSpaceServiceExporter implements ServiceExporter {
 
 	@Override
 	public List<AstrixServiceProperties> getProvidedServices() {
-		AstrixServiceProperties result = new AstrixServiceProperties();
-		result.setApi(GigaSpace.class);
-		result.setQualifier(space.getName());
-		SpaceURL finderURL = space.getSpace().getFinderURL();
-		LookupLocator[] locators = finderURL.getLookupLocators();
-		if (locators != null) {
-			StringBuilder locatorsString = new StringBuilder();
-			for (LookupLocator locator : locators) {
-				if (locatorsString.length() > 0) {
-					locatorsString.append(",");
-					
-				}
-				// TODO: how to convert locator to string?
-				locatorsString.append(locator.getHost());
-			}
-			result.setProperty("locators", locatorsString.toString()); 
-		} else {
-			StringBuilder groupsString = new StringBuilder();
-			for (String group : finderURL.getLookupGroups()) {
-				if (groupsString.length() > 0) {
-					groupsString.append(",");
-					
-				}
-				groupsString.append(group);
-			}
-			result.setProperty("groups", groupsString.toString());
-		}
-		return Arrays.asList(result);
+		return Arrays.asList(GsBinder.createProperties(space));
 	}
 
 }

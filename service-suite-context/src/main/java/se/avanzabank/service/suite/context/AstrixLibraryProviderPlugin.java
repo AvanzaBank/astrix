@@ -63,4 +63,9 @@ public class AstrixLibraryProviderPlugin implements AstrixServiceProviderPlugin 
 		this.context = context;
 	}
 
+	@Override
+	public boolean consumes(Class<?> descriptorHolder) {
+		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType());
+	}
+
 }

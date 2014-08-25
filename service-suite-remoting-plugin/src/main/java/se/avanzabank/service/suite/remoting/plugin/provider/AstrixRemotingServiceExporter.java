@@ -30,6 +30,8 @@ import se.avanzabank.service.suite.provider.remoting.AstrixRemoteServiceExport;
 
 public class AstrixRemotingServiceExporter implements ServiceExporter, ApplicationContextAware {
 	
+	public static final String SPACE_NAME_PROPERTY = "space";
+	
 	private ApplicationContext applicationContext;
 	private GigaSpace gigaSpace;
 	
@@ -60,8 +62,8 @@ public class AstrixRemotingServiceExporter implements ServiceExporter, Applicati
 					throw new IllegalArgumentException("Cannot export: " + service.getClass() + " as " + providedApi);
 				}
 				serviceProperties.setApi(providedApi);
-				serviceProperties.setProperty("space", gigaSpace.getName());
-				serviceProperties.setQualifier(gigaSpace.getName()); // TODO: only set qualifier and skip 'space' property?
+				serviceProperties.setProperty(SPACE_NAME_PROPERTY, gigaSpace.getSpace().getName());
+//				serviceProperties.setQualifier(gigaSpace.getSpace().getName()); // TODO: only set qualifier and skip 'space' property?
 				result.add(serviceProperties);
 				// TODO: space-name and locator information: who provides it???
 			}

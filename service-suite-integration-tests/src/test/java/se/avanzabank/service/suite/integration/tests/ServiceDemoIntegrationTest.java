@@ -87,12 +87,13 @@ public class ServiceDemoIntegrationTest {
 		proxy.clear(null);
 		
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.registerService(SpaceLocator.class, new UsesLookupGroupsSpaceLocator(pu.getLookupGroupName()));
+		configurer.registerService(SpaceLocator.class, new UsesLookupGroupsSpaceLocator(serviceBus.getLookupGroupName())); // For service-bus-discovery
 //		configurer.useFaultTolerance(true);
 //		configurer.enableVersioning(true);
 		configurer.useFaultTolerance(false);
 		configurer.enableVersioning(false);
 		Astrix astrix = configurer.configure();
+		Thread.sleep(5000); // TODO: wait for service to be registered in service bus in clean way...
 		this.lunchService = astrix.getService(LunchService.class);
 		this.lunchUtil = astrix.getService(LunchUtil.class);
 	}
@@ -108,7 +109,7 @@ public class ServiceDemoIntegrationTest {
 		assertEquals("Martins Green Room", r.getName());
 	}
 	
-//	@Test
+	@Test
 	public void broadcastedRequest_InteractingWithServiceActivator() throws Exception {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		
@@ -116,7 +117,7 @@ public class ServiceDemoIntegrationTest {
 		assertEquals("Martins Green Room", r.getName());
 	}
 	
-//	@Test
+	@Test
 	public void routedRequest_throwsException() throws Exception {
 		try {
 			GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
@@ -128,7 +129,7 @@ public class ServiceDemoIntegrationTest {
 		}
 	}
 	
-//	@Test
+	@Test
 	public void useLibrary() throws Exception {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").withFoodType("vegetarian").build());
 		LunchRestaurant r = lunchUtil.suggestVegetarianRestaurant();

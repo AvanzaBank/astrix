@@ -20,6 +20,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.openspaces.core.GigaSpace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import se.avanzabank.service.suite.bus.client.AstrixServiceBus;
@@ -27,8 +29,8 @@ import se.avanzabank.service.suite.bus.client.AstrixServiceProperties;
 import se.avanzabank.service.suite.context.AstrixPluginDiscovery;
 import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
 import se.avanzabank.service.suite.provider.core.AstrixServiceBusApi;
-import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
 import se.avanzabank.service.suite.remoting.client.AstrixRemotingProxy;
+import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
 import se.avanzabank.space.SpaceLocator;
 /*
  * Responsible for continiously publishing all exported services from this application on the service bus.
@@ -38,6 +40,7 @@ public class AstrixServiceBusExporter extends Thread {
 
 	private List<ServiceExporter> serviceProvideres;
 	private final AstrixServiceBus serviceBus;
+	private final Logger log = LoggerFactory.getLogger(AstrixServiceBusExporter.class);
 
 	@Autowired
 	public AstrixServiceBusExporter(
@@ -76,6 +79,7 @@ public class AstrixServiceBusExporter extends Thread {
 	private void exportProvidedServcies() {
 		for (ServiceExporter provider : serviceProvideres) {
 			for (AstrixServiceProperties serviceProperties : provider.getProvidedServices()) {
+				log.debug("Exporting on service bus. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 				serviceBus.register(serviceProperties.getApi(), serviceProperties);
 			}
 		}

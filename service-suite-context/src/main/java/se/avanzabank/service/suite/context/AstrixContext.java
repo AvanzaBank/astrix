@@ -15,53 +15,28 @@
  */
 package se.avanzabank.service.suite.context;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.annotation.PostConstruct;
 
 public class AstrixContext {
 	
-	private final ConcurrentMap<Class<?>, List<?>> pluginsByType = new ConcurrentHashMap<Class<?>, List<?>>();
+	private final AstrixPlugins plugins = new AstrixPlugins();
 	private AstrixImpl astrix = new AstrixImpl();
 	
 	public AstrixContext() {
 	}
 	
 	public <T> T getPlugin(Class<T> type) {
-		List<T> providers = (List<T>) pluginsByType.get(type);
-		if (providers == null) {
-			throw new IllegalArgumentException("No provider registered for type: " + type);
-		}
-		if (providers.size() != 1) {
-			throw new IllegalArgumentException("Expected one provider for: " + type + " fount: + "+ providers);
-		}
-		return providers.get(0);
+		return plugins.getPlugin(type);
 	}
 	
 	public <T> List<T> getPlugins(Class<T> type) {
-		List<T> providers = (List<T>) pluginsByType.get(type);
-		if (providers == null) {
-			throw new IllegalArgumentException("No provider registered for type: " + type);
-		}
-		return providers;
+		return plugins.getPlugins(type);
 	}
 
 	public <T> void registerPlugin(Class<T> type, T provider) {
-		this.pluginsByType.putIfAbsent(type, new ArrayList<>());
-		List<T> providers = (List<T>) this.pluginsByType.get(type);
-		providers.add(provider);
+		plugins.registerPlugin(type, provider);
 	}
 	
-	@PostConstruct
-	public void discoverPlugins() {
-		AstrixPluginDiscovery.discoverAllPlugins(this, AstrixServiceProviderPlugin.class, new AstrixLibraryProviderPlugin());
-		AstrixPluginDiscovery.discoverOnePlugin(this, AstrixVersioningPlugin.class);
-		AstrixPluginDiscovery.discoverOnePlugin(this, AstrixFaultTolerancePlugin.class);
-	}
-
 	public void registerServiceProvider(AstrixServiceProvider serviceProvider) {
 		this.astrix.registerServiceProvider(serviceProvider);
 	}

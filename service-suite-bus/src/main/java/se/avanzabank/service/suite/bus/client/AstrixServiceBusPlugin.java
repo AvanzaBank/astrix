@@ -19,13 +19,15 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.kohsuke.MetaInfServices;
+
 import se.avanzabank.service.suite.context.AstrixContext;
-import se.avanzabank.service.suite.context.AstrixPluginDiscovery;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
 import se.avanzabank.service.suite.context.AstrixServiceProvider;
 import se.avanzabank.service.suite.context.AstrixServiceProviderPlugin;
 import se.avanzabank.service.suite.provider.core.AstrixServiceBusApi;
 
+@MetaInfServices(AstrixServiceProviderPlugin.class)
 public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin {
 	
 	private AstrixContext context;
@@ -61,7 +63,11 @@ public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin {
 	@Override
 	public void setContext(AstrixContext context) {
 		this.context = context;
-		AstrixPluginDiscovery.discoverPlugins(AstrixServiceBusComponent.class);
+	}
+
+	@Override
+	public boolean consumes(Class<?> descriptorHolder) {
+		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType());
 	}
 
 }

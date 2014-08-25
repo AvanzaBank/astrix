@@ -37,14 +37,6 @@ public class AstrixPluginDiscovery {
 		return result;
 	}
 	
-	public static AstrixVersioningPlugin discoverObjectSerializerFactory() {
-		Iterator<AstrixVersioningPlugin> serializerFactory = ServiceLoader.load(AstrixVersioningPlugin.class).iterator();
-		if (!serializerFactory.hasNext()) {
-			return null;
-		}
-		return serializerFactory.next();
-	}
-	
 	static <T> void discoverAllPlugins(AstrixContext context, Class<T> type, T defaultProvider) {
 		List<T> plugins = discoverPlugins(type);
 		if (plugins.isEmpty()) {

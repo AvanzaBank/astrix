@@ -23,14 +23,20 @@ import java.util.concurrent.ConcurrentMap;
 public class AstrixServiceProvider {
 	
 	private ConcurrentMap<Class<?>, AstrixServiceFactory<?>> serviceFactoryByProvidedService = new ConcurrentHashMap<>();
+	private Class<?> descriptorHolder;
 	
-	public AstrixServiceProvider(List<AstrixServiceFactory<?>> factories, Class<?> descriptor) {
+	public AstrixServiceProvider(List<AstrixServiceFactory<?>> factories, Class<?> descriptorHolder) {
+		this.descriptorHolder = descriptorHolder;
 		for (AstrixServiceFactory<?> factory : factories) {
 			AstrixServiceFactory<?> previous = this.serviceFactoryByProvidedService.putIfAbsent(factory.getServiceType(), factory);
 			if (previous != null) {
-				throw new IllegalArgumentException("Multiple service factories found on: " + descriptor);
+				throw new IllegalArgumentException("Multiple service factories found on: " + descriptorHolder);
 			}
 		}
+	}
+	
+	public Class<?> getDescriptorHolder() {
+		return descriptorHolder;
 	}
 
 	public Collection<Class<?>> providedServices() {
