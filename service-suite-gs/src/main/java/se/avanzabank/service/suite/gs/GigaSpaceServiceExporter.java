@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.service.suite.provider.context;
+package se.avanzabank.service.suite.gs;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +22,7 @@ import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import se.avanzabank.service.suite.bus.client.AstrixServiceProperties;
-import se.avanzabank.service.suite.gs.GsBinder;
+import se.avanzabank.service.suite.provider.context.ServiceExporter;
 
 public class GigaSpaceServiceExporter implements ServiceExporter {
 	

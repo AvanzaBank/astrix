@@ -19,12 +19,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 
 import se.avanzabank.service.suite.bus.client.AstrixServiceBus;
-import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 
 /**
  * @author Elias Lindholm (elilin)
@@ -40,27 +38,6 @@ public class AstrixServiceProviderFrameworkBean implements BeanDefinitionRegistr
 		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceBus.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_astrixServiceExporterBean", beanDefinition);
-//		
-//		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixRemoteServiceProviderFactory.class);
-//		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-//		registry.registerBeanDefinition("_astrixRemoteServiceProviderFactory", beanDefinition);
-//		
-//		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixRemoteServiceProvider.class);
-//		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-//		beanDefinition.setFactoryBeanName("_astrixRemoteServiceProviderFactory");
-//		beanDefinition.setFactoryMethodName("create");
-//		registry.registerBeanDefinition("_astrixRemoteServiceProvider", beanDefinition);
-//		
-//		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixRemotingArgumentSerializerFactory.class);
-//		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-//		registry.registerBeanDefinition("_astrixRemotingArgumentSerializerFactory", beanDefinition);
-//		
-//		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixObjectSerializer.class);
-//		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-//		beanDefinition.setScope(AbstractBeanDefinition.SCOPE_SINGLETON);
-//		beanDefinition.setFactoryBeanName("_astrixRemotingArgumentSerializerFactory");
-//		beanDefinition.setFactoryMethodName("create");
-//		registry.registerBeanDefinition("_astrixRemotingArgumentSerializer", beanDefinition);
 	}
 
 	@Override

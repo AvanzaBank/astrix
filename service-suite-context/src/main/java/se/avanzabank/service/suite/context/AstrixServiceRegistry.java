@@ -40,6 +40,10 @@ public class AstrixServiceRegistry {
 		return instance;
 	}
 	
+	public <T> T waitForService(Class<T> type, long timeoutMillis) {
+		return getService(type); // TODO: how to discover when a service becomes available?
+	}
+	
 	public <T> AstrixServiceFactory<T> getServiceFactory(Class<T> type) {
 		AstrixServiceProvider serviceProvider = getServiceProvider(type);
 		return serviceProvider.getServiceFactory(type);

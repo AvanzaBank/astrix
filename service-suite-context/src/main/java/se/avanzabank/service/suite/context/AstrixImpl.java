@@ -30,4 +30,9 @@ public class AstrixImpl implements Astrix {
 		serviceRegistry.registerProvider(serviceProvider);
 	}
 
+	@Override
+	public <T> T waitForService(Class<T> type, long timeoutMillis) {
+		return serviceRegistry.waitForService(type, timeoutMillis);
+	}
+
 }

@@ -76,6 +76,7 @@ public class ServiceDemoIntegrationTest {
 	private LunchUtil lunchUtil;
 	
 	static {
+		// TODO: remove debugging information
 		BasicConfigurator.configure();
 		Logger.getRootLogger().setLevel(Level.WARN);
 		Logger.getLogger("se.avanzabank.service.suite").setLevel(Level.DEBUG);
@@ -93,7 +94,9 @@ public class ServiceDemoIntegrationTest {
 		configurer.useFaultTolerance(false);
 		configurer.enableVersioning(false);
 		Astrix astrix = configurer.configure();
-		Thread.sleep(5000); // TODO: wait for service to be registered in service bus in clean way...
+		Thread.sleep(500); // TODO: wait for service to be registered in service bus in clean way...
+//		this.lunchService = astrix.waitForService(LunchService.class, 5000);
+//		this.lunchUtil = astrix.waitForService(LunchUtil.class, 5000);
 		this.lunchService = astrix.getService(LunchService.class);
 		this.lunchUtil = astrix.getService(LunchUtil.class);
 	}

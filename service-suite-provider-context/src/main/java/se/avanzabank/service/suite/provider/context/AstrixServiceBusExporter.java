@@ -51,19 +51,14 @@ public class AstrixServiceBusExporter extends Thread {
 		this.serviceBus = AstrixRemotingProxy.create(AstrixServiceBus.class, AstrixRemotingTransport.remoteSpace(serviceBusSpace), versioningPlugin.create(AstrixServiceBusApi.class));
 		this.serviceProvideres = serviceProvideres;
 	}
-	
-//	@Autowired
-//	public void setServiceProvideres(List<ServiceExporter> serviceProvideres) {
-//		this.serviceProvideres = serviceProvideres;
-//	}
-	
+
 	@PostConstruct
 	public void startServiceExporter() {
 		start();
 	}
 
 	// TODO: proper logging and management of exporter thread
-	// TODO: only run on one primary instance (typically the one with id "1")
+	// TODO: For pu's: only run on one primary instance (typically the one with id "1")
 	@Override
 	public void run() {
 		while (!interrupted()) {

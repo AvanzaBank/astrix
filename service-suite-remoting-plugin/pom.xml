@@ -22,5 +22,10 @@
   		<artifactId>service-suite-provider-context</artifactId>
   		<version>${project.version}</version>
   	</dependency>
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
+  		<artifactId>service-suite-gs</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
   </dependencies>
 </project>
