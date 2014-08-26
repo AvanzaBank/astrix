@@ -34,7 +34,7 @@
   	</dependency>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
-  		<artifactId>service-suite-remoting-plugin</artifactId>
+  		<artifactId>service-suite-remoting-component</artifactId>
   		<version>${project.version}</version>
   	</dependency>
   	<dependency>

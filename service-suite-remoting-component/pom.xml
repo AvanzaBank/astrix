@@ -5,7 +5,7 @@
     <artifactId>service-suite-parent</artifactId>
     <version>DEVEL-SNAPSHOT</version>
   </parent>
-  <artifactId>service-suite-remoting-plugin</artifactId>
+  <artifactId>service-suite-remoting-component</artifactId>
   <dependencies>
   	<dependency>
   		<groupId>${project.groupId}</groupId>

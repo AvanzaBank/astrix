@@ -22,7 +22,7 @@
 		<module>service-suite-integration-tests</module>
 		<module>service-suite-bus-pu</module>
 		<module>service-suite-provider-context</module>
-		<module>service-suite-remoting-plugin</module>
+		<module>service-suite-remoting-component</module>
 	</modules>
 	
 	<dependencyManagement>
