@@ -31,7 +31,7 @@ import se.avanzabank.service.suite.provider.versioning.AstrixVersioned;
 )
 // Tjänsten publiceras och kan slås upp via tjänstebussen
 @AstrixServiceBusApi
-// Tjänsten är exponerar en gs-remoting-tjänst
+// Tjänsten exponerar en gs-remoting-tjänst
 @AstrixRemoteApiDescriptor (
 	exportedApis = {
 		LunchService.class

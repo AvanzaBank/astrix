@@ -58,7 +58,7 @@ public class JsonObjectMapper {
 		return new JsonObjectMapper(new SimpleJacksonJsonMessageMapper(objectMapper));
 	}
 	
-	// TODO: remove direct version: replace by AstrixObjectSerializer abstraction
+	// TODO: remove direct version: replaced by AstrixObjectSerializer abstraction
 	public static JsonObjectMapper direct() {
 		return direct(new DirectMessageMapper());
 	}
@@ -66,24 +66,6 @@ public class JsonObjectMapper {
 	public static JsonObjectMapper direct(DirectMessageMapper messageMapper) {
 		return new JsonObjectMapper(messageMapper);
 	}
-	
-	public static JsonObjectMapper directWith(IOException cause) {
-		return new JsonObjectMapper(new Impl() {
-			@Override
-			public String serialize(Object object, int toVersion) throws Exception {
-				return null;
-			}
-
-			@Override
-			public <T> T deserialize(String json, Class<T> target,
-					int fromVersion) throws Exception {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-		});
-	}
-	
 	
 	public interface Impl {
 		String serialize(Object object, int toVersion) throws Exception;

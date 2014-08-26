@@ -16,6 +16,7 @@
 package se.avanzabank.service.suite.bus.client;
 
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
+import se.avanzabank.service.suite.provider.versioning.AstrixVersioned;
 
 /**
  * The serivce-bus-api uses astrix-remoting to export its service. Note that

@@ -1,0 +1,27 @@
+=== IN PROGRESS ===
+
+* Tjänstekonsumenter ska kunna använda Astrix som factory-bean för att skapa tjänster på ett enkelt sätt.
+
+
+
+=== BACKLOG ===
+
+
+
+
+* Versionshantering av tjänster
+
+* Feltolerans
+
+* Hantera att tjänstebussen inte är tillgänglig när man skapar en tjänst
+
+* ServiceUnavailable
+
+* Skapa struktur som tillåter enhetstestning i större omfattning
+
+
+
+
+
+
+=== DONE ===
