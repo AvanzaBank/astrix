@@ -87,12 +87,12 @@ public class AstrixServiceActivator {
 		try {
 			return doInvoke(request);
 		} catch (Exception e) {
-			logger.info("Service invocation ended with exception", e);
 			Throwable exceptionThrownByService = resolveException(e);
 			AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
 			invocationResponse.setExceptionMsg(exceptionThrownByService.getMessage());
 			invocationResponse.setCorrelationId(UUID.randomUUID().toString()); // TODO: use header instead?
 			invocationResponse.setThrownExceptionType(exceptionThrownByService.getClass().getName());
+			logger.info("Service invocation ended with exception, correlationId=" + invocationResponse.getCorrelationId(), e);
 			return invocationResponse;
 		}
 	}

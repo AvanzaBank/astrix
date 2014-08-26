@@ -19,7 +19,9 @@
 
 * Skapa struktur som tillåter enhetstestning i större omfattning
 
+* Se över modulstruktur
 
+* Se över namngivning på moduler/klasser
 
 
 
