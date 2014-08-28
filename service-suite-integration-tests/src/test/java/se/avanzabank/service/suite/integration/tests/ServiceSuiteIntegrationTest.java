@@ -39,6 +39,7 @@ import se.avanzabank.service.suite.integration.tests.domain.api.LunchRestaurant;
 import se.avanzabank.service.suite.integration.tests.domain.api.LunchService;
 import se.avanzabank.service.suite.integration.tests.domain.api.LunchUtil;
 import se.avanzabank.service.suite.remoting.client.AstrixRemoteServiceException;
+import se.avanzabank.service.suite.remoting.plugin.consumer.AstrixRemotingPluginDependencies;
 import se.avanzabank.space.SpaceLocator;
 import se.avanzabank.space.UsesLookupGroupsSpaceLocator;
 import se.avanzabank.space.junit.pu.PuConfigurers;
@@ -89,10 +90,9 @@ public class ServiceSuiteIntegrationTest {
 		
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.registerDependency(SpaceLocator.class, new UsesLookupGroupsSpaceLocator(serviceBus.getLookupGroupName())); // For service-bus-discovery
-//		configurer.useFaultTolerance(true);
-//		configurer.enableVersioning(true);
+		configurer.registerDependency(new AstrixRemotingPluginDependencies(new UsesLookupGroupsSpaceLocator(serviceBus.getLookupGroupName())));
 		configurer.useFaultTolerance(false);
-		configurer.enableVersioning(false);
+		configurer.enableVersioning(true);
 		Astrix astrix = configurer.configure();
 		Thread.sleep(1500); // TODO: wait for service to be registered in service bus in clean way...
 //		this.lunchService = astrix.waitForService(LunchService.class, 5000);

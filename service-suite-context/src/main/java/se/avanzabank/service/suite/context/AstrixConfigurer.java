@@ -86,6 +86,10 @@ public class AstrixConfigurer {
 //				Arrays.<AstrixServiceFactory<?>>asList(new SingleInstanceServiceFactory<T>(provider, type)), provider.getClass());
 //		context.registerServiceProvider(serviceProvider);
 	}
+
+	public void registerDependency(ExternalDependencyBean externalDependency) {
+		this.externalDependencyBeans.add(externalDependency);
+	}
 	
 //	private static class SingleInstanceServiceFactory<T> implements AstrixServiceFactory<T> {
 //		

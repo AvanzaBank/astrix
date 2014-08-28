@@ -25,21 +25,9 @@ import org.slf4j.LoggerFactory;
 
 class AstrixPluginDiscovery {
 	
-	// TODO: make package private
-	
 	// TODO: cache discovered plugins by type?
 	
 	private static final Logger log = LoggerFactory.getLogger(AstrixPluginDiscovery.class);
-	
-	public static List<AstrixServiceProviderPlugin> discoverServiceProviderPlugins() {
-		Iterator<AstrixServiceProviderPlugin> serviceProviderPlugins = ServiceLoader.load(AstrixServiceProviderPlugin.class).iterator();
-		List<AstrixServiceProviderPlugin> result = new ArrayList<>();
-		while (serviceProviderPlugins.hasNext()) {
-			AstrixServiceProviderPlugin serviceProviderPlugin = serviceProviderPlugins.next();
-			result.add(serviceProviderPlugin);
-		}
-		return result;
-	}
 	
 	static <T> void discoverAllPlugins(AstrixContext context, Class<T> type, T defaultProvider) {
 		List<T> plugins = discoverPlugins(type);
@@ -53,35 +41,6 @@ class AstrixPluginDiscovery {
 		}
 	}
 
-	static <T> void discoverPlugin(AstrixContext context, Class<T> type, T defaultProvider) {
-		List<T> plugins = discoverPlugins(type);
-		if (plugins.isEmpty()) {
-			log.debug("No plugin discovered for {}, using default {}", type.getName(), defaultProvider.getClass().getName());
-			context.registerPlugin(type, defaultProvider);
-			return;
-		}
-		if (plugins.size() > 1) {
-			throw new IllegalStateException("Multiple providers found for plugin: " + type + ". Plugins: " + plugins);
-		}
-		T provider = plugins.get(0);
-		log.debug("Found plugin for {}, using {}", type.getName(), provider.getClass().getName());
-		context.registerPlugin(type, provider);
-	}
-	
-	public static <T> T discoverPlugin(Class<T> type, T defaultProvider) {
-		List<T> plugins = discoverPlugins(type);
-		if (plugins.isEmpty()) {
-			log.debug("No plugin discovered for {}, using default {}", type.getName(), defaultProvider.getClass().getName());
-			return defaultProvider;
-		}
-		if (plugins.size() > 1) {
-			throw new IllegalStateException("Multiple providers found for plugin: " + type + ". Plugins: " + plugins);
-		}
-		T provider = plugins.get(0);
-		log.debug("Found plugin for {}, using {}", type.getName(), provider.getClass().getName());
-		return provider;
-	}
-	
 	static <T> void discoverOnePlugin(AstrixContext context, Class<T> type) {
 		List<T> plugins = discoverPlugins(type);
 		if (plugins.isEmpty()) {
@@ -95,16 +54,7 @@ class AstrixPluginDiscovery {
 		context.registerPlugin(type, provider);
 	}
 	
-	
-	public static <T> T discoverPlugin(Class<T> type) {
-		Iterator<T> plugins = ServiceLoader.load(type).iterator();		
-		if (!plugins.hasNext()) {
-			throw new RuntimeException("No plugin found for type: " + type);
-		}
-		return plugins.next(); // TODO: detect config error (more than one provider)... 
-	}
-	
-	public static <T> List<T> discoverPlugins(Class<T> type) {
+	static <T> List<T> discoverPlugins(Class<T> type) {
 		Iterator<T> plugins = ServiceLoader.load(type).iterator();		
 		List<T> result = new ArrayList<>();
 		while (plugins.hasNext()) {
