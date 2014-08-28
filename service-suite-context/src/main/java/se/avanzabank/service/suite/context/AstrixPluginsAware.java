@@ -13,22 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.service.suite.bus.client;
+package se.avanzabank.service.suite.context;
 
-import java.util.List;
+public interface AstrixPluginsAware {
+	
+	void setPlugins(AstrixPlugins plugins);
 
-
-public interface AstrixServiceBusComponent {
-	
-	/**
-	 * Check whether this component exports any services on a given descriptor.
-	 * 
-	 * @param possibleDescriptorHolder
-	 * @return
-	 */
-	List<Class<?>> getExportedServices(Class<?> possibleDescriptorHolder);
-	
-	
-	<T> T createService(Class<?> descriptorHolder, Class<T> type, AstrixServiceProperties serviceProperties);
-	
 }

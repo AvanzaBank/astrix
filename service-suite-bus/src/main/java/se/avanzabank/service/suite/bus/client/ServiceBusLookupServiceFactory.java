@@ -19,16 +19,18 @@ import java.util.Arrays;
 import java.util.List;
 
 import se.avanzabank.service.suite.context.AstrixContext;
+import se.avanzabank.service.suite.context.AstrixContextAware;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
 import se.avanzabank.service.suite.context.ServiceDependencies;
 import se.avanzabank.service.suite.context.ServiceDependenciesAware;
 
-public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T>, ServiceDependenciesAware {
+public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T>, ServiceDependenciesAware, AstrixContextAware {
 
 	private Class<T> api;
 	private Class<?> descriptorHolder;
 	private AstrixServiceBusComponent serviceBusComponent;
 	private ServiceDependencies services;
+	private AstrixContext astrixContext;
 	
 
 	public ServiceBusLookupServiceFactory(Class<?> descriptorHolder,
@@ -40,7 +42,7 @@ public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T
 	}
 
 	@Override
-	public T create(AstrixContext context) {
+	public T create() {
 		// TODO: always return a proxy-instance, no matter in which of the steps below that the lookup fails
 		AstrixServiceBus serviceBus = services.getService(AstrixServiceBus.class); // service dependency
 		AstrixServiceProperties serviceProperties = serviceBus.lookup(api); // TODO: might fail
@@ -48,7 +50,8 @@ public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T
 			// TODO: manage non discovered services
 			throw new RuntimeException("Did not discover: " + api);
 		}
-		return serviceBusComponent.createService(descriptorHolder, api, serviceProperties, context);
+		astrixContext.injectDependencies(serviceBusComponent);
+		return serviceBusComponent.createService(descriptorHolder, api, serviceProperties);
 	}
 	
 	@Override
@@ -64,6 +67,11 @@ public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T
 	@Override
 	public void setServiceDependencies(ServiceDependencies services) {
 		this.services = services;
+	}
+
+	@Override
+	public void setAstrixContext(AstrixContext astrixContext) {
+		this.astrixContext = astrixContext;
 	}
 	
 	/*

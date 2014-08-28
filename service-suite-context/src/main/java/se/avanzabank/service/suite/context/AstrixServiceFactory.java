@@ -18,7 +18,7 @@ package se.avanzabank.service.suite.context;
 
 public interface AstrixServiceFactory<T> {
 	
-	T create(AstrixContext context);
+	T create();
 	
 	Class<T> getServiceType();
 	

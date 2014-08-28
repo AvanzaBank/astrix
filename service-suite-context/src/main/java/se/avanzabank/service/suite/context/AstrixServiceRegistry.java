@@ -35,30 +35,12 @@ public class AstrixServiceRegistry {
 			return instance;
 		}
 		// TODO: synchronize creation of service
+		// TODO: fix caching of created services
 		AstrixServiceFactory<T> serviceFactory = getServiceFactory(type);
-		if (serviceFactory instanceof ExternalDependencyAware) {
-			injectDependencies((ExternalDependencyAware)serviceFactory, context);
-		}
-		if (serviceFactory instanceof ServiceDependenciesAware) {
-			injectDependencies((ServiceDependenciesAware)serviceFactory, context);
-		}
-		instance = serviceFactory.create(context);
+		context.injectDependencies(serviceFactory);
+		instance = serviceFactory.create();
 		instanceCache.put(type, instance);
 		return instance;
-	}
-	
-	private void injectDependencies(ServiceDependenciesAware serviceDependenciesAware, final AstrixContext context) {
-		serviceDependenciesAware.setServiceDependencies(new ServiceDependencies() {
-			@Override
-			public <T> T getService(Class<T> service) {
-				return AstrixServiceRegistry.this.getService(service, context);
-			}
-		});
-	}
-
-	private <D extends ExternalDependencyBean> void injectDependencies(ExternalDependencyAware<D> externalDependencyAware, AstrixContext context) {
-		D dependency = context.getExternalDependency(externalDependencyAware.getDependencyBeanClass());
-		externalDependencyAware.setDependency(dependency);
 	}
 
 	public <T> T waitForService(Class<T> type, long timeoutMillis) {

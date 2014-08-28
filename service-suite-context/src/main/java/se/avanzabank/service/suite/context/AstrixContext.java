@@ -47,6 +47,35 @@ public class AstrixContext implements Astrix {
 	public void registerServiceProvider(AstrixServiceProvider serviceProvider) {
 		this.serviceRegistry.registerProvider(serviceProvider);
 	}
+	
+	public void injectDependencies(Object object) {
+		if (object instanceof ExternalDependencyAware) {
+			injectExternalDependencies((ExternalDependencyAware<?>)object);
+		}
+		if (object instanceof ServiceDependenciesAware) {
+			injectServiceDependencies((ServiceDependenciesAware)object);
+		}
+		if (object instanceof AstrixPluginsAware) {
+			AstrixPluginsAware.class.cast(object).setPlugins(getPlugins());
+		}
+		if (object instanceof AstrixContextAware) {
+			AstrixContextAware.class.cast(object).setAstrixContext(this);
+		}
+	}
+	
+	private void injectServiceDependencies(ServiceDependenciesAware serviceDependenciesAware) {
+		serviceDependenciesAware.setServiceDependencies(new ServiceDependencies() {
+			@Override
+			public <T> T getService(Class<T> service) {
+				return AstrixContext.this.getService(service);
+			}
+		});
+	}
+
+	private <D extends ExternalDependencyBean> void injectExternalDependencies(ExternalDependencyAware<D> externalDependencyAware) {
+		D dependency = getExternalDependency(externalDependencyAware.getDependencyBeanClass());
+		externalDependencyAware.setDependency(dependency);
+	}
 
 	/**
 	 * Looks up a service in the local service registry. <p>

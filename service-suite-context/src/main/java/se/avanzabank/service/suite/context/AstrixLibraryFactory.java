@@ -36,7 +36,7 @@ public class AstrixLibraryFactory<T> implements AstrixServiceFactory<T>, Service
 	}
 
 	@Override
-	public T create(AstrixContext context) {
+	public T create() {
 		Object[] args = new Object[factoryMethod.getParameterTypes().length];
 		// TODO: analyze each factory for what dependencies they have?
 		for (int argumentIndex = 0; argumentIndex < factoryMethod.getParameterTypes().length; argumentIndex++) {

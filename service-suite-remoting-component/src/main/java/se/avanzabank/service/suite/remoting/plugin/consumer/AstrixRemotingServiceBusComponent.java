@@ -23,9 +23,12 @@ import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.service.suite.bus.client.AstrixServiceBusComponent;
 import se.avanzabank.service.suite.bus.client.AstrixServiceProperties;
-import se.avanzabank.service.suite.context.AstrixContext;
 import se.avanzabank.service.suite.context.AstrixFaultTolerancePlugin;
+import se.avanzabank.service.suite.context.AstrixPlugins;
+import se.avanzabank.service.suite.context.AstrixPluginsAware;
 import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
+import se.avanzabank.service.suite.context.ServiceDependencies;
+import se.avanzabank.service.suite.context.ServiceDependenciesAware;
 import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 import se.avanzabank.service.suite.gs.GigaSpaceRegistry;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
@@ -34,7 +37,7 @@ import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
 import se.avanzabank.service.suite.remoting.plugin.provider.AstrixRemotingServiceBusExporter;
 
 @MetaInfServices(AstrixServiceBusComponent.class)
-public class AstrixRemotingServiceBusComponent implements AstrixServiceBusComponent {
+public class AstrixRemotingServiceBusComponent implements AstrixServiceBusComponent, ServiceDependenciesAware, AstrixPluginsAware {
 
 	// TODO: what if lookup of service-properties fails? whose responsible of making new attempts to discover provider?
 	// Multiple cases exists:
@@ -42,13 +45,16 @@ public class AstrixRemotingServiceBusComponent implements AstrixServiceBusCompon
 	// 2. No service-provider registered in bus (i.e. service bus instance running but no provider registered with bus yet).
 	//
 	
+	private AstrixPlugins plugins;
+	private ServiceDependencies services;
+	
 	@Override
-	public <T> T createService(Class<?> descriptorHolder, Class<T> api, AstrixServiceProperties serviceProperties, AstrixContext context) {
-		AstrixObjectSerializer objectSerializer = context.getPlugin(AstrixVersioningPlugin.class).create(descriptorHolder);
-		AstrixFaultTolerancePlugin faultTolerance = context.getPlugin(AstrixFaultTolerancePlugin.class);
+	public <T> T createService(Class<?> descriptorHolder, Class<T> api, AstrixServiceProperties serviceProperties) {
+		AstrixObjectSerializer objectSerializer = plugins.getPlugin(AstrixVersioningPlugin.class).create(descriptorHolder);
+		AstrixFaultTolerancePlugin faultTolerance = plugins.getPlugin(AstrixFaultTolerancePlugin.class);
 		
 		// TODO: is GigaSpaceRegistry really a service???
-		GigaSpaceRegistry registry = context.getService(GigaSpaceRegistry.class); // TODO: behöver den här klassen verkligen känna till space-namnet? Kan inte det abstraheras bort av AstrixServiceContext???
+		GigaSpaceRegistry registry = services.getService(GigaSpaceRegistry.class); // TODO: behöver den här klassen verkligen känna till space-namnet? Kan inte det abstraheras bort av AstrixServiceContext???
 		String targetSpace = serviceProperties.getProperty(AstrixRemotingServiceBusExporter.SPACE_NAME_PROPERTY);
 		AstrixRemotingTransport remotingTransport = AstrixRemotingTransport.remoteSpace(registry.lookup(targetSpace)); // TODO: caching of created proxies, fault tolerance?
 		
@@ -64,6 +70,21 @@ public class AstrixRemotingServiceBusComponent implements AstrixServiceBusCompon
 		}
 		AstrixRemoteApiDescriptor remoteApiDescriptor = possiblyHoldsDescriptor.getAnnotation(AstrixRemoteApiDescriptor.class);
 		return Arrays.asList(remoteApiDescriptor.exportedApis());
+	}
+
+	@Override
+	public List<Class<?>> getServiceDependencies() {
+		return Arrays.<Class<?>>asList(GigaSpaceRegistry.class);
+	}
+
+	@Override
+	public void setServiceDependencies(ServiceDependencies services) {
+		this.services = services;
+	}
+
+	@Override
+	public void setPlugins(AstrixPlugins plugins) {
+		this.plugins = plugins;
 	}
 
 }
