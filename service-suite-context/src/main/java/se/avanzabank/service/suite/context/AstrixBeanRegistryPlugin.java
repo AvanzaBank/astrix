@@ -22,14 +22,4 @@ public interface AstrixBeanRegistryPlugin {
 	
 	void registerBeanDefinitions(BeanDefinitionRegistry registry) throws BeansException;
 	
-	/**
-	 * Returns an optional bean dependency class.
-	 * 
-	 * If the plugin defines a dependency class, then it will be registered in the bean registry
-	 * and available as autowire candiate by other beans created by the plugin
-	 * 
-	 * @return
-	 */
-	Class<?> getBeanDependencyClass();
-	
 }

@@ -21,6 +21,6 @@ public interface Astrix {
 
 	<T> T getService(Class<T> type);
 
-	<T> T waitForService(Class<T> class1, long timeoutMillis);
+	<T> T waitForService(Class<T> type, long timeoutMillis);
 
 }
