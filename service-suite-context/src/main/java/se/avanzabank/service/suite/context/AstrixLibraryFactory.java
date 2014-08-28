@@ -36,12 +36,11 @@ public class AstrixLibraryFactory<T> implements AstrixServiceFactory<T> {
 
 	@Override
 	public T create(AstrixContext context) {
-		Astrix astrix = context.getAstrix();
 		Object[] args = new Object[factoryMethod.getParameterTypes().length];
 		// TODO: analyze each factory for what dependencies they have?
 		for (int argumentIndex = 0; argumentIndex < factoryMethod.getParameterTypes().length; argumentIndex++) {
 			Class<?> argumentType = factoryMethod.getParameterTypes()[argumentIndex];
-			args[argumentIndex] = astrix.getService(argumentType); // TODO: discover circular library creation
+			args[argumentIndex] = context.getService(argumentType); // TODO: discover circular library creation
 		}
 		Object result;
 		try {

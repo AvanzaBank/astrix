@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 public class AstrixContext implements Astrix {
 	
 	private final AstrixPlugins plugins;
@@ -30,7 +28,6 @@ public class AstrixContext implements Astrix {
 	private ConcurrentMap<Class<?>, ExternalDependencyBean> externalDependencyBean = new ConcurrentHashMap<>();
 	private List<Object> externalDependencies = new ArrayList<>();
 	
-	@Autowired
 	public AstrixContext(AstrixPlugins plugins) {
 		this.plugins = plugins;
 	}
@@ -49,11 +46,6 @@ public class AstrixContext implements Astrix {
 	
 	public void registerServiceProvider(AstrixServiceProvider serviceProvider) {
 		this.serviceRegistry.registerProvider(serviceProvider);
-	}
-
-	public Astrix getAstrix() {
-		// TODO: delete me
-		return this;
 	}
 
 	/**

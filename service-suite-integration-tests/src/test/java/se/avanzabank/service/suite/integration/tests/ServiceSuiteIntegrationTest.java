@@ -92,7 +92,7 @@ public class ServiceSuiteIntegrationTest {
 		configurer.useFaultTolerance(false);
 		configurer.enableVersioning(true);
 		Astrix astrix = configurer.configure();
-		Thread.sleep(1500); // TODO: wait for service to be registered in service bus in clean way...
+		Thread.sleep(1000); // TODO: wait for service to be registered in service bus in clean way...
 //		this.lunchService = astrix.waitForService(LunchService.class, 5000);
 //		this.lunchUtil = astrix.waitForService(LunchUtil.class, 5000);
 		this.lunchService = astrix.getService(LunchService.class);
