@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 package se.avanzabank.service.suite.context;
-
+/**
+ * Extension to {@link AstrixServiceFactory} for factories that requires external
+ * dependencies, for instance a SpaceLocator. 
+ * 
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ * @param <T>
+ */
 public interface ExternalDependencyAware<T extends ExternalDependencyBean> {
 	
 	void setDependency(T instance);

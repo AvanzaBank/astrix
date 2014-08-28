@@ -19,7 +19,7 @@ package se.avanzabank.service.suite.context;
 /**
  * Marker interface for all 'external dependency beans', see {@link ExternalDependencyAware#getDependencyBeanClass()}
  * 
- * This interface is used to be able to autowire all ExternalDependencyBean's into AstrixContext
+ * This interface is used to be able to autowire all ExternalDependencyBean's into AstrixContext.
  * 
  * @author Elias Lindholm (elilin)
  *

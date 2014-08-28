@@ -24,11 +24,13 @@ public class AstrixConfigurer {
 
 	private boolean useFaultTolerance = false;
 	private boolean enableVersioning = true;
-	private AstrixContext context = new AstrixContext(new AstrixPlugins());
 	private List<ExternalDependencyBean> externalDependencyBeans = new ArrayList<>();
+	private List<Object> externalDependencies = new ArrayList<>();
 	
 	public AstrixContext configure() {
-		context.setExternalDependencies(externalDependencyBeans);
+		AstrixContext context = new AstrixContext(new AstrixPlugins());
+		context.setExternalDependencyBeans(externalDependencyBeans);
+		context.setExternalDependencies(externalDependencies);
 		configureFaultTolerance(context);
 		configureVersioning(context);
 		discoverServiceProviderPlugins(context);
@@ -75,38 +77,11 @@ public class AstrixConfigurer {
 	}
 
 	public <T> void registerDependency(T dependency) {
-		this.context.addExternalDependency(dependency);
+		this.externalDependencies.add(dependency);
 	}
 
 	public void registerDependency(ExternalDependencyBean externalDependency) {
 		this.externalDependencyBeans.add(externalDependency);
 	}
-	
-//	private static class SingleInstanceServiceFactory<T> implements AstrixServiceFactory<T> {
-//		
-//		private final T instance;
-//		private final Class<T> serviceType;
-//
-//		public SingleInstanceServiceFactory(T instance, Class<T> serviceType) {
-//			this.instance = instance;
-//			this.serviceType = serviceType;
-//		}
-//
-//		@Override
-//		public T create(AstrixContext context) {
-//			return instance;
-//		}
-//
-//		@Override
-//		public Class<T> getServiceType() {
-//			return this.serviceType;
-//		}
-//
-//		@Override
-//		public List<Class<?>> getServiceDependencies() {
-//			return null;
-//		}
-//		
-//	}
 	
 }

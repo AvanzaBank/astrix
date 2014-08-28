@@ -75,14 +75,14 @@ public class AstrixContext implements Astrix {
 		throw new UnsupportedOperationException();
 	}
 
-	public void setExternalDependencies(List<ExternalDependencyBean> externalDependencies) {
+	public void setExternalDependencyBeans(List<ExternalDependencyBean> externalDependencies) {
 		for (ExternalDependencyBean dependency : externalDependencies) {
 			this.externalDependencyBean.put(dependency.getClass(), dependency);
 		}
 	}
-	
-	public void addExternalDependency(Object dependency) {
-		this.externalDependencies.add(dependency);
+
+	public void setExternalDependencies(List<Object> externalDependencies) {
+		this.externalDependencies = externalDependencies;
 	}
 	
 	public <T extends ExternalDependencyBean> T getExternalDependency(Class<T> dependencyType) {
