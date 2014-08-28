@@ -42,16 +42,7 @@ public class AstrixServiceFactoryBean<T> implements FactoryBean<T> {
 
 	@Override
 	public T getObject() throws Exception {
-		AstrixServiceFactory<T> serviceFactory = astrix.getServiceFactory(type);
-		if (serviceFactory instanceof ExternalDependencyAware) {
-			injetExternalDependency((ExternalDependencyAware<?>)serviceFactory);
-		}
-		return serviceFactory.create(astrix);
-	}
-
-	private <D extends ExternalDependencyBean> void injetExternalDependency(ExternalDependencyAware<D> externalDependencyAware) {
-		D dependency = astrix.getExternalDependency(externalDependencyAware.getDependencyBeanClass());
-		externalDependencyAware.setDependency(dependency);
+		return astrix.getService(type);
 	}
 
 	@Override
