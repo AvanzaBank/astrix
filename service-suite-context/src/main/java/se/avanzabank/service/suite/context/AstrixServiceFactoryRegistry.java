@@ -15,38 +15,17 @@
  */
 package se.avanzabank.service.suite.context;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AstrixServiceRegistry {
+public class AstrixServiceFactoryRegistry {
 	
-	private final InstanceCache instanceCache = new InstanceCache();
 	private final ConcurrentMap<Class<?>, AstrixServiceProvider> serviceProviderByProvidedService = new ConcurrentHashMap<>();
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	public <T> T getService(Class<T> type, AstrixContext context) {
-		T instance = instanceCache.get(type);
-		if (instance != null) {
-			return instance;
-		}
-		// TODO: synchronize creation of service
-		// TODO: fix caching of created services
-		AstrixServiceFactory<T> serviceFactory = getServiceFactory(type);
-		context.injectDependencies(serviceFactory);
-		instance = serviceFactory.create();
-		instanceCache.put(type, instance);
-		return instance;
-	}
-
-	public <T> T waitForService(Class<T> type, long timeoutMillis) {
-		throw new UnsupportedOperationException();
-	}
-	
 	public <T> AstrixServiceFactory<T> getServiceFactory(Class<T> type) {
 		AstrixServiceProvider serviceProvider = getServiceProvider(type);
 		return serviceProvider.getServiceFactory(type);

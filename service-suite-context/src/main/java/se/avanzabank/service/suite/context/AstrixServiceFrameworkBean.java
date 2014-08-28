@@ -121,9 +121,10 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 			AstrixContext astrixContext) {
 		Set<Class<? extends ExternalDependencyBean>> result = new HashSet<>();
 		for (Class<?> consumedService : resolveAllConsumedServices(astrixContext)) {
-			AstrixServiceFactory<?> serviceFactory = astrixContext.getServiceFactory(consumedService);
-			if (serviceFactory instanceof ExternalDependencyAware) {
-				result.add(ExternalDependencyAware.class.cast(serviceFactory).getDependencyBeanClass());
+			Class<? extends ExternalDependencyBean> externalDependencyBean =
+					astrixContext.getExternalDependencyBean(consumedService);
+			if (externalDependencyBean != null) {
+				result.add(externalDependencyBean);
 			}
 		}
 		return result;

@@ -17,6 +17,7 @@ package se.avanzabank.service.suite.context;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -24,16 +25,12 @@ import java.util.concurrent.ConcurrentMap;
 public class AstrixContext implements Astrix {
 	
 	private final AstrixPlugins plugins;
-	private final AstrixServiceRegistry serviceRegistry = new AstrixServiceRegistry();
+	private final AstrixServiceFactoryRegistry serviceFactoryRegistry = new AstrixServiceFactoryRegistry();
 	private ConcurrentMap<Class<?>, ExternalDependencyBean> externalDependencyBean = new ConcurrentHashMap<>();
 	private List<Object> externalDependencies = new ArrayList<>();
 	
 	public AstrixContext(AstrixPlugins plugins) {
 		this.plugins = plugins;
-	}
-	
-	public <T> T getPlugin(Class<T> type) {
-		return plugins.getPlugin(type);
 	}
 	
 	public <T> List<T> getPlugins(Class<T> type) {
@@ -45,7 +42,7 @@ public class AstrixContext implements Astrix {
 	}
 	
 	public void registerServiceProvider(AstrixServiceProvider serviceProvider) {
-		this.serviceRegistry.registerProvider(serviceProvider);
+		this.serviceFactoryRegistry.registerProvider(serviceProvider);
 	}
 	
 	public void injectDependencies(Object object) {
@@ -84,15 +81,34 @@ public class AstrixContext implements Astrix {
 	 * @return
 	 */
 	public <T> T getService(Class<T> type) {
-		return this.serviceRegistry.getService(type, this); // TODO: avoid passing 'this' reference by splitting AstrixContext into more abstractions if possible?
+		// TODO: synchronize creation of service
+		// TODO: fix caching of created services
+		AstrixServiceFactory<T> serviceFactory = getServiceFactory(type);
+		injectDependencies(serviceFactory);
+		return serviceFactory.create();
 	}
 	
-	public <T> AstrixServiceFactory<T> getServiceFactory(Class<T> type) {
-		return this.serviceRegistry.getServiceFactory(type);
+	private <T> AstrixServiceFactory<T> getServiceFactory(Class<T> type) {
+		return this.serviceFactoryRegistry.getServiceFactory(type);
+	}
+	
+	/**
+	 * Returns the external dependencies (as defined by an ExternalDependencyBean) required 
+	 * to create a given service, or null if no external dependencies exists. <p>
+	 * 
+	 * @param serviceType
+	 * @return
+	 */
+	public Class<? extends ExternalDependencyBean> getExternalDependencyBean(Class<?> serviceType) {
+		AstrixServiceFactory<?> serviceFactory = getServiceFactory(serviceType);
+		if (serviceFactory instanceof ExternalDependencyAware) {
+			return ExternalDependencyAware.class.cast(serviceFactory).getDependencyBeanClass();
+		}
+		return null;
 	}
 	
 	public <T> AstrixServiceProvider getsServiceProvider(Class<T> type) {
-		return this.serviceRegistry.getServiceProvider(type);
+		return this.serviceFactoryRegistry.getServiceProvider(type);
 	}
 
 	public AstrixPlugins getPlugins() {
@@ -149,6 +165,20 @@ public class AstrixContext implements Astrix {
 			}
 		}
 		throw new RuntimeException("Missing dependency: " + type.getName());
+	}
+
+	/**
+	 * Returns the transitive service dependencies required to create a given service, 
+	 * ie the services that are used by, or during creation, of a given service.
+	 * @param serviceType
+	 * @return
+	 */
+	public List<Class<?>> getTransitiveServiceDependencies(Class<?> serviceType) {
+		AstrixServiceFactory<?> serviceFactory = getServiceFactory(serviceType);
+		if (serviceFactory instanceof ServiceDependenciesAware) {
+			return ServiceDependenciesAware.class.cast(serviceFactory).getServiceDependencies();
+		}
+		return Collections.emptyList();
 	}
 	
 }

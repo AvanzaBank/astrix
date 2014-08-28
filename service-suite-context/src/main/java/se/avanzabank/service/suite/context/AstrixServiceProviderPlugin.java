@@ -34,6 +34,7 @@ public interface AstrixServiceProviderPlugin {
 	
 //	void setContext(AstrixContext context);
 	
+	// TODO: AstrixPluginsAware?
 	void setPlugins(AstrixPlugins plugins);
 	
 	/**
