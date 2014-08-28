@@ -15,15 +15,11 @@
  */
 package se.avanzabank.service.suite.context;
 
-import java.util.List;
 
 public interface AstrixServiceFactory<T> {
 	
 	T create(AstrixContext context);
 	
 	Class<T> getServiceType();
-	//TODO: separate this into another interface?
-	//TODO: how to ensure that a servicefactory only uses defined dependencies?
-	List<Class<?>> getServiceDependencies(); 
 	
 }

@@ -33,7 +33,10 @@ public class ServiceDependencyResolver {
 		for (Class<?> consumedApi : consumedApis) {
 			result.add(consumedApi);
 			AstrixServiceFactory<?> serviceFactory = context.getServiceFactory(consumedApi);
-			result.addAll(resolveConsumedServices(serviceFactory.getServiceDependencies()));
+			if (serviceFactory instanceof ServiceDependenciesAware) {
+				List<Class<?>> servicesDeps = ServiceDependenciesAware.class.cast(serviceFactory).getServiceDependencies();
+				result.addAll(resolveConsumedServices(servicesDeps));
+			}
 		}
 		return result;
 	}

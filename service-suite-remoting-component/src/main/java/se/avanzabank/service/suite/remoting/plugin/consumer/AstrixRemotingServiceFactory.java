@@ -83,9 +83,4 @@ public class AstrixRemotingServiceFactory<T> implements AstrixServiceFactory<T>,
 		return AstrixRemotingPluginDependencies.class;
 	}
 	
-	@Override
-	public List<Class<?>> getServiceDependencies() {
-		return Collections.emptyList();
-	}
-
 }

@@ -20,12 +20,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AstrixLibraryFactory<T> implements AstrixServiceFactory<T> {
+public class AstrixLibraryFactory<T> implements AstrixServiceFactory<T>, ServiceDependenciesAware {
 
 	private Object factoryInstance;
 	private Method factoryMethod;
 	private Class<T> type;
 	private List<Class<?>> serviceDependencies = new ArrayList<>();
+	private ServiceDependencies services;
 	
 	public AstrixLibraryFactory(Object factoryInstance, Method factoryMethod) {
 		this.factoryInstance = factoryInstance;
@@ -40,7 +41,7 @@ public class AstrixLibraryFactory<T> implements AstrixServiceFactory<T> {
 		// TODO: analyze each factory for what dependencies they have?
 		for (int argumentIndex = 0; argumentIndex < factoryMethod.getParameterTypes().length; argumentIndex++) {
 			Class<?> argumentType = factoryMethod.getParameterTypes()[argumentIndex];
-			args[argumentIndex] = context.getService(argumentType); // TODO: discover circular library creation
+			args[argumentIndex] = services.getService(argumentType); // TODO: discover circular library creation
 		}
 		Object result;
 		try {
@@ -59,6 +60,11 @@ public class AstrixLibraryFactory<T> implements AstrixServiceFactory<T> {
 	@Override
 	public List<Class<?>> getServiceDependencies() {
 		return this.serviceDependencies;
+	}
+
+	@Override
+	public void setServiceDependencies(ServiceDependencies services) {
+		this.services = services;
 	}
 	
 }

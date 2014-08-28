@@ -20,12 +20,15 @@ import java.util.List;
 
 import se.avanzabank.service.suite.context.AstrixContext;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
+import se.avanzabank.service.suite.context.ServiceDependencies;
+import se.avanzabank.service.suite.context.ServiceDependenciesAware;
 
-public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T> {
+public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T>, ServiceDependenciesAware {
 
 	private Class<T> api;
 	private Class<?> descriptorHolder;
 	private AstrixServiceBusComponent serviceBusComponent;
+	private ServiceDependencies services;
 	
 
 	public ServiceBusLookupServiceFactory(Class<?> descriptorHolder,
@@ -39,7 +42,7 @@ public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T
 	@Override
 	public T create(AstrixContext context) {
 		// TODO: always return a proxy-instance, no matter in which of the steps below that the lookup fails
-		AstrixServiceBus serviceBus = context.getService(AstrixServiceBus.class); // service dependency
+		AstrixServiceBus serviceBus = services.getService(AstrixServiceBus.class); // service dependency
 		AstrixServiceProperties serviceProperties = serviceBus.lookup(api); // TODO: might fail
 		if (serviceProperties == null) {
 			// TODO: manage non discovered services
@@ -56,6 +59,11 @@ public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T
 	@Override
 	public Class<T> getServiceType() {
 		return this.api;
+	}
+
+	@Override
+	public void setServiceDependencies(ServiceDependencies services) {
+		this.services = services;
 	}
 	
 	/*

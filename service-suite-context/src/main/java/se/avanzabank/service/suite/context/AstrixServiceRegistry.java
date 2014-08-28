@@ -39,11 +39,23 @@ public class AstrixServiceRegistry {
 		if (serviceFactory instanceof ExternalDependencyAware) {
 			injectDependencies((ExternalDependencyAware)serviceFactory, context);
 		}
+		if (serviceFactory instanceof ServiceDependenciesAware) {
+			injectDependencies((ServiceDependenciesAware)serviceFactory, context);
+		}
 		instance = serviceFactory.create(context);
 		instanceCache.put(type, instance);
 		return instance;
 	}
 	
+	private void injectDependencies(ServiceDependenciesAware serviceDependenciesAware, final AstrixContext context) {
+		serviceDependenciesAware.setServiceDependencies(new ServiceDependencies() {
+			@Override
+			public <T> T getService(Class<T> service) {
+				return AstrixServiceRegistry.this.getService(service, context);
+			}
+		});
+	}
+
 	private <D extends ExternalDependencyBean> void injectDependencies(ExternalDependencyAware<D> externalDependencyAware, AstrixContext context) {
 		D dependency = context.getExternalDependency(externalDependencyAware.getDependencyBeanClass());
 		externalDependencyAware.setDependency(dependency);
