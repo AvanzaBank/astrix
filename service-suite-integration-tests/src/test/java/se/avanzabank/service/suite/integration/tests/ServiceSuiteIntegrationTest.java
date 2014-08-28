@@ -38,8 +38,8 @@ import se.avanzabank.service.suite.integration.tests.domain.api.GetLunchRestaura
 import se.avanzabank.service.suite.integration.tests.domain.api.LunchRestaurant;
 import se.avanzabank.service.suite.integration.tests.domain.api.LunchService;
 import se.avanzabank.service.suite.integration.tests.domain.api.LunchUtil;
+import se.avanzabank.service.suite.integration.tests.domain2.api.LunchRestaurantGrader;
 import se.avanzabank.service.suite.remoting.client.AstrixRemoteServiceException;
-import se.avanzabank.service.suite.remoting.plugin.consumer.AstrixRemotingPluginDependencies;
 import se.avanzabank.space.UsesLookupGroupsSpaceLocator;
 import se.avanzabank.space.junit.pu.PuConfigurers;
 import se.avanzabank.space.junit.pu.RunningPu;
@@ -50,30 +50,36 @@ import se.avanzabank.space.junit.pu.RunningPu;
  */
 public class ServiceSuiteIntegrationTest {
 	
-	public static RunningPu pu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
+	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
 											  .configure();
 	
-	public static RunningPu serviceBus = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-bus-pu.xml")
+	public static RunningPu serviceBuspu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-bus-pu.xml")
 													  .numberOfPrimaries(1)
 													  .numberOfBackups(0)
 													  .configure();
 	
+	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
+																  .numberOfPrimaries(1)
+																  .numberOfBackups(0)
+																  .configure();
+	
 	public static JndiServerRule jndi = new JndiServerRule(new JndiServerRuleHook() {
 		@Override
 		public void afterStart(EmbeddedJndiServer jndiServer) {
-			jndiServer.addValueEntry("service-bus-space", "jini://*/*/service-bus-space?groups=" + serviceBus.getLookupGroupName());
+			jndiServer.addValueEntry("service-bus-space", "jini://*/*/service-bus-space?groups=" + serviceBuspu.getLookupGroupName());
 		}
 	});
 	
 	@ClassRule
-	public static RuleChain order = RuleChain.outerRule(serviceBus).around(jndi).around(pu);
-	
+	public static RuleChain order = RuleChain.outerRule(serviceBuspu).around(jndi).around(lunchPu).around(lunchGraderPu);
+
 	
 	
 	private LunchService lunchService;
 	private LunchUtil lunchUtil;
+	private LunchRestaurantGrader lunchRestaurantGrader;
 	
 	static {
 		// TODO: remove debugging information
@@ -84,11 +90,11 @@ public class ServiceSuiteIntegrationTest {
 	
 	@Before
 	public void setup() throws Exception {
-		GigaSpace proxy = pu.getClusteredGigaSpace();
+		GigaSpace proxy = lunchPu.getClusteredGigaSpace();
 		proxy.clear(null);
 		
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceBus.getLookupGroupName())); // For service-bus-discovery
+		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceBuspu.getLookupGroupName())); // For service-bus-discovery
 		configurer.useFaultTolerance(false);
 		configurer.enableVersioning(true);
 		Astrix astrix = configurer.configure();
@@ -97,7 +103,20 @@ public class ServiceSuiteIntegrationTest {
 //		this.lunchUtil = astrix.waitForService(LunchUtil.class, 5000);
 		this.lunchService = astrix.getService(LunchService.class);
 		this.lunchUtil = astrix.getService(LunchUtil.class);
+		this.lunchRestaurantGrader = astrix.getService(LunchRestaurantGrader.class);
+
 	}
+	
+	@Test
+	public void testPuThatConsumesOtherServcies() throws Exception {
+		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
+		
+		lunchRestaurantGrader.grade("Martins Green Room", 2);
+		lunchRestaurantGrader.grade("Martins Green Room", 4);
+		
+		assertEquals(3.0, lunchRestaurantGrader.getAvarageGrade("Martins Green Room"), 0.01D);
+	}
+
 	
 	@Test
 	public void routedRequestDemo() throws Exception {
