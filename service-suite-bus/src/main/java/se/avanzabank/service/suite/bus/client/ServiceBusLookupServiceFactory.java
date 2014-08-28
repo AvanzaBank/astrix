@@ -15,6 +15,9 @@
  */
 package se.avanzabank.service.suite.bus.client;
 
+import java.util.Arrays;
+import java.util.List;
+
 import se.avanzabank.service.suite.context.AstrixContext;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
 
@@ -23,29 +26,31 @@ public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T
 	private Class<T> api;
 	private Class<?> descriptorHolder;
 	private AstrixServiceBusComponent serviceBusComponent;
-	private AstrixContext context;
 	
 
 	public ServiceBusLookupServiceFactory(Class<?> descriptorHolder,
 			Class<T> api,
-			AstrixServiceBusComponent serviceBusComponent,
-			AstrixContext context) {
+			AstrixServiceBusComponent serviceBusComponent) {
 		this.descriptorHolder = descriptorHolder;
 		this.api = api;
 		this.serviceBusComponent = serviceBusComponent;
-		this.context = context;
 	}
 
 	@Override
-	public T create() {
+	public T create(AstrixContext context) {
 		// TODO: always return a proxy-instance, no matter in which of the steps below that the lookup fails
-		AstrixServiceBus serviceBus = context.getService(AstrixServiceBus.class);
+		AstrixServiceBus serviceBus = context.getService(AstrixServiceBus.class); // service dependency
 		AstrixServiceProperties serviceProperties = serviceBus.lookup(api); // TODO: might fail
 		if (serviceProperties == null) {
 			// TODO: manage non discovered services
 			throw new RuntimeException("Did not discover: " + api);
 		}
 		return serviceBusComponent.createService(descriptorHolder, api, serviceProperties, context);
+	}
+	
+	@Override
+	public List<Class<?>> getServiceDependencies() {
+		return Arrays.<Class<?>>asList(AstrixServiceBus.class);
 	}
 
 	@Override

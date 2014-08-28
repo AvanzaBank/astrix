@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.service.suite.context;
+package se.avanzabank.service.suite.remoting.plugin.consumer;
 
-public interface AstrixFaultTolerancePlugin {
+import org.springframework.beans.factory.annotation.Autowired;
+
+import se.avanzabank.service.suite.context.ExternalDependencyBean;
+import se.avanzabank.space.SpaceLocator;
+
+public class AstrixRemotingPluginDependencies implements ExternalDependencyBean {
 	
-	<T> T addFaultTolerance(Class<T> api, T provider);
+	private final SpaceLocator spaceLocator;
+
+	@Autowired
+	public AstrixRemotingPluginDependencies(SpaceLocator spaceLocator) {
+		this.spaceLocator = spaceLocator;
+	}
 	
-	
-	
-	
-	public static class Default {
-		public static AstrixFaultTolerancePlugin create() {
-			return new AstrixFaultTolerancePlugin() {
-				@Override
-				public <T> T addFaultTolerance(Class<T> api, T provider) {
-					return provider;
-				}
-			};
-		}
+	public SpaceLocator getSpaceLocator() {
+		return spaceLocator;
 	}
 
 }

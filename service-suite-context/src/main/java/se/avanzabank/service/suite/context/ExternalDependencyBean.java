@@ -15,22 +15,15 @@
  */
 package se.avanzabank.service.suite.context;
 
-public interface AstrixFaultTolerancePlugin {
-	
-	<T> T addFaultTolerance(Class<T> api, T provider);
-	
-	
-	
-	
-	public static class Default {
-		public static AstrixFaultTolerancePlugin create() {
-			return new AstrixFaultTolerancePlugin() {
-				@Override
-				public <T> T addFaultTolerance(Class<T> api, T provider) {
-					return provider;
-				}
-			};
-		}
-	}
+
+/**
+ * Marker interface for all 'external dependency beans', see {@link ExternalDependencyAware#getDependencyBeanClass()}
+ * 
+ * This interface is used to be able to autowire all ExternalDependencyBean's into AstrixContext
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public interface ExternalDependencyBean {
 
 }

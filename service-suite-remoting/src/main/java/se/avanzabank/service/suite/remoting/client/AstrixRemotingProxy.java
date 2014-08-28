@@ -206,14 +206,14 @@ public class AstrixRemotingProxy implements InvocationHandler {
 		}
 		final AstrixRemoteResultReducer<T, T> reducer = (AstrixRemoteResultReducer<T, T>) broadcast.reducer().newInstance();
 		Observable<List<AstrixServiceInvocationResponse>> responesObservable = this.serviceTransport.observeProcessBroadcastRequest(request);
-		if (returnType.equals(Void.TYPE)) {
-			return responesObservable.map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
-				@Override
-				public T call(List<AstrixServiceInvocationResponse> t1) {
-					return null; // TODO: How to handle void?
-				}
-			});
-		}
+//		if (returnType.equals(Void.TYPE)) {
+//			return responesObservable.map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
+//				@Override
+//				public T call(List<AstrixServiceInvocationResponse> t1) {
+//					return null; // TODO: How to handle void?
+//				}
+//			});
+//		}
 		return responesObservable.map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
 			@Override
 			public T call(List<AstrixServiceInvocationResponse> t1) {
@@ -230,14 +230,6 @@ public class AstrixRemotingProxy implements InvocationHandler {
 			final Class<?> returnType, AstrixServiceInvocationRequest request,
 			GsRoutingKey routingKey) {
 		Observable<AstrixServiceInvocationResponse> response = this.serviceTransport.observeProcessRoutedRequest(request, routingKey);
-		if (returnType.equals(Void.TYPE)) {
-			return response.map(new Func1<AstrixServiceInvocationResponse, Object>() {
-				@Override
-				public Object call(AstrixServiceInvocationResponse t1) {
-					return null; // TODO: How to handle void?
-				}
-			});
-		}
 		return response.map(new Func1<AstrixServiceInvocationResponse, Object>() {
 			@Override
 			public Object call(AstrixServiceInvocationResponse t1) {

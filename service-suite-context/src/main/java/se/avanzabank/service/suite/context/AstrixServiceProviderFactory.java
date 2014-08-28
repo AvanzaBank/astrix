@@ -20,18 +20,23 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 
 public class AstrixServiceProviderFactory {
 	
+	private final Logger log = LoggerFactory.getLogger(AstrixServiceProviderFactory.class);
 	private ConcurrentMap<Class<? extends Annotation>, AstrixServiceProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	
 	public AstrixServiceProviderFactory(AstrixContext context) {
 		for (AstrixServiceProviderPlugin plugin : context.getPlugins(AstrixServiceProviderPlugin.class)) {
-			plugin.setContext(context);
+			plugin.setPlugins(context.getPlugins());
 			AstrixServiceProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
-				// TODO: warning, multiple providers for same annotation type..
+				// TODO: how to handle multiple providers for same annotation type? Is it allowed
+				log.warn("Multiple AstrixServiceProviderPlugin's found for annotation={}. p1={} p2={}", new Object[]{plugin, previous});
 			}
 		}
 	}
@@ -39,7 +44,6 @@ public class AstrixServiceProviderFactory {
 	public Set<Class<? extends Annotation>> getProvidedAnnotaionTypes() {
 		return pluginByAnnotationType.keySet();
 	}
-	
 	
 	public AstrixServiceProvider create(Class<?> descriptorHolder) {
 		// TODO: descriptor is not the actual annotation type, but rather the class holding the given annotation
@@ -50,6 +54,7 @@ public class AstrixServiceProviderFactory {
 	private AstrixServiceProviderPlugin getProviderFactoryPlugin(Class<?> descriptorHolder) {
 		for (AstrixServiceProviderPlugin plugin : pluginByAnnotationType.values()) {
 			if (plugin.consumes(descriptorHolder)) {
+				// TODO: what if multiple plugins consumes same annotation?
 				return plugin;
 			}
 		}

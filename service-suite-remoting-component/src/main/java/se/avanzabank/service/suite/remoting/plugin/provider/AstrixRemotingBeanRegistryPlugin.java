@@ -20,14 +20,27 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.service.suite.context.AstrixBeanRegistryPlugin;
+import se.avanzabank.service.suite.remoting.plugin.consumer.AstrixRemotingPluginDependencies;
 import se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean;
 
+/**
+ * @author Elias Lindholm (elilin)
+ *
+ */
 @MetaInfServices(AstrixBeanRegistryPlugin.class)
 public class AstrixRemotingBeanRegistryPlugin implements AstrixBeanRegistryPlugin {
 
 	@Override
 	public void registerBeanDefinitions(BeanDefinitionRegistry registry) throws BeansException {
 		new AstrixRemotingFrameworkBean().postProcessBeanDefinitionRegistry(registry);
+	}
+	
+	@Override
+	public Class<?> getBeanDependencyClass() {
+		// TODO: those are client side dependencies required to create a 
+		// remote service proxy. Do we need to separate between client and
+		// server side deps?
+		return AstrixRemotingPluginDependencies.class;
 	}
 
 }

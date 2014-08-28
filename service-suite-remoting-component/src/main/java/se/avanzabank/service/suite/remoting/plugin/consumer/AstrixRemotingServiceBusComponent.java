@@ -29,6 +29,7 @@ import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
 import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 import se.avanzabank.service.suite.gs.GigaSpaceRegistry;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
+import se.avanzabank.service.suite.remoting.client.AstrixRemotingProxy;
 import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
 import se.avanzabank.service.suite.remoting.plugin.provider.AstrixRemotingServiceBusExporter;
 
@@ -47,15 +48,13 @@ public class AstrixRemotingServiceBusComponent implements AstrixServiceBusCompon
 		AstrixFaultTolerancePlugin faultTolerance = context.getPlugin(AstrixFaultTolerancePlugin.class);
 		
 		// TODO: is GigaSpaceRegistry really a service???
-		final GigaSpaceRegistry registry = context.getService(GigaSpaceRegistry.class); // TODO: behöver den här klassen verkligen känna till space-namnet? Kan inte det abstraheras bort av AstrixServiceContext???
-		final String targetSpace = serviceProperties.getProperty(AstrixRemotingServiceBusExporter.SPACE_NAME_PROPERTY);
-		AstrixRemotingTransportFactory remotingTransportFactory = new AstrixRemotingTransportFactory() {
-			@Override
-			public AstrixRemotingTransport createRemotingTransport() {
-				return AstrixRemotingTransport.remoteSpace(registry.lookup(targetSpace)); // TODO: caching of created proxies, fault tolerance?
-			}
-		};
-		return new AstrixRemotingServiceFactory<>(api, remotingTransportFactory, objectSerializer, faultTolerance).create();
+		GigaSpaceRegistry registry = context.getService(GigaSpaceRegistry.class); // TODO: behöver den här klassen verkligen känna till space-namnet? Kan inte det abstraheras bort av AstrixServiceContext???
+		String targetSpace = serviceProperties.getProperty(AstrixRemotingServiceBusExporter.SPACE_NAME_PROPERTY);
+		AstrixRemotingTransport remotingTransport = AstrixRemotingTransport.remoteSpace(registry.lookup(targetSpace)); // TODO: caching of created proxies, fault tolerance?
+		
+		T proxy = AstrixRemotingProxy.create(api, remotingTransport, objectSerializer);
+		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(api, proxy);
+		return proxyWithFaultTolerance;
 	}
 
 	@Override

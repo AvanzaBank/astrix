@@ -28,6 +28,12 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
  */
 public class AstrixRemotingFrameworkBean implements BeanDefinitionRegistryPostProcessor {
 	
+	/*
+	 * This is a server side component required to export gs-remoting-services. We don't want those
+	 * beans from non-pu's like a web-application
+	 * 
+	 */
+	
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceActivator.class);

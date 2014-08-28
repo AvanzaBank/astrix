@@ -26,6 +26,9 @@ public interface AstrixObjectSerializer {
 	public static class NoVersioningSupport implements AstrixObjectSerializer {
 		@Override
 		public <T> T deserialize(Object element, Class<T> type, int version) {
+			if (type.isPrimitive()) {
+				return (T) element;
+			}
 			return type.cast(element);
 		}
 		@Override

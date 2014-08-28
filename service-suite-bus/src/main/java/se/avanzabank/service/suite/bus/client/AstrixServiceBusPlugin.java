@@ -17,11 +17,12 @@ package se.avanzabank.service.suite.bus.client;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
-import se.avanzabank.service.suite.context.AstrixContext;
+import se.avanzabank.service.suite.context.AstrixPlugins;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
 import se.avanzabank.service.suite.context.AstrixServiceProvider;
 import se.avanzabank.service.suite.context.AstrixServiceProviderPlugin;
@@ -30,8 +31,8 @@ import se.avanzabank.service.suite.provider.core.AstrixServiceBusApi;
 @MetaInfServices(AstrixServiceProviderPlugin.class)
 public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin {
 	
-	private AstrixContext context;
-	
+	private AstrixPlugins plugins;
+
 	public AstrixServiceBusPlugin() {
 	}
 
@@ -44,7 +45,7 @@ public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin {
 			for (Class<?> exportedApi : component.getExportedServices(descriptorHolder)) {
 				// I det här läget vill jag inte slå upp tjänsten, enbart skapa en factory som 'on demand' slår upp
 				// tjänsten över tjänstebussen.
-				ServiceBusLookupServiceFactory<?> factory = new ServiceBusLookupServiceFactory<>(descriptorHolder, exportedApi, component, context);
+				ServiceBusLookupServiceFactory<?> factory = new ServiceBusLookupServiceFactory<>(descriptorHolder, exportedApi, component);
 				factories.add(factory);
 			}
 		}
@@ -52,7 +53,7 @@ public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin {
 	}
 
 	private List<AstrixServiceBusComponent> getAllComponents() {
-		return context.getPlugins(AstrixServiceBusComponent.class);
+		return plugins.getPlugins(AstrixServiceBusComponent.class);
 	}
 
 	@Override
@@ -61,13 +62,19 @@ public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin {
 	}
 
 	@Override
-	public void setContext(AstrixContext context) {
-		this.context = context;
+	public boolean consumes(Class<?> descriptorHolder) {
+		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType());
+	}
+	
+	@Override
+	public List<Class<?>> getDependencies() {
+		return Collections.emptyList();
 	}
 
 	@Override
-	public boolean consumes(Class<?> descriptorHolder) {
-		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType());
+	public void setPlugins(AstrixPlugins plugins) {
+		this.plugins = plugins;
+		
 	}
 
 }

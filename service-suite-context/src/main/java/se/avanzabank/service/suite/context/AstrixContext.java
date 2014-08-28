@@ -15,14 +15,20 @@
  */
 package se.avanzabank.service.suite.context;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class AstrixContext {
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class AstrixContext implements Astrix {
 	
-	private final AstrixPlugins plugins = new AstrixPlugins();
-	private AstrixImpl astrix = new AstrixImpl();
+	private final AstrixPlugins plugins;
+	private final AstrixServiceRegistry serviceRegistry = new AstrixServiceRegistry();
+	private List<ExternalDependencyBean> externalDependencies = new ArrayList<>();
 	
-	public AstrixContext() {
+	@Autowired
+	public AstrixContext(AstrixPlugins plugins) {
+		this.plugins = plugins;
 	}
 	
 	public <T> T getPlugin(Class<T> type) {
@@ -38,11 +44,12 @@ public class AstrixContext {
 	}
 	
 	public void registerServiceProvider(AstrixServiceProvider serviceProvider) {
-		this.astrix.registerServiceProvider(serviceProvider);
+		this.serviceRegistry.registerProvider(serviceProvider);
 	}
 
 	public Astrix getAstrix() {
-		return this.astrix;
+		// TODO: delete me
+		return this;
 	}
 
 	/**
@@ -52,8 +59,37 @@ public class AstrixContext {
 	 * @return
 	 */
 	public <T> T getService(Class<T> type) {
-		return this.astrix.getService(type);
+		return this.serviceRegistry.getService(type, this); // TODO: avoid passing 'this' reference by splitting AstrixContext into more abstractions if possible?
 	}
 	
+	public <T> AstrixServiceFactory<T> getServiceFactory(Class<T> type) {
+		return this.serviceRegistry.getServiceFactory(type);
+	}
+	
+	public <T> AstrixServiceProvider getsServiceProvider(Class<T> type) {
+		return this.serviceRegistry.getServiceProvider(type);
+	}
+
+	public AstrixPlugins getPlugins() {
+		return this.plugins;
+	}
+
+	@Override
+	public <T> T waitForService(Class<T> class1, long timeoutMillis) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setExternalDependencies(List<ExternalDependencyBean> externalDependencies) {
+		this.externalDependencies = externalDependencies;
+	}
+	
+	public <T extends ExternalDependencyBean> T getExternalDependency(Class<T> type) {
+		for (ExternalDependencyBean dep : this.externalDependencies) {
+			if (type.isAssignableFrom(dep.getClass())) {
+				return type.cast(dep);
+			}
+		}
+		throw new IllegalStateException("Missing dependency: " + type);
+	}
 	
 }

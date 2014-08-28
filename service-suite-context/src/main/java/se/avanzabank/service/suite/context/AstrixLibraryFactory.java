@@ -16,25 +16,29 @@
 package se.avanzabank.service.suite.context;
 
 import java.lang.reflect.Method;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class AstrixLibraryFactory<T> implements AstrixServiceFactory<T> {
 
 	private Object factoryInstance;
 	private Method factoryMethod;
-	private Astrix astrix;
 	private Class<T> type;
+	private List<Class<?>> serviceDependencies = new ArrayList<>();
 	
-	public AstrixLibraryFactory(Object factoryInstance, Method factoryMethod, Astrix astrix) {
+	public AstrixLibraryFactory(Object factoryInstance, Method factoryMethod) {
 		this.factoryInstance = factoryInstance;
 		this.factoryMethod = factoryMethod;
-		this.astrix = astrix;
 		this.type = (Class<T>) factoryMethod.getReturnType();
+		this.serviceDependencies = Arrays.asList(factoryMethod.getParameterTypes());
 	}
 
 	@Override
-	public T create() {
+	public T create(AstrixContext context) {
+		Astrix astrix = context.getAstrix();
 		Object[] args = new Object[factoryMethod.getParameterTypes().length];
+		// TODO: analyze each factory for what dependencies they have?
 		for (int argumentIndex = 0; argumentIndex < factoryMethod.getParameterTypes().length; argumentIndex++) {
 			Class<?> argumentType = factoryMethod.getParameterTypes()[argumentIndex];
 			args[argumentIndex] = astrix.getService(argumentType); // TODO: discover circular library creation
@@ -45,7 +49,6 @@ public class AstrixLibraryFactory<T> implements AstrixServiceFactory<T> {
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to instantiate library using: " + factoryMethod.toString() + " on " + type.getName(), e);
 		}
-		
 		return type.cast(result);
 	}
 	
@@ -53,5 +56,10 @@ public class AstrixLibraryFactory<T> implements AstrixServiceFactory<T> {
 	public Class<T> getServiceType() {
 		return this.type;
 	}
-
+	
+	@Override
+	public List<Class<?>> getServiceDependencies() {
+		return this.serviceDependencies;
+	}
+	
 }

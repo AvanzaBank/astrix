@@ -25,10 +25,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import se.avanzabank.service.suite.bus.client.AstrixServiceBus;
+import se.avanzabank.service.suite.bus.client.AstrixServiceBusApiDescriptor;
 import se.avanzabank.service.suite.bus.client.AstrixServiceProperties;
 import se.avanzabank.service.suite.context.AstrixPlugins;
 import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
-import se.avanzabank.service.suite.provider.core.AstrixServiceBusApi;
 import se.avanzabank.service.suite.remoting.client.AstrixRemotingProxy;
 import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
 import se.avanzabank.space.SpaceLocator;
@@ -48,8 +48,9 @@ public class AstrixServiceBusExporterWorker extends Thread {
 			SpaceLocator sl,
 			AstrixPlugins astrixPlugins) {
 		AstrixVersioningPlugin versioningPlugin = astrixPlugins.getPlugin(AstrixVersioningPlugin.class);
+		// TODO: AstrixSerivceBus should be retreived from service-framework, not by hard-coding usage of remoting-framework here.
 		GigaSpace serviceBusSpace = sl.createClusteredProxy("service-bus-space"); // TODO: fault tolerance, connection mannagment, etc.
-		this.serviceBus = AstrixRemotingProxy.create(AstrixServiceBus.class, AstrixRemotingTransport.remoteSpace(serviceBusSpace), versioningPlugin.create(AstrixServiceBusApi.class));
+		this.serviceBus = AstrixRemotingProxy.create(AstrixServiceBus.class, AstrixRemotingTransport.remoteSpace(serviceBusSpace), versioningPlugin.create(AstrixServiceBusApiDescriptor.class));
 		this.serviceProvideres = serviceProvideres;
 	}
 

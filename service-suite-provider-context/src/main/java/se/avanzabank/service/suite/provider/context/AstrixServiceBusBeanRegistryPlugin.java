@@ -37,5 +37,10 @@ public class AstrixServiceBusBeanRegistryPlugin implements AstrixBeanRegistryPlu
 //		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 //		registry.registerBeanDefinition("_astrixServiceExporterBean", beanDefinition);
 	}
+	
+	@Override
+	public Class<?> getBeanDependencyClass() {
+		return null; // No dependencies
+	}
 
 }

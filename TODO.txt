@@ -1,7 +1,7 @@
 === IN PROGRESS ===
 
 * Tjänstekonsumenter ska kunna använda Astrix som factory-bean för att skapa tjänster på ett enkelt sätt.
-
+	- Astrix-tjänster ska kunna autowiras in i de klasser som använder dessa.
 
 
 === BACKLOG ===

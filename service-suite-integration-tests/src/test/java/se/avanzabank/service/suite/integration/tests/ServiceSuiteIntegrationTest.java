@@ -88,7 +88,7 @@ public class ServiceSuiteIntegrationTest {
 		proxy.clear(null);
 		
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.registerService(SpaceLocator.class, new UsesLookupGroupsSpaceLocator(serviceBus.getLookupGroupName())); // For service-bus-discovery
+		configurer.registerDependency(SpaceLocator.class, new UsesLookupGroupsSpaceLocator(serviceBus.getLookupGroupName())); // For service-bus-discovery
 //		configurer.useFaultTolerance(true);
 //		configurer.enableVersioning(true);
 		configurer.useFaultTolerance(false);

@@ -15,7 +15,6 @@
  */
 package se.avanzabank.service.suite.context;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;

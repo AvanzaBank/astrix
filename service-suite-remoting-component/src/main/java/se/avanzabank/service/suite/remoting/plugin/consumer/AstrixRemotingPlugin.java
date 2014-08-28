@@ -17,27 +17,23 @@ package se.avanzabank.service.suite.remoting.plugin.consumer;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.service.suite.context.AstrixContext;
-import se.avanzabank.service.suite.context.AstrixFaultTolerancePlugin;
+import se.avanzabank.service.suite.context.AstrixPlugins;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
 import se.avanzabank.service.suite.context.AstrixServiceProvider;
 import se.avanzabank.service.suite.context.AstrixServiceProviderPlugin;
-import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
-import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 import se.avanzabank.service.suite.provider.core.AstrixServiceBusApi;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
-import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
 import se.avanzabank.space.SpaceLocator;
 
 @MetaInfServices(AstrixServiceProviderPlugin.class)
 public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin {
-
-	private AstrixContext context;
-
+	
 	@Override
 	public AstrixServiceProvider create(Class<?> descriptorHolder) {
 		AstrixRemoteApiDescriptor remoteApiDescriptor = descriptorHolder.getAnnotation(AstrixRemoteApiDescriptor.class);
@@ -47,20 +43,9 @@ public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin {
 		}
 		Class<?>[] exportedApis = remoteApiDescriptor.exportedApis();
 		List<AstrixServiceFactory<?>> serviceFactories = new ArrayList<>();
-		AstrixObjectSerializer objectSerializer = context.getPlugin(AstrixVersioningPlugin.class).create(descriptorHolder);
-		
-		final SpaceLocator spaceLocator = context.getService(SpaceLocator.class);
-		
-		AstrixFaultTolerancePlugin faultTolerance = context.getPlugin(AstrixFaultTolerancePlugin.class);
-		AstrixRemotingTransportFactory remotingTransportFactory = new AstrixRemotingTransportFactory() {
-			@Override
-			public AstrixRemotingTransport createRemotingTransport() {
-				return AstrixRemotingTransport.remoteSpace(spaceLocator.createClusteredProxy(targetSpace)); // TODO: caching of created proxies, fault tolerance?
-			}
-		};
 		for (Class<?> api : exportedApis) {
 			serviceFactories.add(
-					new AstrixRemotingServiceFactory<>(api, remotingTransportFactory, objectSerializer, faultTolerance));
+					new AstrixRemotingServiceFactory<>(api, targetSpace, descriptorHolder));
 		}
 		return new AstrixServiceProvider(serviceFactories, descriptorHolder);
 	}
@@ -71,14 +56,18 @@ public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin {
 	}
 
 	@Override
-	public void setContext(AstrixContext context) {
-		this.context = context;
-	}
-	
-	@Override
 	public boolean consumes(Class<?> descriptorHolder) {
 		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType()) 
 				&& !descriptorHolder.isAnnotationPresent(AstrixServiceBusApi.class);
+	}
+	
+	@Override
+	public List<Class<?>> getDependencies() {
+		return Arrays.<Class<?>>asList(SpaceLocator.class);
+	}
+
+	@Override
+	public void setPlugins(AstrixPlugins plugins) {
 	}
 	
 }

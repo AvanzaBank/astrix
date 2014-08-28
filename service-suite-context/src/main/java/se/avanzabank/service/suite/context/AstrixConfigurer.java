@@ -15,16 +15,21 @@
  */
 package se.avanzabank.service.suite.context;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class AstrixConfigurer {
 
 	private boolean useFaultTolerance = false;
-	private boolean enableVersioning = false;
-	private AstrixContext context = new AstrixContext();
+	private boolean enableVersioning = true;
+	private AstrixContext context = new AstrixContext(new AstrixPlugins());
+	private List<ExternalDependencyBean> externalDependencyBeans = new ArrayList<>();
+	private List<Object> externalDependencies = new ArrayList<>();
 	
-	public Astrix configure() {
+	public AstrixContext configure() {
+		context.setExternalDependencies(externalDependencyBeans);
 		configureFaultTolerance(context);
 		configureVersioning(context);
 		discoverServiceProviderPlugins(context);
@@ -34,7 +39,16 @@ public class AstrixConfigurer {
 		for (AstrixServiceProvider serviceProvider : serviceProviders) {
 			context.registerServiceProvider(serviceProvider);
 		}
-		return context.getAstrix();
+		return context;
+	}
+	
+	@Autowired(required = false)
+	public void setExternalDependencies(List<ExternalDependencyBean> externalDependencies) {
+		this.externalDependencyBeans = externalDependencies;
+	}
+	
+	public List<Object> getExternalDependencies() {
+		return externalDependencies;
 	}
 	
 	public void useFaultTolerance(boolean useFaultTolerance) {
@@ -66,34 +80,38 @@ public class AstrixConfigurer {
 	}
 
 	// TODO: should registering a service be part of api??? or provide some other way to configure Astrix
-	public <T> void registerService(Class<T> type, T provider) {
-		AstrixServiceProvider serviceProvider = new AstrixServiceProvider(
-				Arrays.<AstrixServiceFactory<?>>asList(new SingleInstanceServiceFactory<T>(provider, type)), provider.getClass());
-		context.registerServiceProvider(serviceProvider);
+	public <T> void registerDependency(Class<T> type, T provider) {
+		this.externalDependencies.add(provider);
+//		AstrixServiceProvider serviceProvider = new AstrixServiceProvider(
+//				Arrays.<AstrixServiceFactory<?>>asList(new SingleInstanceServiceFactory<T>(provider, type)), provider.getClass());
+//		context.registerServiceProvider(serviceProvider);
 	}
 	
-	private static class SingleInstanceServiceFactory<T> implements AstrixServiceFactory<T> {
-		
-		private final T instance;
-		private final Class<T> serviceType;
-
-		public SingleInstanceServiceFactory(T instance, Class<T> serviceType) {
-			this.instance = instance;
-			this.serviceType = serviceType;
-		}
-
-		@Override
-		public T create() {
-			return instance;
-		}
-
-		@Override
-		public Class<T> getServiceType() {
-			return this.serviceType;
-		}
-		
-		
-		
-	}
+//	private static class SingleInstanceServiceFactory<T> implements AstrixServiceFactory<T> {
+//		
+//		private final T instance;
+//		private final Class<T> serviceType;
+//
+//		public SingleInstanceServiceFactory(T instance, Class<T> serviceType) {
+//			this.instance = instance;
+//			this.serviceType = serviceType;
+//		}
+//
+//		@Override
+//		public T create(AstrixContext context) {
+//			return instance;
+//		}
+//
+//		@Override
+//		public Class<T> getServiceType() {
+//			return this.serviceType;
+//		}
+//
+//		@Override
+//		public List<Class<?>> getServiceDependencies() {
+//			return null;
+//		}
+//		
+//	}
 	
 }

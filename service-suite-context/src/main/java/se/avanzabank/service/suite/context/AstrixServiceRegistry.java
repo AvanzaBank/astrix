@@ -15,7 +15,8 @@
  */
 package se.avanzabank.service.suite.context;
 
-import java.util.Map;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -28,20 +29,45 @@ public class AstrixServiceRegistry {
 	private final ConcurrentMap<Class<?>, AstrixServiceProvider> serviceProviderByProvidedService = new ConcurrentHashMap<>();
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	public <T> T getService(Class<T> type) {
+	public <T> T getService(Class<T> type, AstrixContext context) {
 		T instance = instanceCache.get(type);
 		if (instance != null) {
 			return instance;
 		}
 		// TODO: synchronize creation of service
 		AstrixServiceFactory<T> serviceFactory = getServiceFactory(type);
-		instance = serviceFactory.create();
+		if (serviceFactory instanceof ExternalDependencyAware) {
+			injectDependencies((ExternalDependencyAware)serviceFactory, context);
+		}
+		instance = serviceFactory.create(context);
 		instanceCache.put(type, instance);
 		return instance;
 	}
 	
+	private <D extends ExternalDependencyBean> void injectDependencies(ExternalDependencyAware<D> externalDependencyAware, AstrixContext context) {
+		D dependency = context.getExternalDependency(externalDependencyAware.getDependencyBeanClass());
+		externalDependencyAware.setDependency(dependency);
+//		Class<D> dependencyBeanClass = externalDependencyAware.getDependencyBeanClass();
+//		if (dependencyBeanClass.getConstructors().length != 1) {
+//			throw new IllegalArgumentException(
+//					"Dependency bean class must have exactly one constructor. " + externalDependencyAware.getClass().getName());
+//		}
+//		Constructor<?> constructor = dependencyBeanClass.getConstructors()[0];
+//		Class<?>[] parameterTypes = constructor.getParameterTypes();
+//		Object[] params = new Object[parameterTypes.length];
+//		for (int i = 0; i < parameterTypes.length; i++) {
+//			params[i] = getService(parameterTypes[i], context); // TODO: introduce externalDependency as separate concept from service
+//		}
+//		try {
+//			D dependency = dependencyBeanClass.cast(constructor.newInstance(params));
+//			externalDependencyAware.setDependency(dependency);
+//		} catch (Exception e) {
+//			throw new RuntimeException("Failed to inject dependencies to: " + externalDependencyAware.getClass().getName(), e);
+//		}
+	}
+
 	public <T> T waitForService(Class<T> type, long timeoutMillis) {
-		return getService(type); // TODO: how to discover when a service becomes available?
+		throw new UnsupportedOperationException();
 	}
 	
 	public <T> AstrixServiceFactory<T> getServiceFactory(Class<T> type) {

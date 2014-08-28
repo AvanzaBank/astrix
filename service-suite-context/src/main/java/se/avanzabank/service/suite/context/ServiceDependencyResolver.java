@@ -15,22 +15,27 @@
  */
 package se.avanzabank.service.suite.context;
 
-public interface AstrixFaultTolerancePlugin {
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class ServiceDependencyResolver {
 	
-	<T> T addFaultTolerance(Class<T> api, T provider);
+	private AstrixContext context;
 	
+	public ServiceDependencyResolver(AstrixContext context) {
+		this.context = context;
+	}
 	
-	
-	
-	public static class Default {
-		public static AstrixFaultTolerancePlugin create() {
-			return new AstrixFaultTolerancePlugin() {
-				@Override
-				public <T> T addFaultTolerance(Class<T> api, T provider) {
-					return provider;
-				}
-			};
+	public Collection<Class<?>> resolveConsumedServices(List<Class<?>> consumedApis) {
+		Set<Class<?>> result = new HashSet<>();
+		for (Class<?> consumedApi : consumedApis) {
+			result.add(consumedApi);
+			AstrixServiceFactory<?> serviceFactory = context.getServiceFactory(consumedApi);
+			result.addAll(resolveConsumedServices(serviceFactory.getServiceDependencies()));
 		}
+		return result;
 	}
 
 }

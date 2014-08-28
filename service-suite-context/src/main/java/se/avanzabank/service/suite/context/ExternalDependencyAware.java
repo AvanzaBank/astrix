@@ -15,22 +15,10 @@
  */
 package se.avanzabank.service.suite.context;
 
-public interface AstrixFaultTolerancePlugin {
+public interface ExternalDependencyAware<T extends ExternalDependencyBean> {
 	
-	<T> T addFaultTolerance(Class<T> api, T provider);
+	void setDependency(T instance);
 	
-	
-	
-	
-	public static class Default {
-		public static AstrixFaultTolerancePlugin create() {
-			return new AstrixFaultTolerancePlugin() {
-				@Override
-				public <T> T addFaultTolerance(Class<T> api, T provider) {
-					return provider;
-				}
-			};
-		}
-	}
+	Class<T> getDependencyBeanClass();
 
 }
