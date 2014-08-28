@@ -47,23 +47,6 @@ public class AstrixServiceRegistry {
 	private <D extends ExternalDependencyBean> void injectDependencies(ExternalDependencyAware<D> externalDependencyAware, AstrixContext context) {
 		D dependency = context.getExternalDependency(externalDependencyAware.getDependencyBeanClass());
 		externalDependencyAware.setDependency(dependency);
-//		Class<D> dependencyBeanClass = externalDependencyAware.getDependencyBeanClass();
-//		if (dependencyBeanClass.getConstructors().length != 1) {
-//			throw new IllegalArgumentException(
-//					"Dependency bean class must have exactly one constructor. " + externalDependencyAware.getClass().getName());
-//		}
-//		Constructor<?> constructor = dependencyBeanClass.getConstructors()[0];
-//		Class<?>[] parameterTypes = constructor.getParameterTypes();
-//		Object[] params = new Object[parameterTypes.length];
-//		for (int i = 0; i < parameterTypes.length; i++) {
-//			params[i] = getService(parameterTypes[i], context); // TODO: introduce externalDependency as separate concept from service
-//		}
-//		try {
-//			D dependency = dependencyBeanClass.cast(constructor.newInstance(params));
-//			externalDependencyAware.setDependency(dependency);
-//		} catch (Exception e) {
-//			throw new RuntimeException("Failed to inject dependencies to: " + externalDependencyAware.getClass().getName(), e);
-//		}
 	}
 
 	public <T> T waitForService(Class<T> type, long timeoutMillis) {

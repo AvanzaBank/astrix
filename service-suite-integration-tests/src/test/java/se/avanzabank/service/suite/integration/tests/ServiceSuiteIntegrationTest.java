@@ -40,7 +40,6 @@ import se.avanzabank.service.suite.integration.tests.domain.api.LunchService;
 import se.avanzabank.service.suite.integration.tests.domain.api.LunchUtil;
 import se.avanzabank.service.suite.remoting.client.AstrixRemoteServiceException;
 import se.avanzabank.service.suite.remoting.plugin.consumer.AstrixRemotingPluginDependencies;
-import se.avanzabank.space.SpaceLocator;
 import se.avanzabank.space.UsesLookupGroupsSpaceLocator;
 import se.avanzabank.space.junit.pu.PuConfigurers;
 import se.avanzabank.space.junit.pu.RunningPu;
@@ -89,8 +88,7 @@ public class ServiceSuiteIntegrationTest {
 		proxy.clear(null);
 		
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.registerDependency(SpaceLocator.class, new UsesLookupGroupsSpaceLocator(serviceBus.getLookupGroupName())); // For service-bus-discovery
-		configurer.registerDependency(new AstrixRemotingPluginDependencies(new UsesLookupGroupsSpaceLocator(serviceBus.getLookupGroupName())));
+		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceBus.getLookupGroupName())); // For service-bus-discovery
 		configurer.useFaultTolerance(false);
 		configurer.enableVersioning(true);
 		Astrix astrix = configurer.configure();

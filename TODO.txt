@@ -6,8 +6,9 @@
 
 === BACKLOG ===
 
+* Skapa enbart en instans av varje tjänst.
 
-
+* LifeCycle-hantering av tjänster och andra astrix-komponenter.
 
 * Versionshantering av tjänster
 

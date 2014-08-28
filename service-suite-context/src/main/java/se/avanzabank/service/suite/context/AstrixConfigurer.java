@@ -26,7 +26,6 @@ public class AstrixConfigurer {
 	private boolean enableVersioning = true;
 	private AstrixContext context = new AstrixContext(new AstrixPlugins());
 	private List<ExternalDependencyBean> externalDependencyBeans = new ArrayList<>();
-	private List<Object> externalDependencies = new ArrayList<>();
 	
 	public AstrixContext configure() {
 		context.setExternalDependencies(externalDependencyBeans);
@@ -45,10 +44,6 @@ public class AstrixConfigurer {
 	@Autowired(required = false)
 	public void setExternalDependencies(List<ExternalDependencyBean> externalDependencies) {
 		this.externalDependencyBeans = externalDependencies;
-	}
-	
-	public List<Object> getExternalDependencies() {
-		return externalDependencies;
 	}
 	
 	public void useFaultTolerance(boolean useFaultTolerance) {
@@ -79,12 +74,8 @@ public class AstrixConfigurer {
 		}
 	}
 
-	// TODO: should registering a service be part of api??? or provide some other way to configure Astrix
-	public <T> void registerDependency(Class<T> type, T provider) {
-		this.externalDependencies.add(provider);
-//		AstrixServiceProvider serviceProvider = new AstrixServiceProvider(
-//				Arrays.<AstrixServiceFactory<?>>asList(new SingleInstanceServiceFactory<T>(provider, type)), provider.getClass());
-//		context.registerServiceProvider(serviceProvider);
+	public <T> void registerDependency(T dependency) {
+		this.context.addExternalDependency(dependency);
 	}
 
 	public void registerDependency(ExternalDependencyBean externalDependency) {

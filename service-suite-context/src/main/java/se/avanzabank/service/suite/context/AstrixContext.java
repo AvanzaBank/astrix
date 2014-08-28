@@ -15,8 +15,11 @@
  */
 package se.avanzabank.service.suite.context;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,7 +27,8 @@ public class AstrixContext implements Astrix {
 	
 	private final AstrixPlugins plugins;
 	private final AstrixServiceRegistry serviceRegistry = new AstrixServiceRegistry();
-	private List<ExternalDependencyBean> externalDependencies = new ArrayList<>();
+	private ConcurrentMap<Class<?>, ExternalDependencyBean> externalDependencyBean = new ConcurrentHashMap<>();
+	private List<Object> externalDependencies = new ArrayList<>();
 	
 	@Autowired
 	public AstrixContext(AstrixPlugins plugins) {
@@ -80,16 +84,50 @@ public class AstrixContext implements Astrix {
 	}
 
 	public void setExternalDependencies(List<ExternalDependencyBean> externalDependencies) {
-		this.externalDependencies = externalDependencies;
+		for (ExternalDependencyBean dependency : externalDependencies) {
+			this.externalDependencyBean.put(dependency.getClass(), dependency);
+		}
 	}
 	
-	public <T extends ExternalDependencyBean> T getExternalDependency(Class<T> type) {
-		for (ExternalDependencyBean dep : this.externalDependencies) {
+	public void addExternalDependency(Object dependency) {
+		this.externalDependencies.add(dependency);
+	}
+	
+	public <T extends ExternalDependencyBean> T getExternalDependency(Class<T> dependencyType) {
+		ExternalDependencyBean externalDependencyBean = this.externalDependencyBean.get(dependencyType);
+		if (externalDependencyBean == null) {
+			return createExternalDependencyBean(dependencyType);
+		}
+		return dependencyType.cast(externalDependencyBean);
+	}
+	
+	private <D extends ExternalDependencyBean> D createExternalDependencyBean(Class<D> dependencyBeanClass) {
+		if (dependencyBeanClass.getConstructors().length != 1) {
+			throw new IllegalArgumentException(
+					"Dependency bean class must have exactly one constructor. " + dependencyBeanClass);
+		}
+		Constructor<?> constructor = dependencyBeanClass.getConstructors()[0];
+		Class<?>[] parameterTypes = constructor.getParameterTypes();
+		Object[] params = new Object[parameterTypes.length];
+		for (int i = 0; i < parameterTypes.length; i++) {
+			params[i] = getDependency(parameterTypes[i]); // TODO: introduce externalDependency as separate concept from service
+		}
+		try {
+			D result = dependencyBeanClass.cast(constructor.newInstance(params));
+			this.externalDependencyBean.put(dependencyBeanClass, result);
+			return result;
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to create dependencyBean: " + dependencyBeanClass, e);
+		}
+	}
+
+	private <T> T getDependency(Class<T> type) {
+		for (Object dep : this.externalDependencies) {
 			if (type.isAssignableFrom(dep.getClass())) {
 				return type.cast(dep);
 			}
 		}
-		throw new IllegalStateException("Missing dependency: " + type);
+		throw new RuntimeException("Missing dependency: " + type.getName());
 	}
 	
 }
