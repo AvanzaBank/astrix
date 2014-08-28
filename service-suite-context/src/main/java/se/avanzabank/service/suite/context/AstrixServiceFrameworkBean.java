@@ -89,7 +89,7 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 		registry.registerBeanDefinition("_astrixConfigurer", beanDefinition);
 
 		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixContext.class);
-		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
+		beanDefinition.setAutowireMode(Autowire.NO.value());
 		beanDefinition.setFactoryBeanName("_astrixConfigurer");
 		beanDefinition.setFactoryMethodName("configure");
 		registry.registerBeanDefinition("_astrixContext", beanDefinition);
