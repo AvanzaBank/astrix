@@ -18,19 +18,16 @@ package se.avanzabank.service.suite.bus.client;
 import java.util.Arrays;
 import java.util.List;
 
-import se.avanzabank.service.suite.context.AstrixContext;
-import se.avanzabank.service.suite.context.AstrixContextAware;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
 import se.avanzabank.service.suite.context.ServiceDependencies;
 import se.avanzabank.service.suite.context.ServiceDependenciesAware;
 
-public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T>, ServiceDependenciesAware, AstrixContextAware {
+public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T>, ServiceDependenciesAware {
 
 	private Class<T> api;
 	private Class<?> descriptorHolder;
 	private AstrixServiceBusComponent serviceBusComponent;
 	private ServiceDependencies services;
-	private AstrixContext astrixContext;
 	
 
 	public ServiceBusLookupServiceFactory(Class<?> descriptorHolder,
@@ -50,7 +47,6 @@ public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T
 			// TODO: manage non discovered services
 			throw new RuntimeException("Did not discover: " + api);
 		}
-//		astrixContext.injectDependencies(serviceBusComponent);
 		return serviceBusComponent.createService(descriptorHolder, api, serviceProperties);
 	}
 	
@@ -69,11 +65,6 @@ public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T
 		this.services = services;
 	}
 
-	@Override
-	public void setAstrixContext(AstrixContext astrixContext) {
-		this.astrixContext = astrixContext;
-	}
-	
 	/*
 	 * TODO: skapa en mekanism som upprätthåller en GigaSpace-koppling:
 	 * 

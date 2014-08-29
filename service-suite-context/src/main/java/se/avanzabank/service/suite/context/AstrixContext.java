@@ -52,6 +52,8 @@ public class AstrixContext implements Astrix {
 	
 	private void injectDependencies(Object plugin) {
 		if (plugin instanceof ExternalDependencyAware) {
+			// TODO: use indirection layer to avoid depending on unused external dependencies?
+			// As implemented now, if an unused plugin has an external dependency it is still required
 			injectExternalDependencies((ExternalDependencyAware<?>)plugin);
 		}
 		if (plugin instanceof ServiceDependenciesAware) {
@@ -59,9 +61,6 @@ public class AstrixContext implements Astrix {
 		}
 		if (plugin instanceof AstrixPluginsAware) {
 			AstrixPluginsAware.class.cast(plugin).setPlugins(getPlugins());
-		}
-		if (plugin instanceof AstrixContextAware) {
-			AstrixContextAware.class.cast(plugin).setAstrixContext(this);
 		}
 	}
 	
