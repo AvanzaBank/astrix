@@ -15,6 +15,7 @@
  */
 package se.avanzabank.service.suite.provider.context;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -41,29 +42,36 @@ import se.avanzabank.space.SpaceLocator;
  */
 public class AstrixServiceBusExporterWorker extends Thread {
 	
-	private final List<ServiceBusExporter> serviceProvideres;
+	private List<ServiceBusExporter> serviceExporters = Collections.emptyList();
 	private final AstrixServiceBus serviceBus;
 	private final Logger log = LoggerFactory.getLogger(AstrixServiceBusExporterWorker.class);
 
 	@Autowired
 	public AstrixServiceBusExporterWorker(
-			List<ServiceBusExporter> serviceProvideres,
 			SpaceLocator sl, // External dependency
 			AstrixPlugins astrixPlugins) { // Plugin dependency
 		AstrixVersioningPlugin versioningPlugin = astrixPlugins.getPlugin(AstrixVersioningPlugin.class);
 		// TODO: AstrixSerivceBus should be retreived from service-framework, not by hard-coding usage of remoting-framework here.
 		GigaSpace serviceBusSpace = sl.createClusteredProxy("service-bus-space"); // TODO: fault tolerance, connection mannagment, etc.
 		this.serviceBus = AstrixRemotingProxy.create(AstrixServiceBus.class, AstrixRemotingTransport.remoteSpace(serviceBusSpace), versioningPlugin.create(AstrixServiceBusApiDescriptor.class));
-		this.serviceProvideres = serviceProvideres;
 	}
-	
+
 	public AstrixServiceBusExporterWorker(List<ServiceBusExporter> serviceProvideres, AstrixServiceBus serviceBus) {
 		this.serviceBus = serviceBus;
-		this.serviceProvideres = serviceProvideres;
+		this.serviceExporters = serviceProvideres;
 	}
+
+	@Autowired(required = false)
+	public void setServiceExporters(List<ServiceBusExporter> serviceExporters) {
+		this.serviceExporters = serviceExporters;
+	}
+	
 
 	@PostConstruct
 	public void startServiceExporter() {
+		if (serviceExporters.isEmpty()) {
+			log.info("No ServiceExporters configured. No services will be published on service bus");
+		}
 		start();
 	}
 
@@ -82,7 +90,7 @@ public class AstrixServiceBusExporterWorker extends Thread {
 	}
 
 	private void exportProvidedServcies() {
-		for (ServiceBusExporter provider : serviceProvideres) {
+		for (ServiceBusExporter provider : serviceExporters) {
 			for (AstrixServiceProperties serviceProperties : provider.getProvidedServices()) {
 				log.debug("Exporting on service bus. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 				serviceBus.register(serviceProperties.getApi(), serviceProperties);

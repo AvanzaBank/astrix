@@ -22,6 +22,8 @@ import java.util.concurrent.ConcurrentMap;
 
 public class AstrixServiceProvider {
 	
+	// TODO: rename to AstrixApiProvider and reserve the term service-provider for server side use?
+	
 	private ConcurrentMap<Class<?>, AstrixServiceFactory<?>> serviceFactoryByProvidedService = new ConcurrentHashMap<>();
 	private Class<?> descriptorHolder;
 	

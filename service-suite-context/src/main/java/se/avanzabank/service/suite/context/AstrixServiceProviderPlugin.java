@@ -19,8 +19,18 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 
-
+/**
+ * Regarding the name, this is a 'client side' component used to bind to
+ * different services. 
+ * 
+ * AstrixServiceProviderPlugin's are 
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public interface AstrixServiceProviderPlugin {
+	
+	// TODO: rename to AstrixServiceBinderPlugin?
 	
 	List<AstrixServiceFactory<?>> createServiceFactories(Class<?> descriptorHolder);
 	

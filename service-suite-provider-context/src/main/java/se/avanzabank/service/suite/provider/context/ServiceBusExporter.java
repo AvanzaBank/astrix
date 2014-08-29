@@ -18,10 +18,16 @@ package se.avanzabank.service.suite.provider.context;
 import java.util.List;
 
 import se.avanzabank.service.suite.bus.client.AstrixServiceProperties;
-
+/**
+ * This is the service-provider part of the service-bus.
+ * 
+ * It's used on the server side to publish a set of services
+ * provided onto the service-bus. <p>
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public interface ServiceBusExporter {
-	
-	// TODO: avoid name conflict between this interface and worker thread 
 	
 	List<AstrixServiceProperties> getProvidedServices();
 

@@ -17,8 +17,22 @@ package se.avanzabank.service.suite.bus.client;
 
 import java.util.List;
 
-
+/**
+ * This is the service-consumer part of the service bus.
+ * 
+ * It's used on the client side to find what services
+ * might be looked up on the service bus, as well as
+ * binding to those services given AstrixServiceProperties
+ * looked up on the service bus. <p>
+ * 
+ * 
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public interface AstrixServiceBusComponent {
+	
+	// TODO: rename to AstrixServiceBusConsumer??
 	
 	/**
 	 * Check whether this component exports any services on a given descriptor.

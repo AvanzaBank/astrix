@@ -1,6 +1,6 @@
 === IN PROGRESS ===
 
-* Inför ett web-applikation som konsumerar tjänster för att säkerställa att icke-pu:ar hanteras korrekt.
+* Inför en web-applikation som konsumerar tjänster för att säkerställa att icke-pu:ar hanteras korrekt.
 
 * Cleanup: Se över strukturen på service-suite-context. Ta bort oanvända abstraktioner.
 
@@ -9,6 +9,8 @@
 
 
 === BACKLOG ===
+
+* Se över de felemeddelanden som en användare får om något ExternalDependency saknas i app-contextet.
 
 * Hur ska AstrixBeanDefnitionRegistryPlugin's hantera beroenden? De bönor som dessa registrerar kommer inte
 hanteras av Astrix. Hur ska då AstrixPlugins/ExternalDepenendencies/ServiceDependencies hanteras?

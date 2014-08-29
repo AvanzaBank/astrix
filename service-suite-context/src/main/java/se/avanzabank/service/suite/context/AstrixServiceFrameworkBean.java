@@ -40,12 +40,19 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 	private List<Class<?>> consumedApis = new ArrayList<>();
 
 	/*
-	 * We must separate between server-side components (those used to export different services) and
+	 * We must distinguish between server-side components (those used to export different services) and
 	 * client-side components (those used to consume services). 
 	 * 
 	 * For instance: We want the client-side components in every application (web-app, pu, etc)
 	 * but only sometimes want the server-side components (we don't want the gs-remoting exporting
 	 * mechanism from a web-app).
+	 * 
+	 * Client side components will have their dependencies injected by AstrixContext (xxxAware).
+	 * 
+	 * Server side components will have their dependencies injected by spring as
+	 * it stands now. Server side components are registered by AstrixBeanRegistryPlugin's. 
+	 * 
+	 * 
 	 */
 	
 	@Override
