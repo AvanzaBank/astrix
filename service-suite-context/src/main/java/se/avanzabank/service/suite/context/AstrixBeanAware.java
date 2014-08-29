@@ -15,11 +15,12 @@
  */
 package se.avanzabank.service.suite.context;
 
+import java.util.List;
 
-public interface AstrixServiceFactory<T> {
+public interface AstrixBeanAware {
 	
-	T create();
+	List<Class<?>> getBeanDependencies();
 	
-	Class<T> getServiceType();
-	
+	void setAstrixBeans(AstrixBeans beans);
+
 }

@@ -28,20 +28,20 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 import se.avanzabank.service.suite.provider.test.AstrixInMemory;
 
-public class AstrixServiceProviderScanner {
+public class AstrixApiProviderScanner {
 
-	private final Logger log = LoggerFactory.getLogger(AstrixServiceProviderScanner.class);
+	private final Logger log = LoggerFactory.getLogger(AstrixApiProviderScanner.class);
 	
 	private String basePackage = "se.avanzabank";
-	private AstrixServiceProviderFactory serviceProviderFactory;
+	private AstrixApiProviderFactory apiProviderFactory;
 
-	public AstrixServiceProviderScanner(String basePackage,
-										AstrixServiceProviderFactory factory) {
+	public AstrixApiProviderScanner(String basePackage,
+										AstrixApiProviderFactory factory) {
 		this.basePackage = basePackage;
-		this.serviceProviderFactory = factory;
+		this.apiProviderFactory = factory;
 	}
 
-	public List<AstrixServiceProvider> scan() {
+	public List<AstrixApiProvider> scan() {
 		return doScan(new ProviderFilter() {
 			@Override
 			public boolean accept(Class<?> providerType) {
@@ -50,7 +50,7 @@ public class AstrixServiceProviderScanner {
 		});
 	}
 	
-	public List<AstrixServiceProvider> scanInMemoryProviders() {
+	public List<AstrixApiProvider> scanInMemoryProviders() {
 		return doScan(new ProviderFilter() {
 			@Override
 			public boolean accept(Class<?> providerType) {
@@ -63,10 +63,10 @@ public class AstrixServiceProviderScanner {
 		boolean accept(Class<?> providerType);
 	}
 	
-	private List<AstrixServiceProvider> doScan(ProviderFilter providerFilter) {
-		List<AstrixServiceProvider> discoveredProviders = new ArrayList<>();
+	private List<AstrixApiProvider> doScan(ProviderFilter providerFilter) {
+		List<AstrixApiProvider> discoveredProviders = new ArrayList<>();
 		ClassPathScanningCandidateComponentProvider providerScanner = new ClassPathScanningCandidateComponentProvider(false);
-		for (Class<? extends Annotation> providerFactory : this.serviceProviderFactory.getProvidedAnnotaionTypes()) {
+		for (Class<? extends Annotation> providerFactory : this.apiProviderFactory.getProvidedAnnotaionTypes()) {
 			providerScanner.addIncludeFilter(new AnnotationTypeFilter(providerFactory));
 		}
 		Set<BeanDefinition> foundCandidateComponents = providerScanner.findCandidateComponents(basePackage);
@@ -77,7 +77,7 @@ public class AstrixServiceProviderScanner {
 					continue;
 				}
 				log.debug("Found provider {}", providerClass.getName());
-				discoveredProviders.add(this.serviceProviderFactory.create(providerClass));
+				discoveredProviders.add(this.apiProviderFactory.create(providerClass));
 			} catch (ClassNotFoundException e) {
 				throw new IllegalStateException("Unable to load api provider class " + beanDefinition.getBeanClassName(), e);
 			}

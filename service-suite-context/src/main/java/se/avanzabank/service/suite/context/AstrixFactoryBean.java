@@ -15,12 +15,20 @@
  */
 package se.avanzabank.service.suite.context;
 
-import java.util.List;
-
-public interface ServiceDependenciesAware {
+/**
+ * Bean is the generic name used for each api element that astrix manages. It
+ * might be in the form of a service 'remoting service', in the form of a library.
+ * 
+ * Bean is the generic term used for an instance of a given type. <p>
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ * @param <T>
+ */
+public interface AstrixFactoryBean<T> {
 	
-	List<Class<?>> getServiceDependencies();
+	T create();
 	
-	void setServiceDependencies(ServiceDependencies services);
-
+	Class<T> getBeanType();
+	
 }

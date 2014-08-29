@@ -33,13 +33,13 @@ public class AstrixConfigurer {
 		context.setExternalDependencies(externalDependencies);
 		configureFaultTolerance(context);
 		configureVersioning(context);
-		discoverServiceProviderPlugins(context);
-		List<AstrixServiceProviderPlugin> serviceProviderPlugins = context.getPlugins(AstrixServiceProviderPlugin.class);
-		AstrixServiceProviderFactory serviceProviderFactory = new AstrixServiceProviderFactory(serviceProviderPlugins);
+		discoverApiProviderPlugins(context);
+		List<AstrixApiProviderPlugin> apiProviderPlugins = context.getPlugins(AstrixApiProviderPlugin.class);
+		AstrixApiProviderFactory apiProviderFactory = new AstrixApiProviderFactory(apiProviderPlugins);
 		
-		List<AstrixServiceProvider> serviceProviders = new AstrixServiceProviderScanner("se.avanzabank", serviceProviderFactory).scan();
-		for (AstrixServiceProvider serviceProvider : serviceProviders) {
-			context.registerServiceProvider(serviceProvider);
+		List<AstrixApiProvider> apiProviders = new AstrixApiProviderScanner("se.avanzabank", apiProviderFactory).scan();
+		for (AstrixApiProvider apiProvider : apiProviders) {
+			context.registerApiProvider(apiProvider);
 		}
 		return context;
 	}
@@ -57,8 +57,8 @@ public class AstrixConfigurer {
 		this.enableVersioning = enableVersioning;
 	}
 
-	private void discoverServiceProviderPlugins(AstrixContext context) {
-		AstrixPluginDiscovery.discoverAllPlugins(context, AstrixServiceProviderPlugin.class, new AstrixLibraryProviderPlugin());
+	private void discoverApiProviderPlugins(AstrixContext context) {
+		AstrixPluginDiscovery.discoverAllPlugins(context, AstrixApiProviderPlugin.class, new AstrixLibraryProviderPlugin());
 	}
 	
 	private void configureVersioning(AstrixContext context) {

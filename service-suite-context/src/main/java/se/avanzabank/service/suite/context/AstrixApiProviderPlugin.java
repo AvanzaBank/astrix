@@ -20,19 +20,16 @@ import java.util.List;
 
 
 /**
- * Regarding the name, this is a 'client side' component used to bind to
- * different services. 
+ * This is a 'client side' component used to 
+ * create factory beans for a given api. <p>
  * 
- * AstrixServiceProviderPlugin's are 
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AstrixServiceProviderPlugin {
+public interface AstrixApiProviderPlugin {
 	
-	// TODO: rename to AstrixServiceBinderPlugin?
-	
-	List<AstrixServiceFactory<?>> createServiceFactories(Class<?> descriptorHolder);
+	List<AstrixFactoryBean<?>> createFactoryBeans(Class<?> apiDescriptorHolder);
 	
 	@Deprecated // TODO: remove, replaced by consumes
 	Class<? extends Annotation> getProviderAnnotationType();

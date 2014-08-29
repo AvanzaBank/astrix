@@ -27,17 +27,17 @@ import org.slf4j.LoggerFactory;
 
 
 
-public class AstrixServiceProviderFactory {
+public class AstrixApiProviderFactory {
 	
-	private final Logger log = LoggerFactory.getLogger(AstrixServiceProviderFactory.class);
-	private ConcurrentMap<Class<? extends Annotation>, AstrixServiceProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
+	private final Logger log = LoggerFactory.getLogger(AstrixApiProviderFactory.class);
+	private ConcurrentMap<Class<? extends Annotation>, AstrixApiProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	
-	public AstrixServiceProviderFactory(Collection<AstrixServiceProviderPlugin> serviceProviderPlugins) {
-		for (AstrixServiceProviderPlugin plugin : serviceProviderPlugins) {
-			AstrixServiceProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
+	public AstrixApiProviderFactory(Collection<AstrixApiProviderPlugin> apiProviderPlugins) {
+		for (AstrixApiProviderPlugin plugin : apiProviderPlugins) {
+			AstrixApiProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
 				// TODO: how to handle multiple providers for same annotation type? Is it allowed
-				log.warn("Multiple AstrixServiceProviderPlugin's found for annotation={}. p1={} p2={}", new Object[]{plugin, previous});
+				log.warn("Multiple AstrixApiProviderPlugin's found for annotation={}. p1={} p2={}", new Object[]{plugin, previous});
 			}
 		}
 	}
@@ -46,15 +46,15 @@ public class AstrixServiceProviderFactory {
 		return pluginByAnnotationType.keySet();
 	}
 	
-	public AstrixServiceProvider create(Class<?> descriptorHolder) {
+	public AstrixApiProvider create(Class<?> descriptorHolder) {
 		// TODO: descriptor is not the actual annotation type, but rather the class holding the given annotation
-		AstrixServiceProviderPlugin providerFactoryPlugin = getProviderFactoryPlugin(descriptorHolder);
-		List<AstrixServiceFactory<?>> serviceFactories = providerFactoryPlugin.createServiceFactories(descriptorHolder);
-		return new AstrixServiceProvider(serviceFactories, descriptorHolder); 
+		AstrixApiProviderPlugin providerFactoryPlugin = getProviderFactoryPlugin(descriptorHolder);
+		List<AstrixFactoryBean<?>> factoryBeans = providerFactoryPlugin.createFactoryBeans(descriptorHolder);
+		return new AstrixApiProvider(factoryBeans, descriptorHolder); 
 	}
 
-	private AstrixServiceProviderPlugin getProviderFactoryPlugin(Class<?> descriptorHolder) {
-		for (AstrixServiceProviderPlugin plugin : pluginByAnnotationType.values()) {
+	private AstrixApiProviderPlugin getProviderFactoryPlugin(Class<?> descriptorHolder) {
+		for (AstrixApiProviderPlugin plugin : pluginByAnnotationType.values()) {
 			if (plugin.consumes(descriptorHolder)) {
 				// TODO: what if multiple plugins consumes same annotation?
 				return plugin;

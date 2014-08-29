@@ -20,19 +20,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AstrixLibraryFactory<T> implements AstrixServiceFactory<T>, ServiceDependenciesAware {
+public class AstrixLibraryFactory<T> implements AstrixFactoryBean<T>, AstrixBeanAware {
 
 	private Object factoryInstance;
 	private Method factoryMethod;
 	private Class<T> type;
-	private List<Class<?>> serviceDependencies = new ArrayList<>();
-	private ServiceDependencies services;
+	private List<Class<?>> astrixBeanDependencies = new ArrayList<>();
+	private AstrixBeans beans;
 	
 	public AstrixLibraryFactory(Object factoryInstance, Method factoryMethod) {
 		this.factoryInstance = factoryInstance;
 		this.factoryMethod = factoryMethod;
 		this.type = (Class<T>) factoryMethod.getReturnType();
-		this.serviceDependencies = Arrays.asList(factoryMethod.getParameterTypes());
+		this.astrixBeanDependencies = Arrays.asList(factoryMethod.getParameterTypes());
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class AstrixLibraryFactory<T> implements AstrixServiceFactory<T>, Service
 		// TODO: analyze each factory for what dependencies they have?
 		for (int argumentIndex = 0; argumentIndex < factoryMethod.getParameterTypes().length; argumentIndex++) {
 			Class<?> argumentType = factoryMethod.getParameterTypes()[argumentIndex];
-			args[argumentIndex] = services.getService(argumentType); // TODO: discover circular library creation
+			args[argumentIndex] = beans.getBean(argumentType); // TODO: discover circular library creation
 		}
 		Object result;
 		try {
@@ -53,18 +53,18 @@ public class AstrixLibraryFactory<T> implements AstrixServiceFactory<T>, Service
 	}
 	
 	@Override
-	public Class<T> getServiceType() {
+	public Class<T> getBeanType() {
 		return this.type;
 	}
 	
 	@Override
-	public List<Class<?>> getServiceDependencies() {
-		return this.serviceDependencies;
+	public List<Class<?>> getBeanDependencies() {
+		return this.astrixBeanDependencies;
 	}
 
 	@Override
-	public void setServiceDependencies(ServiceDependencies services) {
-		this.services = services;
+	public void setAstrixBeans(AstrixBeans beans) {
+		this.beans = beans;
 	}
 	
 }

@@ -15,9 +15,6 @@
  */
 package se.avanzabank.service.suite.context;
 
-public interface ServiceDependencies {
-	
-	// Rename to Services or similar?
-
-	<T> T getService(Class<T> service);
+public interface AstrixBeans {
+	<T> T getBean(Class<T> beanType);
 }

@@ -27,8 +27,8 @@ import se.avanzabank.service.suite.context.AstrixFaultTolerancePlugin;
 import se.avanzabank.service.suite.context.AstrixPlugins;
 import se.avanzabank.service.suite.context.AstrixPluginsAware;
 import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
-import se.avanzabank.service.suite.context.ServiceDependencies;
-import se.avanzabank.service.suite.context.ServiceDependenciesAware;
+import se.avanzabank.service.suite.context.AstrixBeans;
+import se.avanzabank.service.suite.context.AstrixBeanAware;
 import se.avanzabank.service.suite.core.AstrixObjectSerializer;
 import se.avanzabank.service.suite.gs.GigaSpaceRegistry;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
@@ -37,7 +37,7 @@ import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
 import se.avanzabank.service.suite.remoting.plugin.provider.AstrixRemotingServiceBusExporter;
 
 @MetaInfServices(AstrixServiceBusComponent.class)
-public class AstrixRemotingServiceBusComponent implements AstrixServiceBusComponent, ServiceDependenciesAware, AstrixPluginsAware {
+public class AstrixRemotingServiceBusComponent implements AstrixServiceBusComponent, AstrixBeanAware, AstrixPluginsAware {
 
 	// TODO: what if lookup of service-properties fails? whose responsible of making new attempts to discover provider?
 	// Multiple cases exists:
@@ -46,7 +46,7 @@ public class AstrixRemotingServiceBusComponent implements AstrixServiceBusCompon
 	//
 	
 	private AstrixPlugins plugins;
-	private ServiceDependencies services;
+	private AstrixBeans beans;
 	
 	@Override
 	public <T> T createService(Class<?> descriptorHolder, Class<T> api, AstrixServiceProperties serviceProperties) {
@@ -54,7 +54,7 @@ public class AstrixRemotingServiceBusComponent implements AstrixServiceBusCompon
 		AstrixFaultTolerancePlugin faultTolerance = plugins.getPlugin(AstrixFaultTolerancePlugin.class);
 		
 		// TODO: is GigaSpaceRegistry really a service???
-		GigaSpaceRegistry registry = services.getService(GigaSpaceRegistry.class); // TODO: behöver den här klassen verkligen känna till space-namnet? Kan inte det abstraheras bort av AstrixServiceContext???
+		GigaSpaceRegistry registry = beans.getBean(GigaSpaceRegistry.class); // TODO: behöver den här klassen verkligen känna till space-namnet? Kan inte det abstraheras bort av AstrixServiceContext???
 		String targetSpace = serviceProperties.getProperty(AstrixRemotingServiceBusExporter.SPACE_NAME_PROPERTY);
 		AstrixRemotingTransport remotingTransport = AstrixRemotingTransport.remoteSpace(registry.lookup(targetSpace)); // TODO: caching of created proxies, fault tolerance?
 		
@@ -73,13 +73,13 @@ public class AstrixRemotingServiceBusComponent implements AstrixServiceBusCompon
 	}
 
 	@Override
-	public List<Class<?>> getServiceDependencies() {
+	public List<Class<?>> getBeanDependencies() {
 		return Arrays.<Class<?>>asList(GigaSpaceRegistry.class);
 	}
 
 	@Override
-	public void setServiceDependencies(ServiceDependencies services) {
-		this.services = services;
+	public void setAstrixBeans(AstrixBeans beans) {
+		this.beans = beans;
 	}
 
 	@Override

@@ -26,6 +26,8 @@ import se.avanzabank.service.suite.context.AstrixBeanRegistryPlugin;
 @MetaInfServices(AstrixBeanRegistryPlugin.class)
 public class AstrixServiceBusBeanRegistryPlugin implements AstrixBeanRegistryPlugin {
 
+	// TODO: how to know if a AstrixServicebusExporter should be registered?
+	
 	@Override
 	public void registerBeanDefinitions(BeanDefinitionRegistry registry) throws BeansException {
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceBusExporterWorker.class);

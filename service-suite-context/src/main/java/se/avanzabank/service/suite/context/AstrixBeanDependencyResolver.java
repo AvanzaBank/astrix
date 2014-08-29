@@ -20,20 +20,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ServiceDependencyResolver {
+public class AstrixBeanDependencyResolver {
 	
 	private AstrixContext context;
 	
-	public ServiceDependencyResolver(AstrixContext context) {
+	public AstrixBeanDependencyResolver(AstrixContext context) {
 		this.context = context;
 	}
 	
-	public Collection<Class<?>> resolveConsumedServices(List<Class<?>> consumedApis) {
+	/**
+	 * Resolves what beans are required to create a given set beanTypes (ie 
+	 * discover all transitive bean dependencies).
+	 * 
+	 * @param beanTypes
+	 * @return
+	 */
+	public Collection<Class<?>> resolveConsumedBeans(List<Class<?>> beanTypes) {
 		Set<Class<?>> result = new HashSet<>();
-		for (Class<?> consumedApi : consumedApis) {
-			result.add(consumedApi);
-			List<Class<?>> transitiveDependencies = context.getTransitiveServiceDependencies(consumedApi);
-			result.addAll(resolveConsumedServices(transitiveDependencies));
+		for (Class<?> consumedBeanType : beanTypes) {
+			result.add(consumedBeanType);
+			List<Class<?>> transitiveDependencies = context.getTransitiveBeanDependencies(consumedBeanType);
+			result.addAll(resolveConsumedBeans(transitiveDependencies));
 		}
 		return result;
 	}

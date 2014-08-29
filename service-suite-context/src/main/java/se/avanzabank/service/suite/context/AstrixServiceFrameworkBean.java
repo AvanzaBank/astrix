@@ -37,11 +37,11 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostProcessor {
 	
 	// TODO: rename to consumedServices?
-	private List<Class<?>> consumedApis = new ArrayList<>();
+	private List<Class<?>> consumedAstrixBeans = new ArrayList<>();
 
 	/*
-	 * We must distinguish between server-side components (those used to export different services) and
-	 * client-side components (those used to consume services). 
+	 * We must distinguish between server-side components (those used to export different SERVICES) and
+	 * client-side components (those used to consume BEANS (services, librarys, ets)). 
 	 * 
 	 * For instance: We want the client-side components in every application (web-app, pu, etc)
 	 * but only sometimes want the server-side components (we don't want the gs-remoting exporting
@@ -58,22 +58,27 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		/*
-		 * TODO:
-		 * 1.a discover all plugins (remoting, messaging, library etc)
-		 *  .b discover all service-providers 
-		 *  .c create meta-data model (no instantiation) for all services available
+		 * NOTE: its important to avoid premature instantiation of spring-beans, hence
+		 * we may not query the spring ApplicationContext from astrix-classes, since we
+		 * don't know in what order spring will instantiate beans.
+		 * 
+		 * Therefore we init process looks like this:
+		 * 
+		 * 1. Discover all plugins using astrix-plugin-discovery
+		 * 2. Scan for api-providers on classpath and build AstrixBeanFactories
+		 *  -> Its important that no "xxxAware" injected dependency is used in this phase,
+		 *  especially no ExternalDependencyBean since we have created the ApplicationContext yet.
 		 *  
-		 * 2.  for each 'consumedApi':
-		 *  .a Retrieve provider for api.
-		 *  .b Register bean-definition for 'dependency-bean' for that plugin
-		 *  .c somehow: register a FactoryBean that depends on 'dependency-bean' and creates api
-		 *  
+		 * 3. For each consumedApi register a AstrixSpringFactoryBean.
+		 * 
+		 * 4. Let other service-providing component register it's spring beans. TODO: how to do this in clean way?
+		 * 
 		 */
 		
 		// TODO: avoid creating two AstrixContext's (here and as spring bean)
 		AstrixContext astrixContext = new AstrixConfigurer().configure(); 
 		
-		// For each consumed service, either directly or indirectly (for instance via a library), 
+		// For each consumedApi, either directly or indirectly (for instance via a library), 
 		// we must register a bean definition for the ExternalDependencyBean to "collect" the dependencies from
 		// the application-context
 		Set<Class<? extends ExternalDependencyBean>> externalDependencyBeanTypes = resolveAllExternalDependencies(astrixContext);
@@ -83,9 +88,7 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 			registry.registerBeanDefinition(dependencyBeanName, dependenciesBeanDefinition);
 		}
 		
-		// AstrixConfigurer must be created AFTER all dependency-beans have bean created
-		// TODO: is this setDependsOn really needed? Won't spring ensure this since we autowire all ExternalDependencyBean's
-		// into the AstrixConfigurer?
+		// AstrixConfigurer must be created AFTER all dependency-beans have bean created.
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AstrixConfigurer.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		beanDefinition.setDependsOn(getDependencyBeanNames(externalDependencyBeanTypes));
@@ -104,12 +107,12 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 		registry.registerBeanDefinition("_astrixPlugins", beanDefinition);
 		
 		
-		for (Class<?> consumedService : consumedApis) {
-			beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceFactoryBean.class);
+		for (Class<?> consumedAstrixBean : consumedAstrixBeans) {
+			beanDefinition = new AnnotatedGenericBeanDefinition(AstrixSpringFactoryBean.class);
 			MutablePropertyValues props = new MutablePropertyValues();
-			props.add("type", consumedService);
+			props.add("type", consumedAstrixBean);
 			beanDefinition.setPropertyValues(props);
-			registry.registerBeanDefinition("_" + consumedService.getName(), beanDefinition);
+			registry.registerBeanDefinition("_" + consumedAstrixBean.getName(), beanDefinition);
 		}
 			
 		for (AstrixBeanRegistryPlugin beanRegistryPlugin :
@@ -130,9 +133,9 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 	private Set<Class<? extends ExternalDependencyBean>> resolveAllExternalDependencies(
 			AstrixContext astrixContext) {
 		Set<Class<? extends ExternalDependencyBean>> result = new HashSet<>();
-		for (Class<?> consumedService : resolveAllConsumedServices(astrixContext)) {
+		for (Class<?> consumedBeans : resolveAllConsumedBeans(astrixContext)) {
 			Class<? extends ExternalDependencyBean> externalDependencyBean =
-					astrixContext.getExternalDependencyBean(consumedService);
+					astrixContext.getExternalDependencyBean(consumedBeans);
 			if (externalDependencyBean != null) {
 				result.add(externalDependencyBean);
 			}
@@ -140,8 +143,8 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 		return result;
 	}
 
-	private Collection<Class<?>> resolveAllConsumedServices(AstrixContext astrixContext) {
-		return new ServiceDependencyResolver(astrixContext).resolveConsumedServices(consumedApis);
+	private Collection<Class<?>> resolveAllConsumedBeans(AstrixContext astrixContext) {
+		return new AstrixBeanDependencyResolver(astrixContext).resolveConsumedBeans(consumedAstrixBeans);
 	}
 
 	@Override
@@ -149,12 +152,12 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 		// intentionally empty, inherited from BeanDefinitionRegistryPostProcessor
 	}
 	
-	public void setConsumedApis(List<Class<?>> consumedApis) {
-		this.consumedApis = consumedApis;
+	public void setConsumedAstrixBeans(List<Class<?>> consumedAstrixBeans) {
+		this.consumedAstrixBeans = consumedAstrixBeans;
 	}
 	
 	public List<Class<?>> getConsumedApis() {
-		return consumedApis;
+		return consumedAstrixBeans;
 	}
 	
 }

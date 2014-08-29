@@ -18,7 +18,7 @@ package se.avanzabank.service.suite.context;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class AstrixServiceFactoryBean<T> implements FactoryBean<T> {
+public class AstrixSpringFactoryBean<T> implements FactoryBean<T> {
 	
 	private Class<T> type;
 	private AstrixContext astrix;
@@ -42,7 +42,7 @@ public class AstrixServiceFactoryBean<T> implements FactoryBean<T> {
 
 	@Override
 	public T getObject() throws Exception {
-		return astrix.getService(type);
+		return astrix.getBean(type);
 	}
 
 	@Override

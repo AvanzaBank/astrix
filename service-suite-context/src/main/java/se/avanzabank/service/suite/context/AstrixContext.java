@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentMap;
 public class AstrixContext implements Astrix {
 	
 	private final AstrixPlugins plugins;
-	private final AstrixServiceFactoryRegistry serviceFactoryRegistry = new AstrixServiceFactoryRegistry();
+	private final AstrixBeanFactoryRegistry beanFactoryRegistry = new AstrixBeanFactoryRegistry();
 	private ConcurrentMap<Class<?>, ExternalDependencyBean> externalDependencyBean = new ConcurrentHashMap<>();
 	private List<Object> externalDependencies = new ArrayList<>();
 	
@@ -46,8 +46,8 @@ public class AstrixContext implements Astrix {
 		plugins.registerPlugin(type, provider);
 	}
 	
-	public void registerServiceProvider(AstrixServiceProvider serviceProvider) {
-		this.serviceFactoryRegistry.registerProvider(serviceProvider);
+	public void registerApiProvider(AstrixApiProvider apiProvider) {
+		this.beanFactoryRegistry.registerProvider(apiProvider);
 	}
 	
 	private void injectDependencies(Object plugin) {
@@ -56,19 +56,22 @@ public class AstrixContext implements Astrix {
 			// As implemented now, if an unused plugin has an external dependency it is still required
 			injectExternalDependencies((ExternalDependencyAware<?>)plugin);
 		}
-		if (plugin instanceof ServiceDependenciesAware) {
-			injectServiceDependencies((ServiceDependenciesAware)plugin);
+		if (plugin instanceof AstrixBeanAware) {
+			injectBeanDependencies((AstrixBeanAware)plugin);
 		}
 		if (plugin instanceof AstrixPluginsAware) {
 			AstrixPluginsAware.class.cast(plugin).setPlugins(getPlugins());
 		}
 	}
 	
-	private void injectServiceDependencies(ServiceDependenciesAware serviceDependenciesAware) {
-		serviceDependenciesAware.setServiceDependencies(new ServiceDependencies() {
+	private void injectBeanDependencies(final AstrixBeanAware beanDependenciesAware) {
+		beanDependenciesAware.setAstrixBeans(new AstrixBeans() {
 			@Override
-			public <T> T getService(Class<T> service) {
-				return AstrixContext.this.getService(service);
+			public <T> T getBean(Class<T> beanType) {
+				if (!beanDependenciesAware.getBeanDependencies().contains(beanType)) {
+					throw new RuntimeException("Undeclared bean dependency: " + beanType);
+				}
+				return AstrixContext.this.getBean(beanType);
 			}
 		});
 	}
@@ -79,40 +82,40 @@ public class AstrixContext implements Astrix {
 	}
 
 	/**
-	 * Looks up a service in the local service registry. <p>
+	 * Looks up a bean in the bean registry. <p>
 	 * 
-	 * @param type
+	 * @param beanType
 	 * @return
 	 */
-	public <T> T getService(Class<T> type) {
-		// TODO: synchronize creation of service
-		// TODO: fix caching of created services
-		AstrixServiceFactory<T> serviceFactory = getServiceFactory(type);
-		injectDependencies(serviceFactory);
-		return serviceFactory.create();
+	public <T> T getBean(Class<T> beanType) {
+		// TODO: synchronize creation of bean
+		// TODO: fix caching of created bean
+		AstrixFactoryBean<T> factory = getFactoryBean(beanType);
+		injectDependencies(factory);
+		return factory.create();
 	}
 	
-	private <T> AstrixServiceFactory<T> getServiceFactory(Class<T> type) {
-		return this.serviceFactoryRegistry.getServiceFactory(type);
+	private <T> AstrixFactoryBean<T> getFactoryBean(Class<T> beanType) {
+		return this.beanFactoryRegistry.getFactoryBean(beanType);
 	}
 	
 	/**
 	 * Returns the external dependencies (as defined by an ExternalDependencyBean) required 
-	 * to create a given service, or null if no external dependencies exists. <p>
+	 * to create a given bean, or null if no external dependencies exists. <p>
 	 * 
-	 * @param serviceType
+	 * @param beanType
 	 * @return
 	 */
-	public Class<? extends ExternalDependencyBean> getExternalDependencyBean(Class<?> serviceType) {
-		AstrixServiceFactory<?> serviceFactory = getServiceFactory(serviceType);
-		if (serviceFactory instanceof ExternalDependencyAware) {
-			return ExternalDependencyAware.class.cast(serviceFactory).getDependencyBeanClass();
+	public Class<? extends ExternalDependencyBean> getExternalDependencyBean(Class<?> beanType) {
+		AstrixFactoryBean<?> factoryBean = getFactoryBean(beanType);
+		if (factoryBean instanceof ExternalDependencyAware) {
+			return ExternalDependencyAware.class.cast(factoryBean).getDependencyBeanClass();
 		}
 		return null;
 	}
 	
-	public <T> AstrixServiceProvider getsServiceProvider(Class<T> type) {
-		return this.serviceFactoryRegistry.getServiceProvider(type);
+	public <T> AstrixApiProvider getsApiProvider(Class<T> beanType) {
+		return this.beanFactoryRegistry.getApiProvider(beanType);
 	}
 
 	public AstrixPlugins getPlugins() {
@@ -120,7 +123,7 @@ public class AstrixContext implements Astrix {
 	}
 
 	@Override
-	public <T> T waitForService(Class<T> class1, long timeoutMillis) {
+	public <T> T waitForBean(Class<T> class1, long timeoutMillis) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -151,7 +154,7 @@ public class AstrixContext implements Astrix {
 		Class<?>[] parameterTypes = constructor.getParameterTypes();
 		Object[] params = new Object[parameterTypes.length];
 		for (int i = 0; i < parameterTypes.length; i++) {
-			params[i] = getDependency(parameterTypes[i]); // TODO: introduce externalDependency as separate concept from service
+			params[i] = getDependency(parameterTypes[i]);
 		}
 		try {
 			D result = dependencyBeanClass.cast(constructor.newInstance(params));
@@ -172,15 +175,16 @@ public class AstrixContext implements Astrix {
 	}
 
 	/**
-	 * Returns the transitive service dependencies required to create a given service, 
-	 * ie the services that are used by, or during creation, of a given service.
-	 * @param serviceType
+	 * Returns the transitive bean dependencies required to create a bean of given type, 
+	 * ie the beans that are used by, or during creation, of a given bean.
+	 * 
+	 * @param beanType
 	 * @return
 	 */
-	public List<Class<?>> getTransitiveServiceDependencies(Class<?> serviceType) {
-		AstrixServiceFactory<?> serviceFactory = getServiceFactory(serviceType);
-		if (serviceFactory instanceof ServiceDependenciesAware) {
-			return ServiceDependenciesAware.class.cast(serviceFactory).getServiceDependencies();
+	public List<Class<?>> getTransitiveBeanDependencies(Class<?> beanType) {
+		AstrixFactoryBean<?> beanFactory = getFactoryBean(beanType);
+		if (beanFactory instanceof AstrixBeanAware) {
+			return AstrixBeanAware.class.cast(beanFactory).getBeanDependencies();
 		}
 		return Collections.emptyList();
 	}

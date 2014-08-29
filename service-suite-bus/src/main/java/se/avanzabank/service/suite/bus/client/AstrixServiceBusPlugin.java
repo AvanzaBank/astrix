@@ -23,21 +23,21 @@ import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.service.suite.context.AstrixPlugins;
 import se.avanzabank.service.suite.context.AstrixPluginsAware;
-import se.avanzabank.service.suite.context.AstrixServiceFactory;
-import se.avanzabank.service.suite.context.AstrixServiceProviderPlugin;
+import se.avanzabank.service.suite.context.AstrixFactoryBean;
+import se.avanzabank.service.suite.context.AstrixApiProviderPlugin;
 import se.avanzabank.service.suite.provider.core.AstrixServiceBusApi;
 
-@MetaInfServices(AstrixServiceProviderPlugin.class)
-public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin, AstrixPluginsAware {
+@MetaInfServices(AstrixApiProviderPlugin.class)
+public class AstrixServiceBusPlugin implements AstrixApiProviderPlugin, AstrixPluginsAware {
 	
 	private AstrixPlugins plugins;
 
 	@Override
-	public List<AstrixServiceFactory<?>> createServiceFactories(Class<?> descriptorHolder) {
-		List<AstrixServiceFactory<?>> result = new ArrayList<>();
+	public List<AstrixFactoryBean<?>> createFactoryBeans(Class<?> descriptorHolder) {
+		List<AstrixFactoryBean<?>> result = new ArrayList<>();
 		for (AstrixServiceBusComponent component : getAllComponents()) {
 			for (Class<?> exportedApi : component.getExportedServices(descriptorHolder)) {
-				result.add(new ServiceBusLookupServiceFactory<>(descriptorHolder, exportedApi, component));
+				result.add(new ServiceBusLookupFactory<>(descriptorHolder, exportedApi, component));
 			}
 		}
 		return result;

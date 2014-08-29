@@ -18,7 +18,7 @@ package se.avanzabank.service.suite.remoting.plugin.consumer;
 import se.avanzabank.service.suite.context.AstrixFaultTolerancePlugin;
 import se.avanzabank.service.suite.context.AstrixPlugins;
 import se.avanzabank.service.suite.context.AstrixPluginsAware;
-import se.avanzabank.service.suite.context.AstrixServiceFactory;
+import se.avanzabank.service.suite.context.AstrixFactoryBean;
 import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
 import se.avanzabank.service.suite.context.ExternalDependencyAware;
 import se.avanzabank.service.suite.core.AstrixObjectSerializer;
@@ -26,7 +26,7 @@ import se.avanzabank.service.suite.remoting.client.AstrixRemotingProxy;
 import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
 import se.avanzabank.space.SpaceLocator;
 
-public class AstrixRemotingServiceFactory<T> implements AstrixServiceFactory<T>, ExternalDependencyAware<AstrixRemotingPluginDependencies>, AstrixPluginsAware {
+public class AstrixRemotingServiceFactory<T> implements AstrixFactoryBean<T>, ExternalDependencyAware<AstrixRemotingPluginDependencies>, AstrixPluginsAware {
 	
 	private final Class<T> serviceApi;
 	private final String targetSpace;
@@ -67,7 +67,7 @@ public class AstrixRemotingServiceFactory<T> implements AstrixServiceFactory<T>,
 	}
 
 	@Override
-	public Class<T> getServiceType() {
+	public Class<T> getBeanType() {
 		return serviceApi;
 	}
 	

@@ -13,7 +13,7 @@
     
 <!--     <bean class="se.avanzabank.service.suite.context.AstrixServiceFrameworkBean"/> -->
     <bean class="se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean"/>
-<!--     <bean class="se.avanzabank.service.suite.context.AstrixPlugins"/> -->
+<!--     <bean class="se.avanzabank.service.suite.context.AsttrixPlugins"/> -->
 
 	<bean id="astrixContext" class="se.avanzabank.service.suite.context.AstrixContext"/>
 	<bean id="astrixPlugins" class="se.avanzabank.service.suite.context.AstrixPlugins" factory-bean="astrixContext" factory-method="getPlugins"/>

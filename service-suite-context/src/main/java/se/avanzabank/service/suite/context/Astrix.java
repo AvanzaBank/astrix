@@ -19,8 +19,8 @@ package se.avanzabank.service.suite.context;
 
 public interface Astrix {
 
-	<T> T getService(Class<T> type);
+	<T> T getBean(Class<T> beanType);
 
-	<T> T waitForService(Class<T> type, long timeoutMillis);
+	<T> T waitForBean(Class<T> type, long timeoutMillis);
 
 }

@@ -15,7 +15,7 @@
  */
 package se.avanzabank.service.suite.context;
 /**
- * Extension to {@link AstrixServiceFactory} for factories that requires external
+ * Extension to {@link AstrixFactoryBean} for factories that requires external
  * dependencies, for instance a SpaceLocator. 
  * 
  * 

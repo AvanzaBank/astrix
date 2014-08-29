@@ -25,13 +25,13 @@ import org.kohsuke.MetaInfServices;
 import se.avanzabank.service.suite.provider.library.AstrixExport;
 import se.avanzabank.service.suite.provider.library.AstrixLibraryProvider;
 
-@MetaInfServices(AstrixServiceProviderPlugin.class)
-public class AstrixLibraryProviderPlugin implements AstrixServiceProviderPlugin {
+@MetaInfServices(AstrixApiProviderPlugin.class)
+public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
 	
 	@Override
-	public List<AstrixServiceFactory<?>> createServiceFactories(Class<?> descriptorHolder) {
+	public List<AstrixFactoryBean<?>> createFactoryBeans(Class<?> descriptorHolder) {
 		Object libraryProviderInstance = initInstanceProvider(descriptorHolder); // TODO: who manages lifecycle for the libraryProviderInstance?
-		List<AstrixServiceFactory<?>> result = new ArrayList<>();
+		List<AstrixFactoryBean<?>> result = new ArrayList<>();
 		for (Method m : descriptorHolder.getMethods()) {
 			if (m.isAnnotationPresent(AstrixExport.class)) {
 				result.add(new AstrixLibraryFactory<>(libraryProviderInstance, m));

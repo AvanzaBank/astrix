@@ -101,9 +101,9 @@ public class ServiceSuiteIntegrationTest {
 		Thread.sleep(1000); // TODO: wait for service to be registered in service bus in clean way...
 //		this.lunchService = astrix.waitForService(LunchService.class, 5000);
 //		this.lunchUtil = astrix.waitForService(LunchUtil.class, 5000);
-		this.lunchService = astrix.getService(LunchService.class);
-		this.lunchUtil = astrix.getService(LunchUtil.class);
-		this.lunchRestaurantGrader = astrix.getService(LunchRestaurantGrader.class);
+		this.lunchService = astrix.getBean(LunchService.class);
+		this.lunchUtil = astrix.getBean(LunchUtil.class);
+		this.lunchRestaurantGrader = astrix.getBean(LunchRestaurantGrader.class);
 
 	}
 	

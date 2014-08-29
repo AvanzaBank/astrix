@@ -20,19 +20,19 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class AstrixServiceProvider {
+public class AstrixApiProvider {
 	
-	// TODO: rename to AstrixApiProvider and reserve the term service-provider for server side use?
-	
-	private ConcurrentMap<Class<?>, AstrixServiceFactory<?>> serviceFactoryByProvidedService = new ConcurrentHashMap<>();
+	private ConcurrentMap<Class<?>, AstrixFactoryBean<?>> factoryByProvidedType = new ConcurrentHashMap<>();
 	private Class<?> descriptorHolder;
 	
-	public AstrixServiceProvider(List<AstrixServiceFactory<?>> factories, Class<?> descriptorHolder) {
+	public AstrixApiProvider(List<AstrixFactoryBean<?>> factories, Class<?> descriptorHolder) {
 		this.descriptorHolder = descriptorHolder;
-		for (AstrixServiceFactory<?> factory : factories) {
-			AstrixServiceFactory<?> previous = this.serviceFactoryByProvidedService.putIfAbsent(factory.getServiceType(), factory);
+		for (AstrixFactoryBean<?> factory : factories) {
+			AstrixFactoryBean<?> previous = this.factoryByProvidedType.putIfAbsent(factory.getBeanType(), factory);
 			if (previous != null) {
-				throw new IllegalArgumentException("Multiple service factories found on: " + descriptorHolder);
+				throw new IllegalArgumentException(
+						String.format("Duplicate bean factories found. type=%s descriptor=%s",
+								factory.getBeanType().getName(), descriptorHolder.getName()));
 			}
 		}
 	}
@@ -41,12 +41,12 @@ public class AstrixServiceProvider {
 		return descriptorHolder;
 	}
 
-	public Collection<Class<?>> providedServices() {
-		return this.serviceFactoryByProvidedService.keySet();
+	public Collection<Class<?>> providedApis() {
+		return this.factoryByProvidedType.keySet();
 	}
 	
-	public <T> AstrixServiceFactory<T> getServiceFactory(Class<T> type) {
-		return (AstrixServiceFactory<T>) this.serviceFactoryByProvidedService.get(type);
+	public <T> AstrixFactoryBean<T> getFactory(Class<T> type) {
+		return (AstrixFactoryBean<T>) this.factoryByProvidedType.get(type);
 	}
 	
 }

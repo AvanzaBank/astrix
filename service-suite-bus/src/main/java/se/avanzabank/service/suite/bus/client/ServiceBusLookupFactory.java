@@ -18,19 +18,18 @@ package se.avanzabank.service.suite.bus.client;
 import java.util.Arrays;
 import java.util.List;
 
-import se.avanzabank.service.suite.context.AstrixServiceFactory;
-import se.avanzabank.service.suite.context.ServiceDependencies;
-import se.avanzabank.service.suite.context.ServiceDependenciesAware;
+import se.avanzabank.service.suite.context.AstrixFactoryBean;
+import se.avanzabank.service.suite.context.AstrixBeans;
+import se.avanzabank.service.suite.context.AstrixBeanAware;
 
-public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T>, ServiceDependenciesAware {
+public class ServiceBusLookupFactory<T> implements AstrixFactoryBean<T>, AstrixBeanAware {
 
 	private Class<T> api;
 	private Class<?> descriptorHolder;
 	private AstrixServiceBusComponent serviceBusComponent;
-	private ServiceDependencies services;
-	
+	private AstrixBeans beans;
 
-	public ServiceBusLookupServiceFactory(Class<?> descriptorHolder,
+	public ServiceBusLookupFactory(Class<?> descriptorHolder,
 			Class<T> api,
 			AstrixServiceBusComponent serviceBusComponent) {
 		this.descriptorHolder = descriptorHolder;
@@ -41,7 +40,7 @@ public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T
 	@Override
 	public T create() {
 		// TODO: always return a proxy-instance, no matter in which of the steps below that the lookup fails
-		AstrixServiceBus serviceBus = services.getService(AstrixServiceBus.class); // service dependency
+		AstrixServiceBus serviceBus = beans.getBean(AstrixServiceBus.class); // service dependency
 		AstrixServiceProperties serviceProperties = serviceBus.lookup(api); // TODO: might fail
 		if (serviceProperties == null) {
 			// TODO: manage non discovered services
@@ -51,18 +50,18 @@ public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T
 	}
 	
 	@Override
-	public List<Class<?>> getServiceDependencies() {
+	public List<Class<?>> getBeanDependencies() {
 		return Arrays.<Class<?>>asList(AstrixServiceBus.class);
 	}
 
 	@Override
-	public Class<T> getServiceType() {
+	public Class<T> getBeanType() {
 		return this.api;
 	}
 
 	@Override
-	public void setServiceDependencies(ServiceDependencies services) {
-		this.services = services;
+	public void setAstrixBeans(AstrixBeans beans) {
+		this.beans = beans;
 	}
 
 	/*
