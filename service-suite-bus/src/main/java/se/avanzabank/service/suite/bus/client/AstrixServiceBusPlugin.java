@@ -33,20 +33,12 @@ public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin, Astr
 	
 	private AstrixPlugins plugins;
 
-	public AstrixServiceBusPlugin() {
-	}
-
 	@Override
 	public AstrixServiceProvider create(Class<?> descriptorHolder) {
 		List<AstrixServiceFactory<?>> factories = new ArrayList<>();
-		// Find component
-		
 		for (AstrixServiceBusComponent component : getAllComponents()) {
 			for (Class<?> exportedApi : component.getExportedServices(descriptorHolder)) {
-				// I det här läget vill jag inte slå upp tjänsten, enbart skapa en factory som 'on demand' slår upp
-				// tjänsten över tjänstebussen.
-				ServiceBusLookupServiceFactory<?> factory = new ServiceBusLookupServiceFactory<>(descriptorHolder, exportedApi, component);
-				factories.add(factory);
+				factories.add(new ServiceBusLookupServiceFactory<>(descriptorHolder, exportedApi, component));
 			}
 		}
 		return new AstrixServiceProvider(factories , descriptorHolder);
@@ -69,7 +61,6 @@ public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin, Astr
 	@Override
 	public void setPlugins(AstrixPlugins plugins) {
 		this.plugins = plugins;
-		
 	}
 
 }

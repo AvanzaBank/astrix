@@ -14,6 +14,8 @@ dependencies i samband med skapandet.
 
 === BACKLOG ===
 
+* Cleanup: AstrixServiceProviderPlugin ska inte behöva skapa en AstrixServiceProvider utan AstrixServiceFactory[]
+
 * Cleanup: AstrixServiceBus-pu ska använda AstrixRemotingFrameworkBean snarare än interna klasser för att skapa
 en astrix-runtime.
 
