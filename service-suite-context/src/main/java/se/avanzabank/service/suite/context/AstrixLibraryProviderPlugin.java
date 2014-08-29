@@ -29,7 +29,7 @@ import se.avanzabank.service.suite.provider.library.AstrixLibraryProvider;
 public class AstrixLibraryProviderPlugin implements AstrixServiceProviderPlugin {
 	
 	@Override
-	public List<AstrixServiceFactory<?>> create(Class<?> descriptorHolder) {
+	public List<AstrixServiceFactory<?>> createServiceFactories(Class<?> descriptorHolder) {
 		Object libraryProviderInstance = initInstanceProvider(descriptorHolder); // TODO: who manages lifecycle for the libraryProviderInstance?
 		List<AstrixServiceFactory<?>> result = new ArrayList<>();
 		for (Method m : descriptorHolder.getMethods()) {

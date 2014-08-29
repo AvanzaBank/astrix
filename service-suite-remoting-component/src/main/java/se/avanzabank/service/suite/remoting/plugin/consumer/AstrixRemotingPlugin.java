@@ -30,7 +30,7 @@ import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
 public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin {
 	
 	@Override
-	public List<AstrixServiceFactory<?>> create(Class<?> descriptorHolder) {
+	public List<AstrixServiceFactory<?>> createServiceFactories(Class<?> descriptorHolder) {
 		AstrixRemoteApiDescriptor remoteApiDescriptor = descriptorHolder.getAnnotation(AstrixRemoteApiDescriptor.class);
 		final String targetSpace = remoteApiDescriptor.targetSpaceName();
 		if (targetSpace.isEmpty()) {

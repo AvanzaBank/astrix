@@ -49,7 +49,7 @@ public class AstrixServiceProviderFactory {
 	public AstrixServiceProvider create(Class<?> descriptorHolder) {
 		// TODO: descriptor is not the actual annotation type, but rather the class holding the given annotation
 		AstrixServiceProviderPlugin providerFactoryPlugin = getProviderFactoryPlugin(descriptorHolder);
-		List<AstrixServiceFactory<?>> serviceFactories = providerFactoryPlugin.create(descriptorHolder);
+		List<AstrixServiceFactory<?>> serviceFactories = providerFactoryPlugin.createServiceFactories(descriptorHolder);
 		return new AstrixServiceProvider(serviceFactories, descriptorHolder); 
 	}
 

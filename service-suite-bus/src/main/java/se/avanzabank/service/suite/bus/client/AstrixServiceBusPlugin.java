@@ -33,7 +33,7 @@ public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin, Astr
 	private AstrixPlugins plugins;
 
 	@Override
-	public List<AstrixServiceFactory<?>> create(Class<?> descriptorHolder) {
+	public List<AstrixServiceFactory<?>> createServiceFactories(Class<?> descriptorHolder) {
 		List<AstrixServiceFactory<?>> result = new ArrayList<>();
 		for (AstrixServiceBusComponent component : getAllComponents()) {
 			for (Class<?> exportedApi : component.getExportedServices(descriptorHolder)) {

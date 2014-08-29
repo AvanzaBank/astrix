@@ -33,8 +33,8 @@ import se.avanzabank.service.suite.remoting.client.AstrixRemotingProxy;
 import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
 import se.avanzabank.space.SpaceLocator;
 /*
- * Responsible for continiously publishing all exported services from this application on the service bus.
- * 
+ * The serivice bus worker is a server-side component responsible for continiously publishing 
+ * all exported services from the current application onto the service bus.
  */
 public class AstrixServiceBusExporterWorker extends Thread {
 

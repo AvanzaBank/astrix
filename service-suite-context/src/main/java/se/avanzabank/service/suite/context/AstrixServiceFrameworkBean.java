@@ -43,7 +43,7 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 	 * We must separate between server-side components (those used to export different services) and
 	 * client-side components (those used to consume services). 
 	 * 
-	 * For instance: We wan't the client-side components in every application (web-app, pu, etc)
+	 * For instance: We want the client-side components in every application (web-app, pu, etc)
 	 * but only sometimes want the server-side components (we don't want the gs-remoting exporting
 	 * mechanism from a web-app).
 	 */
@@ -67,7 +67,7 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 		AstrixContext astrixContext = new AstrixConfigurer().configure(); 
 		
 		// For each consumed service, either directly or indirectly (for instance via a library), 
-		// we must register a bean definition for the dependency bean to "collect" the dependencies from
+		// we must register a bean definition for the ExternalDependencyBean to "collect" the dependencies from
 		// the application-context
 		Set<Class<? extends ExternalDependencyBean>> externalDependencyBeanTypes = resolveAllExternalDependencies(astrixContext);
 		for (Class<?> dependencBeanClass : externalDependencyBeanTypes) {
@@ -75,10 +75,6 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 			String dependencyBeanName = "_astrixDependencyBean" + dependencBeanClass.getName();
 			registry.registerBeanDefinition(dependencyBeanName, dependenciesBeanDefinition);
 		}
-		
-//		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AstrixPlugins.class);
-//		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-//		registry.registerBeanDefinition("_astrixPlugins", beanDefinition);
 		
 		// AstrixConfigurer must be created AFTER all dependency-beans have bean created
 		// TODO: is this setDependsOn really needed? Won't spring ensure this since we autowire all ExternalDependencyBean's

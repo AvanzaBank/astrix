@@ -22,7 +22,7 @@ import java.util.List;
 
 public interface AstrixServiceProviderPlugin {
 	
-	List<AstrixServiceFactory<?>> create(Class<?> descriptorHolder);
+	List<AstrixServiceFactory<?>> createServiceFactories(Class<?> descriptorHolder);
 	
 	@Deprecated // TODO: remove, replaced by consumes
 	Class<? extends Annotation> getProviderAnnotationType();
