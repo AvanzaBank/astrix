@@ -1,5 +1,9 @@
 === IN PROGRESS ===
 
+* Cleanup: Tydlig life-cycle för plugins. När de skapas ska alla dess dependencies injectas.
+Det innebär att enbar AstrixContext får skapa plugin:er, och att AstrixContext injectar 
+dependencies i samband med skapandet.
+
 * Cleanup: Se över strukturen på service-suite-context. Ta bort oanvända abstraktioner.
 
 * Tjänstekonsumenter ska kunna använda Astrix som factory-bean för att skapa tjänster på ett enkelt sätt.
