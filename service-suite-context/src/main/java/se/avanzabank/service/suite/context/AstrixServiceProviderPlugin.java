@@ -16,12 +16,13 @@
 package se.avanzabank.service.suite.context;
 
 import java.lang.annotation.Annotation;
+import java.util.List;
 
 
 
 public interface AstrixServiceProviderPlugin {
 	
-	AstrixServiceProvider create(Class<?> descriptorHolder);
+	List<AstrixServiceFactory<?>> create(Class<?> descriptorHolder);
 	
 	@Deprecated // TODO: remove, replaced by consumes
 	Class<? extends Annotation> getProviderAnnotationType();

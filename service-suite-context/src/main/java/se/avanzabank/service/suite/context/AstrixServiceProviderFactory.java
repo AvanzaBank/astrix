@@ -17,6 +17,7 @@ package se.avanzabank.service.suite.context;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -48,7 +49,8 @@ public class AstrixServiceProviderFactory {
 	public AstrixServiceProvider create(Class<?> descriptorHolder) {
 		// TODO: descriptor is not the actual annotation type, but rather the class holding the given annotation
 		AstrixServiceProviderPlugin providerFactoryPlugin = getProviderFactoryPlugin(descriptorHolder);
-		return providerFactoryPlugin.create(descriptorHolder);
+		List<AstrixServiceFactory<?>> serviceFactories = providerFactoryPlugin.create(descriptorHolder);
+		return new AstrixServiceProvider(serviceFactories, descriptorHolder); 
 	}
 
 	private AstrixServiceProviderPlugin getProviderFactoryPlugin(Class<?> descriptorHolder) {

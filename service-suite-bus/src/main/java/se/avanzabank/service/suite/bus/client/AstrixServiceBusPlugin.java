@@ -24,7 +24,6 @@ import org.kohsuke.MetaInfServices;
 import se.avanzabank.service.suite.context.AstrixPlugins;
 import se.avanzabank.service.suite.context.AstrixPluginsAware;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
-import se.avanzabank.service.suite.context.AstrixServiceProvider;
 import se.avanzabank.service.suite.context.AstrixServiceProviderPlugin;
 import se.avanzabank.service.suite.provider.core.AstrixServiceBusApi;
 
@@ -34,14 +33,14 @@ public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin, Astr
 	private AstrixPlugins plugins;
 
 	@Override
-	public AstrixServiceProvider create(Class<?> descriptorHolder) {
-		List<AstrixServiceFactory<?>> factories = new ArrayList<>();
+	public List<AstrixServiceFactory<?>> create(Class<?> descriptorHolder) {
+		List<AstrixServiceFactory<?>> result = new ArrayList<>();
 		for (AstrixServiceBusComponent component : getAllComponents()) {
 			for (Class<?> exportedApi : component.getExportedServices(descriptorHolder)) {
-				factories.add(new ServiceBusLookupServiceFactory<>(descriptorHolder, exportedApi, component));
+				result.add(new ServiceBusLookupServiceFactory<>(descriptorHolder, exportedApi, component));
 			}
 		}
-		return new AstrixServiceProvider(factories , descriptorHolder);
+		return result;
 	}
 
 	private List<AstrixServiceBusComponent> getAllComponents() {

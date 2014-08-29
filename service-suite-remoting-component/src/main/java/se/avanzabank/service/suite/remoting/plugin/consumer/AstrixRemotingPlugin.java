@@ -22,7 +22,6 @@ import java.util.List;
 import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
-import se.avanzabank.service.suite.context.AstrixServiceProvider;
 import se.avanzabank.service.suite.context.AstrixServiceProviderPlugin;
 import se.avanzabank.service.suite.provider.core.AstrixServiceBusApi;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
@@ -31,19 +30,19 @@ import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
 public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin {
 	
 	@Override
-	public AstrixServiceProvider create(Class<?> descriptorHolder) {
+	public List<AstrixServiceFactory<?>> create(Class<?> descriptorHolder) {
 		AstrixRemoteApiDescriptor remoteApiDescriptor = descriptorHolder.getAnnotation(AstrixRemoteApiDescriptor.class);
 		final String targetSpace = remoteApiDescriptor.targetSpaceName();
 		if (targetSpace.isEmpty()) {
 			throw new IllegalArgumentException("No space name found on: " + descriptorHolder);
 		}
 		Class<?>[] exportedApis = remoteApiDescriptor.exportedApis();
-		List<AstrixServiceFactory<?>> serviceFactories = new ArrayList<>();
+		List<AstrixServiceFactory<?>> result = new ArrayList<>();
 		for (Class<?> api : exportedApis) {
-			serviceFactories.add(
+			result.add(
 					new AstrixRemotingServiceFactory<>(api, targetSpace, descriptorHolder));
 		}
-		return new AstrixServiceProvider(serviceFactories, descriptorHolder);
+		return result;
 	}
 
 	@Override
