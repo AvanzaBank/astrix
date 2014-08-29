@@ -16,6 +16,7 @@
 package se.avanzabank.service.suite.context;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -30,9 +31,8 @@ public class AstrixServiceProviderFactory {
 	private final Logger log = LoggerFactory.getLogger(AstrixServiceProviderFactory.class);
 	private ConcurrentMap<Class<? extends Annotation>, AstrixServiceProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	
-	public AstrixServiceProviderFactory(AstrixContext context) {
-		for (AstrixServiceProviderPlugin plugin : context.getPlugins(AstrixServiceProviderPlugin.class)) {
-//			context.injectDependencies(plugin);
+	public AstrixServiceProviderFactory(Collection<AstrixServiceProviderPlugin> serviceProviderPlugins) {
+		for (AstrixServiceProviderPlugin plugin : serviceProviderPlugins) {
 			AstrixServiceProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
 				// TODO: how to handle multiple providers for same annotation type? Is it allowed

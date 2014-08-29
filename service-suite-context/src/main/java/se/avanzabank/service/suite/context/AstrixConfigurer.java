@@ -34,7 +34,8 @@ public class AstrixConfigurer {
 		configureFaultTolerance(context);
 		configureVersioning(context);
 		discoverServiceProviderPlugins(context);
-		AstrixServiceProviderFactory serviceProviderFactory = new AstrixServiceProviderFactory(context);
+		List<AstrixServiceProviderPlugin> serviceProviderPlugins = context.getPlugins(AstrixServiceProviderPlugin.class);
+		AstrixServiceProviderFactory serviceProviderFactory = new AstrixServiceProviderFactory(serviceProviderPlugins);
 		
 		List<AstrixServiceProvider> serviceProviders = new AstrixServiceProviderScanner("se.avanzabank", serviceProviderFactory).scan();
 		for (AstrixServiceProvider serviceProvider : serviceProviders) {
