@@ -17,19 +17,15 @@ package se.avanzabank.service.suite.remoting.plugin.consumer;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
-import se.avanzabank.service.suite.context.AstrixContext;
-import se.avanzabank.service.suite.context.AstrixPlugins;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
 import se.avanzabank.service.suite.context.AstrixServiceProvider;
 import se.avanzabank.service.suite.context.AstrixServiceProviderPlugin;
 import se.avanzabank.service.suite.provider.core.AstrixServiceBusApi;
 import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
-import se.avanzabank.space.SpaceLocator;
 
 @MetaInfServices(AstrixServiceProviderPlugin.class)
 public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin {
@@ -59,10 +55,6 @@ public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin {
 	public boolean consumes(Class<?> descriptorHolder) {
 		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType()) 
 				&& !descriptorHolder.isAnnotationPresent(AstrixServiceBusApi.class);
-	}
-	
-	@Override
-	public void setPlugins(AstrixPlugins plugins) {
 	}
 	
 }

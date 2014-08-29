@@ -28,7 +28,4 @@ public interface AstrixServiceProviderPlugin {
 	
 	boolean consumes(Class<?> descriptorHolder);
 	
-	// TODO: AstrixPluginsAware?
-	void setPlugins(AstrixPlugins plugins);
-	
 }

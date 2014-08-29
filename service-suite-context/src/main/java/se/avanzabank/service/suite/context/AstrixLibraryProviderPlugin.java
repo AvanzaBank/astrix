@@ -18,7 +18,6 @@ package se.avanzabank.service.suite.context;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
@@ -26,12 +25,9 @@ import org.kohsuke.MetaInfServices;
 import se.avanzabank.service.suite.provider.library.AstrixExport;
 import se.avanzabank.service.suite.provider.library.AstrixLibraryProvider;
 
-@MetaInfServices
+@MetaInfServices(AstrixServiceProviderPlugin.class)
 public class AstrixLibraryProviderPlugin implements AstrixServiceProviderPlugin {
 	
-	public AstrixLibraryProviderPlugin() {
-	}
-
 	@Override
 	public AstrixServiceProvider create(Class<?> descriptorHolder) {
 		Object libraryProviderInstance = initInstanceProvider(descriptorHolder); // TODO: who manages lifecycle for the libraryProviderInstance?
@@ -57,10 +53,6 @@ public class AstrixLibraryProviderPlugin implements AstrixServiceProviderPlugin 
 		return AstrixLibraryProvider.class;
 	}
 	
-	@Override
-	public void setPlugins(AstrixPlugins plugins) {
-	}
-
 	@Override
 	public boolean consumes(Class<?> descriptorHolder) {
 		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType());

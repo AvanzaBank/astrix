@@ -22,13 +22,14 @@ import java.util.List;
 import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.service.suite.context.AstrixPlugins;
+import se.avanzabank.service.suite.context.AstrixPluginsAware;
 import se.avanzabank.service.suite.context.AstrixServiceFactory;
 import se.avanzabank.service.suite.context.AstrixServiceProvider;
 import se.avanzabank.service.suite.context.AstrixServiceProviderPlugin;
 import se.avanzabank.service.suite.provider.core.AstrixServiceBusApi;
 
 @MetaInfServices(AstrixServiceProviderPlugin.class)
-public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin {
+public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin, AstrixPluginsAware {
 	
 	private AstrixPlugins plugins;
 

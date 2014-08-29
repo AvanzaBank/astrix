@@ -30,9 +30,9 @@ public class AstrixServiceProviderFactory {
 	private final Logger log = LoggerFactory.getLogger(AstrixServiceProviderFactory.class);
 	private ConcurrentMap<Class<? extends Annotation>, AstrixServiceProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	
-	public AstrixServiceProviderFactory(AstrixPlugins plugins) {
-		for (AstrixServiceProviderPlugin plugin : plugins.getPlugins(AstrixServiceProviderPlugin.class)) {
-			plugin.setPlugins(plugins);
+	public AstrixServiceProviderFactory(AstrixContext context) {
+		for (AstrixServiceProviderPlugin plugin : context.getPlugins(AstrixServiceProviderPlugin.class)) {
+			context.injectDependencies(plugin);
 			AstrixServiceProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
 				// TODO: how to handle multiple providers for same annotation type? Is it allowed
