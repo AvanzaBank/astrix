@@ -50,7 +50,7 @@ public class ServiceBusLookupServiceFactory<T> implements AstrixServiceFactory<T
 			// TODO: manage non discovered services
 			throw new RuntimeException("Did not discover: " + api);
 		}
-		astrixContext.injectDependencies(serviceBusComponent);
+//		astrixContext.injectDependencies(serviceBusComponent);
 		return serviceBusComponent.createService(descriptorHolder, api, serviceProperties);
 	}
 	

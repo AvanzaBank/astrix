@@ -28,7 +28,7 @@ public class AstrixConfigurer {
 	private List<Object> externalDependencies = new ArrayList<>();
 	
 	public AstrixContext configure() {
-		AstrixContext context = new AstrixContext(new AstrixPlugins());
+		AstrixContext context = new AstrixContext();
 		context.setExternalDependencyBeans(externalDependencyBeans);
 		context.setExternalDependencies(externalDependencies);
 		configureFaultTolerance(context);

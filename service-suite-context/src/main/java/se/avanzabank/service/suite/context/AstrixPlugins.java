@@ -31,8 +31,12 @@ public class AstrixPlugins {
 	
 	private final ConcurrentMap<Class<?>, Plugin<?>> pluginsByType = new ConcurrentHashMap<>();
 	private final boolean autodiscover = true;
+	private final AstrixPluginInitializer pluginInitializer;
 	
-	
+	public AstrixPlugins(AstrixPluginInitializer plugininitializer) {
+		this.pluginInitializer = plugininitializer;
+	}
+
 	public <T> T getPlugin(Class<T> type) {
 		Plugin<T> plugin = getPluginInstance(type);
 		return plugin.getOne();
@@ -43,10 +47,11 @@ public class AstrixPlugins {
 		return plugin.getAll();
 	}
 
-	public <T> void registerPlugin(Class<T> type, T provider) {
-		this.pluginsByType.putIfAbsent(type, new Plugin<>(type));
-		Plugin<T> plugin = (Plugin<T>) pluginsByType.get(type);
-		plugin.add(provider);
+	public <T> void registerPlugin(Class<T> pluginType, T pluginProvider) {
+		this.pluginInitializer.init(pluginProvider);
+		this.pluginsByType.putIfAbsent(pluginType, new Plugin<>(pluginType));
+		Plugin<T> plugin = (Plugin<T>) pluginsByType.get(pluginType);
+		plugin.add(pluginProvider);
 	}
 	
 	private <T> Plugin<T> getPluginInstance(Class<T> type) {
@@ -55,7 +60,7 @@ public class AstrixPlugins {
 			 return plugin;
 		 }
 		 if (autodiscover) {
-			this.pluginsByType.put(type, Plugin.autoDiscover(type)); 
+			this.pluginsByType.put(type, Plugin.autoDiscover(type, pluginInitializer)); 
 		 }
 		 return (Plugin<T>) pluginsByType.get(type);
 	}
@@ -71,20 +76,26 @@ public class AstrixPlugins {
 		public Plugin(Class<T> type, List<T> discoverPlugins) {
 			this.type = type;
 			this.providers = discoverPlugins;
+			for (Object pluginProvider : providers) {
+				
+			}
 		}
 		
-		public static <T> Plugin<T> autoDiscover(Class<T> type) {
+		public static <T> Plugin<T> autoDiscover(Class<T> type, AstrixPluginInitializer initializer) {
 			List<T> plugins = AstrixPluginDiscovery.discoverPlugins(type);
 			if (plugins.isEmpty()) {
 				Method defaultFactory = getDefaultFactory(type);
 				if (defaultFactory != null) {
 					try {
-						log.debug("Plugin not found {}.", type);
+						log.debug("Plugin not found {}. Using default factory to create {}", type, defaultFactory);
 						plugins.add((T) defaultFactory.invoke(null));
 					} catch (Exception e) {
 						log.warn("Failed to create default plugin for type=" + type, e);
 					}
 				}
+			}
+			for (T plugin : plugins) {
+				initializer.init(plugin);
 			}
 			return new Plugin(type, plugins);
 		}

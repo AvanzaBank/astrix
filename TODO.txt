@@ -6,11 +6,16 @@ dependencies i samband med skapandet.
 
 * Cleanup: Se över strukturen på service-suite-context. Ta bort oanvända abstraktioner.
 
+* Cleanup: Ta bort AstrixContextAware. Ingen plugin ska behöva tillgång till AstrixContext
+
 * Tjänstekonsumenter ska kunna använda Astrix som factory-bean för att skapa tjänster på ett enkelt sätt.
 	- Astrix-tjänster ska kunna autowiras in i de klasser som använder dessa.
 
 
 === BACKLOG ===
+
+* Cleanup: AstrixServiceBus-pu ska använda AstrixRemotingFrameworkBean snarare än interna klasser för att skapa
+en astrix-runtime.
 
 * Skapa enbart en instans av varje tjänst.
 

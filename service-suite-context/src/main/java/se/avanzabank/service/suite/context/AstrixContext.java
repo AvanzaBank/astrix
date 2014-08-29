@@ -29,8 +29,13 @@ public class AstrixContext implements Astrix {
 	private ConcurrentMap<Class<?>, ExternalDependencyBean> externalDependencyBean = new ConcurrentHashMap<>();
 	private List<Object> externalDependencies = new ArrayList<>();
 	
-	public AstrixContext(AstrixPlugins plugins) {
-		this.plugins = plugins;
+	public AstrixContext() {
+		this.plugins = new AstrixPlugins(new AstrixPluginInitializer() {
+			@Override
+			public void init(Object plugin) {
+				injectDependencies(plugin);
+			}
+		});
 	}
 	
 	public <T> List<T> getPlugins(Class<T> type) {
@@ -45,18 +50,18 @@ public class AstrixContext implements Astrix {
 		this.serviceFactoryRegistry.registerProvider(serviceProvider);
 	}
 	
-	public void injectDependencies(Object object) {
-		if (object instanceof ExternalDependencyAware) {
-			injectExternalDependencies((ExternalDependencyAware<?>)object);
+	private void injectDependencies(Object plugin) {
+		if (plugin instanceof ExternalDependencyAware) {
+			injectExternalDependencies((ExternalDependencyAware<?>)plugin);
 		}
-		if (object instanceof ServiceDependenciesAware) {
-			injectServiceDependencies((ServiceDependenciesAware)object);
+		if (plugin instanceof ServiceDependenciesAware) {
+			injectServiceDependencies((ServiceDependenciesAware)plugin);
 		}
-		if (object instanceof AstrixPluginsAware) {
-			AstrixPluginsAware.class.cast(object).setPlugins(getPlugins());
+		if (plugin instanceof AstrixPluginsAware) {
+			AstrixPluginsAware.class.cast(plugin).setPlugins(getPlugins());
 		}
-		if (object instanceof AstrixContextAware) {
-			AstrixContextAware.class.cast(object).setAstrixContext(this);
+		if (plugin instanceof AstrixContextAware) {
+			AstrixContextAware.class.cast(plugin).setAstrixContext(this);
 		}
 	}
 	

@@ -76,14 +76,14 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 			registry.registerBeanDefinition(dependencyBeanName, dependenciesBeanDefinition);
 		}
 		
-		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AstrixPlugins.class);
-		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-		registry.registerBeanDefinition("_astrixPlugins", beanDefinition);
+//		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AstrixPlugins.class);
+//		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
+//		registry.registerBeanDefinition("_astrixPlugins", beanDefinition);
 		
 		// AstrixConfigurer must be created AFTER all dependency-beans have bean created
 		// TODO: is this setDependsOn really needed? Won't spring ensure this since we autowire all ExternalDependencyBean's
 		// into the AstrixConfigurer?
-		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixConfigurer.class);
+		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AstrixConfigurer.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		beanDefinition.setDependsOn(getDependencyBeanNames(externalDependencyBeanTypes));
 		registry.registerBeanDefinition("_astrixConfigurer", beanDefinition);
@@ -93,6 +93,13 @@ public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostPro
 		beanDefinition.setFactoryBeanName("_astrixConfigurer");
 		beanDefinition.setFactoryMethodName("configure");
 		registry.registerBeanDefinition("_astrixContext", beanDefinition);
+		
+		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixPlugins.class);
+		beanDefinition.setAutowireMode(Autowire.NO.value());
+		beanDefinition.setFactoryBeanName("_astrixContext");
+		beanDefinition.setFactoryMethodName("getPlugins");
+		registry.registerBeanDefinition("_astrixPlugins", beanDefinition);
+		
 		
 		for (Class<?> consumedService : consumedApis) {
 			beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceFactoryBean.class);

@@ -13,7 +13,10 @@
     
 <!--     <bean class="se.avanzabank.service.suite.context.AstrixServiceFrameworkBean"/> -->
     <bean class="se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean"/>
-    <bean class="se.avanzabank.service.suite.context.AstrixPlugins"/>
+<!--     <bean class="se.avanzabank.service.suite.context.AstrixPlugins"/> -->
+
+	<bean id="astrixContext" class="se.avanzabank.service.suite.context.AstrixContext"/>
+	<bean id="astrixPlugins" class="se.avanzabank.service.suite.context.AstrixPlugins" factory-bean="astrixContext" factory-method="getPlugins"/>
     
     <!-- weird: somehow the service-bus must export it's api... it uses a... ehh... remote-service-descriptor! -->
     <bean class="se.avanzabank.service.suite.bus.client.AstrixServiceBusApiDescriptor"/>
