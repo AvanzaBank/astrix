@@ -30,7 +30,10 @@ public class AstrixRemotingFrameworkBean implements BeanDefinitionRegistryPostPr
 	
 	/*
 	 * This is a server side component required to export gs-remoting-services. We don't want those
-	 * beans from non-pu's like a web-application
+	 * beans from non-pu's like a web-application.
+	 * 
+	 * As it stands now this Those will be registered from non-pus since AstrixRemotingBeanRegistryPlugin
+	 * is supposed to be available from all clients. <p>
 	 * 
 	 */
 	

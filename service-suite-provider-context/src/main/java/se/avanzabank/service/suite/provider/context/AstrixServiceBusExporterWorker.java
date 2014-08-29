@@ -32,25 +32,33 @@ import se.avanzabank.service.suite.context.AstrixVersioningPlugin;
 import se.avanzabank.service.suite.remoting.client.AstrixRemotingProxy;
 import se.avanzabank.service.suite.remoting.client.AstrixRemotingTransport;
 import se.avanzabank.space.SpaceLocator;
-/*
- * The serivice bus worker is a server-side component responsible for continiously publishing 
+/**
+ * The service bus worker is a server-side component responsible for continiously publishing 
  * all exported services from the current application onto the service bus.
+ * 
+ * @author Elias Lindholm (elilin)
+ * 
  */
 public class AstrixServiceBusExporterWorker extends Thread {
-
-	private List<ServiceBusExporter> serviceProvideres;
+	
+	private final List<ServiceBusExporter> serviceProvideres;
 	private final AstrixServiceBus serviceBus;
 	private final Logger log = LoggerFactory.getLogger(AstrixServiceBusExporterWorker.class);
 
 	@Autowired
 	public AstrixServiceBusExporterWorker(
 			List<ServiceBusExporter> serviceProvideres,
-			SpaceLocator sl,
-			AstrixPlugins astrixPlugins) {
+			SpaceLocator sl, // External dependency
+			AstrixPlugins astrixPlugins) { // Plugin dependency
 		AstrixVersioningPlugin versioningPlugin = astrixPlugins.getPlugin(AstrixVersioningPlugin.class);
 		// TODO: AstrixSerivceBus should be retreived from service-framework, not by hard-coding usage of remoting-framework here.
 		GigaSpace serviceBusSpace = sl.createClusteredProxy("service-bus-space"); // TODO: fault tolerance, connection mannagment, etc.
 		this.serviceBus = AstrixRemotingProxy.create(AstrixServiceBus.class, AstrixRemotingTransport.remoteSpace(serviceBusSpace), versioningPlugin.create(AstrixServiceBusApiDescriptor.class));
+		this.serviceProvideres = serviceProvideres;
+	}
+	
+	public AstrixServiceBusExporterWorker(List<ServiceBusExporter> serviceProvideres, AstrixServiceBus serviceBus) {
+		this.serviceBus = serviceBus;
 		this.serviceProvideres = serviceProvideres;
 	}
 
