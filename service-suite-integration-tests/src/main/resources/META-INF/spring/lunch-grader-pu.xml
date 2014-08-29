@@ -17,14 +17,13 @@
 				<value>se.avanzabank.service.suite.integration.tests.domain.api.LunchService</value>
 			</list>
 		</property>
+		<property name="serviceDescriptor" value="se.avanzabank.service.suite.integration.tests.domain2.apiruntime.LunchGradeApiDescriptor"/>
 	</bean>
 	
 	<bean id="astrixRemotingServiceExporter" class="se.avanzabank.service.suite.remoting.plugin.provider.AstrixRemotingServiceBusExporter"/>
 	<bean id="gsServiceExporter" class="se.avanzabank.service.suite.gs.GigaSpaceServiceBusExporter"/>
 	
 	<bean id="spaceLocator" class="se.avanzabank.space.UsesJndiLookupSpaceLocator"/>
-	
-    <bean id="lunchGradeApiDescriptor" class="se.avanzabank.service.suite.integration.tests.domain2.apiruntime.LunchGradeApiDescriptor"/>
     <bean id="lunchRestaurantGrader" class="se.avanzabank.service.suite.integration.tests.domain2.pu.LunchRestaurantGraderImpl"/>
 	
 	    

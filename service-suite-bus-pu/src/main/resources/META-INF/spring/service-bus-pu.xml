@@ -11,14 +11,14 @@
     <os-core:space id="space" url="/./service-bus-space" mirror="false"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
     
-<!--     <bean class="se.avanzabank.service.suite.context.AstrixFrameworkBean"/> -->
-    <bean class="se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean"/>
-<!--     <bean class="se.avanzabank.service.suite.context.AsttrixPlugins"/> -->
+<!--     <bean class="se.avanzabank.service.suite.context.AstrixFrameworkBean"> -->
+<!--     	<property name="serviceDescriptor" value="se.avanzabank.service.suite.bus.client.AstrixServiceBusApiDescriptor"/> -->
+<!--     </bean> -->
 
+	<!-- TODO: replace with AstrixFrameworkBean -->
+    <bean class="se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean"/>
 	<bean id="astrixContext" class="se.avanzabank.service.suite.context.AstrixContext"/>
 	<bean id="astrixPlugins" class="se.avanzabank.service.suite.context.AstrixPlugins" factory-bean="astrixContext" factory-method="getPlugins"/>
-    
-    <!-- weird: somehow the service-bus must export it's api... it uses a... ehh... remote-service-descriptor! -->
     <bean class="se.avanzabank.service.suite.bus.client.AstrixServiceBusApiDescriptor"/>
     
     <bean class="se.avanzabank.service.suite.bus.pu.AstrixServiceBusImpl"/>

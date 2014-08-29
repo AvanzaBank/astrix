@@ -37,6 +37,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 public class AstrixFrameworkBean implements BeanDefinitionRegistryPostProcessor {
 	
 	private List<Class<?>> consumedAstrixBeans = new ArrayList<>();
+	private Class<?> serviceDescriptor;
 
 	/*
 	 * We must distinguish between server-side components (those used to export different SERVICES) and
@@ -113,7 +114,13 @@ public class AstrixFrameworkBean implements BeanDefinitionRegistryPostProcessor 
 			beanDefinition.setPropertyValues(props);
 			registry.registerBeanDefinition("_" + consumedAstrixBean.getName(), beanDefinition);
 		}
-			
+		
+		if (serviceDescriptor == null) {
+			return;
+		}
+		beanDefinition = new AnnotatedGenericBeanDefinition(serviceDescriptor);
+		registry.registerBeanDefinition("_astrixServiceDescriptor", beanDefinition);
+		
 		for (AstrixBeanRegistryPlugin beanRegistryPlugin :
 			AstrixPluginDiscovery.discoverPlugins(AstrixBeanRegistryPlugin.class)) {
 			beanRegistryPlugin.registerBeanDefinitions(registry);
@@ -153,6 +160,16 @@ public class AstrixFrameworkBean implements BeanDefinitionRegistryPostProcessor 
 	
 	public void setConsumedAstrixBeans(List<Class<?>> consumedAstrixBeans) {
 		this.consumedAstrixBeans = consumedAstrixBeans;
+	}
+	
+	/**
+	 * If a service descriptor is provided, then the service exporting part of the framework
+	 * will be loaded with all required components for the given serviceDescriptor.
+	 * 
+	 * @param serviceDescriptor
+	 */
+	public void setServiceDescriptor(Class<?> serviceDescriptor) {
+		this.serviceDescriptor = serviceDescriptor;
 	}
 	
 	public List<Class<?>> getConsumedApis() {

@@ -12,23 +12,16 @@
     <os-core:giga-space id="gigaSpace" space="space"/>
     
     <!-- Bootstraps Astrix service framework (provider and consumer) -->
-	<bean id="astrixServiceFrameworkBean" class="se.avanzabank.service.suite.context.AstrixFrameworkBean"/>
+	<bean id="astrixServiceFrameworkBean" class="se.avanzabank.service.suite.context.AstrixFrameworkBean">
+		<property name="serviceDescriptor" value="se.avanzabank.service.suite.integration.tests.domain.apiruntime.LunchApiDescriptor"/>
+	</bean>
 	
 <!-- 	Service bus requires SpaceLocator to locate service bus, this dependency is implicit. -->
 	<bean id="spaceLocator" class="se.avanzabank.space.UsesJndiLookupSpaceLocator"/>
 	
-	<!-- Bootstraps Astrix remoting framework TODO: this should not be necessary. Declaring a AstrixServiceProviderFrameworkBean should be enough -->
-<!-- 	<bean id="astrixRemotingFrameworkBean" class="se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean"/> -->
-	
 	<!-- TODO: autodiscover all ServiceExporter's? -->
 	<bean id="astrixRemotingServiceExporter" class="se.avanzabank.service.suite.remoting.plugin.provider.AstrixRemotingServiceBusExporter"/>
 	<bean id="gsServiceExporter" class="se.avanzabank.service.suite.gs.GigaSpaceServiceBusExporter"/>
-    
-    
-    
-    
-    <!-- Api descriptor (for remoting api), contains versioning info, maybe it should be a property on AstrixServiceProviderFrameworkBean? -->
-    <bean id="lunchApiDescriptor" class="se.avanzabank.service.suite.integration.tests.domain.apiruntime.LunchApiDescriptor"/>
     
 	<!-- The actual service implementation(s) -->
     <bean id="lunchService" class="se.avanzabank.service.suite.integration.tests.domain.pu.LunchServiceImpl"/>
