@@ -19,7 +19,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
+/**
+ * An AstrixApiProvider holds a factory for each beanType provided by the given api. <p>
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AstrixApiProvider {
 	
 	private ConcurrentMap<Class<?>, AstrixFactoryBean<?>> factoryByProvidedType = new ConcurrentHashMap<>();

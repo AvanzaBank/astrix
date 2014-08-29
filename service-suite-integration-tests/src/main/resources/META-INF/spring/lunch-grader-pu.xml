@@ -11,7 +11,7 @@
     <os-core:space id="space" url="/./service-api-consumer-space" mirror="false"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
     
-	<bean id="astrixServiceFrameworkBean" class="se.avanzabank.service.suite.context.AstrixServiceFrameworkBean">
+	<bean id="astrixServiceFrameworkBean" class="se.avanzabank.service.suite.context.AstrixFrameworkBean">
 		<property name="consumedAstrixBeans">
 			<list>
 				<value>se.avanzabank.service.suite.integration.tests.domain.api.LunchService</value>

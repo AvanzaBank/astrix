@@ -34,9 +34,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceFrameworkBean implements BeanDefinitionRegistryPostProcessor {
+public class AstrixFrameworkBean implements BeanDefinitionRegistryPostProcessor {
 	
-	// TODO: rename to consumedServices?
 	private List<Class<?>> consumedAstrixBeans = new ArrayList<>();
 
 	/*

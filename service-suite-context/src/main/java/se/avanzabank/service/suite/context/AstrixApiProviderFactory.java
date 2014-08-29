@@ -26,7 +26,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-
+/**
+ * This is a component used to consume astrix-apis. Given an descriptorHolder
+ * this factory creates an {@link AstrixApiProvider}. <p>
+ *  
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AstrixApiProviderFactory {
 	
 	private final Logger log = LoggerFactory.getLogger(AstrixApiProviderFactory.class);
@@ -42,7 +48,7 @@ public class AstrixApiProviderFactory {
 		}
 	}
 	
-	public Set<Class<? extends Annotation>> getProvidedAnnotaionTypes() {
+	public Set<Class<? extends Annotation>> getProvidedAnnotationTypes() {
 		return pluginByAnnotationType.keySet();
 	}
 	

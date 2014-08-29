@@ -66,7 +66,7 @@ public class AstrixApiProviderScanner {
 	private List<AstrixApiProvider> doScan(ProviderFilter providerFilter) {
 		List<AstrixApiProvider> discoveredProviders = new ArrayList<>();
 		ClassPathScanningCandidateComponentProvider providerScanner = new ClassPathScanningCandidateComponentProvider(false);
-		for (Class<? extends Annotation> providerFactory : this.apiProviderFactory.getProvidedAnnotaionTypes()) {
+		for (Class<? extends Annotation> providerFactory : this.apiProviderFactory.getProvidedAnnotationTypes()) {
 			providerScanner.addIncludeFilter(new AnnotationTypeFilter(providerFactory));
 		}
 		Set<BeanDefinition> foundCandidateComponents = providerScanner.findCandidateComponents(basePackage);
