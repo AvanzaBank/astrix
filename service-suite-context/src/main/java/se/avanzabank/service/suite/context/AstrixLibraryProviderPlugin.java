@@ -66,9 +66,4 @@ public class AstrixLibraryProviderPlugin implements AstrixServiceProviderPlugin 
 		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType());
 	}
 
-	@Override
-	public List<Class<?>> getDependencies() {
-		return Collections.emptyList();
-	}
-
 }

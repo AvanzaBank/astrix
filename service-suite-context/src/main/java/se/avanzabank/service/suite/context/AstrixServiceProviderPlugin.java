@@ -16,7 +16,6 @@
 package se.avanzabank.service.suite.context;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
 
 
 
@@ -29,26 +28,7 @@ public interface AstrixServiceProviderPlugin {
 	
 	boolean consumes(Class<?> descriptorHolder);
 	
-	// TODO: how to avoid circular api creation when injecting astrix instance into each plugin??
-//	void setAstrix(Astrix astrix);
-	
-//	void setContext(AstrixContext context);
-	
 	// TODO: AstrixPluginsAware?
 	void setPlugins(AstrixPlugins plugins);
-	
-	/**
-	 * Returns a list of all services that this plugin depends on. 
-	 * 
-	 * Services might be used by the plugin by invoking AstrixContext.getService(type).
-	 * 
-	 *  
-	 * 
-	 * 
-	 * @return
-	 */
-	// TODO: Should we use another mechanism to retrieve plugin dependencies than AstrixContext.getService(type)?
-	List<Class<?>> getDependencies(); // TODO: ensure that plugin can only get services it depends on.
-	
 	
 }

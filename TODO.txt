@@ -1,5 +1,7 @@
 === IN PROGRESS ===
 
+* Cleanup: Se över strukturen på service-suite-context. Ta bort oanvända abstraktioner.
+
 * Tjänstekonsumenter ska kunna använda Astrix som factory-bean för att skapa tjänster på ett enkelt sätt.
 	- Astrix-tjänster ska kunna autowiras in i de klasser som använder dessa.
 

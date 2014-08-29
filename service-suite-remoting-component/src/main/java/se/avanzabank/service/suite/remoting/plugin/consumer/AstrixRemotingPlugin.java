@@ -62,11 +62,6 @@ public class AstrixRemotingPlugin implements AstrixServiceProviderPlugin {
 	}
 	
 	@Override
-	public List<Class<?>> getDependencies() {
-		return Arrays.<Class<?>>asList(SpaceLocator.class);
-	}
-
-	@Override
 	public void setPlugins(AstrixPlugins plugins) {
 	}
 	

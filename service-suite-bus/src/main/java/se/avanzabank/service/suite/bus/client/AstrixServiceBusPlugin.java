@@ -17,7 +17,6 @@ package se.avanzabank.service.suite.bus.client;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
@@ -66,11 +65,6 @@ public class AstrixServiceBusPlugin implements AstrixServiceProviderPlugin {
 		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType());
 	}
 	
-	@Override
-	public List<Class<?>> getDependencies() {
-		return Collections.emptyList();
-	}
-
 	@Override
 	public void setPlugins(AstrixPlugins plugins) {
 		this.plugins = plugins;
