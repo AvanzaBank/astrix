@@ -15,6 +15,8 @@
  */
 package se.avanzabank.service.suite.provider.context;
 
+import java.lang.annotation.Annotation;
+
 import org.kohsuke.MetaInfServices;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.service.suite.context.AstrixBeanRegistryPlugin;
+import se.avanzabank.service.suite.provider.core.AstrixServiceBusApi;
 
 @MetaInfServices(AstrixBeanRegistryPlugin.class)
 public class AstrixServiceBusBeanRegistryPlugin implements AstrixBeanRegistryPlugin {
@@ -33,6 +36,11 @@ public class AstrixServiceBusBeanRegistryPlugin implements AstrixBeanRegistryPlu
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceBusExporterWorker.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_astrixServiceBusExporter", beanDefinition);
+	}
+
+	@Override
+	public Class<? extends Annotation> getDescriptorType() {
+		return AstrixServiceBusApi.class;
 	}
 	
 }

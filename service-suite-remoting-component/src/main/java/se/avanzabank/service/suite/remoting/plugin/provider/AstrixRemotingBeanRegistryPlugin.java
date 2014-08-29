@@ -15,11 +15,14 @@
  */
 package se.avanzabank.service.suite.remoting.plugin.provider;
 
+import java.lang.annotation.Annotation;
+
 import org.kohsuke.MetaInfServices;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.service.suite.context.AstrixBeanRegistryPlugin;
+import se.avanzabank.service.suite.provider.remoting.AstrixRemoteApiDescriptor;
 import se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean;
 
 /**
@@ -32,6 +35,11 @@ public class AstrixRemotingBeanRegistryPlugin implements AstrixBeanRegistryPlugi
 	@Override
 	public void registerBeanDefinitions(BeanDefinitionRegistry registry) throws BeansException {
 		new AstrixRemotingFrameworkBean().postProcessBeanDefinitionRegistry(registry);
+	}
+
+	@Override
+	public Class<? extends Annotation> getDescriptorType() {
+		return AstrixRemoteApiDescriptor.class;
 	}
 	
 }

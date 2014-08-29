@@ -15,11 +15,18 @@
  */
 package se.avanzabank.service.suite.context;
 
+import java.lang.annotation.Annotation;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 public interface AstrixBeanRegistryPlugin {
 	
+	// This is a server-side only component. Change name to reflect that
+	
 	void registerBeanDefinitions(BeanDefinitionRegistry registry) throws BeansException;
+	
+	Class<? extends Annotation> getDescriptorType();
+	
 	
 }

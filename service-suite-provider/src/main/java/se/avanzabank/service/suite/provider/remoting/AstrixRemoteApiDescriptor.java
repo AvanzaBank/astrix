@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface AstrixRemoteApiDescriptor {
 	
-	// Used to export remoting services
+	// Used to export remoting services, rename to AstrixRemoteServiceDescriptor?
 	
 	Class<?>[] exportedApis();
 

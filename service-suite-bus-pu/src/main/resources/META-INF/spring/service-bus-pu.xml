@@ -11,16 +11,8 @@
     <os-core:space id="space" url="/./service-bus-space" mirror="false"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
     
-<!--     <bean class="se.avanzabank.service.suite.context.AstrixFrameworkBean"> -->
-<!--     	<property name="serviceDescriptor" value="se.avanzabank.service.suite.bus.client.AstrixServiceBusApiDescriptor"/> -->
-<!--     </bean> -->
-
-	<!-- TODO: replace with AstrixFrameworkBean -->
-    <bean class="se.avanzabank.service.suite.remoting.server.AstrixRemotingFrameworkBean"/>
-	<bean id="astrixContext" class="se.avanzabank.service.suite.context.AstrixContext"/>
-	<bean id="astrixPlugins" class="se.avanzabank.service.suite.context.AstrixPlugins" factory-bean="astrixContext" factory-method="getPlugins"/>
-    <bean class="se.avanzabank.service.suite.bus.client.AstrixServiceBusApiDescriptor"/>
-    
+    <bean class="se.avanzabank.service.suite.context.AstrixFrameworkBean">
+    	<property name="serviceDescriptor" value="se.avanzabank.service.suite.bus.client.AstrixServiceBusApiDescriptor"/>
+    </bean>
     <bean class="se.avanzabank.service.suite.bus.pu.AstrixServiceBusImpl"/>
-	    
 </beans>

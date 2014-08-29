@@ -116,6 +116,7 @@ public class AstrixFrameworkBean implements BeanDefinitionRegistryPostProcessor 
 		}
 		
 		if (serviceDescriptor == null) {
+			// Does not export any services, don't load any service-providing components
 			return;
 		}
 		beanDefinition = new AnnotatedGenericBeanDefinition(serviceDescriptor);
@@ -123,6 +124,9 @@ public class AstrixFrameworkBean implements BeanDefinitionRegistryPostProcessor 
 		
 		for (AstrixBeanRegistryPlugin beanRegistryPlugin :
 			AstrixPluginDiscovery.discoverPlugins(AstrixBeanRegistryPlugin.class)) {
+			if (!this.serviceDescriptor.isAnnotationPresent(beanRegistryPlugin.getDescriptorType())) {
+				continue;
+			}
 			beanRegistryPlugin.registerBeanDefinitions(registry);
 		}
 	}
