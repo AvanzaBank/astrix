@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * This is a component used to consume astrix-apis. Given an descriptorHolder
- * this factory creates an {@link AstrixApiProvider}. <p>
+ * This is a component used to create runtime factory representations (AstrixApiProvider) for api's hooked
+ * into astrix. Given an descriptorHolder this factory creates an AstrixApiProvider for a given api. <p>
  *  
  * @author Elias Lindholm (elilin)
  *
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 public class AstrixApiProviderFactory {
 	
 	private final Logger log = LoggerFactory.getLogger(AstrixApiProviderFactory.class);
-	private ConcurrentMap<Class<? extends Annotation>, AstrixApiProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Class<? extends Annotation>, AstrixApiProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	
 	public AstrixApiProviderFactory(Collection<AstrixApiProviderPlugin> apiProviderPlugins) {
 		for (AstrixApiProviderPlugin plugin : apiProviderPlugins) {

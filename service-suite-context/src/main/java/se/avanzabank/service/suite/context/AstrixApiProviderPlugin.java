@@ -20,8 +20,19 @@ import java.util.List;
 
 
 /**
- * This is a 'client side' component used to 
- * create factory beans for a given api. <p>
+ * An AstrixApiProviderPlugin is responsible for creating AstrixFactoryBean's for
+ * all parts of a given "type" of api. By "type" in this context, we don't mean the
+ * different api's that are hooked into astrix for consumption, but rather a mechanism
+ * for an api-provider to use to make the different part's of the api available for consumption.
+ * 
+ * For instance, one type of api is "library", which is handled by the AstrixLibraryProviderPlugin. It
+ * allows api-providers to export api's that require "a lot" of wiring on the "client side" by annotation
+ * a class with @AstrixLibraryProvider an export different api-elements by annotating factory methods
+ * for different api elements with @AstrixExport. 
+ * 
+ * Another type of api is a pure "astrix-remoting" api, which also requires a server side component to respond
+ * to the incoming service-request.
+ * 
  * 
  * 
  * @author Elias Lindholm (elilin)

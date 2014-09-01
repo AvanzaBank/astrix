@@ -91,7 +91,7 @@ public class AstrixContext implements Astrix {
 		// TODO: synchronize creation of bean
 		// TODO: fix caching of created bean
 		AstrixFactoryBean<T> factory = getFactoryBean(beanType);
-		injectDependencies(factory);
+		injectDependencies(factory); // TODO: what the place where it makes most sense to inject dependencies to a AstrixFactory?  
 		return factory.create();
 	}
 	

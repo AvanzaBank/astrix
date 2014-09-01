@@ -154,7 +154,7 @@ public class AstrixFrameworkBean implements BeanDefinitionRegistryPostProcessor 
 	}
 
 	private Collection<Class<?>> resolveAllConsumedBeans(AstrixContext astrixContext) {
-		return new AstrixBeanDependencyResolver(astrixContext).resolveConsumedBeans(consumedAstrixBeans);
+		return new AstrixBeanDependencyResolver(astrixContext).resolveTransitiveBeanDependencies(consumedAstrixBeans);
 	}
 
 	@Override

@@ -15,9 +15,10 @@
  */
 package se.avanzabank.service.suite.context;
 /**
- * Extension to {@link AstrixFactoryBean} for factories that requires external
- * dependencies, for instance a SpaceLocator. 
+ * Astrix-plugins that require 'external' dependencies (to be configured by the user of the framework)
+ * implements this interface to get a runtime reference to the given dependency. <p>
  * 
+ * In order to be able to autowire the dependencies a ExternalDependencyBean is used. <p>
  * 
  * @author Elias Lindholm (elilin)
  *

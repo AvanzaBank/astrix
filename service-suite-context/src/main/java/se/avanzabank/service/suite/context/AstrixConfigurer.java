@@ -58,7 +58,7 @@ public class AstrixConfigurer {
 	}
 
 	private void discoverApiProviderPlugins(AstrixContext context) {
-		AstrixPluginDiscovery.discoverAllPlugins(context, AstrixApiProviderPlugin.class, new AstrixLibraryProviderPlugin());
+		AstrixPluginDiscovery.discoverAllPlugins(context, AstrixApiProviderPlugin.class, new AstrixLibraryProviderPlugin()); // TODO: no need to pass default instance
 	}
 	
 	private void configureVersioning(AstrixContext context) {

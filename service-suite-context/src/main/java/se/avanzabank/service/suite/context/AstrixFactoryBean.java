@@ -16,8 +16,12 @@
 package se.avanzabank.service.suite.context;
 
 /**
- * Bean is the generic name used for each api element that astrix manages. It
- * might be in the form of a service 'remoting service', in the form of a library.
+ * An AstrixFactoryBean is a factory for creating one element that is part of a given api,
+ * see {@link AstrixApiProvider}. <p>
+ * 
+ * Bean is a generic term used for an instance of any api element that astrix can create. 
+ * It might be in the form of a service ('remoting service') or in the form of a library,
+ * or any other object that is part of an api that astrix manages. <p>
  * 
  * Bean is the generic term used for an instance of a given type. <p>
  * 

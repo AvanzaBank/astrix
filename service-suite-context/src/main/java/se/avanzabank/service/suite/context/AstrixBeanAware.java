@@ -16,7 +16,14 @@
 package se.avanzabank.service.suite.context;
 
 import java.util.List;
-
+/**
+ * The bean aware interface allows "astrix-plugin-instances" to depend on
+ * astrix-managed-beans, ie api-elements hooked into astrix. <p> 
+ * 
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public interface AstrixBeanAware {
 	
 	List<Class<?>> getBeanDependencies();

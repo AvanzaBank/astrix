@@ -22,7 +22,8 @@
 	<!-- TODO: autodiscover all ServiceExporter's? -->
 	<bean id="astrixRemotingServiceExporter" class="se.avanzabank.service.suite.remoting.plugin.provider.AstrixRemotingServiceBusExporter"/>
 	<bean id="gsServiceExporter" class="se.avanzabank.service.suite.gs.GigaSpaceServiceBusExporter"/>
-    
+
+
 	<!-- The actual service implementation(s) -->
     <bean id="lunchService" class="se.avanzabank.service.suite.integration.tests.domain.pu.LunchServiceImpl"/>
 	

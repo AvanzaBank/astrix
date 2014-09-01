@@ -35,12 +35,12 @@ public class AstrixBeanDependencyResolver {
 	 * @param beanTypes
 	 * @return
 	 */
-	public Collection<Class<?>> resolveConsumedBeans(List<Class<?>> beanTypes) {
+	public Collection<Class<?>> resolveTransitiveBeanDependencies(List<Class<?>> beanTypes) {
 		Set<Class<?>> result = new HashSet<>();
 		for (Class<?> consumedBeanType : beanTypes) {
 			result.add(consumedBeanType);
 			List<Class<?>> transitiveDependencies = context.getTransitiveBeanDependencies(consumedBeanType);
-			result.addAll(resolveConsumedBeans(transitiveDependencies));
+			result.addAll(resolveTransitiveBeanDependencies(transitiveDependencies));
 		}
 		return result;
 	}
