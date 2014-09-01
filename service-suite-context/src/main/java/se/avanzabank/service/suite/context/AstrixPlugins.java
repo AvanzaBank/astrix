@@ -37,11 +37,25 @@ public class AstrixPlugins {
 		this.pluginInitializer = plugininitializer;
 	}
 
+	/**
+	 * Retrieves a plugin which there is expected to exist exactly one instance of
+	 * at runtime. Zero or multiple instance is a runtime configuration error. <p>
+	 * 
+	 * @param type
+	 * @return
+	 */
 	public <T> T getPlugin(Class<T> type) {
 		Plugin<T> plugin = getPluginInstance(type);
 		return plugin.getOne();
 	}
 	
+	/**
+	 * Returns all plugins of a given type. This is used to locate all runtime instances
+	 * of a given plugin. 
+	 * 
+	 * @param type
+	 * @return
+	 */
 	public <T> List<T> getPlugins(Class<T> type) {
 		Plugin<T> plugin = getPluginInstance(type);
 		return plugin.getAll();

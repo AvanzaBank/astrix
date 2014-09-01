@@ -41,7 +41,7 @@ public class AstrixFrameworkBean implements BeanDefinitionRegistryPostProcessor 
 
 	/*
 	 * We must distinguish between server-side components (those used to export different SERVICES) and
-	 * client-side components (those used to consume BEANS (services, librarys, ets)). 
+	 * client-side components (those used to consume BEANS (services, libraries, etc)). 
 	 * 
 	 * For instance: We want the client-side components in every application (web-app, pu, etc)
 	 * but only sometimes want the server-side components (we don't want the gs-remoting exporting
