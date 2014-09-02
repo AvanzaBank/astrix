@@ -24,10 +24,10 @@ import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 
 public class GigaSpaceRegistryImpl implements GigaSpaceRegistry {
 	
-	private final AsterixServiceRegistry serviceBus;
+	private final AsterixServiceRegistry serviceRegistry;
 
-	public GigaSpaceRegistryImpl(AsterixServiceRegistry serviceBus) {
-		this.serviceBus = Objects.requireNonNull(serviceBus);
+	public GigaSpaceRegistryImpl(AsterixServiceRegistry serviceRegistry) {
+		this.serviceRegistry = Objects.requireNonNull(serviceRegistry);
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class GigaSpaceRegistryImpl implements GigaSpaceRegistry {
 	}
 
 	private GsFactory lookupFactory(String spaceName) {
-		AsterixServiceProperties lookup = serviceBus.lookup(GigaSpace.class, spaceName); // TODO: if lookup fails we want
+		AsterixServiceProperties lookup = serviceRegistry.lookup(GigaSpace.class, spaceName); // TODO: if lookup fails we want
 		if (lookup == null) {
 			throw new RuntimeException("Failed to lookup space: " + spaceName); // TODO: handle lookup failure (i.e bus n/a) and lookup 'miss', ie no service registered in bus yet. 
 		}

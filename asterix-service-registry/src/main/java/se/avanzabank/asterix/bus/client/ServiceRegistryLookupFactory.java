@@ -31,17 +31,17 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 
 	public ServiceRegistryLookupFactory(Class<?> descriptorHolder,
 			Class<T> api,
-			AsterixServiceRegistryComponent serviceBusComponent) {
+			AsterixServiceRegistryComponent serviceRegistryComponent) {
 		this.descriptorHolder = descriptorHolder;
 		this.api = api;
-		this.serviceRegistryComponent = serviceBusComponent;
+		this.serviceRegistryComponent = serviceRegistryComponent;
 	}
 
 	@Override
 	public T create() {
 		// TODO: always return a proxy-instance, no matter in which of the steps below that the lookup fails
-		AsterixServiceRegistry serviceBus = beans.getBean(AsterixServiceRegistry.class); // service dependency
-		AsterixServiceProperties serviceProperties = serviceBus.lookup(api); // TODO: might fail
+		AsterixServiceRegistry serviceRegistry = beans.getBean(AsterixServiceRegistry.class); // service dependency
+		AsterixServiceProperties serviceProperties = serviceRegistry.lookup(api); // TODO: might fail
 		if (serviceProperties == null) {
 			// TODO: manage non discovered services
 			throw new RuntimeException("Did not discover: " + api);

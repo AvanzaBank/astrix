@@ -43,8 +43,8 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegi
 	
 		// TODO: how to detect what exporters are required in the given context (depending on serviceDescriptor).
 		// Only required exporters should be registered
-		List<Class<? extends ServiceRegistryExporter>> serviceBusExporters = getRequiredExporters();
-		for (Class<? extends ServiceRegistryExporter> exporter : serviceBusExporters) {
+		List<Class<? extends ServiceRegistryExporter>> serviceRegistryExporters = getRequiredExporters();
+		for (Class<? extends ServiceRegistryExporter> exporter : serviceRegistryExporters) {
 			beanDefinition = new AnnotatedGenericBeanDefinition(exporter);
 			beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 			registry.registerBeanDefinition("_asterixServiceBusExporter-" + exporter.getName(), beanDefinition);

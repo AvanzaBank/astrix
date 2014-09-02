@@ -43,7 +43,7 @@ import se.avanzabank.space.SpaceLocator;
 public class AsterixServiceRegistryExporterWorker extends Thread {
 	
 	private List<ServiceRegistryExporter> serviceExporters = Collections.emptyList();
-	private final AsterixServiceRegistry serviceBus;
+	private final AsterixServiceRegistry serviceRegistry;
 	private final Logger log = LoggerFactory.getLogger(AsterixServiceRegistryExporterWorker.class);
 
 	@Autowired
@@ -52,12 +52,12 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 			AsterixPlugins asterixPlugins) { // Plugin dependency
 		AsterixVersioningPlugin versioningPlugin = asterixPlugins.getPlugin(AsterixVersioningPlugin.class);
 		// TODO: AsterixSerivceBus should be retreived from service-framework, not by hard-coding usage of remoting-framework here.
-		GigaSpace serviceBusSpace = sl.createClusteredProxy("service-bus-space"); // TODO: fault tolerance, connection mannagment, etc.
-		this.serviceBus = AsterixRemotingProxy.create(AsterixServiceRegistry.class, AsterixRemotingTransport.remoteSpace(serviceBusSpace), versioningPlugin.create(AsterixServiceRegistryApiDescriptor.class));
+		GigaSpace serviceRegistrySpace = sl.createClusteredProxy("service-bus-space"); // TODO: fault tolerance, connection mannagment, etc.
+		this.serviceRegistry = AsterixRemotingProxy.create(AsterixServiceRegistry.class, AsterixRemotingTransport.remoteSpace(serviceRegistrySpace), versioningPlugin.create(AsterixServiceRegistryApiDescriptor.class));
 	}
 
-	public AsterixServiceRegistryExporterWorker(List<ServiceRegistryExporter> serviceProvideres, AsterixServiceRegistry serviceBus) {
-		this.serviceBus = serviceBus;
+	public AsterixServiceRegistryExporterWorker(List<ServiceRegistryExporter> serviceProvideres, AsterixServiceRegistry serviceRegistry) {
+		this.serviceRegistry = serviceRegistry;
 		this.serviceExporters = serviceProvideres;
 	}
 
@@ -93,7 +93,7 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 		for (ServiceRegistryExporter provider : serviceExporters) {
 			for (AsterixServiceProperties serviceProperties : provider.getProvidedServices()) {
 				log.debug("Exporting on service bus. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
-				serviceBus.register(serviceProperties.getApi(), serviceProperties);
+				serviceRegistry.register(serviceProperties.getApi(), serviceProperties);
 			}
 		}
 	}
