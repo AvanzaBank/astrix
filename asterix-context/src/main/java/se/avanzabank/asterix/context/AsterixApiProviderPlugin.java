@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * An AsterixApiProviderPlugin is responsible for creating AsterixFactoryBean's for
  * all parts of a given "type" of api. By "type" in this context, we don't mean the
- * different api's that are hooked into astrix for consumption, but rather a mechanism
+ * different api's that are hooked into asterix for consumption, but rather a mechanism
  * for an api-provider to use to make the different part's of the api available for consumption.
  * 
  * For instance, one type of api is "library", which is handled by the AsterixLibraryProviderPlugin. It
@@ -30,7 +30,7 @@ import java.util.List;
  * a class with @AsterixLibraryProvider an export different api-elements by annotating factory methods
  * for different api elements with @AsterixExport. 
  * 
- * Another type of api is a pure "astrix-remoting" api, which also requires a server side component to respond
+ * Another type of api is a pure "asterix-remoting" api, which also requires a server side component to respond
  * to the incoming service-request.
  * 
  * 

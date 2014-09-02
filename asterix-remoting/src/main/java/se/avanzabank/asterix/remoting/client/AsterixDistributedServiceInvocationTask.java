@@ -32,7 +32,7 @@ public class AsterixDistributedServiceInvocationTask implements DistributedTask<
 
 	private static final long serialVersionUID = 1L;
 	@Resource
-	private transient AsterixServiceActivator astrixServiceActivator;
+	private transient AsterixServiceActivator asterixServiceActivator;
 	private final AsterixServiceInvocationRequest request;
 	
 	public AsterixDistributedServiceInvocationTask(AsterixServiceInvocationRequest request) {
@@ -41,7 +41,7 @@ public class AsterixDistributedServiceInvocationTask implements DistributedTask<
 
 	@Override
 	public AsterixServiceInvocationResponse execute() throws Exception {
-		return astrixServiceActivator.invokeService(request);
+		return asterixServiceActivator.invokeService(request);
 	}
 	
 	@Override

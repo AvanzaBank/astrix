@@ -59,12 +59,12 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		/*
 		 * NOTE: its important to avoid premature instantiation of spring-beans, hence
-		 * we may not query the spring ApplicationContext from astrix-classes, since we
+		 * we may not query the spring ApplicationContext from asterix-classes, since we
 		 * don't know in what order spring will instantiate beans.
 		 * 
 		 * Therefore we init process looks like this:
 		 * 
-		 * 1. Discover all plugins using astrix-plugin-discovery
+		 * 1. Discover all plugins using asterix-plugin-discovery
 		 * 2. Scan for api-providers on classpath and build AsterixBeanFactories
 		 *  -> Its important that no "xxxAware" injected dependency is used in this phase,
 		 *  especially no ExternalDependencyBean since we have created the ApplicationContext yet.
@@ -76,15 +76,15 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		 */
 		
 		// TODO: avoid creating two AsterixContext's  (here and as spring bean)
-		AsterixContext astrixContext = new AsterixConfigurer().configure(); 
+		AsterixContext asterixContext = new AsterixConfigurer().configure(); 
 		
 		// For each consumedApi, either directly or indirectly (for instance via a library), 
 		// we must register a bean definition for the ExternalDependencyBean to "collect" the dependencies from
 		// the application-context
-		Set<Class<? extends ExternalDependencyBean>> externalDependencyBeanTypes = resolveAllExternalDependencies(astrixContext);
+		Set<Class<? extends ExternalDependencyBean>> externalDependencyBeanTypes = resolveAllExternalDependencies(asterixContext);
 		for (Class<?> dependencBeanClass : externalDependencyBeanTypes) {
 			AnnotatedGenericBeanDefinition dependenciesBeanDefinition = new AnnotatedGenericBeanDefinition(dependencBeanClass);
-			String dependencyBeanName = "_astrixDependencyBean" + dependencBeanClass.getName();
+			String dependencyBeanName = "_asterixDependencyBean" + dependencBeanClass.getName();
 			registry.registerBeanDefinition(dependencyBeanName, dependenciesBeanDefinition);
 		}
 		
@@ -92,19 +92,19 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixConfigurer.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		beanDefinition.setDependsOn(getDependencyBeanNames(externalDependencyBeanTypes));
-		registry.registerBeanDefinition("_astrixConfigurer", beanDefinition);
+		registry.registerBeanDefinition("_asterixConfigurer", beanDefinition);
 
 		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixContext.class);
 		beanDefinition.setAutowireMode(Autowire.NO.value());
-		beanDefinition.setFactoryBeanName("_astrixConfigurer");
+		beanDefinition.setFactoryBeanName("_asterixConfigurer");
 		beanDefinition.setFactoryMethodName("configure");
-		registry.registerBeanDefinition("_astrixContext", beanDefinition);
+		registry.registerBeanDefinition("_asterixContext", beanDefinition);
 		
 		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixPlugins.class);
 		beanDefinition.setAutowireMode(Autowire.NO.value());
-		beanDefinition.setFactoryBeanName("_astrixContext");
+		beanDefinition.setFactoryBeanName("_asterixContext");
 		beanDefinition.setFactoryMethodName("getPlugins");
-		registry.registerBeanDefinition("_astrixPlugins", beanDefinition);
+		registry.registerBeanDefinition("_asterixPlugins", beanDefinition);
 		
 		
 		for (Class<?> consumedAsterixBean : consumedAsterixBeans) {
@@ -120,7 +120,7 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 			return;
 		}
 		beanDefinition = new AnnotatedGenericBeanDefinition(serviceDescriptor);
-		registry.registerBeanDefinition("_astrixServiceDescriptor", beanDefinition);
+		registry.registerBeanDefinition("_asterixServiceDescriptor", beanDefinition);
 		
 		for (AsterixBeanRegistryPlugin beanRegistryPlugin :
 			AsterixPluginDiscovery.discoverPlugins(AsterixBeanRegistryPlugin.class)) {
@@ -135,17 +135,17 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 			Set<Class<? extends ExternalDependencyBean>> externalDependencyBeanTypes) {
 		List<String> result = new ArrayList<>(externalDependencyBeanTypes.size());
 		for (Class<?> externalDependencyBean : externalDependencyBeanTypes) {
-			result.add("_astrixDependencyBean" + externalDependencyBean.getName());
+			result.add("_asterixDependencyBean" + externalDependencyBean.getName());
 		}
 		return result.toArray(new String[result.size()]);
 	}
 
 	private Set<Class<? extends ExternalDependencyBean>> resolveAllExternalDependencies(
-			AsterixContext astrixContext) {
+			AsterixContext asterixContext) {
 		Set<Class<? extends ExternalDependencyBean>> result = new HashSet<>();
-		for (Class<?> consumedBeans : resolveAllConsumedBeans(astrixContext)) {
+		for (Class<?> consumedBeans : resolveAllConsumedBeans(asterixContext)) {
 			Class<? extends ExternalDependencyBean> externalDependencyBean =
-					astrixContext.getExternalDependencyBean(consumedBeans);
+					asterixContext.getExternalDependencyBean(consumedBeans);
 			if (externalDependencyBean != null) {
 				result.add(externalDependencyBean);
 			}
@@ -153,8 +153,8 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		return result;
 	}
 
-	private Collection<Class<?>> resolveAllConsumedBeans(AsterixContext astrixContext) {
-		return new AsterixBeanDependencyResolver(astrixContext).resolveTransitiveBeanDependencies(consumedAsterixBeans);
+	private Collection<Class<?>> resolveAllConsumedBeans(AsterixContext asterixContext) {
+		return new AsterixBeanDependencyResolver(asterixContext).resolveTransitiveBeanDependencies(consumedAsterixBeans);
 	}
 
 	@Override

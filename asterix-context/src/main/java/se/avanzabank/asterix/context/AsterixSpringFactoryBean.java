@@ -21,15 +21,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class AsterixSpringFactoryBean<T> implements FactoryBean<T> {
 	
 	private Class<T> type;
-	private AsterixContext astrix;
+	private AsterixContext asterix;
 
 	@Autowired
-	public void setAsterixContext(AsterixContext astrix) {
-		this.astrix = astrix;
+	public void setAsterixContext(AsterixContext asterix) {
+		this.asterix = asterix;
 	}
 	
 	public AsterixContext getAsterixContext() {
-		return astrix;
+		return asterix;
 	}
 	
 	public void setType(Class<T> type) {
@@ -42,7 +42,7 @@ public class AsterixSpringFactoryBean<T> implements FactoryBean<T> {
 
 	@Override
 	public T getObject() throws Exception {
-		return astrix.getBean(type);
+		return asterix.getBean(type);
 	}
 
 	@Override

@@ -97,13 +97,13 @@ public class ServiceSuiteIntegrationTest {
 		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceBuspu.getLookupGroupName())); // For service-bus-discovery
 		configurer.useFaultTolerance(false);
 		configurer.enableVersioning(true);
-		Asterix astrix = configurer.configure();
+		Asterix asterix = configurer.configure();
 		Thread.sleep(1000); // TODO: wait for service to be registered in service bus in clean way...
-//		this.lunchService = astrix.waitForService(LunchService.class, 5000);
-//		this.lunchUtil = astrix.waitForService(LunchUtil.class, 5000);
-		this.lunchService = astrix.getBean(LunchService.class);
-		this.lunchUtil = astrix.getBean(LunchUtil.class);
-		this.lunchRestaurantGrader = astrix.getBean(LunchRestaurantGrader.class);
+//		this.lunchService = asterix.waitForService(LunchService.class, 5000);
+//		this.lunchUtil = asterix.waitForService(LunchUtil.class, 5000);
+		this.lunchService = asterix.getBean(LunchService.class);
+		this.lunchUtil = asterix.getBean(LunchUtil.class);
+		this.lunchRestaurantGrader = asterix.getBean(LunchRestaurantGrader.class);
 
 	}
 	

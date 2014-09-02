@@ -34,7 +34,7 @@ public class AsterixServiceInvocationTask implements Task<AsterixServiceInvocati
 	private static final long serialVersionUID = 1L;
 
 	@Resource
-	private transient AsterixServiceActivator astrixServiceActivator;
+	private transient AsterixServiceActivator asterixServiceActivator;
 	private final AsterixServiceInvocationRequest invocationRequest;
 	
 	public AsterixServiceInvocationTask(AsterixServiceInvocationRequest invocationRequest) {
@@ -43,7 +43,7 @@ public class AsterixServiceInvocationTask implements Task<AsterixServiceInvocati
 
 	@Override
 	public AsterixServiceInvocationResponse execute() throws Exception {
-		return astrixServiceActivator.invokeService(invocationRequest);
+		return asterixServiceActivator.invokeService(invocationRequest);
 	}
 
 }

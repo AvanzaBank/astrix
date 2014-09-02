@@ -53,10 +53,10 @@ public class AsterixRemotingProxy implements InvocationHandler {
 	
 	private AsterixRemotingProxy(Class<?> serviceApi,
 							  AsterixObjectSerializer objectSerializer,
-							  AsterixRemotingTransport astrixServiceTransport) {
+							  AsterixRemotingTransport asterixServiceTransport) {
 		this.apiVersion = objectSerializer.version();
 		this.objectSerializer = objectSerializer;
-		this.serviceTransport = astrixServiceTransport;
+		this.serviceTransport = asterixServiceTransport;
 		for (Method m : serviceApi.getMethods()) {
 			remoteServiceMethodByMethod.put(m, RemoteServiceMethod.create(m));
 		}

@@ -45,11 +45,11 @@ public class AsterixRemotingFrameworkBean implements BeanDefinitionRegistryPostP
 		
 		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceExporterBean.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-		registry.registerBeanDefinition("_astrixServiceExporterBean", beanDefinition);
+		registry.registerBeanDefinition("_asterixServiceExporterBean", beanDefinition);
 		
 		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixRemotingArgumentSerializerFactory.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-		registry.registerBeanDefinition("_astrixRemotingArgumentSerializerFactory", beanDefinition);
+		registry.registerBeanDefinition("_asterixRemotingArgumentSerializerFactory", beanDefinition);
 	}
 
 	@Override

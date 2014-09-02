@@ -25,14 +25,14 @@ public class AsterixLibraryFactory<T> implements AsterixFactoryBean<T>, AsterixB
 	private Object factoryInstance;
 	private Method factoryMethod;
 	private Class<T> type;
-	private List<Class<?>> astrixBeanDependencies = new ArrayList<>();
+	private List<Class<?>> asterixBeanDependencies = new ArrayList<>();
 	private AsterixBeans beans;
 	
 	public AsterixLibraryFactory(Object factoryInstance, Method factoryMethod) {
 		this.factoryInstance = factoryInstance;
 		this.factoryMethod = factoryMethod;
 		this.type = (Class<T>) factoryMethod.getReturnType();
-		this.astrixBeanDependencies = Arrays.asList(factoryMethod.getParameterTypes());
+		this.asterixBeanDependencies = Arrays.asList(factoryMethod.getParameterTypes());
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class AsterixLibraryFactory<T> implements AsterixFactoryBean<T>, AsterixB
 	
 	@Override
 	public List<Class<?>> getBeanDependencies() {
-		return this.astrixBeanDependencies;
+		return this.asterixBeanDependencies;
 	}
 
 	@Override

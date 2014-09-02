@@ -23,13 +23,13 @@ public interface AsterixVersioningPlugin {
 	
 	// TODO: rename to AsterixVersioningPlugin???
 	
-	public AsterixObjectSerializer create(Class<?> astrixApiDescriptorHolder);
+	public AsterixObjectSerializer create(Class<?> asterixApiDescriptorHolder);
 	
 	public static class Default {
 		public static AsterixVersioningPlugin create() {
 			return new AsterixVersioningPlugin() {
 				@Override
-				public AsterixObjectSerializer create(Class<?> astrixApiDescriptorHolder) {
+				public AsterixObjectSerializer create(Class<?> asterixApiDescriptorHolder) {
 					return new NoVersioningSupport();
 				}
 			};

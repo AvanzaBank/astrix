@@ -39,7 +39,7 @@ public class AsterixServiceBusBeanRegistryPlugin implements AsterixBeanRegistryP
 	public void registerBeanDefinitions(BeanDefinitionRegistry registry) throws BeansException {
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceBusExporterWorker.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-		registry.registerBeanDefinition("_astrixServiceBusExporterWorker", beanDefinition);
+		registry.registerBeanDefinition("_asterixServiceBusExporterWorker", beanDefinition);
 	
 		// TODO: how to detect what exporters are required in the given context (depending on serviceDescriptor).
 		// Only required exporters should be registered
@@ -47,7 +47,7 @@ public class AsterixServiceBusBeanRegistryPlugin implements AsterixBeanRegistryP
 		for (Class<? extends ServiceBusExporter> exporter : serviceBusExporters) {
 			beanDefinition = new AnnotatedGenericBeanDefinition(exporter);
 			beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-			registry.registerBeanDefinition("_astrixServiceBusExporter-" + exporter.getName(), beanDefinition);
+			registry.registerBeanDefinition("_asterixServiceBusExporter-" + exporter.getName(), beanDefinition);
 		}
 	}
 

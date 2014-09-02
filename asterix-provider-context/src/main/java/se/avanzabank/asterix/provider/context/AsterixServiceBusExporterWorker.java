@@ -49,8 +49,8 @@ public class AsterixServiceBusExporterWorker extends Thread {
 	@Autowired
 	public AsterixServiceBusExporterWorker(
 			SpaceLocator sl, // External dependency
-			AsterixPlugins astrixPlugins) { // Plugin dependency
-		AsterixVersioningPlugin versioningPlugin = astrixPlugins.getPlugin(AsterixVersioningPlugin.class);
+			AsterixPlugins asterixPlugins) { // Plugin dependency
+		AsterixVersioningPlugin versioningPlugin = asterixPlugins.getPlugin(AsterixVersioningPlugin.class);
 		// TODO: AsterixSerivceBus should be retreived from service-framework, not by hard-coding usage of remoting-framework here.
 		GigaSpace serviceBusSpace = sl.createClusteredProxy("service-bus-space"); // TODO: fault tolerance, connection mannagment, etc.
 		this.serviceBus = AsterixRemotingProxy.create(AsterixServiceBus.class, AsterixRemotingTransport.remoteSpace(serviceBusSpace), versioningPlugin.create(AsterixServiceBusApiDescriptor.class));

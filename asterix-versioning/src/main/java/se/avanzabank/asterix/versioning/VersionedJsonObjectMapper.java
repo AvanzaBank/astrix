@@ -229,7 +229,7 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 		}
 		
 		private ObjectMapper buildMigratingMapper(ObjectMapper rawMapper, ThreadLocal<Integer> versionHolder) {
-			SimpleModule module = new SimpleModule("astrix-migratingModule", new Version(1,0,0, ""));
+			SimpleModule module = new SimpleModule("asterix-migratingModule", new Version(1,0,0, ""));
 			for (JsonMessageMigrator<?> migrator : this.migratorsByType.values()) {
 				registerSerializerAndDeserializer(rawMapper, versionHolder, module, migrator);
 			}
@@ -259,7 +259,7 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 		}
 
 		private ObjectMapper buildRaw() {
-			SimpleModule rawModule = new SimpleModule("astrix-rawModule", new Version(1,0,0, ""));
+			SimpleModule rawModule = new SimpleModule("asterix-rawModule", new Version(1,0,0, ""));
 			for (JsonDeserializerHolder<?> deserializer : this.deserializers) {
 				deserializer.register(rawModule);
 			}

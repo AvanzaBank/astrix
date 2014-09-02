@@ -24,9 +24,9 @@ import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 @MetaInfServices(AsterixVersioningPlugin.class)
 public class JacksonVersioningPlugin implements AsterixVersioningPlugin {
 	@Override
-	public AsterixObjectSerializer create(Class<?> astrixApiDescriptorHolder) {
-		if (astrixApiDescriptorHolder.isAnnotationPresent(AsterixVersioned.class)) {
-			AsterixVersioned versioningInfo = astrixApiDescriptorHolder.getAnnotation(AsterixVersioned.class);
+	public AsterixObjectSerializer create(Class<?> asterixApiDescriptorHolder) {
+		if (asterixApiDescriptorHolder.isAnnotationPresent(AsterixVersioned.class)) {
+			AsterixVersioned versioningInfo = asterixApiDescriptorHolder.getAnnotation(AsterixVersioned.class);
 			return new VersionJacksonAsterixObjectSerializer(versioningInfo);
 		}
 		return new AsterixObjectSerializer.NoVersioningSupport();

@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 /**
  * An AsterixApiProvider holds factories for creating instances of all different elements
- * that is part of an api hooked into astrix. More precisely it holds an AsterixFactoryBean 
+ * that is part of an api hooked into asterix. More precisely it holds an AsterixFactoryBean 
  * for each beanType provided by the given api. <p>
  * 
  * @author Elias Lindholm (elilin)

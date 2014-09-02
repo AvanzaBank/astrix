@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is a component used to create runtime factory representations (AsterixApiProvider) for api's hooked
- * into astrix. Given an descriptorHolder this factory creates an AsterixApiProvider for a given api. <p>
+ * into asterix. Given an descriptorHolder this factory creates an AsterixApiProvider for a given api. <p>
  *  
  * @author Elias Lindholm (elilin)
  *

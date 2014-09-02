@@ -17,8 +17,8 @@ package se.avanzabank.asterix.context;
 
 import java.util.List;
 /**
- * The bean aware interface allows "astrix-plugin-instances" to depend on
- * astrix-managed-beans, ie api-elements hooked into astrix. <p> 
+ * The bean aware interface allows "asterix-plugin-instances" to depend on
+ * asterix-managed-beans, ie api-elements hooked into asterix. <p> 
  * 
  * 
  * @author Elias Lindholm (elilin)

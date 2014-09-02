@@ -19,7 +19,7 @@ import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 
 /**
- * The serivce-bus-api uses astrix-remoting to export its service. Note that
+ * The serivce-bus-api uses asterix-remoting to export its service. Note that
  * it doesn't use the service-bus to bind to the providers, but rather uses a
  * SpaceLocator and the space-name provided here. 
  * 

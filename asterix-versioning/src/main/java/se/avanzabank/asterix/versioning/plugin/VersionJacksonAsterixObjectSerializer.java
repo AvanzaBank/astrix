@@ -41,13 +41,13 @@ public class VersionJacksonAsterixObjectSerializer implements AsterixObjectSeria
 			Class<? extends AsterixJsonApiMigration>[] apiMigrationFactories,
 			Class<? extends AsterixObjectMapperConfigurer> objectMapperConfigurerFactory) {
 		try {
-			AsterixObjectMapperConfigurer astrixObjectMapperConfigurer = objectMapperConfigurerFactory.newInstance();
+			AsterixObjectMapperConfigurer asterixObjectMapperConfigurer = objectMapperConfigurerFactory.newInstance();
 			List<AsterixJsonApiMigration> apiMigrations = new ArrayList<>();
 			for (Class<? extends AsterixJsonApiMigration> apiMigrationFactory : apiMigrationFactories) {
 				apiMigrations.add(apiMigrationFactory.newInstance());
 			}
 			VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
-			astrixObjectMapperConfigurer.configure(objectMapperBuilder);
+			asterixObjectMapperConfigurer.configure(objectMapperBuilder);
 			return JsonObjectMapper.create(objectMapperBuilder.build());
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException("Failed to init JsonObjectMapper", e);
