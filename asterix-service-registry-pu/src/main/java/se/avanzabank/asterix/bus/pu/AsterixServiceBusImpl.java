@@ -19,12 +19,12 @@ import org.openspaces.core.GigaSpace;
 import org.openspaces.remoting.Routing;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.bus.client.AsterixServiceBus;
+import se.avanzabank.asterix.bus.client.AsterixServiceRegistry;
 import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteServiceExport;
 
-@AsterixRemoteServiceExport(AsterixServiceBus.class)
-public class AsterixServiceBusImpl implements AsterixServiceBus {
+@AsterixRemoteServiceExport(AsterixServiceRegistry.class)
+public class AsterixServiceBusImpl implements AsterixServiceRegistry {
 	
 	private GigaSpace gigaSpace;
 	

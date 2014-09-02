@@ -28,23 +28,23 @@ import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.provider.core.AsterixServiceBusApi;
 
 @MetaInfServices(AsterixApiProviderPlugin.class)
-public class AsterixServiceBusPlugin implements AsterixApiProviderPlugin, AsterixPluginsAware {
+public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderPlugin, AsterixPluginsAware {
 	
 	private AsterixPlugins plugins;
 
 	@Override
 	public List<AsterixFactoryBean<?>> createFactoryBeans(Class<?> descriptorHolder) {
 		List<AsterixFactoryBean<?>> result = new ArrayList<>();
-		for (AsterixServiceBusComponent component : getAllComponents()) {
+		for (AsterixServiceRegistryComponent component : getAllComponents()) {
 			for (Class<?> exportedApi : component.getExportedServices(descriptorHolder)) {
-				result.add(new ServiceBusLookupFactory<>(descriptorHolder, exportedApi, component));
+				result.add(new ServiceRegistryLookupFactory<>(descriptorHolder, exportedApi, component));
 			}
 		}
 		return result;
 	}
 
-	private List<AsterixServiceBusComponent> getAllComponents() {
-		return plugins.getPlugins(AsterixServiceBusComponent.class);
+	private List<AsterixServiceRegistryComponent> getAllComponents() {
+		return plugins.getPlugins(AsterixServiceRegistryComponent.class);
 	}
 
 	@Override

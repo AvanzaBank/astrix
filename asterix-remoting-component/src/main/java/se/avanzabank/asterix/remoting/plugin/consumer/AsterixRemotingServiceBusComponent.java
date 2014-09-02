@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
-import se.avanzabank.asterix.bus.client.AsterixServiceBusComponent;
+import se.avanzabank.asterix.bus.client.AsterixServiceRegistryComponent;
 import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixBeanAware;
 import se.avanzabank.asterix.context.AsterixBeans;
@@ -36,8 +36,8 @@ import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
 import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceBusExporter;
 
-@MetaInfServices(AsterixServiceBusComponent.class)
-public class AsterixRemotingServiceBusComponent implements AsterixServiceBusComponent, AsterixBeanAware, AsterixPluginsAware {
+@MetaInfServices(AsterixServiceRegistryComponent.class)
+public class AsterixRemotingServiceBusComponent implements AsterixServiceRegistryComponent, AsterixBeanAware, AsterixPluginsAware {
 
 	// TODO: what if lookup of service-properties fails? whose responsible of making new attempts to discover provider?
 	// Multiple cases exists:

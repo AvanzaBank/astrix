@@ -19,14 +19,14 @@ import java.util.Objects;
 
 import org.openspaces.core.GigaSpace;
 
-import se.avanzabank.asterix.bus.client.AsterixServiceBus;
+import se.avanzabank.asterix.bus.client.AsterixServiceRegistry;
 import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 
 public class GigaSpaceRegistryImpl implements GigaSpaceRegistry {
 	
-	private final AsterixServiceBus serviceBus;
+	private final AsterixServiceRegistry serviceBus;
 
-	public GigaSpaceRegistryImpl(AsterixServiceBus serviceBus) {
+	public GigaSpaceRegistryImpl(AsterixServiceRegistry serviceBus) {
 		this.serviceBus = Objects.requireNonNull(serviceBus);
 	}
 

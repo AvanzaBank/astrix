@@ -16,7 +16,6 @@
 package se.avanzabank.asterix.bus.client;
 
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
-import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 
 /**
  * The serivce-bus-api uses asterix-remoting to export its service. Note that
@@ -28,11 +27,11 @@ import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
  */
 @AsterixRemoteApiDescriptor (
 	exportedApis = {
-		AsterixServiceBus.class,
+		AsterixServiceRegistry.class,
 	},
 	targetSpaceName = "service-bus-space"
 )
-public class AsterixServiceBusApiDescriptor {
+public class AsterixServiceRegistryApiDescriptor {
 }
 
 

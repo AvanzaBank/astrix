@@ -15,7 +15,7 @@
  */
 package se.avanzabank.asterix.gs;
 
-import se.avanzabank.asterix.bus.client.AsterixServiceBus;
+import se.avanzabank.asterix.bus.client.AsterixServiceRegistry;
 import se.avanzabank.asterix.provider.library.AsterixExport;
 import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
 
@@ -23,8 +23,8 @@ import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
 public class GsServiceDescriptor {
 	
 	@AsterixExport
-	public GigaSpaceRegistry createGigaSpaceRegistry(AsterixServiceBus serviceBus) {
-		return new GigaSpaceRegistryImpl(serviceBus);
+	public GigaSpaceRegistry createGigaSpaceRegistry(AsterixServiceRegistry serviceRegistry) {
+		return new GigaSpaceRegistryImpl(serviceRegistry);
 	}
 
 }

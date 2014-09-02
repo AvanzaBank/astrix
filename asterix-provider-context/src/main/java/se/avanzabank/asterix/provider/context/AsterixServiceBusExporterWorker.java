@@ -25,8 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.bus.client.AsterixServiceBus;
-import se.avanzabank.asterix.bus.client.AsterixServiceBusApiDescriptor;
+import se.avanzabank.asterix.bus.client.AsterixServiceRegistry;
+import se.avanzabank.asterix.bus.client.AsterixServiceRegistryApiDescriptor;
 import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
@@ -43,7 +43,7 @@ import se.avanzabank.space.SpaceLocator;
 public class AsterixServiceBusExporterWorker extends Thread {
 	
 	private List<ServiceBusExporter> serviceExporters = Collections.emptyList();
-	private final AsterixServiceBus serviceBus;
+	private final AsterixServiceRegistry serviceBus;
 	private final Logger log = LoggerFactory.getLogger(AsterixServiceBusExporterWorker.class);
 
 	@Autowired
@@ -53,10 +53,10 @@ public class AsterixServiceBusExporterWorker extends Thread {
 		AsterixVersioningPlugin versioningPlugin = asterixPlugins.getPlugin(AsterixVersioningPlugin.class);
 		// TODO: AsterixSerivceBus should be retreived from service-framework, not by hard-coding usage of remoting-framework here.
 		GigaSpace serviceBusSpace = sl.createClusteredProxy("service-bus-space"); // TODO: fault tolerance, connection mannagment, etc.
-		this.serviceBus = AsterixRemotingProxy.create(AsterixServiceBus.class, AsterixRemotingTransport.remoteSpace(serviceBusSpace), versioningPlugin.create(AsterixServiceBusApiDescriptor.class));
+		this.serviceBus = AsterixRemotingProxy.create(AsterixServiceRegistry.class, AsterixRemotingTransport.remoteSpace(serviceBusSpace), versioningPlugin.create(AsterixServiceRegistryApiDescriptor.class));
 	}
 
-	public AsterixServiceBusExporterWorker(List<ServiceBusExporter> serviceProvideres, AsterixServiceBus serviceBus) {
+	public AsterixServiceBusExporterWorker(List<ServiceBusExporter> serviceProvideres, AsterixServiceRegistry serviceBus) {
 		this.serviceBus = serviceBus;
 		this.serviceExporters = serviceProvideres;
 	}

@@ -22,36 +22,36 @@ import se.avanzabank.asterix.context.AsterixBeanAware;
 import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
 
-public class ServiceBusLookupFactory<T> implements AsterixFactoryBean<T>, AsterixBeanAware {
+public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, AsterixBeanAware {
 
 	private Class<T> api;
 	private Class<?> descriptorHolder;
-	private AsterixServiceBusComponent serviceBusComponent;
+	private AsterixServiceRegistryComponent serviceRegistryComponent;
 	private AsterixBeans beans;
 
-	public ServiceBusLookupFactory(Class<?> descriptorHolder,
+	public ServiceRegistryLookupFactory(Class<?> descriptorHolder,
 			Class<T> api,
-			AsterixServiceBusComponent serviceBusComponent) {
+			AsterixServiceRegistryComponent serviceBusComponent) {
 		this.descriptorHolder = descriptorHolder;
 		this.api = api;
-		this.serviceBusComponent = serviceBusComponent;
+		this.serviceRegistryComponent = serviceBusComponent;
 	}
 
 	@Override
 	public T create() {
 		// TODO: always return a proxy-instance, no matter in which of the steps below that the lookup fails
-		AsterixServiceBus serviceBus = beans.getBean(AsterixServiceBus.class); // service dependency
+		AsterixServiceRegistry serviceBus = beans.getBean(AsterixServiceRegistry.class); // service dependency
 		AsterixServiceProperties serviceProperties = serviceBus.lookup(api); // TODO: might fail
 		if (serviceProperties == null) {
 			// TODO: manage non discovered services
 			throw new RuntimeException("Did not discover: " + api);
 		}
-		return serviceBusComponent.createService(descriptorHolder, api, serviceProperties);
+		return serviceRegistryComponent.createService(descriptorHolder, api, serviceProperties);
 	}
 	
 	@Override
 	public List<Class<?>> getBeanDependencies() {
-		return Arrays.<Class<?>>asList(AsterixServiceBus.class);
+		return Arrays.<Class<?>>asList(AsterixServiceRegistry.class);
 	}
 
 	@Override

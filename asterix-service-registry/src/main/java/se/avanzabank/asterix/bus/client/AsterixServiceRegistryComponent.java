@@ -30,9 +30,9 @@ import java.util.List;
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AsterixServiceBusComponent {
+public interface AsterixServiceRegistryComponent {
 	
-	// TODO: rename to AsterixServiceBusConsumer??
+	// TODO: rename to AsterixServiceRegistryConsumer??
 	
 	/**
 	 * Check whether this component exports any services on a given descriptor.

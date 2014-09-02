@@ -12,7 +12,7 @@
     <os-core:giga-space id="gigaSpace" space="space"/>
     
     <bean class="se.avanzabank.asterix.context.AsterixFrameworkBean">
-    	<property name="serviceDescriptor" value="se.avanzabank.asterix.bus.client.AsterixServiceBusApiDescriptor"/>
+    	<property name="serviceDescriptor" value="se.avanzabank.asterix.bus.client.AsterixServiceRegistryApiDescriptor"/>
     </bean>
     <bean class="se.avanzabank.asterix.bus.pu.AsterixServiceBusImpl"/>
 </beans>

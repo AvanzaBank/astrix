@@ -19,7 +19,7 @@ import org.openspaces.remoting.Routing;
 
 
 
-public interface AsterixServiceBus {
+public interface AsterixServiceRegistry {
 	
 	// TODO: use separate interface for providers and consumers?
 	
