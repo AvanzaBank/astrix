@@ -17,7 +17,7 @@ package se.avanzabank.asterix.provider.context;
 
 import java.util.List;
 
-import se.avanzabank.asterix.bus.client.AstrixServiceProperties;
+import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 /**
  * This is the service-provider part of the service-bus.
  * 
@@ -29,6 +29,6 @@ import se.avanzabank.asterix.bus.client.AstrixServiceProperties;
  */
 public interface ServiceBusExporter {
 	
-	List<AstrixServiceProperties> getProvidedServices();
+	List<AsterixServiceProperties> getProvidedServices();
 
 }

@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 
 import org.openspaces.remoting.Routing;
 
-import se.avanzabank.asterix.core.AstrixBroadcast;
+import se.avanzabank.asterix.core.AsterixBroadcast;
 import se.avanzabank.asterix.remoting.util.MethodSignatureBuilder;
 /**
  * 
@@ -64,9 +64,9 @@ class RemoteServiceMethod {
 		if (result != null) {
 			return result;
 		}
-		if (m.getAnnotation(AstrixBroadcast.class) == null) {
+		if (m.getAnnotation(AsterixBroadcast.class) == null) {
 			throw new AmbiguousRoutingException(String.format("Ambiguous routing. No routing argument defined in method signature or on method " +
-					"arguments and method not annotated with @AstrixBroadcast. serviceMethod=%s", m.toString()));
+					"arguments and method not annotated with @AsterixBroadcast. serviceMethod=%s", m.toString()));
 		}
 		return new BroadcastRoutingStrategy();
 	}
@@ -78,7 +78,7 @@ class RemoteServiceMethod {
 			if (routingKeyMethod != null) {
 				if (result != null) {
 					throw new AmbiguousRoutingException(String.format("Ambiguous routing, multiple arguments with @SpaceRouting annotated methods." +
-							" Use @Routing on one service argument to identify routing method, or @AstrixBroadcast for broadcast" +
+							" Use @Routing on one service argument to identify routing method, or @AsterixBroadcast for broadcast" +
 							" operations. service method=%s", m.toString()));
 				}
 				result = new AnnotatedArgumentInstanceRoutingStrategy(argumentIndex, routingKeyMethod);

@@ -21,7 +21,7 @@ import java.util.List;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.bus.client.AstrixServiceProperties;
+import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 import se.avanzabank.asterix.provider.context.ServiceBusExporter;
 
 public class GigaSpaceServiceBusExporter implements ServiceBusExporter {
@@ -34,7 +34,7 @@ public class GigaSpaceServiceBusExporter implements ServiceBusExporter {
 	}
 
 	@Override
-	public List<AstrixServiceProperties> getProvidedServices() {
+	public List<AsterixServiceProperties> getProvidedServices() {
 		return Arrays.asList(GsBinder.createProperties(space));
 	}
 

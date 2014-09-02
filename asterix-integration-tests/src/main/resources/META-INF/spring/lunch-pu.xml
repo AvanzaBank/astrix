@@ -11,8 +11,8 @@
     <os-core:space id="space" url="/./service-demo-space" mirror="false"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
     
-    <!-- Astrix service framework (provider and consumer) -->
-	<bean id="astrixServiceFrameworkBean" class="se.avanzabank.asterix.context.AstrixFrameworkBean">
+    <!-- Asterix service framework (provider and consumer) -->
+	<bean id="astrixServiceFrameworkBean" class="se.avanzabank.asterix.context.AsterixFrameworkBean">
 		<property name="serviceDescriptor" value="se.avanzabank.asterix.integration.tests.domain.apiruntime.LunchApiDescriptor"/>
 	</bean>
 	
@@ -20,7 +20,7 @@
 	<bean id="spaceLocator" class="se.avanzabank.space.UsesJndiLookupSpaceLocator"/>
 	
 	<!-- TODO: autodiscover all ServiceExporter's? -->
-	<bean id="astrixRemotingServiceExporter" class="se.avanzabank.asterix.remoting.plugin.provider.AstrixRemotingServiceBusExporter"/>
+	<bean id="astrixRemotingServiceExporter" class="se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceBusExporter"/>
 	<bean id="gsServiceExporter" class="se.avanzabank.asterix.gs.GigaSpaceServiceBusExporter"/>
 
 

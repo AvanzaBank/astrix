@@ -19,14 +19,14 @@ import java.util.Objects;
 
 import org.openspaces.core.GigaSpace;
 
-import se.avanzabank.asterix.bus.client.AstrixServiceBus;
-import se.avanzabank.asterix.bus.client.AstrixServiceProperties;
+import se.avanzabank.asterix.bus.client.AsterixServiceBus;
+import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 
 public class GigaSpaceRegistryImpl implements GigaSpaceRegistry {
 	
-	private final AstrixServiceBus serviceBus;
+	private final AsterixServiceBus serviceBus;
 
-	public GigaSpaceRegistryImpl(AstrixServiceBus serviceBus) {
+	public GigaSpaceRegistryImpl(AsterixServiceBus serviceBus) {
 		this.serviceBus = Objects.requireNonNull(serviceBus);
 	}
 
@@ -38,7 +38,7 @@ public class GigaSpaceRegistryImpl implements GigaSpaceRegistry {
 	}
 
 	private GsFactory lookupFactory(String spaceName) {
-		AstrixServiceProperties lookup = serviceBus.lookup(GigaSpace.class, spaceName); // TODO: if lookup fails we want
+		AsterixServiceProperties lookup = serviceBus.lookup(GigaSpace.class, spaceName); // TODO: if lookup fails we want
 		if (lookup == null) {
 			throw new RuntimeException("Failed to lookup space: " + spaceName); // TODO: handle lookup failure (i.e bus n/a) and lookup 'miss', ie no service registered in bus yet. 
 		}

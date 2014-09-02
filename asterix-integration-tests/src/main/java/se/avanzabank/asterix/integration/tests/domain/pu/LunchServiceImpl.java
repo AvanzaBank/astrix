@@ -21,9 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import se.avanzabank.asterix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
-import se.avanzabank.asterix.provider.remoting.AstrixRemoteServiceExport;
+import se.avanzabank.asterix.provider.remoting.AsterixRemoteServiceExport;
 
-@AstrixRemoteServiceExport(LunchService.class)
+@AsterixRemoteServiceExport(LunchService.class)
 public class LunchServiceImpl implements LunchService {
 
 	private final GigaSpace gigaSpace;

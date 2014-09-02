@@ -15,11 +15,11 @@
  */
 package se.avanzabank.asterix.integration.tests.domain.apiruntime;
 
-import se.avanzabank.asterix.provider.versioning.AstrixObjectMapperConfigurer;
+import se.avanzabank.asterix.provider.versioning.AsterixObjectMapperConfigurer;
 import se.avanzabank.asterix.provider.versioning.JacksonObjectMapperBuilder;
 
 
-public class LunchApiObjectMapperConfigurer implements AstrixObjectMapperConfigurer {
+public class LunchApiObjectMapperConfigurer implements AsterixObjectMapperConfigurer {
 
 	@Override
 	public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {

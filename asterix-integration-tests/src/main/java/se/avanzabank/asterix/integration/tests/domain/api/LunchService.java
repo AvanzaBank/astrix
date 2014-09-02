@@ -15,13 +15,13 @@
  */
 package se.avanzabank.asterix.integration.tests.domain.api;
 
-import se.avanzabank.asterix.core.AstrixBroadcast;
+import se.avanzabank.asterix.core.AsterixBroadcast;
 
 
 
 public interface LunchService {
 	
-	@AstrixBroadcast(reducer = LunchSuggestionReducer.class)
+	@AsterixBroadcast(reducer = LunchSuggestionReducer.class)
 	LunchRestaurant suggestRandomLunchRestaurant(String foodType);
 	
 	void addLunchRestaurant(LunchRestaurant restaurant);

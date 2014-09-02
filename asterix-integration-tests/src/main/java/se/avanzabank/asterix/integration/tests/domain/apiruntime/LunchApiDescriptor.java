@@ -16,13 +16,13 @@
 package se.avanzabank.asterix.integration.tests.domain.apiruntime;
 
 import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
-import se.avanzabank.asterix.provider.core.AstrixServiceBusApi;
-import se.avanzabank.asterix.provider.remoting.AstrixRemoteApiDescriptor;
-import se.avanzabank.asterix.provider.versioning.AstrixVersioned;
+import se.avanzabank.asterix.provider.core.AsterixServiceBusApi;
+import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
+import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 
 
 // API:t är versionshanterat
-@AstrixVersioned(
+@AsterixVersioned(
 	apiMigrations = {
 		LunchApiV1Migration.class
 	},	
@@ -30,9 +30,9 @@ import se.avanzabank.asterix.provider.versioning.AstrixVersioned;
 	objectMapperConfigurer = LunchApiObjectMapperConfigurer.class
 )
 // Tjänsten publiceras och kan slås upp via tjänstebussen
-@AstrixServiceBusApi
+@AsterixServiceBusApi
 // Tjänsten exponerar en gs-remoting-tjänst
-@AstrixRemoteApiDescriptor (
+@AsterixRemoteApiDescriptor (
 	exportedApis = {
 		LunchService.class
 	}

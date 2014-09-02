@@ -16,11 +16,11 @@
 package se.avanzabank.asterix.integration.tests.domain2.apiruntime;
 
 import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
-import se.avanzabank.asterix.provider.core.AstrixServiceBusApi;
-import se.avanzabank.asterix.provider.remoting.AstrixRemoteApiDescriptor;
+import se.avanzabank.asterix.provider.core.AsterixServiceBusApi;
+import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 
-@AstrixServiceBusApi
-@AstrixRemoteApiDescriptor (
+@AsterixServiceBusApi
+@AsterixRemoteApiDescriptor (
 	exportedApis = {
 		LunchRestaurantGrader.class,
 	}

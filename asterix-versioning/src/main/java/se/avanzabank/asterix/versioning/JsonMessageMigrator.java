@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.codehaus.jackson.node.ObjectNode;
 
-import se.avanzabank.asterix.provider.versioning.AstrixJsonMessageMigration;
+import se.avanzabank.asterix.provider.versioning.AsterixJsonMessageMigration;
 /**
  * A message migrator is responsible for migration a message on an old version
  * to the current version, and also responsible for migration messages on the
@@ -70,10 +70,10 @@ class JsonMessageMigrator<T> {
 	
 	static class JsonMessageMigrationWithVersion<T> implements Comparable<JsonMessageMigrationWithVersion<T>> {
 		private int version;
-		private AstrixJsonMessageMigration<T> migration;
+		private AsterixJsonMessageMigration<T> migration;
 
 		public JsonMessageMigrationWithVersion(int version,
-				AstrixJsonMessageMigration<T> migration) {
+				AsterixJsonMessageMigration<T> migration) {
 			this.version = version;
 			this.migration = migration;
 		}
@@ -105,7 +105,7 @@ class JsonMessageMigrator<T> {
 			this.javaType = javaType;
 		}
 		
-		public Builder<T> addMigration(AstrixJsonMessageMigration<T> migration, int fromVersion) {
+		public Builder<T> addMigration(AsterixJsonMessageMigration<T> migration, int fromVersion) {
 			migrations.add(new JsonMessageMigrationWithVersion<>(fromVersion, migration));
 			return this;
 		}

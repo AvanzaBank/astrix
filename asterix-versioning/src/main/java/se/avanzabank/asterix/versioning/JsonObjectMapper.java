@@ -58,7 +58,7 @@ public class JsonObjectMapper {
 		return new JsonObjectMapper(new SimpleJacksonJsonMessageMapper(objectMapper));
 	}
 	
-	// TODO: remove direct version: replaced by AstrixObjectSerializer abstraction
+	// TODO: remove direct version: replaced by AsterixObjectSerializer abstraction
 	public static JsonObjectMapper direct() {
 		return direct(new DirectMessageMapper());
 	}

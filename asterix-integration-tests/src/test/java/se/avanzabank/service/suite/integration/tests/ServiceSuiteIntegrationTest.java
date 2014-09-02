@@ -29,14 +29,14 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.openspaces.core.GigaSpace;
 
-import se.avanzabank.asterix.context.Astrix;
-import se.avanzabank.asterix.context.AstrixConfigurer;
+import se.avanzabank.asterix.context.Asterix;
+import se.avanzabank.asterix.context.AsterixConfigurer;
 import se.avanzabank.asterix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchUtil;
 import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
-import se.avanzabank.asterix.remoting.client.AstrixRemoteServiceException;
+import se.avanzabank.asterix.remoting.client.AsterixRemoteServiceException;
 import se.avanzabank.core.test.util.jndi.EmbeddedJndiServer;
 import se.avanzabank.core.test.util.jndi.JndiServerRule;
 import se.avanzabank.core.test.util.jndi.JndiServerRuleHook;
@@ -93,11 +93,11 @@ public class ServiceSuiteIntegrationTest {
 		GigaSpace proxy = lunchPu.getClusteredGigaSpace();
 		proxy.clear(null);
 		
-		AstrixConfigurer configurer = new AstrixConfigurer();
+		AsterixConfigurer configurer = new AsterixConfigurer();
 		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceBuspu.getLookupGroupName())); // For service-bus-discovery
 		configurer.useFaultTolerance(false);
 		configurer.enableVersioning(true);
-		Astrix astrix = configurer.configure();
+		Asterix astrix = configurer.configure();
 		Thread.sleep(1000); // TODO: wait for service to be registered in service bus in clean way...
 //		this.lunchService = astrix.waitForService(LunchService.class, 5000);
 //		this.lunchUtil = astrix.waitForService(LunchUtil.class, 5000);
@@ -143,7 +143,7 @@ public class ServiceSuiteIntegrationTest {
 			GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
 			request.setName("throwException"); // LunchServiceImpl is hard-coded to throw exception for this name.
 			lunchService.getLunchRestaurant(request);
-		} catch (AstrixRemoteServiceException e) {
+		} catch (AsterixRemoteServiceException e) {
 			assertEquals(IllegalArgumentException.class.getName(), e.getExceptionType());
 			assertThat(e.getMessage(), startsWith("[java.lang.IllegalArgumentException: Illegal restaurant: throwException]"));
 		}

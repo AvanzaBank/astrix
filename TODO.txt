@@ -8,8 +8,8 @@
 
 * Se över de felemeddelanden som en användare får om något ExternalDependency saknas i app-contextet.
 
-* Hur ska AstrixBeanDefnitionRegistryPlugin's hantera beroenden? De bönor som dessa registrerar kommer inte
-hanteras av Astrix. Hur ska då AstrixPlugins/ExternalDepenendencies/ServiceDependencies hanteras?
+* Hur ska AsterixBeanDefnitionRegistryPlugin's hantera beroenden? De bönor som dessa registrerar kommer inte
+hanteras av Asterix. Hur ska då AsterixPlugins/ExternalDepenendencies/ServiceDependencies hanteras?
 
 * Skapa enbart en instans av varje tjänst.
 
@@ -42,15 +42,15 @@ hanteras av Astrix. Hur ska då AstrixPlugins/ExternalDepenendencies/ServiceDepe
 === DONE ===
 
 * Cleanup: Tydlig life-cycle för plugins. När de skapas ska alla dess dependencies injectas.
-Det innebär att enbart AstrixContext får skapa plugin:er, och att AstrixContext injectar 
+Det innebär att enbart AsterixContext får skapa plugin:er, och att AsterixContext injectar 
 dependencies i samband med skapandet.
 
-* Cleanup: Ta bort AstrixContextAware. Ingen plugin ska behöva tillgång till AstrixContext
+* Cleanup: Ta bort AsterixContextAware. Ingen plugin ska behöva tillgång till AsterixContext
 
-* Tjänstekonsumenter ska kunna använda Astrix som factory-bean för att skapa tjänster på ett enkelt sätt.
-	- Astrix-tjänster ska kunna autowiras in i de klasser som använder dessa.
+* Tjänstekonsumenter ska kunna använda Asterix som factory-bean för att skapa tjänster på ett enkelt sätt.
+	- Asterix-tjänster ska kunna autowiras in i de klasser som använder dessa.
 	
-* Cleanup: AstrixServiceProviderPlugin ska inte behöva skapa en AstrixServiceProvider utan AstrixServiceFactory[]
+* Cleanup: AsterixServiceProviderPlugin ska inte behöva skapa en AsterixServiceProvider utan AsterixServiceFactory[]
 
-* Cleanup: AstrixServiceBus-pu ska använda AstrixRemotingFrameworkBean snarare än interna klasser för att skapa
+* Cleanup: AsterixServiceBus-pu ska använda AsterixRemotingFrameworkBean snarare än interna klasser för att skapa
 en astrix-runtime.	

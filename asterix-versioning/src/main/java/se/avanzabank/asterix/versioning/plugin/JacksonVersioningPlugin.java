@@ -17,19 +17,19 @@ package se.avanzabank.asterix.versioning.plugin;
 
 import org.kohsuke.MetaInfServices;
 
-import se.avanzabank.asterix.context.AstrixVersioningPlugin;
-import se.avanzabank.asterix.core.AstrixObjectSerializer;
-import se.avanzabank.asterix.provider.versioning.AstrixVersioned;
+import se.avanzabank.asterix.context.AsterixVersioningPlugin;
+import se.avanzabank.asterix.core.AsterixObjectSerializer;
+import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 
-@MetaInfServices(AstrixVersioningPlugin.class)
-public class JacksonVersioningPlugin implements AstrixVersioningPlugin {
+@MetaInfServices(AsterixVersioningPlugin.class)
+public class JacksonVersioningPlugin implements AsterixVersioningPlugin {
 	@Override
-	public AstrixObjectSerializer create(Class<?> astrixApiDescriptorHolder) {
-		if (astrixApiDescriptorHolder.isAnnotationPresent(AstrixVersioned.class)) {
-			AstrixVersioned versioningInfo = astrixApiDescriptorHolder.getAnnotation(AstrixVersioned.class);
-			return new VersionJacksonAstrixObjectSerializer(versioningInfo);
+	public AsterixObjectSerializer create(Class<?> astrixApiDescriptorHolder) {
+		if (astrixApiDescriptorHolder.isAnnotationPresent(AsterixVersioned.class)) {
+			AsterixVersioned versioningInfo = astrixApiDescriptorHolder.getAnnotation(AsterixVersioned.class);
+			return new VersionJacksonAsterixObjectSerializer(versioningInfo);
 		}
-		return new AstrixObjectSerializer.NoVersioningSupport();
+		return new AsterixObjectSerializer.NoVersioningSupport();
 	}
 
 }

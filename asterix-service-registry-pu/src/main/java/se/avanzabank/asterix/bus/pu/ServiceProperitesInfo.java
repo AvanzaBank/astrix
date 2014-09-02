@@ -18,19 +18,19 @@ package se.avanzabank.asterix.bus.pu;
 import com.gigaspaces.annotation.pojo.SpaceId;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 
-import se.avanzabank.asterix.bus.client.AstrixServiceProperties;
+import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 
 public class ServiceProperitesInfo {
 
-	private AstrixServiceProperties properties = new AstrixServiceProperties();
+	private AsterixServiceProperties properties = new AsterixServiceProperties();
 	private ServiceKey serviceKey;
 	private Class<?> apiType;
 
-	public AstrixServiceProperties getProperties() {
+	public AsterixServiceProperties getProperties() {
 		return properties;
 	}
 
-	public void setProperties(AstrixServiceProperties properties) {
+	public void setProperties(AsterixServiceProperties properties) {
 		this.properties = properties;
 	}
 	

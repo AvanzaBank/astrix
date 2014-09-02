@@ -17,14 +17,14 @@ package se.avanzabank.asterix.integration.tests.domain.api;
 
 import java.util.List;
 
-import se.avanzabank.asterix.core.AstrixRemoteResult;
-import se.avanzabank.asterix.core.AstrixRemoteResultReducer;
+import se.avanzabank.asterix.core.AsterixRemoteResult;
+import se.avanzabank.asterix.core.AsterixRemoteResultReducer;
 
-public class LunchSuggestionReducer implements AstrixRemoteResultReducer<LunchRestaurant, LunchRestaurant> {
+public class LunchSuggestionReducer implements AsterixRemoteResultReducer<LunchRestaurant, LunchRestaurant> {
 
 	@Override
-	public LunchRestaurant reduce(List<AstrixRemoteResult<LunchRestaurant>> result) {
-		for (AstrixRemoteResult<LunchRestaurant> l : result) {
+	public LunchRestaurant reduce(List<AsterixRemoteResult<LunchRestaurant>> result) {
+		for (AsterixRemoteResult<LunchRestaurant> l : result) {
 			if (l.getResult() != null) {
 				return l.getResult();
 			}

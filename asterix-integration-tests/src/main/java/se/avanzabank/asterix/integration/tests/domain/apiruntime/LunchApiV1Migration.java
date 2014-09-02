@@ -18,10 +18,10 @@ package se.avanzabank.asterix.integration.tests.domain.apiruntime;
 import org.codehaus.jackson.node.ObjectNode;
 
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
-import se.avanzabank.asterix.provider.versioning.AstrixJsonApiMigration;
-import se.avanzabank.asterix.provider.versioning.AstrixJsonMessageMigration;
+import se.avanzabank.asterix.provider.versioning.AsterixJsonApiMigration;
+import se.avanzabank.asterix.provider.versioning.AsterixJsonMessageMigration;
 
-public class LunchApiV1Migration implements AstrixJsonApiMigration {
+public class LunchApiV1Migration implements AsterixJsonApiMigration {
 
 	@Override
 	public int fromVersion() {
@@ -29,13 +29,13 @@ public class LunchApiV1Migration implements AstrixJsonApiMigration {
 	}
 	
 	@Override
-	public AstrixJsonMessageMigration<?>[] getMigrations() {
-		return new AstrixJsonMessageMigration[] {
+	public AsterixJsonMessageMigration<?>[] getMigrations() {
+		return new AsterixJsonMessageMigration[] {
 			new LunchRestaurantV1Migration()
 		};
 	}
 	
-	private static class LunchRestaurantV1Migration implements AstrixJsonMessageMigration<LunchRestaurant> {
+	private static class LunchRestaurantV1Migration implements AsterixJsonMessageMigration<LunchRestaurant> {
 
 		@Override
 		public void upgrade(ObjectNode json) {
