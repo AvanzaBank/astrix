@@ -4,10 +4,6 @@
 
 * Cleanup: Se över strukturen på service-suite-context. Ta bort oanvända abstraktioner.
 
-* Tjänstekonsumenter ska kunna använda Astrix som factory-bean för att skapa tjänster på ett enkelt sätt.
-	- Astrix-tjänster ska kunna autowiras in i de klasser som använder dessa.
-
-
 === BACKLOG ===
 
 * Se över de felemeddelanden som en användare får om något ExternalDependency saknas i app-contextet.
@@ -15,18 +11,13 @@
 * Hur ska AstrixBeanDefnitionRegistryPlugin's hantera beroenden? De bönor som dessa registrerar kommer inte
 hanteras av Astrix. Hur ska då AstrixPlugins/ExternalDepenendencies/ServiceDependencies hanteras?
 
-* Cleanup: AstrixServiceProviderPlugin ska inte behöva skapa en AstrixServiceProvider utan AstrixServiceFactory[]
-
-* Cleanup: AstrixServiceBus-pu ska använda AstrixRemotingFrameworkBean snarare än interna klasser för att skapa
-en astrix-runtime.
-
 * Skapa enbart en instans av varje tjänst.
 
 * LifeCycle-hantering av tjänster och andra astrix-komponenter.
 
-* Versionshantering av tjänster
+* Versionshantering av tjänster - implementera
 
-* Feltolerans
+* Feltolerans - implementera
 
 * Hantera att tjänstebussen inte är tillgänglig när man skapar en tjänst
 
@@ -37,9 +28,16 @@ en astrix-runtime.
 * Se över modulstruktur
 
 * Se över namngivning på moduler/klasser
+  - service-bus -> service-registry
 
+* Tjänster som registreras i service-bussen måste leasas
+	- konsumenter: ska fortlöpande slå upp tjänster på bussen
+	- service-bus-pu: ska ta bort tjänster från registret om leasen inte förnyats
+	- server: ska regelbundet förnya leasen för de tjänster som tillhandahålls
+	
+* Inrapportering av metrics från olika astrix-pluginer
 
-
+* Övervakning av tjänstebussen
 
 === DONE ===
 
@@ -48,3 +46,11 @@ Det innebär att enbart AstrixContext får skapa plugin:er, och att AstrixContex
 dependencies i samband med skapandet.
 
 * Cleanup: Ta bort AstrixContextAware. Ingen plugin ska behöva tillgång till AstrixContext
+
+* Tjänstekonsumenter ska kunna använda Astrix som factory-bean för att skapa tjänster på ett enkelt sätt.
+	- Astrix-tjänster ska kunna autowiras in i de klasser som använder dessa.
+	
+* Cleanup: AstrixServiceProviderPlugin ska inte behöva skapa en AstrixServiceProvider utan AstrixServiceFactory[]
+
+* Cleanup: AstrixServiceBus-pu ska använda AstrixRemotingFrameworkBean snarare än interna klasser för att skapa
+en astrix-runtime.	
