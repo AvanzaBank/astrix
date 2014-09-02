@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.service.suite.integration.tests;
+package se.avanzabank.asterix.integration.tests;
 
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 

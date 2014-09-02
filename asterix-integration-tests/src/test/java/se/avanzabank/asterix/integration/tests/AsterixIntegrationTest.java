@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.service.suite.integration.tests;
+package se.avanzabank.asterix.integration.tests;
 
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static se.avanzabank.service.suite.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
+import static se.avanzabank.asterix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -48,7 +48,7 @@ import se.avanzabank.space.junit.pu.RunningPu;
  * @author Elias Lindholm (elilin)
  *
  */
-public class ServiceSuiteIntegrationTest {
+public class AsterixIntegrationTest {
 	
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
