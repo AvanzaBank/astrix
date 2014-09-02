@@ -7,22 +7,22 @@
 		<version>DEVEL-SNAPSHOT</version>
 	</parent>
 	<groupId>se.avanzabank.service</groupId>
-	<artifactId>service-suite-parent</artifactId>
+	<artifactId>asterix-parent</artifactId>
 	<version>DEVEL-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
-		<module>service-suite-core</module>
-		<module>service-suite-provider</module>
-		<module>service-suite-remoting</module>
-		<module>service-suite-context</module>
-		<module>service-suite-versioning</module>
-		<module>service-suite-fault-tolerance</module>
-		<module>service-suite-bus</module>
-		<module>service-suite-gs</module>
-		<module>service-suite-integration-tests</module>
-		<module>service-suite-bus-pu</module>
-		<module>service-suite-provider-context</module>
-		<module>service-suite-remoting-component</module>
+		<module>asterix-core</module>
+		<module>asterix-provider</module>
+		<module>asterix-remoting</module>
+		<module>asterix-context</module>
+		<module>asterix-versioning</module>
+		<module>asterix-fault-tolerance</module>
+		<module>asterix-service-registry</module>
+		<module>asterix-gs</module>
+		<module>asterix-integration-tests</module>
+		<module>asterix-service-registry-pu</module>
+		<module>asterix-provider-context</module>
+		<module>asterix-remoting-component</module>
 	</modules>
 	
 	<dependencyManagement>
