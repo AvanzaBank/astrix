@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 
 /**
  * Used to indicate that this api can be exported(published) to the
- * service bus as well as looked up on the service bus.
+ * service registry as well as looked up on the service registry.
  * 
  * @author Elias Lindholm (elilin)
  */

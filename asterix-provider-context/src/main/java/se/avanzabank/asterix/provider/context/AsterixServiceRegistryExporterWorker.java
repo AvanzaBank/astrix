@@ -34,8 +34,8 @@ import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryApiDescriptor;
 import se.avanzabank.space.SpaceLocator;
 /**
- * The service bus worker is a server-side component responsible for continiously publishing 
- * all exported services from the current application onto the service bus.
+ * The service registry worker is a server-side component responsible for continiously publishing 
+ * all exported services from the current application onto the service registry.
  * 
  * @author Elias Lindholm (elilin)
  * 
@@ -70,7 +70,7 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	@PostConstruct
 	public void startServiceExporter() {
 		if (serviceExporters.isEmpty()) {
-			log.info("No ServiceExporters configured. No services will be published on service bus");
+			log.info("No ServiceExporters configured. No services will be published to service registry");
 		}
 		start();
 	}
@@ -92,7 +92,7 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	private void exportProvidedServcies() {
 		for (ServiceRegistryExporter provider : serviceExporters) {
 			for (AsterixServiceProperties serviceProperties : provider.getProvidedServices()) {
-				log.debug("Exporting on service bus. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
+				log.debug("Exporting to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 				serviceRegistry.register(serviceProperties.getApi(), serviceProperties);
 			}
 		}

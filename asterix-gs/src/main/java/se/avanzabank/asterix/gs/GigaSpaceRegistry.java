@@ -22,10 +22,10 @@ public interface GigaSpaceRegistry {
 	/*
 	 * TODO: om vi inför ett globalt register, hur ska vi då upptäcka när en GigaSpace-proxy inte används längre och därmed kan förstöras?
 	 * 
-	 * Det gäller även andra saker som slås upp över tjänste-bussen. Hur vet man att den uppslagna tjänsten inte används längre?
+	 * Det gäller även andra saker som slås upp över tjänste-registret. Hur vet man att den uppslagna tjänsten inte används längre?
 	 * 
 	 * 
-	 * Allt som slås upp över bussen måste kunna bindas om dynamiskt utan att konsumenten behöver slå upp tjänsten på nytt. Det kräver
+	 * Allt som slås upp över registret måste kunna bindas om dynamiskt utan att konsumenten behöver slå upp tjänsten på nytt. Det kräver
 	 * att den proxy som returneras abstraherar bort "återbindning". 
 	 * 
 	 * (O)relaterat: Hur vet man när det är dags att slå upp en remoting-tjänst mot service-registret igen? Typiskt vill man väl göra en slagning
@@ -37,8 +37,8 @@ public interface GigaSpaceRegistry {
 	
 	
 	/*
-	 * Går det att designa ramverket så att GigaSpaceRegistry inte är en "core"-komponent i tjänstebussen? Vi vill dock att 
-	 * GigaSpace instanser ska slås upp via tjänstebussen. Hur ska de som behöver tjänsteregistret få tag i en instans av det?
+	 * Går det att designa ramverket så att GigaSpaceRegistry inte är en "core"-komponent i tjänsteregistret? Vi vill dock att 
+	 * GigaSpace instanser ska slås upp via tjänsteregistret. Hur ska de som behöver tjänsteregistret få tag i en instans av det?
 	 * 
 	 *  
 	 * 

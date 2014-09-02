@@ -27,7 +27,7 @@ import se.avanzabank.asterix.provider.remoting.AsterixRemoteServiceExport;
  * This bean makes all beans annotated with AsterixRemoteServiceExport invokable using the remoting 
  * framework. 
  * 
- * Note that this bean does not publish any services onto the service bus.  
+ * Note that this bean does not publish any services onto the service registry.  
  * 
  * @author Elias Lindholm (elilin)
  *

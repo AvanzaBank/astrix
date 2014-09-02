@@ -18,12 +18,12 @@ package se.avanzabank.asterix.service.registry.client;
 import java.util.List;
 
 /**
- * This is the service-consumer part of the service bus.
+ * This is the service-consumer part of the service registry.
  * 
  * It's used on the client side to find what services
- * might be looked up on the service bus, as well as
+ * might be looked up on the service registry, as well as
  * binding to those services given AsterixServiceProperties
- * looked up on the service bus. <p>
+ * looked up on the service registry. <p>
  * 
  * 
  * 

@@ -29,7 +29,7 @@ import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 	version = 2,
 	objectMapperConfigurer = LunchApiObjectMapperConfigurer.class
 )
-// Tjänsten publiceras och kan slås upp via tjänstebussen
+// Tjänsten publiceras och kan slås upp via tjänsteregistret
 @AsterixServiceRegistryApi
 // Tjänsten exponerar en gs-remoting-tjänst
 @AsterixRemoteApiDescriptor (

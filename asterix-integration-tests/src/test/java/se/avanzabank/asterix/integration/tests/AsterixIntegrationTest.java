@@ -98,7 +98,7 @@ public class AsterixIntegrationTest {
 		configurer.useFaultTolerance(false);
 		configurer.enableVersioning(true);
 		Asterix asterix = configurer.configure();
-		Thread.sleep(1000); // TODO: wait for service to be registered in service bus in clean way...
+		Thread.sleep(1000); // TODO: wait for service to be registered in service registry in clean way...
 //		this.lunchService = asterix.waitForService(LunchService.class, 5000);
 //		this.lunchUtil = asterix.waitForService(LunchUtil.class, 5000);
 		this.lunchService = asterix.getBean(LunchService.class);

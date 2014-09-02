@@ -16,7 +16,7 @@
 		<property name="serviceDescriptor" value="se.avanzabank.asterix.integration.tests.domain.apiruntime.LunchApiDescriptor"/>
 	</bean>
 	
-<!-- 	Service bus requires SpaceLocator to locate service bus, this dependency is implicit. -->
+<!-- 	Service bus requires SpaceLocator to locate service registry, this dependency is implicit. -->
 	<bean id="spaceLocator" class="se.avanzabank.space.UsesJndiLookupSpaceLocator"/>
 	
 	<!-- TODO: autodiscover all ServiceExporter's? -->
