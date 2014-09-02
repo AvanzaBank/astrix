@@ -37,7 +37,7 @@ hanteras av Asterix. Hur ska då AsterixPlugins/ExternalDepenendencies/ServiceDe
 	
 * Inrapportering av metrics från olika astrix-pluginer
 
-* Övervakning av tjänstebussen
+* Övervakning av tjänsteregistret
 
 === DONE ===
 
