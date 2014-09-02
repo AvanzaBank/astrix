@@ -29,7 +29,7 @@ import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 	exportedApis = {
 		AsterixServiceRegistry.class,
 	},
-	targetSpaceName = "service-bus-space"
+	targetSpaceName = "service-registry-space"
 )
 public class AsterixServiceRegistryApiDescriptor {
 }

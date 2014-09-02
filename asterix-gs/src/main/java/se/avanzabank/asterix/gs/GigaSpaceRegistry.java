@@ -28,7 +28,7 @@ public interface GigaSpaceRegistry {
 	 * Allt som slås upp över bussen måste kunna bindas om dynamiskt utan att konsumenten behöver slå upp tjänsten på nytt. Det kräver
 	 * att den proxy som returneras abstraherar bort "återbindning". 
 	 * 
-	 * (O)relaterat: Hur vet man när det är dags att slå upp en remoting-tjänst mot service-bussen igen? Typiskt vill man väl göra en slagning
+	 * (O)relaterat: Hur vet man när det är dags att slå upp en remoting-tjänst mot service-registret igen? Typiskt vill man väl göra en slagning
 	 * när man börjar få "SpaceUnavailableException"? Skapa "special" proxy som tillåger att man lyssnar på att proxy:n blir nedkopplad?
 	 * 
 	 *  

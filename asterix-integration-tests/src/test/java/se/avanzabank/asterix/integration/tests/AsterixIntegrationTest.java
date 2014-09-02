@@ -55,7 +55,7 @@ public class AsterixIntegrationTest {
 											  .numberOfBackups(0)
 											  .configure();
 	
-	public static RunningPu serviceRegistrypu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-bus-pu.xml")
+	public static RunningPu serviceRegistrypu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
 													  .numberOfPrimaries(1)
 													  .numberOfBackups(0)
 													  .configure();
@@ -68,7 +68,7 @@ public class AsterixIntegrationTest {
 	public static JndiServerRule jndi = new JndiServerRule(new JndiServerRuleHook() {
 		@Override
 		public void afterStart(EmbeddedJndiServer jndiServer) {
-			jndiServer.addValueEntry("service-bus-space", "jini://*/*/service-bus-space?groups=" + serviceRegistrypu.getLookupGroupName());
+			jndiServer.addValueEntry("service-registry-space", "jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
 		}
 	});
 	
@@ -94,7 +94,7 @@ public class AsterixIntegrationTest {
 		proxy.clear(null);
 		
 		AsterixConfigurer configurer = new AsterixConfigurer();
-		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceRegistrypu.getLookupGroupName())); // For service-bus-discovery
+		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceRegistrypu.getLookupGroupName())); // For service-registry-discovery
 		configurer.useFaultTolerance(false);
 		configurer.enableVersioning(true);
 		Asterix asterix = configurer.configure();

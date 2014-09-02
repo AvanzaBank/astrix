@@ -8,7 +8,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <context:annotation-config/>
-    <os-core:space id="space" url="/./service-bus-space" mirror="false"/>
+    <os-core:space id="space" url="/./service-registry-space" mirror="false"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
     
     <bean class="se.avanzabank.asterix.context.AsterixFrameworkBean">

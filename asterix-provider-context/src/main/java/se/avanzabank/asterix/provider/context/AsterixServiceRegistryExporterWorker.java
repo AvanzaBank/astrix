@@ -52,7 +52,7 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 			AsterixPlugins asterixPlugins) { // Plugin dependency
 		AsterixVersioningPlugin versioningPlugin = asterixPlugins.getPlugin(AsterixVersioningPlugin.class);
 		// TODO: AsterixSerivceBus should be retreived from service-framework, not by hard-coding usage of remoting-framework here.
-		GigaSpace serviceRegistrySpace = sl.createClusteredProxy("service-bus-space"); // TODO: fault tolerance, connection mannagment, etc.
+		GigaSpace serviceRegistrySpace = sl.createClusteredProxy("service-registry-space"); // TODO: fault tolerance, connection mannagment, etc.
 		this.serviceRegistry = AsterixRemotingProxy.create(AsterixServiceRegistry.class, AsterixRemotingTransport.remoteSpace(serviceRegistrySpace), versioningPlugin.create(AsterixServiceRegistryApiDescriptor.class));
 	}
 
