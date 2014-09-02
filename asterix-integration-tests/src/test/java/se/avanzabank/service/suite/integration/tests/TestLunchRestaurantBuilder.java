@@ -15,7 +15,7 @@
  */
 package se.avanzabank.service.suite.integration.tests;
 
-import se.avanzabank.service.suite.integration.tests.domain.api.LunchRestaurant;
+import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 
 public class TestLunchRestaurantBuilder {
 	

@@ -11,8 +11,8 @@
     <os-core:space id="space" url="/./service-bus-space" mirror="false"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
     
-    <bean class="se.avanzabank.service.suite.context.AstrixFrameworkBean">
-    	<property name="serviceDescriptor" value="se.avanzabank.service.suite.bus.client.AstrixServiceBusApiDescriptor"/>
+    <bean class="se.avanzabank.asterix.context.AstrixFrameworkBean">
+    	<property name="serviceDescriptor" value="se.avanzabank.asterix.bus.client.AstrixServiceBusApiDescriptor"/>
     </bean>
-    <bean class="se.avanzabank.service.suite.bus.pu.AstrixServiceBusImpl"/>
+    <bean class="se.avanzabank.asterix.bus.pu.AstrixServiceBusImpl"/>
 </beans>
