@@ -5,7 +5,7 @@
     <artifactId>asterix-parent</artifactId>
     <version>DEVEL-SNAPSHOT</version>
   </parent>
-  <artifactId>asterix-registry-pu</artifactId>
+  <artifactId>asterix-service-registry-pu</artifactId>
   <dependencies>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
