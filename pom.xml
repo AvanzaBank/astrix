@@ -6,7 +6,7 @@
 		<groupId>se.avanzabank.maven</groupId>
 		<version>DEVEL-SNAPSHOT</version>
 	</parent>
-	<groupId>se.avanzabank.service</groupId>
+	<groupId>se.avanzabank.asterix</groupId>
 	<artifactId>asterix-parent</artifactId>
 	<version>DEVEL-SNAPSHOT</version>
 	<packaging>pom</packaging>
