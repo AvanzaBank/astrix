@@ -15,6 +15,7 @@
  */
 package se.avanzabank.asterix.remoting.plugin.consumer;
 
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
 import se.avanzabank.asterix.context.AsterixFaultTolerancePlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
@@ -30,7 +31,7 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, 
 	
 	private final Class<T> serviceApi;
 	private final String targetSpace;
-    private final Class<?> descriptorHolder;
+    private final AsterixApiDescriptor descriptor;
 	private AsterixRemotingPluginDependencies dependencies;
 	private AsterixPlugins plugins;
 	
@@ -39,7 +40,7 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, 
 										Class<?> descriptorHolder) {
 		this.serviceApi = serviceApi;
 		this.targetSpace = targetSpaceName;
-		this.descriptorHolder = descriptorHolder;
+		this.descriptor = new AsterixApiDescriptor(descriptorHolder); // TODO: inject AsterixApiDescriptor
 	}
 
 	@Override
@@ -57,7 +58,7 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, 
 	}
 
 	private AsterixObjectSerializer createObjectSerializer() {
-		return plugins.getPlugin(AsterixVersioningPlugin.class).create(descriptorHolder);
+		return plugins.getPlugin(AsterixVersioningPlugin.class).create(descriptor);
 	}
 
 	private AsterixRemotingTransport createRemotingTransport() {

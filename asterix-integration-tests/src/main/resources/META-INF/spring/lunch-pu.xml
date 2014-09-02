@@ -18,11 +18,6 @@
 	
 <!-- 	Service registry requires SpaceLocator to locate service registry, this dependency is implicit. -->
 	<bean id="spaceLocator" class="se.avanzabank.space.UsesJndiLookupSpaceLocator"/>
-	
-	<!-- TODO: autodiscover all ServiceExporter's? -->
-	<bean id="asterixRemotingServiceExporter" class="se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter"/>
-	<bean id="gsServiceExporter" class="se.avanzabank.asterix.gs.GigaSpaceServiceRegistryExporter"/>
-
 
 	<!-- The actual service implementation(s) -->
     <bean id="lunchService" class="se.avanzabank.asterix.integration.tests.domain.pu.LunchServiceImpl"/>

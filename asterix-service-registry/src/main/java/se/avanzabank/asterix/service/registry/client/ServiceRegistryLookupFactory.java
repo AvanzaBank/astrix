@@ -18,6 +18,7 @@ package se.avanzabank.asterix.service.registry.client;
 import java.util.Arrays;
 import java.util.List;
 
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixBeanAware;
 import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
@@ -25,14 +26,14 @@ import se.avanzabank.asterix.context.AsterixFactoryBean;
 public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, AsterixBeanAware {
 
 	private Class<T> api;
-	private Class<?> descriptorHolder;
+	private AsterixApiDescriptor descriptor;
 	private AsterixServiceRegistryComponent serviceRegistryComponent;
 	private AsterixBeans beans;
 
 	public ServiceRegistryLookupFactory(Class<?> descriptorHolder,
 			Class<T> api,
 			AsterixServiceRegistryComponent serviceRegistryComponent) {
-		this.descriptorHolder = descriptorHolder;
+		this.descriptor = new AsterixApiDescriptor(descriptorHolder);
 		this.api = api;
 		this.serviceRegistryComponent = serviceRegistryComponent;
 	}
@@ -44,9 +45,9 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 		AsterixServiceProperties serviceProperties = serviceRegistry.lookup(api); // TODO: might fail
 		if (serviceProperties == null) {
 			// TODO: manage non discovered services
-			throw new RuntimeException("Did not discover: " + api);
+			throw new RuntimeException("Did not discover: " + api  + " in service registry");
 		}
-		return serviceRegistryComponent.createService(descriptorHolder, api, serviceProperties);
+		return serviceRegistryComponent.createService(descriptor, api, serviceProperties);
 	}
 	
 	@Override

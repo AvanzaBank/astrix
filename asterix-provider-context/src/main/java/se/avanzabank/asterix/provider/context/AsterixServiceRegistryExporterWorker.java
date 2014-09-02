@@ -25,8 +25,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
+import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
@@ -51,9 +53,10 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 			SpaceLocator sl, // External dependency
 			AsterixPlugins asterixPlugins) { // Plugin dependency
 		AsterixVersioningPlugin versioningPlugin = asterixPlugins.getPlugin(AsterixVersioningPlugin.class);
-		// TODO: AsterixSerivceBus should be retreived from service-framework, not by hard-coding usage of remoting-framework here.
+		// TODO: AsterixServiceRegistry should be retreived from service-framework, not by hard-coding usage of remoting-framework here.
 		GigaSpace serviceRegistrySpace = sl.createClusteredProxy("service-registry-space"); // TODO: fault tolerance, connection mannagment, etc.
-		this.serviceRegistry = AsterixRemotingProxy.create(AsterixServiceRegistry.class, AsterixRemotingTransport.remoteSpace(serviceRegistrySpace), versioningPlugin.create(AsterixServiceRegistryApiDescriptor.class));
+		AsterixObjectSerializer serializer = versioningPlugin.create(new AsterixApiDescriptor(AsterixServiceRegistryApiDescriptor.class));
+		this.serviceRegistry = AsterixRemotingProxy.create(AsterixServiceRegistry.class, AsterixRemotingTransport.remoteSpace(serviceRegistrySpace), serializer);
 	}
 
 	public AsterixServiceRegistryExporterWorker(List<ServiceRegistryExporter> serviceProvideres, AsterixServiceRegistry serviceRegistry) {

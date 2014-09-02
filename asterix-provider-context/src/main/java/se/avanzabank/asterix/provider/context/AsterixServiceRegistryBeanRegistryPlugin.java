@@ -16,8 +16,9 @@
 package se.avanzabank.asterix.provider.context;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.kohsuke.MetaInfServices;
 import org.springframework.beans.BeansException;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefiniti
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixBeanRegistryPlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
@@ -32,18 +34,30 @@ import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 
 @MetaInfServices(AsterixBeanRegistryPlugin.class)
 public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegistryPlugin, AsterixPluginsAware {
+	
+	/*
+	 * När man skapar en komponent i tjänste-registret så måste på något sätt följande utföras av komponenten:
+	 * 
+	 * För att jacka-in sig i AsterixApiProvider:
+	 * 	- Ha en mekanism för hur man givet AsterixServiceProperties "binder" sig mot tjänsten
+	 * 
+	 * För att jacka-in sig i ServiceRegistryExporterWorker
+	 *  - Definiera vilken konkret ServiceRegistryExporter som ska användas för att registrera tjänsten i registret. 
+	 * 
+	 */
 
 	private AsterixPlugins plugins;
 	
 	@Override
-	public void registerBeanDefinitions(BeanDefinitionRegistry registry) throws BeansException {
+	public void registerBeanDefinitions(BeanDefinitionRegistry registry, AsterixApiDescriptor descriptor) throws BeansException {
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceRegistryExporterWorker.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_asterixServiceBusExporterWorker", beanDefinition);
 	
 		// TODO: how to detect what exporters are required in the given context (depending on serviceDescriptor).
-		// Only required exporters should be registered
-		List<Class<? extends ServiceRegistryExporter>> serviceRegistryExporters = getRequiredExporters();
+		// Only required exporters should be registered.
+		// How to handle dependencies for service-exporters?
+		Set<Class<? extends ServiceRegistryExporter>> serviceRegistryExporters = getRequiredExporters(descriptor);
 		for (Class<? extends ServiceRegistryExporter> exporter : serviceRegistryExporters) {
 			beanDefinition = new AnnotatedGenericBeanDefinition(exporter);
 			beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
@@ -51,8 +65,16 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegi
 		}
 	}
 
-	private List<Class<? extends ServiceRegistryExporter>> getRequiredExporters() {
-		return new ArrayList<>();
+	private Set<Class<? extends ServiceRegistryExporter>> getRequiredExporters(AsterixApiDescriptor descriptor) {
+		List<AsterixServiceRegistryServerComponent> serverComponents = plugins.getPlugins(AsterixServiceRegistryServerComponent.class);
+		Set<Class<? extends ServiceRegistryExporter>> result = new HashSet<>();
+		for (AsterixServiceRegistryServerComponent serverComponent : serverComponents) {
+			if (!serverComponent.isActivatedBy(descriptor)) {
+				continue;
+			}
+			result.addAll(serverComponent.getRequiredExporterClasses());
+		}
+		return result;
 	}
 
 	@Override

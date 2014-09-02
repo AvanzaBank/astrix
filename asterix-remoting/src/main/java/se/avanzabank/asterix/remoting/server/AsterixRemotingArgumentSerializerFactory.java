@@ -15,56 +15,52 @@
  */
 package se.avanzabank.asterix.remoting.server;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
-import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 
-public class AsterixRemotingArgumentSerializerFactory implements ApplicationContextAware {
+public class AsterixRemotingArgumentSerializerFactory {
 	
-	private Class<?> apiDescriptorHolder;
-	private ApplicationContext applicationContext;
+//	private Class<?> apiDescriptorHolder;
+//	private ApplicationContext applicationContext;
 	private AsterixPlugins plugins;
+	private AsterixApiDescriptor apiDescriptor;
 
 	@Autowired
-	public AsterixRemotingArgumentSerializerFactory(AsterixPlugins plugins) {
+	public AsterixRemotingArgumentSerializerFactory(AsterixPlugins plugins, AsterixApiDescriptor apiDescriptor) { // plugin dependency
 		this.plugins = plugins;
+		this.apiDescriptor = apiDescriptor;
 	}
 
 	public AsterixObjectSerializer create() {
 		AsterixVersioningPlugin versioningPlugin = plugins.getPlugin(AsterixVersioningPlugin.class);
-		Class<? extends Object> descriptorClass = apiDescriptorHolder;
-		return versioningPlugin.create(descriptorClass);
+//		Class<? extends Object> descriptorClass = apiDescriptorHolder;
+		return versioningPlugin.create(apiDescriptor);
 	}
 	
-	@PostConstruct
-	public void readDescriptor() {
-		Collection<Object> remoteServiceDescriptors = applicationContext.getBeansWithAnnotation(AsterixRemoteApiDescriptor.class).values();
-		if (remoteServiceDescriptors.size() != 1) {
-			List<String> remoteServiceDescriptorTypes = new ArrayList<>();
-			for (Object rsd : remoteServiceDescriptors) {
-				remoteServiceDescriptorTypes.add(rsd.getClass().getName());
-			}
-			throw new IllegalStateException("Exactly one bean annotated with @AsterixRemoteApiDescriptor should exists in application context. found: " + remoteServiceDescriptorTypes);
-		}
-		this.apiDescriptorHolder = remoteServiceDescriptors.iterator().next().getClass();
-	}
+//	@PostConstruct
+//	public void readDescriptor() {
+//		Collection<Object> remoteServiceDescriptors = applicationContext.getBeansWithAnnotation(AsterixRemoteApiDescriptor.class).values();
+//		if (remoteServiceDescriptors.size() != 1) {
+//			List<String> remoteServiceDescriptorTypes = new ArrayList<>();
+//			for (Object rsd : remoteServiceDescriptors) {
+//				remoteServiceDescriptorTypes.add(rsd.getClass().getName());
+//			}
+//			throw new IllegalStateException("Exactly one bean annotated with @AsterixRemoteApiDescriptor should exists in application context. found: " + remoteServiceDescriptorTypes);
+//		}
+//		this.apiDescriptorHolder = remoteServiceDescriptors.iterator().next().getClass();
+//	}
 
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.applicationContext = applicationContext;
-	}
+//	@Override
+//	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+//		this.applicationContext = applicationContext;
+//	}
 	
 	
 

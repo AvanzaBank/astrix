@@ -2,14 +2,14 @@
 
 * Inför en web-applikation som konsumerar tjänster för att säkerställa att icke-pu:ar hanteras korrekt.
 
-* Cleanup: Se över strukturen på service-suite-context. Ta bort oanvända abstraktioner.
+* Hur ska AsterixBeanDefnitionRegistryPlugin's hantera beroenden? De bönor som dessa registrerar kommer inte
+hanteras av Asterix. Hur ska då AsterixPlugins/ExternalDepenendencies/ServiceDependencies hanteras?
 
 === BACKLOG ===
 
-* Se över de felemeddelanden som en användare får om något ExternalDependency saknas i app-contextet.
+* Cleanup: Se över strukturen på service-suite-context. Ta bort oanvända abstraktioner.
 
-* Hur ska AsterixBeanDefnitionRegistryPlugin's hantera beroenden? De bönor som dessa registrerar kommer inte
-hanteras av Asterix. Hur ska då AsterixPlugins/ExternalDepenendencies/ServiceDependencies hanteras?
+* Se över de felemeddelanden som en användare får om något ExternalDependency saknas i app-contextet.
 
 * Skapa enbart en instans av varje tjänst.
 

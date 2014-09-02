@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixBeanAware;
 import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixFaultTolerancePlugin;
@@ -49,8 +50,8 @@ public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRe
 	private AsterixBeans beans;
 	
 	@Override
-	public <T> T createService(Class<?> descriptorHolder, Class<T> api, AsterixServiceProperties serviceProperties) {
-		AsterixObjectSerializer objectSerializer = plugins.getPlugin(AsterixVersioningPlugin.class).create(descriptorHolder);
+	public <T> T createService(AsterixApiDescriptor descriptor, Class<T> api, AsterixServiceProperties serviceProperties) {
+		AsterixObjectSerializer objectSerializer = plugins.getPlugin(AsterixVersioningPlugin.class).create(descriptor);
 		AsterixFaultTolerancePlugin faultTolerance = plugins.getPlugin(AsterixFaultTolerancePlugin.class);
 		
 		// TODO: is GigaSpaceRegistry really a service???
@@ -64,7 +65,7 @@ public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRe
 	}
 
 	@Override
-	public List<Class<?>> getExportedServices(Class<?> possiblyHoldsDescriptor) {
+	public List<Class<?>> getExportedServices(AsterixApiDescriptor possiblyHoldsDescriptor) {
 		if (!possiblyHoldsDescriptor.isAnnotationPresent(AsterixRemoteApiDescriptor.class)) {
 			return Collections.emptyList();
 		}

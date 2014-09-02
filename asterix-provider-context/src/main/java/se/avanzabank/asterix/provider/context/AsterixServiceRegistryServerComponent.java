@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.context;
+package se.avanzabank.asterix.provider.context;
 
-import java.lang.annotation.Annotation;
+import java.util.List;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
 
-public interface AsterixBeanRegistryPlugin {
+public interface AsterixServiceRegistryServerComponent {
 	
-	// This is a server-side only component. Change name to reflect that
+	// TODO: Find suitable name for this abstraction. This is ther server-side correspondence to AsterixServiceRegistryComponent
 	
-	void registerBeanDefinitions(BeanDefinitionRegistry registry, AsterixApiDescriptor descriptor) throws BeansException;
-	
-	Class<? extends Annotation> getDescriptorType();
-	
+	List<Class<? extends ServiceRegistryExporter>> getRequiredExporterClasses();
+
+	boolean isActivatedBy(AsterixApiDescriptor descriptor);
 	
 }

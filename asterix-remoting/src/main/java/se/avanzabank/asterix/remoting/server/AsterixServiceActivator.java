@@ -83,6 +83,10 @@ public class AsterixServiceActivator {
 		}
 	}
 	
+	/**
+	 * @param request
+	 * @return
+	 */
 	public AsterixServiceInvocationResponse invokeService(AsterixServiceInvocationRequest request) {
 		try {
 			return doInvoke(request);
@@ -92,7 +96,7 @@ public class AsterixServiceActivator {
 			invocationResponse.setExceptionMsg(exceptionThrownByService.getMessage());
 			invocationResponse.setCorrelationId(UUID.randomUUID().toString()); // TODO: use header instead?
 			invocationResponse.setThrownExceptionType(exceptionThrownByService.getClass().getName());
-			logger.info("Service invocation ended with exception, correlationId=" + invocationResponse.getCorrelationId(), e);
+			logger.info(String.format("Service invocation ended with exception. request=%s correlationId=%s", request, invocationResponse.getCorrelationId()), e);
 			return invocationResponse;
 		}
 	}

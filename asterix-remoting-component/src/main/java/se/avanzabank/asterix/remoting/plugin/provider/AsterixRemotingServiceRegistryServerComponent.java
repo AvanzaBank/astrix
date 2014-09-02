@@ -15,32 +15,30 @@
  */
 package se.avanzabank.asterix.remoting.plugin.provider;
 
-import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.List;
 
 import org.kohsuke.MetaInfServices;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
-import se.avanzabank.asterix.context.AsterixBeanRegistryPlugin;
+import se.avanzabank.asterix.gs.GigaSpaceServiceRegistryExporter;
+import se.avanzabank.asterix.provider.context.AsterixServiceRegistryServerComponent;
+import se.avanzabank.asterix.provider.context.ServiceRegistryExporter;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
-import se.avanzabank.asterix.remoting.server.AsterixRemotingFrameworkBean;
 
-/**
- * @author Elias Lindholm (elilin)
- *
- */
-@MetaInfServices(AsterixBeanRegistryPlugin.class)
-public class AsterixRemotingBeanRegistryPlugin implements AsterixBeanRegistryPlugin {
+@MetaInfServices(AsterixServiceRegistryServerComponent.class)
+public class AsterixRemotingServiceRegistryServerComponent implements AsterixServiceRegistryServerComponent {
 
 	@Override
-	public void registerBeanDefinitions(BeanDefinitionRegistry registry, AsterixApiDescriptor descriptor) throws BeansException {
-		new AsterixRemotingFrameworkBean().postProcessBeanDefinitionRegistry(registry);
+	public List<Class<? extends ServiceRegistryExporter>> getRequiredExporterClasses() {
+		return Arrays.<Class<? extends ServiceRegistryExporter>>asList(
+				AsterixRemotingServiceRegistryExporter.class,
+				GigaSpaceServiceRegistryExporter.class);
 	}
 
 	@Override
-	public Class<? extends Annotation> getDescriptorType() {
-		return AsterixRemoteApiDescriptor.class;
+	public boolean isActivatedBy(AsterixApiDescriptor descriptor) {
+		return descriptor.isAnnotationPresent(AsterixRemoteApiDescriptor.class);
 	}
-	
+
 }

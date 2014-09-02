@@ -85,7 +85,7 @@ public class AsterixIntegrationTest {
 		// TODO: remove debugging information
 		BasicConfigurator.configure();
 		Logger.getRootLogger().setLevel(Level.WARN);
-		Logger.getLogger("se.avanzabank.service.suite").setLevel(Level.DEBUG);
+		Logger.getLogger("se.avanzabank.asterix").setLevel(Level.DEBUG);
 	}
 	
 	@Before
@@ -117,7 +117,6 @@ public class AsterixIntegrationTest {
 		assertEquals(3.0, lunchRestaurantGrader.getAvarageGrade("Martins Green Room"), 0.01D);
 	}
 
-	
 	@Test
 	public void routedRequestDemo() throws Exception {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());

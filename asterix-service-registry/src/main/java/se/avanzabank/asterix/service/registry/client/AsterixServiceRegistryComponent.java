@@ -17,6 +17,8 @@ package se.avanzabank.asterix.service.registry.client;
 
 import java.util.List;
 
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
+
 /**
  * This is the service-consumer part of the service registry.
  * 
@@ -40,9 +42,9 @@ public interface AsterixServiceRegistryComponent {
 	 * @param possibleDescriptorHolder
 	 * @return
 	 */
-	List<Class<?>> getExportedServices(Class<?> possibleDescriptorHolder);
+	List<Class<?>> getExportedServices(AsterixApiDescriptor apiDescriptor);
 	
 	
-	<T> T createService(Class<?> descriptorHolder, Class<T> type, AsterixServiceProperties serviceProperties);
+	<T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, AsterixServiceProperties serviceProperties);
 	
 }

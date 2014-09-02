@@ -16,6 +16,7 @@
 package se.avanzabank.asterix.remoting.client;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 /**
@@ -44,6 +45,11 @@ public class AsterixServiceInvocationRequest implements Serializable {
 	
 	public String getHeader(String name) {
 		return this.headers.get(name);
+	}
+	
+	@Override
+	public String toString() {
+		return "Invocation Request. headers=" + this.headers.toString() + ", arguments=" + Arrays.toString(arguments);
 	}
 
 	

@@ -15,25 +15,15 @@
  */
 package se.avanzabank.asterix.context;
 
-import se.avanzabank.asterix.core.AsterixObjectSerializer;
-import se.avanzabank.asterix.core.AsterixObjectSerializer.NoVersioningSupport;
-
-
-public interface AsterixVersioningPlugin {
+/**
+ * This interface allows server-side components to get the service-descriptor for
+ * the current server to be injected. 
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public interface AsterixServiceProviderDescriptorAware {
 	
-	// TODO: rename to AsterixVersioningPlugin???
-	
-	public AsterixObjectSerializer create(AsterixApiDescriptor descriptor);
-	
-	public static class Default {
-		public static AsterixVersioningPlugin create() {
-			return new AsterixVersioningPlugin() {
-				@Override
-				public AsterixObjectSerializer create(AsterixApiDescriptor asterixApiDescriptor) {
-					return new NoVersioningSupport();
-				}
-			};
-		}
-	}
+	void setServiceProviderDescriptor(AsterixApiDescriptor descriptor);
 
 }

@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixApiProviderPlugin;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
 import se.avanzabank.asterix.context.AsterixPlugins;
@@ -34,9 +35,10 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 
 	@Override
 	public List<AsterixFactoryBean<?>> createFactoryBeans(Class<?> descriptorHolder) {
+		AsterixApiDescriptor descriptor = new AsterixApiDescriptor(descriptorHolder); // TODO: pass descriptor as argument
 		List<AsterixFactoryBean<?>> result = new ArrayList<>();
 		for (AsterixServiceRegistryComponent component : getAllComponents()) {
-			for (Class<?> exportedApi : component.getExportedServices(descriptorHolder)) {
+			for (Class<?> exportedApi : component.getExportedServices(descriptor)) {
 				result.add(new ServiceRegistryLookupFactory<>(descriptorHolder, exportedApi, component));
 			}
 		}

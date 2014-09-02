@@ -11,7 +11,7 @@
     <os-core:space id="space" url="/./service-api-consumer-space" mirror="false"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
     
-	<bean id="asterixServiceFrameworkBean" class="se.avanzabank.asterix.context.AsterixFrameworkBean">
+	<bean id="asterixFrameworkBean" class="se.avanzabank.asterix.context.AsterixFrameworkBean">
 		<property name="consumedAsterixBeans">
 			<list>
 				<value>se.avanzabank.asterix.integration.tests.domain.api.LunchService</value>
@@ -19,9 +19,6 @@
 		</property>
 		<property name="serviceDescriptor" value="se.avanzabank.asterix.integration.tests.domain2.apiruntime.LunchGradeApiDescriptor"/>
 	</bean>
-	
-	<bean id="asterixRemotingServiceExporter" class="se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter"/>
-	<bean id="gsServiceExporter" class="se.avanzabank.asterix.gs.GigaSpaceServiceRegistryExporter"/>
 	
 	<bean id="spaceLocator" class="se.avanzabank.space.UsesJndiLookupSpaceLocator"/>
     <bean id="lunchRestaurantGrader" class="se.avanzabank.asterix.integration.tests.domain2.pu.LunchRestaurantGraderImpl"/>

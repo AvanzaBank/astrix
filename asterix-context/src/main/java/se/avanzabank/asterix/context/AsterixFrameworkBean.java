@@ -26,6 +26,7 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 
@@ -119,15 +120,18 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 			// Does not export any services, don't load any service-providing components
 			return;
 		}
-		beanDefinition = new AnnotatedGenericBeanDefinition(serviceDescriptor);
-		registry.registerBeanDefinition("_asterixServiceDescriptor", beanDefinition);
 		
+		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixApiDescriptor.class);
+		beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues(){{
+			addIndexedArgumentValue(0, serviceDescriptor);
+		}});
+		registry.registerBeanDefinition("_asterixServiceDescriptor", beanDefinition); // TODO: rename to apiDescriptor?
 		for (AsterixBeanRegistryPlugin beanRegistryPlugin :
-			AsterixPluginDiscovery.discoverPlugins(AsterixBeanRegistryPlugin.class)) {
+			asterixContext.getPlugins(AsterixBeanRegistryPlugin.class)) {
 			if (!this.serviceDescriptor.isAnnotationPresent(beanRegistryPlugin.getDescriptorType())) {
 				continue;
 			}
-			beanRegistryPlugin.registerBeanDefinitions(registry);
+			beanRegistryPlugin.registerBeanDefinitions(registry, new AsterixApiDescriptor(serviceDescriptor));
 		}
 	}
 

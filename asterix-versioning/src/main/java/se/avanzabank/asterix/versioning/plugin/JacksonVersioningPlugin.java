@@ -17,6 +17,7 @@ package se.avanzabank.asterix.versioning.plugin;
 
 import org.kohsuke.MetaInfServices;
 
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
@@ -24,9 +25,9 @@ import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 @MetaInfServices(AsterixVersioningPlugin.class)
 public class JacksonVersioningPlugin implements AsterixVersioningPlugin {
 	@Override
-	public AsterixObjectSerializer create(Class<?> asterixApiDescriptorHolder) {
-		if (asterixApiDescriptorHolder.isAnnotationPresent(AsterixVersioned.class)) {
-			AsterixVersioned versioningInfo = asterixApiDescriptorHolder.getAnnotation(AsterixVersioned.class);
+	public AsterixObjectSerializer create(AsterixApiDescriptor descriptor) {
+		if (descriptor.isAnnotationPresent(AsterixVersioned.class)) {
+			AsterixVersioned versioningInfo = descriptor.getAnnotation(AsterixVersioned.class);
 			return new VersionJacksonAsterixObjectSerializer(versioningInfo);
 		}
 		return new AsterixObjectSerializer.NoVersioningSupport();
