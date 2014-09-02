@@ -18,8 +18,8 @@ package se.avanzabank.asterix.service.registry.client;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 
 /**
- * The serivce-bus-api uses asterix-remoting to export its service. Note that
- * it doesn't use the service-bus to bind to the providers, but rather uses a
+ * The service registry api uses asterix-remoting to export its service. Note that
+ * it doesn't use the service registry to bind to the providers, but rather uses a
  * SpaceLocator and the space-name provided here. 
  * 
  * @author Elias Lindholm (elilin)

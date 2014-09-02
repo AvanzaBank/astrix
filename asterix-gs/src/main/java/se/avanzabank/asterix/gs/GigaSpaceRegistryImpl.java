@@ -40,7 +40,7 @@ public class GigaSpaceRegistryImpl implements GigaSpaceRegistry {
 	private GsFactory lookupFactory(String spaceName) {
 		AsterixServiceProperties lookup = serviceRegistry.lookup(GigaSpace.class, spaceName); // TODO: if lookup fails we want
 		if (lookup == null) {
-			throw new RuntimeException("Failed to lookup space: " + spaceName); // TODO: handle lookup failure (i.e bus n/a) and lookup 'miss', ie no service registered in bus yet. 
+			throw new RuntimeException("Failed to lookup space: " + spaceName); // TODO: handle lookup failure (i.e service registry n/a) and lookup 'miss', ie no service registered in service registry yet. 
 		}
 		return GsBinder.createGsFactory(lookup, spaceName);
 	}

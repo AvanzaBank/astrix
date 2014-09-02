@@ -41,8 +41,8 @@ public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRe
 
 	// TODO: what if lookup of service-properties fails? whose responsible of making new attempts to discover provider?
 	// Multiple cases exists:
-	// 1. No service-bus available (i.e. server instance not running)
-	// 2. No service-provider registered in bus (i.e. service registry instance running but no provider registered with bus yet).
+	// 1. No service registry available (i.e. server instance not running)
+	// 2. No service registered in service registry (i.e. service registry instance running but no provider registered with it yet).
 	//
 	
 	private AsterixPlugins plugins;

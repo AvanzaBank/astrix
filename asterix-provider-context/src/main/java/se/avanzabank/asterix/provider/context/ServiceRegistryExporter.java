@@ -19,10 +19,10 @@ import java.util.List;
 
 import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 /**
- * This is the service-provider part of the service-bus.
+ * This is the service-provider part of the service registry.
  * 
  * It's used on the server side to publish a set of services
- * provided onto the service-bus. <p>
+ * provided to the service registry. <p>
  * 
  * @author Elias Lindholm (elilin)
  *
