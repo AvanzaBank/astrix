@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.bus.pu;
+package se.avanzabank.asterix.service.registry.pu;
 
 import org.openspaces.core.GigaSpace;
 import org.openspaces.remoting.Routing;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.bus.client.AsterixServiceRegistry;
-import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteServiceExport;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
 
 @AsterixRemoteServiceExport(AsterixServiceRegistry.class)
 public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {

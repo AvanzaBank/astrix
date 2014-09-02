@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.bus.pu;
+package se.avanzabank.asterix.service.registry.pu;
 
 import java.util.Objects;
 

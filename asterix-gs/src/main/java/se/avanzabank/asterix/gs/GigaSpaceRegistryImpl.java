@@ -19,8 +19,8 @@ import java.util.Objects;
 
 import org.openspaces.core.GigaSpace;
 
-import se.avanzabank.asterix.bus.client.AsterixServiceRegistry;
-import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
 
 public class GigaSpaceRegistryImpl implements GigaSpaceRegistry {
 	

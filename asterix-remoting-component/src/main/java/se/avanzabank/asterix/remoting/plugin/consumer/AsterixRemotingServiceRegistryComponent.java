@@ -21,8 +21,6 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
-import se.avanzabank.asterix.bus.client.AsterixServiceRegistryComponent;
-import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixBeanAware;
 import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixFaultTolerancePlugin;
@@ -35,6 +33,8 @@ import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
 import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
 
 @MetaInfServices(AsterixServiceRegistryComponent.class)
 public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRegistryComponent, AsterixBeanAware, AsterixPluginsAware {

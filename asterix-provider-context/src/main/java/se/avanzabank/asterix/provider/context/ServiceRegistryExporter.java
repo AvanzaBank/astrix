@@ -17,7 +17,7 @@ package se.avanzabank.asterix.provider.context;
 
 import java.util.List;
 
-import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 /**
  * This is the service-provider part of the service-bus.
  * 

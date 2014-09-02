@@ -15,9 +15,9 @@
  */
 package se.avanzabank.asterix.gs;
 
-import se.avanzabank.asterix.bus.client.AsterixServiceRegistry;
 import se.avanzabank.asterix.provider.library.AsterixExport;
 import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
 
 @AsterixLibraryProvider
 public class GsServiceDescriptor {

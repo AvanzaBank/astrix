@@ -25,13 +25,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.bus.client.AsterixServiceRegistry;
-import se.avanzabank.asterix.bus.client.AsterixServiceRegistryApiDescriptor;
-import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryApiDescriptor;
 import se.avanzabank.space.SpaceLocator;
 /**
  * The service bus worker is a server-side component responsible for continiously publishing 

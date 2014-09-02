@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.bus.client;
+package se.avanzabank.asterix.service.registry.client;
 
-import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
+import org.openspaces.remoting.Routing;
 
-/**
- * The serivce-bus-api uses asterix-remoting to export its service. Note that
- * it doesn't use the service-bus to bind to the providers, but rather uses a
- * SpaceLocator and the space-name provided here. 
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-@AsterixRemoteApiDescriptor (
-	exportedApis = {
-		AsterixServiceRegistry.class,
-	},
-	targetSpaceName = "service-registry-space"
-)
-public class AsterixServiceRegistryApiDescriptor {
+
+
+public interface AsterixServiceRegistry {
+	
+	// TODO: use separate interface for providers and consumers?
+	
+	<T> AsterixServiceProperties lookup(@Routing Class<T> type);
+	
+	<T> AsterixServiceProperties lookup(@Routing Class<T> type, String qualifier);
+	
+	<T> void register(@Routing Class<T> type, AsterixServiceProperties properties); // TODO: lease/renewal?
+	
 }
-
-

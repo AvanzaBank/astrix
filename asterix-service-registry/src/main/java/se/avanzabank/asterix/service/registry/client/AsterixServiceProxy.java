@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.bus.client;
+package se.avanzabank.asterix.service.registry.client;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

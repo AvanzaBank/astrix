@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.bus.pu;
+package se.avanzabank.asterix.service.registry.pu;
 
 import com.gigaspaces.annotation.pojo.SpaceId;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 
-import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 
 public class ServiceProperitesInfo {
 

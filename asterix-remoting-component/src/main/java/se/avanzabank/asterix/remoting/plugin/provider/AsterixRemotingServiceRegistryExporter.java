@@ -24,9 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 import se.avanzabank.asterix.provider.context.ServiceRegistryExporter;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteServiceExport;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 
 public class AsterixRemotingServiceRegistryExporter implements ServiceRegistryExporter, ApplicationContextAware {
 	
