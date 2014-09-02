@@ -22,14 +22,14 @@ import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
-import se.avanzabank.asterix.provider.context.ServiceBusExporter;
+import se.avanzabank.asterix.provider.context.ServiceRegistryExporter;
 
-public class GigaSpaceServiceBusExporter implements ServiceBusExporter {
+public class GigaSpaceServiceRegistryExporter implements ServiceRegistryExporter {
 	
 	private final GigaSpace space;
 
 	@Autowired
-	public GigaSpaceServiceBusExporter(GigaSpace space) {
+	public GigaSpaceServiceRegistryExporter(GigaSpace space) {
 		this.space = space;
 	}
 

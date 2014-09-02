@@ -20,8 +20,8 @@
 	<bean id="spaceLocator" class="se.avanzabank.space.UsesJndiLookupSpaceLocator"/>
 	
 	<!-- TODO: autodiscover all ServiceExporter's? -->
-	<bean id="asterixRemotingServiceExporter" class="se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceBusExporter"/>
-	<bean id="gsServiceExporter" class="se.avanzabank.asterix.gs.GigaSpaceServiceBusExporter"/>
+	<bean id="asterixRemotingServiceExporter" class="se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter"/>
+	<bean id="gsServiceExporter" class="se.avanzabank.asterix.gs.GigaSpaceServiceRegistryExporter"/>
 
 
 	<!-- The actual service implementation(s) -->

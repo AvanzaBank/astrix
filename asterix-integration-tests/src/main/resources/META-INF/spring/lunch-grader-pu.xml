@@ -20,8 +20,8 @@
 		<property name="serviceDescriptor" value="se.avanzabank.asterix.integration.tests.domain2.apiruntime.LunchGradeApiDescriptor"/>
 	</bean>
 	
-	<bean id="asterixRemotingServiceExporter" class="se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceBusExporter"/>
-	<bean id="gsServiceExporter" class="se.avanzabank.asterix.gs.GigaSpaceServiceBusExporter"/>
+	<bean id="asterixRemotingServiceExporter" class="se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter"/>
+	<bean id="gsServiceExporter" class="se.avanzabank.asterix.gs.GigaSpaceServiceRegistryExporter"/>
 	
 	<bean id="spaceLocator" class="se.avanzabank.space.UsesJndiLookupSpaceLocator"/>
     <bean id="lunchRestaurantGrader" class="se.avanzabank.asterix.integration.tests.domain2.pu.LunchRestaurantGraderImpl"/>
