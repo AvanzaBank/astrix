@@ -25,10 +25,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
-import se.avanzabank.asterix.provider.context.ServiceBusExporter;
+import se.avanzabank.asterix.provider.context.ServiceRegistryExporter;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteServiceExport;
 
-public class AsterixRemotingServiceBusExporter implements ServiceBusExporter, ApplicationContextAware {
+public class AsterixRemotingServiceRegistryExporter implements ServiceRegistryExporter, ApplicationContextAware {
 	
 	public static final String SPACE_NAME_PROPERTY = "space";
 	
@@ -36,7 +36,7 @@ public class AsterixRemotingServiceBusExporter implements ServiceBusExporter, Ap
 	private GigaSpace gigaSpace;
 	
 	@Autowired
-	public AsterixRemotingServiceBusExporter(GigaSpace gigaSpace) {
+	public AsterixRemotingServiceRegistryExporter(GigaSpace gigaSpace) {
 		this.gigaSpace = gigaSpace;
 	}
 	

@@ -40,14 +40,14 @@ import se.avanzabank.space.SpaceLocator;
  * @author Elias Lindholm (elilin)
  * 
  */
-public class AsterixServiceBusExporterWorker extends Thread {
+public class AsterixServiceRegistryExporterWorker extends Thread {
 	
-	private List<ServiceBusExporter> serviceExporters = Collections.emptyList();
+	private List<ServiceRegistryExporter> serviceExporters = Collections.emptyList();
 	private final AsterixServiceRegistry serviceBus;
-	private final Logger log = LoggerFactory.getLogger(AsterixServiceBusExporterWorker.class);
+	private final Logger log = LoggerFactory.getLogger(AsterixServiceRegistryExporterWorker.class);
 
 	@Autowired
-	public AsterixServiceBusExporterWorker(
+	public AsterixServiceRegistryExporterWorker(
 			SpaceLocator sl, // External dependency
 			AsterixPlugins asterixPlugins) { // Plugin dependency
 		AsterixVersioningPlugin versioningPlugin = asterixPlugins.getPlugin(AsterixVersioningPlugin.class);
@@ -56,13 +56,13 @@ public class AsterixServiceBusExporterWorker extends Thread {
 		this.serviceBus = AsterixRemotingProxy.create(AsterixServiceRegistry.class, AsterixRemotingTransport.remoteSpace(serviceBusSpace), versioningPlugin.create(AsterixServiceRegistryApiDescriptor.class));
 	}
 
-	public AsterixServiceBusExporterWorker(List<ServiceBusExporter> serviceProvideres, AsterixServiceRegistry serviceBus) {
+	public AsterixServiceRegistryExporterWorker(List<ServiceRegistryExporter> serviceProvideres, AsterixServiceRegistry serviceBus) {
 		this.serviceBus = serviceBus;
 		this.serviceExporters = serviceProvideres;
 	}
 
 	@Autowired(required = false)
-	public void setServiceExporters(List<ServiceBusExporter> serviceExporters) {
+	public void setServiceExporters(List<ServiceRegistryExporter> serviceExporters) {
 		this.serviceExporters = serviceExporters;
 	}
 	
@@ -90,7 +90,7 @@ public class AsterixServiceBusExporterWorker extends Thread {
 	}
 
 	private void exportProvidedServcies() {
-		for (ServiceBusExporter provider : serviceExporters) {
+		for (ServiceRegistryExporter provider : serviceExporters) {
 			for (AsterixServiceProperties serviceProperties : provider.getProvidedServices()) {
 				log.debug("Exporting on service bus. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 				serviceBus.register(serviceProperties.getApi(), serviceProperties);

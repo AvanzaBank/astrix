@@ -13,24 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.provider.core;
+package se.avanzabank.asterix.provider.context;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.List;
 
-
+import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 /**
- * Used to indicate that this api can be exported(published) to the
- * service bus as well as looked up on the service bus.
+ * This is the service-provider part of the service-bus.
+ * 
+ * It's used on the server side to publish a set of services
+ * provided onto the service-bus. <p>
  * 
  * @author Elias Lindholm (elilin)
+ *
  */
-@Target(value = { ElementType.TYPE })
-@Retention(value = RetentionPolicy.RUNTIME)
-@Documented
-public @interface AsterixServiceBusApi {
+public interface ServiceRegistryExporter {
 	
+	List<AsterixServiceProperties> getProvidedServices();
+
 }

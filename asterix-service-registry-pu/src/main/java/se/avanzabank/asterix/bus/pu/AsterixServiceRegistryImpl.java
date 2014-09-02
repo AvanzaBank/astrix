@@ -24,12 +24,12 @@ import se.avanzabank.asterix.bus.client.AsterixServiceProperties;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteServiceExport;
 
 @AsterixRemoteServiceExport(AsterixServiceRegistry.class)
-public class AsterixServiceBusImpl implements AsterixServiceRegistry {
+public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {
 	
 	private GigaSpace gigaSpace;
 	
 	@Autowired
-	public AsterixServiceBusImpl(GigaSpace gigaSpace) {
+	public AsterixServiceRegistryImpl(GigaSpace gigaSpace) {
 		this.gigaSpace = gigaSpace;
 	}
 

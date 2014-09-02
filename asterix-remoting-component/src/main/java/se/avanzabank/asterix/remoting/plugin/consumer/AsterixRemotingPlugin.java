@@ -23,7 +23,7 @@ import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.asterix.context.AsterixApiProviderPlugin;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
-import se.avanzabank.asterix.provider.core.AsterixServiceBusApi;
+import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 
 @MetaInfServices(AsterixApiProviderPlugin.class)
@@ -53,7 +53,7 @@ public class AsterixRemotingPlugin implements AsterixApiProviderPlugin {
 	@Override
 	public boolean consumes(Class<?> descriptorHolder) {
 		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType()) 
-				&& !descriptorHolder.isAnnotationPresent(AsterixServiceBusApi.class);
+				&& !descriptorHolder.isAnnotationPresent(AsterixServiceRegistryApi.class);
 	}
 	
 }

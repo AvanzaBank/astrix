@@ -14,5 +14,5 @@
     <bean class="se.avanzabank.asterix.context.AsterixFrameworkBean">
     	<property name="serviceDescriptor" value="se.avanzabank.asterix.bus.client.AsterixServiceRegistryApiDescriptor"/>
     </bean>
-    <bean class="se.avanzabank.asterix.bus.pu.AsterixServiceBusImpl"/>
+    <bean class="se.avanzabank.asterix.bus.pu.AsterixServiceRegistryImpl"/>
 </beans>

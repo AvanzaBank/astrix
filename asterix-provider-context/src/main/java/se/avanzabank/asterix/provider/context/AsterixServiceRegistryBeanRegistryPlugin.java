@@ -28,36 +28,36 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import se.avanzabank.asterix.context.AsterixBeanRegistryPlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
-import se.avanzabank.asterix.provider.core.AsterixServiceBusApi;
+import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 
 @MetaInfServices(AsterixBeanRegistryPlugin.class)
-public class AsterixServiceBusBeanRegistryPlugin implements AsterixBeanRegistryPlugin, AsterixPluginsAware {
+public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegistryPlugin, AsterixPluginsAware {
 
 	private AsterixPlugins plugins;
 	
 	@Override
 	public void registerBeanDefinitions(BeanDefinitionRegistry registry) throws BeansException {
-		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceBusExporterWorker.class);
+		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceRegistryExporterWorker.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_asterixServiceBusExporterWorker", beanDefinition);
 	
 		// TODO: how to detect what exporters are required in the given context (depending on serviceDescriptor).
 		// Only required exporters should be registered
-		List<Class<? extends ServiceBusExporter>> serviceBusExporters = getRequiredExporters();
-		for (Class<? extends ServiceBusExporter> exporter : serviceBusExporters) {
+		List<Class<? extends ServiceRegistryExporter>> serviceBusExporters = getRequiredExporters();
+		for (Class<? extends ServiceRegistryExporter> exporter : serviceBusExporters) {
 			beanDefinition = new AnnotatedGenericBeanDefinition(exporter);
 			beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 			registry.registerBeanDefinition("_asterixServiceBusExporter-" + exporter.getName(), beanDefinition);
 		}
 	}
 
-	private List<Class<? extends ServiceBusExporter>> getRequiredExporters() {
+	private List<Class<? extends ServiceRegistryExporter>> getRequiredExporters() {
 		return new ArrayList<>();
 	}
 
 	@Override
 	public Class<? extends Annotation> getDescriptorType() {
-		return AsterixServiceBusApi.class;
+		return AsterixServiceRegistryApi.class;
 	}
 
 	@Override

@@ -25,7 +25,7 @@ import se.avanzabank.asterix.context.AsterixApiProviderPlugin;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
-import se.avanzabank.asterix.provider.core.AsterixServiceBusApi;
+import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 
 @MetaInfServices(AsterixApiProviderPlugin.class)
 public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderPlugin, AsterixPluginsAware {
@@ -49,7 +49,7 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 
 	@Override
 	public Class<? extends Annotation> getProviderAnnotationType() {
-		return AsterixServiceBusApi.class;
+		return AsterixServiceRegistryApi.class;
 	}
 
 	@Override

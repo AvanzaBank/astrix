@@ -34,10 +34,10 @@ import se.avanzabank.asterix.gs.GigaSpaceRegistry;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
-import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceBusExporter;
+import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter;
 
 @MetaInfServices(AsterixServiceRegistryComponent.class)
-public class AsterixRemotingServiceBusComponent implements AsterixServiceRegistryComponent, AsterixBeanAware, AsterixPluginsAware {
+public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRegistryComponent, AsterixBeanAware, AsterixPluginsAware {
 
 	// TODO: what if lookup of service-properties fails? whose responsible of making new attempts to discover provider?
 	// Multiple cases exists:
@@ -55,7 +55,7 @@ public class AsterixRemotingServiceBusComponent implements AsterixServiceRegistr
 		
 		// TODO: is GigaSpaceRegistry really a service???
 		GigaSpaceRegistry registry = beans.getBean(GigaSpaceRegistry.class); // TODO: behöver den här klassen verkligen känna till space-namnet? Kan inte det abstraheras bort av AsterixServiceContext???
-		String targetSpace = serviceProperties.getProperty(AsterixRemotingServiceBusExporter.SPACE_NAME_PROPERTY);
+		String targetSpace = serviceProperties.getProperty(AsterixRemotingServiceRegistryExporter.SPACE_NAME_PROPERTY);
 		AsterixRemotingTransport remotingTransport = AsterixRemotingTransport.remoteSpace(registry.lookup(targetSpace)); // TODO: caching of created proxies, fault tolerance?
 		
 		T proxy = AsterixRemotingProxy.create(api, remotingTransport, objectSerializer);
