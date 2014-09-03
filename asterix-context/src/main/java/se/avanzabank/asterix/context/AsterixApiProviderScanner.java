@@ -76,8 +76,9 @@ public class AsterixApiProviderScanner {
 				if (!providerFilter.accept(providerClass)) {
 					continue;
 				}
-				log.debug("Found provider {}", providerClass.getName());
-				discoveredProviders.add(this.apiProviderFactory.create(providerClass));
+				AsterixApiDescriptor descriptor = new AsterixApiDescriptor(providerClass);
+				log.debug("Found api provider {}", descriptor);
+				discoveredProviders.add(this.apiProviderFactory.create(descriptor));
 			} catch (ClassNotFoundException e) {
 				throw new IllegalStateException("Unable to load api provider class " + beanDefinition.getBeanClassName(), e);
 			}

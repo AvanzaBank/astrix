@@ -37,10 +37,10 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, 
 	
 	public AsterixRemotingServiceFactory(Class<T> serviceApi,
 										String targetSpaceName, 
-										Class<?> descriptorHolder) {
+										AsterixApiDescriptor descriptor) {
 		this.serviceApi = serviceApi;
 		this.targetSpace = targetSpaceName;
-		this.descriptor = new AsterixApiDescriptor(descriptorHolder); // TODO: inject AsterixApiDescriptor
+		this.descriptor = descriptor; // TODO: inject AsterixApiDescriptor
 	}
 
 	@Override

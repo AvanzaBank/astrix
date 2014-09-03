@@ -29,10 +29,10 @@ import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
 public class AsterixLibraryProviderPlugin implements AsterixApiProviderPlugin {
 	
 	@Override
-	public List<AsterixFactoryBean<?>> createFactoryBeans(Class<?> descriptorHolder) {
+	public List<AsterixFactoryBean<?>> createFactoryBeans(AsterixApiDescriptor descriptorHolder) {
 		Object libraryProviderInstance = initInstanceProvider(descriptorHolder); // TODO: who manages lifecycle for the libraryProviderInstance?
 		List<AsterixFactoryBean<?>> result = new ArrayList<>();
-		for (Method m : descriptorHolder.getMethods()) {
+		for (Method m : descriptorHolder.getDescriptorClass().getMethods()) {
 			if (m.isAnnotationPresent(AsterixExport.class)) {
 				result.add(new AsterixLibraryFactory<>(libraryProviderInstance, m));
 			}
@@ -40,9 +40,9 @@ public class AsterixLibraryProviderPlugin implements AsterixApiProviderPlugin {
 		return result;
 	}
 
-	private Object initInstanceProvider(Class<?> descriptor) {
+	private Object initInstanceProvider(AsterixApiDescriptor descriptor) {
 		try {
-			return descriptor.newInstance();
+			return descriptor.getDescriptorClass().newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to init library provider: " + descriptor.getClass().getName(), e);
 		}
@@ -54,8 +54,8 @@ public class AsterixLibraryProviderPlugin implements AsterixApiProviderPlugin {
 	}
 	
 	@Override
-	public boolean consumes(Class<?> descriptorHolder) {
-		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType());
+	public boolean consumes(AsterixApiDescriptor descriptor) {
+		return descriptor.isAnnotationPresent(getProviderAnnotationType());
 	}
 
 }

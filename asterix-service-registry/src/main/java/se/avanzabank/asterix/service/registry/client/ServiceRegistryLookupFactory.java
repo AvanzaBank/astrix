@@ -30,10 +30,10 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 	private AsterixServiceRegistryComponent serviceRegistryComponent;
 	private AsterixBeans beans;
 
-	public ServiceRegistryLookupFactory(Class<?> descriptorHolder,
+	public ServiceRegistryLookupFactory(AsterixApiDescriptor descriptor,
 			Class<T> api,
 			AsterixServiceRegistryComponent serviceRegistryComponent) {
-		this.descriptor = new AsterixApiDescriptor(descriptorHolder);
+		this.descriptor = descriptor;
 		this.api = api;
 		this.serviceRegistryComponent = serviceRegistryComponent;
 	}

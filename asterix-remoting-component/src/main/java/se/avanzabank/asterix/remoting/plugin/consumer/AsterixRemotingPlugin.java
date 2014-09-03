@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixApiProviderPlugin;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
@@ -30,17 +31,17 @@ import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 public class AsterixRemotingPlugin implements AsterixApiProviderPlugin {
 	
 	@Override
-	public List<AsterixFactoryBean<?>> createFactoryBeans(Class<?> descriptorHolder) {
-		AsterixRemoteApiDescriptor remoteApiDescriptor = descriptorHolder.getAnnotation(AsterixRemoteApiDescriptor.class);
+	public List<AsterixFactoryBean<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
+		AsterixRemoteApiDescriptor remoteApiDescriptor = descriptor.getAnnotation(AsterixRemoteApiDescriptor.class);
 		final String targetSpace = remoteApiDescriptor.targetSpaceName();
 		if (targetSpace.isEmpty()) {
-			throw new IllegalArgumentException("No space name found on: " + descriptorHolder);
+			throw new IllegalArgumentException("No space name found on: " + descriptor);
 		}
 		Class<?>[] exportedApis = remoteApiDescriptor.exportedApis();
 		List<AsterixFactoryBean<?>> result = new ArrayList<>();
 		for (Class<?> api : exportedApis) {
 			result.add(
-					new AsterixRemotingServiceFactory<>(api, targetSpace, descriptorHolder));
+					new AsterixRemotingServiceFactory<>(api, targetSpace, descriptor));
 		}
 		return result;
 	}
@@ -51,7 +52,7 @@ public class AsterixRemotingPlugin implements AsterixApiProviderPlugin {
 	}
 
 	@Override
-	public boolean consumes(Class<?> descriptorHolder) {
+	public boolean consumes(AsterixApiDescriptor descriptorHolder) {
 		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType()) 
 				&& !descriptorHolder.isAnnotationPresent(AsterixServiceRegistryApi.class);
 	}

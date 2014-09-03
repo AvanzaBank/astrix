@@ -40,11 +40,11 @@ import java.util.List;
  */
 public interface AsterixApiProviderPlugin {
 	
-	List<AsterixFactoryBean<?>> createFactoryBeans(Class<?> apiDescriptorHolder);
+	List<AsterixFactoryBean<?>> createFactoryBeans(AsterixApiDescriptor descriptorHolder);
 	
 	@Deprecated // TODO: remove, replaced by consumes
 	Class<? extends Annotation> getProviderAnnotationType();
 	
-	boolean consumes(Class<?> descriptorHolder);
+	boolean consumes(AsterixApiDescriptor descriptor);
 	
 }

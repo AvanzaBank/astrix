@@ -45,4 +45,12 @@ public class AsterixApiDescriptor {
 		return descriptorHolder.getAnnotation(annotationClass);
 	}
 	
+	public String getName() {
+		return this.descriptorHolder.getName();
+	}
+
+	public Class<?> getDescriptorClass() {
+		return descriptorHolder;
+	}
+	
 }

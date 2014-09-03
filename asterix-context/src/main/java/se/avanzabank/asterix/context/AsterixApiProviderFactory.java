@@ -52,14 +52,14 @@ public class AsterixApiProviderFactory {
 		return pluginByAnnotationType.keySet();
 	}
 	
-	public AsterixApiProvider create(Class<?> descriptorHolder) {
+	public AsterixApiProvider create(AsterixApiDescriptor descriptorHolder) {
 		// TODO: descriptor is not the actual annotation type, but rather the class holding the given annotation
 		AsterixApiProviderPlugin providerFactoryPlugin = getProviderFactoryPlugin(descriptorHolder);
 		List<AsterixFactoryBean<?>> factoryBeans = providerFactoryPlugin.createFactoryBeans(descriptorHolder);
 		return new AsterixApiProvider(factoryBeans, descriptorHolder); 
 	}
 
-	private AsterixApiProviderPlugin getProviderFactoryPlugin(Class<?> descriptorHolder) {
+	private AsterixApiProviderPlugin getProviderFactoryPlugin(AsterixApiDescriptor descriptorHolder) {
 		for (AsterixApiProviderPlugin plugin : pluginByAnnotationType.values()) {
 			if (plugin.consumes(descriptorHolder)) {
 				// TODO: what if multiple plugins consumes same annotation?
