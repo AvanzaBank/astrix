@@ -31,6 +31,8 @@ import se.avanzabank.asterix.context.AsterixBeanRegistryPlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
+import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
 @MetaInfServices(AsterixBeanRegistryPlugin.class)
 public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegistryPlugin, AsterixPluginsAware {
@@ -66,9 +68,9 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegi
 	}
 
 	private Set<Class<? extends ServiceRegistryExporter>> getRequiredExporters(AsterixApiDescriptor descriptor) {
-		List<AsterixServiceRegistryServerComponent> serverComponents = plugins.getPlugins(AsterixServiceRegistryServerComponent.class);
+		List<AsterixServiceRegistryComponent> serverComponents = plugins.getPlugins(AsterixServiceRegistryComponent.class);
 		Set<Class<? extends ServiceRegistryExporter>> result = new HashSet<>();
-		for (AsterixServiceRegistryServerComponent serverComponent : serverComponents) {
+		for (AsterixServiceRegistryComponent serverComponent : serverComponents) {
 			if (!serverComponent.isActivatedBy(descriptor)) {
 				continue;
 			}

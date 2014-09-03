@@ -30,12 +30,14 @@ import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.gs.GigaSpaceRegistry;
+import se.avanzabank.asterix.gs.GigaSpaceServiceRegistryExporter;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
 import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
+import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
 @MetaInfServices(AsterixServiceRegistryComponent.class)
 public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRegistryComponent, AsterixBeanAware, AsterixPluginsAware {
@@ -86,6 +88,18 @@ public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRe
 	@Override
 	public void setPlugins(AsterixPlugins plugins) {
 		this.plugins = plugins;
+	}
+
+	@Override
+	public List<Class<? extends ServiceRegistryExporter>> getRequiredExporterClasses() {
+		return Arrays.<Class<? extends ServiceRegistryExporter>>asList(
+				AsterixRemotingServiceRegistryExporter.class,
+				GigaSpaceServiceRegistryExporter.class);
+	}
+
+	@Override
+	public boolean isActivatedBy(AsterixApiDescriptor descriptor) {
+		return descriptor.isAnnotationPresent(AsterixRemoteApiDescriptor.class);
 	}
 
 }

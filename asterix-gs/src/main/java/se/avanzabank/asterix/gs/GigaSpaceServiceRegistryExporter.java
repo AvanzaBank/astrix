@@ -21,8 +21,8 @@ import java.util.List;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.provider.context.ServiceRegistryExporter;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
+import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
 public class GigaSpaceServiceRegistryExporter implements ServiceRegistryExporter {
 	

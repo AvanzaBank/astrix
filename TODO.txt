@@ -1,7 +1,5 @@
 === IN PROGRESS ===
 
-* Inför en web-applikation som konsumerar tjänster för att säkerställa att icke-pu:ar hanteras korrekt.
-
 * Hur ska AsterixBeanDefnitionRegistryPlugin's hantera beroenden? De bönor som dessa registrerar kommer inte
 hanteras av Asterix. Hur ska då AsterixPlugins/ExternalDepenendencies/ServiceDependencies hanteras?
 
@@ -29,9 +27,6 @@ hanteras av Asterix. Hur ska då AsterixPlugins/ExternalDepenendencies/ServiceDe
 
 * Se över modulstruktur
 
-* Se över namngivning på moduler/klasser
-  - service-bus -> service-registry
-
 * Tjänster som registreras i service-bussen måste leasas
 	- konsumenter: ska fortlöpande slå upp tjänster på bussen
 	- service-bus-pu: ska ta bort tjänster från registret om leasen inte förnyats
@@ -55,4 +50,10 @@ dependencies i samband med skapandet.
 * Cleanup: AsterixServiceProviderPlugin ska inte behöva skapa en AsterixServiceProvider utan AsterixServiceFactory[]
 
 * Cleanup: AsterixServiceBus-pu ska använda AsterixRemotingFrameworkBean snarare än interna klasser för att skapa
-en astrix-runtime.	
+en astrix-runtime.
+
+* Inför en web-applikation som konsumerar tjänster för att säkerställa att icke-pu:ar hanteras korrekt.
+
+* Se över namngivning på moduler/klasser
+  - service-bus -> service-registry
+	
