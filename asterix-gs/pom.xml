@@ -18,11 +18,6 @@
   		<version>${project.version}</version>
   	</dependency>
   	<dependency>
-  		<groupId>${project.groupId}</groupId>
-  		<artifactId>asterix-provider-context</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
-  	<dependency>
   		<groupId>se.avanzabank.space</groupId>
   		<artifactId>space-core</artifactId>
   		<version>DEVEL-SNAPSHOT</version>

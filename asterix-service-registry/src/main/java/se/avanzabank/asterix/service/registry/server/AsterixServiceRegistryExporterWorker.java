@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.provider.context;
+package se.avanzabank.asterix.service.registry.server;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +34,6 @@ import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryApiDescriptor;
-import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 import se.avanzabank.space.SpaceLocator;
 /**
  * The service registry worker is a server-side component responsible for continiously publishing 

@@ -21,7 +21,6 @@
 		<module>asterix-gs</module>
 		<module>asterix-integration-tests</module>
 		<module>asterix-service-registry-pu</module>
-		<module>asterix-provider-context</module>
 		<module>asterix-remoting-component</module>
 	</modules>
 	
