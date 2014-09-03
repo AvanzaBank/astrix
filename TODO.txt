@@ -5,6 +5,8 @@
 * Hur ska AsterixBeanDefnitionRegistryPlugin's hantera beroenden? De bönor som dessa registrerar kommer inte
 hanteras av Asterix. Hur ska då AsterixPlugins/ExternalDepenendencies/ServiceDependencies hanteras?
 
+* AsterixApiProviderPlugin.getProviderAnnotationType och AsterixApiProviderPlugin.consumes: En av dessa metoder ska bort 
+
 === BACKLOG ===
 
 * Cleanup: Se över strukturen på service-suite-context. Ta bort oanvända abstraktioner.
