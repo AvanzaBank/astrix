@@ -30,13 +30,14 @@ import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 	objectMapperConfigurer = LunchApiObjectMapperConfigurer.class
 )
 // Tjänsten publiceras och kan slås upp via tjänsteregistret
-@AsterixServiceRegistryApi
-// Tjänsten exponerar en gs-remoting-tjänst
-@AsterixRemoteApiDescriptor (
+@AsterixServiceRegistryApi(
 	exportedApis = {
 		LunchService.class
-	}
+	}	
 )
+// TODO: kan vi få bort behovet av att annotera denna med @AsterixGsApiDescriptor?
+// Som det ser ut nu används denna på server-sidan för att konfa astrix
+@AsterixRemoteApiDescriptor
 public class LunchApiDescriptor {
 	
 	/*

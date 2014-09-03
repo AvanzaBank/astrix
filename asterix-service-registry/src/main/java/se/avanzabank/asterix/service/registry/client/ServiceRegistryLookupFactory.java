@@ -22,20 +22,21 @@ import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixBeanAware;
 import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
+import se.avanzabank.asterix.context.AsterixPlugins;
 
 public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, AsterixBeanAware {
 
 	private Class<T> api;
 	private AsterixApiDescriptor descriptor;
-	private AsterixServiceRegistryComponent serviceRegistryComponent;
 	private AsterixBeans beans;
+	private AsterixPlugins plugins;
 
 	public ServiceRegistryLookupFactory(AsterixApiDescriptor descriptor,
 			Class<T> api,
-			AsterixServiceRegistryComponent serviceRegistryComponent) {
+			AsterixPlugins plugins) {
 		this.descriptor = descriptor;
 		this.api = api;
-		this.serviceRegistryComponent = serviceRegistryComponent;
+		this.plugins = plugins;
 	}
 
 	@Override
@@ -47,9 +48,15 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 			// TODO: manage non discovered services
 			throw new RuntimeException("Did not discover: " + api  + " in service registry");
 		}
+		AsterixServiceRegistryComponent serviceRegistryComponent = getComponent(serviceProperties);
 		return serviceRegistryComponent.createService(descriptor, api, serviceProperties);
 	}
 	
+	private AsterixServiceRegistryComponent getComponent(AsterixServiceProperties serviceProperties) {
+		String componentName = serviceProperties.getComponent();
+		return plugins.getPlugin(AsterixServiceRegistryComponents.class).getComponent(componentName);
+	}
+
 	@Override
 	public List<Class<?>> getBeanDependencies() {
 		return Arrays.<Class<?>>asList(AsterixServiceRegistry.class);

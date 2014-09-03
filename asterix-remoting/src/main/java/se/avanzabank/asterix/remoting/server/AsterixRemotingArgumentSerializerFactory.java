@@ -46,13 +46,13 @@ public class AsterixRemotingArgumentSerializerFactory {
 	
 //	@PostConstruct
 //	public void readDescriptor() {
-//		Collection<Object> remoteServiceDescriptors = applicationContext.getBeansWithAnnotation(AsterixRemoteApiDescriptor.class).values();
+//		Collection<Object> remoteServiceDescriptors = applicationContext.getBeansWithAnnotation(AsterixGsApiDescriptor.class).values();
 //		if (remoteServiceDescriptors.size() != 1) {
 //			List<String> remoteServiceDescriptorTypes = new ArrayList<>();
 //			for (Object rsd : remoteServiceDescriptors) {
 //				remoteServiceDescriptorTypes.add(rsd.getClass().getName());
 //			}
-//			throw new IllegalStateException("Exactly one bean annotated with @AsterixRemoteApiDescriptor should exists in application context. found: " + remoteServiceDescriptorTypes);
+//			throw new IllegalStateException("Exactly one bean annotated with @AsterixGsApiDescriptor should exists in application context. found: " + remoteServiceDescriptorTypes);
 //		}
 //		this.apiDescriptorHolder = remoteServiceDescriptors.iterator().next().getClass();
 //	}

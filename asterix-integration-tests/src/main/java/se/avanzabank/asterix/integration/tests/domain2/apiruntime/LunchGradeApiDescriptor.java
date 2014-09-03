@@ -19,12 +19,12 @@ import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 
-@AsterixServiceRegistryApi
-@AsterixRemoteApiDescriptor (
+@AsterixServiceRegistryApi(
 	exportedApis = {
 		LunchRestaurantGrader.class,
 	}
 )
+@AsterixRemoteApiDescriptor
 public class LunchGradeApiDescriptor {
 }
 

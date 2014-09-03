@@ -32,5 +32,7 @@ import java.lang.annotation.Target;
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
 public @interface AsterixServiceRegistryApi {
+
+	Class<?>[] exportedApis();
 	
 }

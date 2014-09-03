@@ -62,5 +62,7 @@ public interface AsterixServiceRegistryComponent {
 	 * @return
 	 */
 	boolean isActivatedBy(AsterixApiDescriptor descriptor);
+
+	String getName();
 	
 }

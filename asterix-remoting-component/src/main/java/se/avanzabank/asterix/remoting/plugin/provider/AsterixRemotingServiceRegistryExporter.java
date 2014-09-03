@@ -51,11 +51,6 @@ public class AsterixRemotingServiceRegistryExporter implements ServiceRegistryEx
 		for (Object service : applicationContext.getBeansWithAnnotation(AsterixRemoteServiceExport.class).values()) {
 			AsterixRemoteServiceExport remoteServiceExport = service.getClass().getAnnotation(AsterixRemoteServiceExport.class);
 			for (Class<?> providedApi : remoteServiceExport.value()) {
-				if (!providedApi.isAssignableFrom(service.getClass())) {
-					throw new IllegalArgumentException("Cannot export: " + service.getClass() + " as " + providedApi);
-				}
-			}
-			for (Class<?> providedApi : remoteServiceExport.value()) {
 				AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
 				if (!providedApi.isAssignableFrom(service.getClass())) {
 					throw new IllegalArgumentException("Cannot export: " + service.getClass() + " as " + providedApi);

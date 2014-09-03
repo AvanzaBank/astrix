@@ -42,7 +42,7 @@ public class GigaSpaceRegistryImpl implements GigaSpaceRegistry {
 		if (lookup == null) {
 			throw new RuntimeException("Failed to lookup space: " + spaceName); // TODO: handle lookup failure (i.e service registry n/a) and lookup 'miss', ie no service registered in service registry yet. 
 		}
-		return GsBinder.createGsFactory(lookup, spaceName);
+		return GsBinder.createGsFactory(lookup);
 	}
 
 }

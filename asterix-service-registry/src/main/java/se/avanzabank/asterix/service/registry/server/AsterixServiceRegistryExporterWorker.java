@@ -44,7 +44,7 @@ import se.avanzabank.space.SpaceLocator;
  */
 public class AsterixServiceRegistryExporterWorker extends Thread {
 	
-	private List<ServiceRegistryExporter> serviceExporters = Collections.emptyList();
+	private List<ServiceRegistryExporterHolder> serviceExporters = Collections.emptyList();
 	private final AsterixServiceRegistry serviceRegistry;
 	private final Logger log = LoggerFactory.getLogger(AsterixServiceRegistryExporterWorker.class);
 
@@ -59,13 +59,9 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 		this.serviceRegistry = AsterixRemotingProxy.create(AsterixServiceRegistry.class, AsterixRemotingTransport.remoteSpace(serviceRegistrySpace), serializer);
 	}
 
-	public AsterixServiceRegistryExporterWorker(List<ServiceRegistryExporter> serviceProvideres, AsterixServiceRegistry serviceRegistry) {
-		this.serviceRegistry = serviceRegistry;
-		this.serviceExporters = serviceProvideres;
-	}
 
 	@Autowired(required = false)
-	public void setServiceExporters(List<ServiceRegistryExporter> serviceExporters) {
+	public void setServiceExporters(List<ServiceRegistryExporterHolder> serviceExporters) {
 		this.serviceExporters = serviceExporters;
 	}
 	
@@ -93,9 +89,10 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	}
 
 	private void exportProvidedServcies() {
-		for (ServiceRegistryExporter provider : serviceExporters) {
-			for (AsterixServiceProperties serviceProperties : provider.getProvidedServices()) {
+		for (ServiceRegistryExporterHolder exporter : serviceExporters) {
+			for (AsterixServiceProperties serviceProperties : exporter.getProvidedServices()) {
 				log.debug("Exporting to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
+				serviceProperties.setComponent(exporter.getComponentName()); // TODO: should this be moved to ServiceRegistryServiceExporterHolder?
 				serviceRegistry.register(serviceProperties.getApi(), serviceProperties);
 			}
 		}

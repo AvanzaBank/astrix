@@ -58,6 +58,14 @@ public class AsterixServiceProperties implements Serializable {
 	public String toString() {
 		return properties.toString();
 	}
+
+	public String getComponent() {
+		return getProperty("_component");
+	}
+	
+	public void setComponent(String component) {
+		setProperty("_component", component);
+	}
 	
 	
 	

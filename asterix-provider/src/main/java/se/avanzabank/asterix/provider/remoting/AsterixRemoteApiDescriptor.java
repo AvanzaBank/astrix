@@ -32,7 +32,7 @@ public @interface AsterixRemoteApiDescriptor {
 	
 	// Used to export remoting services, rename to AsterixRemoteServiceDescriptor?
 	
-	Class<?>[] exportedApis();
+	Class<?>[] exportedApis() default {};
 
 	String targetSpaceName() default ""; // TODO: default?
 

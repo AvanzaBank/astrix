@@ -101,5 +101,10 @@ public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRe
 	public boolean isActivatedBy(AsterixApiDescriptor descriptor) {
 		return descriptor.isAnnotationPresent(AsterixRemoteApiDescriptor.class);
 	}
+	
+	@Override
+	public String getName() {
+		return "gs-remoting";
+	}
 
 }

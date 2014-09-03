@@ -24,6 +24,8 @@ import org.kohsuke.MetaInfServices;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.annotation.Autowire;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
@@ -55,25 +57,32 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegi
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_asterixServiceBusExporterWorker", beanDefinition);
 	
-		// TODO: how to detect what exporters are required in the given context (depending on serviceDescriptor).
-		// Only required exporters should be registered.
-		// How to handle dependencies for service-exporters?
-		Set<Class<? extends ServiceRegistryExporter>> serviceRegistryExporters = getRequiredExporters(descriptor);
-		for (Class<? extends ServiceRegistryExporter> exporter : serviceRegistryExporters) {
-			beanDefinition = new AnnotatedGenericBeanDefinition(exporter);
-			beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-			registry.registerBeanDefinition("_asterixServiceBusExporter-" + exporter.getName(), beanDefinition);
+		for (final AsterixServiceRegistryComponent component : getActiveComponents(descriptor)) {
+			for (final Class<? extends ServiceRegistryExporter> exporter : component.getRequiredExporterClasses()) {
+				// Register exporter
+				beanDefinition = new AnnotatedGenericBeanDefinition(exporter);
+				beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
+				registry.registerBeanDefinition("_asterixServiceBusExporter-" + exporter.getName(), beanDefinition);
+				
+				// Register exporter holder
+				beanDefinition = new AnnotatedGenericBeanDefinition(ServiceRegistryExporterHolder.class);
+				beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues() {{
+					addIndexedArgumentValue(0, new RuntimeBeanReference("_asterixServiceBusExporter-" + exporter.getName()));
+					addIndexedArgumentValue(1, component.getName());
+				}});
+				registry.registerBeanDefinition("_asterixServiceBusExporterHolder-" + exporter.getName(), beanDefinition);
+			}
 		}
 	}
 
-	private Set<Class<? extends ServiceRegistryExporter>> getRequiredExporters(AsterixApiDescriptor descriptor) {
+	private Set<AsterixServiceRegistryComponent> getActiveComponents(AsterixApiDescriptor descriptor) {
 		List<AsterixServiceRegistryComponent> serverComponents = plugins.getPlugins(AsterixServiceRegistryComponent.class);
-		Set<Class<? extends ServiceRegistryExporter>> result = new HashSet<>();
+		Set<AsterixServiceRegistryComponent> result = new HashSet<>();
 		for (AsterixServiceRegistryComponent serverComponent : serverComponents) {
 			if (!serverComponent.isActivatedBy(descriptor)) {
 				continue;
 			}
-			result.addAll(serverComponent.getRequiredExporterClasses());
+			result.add(serverComponent);
 		}
 		return result;
 	}
