@@ -21,7 +21,7 @@ import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 
 
-// API:t är versionshanterat
+// The API is versioned.
 @AsterixVersioned(
 	apiMigrations = {
 		LunchApiV1Migration.class
@@ -29,7 +29,7 @@ import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 	version = 2,
 	objectMapperConfigurer = LunchApiObjectMapperConfigurer.class
 )
-// Tjänsten publiceras och kan slås upp via tjänsteregistret
+// The service is exported to the service-registry. Consumers queries the service-registry to bind to servers.
 @AsterixServiceRegistryApi(
 	exportedApis = {
 		LunchService.class
@@ -37,16 +37,8 @@ import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 	components = {
 		AsterixServiceRegistryComponents.GS_REMOTING
 	}
-	
 )
 public class LunchApiDescriptor {
-	
-	/*
-	 * TODO: how to export pub-sub/services? local-snapshots? Other not yet known aspects? 
-	 * We need an extension point for new types of 'services'. Annotate each exported api
-	 * with info about what type of api it is?
-	 */
-	
 }
 
 

@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 package se.avanzabank.asterix.provider.component;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AsterixServiceRegistryComponents {
 	
 	// TODO: avoid name conflict with se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponents

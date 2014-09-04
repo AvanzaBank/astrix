@@ -21,7 +21,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
+/**
+ * An AstrixContext is the runtime-environment for the astrix-framework. It is used
+ * both by consuming applications as well as server applications. AsterixContext providers access
+ * to different asterix-plugins at runtime and is used as a factory to create asterix-beans.
+ * 
+ * @author Elias Lindholm (elilin)
+ */
 public class AsterixContext implements Asterix {
 	
 	private final AsterixPlugins plugins;

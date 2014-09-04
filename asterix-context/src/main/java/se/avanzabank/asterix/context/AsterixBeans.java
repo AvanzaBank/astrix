@@ -15,7 +15,13 @@
  */
 package se.avanzabank.asterix.context;
 
-
+/**
+ * Used by asterix-plugins that dependends on asterix-managed beans to 
+ * get an instance of the given depenendencies at runtime. <p> 
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public interface AsterixBeans {
 	
 	<T> T getBean(Class<T> beanType);

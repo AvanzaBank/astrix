@@ -23,7 +23,6 @@ import se.avanzabank.asterix.context.AsterixBeanAware;
 import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
 import se.avanzabank.asterix.context.AsterixPlugins;
-import se.avanzabank.core.util.assertions.Require;
 
 public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, AsterixBeanAware {
 
@@ -33,8 +32,8 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 	private AsterixPlugins plugins;
 
 	public ServiceRegistryLookupFactory(AsterixApiDescriptor descriptor,
-			Class<T> api,
-			AsterixPlugins plugins) {
+										Class<T> api,
+										AsterixPlugins plugins) {
 		this.descriptor = descriptor;
 		this.api = api;
 		this.plugins = plugins;
@@ -43,7 +42,7 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 	@Override
 	public T create(String qualifier) {
 		// TODO: always return a proxy-instance, no matter in which of the steps below that the lookup fails
-		AsterixServiceRegistry serviceRegistry = beans.getBean(AsterixServiceRegistry.class); // service dependency
+		AsterixServiceRegistry serviceRegistry = beans.getBean(AsterixServiceRegistry.class);
 		AsterixServiceProperties serviceProperties = serviceRegistry.lookup(api, qualifier); // TODO: might fail
 		if (serviceProperties == null) {
 			// TODO: manage non discovered services
