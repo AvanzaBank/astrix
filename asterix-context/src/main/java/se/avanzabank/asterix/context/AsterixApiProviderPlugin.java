@@ -42,9 +42,6 @@ public interface AsterixApiProviderPlugin {
 	
 	List<AsterixFactoryBean<?>> createFactoryBeans(AsterixApiDescriptor descriptorHolder);
 	
-	@Deprecated // TODO: remove, replaced by consumes
 	Class<? extends Annotation> getProviderAnnotationType();
-	
-	boolean consumes(AsterixApiDescriptor descriptor);
 	
 }

@@ -42,7 +42,7 @@ public class AsterixApiProviderFactory {
 		for (AsterixApiProviderPlugin plugin : apiProviderPlugins) {
 			AsterixApiProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
-				// TODO: how to handle multiple providers for same annotation type? Is it allowed
+				// TODO: how to handle multiple providers for same annotation type? Is it allowed?
 				log.warn("Multiple AsterixApiProviderPlugin's found for annotation={}. p1={} p2={}", new Object[]{plugin, previous});
 			}
 		}
@@ -60,8 +60,7 @@ public class AsterixApiProviderFactory {
 
 	private AsterixApiProviderPlugin getProviderPlugin(AsterixApiDescriptor descriptor) {
 		for (AsterixApiProviderPlugin plugin : pluginByAnnotationType.values()) {
-			if (plugin.consumes(descriptor)) {
-				// TODO: what if multiple plugins consumes same annotation?
+			if (descriptor.isAnnotationPresent(plugin.getProviderAnnotationType())) {
 				return plugin;
 			}
 		}

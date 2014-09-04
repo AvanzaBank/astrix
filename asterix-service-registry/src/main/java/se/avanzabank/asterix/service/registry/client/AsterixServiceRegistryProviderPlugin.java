@@ -48,11 +48,6 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 	}
 
 	@Override
-	public boolean consumes(AsterixApiDescriptor descriptor) {
-		return descriptor.isAnnotationPresent(getProviderAnnotationType());
-	}
-	
-	@Override
 	public void setPlugins(AsterixPlugins plugins) {
 		this.plugins = plugins;
 	}
