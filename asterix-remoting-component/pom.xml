@@ -19,11 +19,6 @@
   	</dependency>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
-  		<artifactId>asterix-provider-context</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>${project.groupId}</groupId>
   		<artifactId>asterix-gs</artifactId>
   		<version>${project.version}</version>
   	</dependency>
