@@ -35,7 +35,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	}
 
 	public static <T> T create(Class<T> api, T provider) {
-		if (api.isInterface()) {
+		if (!api.isInterface()) {
 			throw new IllegalArgumentException("Can only add fault tolerance to an api exposed using an interface. Exposed api=" + api);
 		}
 		return api.cast(Proxy.newProxyInstance(HystrixAdapter.class.getClassLoader(), new Class[]{api}, new HystrixAdapter<T>(api, provider)));
