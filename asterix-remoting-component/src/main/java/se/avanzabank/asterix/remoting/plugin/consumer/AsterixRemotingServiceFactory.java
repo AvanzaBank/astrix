@@ -15,6 +15,9 @@
  */
 package se.avanzabank.asterix.remoting.plugin.consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
 import se.avanzabank.asterix.context.AsterixFaultTolerancePlugin;
@@ -35,6 +38,8 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, 
 	private AsterixRemotingPluginDependencies dependencies;
 	private AsterixPlugins plugins;
 	
+	private static final Logger log = LoggerFactory.getLogger(AsterixRemotingServiceFactory.class);
+	
 	public AsterixRemotingServiceFactory(Class<T> serviceApi,
 										String targetSpaceName, 
 										AsterixApiDescriptor descriptor) {
@@ -45,6 +50,7 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, 
 
 	@Override
 	public T create(String qualifier) {
+		log.debug("Creating remote service proxy for {}", serviceApi);
 		AsterixRemotingTransport remotingTransport = createRemotingTransport(); // dependency
 		AsterixObjectSerializer objectSerializer = createObjectSerializer(); // plugin
 		AsterixFaultTolerancePlugin faultTolerance = createFaultTolerance(); // plugin

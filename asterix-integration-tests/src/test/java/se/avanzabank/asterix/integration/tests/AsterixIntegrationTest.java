@@ -95,7 +95,7 @@ public class AsterixIntegrationTest {
 		
 		AsterixConfigurer configurer = new AsterixConfigurer();
 		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceRegistrypu.getLookupGroupName())); // For service-registry-discovery
-		configurer.useFaultTolerance(false);
+		configurer.useFaultTolerance(true);
 		configurer.enableVersioning(true);
 		Asterix asterix = configurer.configure();
 		Thread.sleep(1000); // TODO: wait for service to be registered in service registry in clean way...
