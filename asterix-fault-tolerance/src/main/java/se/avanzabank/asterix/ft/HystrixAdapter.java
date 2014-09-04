@@ -21,24 +21,34 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import com.netflix.hystrix.HystrixCommand;
+import com.netflix.hystrix.HystrixCommandKey;
+import com.netflix.hystrix.HystrixCommandProperties;
+import com.netflix.hystrix.HystrixThreadPoolProperties;
+import com.netflix.hystrix.HystrixCommand.Setter;
+import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 
 public class HystrixAdapter<T> implements InvocationHandler {
 
+	private static final int DEFAULT_THREAD_TIMEOUT_MILLIS = 1000;
 	private T provider;
 	private Class<T> api;
+	private String group;
 
-	public HystrixAdapter(Class<T> api, T provider) {
+	public HystrixAdapter(Class<T> api, T provider, String group) {
 		this.api = api;
 		this.provider = provider;
+		this.group = group;
 	}
 
-	public static <T> T create(Class<T> api, T provider) {
+	public static <T> T create(Class<T> api, T provider, String group) {
 		if (!api.isInterface()) {
-			throw new IllegalArgumentException("Can only add fault tolerance to an api exposed using an interface. Exposed api=" + api);
+			throw new IllegalArgumentException(
+					"Can only add fault tolerance to an api exposed using an interface. Exposed api=" + api);
 		}
-		return api.cast(Proxy.newProxyInstance(HystrixAdapter.class.getClassLoader(), new Class[]{api}, new HystrixAdapter<T>(api, provider)));
+		return api.cast(Proxy.newProxyInstance(HystrixAdapter.class.getClassLoader(), new Class[] { api },
+				new HystrixAdapter<T>(api, provider, group)));
 	}
 
 	@Override
@@ -50,7 +60,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 		 *   2. Use HystrixCommand with thread isolation for all blocking operations (any method NOT returning an Observable/Future)
 		 */
 		try {
-			return new HystrixCommand<Object>(getCommandGroupKey()) {
+			return new HystrixCommand<Object>(getKeys()) {
 				@Override
 				protected Object run() throws Exception {
 					return method.invoke(provider, args);
@@ -62,8 +72,27 @@ public class HystrixAdapter<T> implements InvocationHandler {
 		}
 	}
 
-	private HystrixCommandGroupKey getCommandGroupKey() {
-		return HystrixCommandGroupKey.Factory.asKey(api.getName());
+	private Setter getKeys() {
+		HystrixCommandProperties.Setter commandPropertiesDefault =
+				HystrixCommandProperties.Setter().withExecutionIsolationThreadTimeoutInMilliseconds(
+						DEFAULT_THREAD_TIMEOUT_MILLIS);
+		// MaxQueueSize must be set to a non negative value in order for QueueSizeRejectionThreshold to have any effect.
+		// We use a high value for MaxQueueSize in order to allow QueueSizeRejectionThreshold to change dynamically using archaius.
+		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =
+				HystrixThreadPoolProperties.Setter().withMaxQueueSize(1_000_000)
+						.withQueueSizeRejectionThreshold(10);
+
+		return Setter.withGroupKey(getGroupKey())
+				.andCommandKey(getCommandKey())
+				.andCommandPropertiesDefaults(commandPropertiesDefault)
+				.andThreadPoolPropertiesDefaults(threadPoolPropertiesDefaults);
 	}
-	
+
+	private HystrixCommandKey getCommandKey() {
+		return HystrixCommandKey.Factory.asKey(api.getSimpleName());
+	}
+
+	private HystrixCommandGroupKey getGroupKey() {
+		return HystrixCommandGroupKey.Factory.asKey(group);
+	}
 }

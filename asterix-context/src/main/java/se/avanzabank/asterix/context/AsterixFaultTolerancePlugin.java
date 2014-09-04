@@ -17,13 +17,13 @@ package se.avanzabank.asterix.context;
 
 public interface AsterixFaultTolerancePlugin {
 	
-	<T> T addFaultTolerance(Class<T> api, T provider);
+	<T> T addFaultTolerance(Class<T> api, T provider, String group);
 	
 	public static class Default {
 		public static AsterixFaultTolerancePlugin create() {
 			return new AsterixFaultTolerancePlugin() {
 				@Override
-				public <T> T addFaultTolerance(Class<T> api, T provider) {
+				public <T> T addFaultTolerance(Class<T> api, T provider, String group) {
 					return provider;
 				}
 			};

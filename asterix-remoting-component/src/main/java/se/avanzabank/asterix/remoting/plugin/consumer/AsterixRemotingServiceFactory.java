@@ -55,7 +55,8 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, 
 		AsterixObjectSerializer objectSerializer = createObjectSerializer(); // plugin
 		AsterixFaultTolerancePlugin faultTolerance = createFaultTolerance(); // plugin
 		T proxy = AsterixRemotingProxy.create(serviceApi, remotingTransport, objectSerializer);
-		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(serviceApi, proxy);
+		// TODO really use space name as command group?
+		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(serviceApi, proxy, targetSpace);
 		return proxyWithFaultTolerance;
 	}
 

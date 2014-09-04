@@ -25,8 +25,8 @@ import se.avanzabank.asterix.ft.HystrixAdapter;
 public class HystrixFaultTolerancePlugin implements AsterixFaultTolerancePlugin {
 
 	@Override
-	public <T> T addFaultTolerance(Class<T> api, T provider) {
-		return HystrixAdapter.create(api, provider);
+	public <T> T addFaultTolerance(Class<T> api, T provider, String group) {
+		return HystrixAdapter.create(api, provider, group);
 	}
 
 }
