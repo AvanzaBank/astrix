@@ -53,4 +53,9 @@ public class AsterixApiDescriptor {
 		return descriptorHolder;
 	}
 	
+	@Override
+	public String toString() {
+		return descriptorHolder.getName().toString();
+	}
+	
 }

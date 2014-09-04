@@ -44,7 +44,7 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, 
 	}
 
 	@Override
-	public T create() {
+	public T create(String qualifier) {
 		AsterixRemotingTransport remotingTransport = createRemotingTransport(); // dependency
 		AsterixObjectSerializer objectSerializer = createObjectSerializer(); // plugin
 		AsterixFaultTolerancePlugin faultTolerance = createFaultTolerance(); // plugin

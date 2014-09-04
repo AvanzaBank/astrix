@@ -15,24 +15,15 @@
  */
 package se.avanzabank.asterix.gs;
 
+import org.openspaces.core.GigaSpace;
+
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
-import se.avanzabank.asterix.provider.gs.AsterixGsApiDescriptor;
-import se.avanzabank.asterix.provider.library.AsterixExport;
-import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
 
-//@AsterixServiceRegistryApi(
-//	exportedApis = {
-//		GigaSpaceRegistry.class
-//	}
-//)
-//@AsterixGsApiDescriptor
-@AsterixLibraryProvider
-public class GsServiceDescriptor {
-	
-	@AsterixExport
-	public GigaSpaceRegistry createGigaSpaceRegistry(AsterixServiceRegistry serviceRegistry) {
-		return new GigaSpaceRegistryImpl(serviceRegistry);
+@AsterixServiceRegistryApi(
+	exportedApis = {
+		GigaSpace.class
 	}
-
+)
+public class GsDescriptor {
+	
 }

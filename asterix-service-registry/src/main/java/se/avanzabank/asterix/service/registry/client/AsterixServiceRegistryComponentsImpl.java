@@ -32,7 +32,7 @@ public class AsterixServiceRegistryComponentsImpl implements AsterixServiceRegis
 				return component;
 			}
 		}
-		return null;
+		throw new IllegalStateException("No component found with name: " + name);
 	}
 
 	@Override

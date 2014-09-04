@@ -23,6 +23,7 @@ import se.avanzabank.asterix.context.AsterixBeanAware;
 import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
 import se.avanzabank.asterix.context.AsterixPlugins;
+import se.avanzabank.core.util.assertions.Require;
 
 public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, AsterixBeanAware {
 
@@ -40,13 +41,13 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 	}
 
 	@Override
-	public T create() {
+	public T create(String qualifier) {
 		// TODO: always return a proxy-instance, no matter in which of the steps below that the lookup fails
 		AsterixServiceRegistry serviceRegistry = beans.getBean(AsterixServiceRegistry.class); // service dependency
-		AsterixServiceProperties serviceProperties = serviceRegistry.lookup(api); // TODO: might fail
+		AsterixServiceProperties serviceProperties = serviceRegistry.lookup(api, qualifier); // TODO: might fail
 		if (serviceProperties == null) {
 			// TODO: manage non discovered services
-			throw new RuntimeException("Did not discover: " + api  + " in service registry");
+			throw new RuntimeException(String.format("Misssing entry in service-registry api=%s qualifier=%s: ", api.getName(), qualifier));
 		}
 		AsterixServiceRegistryComponent serviceRegistryComponent = getComponent(serviceProperties);
 		return serviceRegistryComponent.createService(descriptor, api, serviceProperties);
@@ -54,6 +55,9 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 	
 	private AsterixServiceRegistryComponent getComponent(AsterixServiceProperties serviceProperties) {
 		String componentName = serviceProperties.getComponent();
+		if (componentName == null) {
+			throw new IllegalArgumentException("Expected a componentName to be set on serviceProperties: " + serviceProperties);
+		}
 		return plugins.getPlugin(AsterixServiceRegistryComponents.class).getComponent(componentName);
 	}
 

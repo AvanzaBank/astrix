@@ -50,8 +50,10 @@ public interface AsterixServiceRegistryComponent {
 	 * 
 	 * @return
 	 */
-	List<Class<? extends ServiceRegistryExporter>> getRequiredExporterClasses();
-
+	Class<? extends ServiceRegistryExporter> getRequiredExporterClasses();
+	
+	List<Class<? extends AsterixServiceRegistryComponent>> getComponentDepenencies();
+	
 	/**
 	 * Checks whether this component is should be activated on the server side by a given descriptor.
 	 * 

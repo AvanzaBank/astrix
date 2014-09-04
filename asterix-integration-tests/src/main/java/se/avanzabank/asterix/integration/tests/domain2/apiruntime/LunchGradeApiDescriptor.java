@@ -21,7 +21,7 @@ import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 
 @AsterixServiceRegistryApi(
 	exportedApis = {
-		LunchRestaurantGrader.class,
+		LunchRestaurantGrader.class
 	}
 )
 @AsterixRemoteApiDescriptor

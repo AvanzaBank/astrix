@@ -15,6 +15,11 @@
  */
 package se.avanzabank.asterix.context;
 
+
 public interface AsterixBeans {
+	
 	<T> T getBean(Class<T> beanType);
+
+	<T> T getBean(Class<T> beanType, String qualifier);
+	
 }

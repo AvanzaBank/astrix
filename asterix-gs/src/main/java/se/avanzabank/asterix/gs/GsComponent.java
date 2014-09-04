@@ -16,8 +16,10 @@
 package se.avanzabank.asterix.gs;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
@@ -26,6 +28,7 @@ import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
 import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
+@MetaInfServices(AsterixServiceRegistryComponent.class)
 public class GsComponent implements AsterixServiceRegistryComponent {
 	@Override
 	public List<Class<?>> getExportedServices(AsterixApiDescriptor apiDescriptor) {
@@ -37,12 +40,17 @@ public class GsComponent implements AsterixServiceRegistryComponent {
 		if (!GigaSpace.class.isAssignableFrom(type)) {
 			throw new IllegalStateException("Programming error, attempted to create: " + type);
 		}
-		return type.cast(GsBinder.createGsFactory(serviceProperties).create());
+		return type.cast(GsBinder.createGsFactory(serviceProperties).create()); // TODO: fault tolerance
 	}
 
 	@Override
-	public List<Class<? extends ServiceRegistryExporter>> getRequiredExporterClasses() {
-		return Arrays.<Class<? extends ServiceRegistryExporter>>asList(GigaSpaceServiceRegistryExporter.class);
+	public Class<? extends ServiceRegistryExporter> getRequiredExporterClasses() {
+		return GigaSpaceServiceRegistryExporter.class;
+	}
+	
+	@Override
+	public List<Class<? extends AsterixServiceRegistryComponent>> getComponentDepenencies() {
+		return Collections.emptyList();
 	}
 
 	@Override

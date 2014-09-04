@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
+import org.openspaces.core.GigaSpace;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixBeanAware;
@@ -29,8 +30,7 @@ import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
-import se.avanzabank.asterix.gs.GigaSpaceRegistry;
-import se.avanzabank.asterix.gs.GigaSpaceServiceRegistryExporter;
+import se.avanzabank.asterix.gs.GsComponent;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
@@ -41,6 +41,8 @@ import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
 @MetaInfServices(AsterixServiceRegistryComponent.class)
 public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRegistryComponent, AsterixBeanAware, AsterixPluginsAware {
+	
+	// TODO: rename to AsterixRemotingComponent
 
 	// TODO: what if lookup of service-properties fails? whose responsible of making new attempts to discover provider?
 	// Multiple cases exists:
@@ -56,10 +58,9 @@ public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRe
 		AsterixObjectSerializer objectSerializer = plugins.getPlugin(AsterixVersioningPlugin.class).create(descriptor);
 		AsterixFaultTolerancePlugin faultTolerance = plugins.getPlugin(AsterixFaultTolerancePlugin.class);
 		
-		// TODO: is GigaSpaceRegistry really a service???
-		GigaSpaceRegistry registry = beans.getBean(GigaSpaceRegistry.class); // TODO: behöver den här klassen verkligen känna till space-namnet? Kan inte det abstraheras bort av AsterixServiceContext???
 		String targetSpace = serviceProperties.getProperty(AsterixRemotingServiceRegistryExporter.SPACE_NAME_PROPERTY);
-		AsterixRemotingTransport remotingTransport = AsterixRemotingTransport.remoteSpace(registry.lookup(targetSpace)); // TODO: caching of created proxies, fault tolerance?
+		GigaSpace space = beans.getBean(GigaSpace.class, targetSpace);
+		AsterixRemotingTransport remotingTransport = AsterixRemotingTransport.remoteSpace(space); // TODO: caching of created proxies, fault tolerance?
 		
 		T proxy = AsterixRemotingProxy.create(api, remotingTransport, objectSerializer);
 		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(api, proxy);
@@ -77,9 +78,9 @@ public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRe
 
 	@Override
 	public List<Class<?>> getBeanDependencies() {
-		return Arrays.<Class<?>>asList(GigaSpaceRegistry.class);
+		return Arrays.<Class<?>>asList(GigaSpace.class);
 	}
-
+	
 	@Override
 	public void setAsterixBeans(AsterixBeans beans) {
 		this.beans = beans;
@@ -91,10 +92,13 @@ public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRe
 	}
 
 	@Override
-	public List<Class<? extends ServiceRegistryExporter>> getRequiredExporterClasses() {
-		return Arrays.<Class<? extends ServiceRegistryExporter>>asList(
-				AsterixRemotingServiceRegistryExporter.class,
-				GigaSpaceServiceRegistryExporter.class);
+	public Class<? extends ServiceRegistryExporter> getRequiredExporterClasses() {
+		return AsterixRemotingServiceRegistryExporter.class;
+	}
+	
+	@Override
+	public List<Class<? extends AsterixServiceRegistryComponent>> getComponentDepenencies() {
+		return Arrays.<Class<? extends AsterixServiceRegistryComponent>>asList(GsComponent.class);
 	}
 
 	@Override

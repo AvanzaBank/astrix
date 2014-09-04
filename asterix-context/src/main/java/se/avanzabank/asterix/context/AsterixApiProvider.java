@@ -30,10 +30,10 @@ import java.util.concurrent.ConcurrentMap;
 public class AsterixApiProvider {
 	
 	private final ConcurrentMap<Class<?>, AsterixFactoryBean<?>> factoryByProvidedType = new ConcurrentHashMap<>();
-	private final AsterixApiDescriptor descriptorHolder;
+	private final AsterixApiDescriptor apiDescriptor;
 	
 	public AsterixApiProvider(List<AsterixFactoryBean<?>> factories, AsterixApiDescriptor descriptorHolder) {
-		this.descriptorHolder = descriptorHolder;
+		this.apiDescriptor = descriptorHolder;
 		for (AsterixFactoryBean<?> factory : factories) {
 			AsterixFactoryBean<?> previous = this.factoryByProvidedType.putIfAbsent(factory.getBeanType(), factory);
 			if (previous != null) {
@@ -44,8 +44,8 @@ public class AsterixApiProvider {
 		}
 	}
 	
-	public AsterixApiDescriptor getDescriptorHolder() {
-		return descriptorHolder;
+	public AsterixApiDescriptor getDescriptor() {
+		return apiDescriptor;
 	}
 
 	public Collection<Class<?>> providedApis() {

@@ -31,5 +31,5 @@ import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 public interface ServiceRegistryExporter {
 	
 	List<AsterixServiceProperties> getProvidedServices();
-
+	
 }

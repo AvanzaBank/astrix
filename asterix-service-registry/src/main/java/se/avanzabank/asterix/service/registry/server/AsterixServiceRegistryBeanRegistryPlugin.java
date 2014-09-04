@@ -16,11 +16,14 @@
 package se.avanzabank.asterix.service.registry.server;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.kohsuke.MetaInfServices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.annotation.Autowire;
@@ -34,6 +37,7 @@ import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponents;
 
 @MetaInfServices(AsterixBeanRegistryPlugin.class)
 public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegistryPlugin, AsterixPluginsAware {
@@ -49,6 +53,7 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegi
 	 * 
 	 */
 
+	private final Logger log = LoggerFactory.getLogger(AsterixServiceRegistryBeanRegistryPlugin.class);
 	private AsterixPlugins plugins;
 	
 	@Override
@@ -57,23 +62,28 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegi
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_asterixServiceBusExporterWorker", beanDefinition);
 	
-		for (final AsterixServiceRegistryComponent component : getActiveComponents(descriptor)) {
-			for (final Class<? extends ServiceRegistryExporter> exporter : component.getRequiredExporterClasses()) {
-				// Register exporter
-				beanDefinition = new AnnotatedGenericBeanDefinition(exporter);
-				beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-				registry.registerBeanDefinition("_asterixServiceBusExporter-" + exporter.getName(), beanDefinition);
-				
-				// Register exporter holder
-				beanDefinition = new AnnotatedGenericBeanDefinition(ServiceRegistryExporterHolder.class);
-				beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues() {{
-					addIndexedArgumentValue(0, new RuntimeBeanReference("_asterixServiceBusExporter-" + exporter.getName()));
-					addIndexedArgumentValue(1, component.getName());
-				}});
-				registry.registerBeanDefinition("_asterixServiceBusExporterHolder-" + exporter.getName(), beanDefinition);
-			}
+		for (final AsterixServiceRegistryComponent component : getAllRequiredComponents(descriptor)) {
+			// Register exporter
+			beanDefinition = new AnnotatedGenericBeanDefinition(component.getRequiredExporterClasses());
+			beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
+			registry.registerBeanDefinition("_asterixServiceBusExporter-" + component.getName(), beanDefinition);
+			
+			// Register exporter holder
+			beanDefinition = new AnnotatedGenericBeanDefinition(ServiceRegistryExporterHolder.class);
+			beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues() {{
+				addIndexedArgumentValue(0, new RuntimeBeanReference("_asterixServiceBusExporter-" + component.getName()));
+				addIndexedArgumentValue(1, component.getName());
+			}});
+			registry.registerBeanDefinition("_asterixServiceBusExporterHolder-" + component.getName(), beanDefinition);
 		}
 	}
+	
+
+	private Set<AsterixServiceRegistryComponent> getAllRequiredComponents(AsterixApiDescriptor descriptor) {
+		Set<AsterixServiceRegistryComponent> activeComponents = getActiveComponents(descriptor);
+		return resolveTransitiveComponents(activeComponents);
+	}
+
 
 	private Set<AsterixServiceRegistryComponent> getActiveComponents(AsterixApiDescriptor descriptor) {
 		List<AsterixServiceRegistryComponent> serverComponents = plugins.getPlugins(AsterixServiceRegistryComponent.class);
@@ -86,6 +96,31 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegi
 		}
 		return result;
 	}
+	
+	private Set<AsterixServiceRegistryComponent> resolveTransitiveComponents(Iterable<AsterixServiceRegistryComponent> components) {
+		Set<AsterixServiceRegistryComponent> result = new HashSet<>();
+		for (AsterixServiceRegistryComponent component : components) {
+			result.add(component);
+			result.addAll(getTransitiveDependencies(component));
+		}
+		return result;
+	}
+
+	private Collection<? extends AsterixServiceRegistryComponent> getTransitiveDependencies(AsterixServiceRegistryComponent component) {
+		List<Class<? extends AsterixServiceRegistryComponent>> componentDepenencies = component.getComponentDepenencies();
+		Set<AsterixServiceRegistryComponent> result = new HashSet<>();
+		for (Class<? extends AsterixServiceRegistryComponent> componentDependencyType : componentDepenencies) {
+			try {
+				AsterixServiceRegistryComponent dependency = plugins.getPlugin(AsterixServiceRegistryComponents.class).getComponent(componentDependencyType.newInstance().getName());
+				result.add(dependency);
+				result.addAll(getTransitiveDependencies(dependency));
+			} catch (Exception e) {
+				log.warn("Failed to load component dependencies", e);
+			}
+		}
+		return result;
+	}
+
 
 	@Override
 	public Class<? extends Annotation> getDescriptorType() {

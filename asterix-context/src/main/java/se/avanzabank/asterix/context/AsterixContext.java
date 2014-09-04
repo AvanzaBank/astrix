@@ -73,6 +73,14 @@ public class AsterixContext implements Asterix {
 				}
 				return AsterixContext.this.getBean(beanType);
 			}
+			
+			@Override
+			public <T> T getBean(Class<T> beanType, String qualifier) {
+				if (!beanDependenciesAware.getBeanDependencies().contains(beanType)) {
+					throw new RuntimeException("Undeclared bean dependency: " + beanType);
+				}
+				return AsterixContext.this.getBean(beanType, qualifier);
+			}
 		});
 	}
 
@@ -92,7 +100,15 @@ public class AsterixContext implements Asterix {
 		// TODO: fix caching of created bean
 		AsterixFactoryBean<T> factory = getFactoryBean(beanType);
 		injectDependencies(factory); // TODO: what the place where it makes most sense to inject dependencies to a AsterixFactory?  
-		return factory.create();
+		return factory.create(null);
+	}
+	
+	public <T> T getBean(Class<T> beanType, String qualifier) {
+		// TODO: synchronize creation of bean
+		// TODO: fix caching of created bean
+		AsterixFactoryBean<T> factory = getFactoryBean(beanType);
+		injectDependencies(factory); // TODO: what the place where it makes most sense to inject dependencies to a AsterixFactory?  
+		return factory.create(qualifier);
 	}
 	
 	private <T> AsterixFactoryBean<T> getFactoryBean(Class<T> beanType) {
