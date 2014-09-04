@@ -43,7 +43,7 @@ public class AsterixBeanFactoryRegistry {
 	public void registerProvider(AsterixApiProvider apiProvider) {
 		for (Class<?> providedApi : apiProvider.providedApis()) {
 			AsterixApiProvider duplicateProvider = apiProviderByBeanType.putIfAbsent(providedApi, apiProvider);
-			log.debug("Registering provider. api={} provider={}", providedApi.getName(), apiProvider.getDescriptor().getName());
+			log.debug("Registering provider: api={} provider={}", providedApi.getName(), apiProvider.getDescriptor().getName());
 			if (duplicateProvider != null) {
 				throw new IllegalStateException(String.format("Multiple providers discovered for api=%s. %s and %s",
 													 		  providedApi.getName(), 
