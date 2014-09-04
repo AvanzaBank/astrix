@@ -34,5 +34,7 @@ import java.lang.annotation.Target;
 public @interface AsterixServiceRegistryApi {
 
 	Class<?>[] exportedApis();
+
+	String[] components();
 	
 }

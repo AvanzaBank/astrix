@@ -21,20 +21,17 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
-import se.avanzabank.asterix.provider.gs.AsterixGsApiDescriptor;
+import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponents;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
 import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
 @MetaInfServices(AsterixServiceRegistryComponent.class)
-public class GsComponent implements AsterixServiceRegistryComponent {
-	@Override
-	public List<Class<?>> getExportedServices(AsterixApiDescriptor apiDescriptor) {
-		return Arrays.<Class<?>>asList(GigaSpace.class);
-	}
-
+public class AsterixGsComponent implements AsterixServiceRegistryComponent {
+	
 	@Override
 	public <T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, AsterixServiceProperties serviceProperties) {
 		if (!GigaSpace.class.isAssignableFrom(type)) {
@@ -44,23 +41,23 @@ public class GsComponent implements AsterixServiceRegistryComponent {
 	}
 
 	@Override
-	public Class<? extends ServiceRegistryExporter> getRequiredExporterClasses() {
+	public Class<? extends ServiceRegistryExporter> getServiceExporterClass() {
 		return GigaSpaceServiceRegistryExporter.class;
 	}
 	
 	@Override
-	public List<Class<? extends AsterixServiceRegistryComponent>> getComponentDepenencies() {
+	public List<String> getComponentDepenencies() {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public boolean isActivatedBy(AsterixApiDescriptor descriptor) {
-		return descriptor.isAnnotationPresent(AsterixGsApiDescriptor.class);
+	public String getName() {
+		return AsterixServiceRegistryComponents.GS;
 	}
 	
 	@Override
-	public String getName() {
-		return "gs";
+	public void registerBeans(BeanDefinitionRegistry registry) {
+		
 	}
-
+	
 }

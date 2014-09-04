@@ -16,11 +16,11 @@
 package se.avanzabank.asterix.remoting.plugin.consumer;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixBeanAware;
@@ -30,17 +30,17 @@ import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
-import se.avanzabank.asterix.gs.GsComponent;
-import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
+import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponents;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
+import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingBeanRegistryPlugin;
 import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
 import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
 @MetaInfServices(AsterixServiceRegistryComponent.class)
-public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRegistryComponent, AsterixBeanAware, AsterixPluginsAware {
+public class AsterixRemotingComponent implements AsterixServiceRegistryComponent, AsterixBeanAware, AsterixPluginsAware {
 	
 	// TODO: rename to AsterixRemotingComponent
 
@@ -68,15 +68,6 @@ public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRe
 	}
 
 	@Override
-	public List<Class<?>> getExportedServices(AsterixApiDescriptor possiblyHoldsDescriptor) {
-		if (!possiblyHoldsDescriptor.isAnnotationPresent(AsterixRemoteApiDescriptor.class)) {
-			return Collections.emptyList();
-		}
-		AsterixRemoteApiDescriptor remoteApiDescriptor = possiblyHoldsDescriptor.getAnnotation(AsterixRemoteApiDescriptor.class);
-		return Arrays.asList(remoteApiDescriptor.exportedApis());
-	}
-
-	@Override
 	public List<Class<?>> getBeanDependencies() {
 		return Arrays.<Class<?>>asList(GigaSpace.class);
 	}
@@ -92,23 +83,23 @@ public class AsterixRemotingServiceRegistryComponent implements AsterixServiceRe
 	}
 
 	@Override
-	public Class<? extends ServiceRegistryExporter> getRequiredExporterClasses() {
+	public Class<? extends ServiceRegistryExporter> getServiceExporterClass() {
 		return AsterixRemotingServiceRegistryExporter.class;
 	}
 	
 	@Override
-	public List<Class<? extends AsterixServiceRegistryComponent>> getComponentDepenencies() {
-		return Arrays.<Class<? extends AsterixServiceRegistryComponent>>asList(GsComponent.class);
+	public List<String> getComponentDepenencies() {
+		return Arrays.asList(AsterixServiceRegistryComponents.GS);
 	}
 
 	@Override
-	public boolean isActivatedBy(AsterixApiDescriptor descriptor) {
-		return descriptor.isAnnotationPresent(AsterixRemoteApiDescriptor.class);
+	public String getName() {
+		return AsterixServiceRegistryComponents.GS_REMOTING;
 	}
 	
 	@Override
-	public String getName() {
-		return "gs-remoting";
+	public void registerBeans(BeanDefinitionRegistry registry) {
+		new AsterixRemotingBeanRegistryPlugin().registerBeanDefinitions(registry, null);
 	}
 
 }

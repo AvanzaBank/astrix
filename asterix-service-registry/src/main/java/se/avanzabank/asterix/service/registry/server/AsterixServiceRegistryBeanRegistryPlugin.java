@@ -62,9 +62,9 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegi
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_asterixServiceBusExporterWorker", beanDefinition);
 	
-		for (final AsterixServiceRegistryComponent component : getAllRequiredComponents(descriptor)) {
+		for (final AsterixServiceRegistryComponent component : getActiveComponents(descriptor)) {
 			// Register exporter
-			beanDefinition = new AnnotatedGenericBeanDefinition(component.getRequiredExporterClasses());
+			beanDefinition = new AnnotatedGenericBeanDefinition(component.getServiceExporterClass());
 			beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 			registry.registerBeanDefinition("_asterixServiceBusExporter-" + component.getName(), beanDefinition);
 			
@@ -75,48 +75,29 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegi
 				addIndexedArgumentValue(1, component.getName());
 			}});
 			registry.registerBeanDefinition("_asterixServiceBusExporterHolder-" + component.getName(), beanDefinition);
+			
+			// TODO: How to ensure beans for component not registered multiple times? (If also used without service-registry, or is it impossible?)
+			component.registerBeans(registry);
 		}
 	}
 	
-
-	private Set<AsterixServiceRegistryComponent> getAllRequiredComponents(AsterixApiDescriptor descriptor) {
-		Set<AsterixServiceRegistryComponent> activeComponents = getActiveComponents(descriptor);
-		return resolveTransitiveComponents(activeComponents);
-	}
-
-
 	private Set<AsterixServiceRegistryComponent> getActiveComponents(AsterixApiDescriptor descriptor) {
-		List<AsterixServiceRegistryComponent> serverComponents = plugins.getPlugins(AsterixServiceRegistryComponent.class);
 		Set<AsterixServiceRegistryComponent> result = new HashSet<>();
-		for (AsterixServiceRegistryComponent serverComponent : serverComponents) {
-			if (!serverComponent.isActivatedBy(descriptor)) {
-				continue;
-			}
-			result.add(serverComponent);
-		}
-		return result;
-	}
-	
-	private Set<AsterixServiceRegistryComponent> resolveTransitiveComponents(Iterable<AsterixServiceRegistryComponent> components) {
-		Set<AsterixServiceRegistryComponent> result = new HashSet<>();
-		for (AsterixServiceRegistryComponent component : components) {
+		for (String componentName : descriptor.getAnnotation(AsterixServiceRegistryApi.class).components()) {
+			AsterixServiceRegistryComponent component = plugins.getPlugin(AsterixServiceRegistryComponents.class).getComponent(componentName);
 			result.add(component);
 			result.addAll(getTransitiveDependencies(component));
 		}
 		return result;
 	}
-
+	
 	private Collection<? extends AsterixServiceRegistryComponent> getTransitiveDependencies(AsterixServiceRegistryComponent component) {
-		List<Class<? extends AsterixServiceRegistryComponent>> componentDepenencies = component.getComponentDepenencies();
+		List<String> componentDepenencies = component.getComponentDepenencies();
 		Set<AsterixServiceRegistryComponent> result = new HashSet<>();
-		for (Class<? extends AsterixServiceRegistryComponent> componentDependencyType : componentDepenencies) {
-			try {
-				AsterixServiceRegistryComponent dependency = plugins.getPlugin(AsterixServiceRegistryComponents.class).getComponent(componentDependencyType.newInstance().getName());
-				result.add(dependency);
-				result.addAll(getTransitiveDependencies(dependency));
-			} catch (Exception e) {
-				log.warn("Failed to load component dependencies", e);
-			}
+		for (String componentDependencyName: componentDepenencies) {
+			AsterixServiceRegistryComponent dependency = plugins.getPlugin(AsterixServiceRegistryComponents.class).getComponent(componentDependencyName);
+			result.add(dependency);
+			result.addAll(getTransitiveDependencies(dependency));
 		}
 		return result;
 	}

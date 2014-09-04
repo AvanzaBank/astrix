@@ -16,8 +16,8 @@
 package se.avanzabank.asterix.integration.tests.domain.apiruntime;
 
 import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
+import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponents;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
-import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 
 
@@ -33,11 +33,12 @@ import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 @AsterixServiceRegistryApi(
 	exportedApis = {
 		LunchService.class
-	}	
+	},
+	components = {
+		AsterixServiceRegistryComponents.GS_REMOTING
+	}
+	
 )
-// TODO: kan vi få bort behovet av att annotera denna med @AsterixGsApiDescriptor?
-// Som det ser ut nu används denna på server-sidan för att konfa astrix
-@AsterixRemoteApiDescriptor
 public class LunchApiDescriptor {
 	
 	/*

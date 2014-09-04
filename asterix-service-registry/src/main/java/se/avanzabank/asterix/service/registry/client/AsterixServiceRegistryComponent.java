@@ -17,6 +17,8 @@ package se.avanzabank.asterix.service.registry.client;
 
 import java.util.List;
 
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
@@ -35,36 +37,26 @@ import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
  */
 public interface AsterixServiceRegistryComponent {
 	
-	/**
-	 * Check whether this component exports any services on a given descriptor.
-	 * 
-	 * @param possibleDescriptorHolder
-	 * @return
-	 */
-	List<Class<?>> getExportedServices(AsterixApiDescriptor apiDescriptor);
-	
 	<T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, AsterixServiceProperties serviceProperties);
 
-	/**
-	 * Used on the server side to export services to the service-registry. <p>
-	 * 
-	 * @return
-	 */
-	Class<? extends ServiceRegistryExporter> getRequiredExporterClasses();
-	
-	List<Class<? extends AsterixServiceRegistryComponent>> getComponentDepenencies();
-	
-	/**
-	 * Checks whether this component is should be activated on the server side by a given descriptor.
-	 * 
-	 * If a service descriptor is activated, then it's required ServiceRegistryExport's will be added
-	 * to the spring-application-context
-	 *  
-	 * @param descriptor
-	 * @return
-	 */
-	boolean isActivatedBy(AsterixApiDescriptor descriptor);
-
 	String getName();
+	
+	/**
+	 * Used on the server side to export the service to the service-registry. <p>
+	 * 
+	 * @return
+	 */
+	Class<? extends ServiceRegistryExporter> getServiceExporterClass();
+	
+	/**
+	 * Used on the server-side to express if this component requires other component to
+	 * export its service to the service-bus
+	 * 
+	 * @return
+	 */
+	List<String> getComponentDepenencies();
+	
+
+	void registerBeans(BeanDefinitionRegistry registry);
 	
 }

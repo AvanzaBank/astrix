@@ -13,22 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.gs;
+package se.avanzabank.asterix.provider.component;
 
-import org.openspaces.core.GigaSpace;
-
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponents;
-import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
-
-@AsterixServiceRegistryApi(
-	exportedApis = {
-		GigaSpace.class
-	},
-	components = {
-		AsterixServiceRegistryComponents.GS_REMOTING
-	}
+public class AsterixServiceRegistryComponents {
 	
-)
-public class GsDescriptor {
+	// TODO: avoid name conflict with se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponents
 	
+	public static final String GS = "gs";
+	public static final String GS_REMOTING = "gs-remoting";
+
 }
