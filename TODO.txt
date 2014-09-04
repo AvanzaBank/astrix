@@ -7,6 +7,10 @@ hanteras av Asterix. Hur ska då AsterixPlugins/ExternalDepenendencies/ServiceDe
 
 === BACKLOG ===
 
+* Lägg till stöd så att man kan skapa asterix-bönor genom super-interface till de faktiska tjänsterna. 
+	Ex: InstrumentService => ReferenceDataServicer. Om vi har en registrerad provider för InstrumentService så ska 
+		man kunna fråga astrerix efter en böna av typen ReferenceDataService, och få tillbaka den InstrumentService som har registrerats. 
+
 * Cleanup: Se över strukturen på service-suite-context. Ta bort oanvända abstraktioner.
 
 * Se över de felemeddelanden som en användare får om något ExternalDependency saknas i app-contextet.
