@@ -17,11 +17,19 @@ package se.avanzabank.asterix.context;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class AsterixConfigurer {
 
+
+	private static final Logger log = LoggerFactory.getLogger(AsterixConfigurer.class);
+	
 	private boolean useFaultTolerance = false;
 	private boolean enableVersioning = true;
 	private List<ExternalDependencyBean> externalDependencyBeans = new ArrayList<>();
@@ -36,14 +44,22 @@ public class AsterixConfigurer {
 		discoverApiProviderPlugins(context);
 		List<AsterixApiProviderPlugin> apiProviderPlugins = context.getPlugins(AsterixApiProviderPlugin.class);
 		AsterixApiProviderFactory apiProviderFactory = new AsterixApiProviderFactory(apiProviderPlugins);
-		
-		List<AsterixApiProvider> apiProviders = new AsterixApiProviderScanner("se.avanzabank", apiProviderFactory).scan();
+		List<AsterixApiProvider> apiProviders = findAsterixApiProviders(apiProviderFactory, "se.avanzabank");
 		for (AsterixApiProvider apiProvider : apiProviders) {
 			context.registerApiProvider(apiProvider);
 		}
 		return context;
 	}
 	
+	private List<AsterixApiProvider> findAsterixApiProviders(AsterixApiProviderFactory apiProviderFactory, String basePackage) {
+		List<AsterixApiDescriptor> apiDescriptors = new AsterixApiAsterixApiDescriptorScanner(basePackage).scan();
+		List<AsterixApiProvider> result = new ArrayList<>();
+		for (AsterixApiDescriptor descriptor : apiDescriptors) {
+			result.add(apiProviderFactory.create(descriptor));
+		}
+		return result;
+	}
+
 	@Autowired(required = false)
 	public void setExternalDependencies(List<ExternalDependencyBean> externalDependencies) {
 		this.externalDependencyBeans = externalDependencies;
@@ -58,12 +74,24 @@ public class AsterixConfigurer {
 	}
 
 	private void discoverApiProviderPlugins(AsterixContext context) {
-		AsterixPluginDiscovery.discoverAllPlugins(context, AsterixApiProviderPlugin.class, new AsterixLibraryProviderPlugin()); // TODO: no need to pass default instance
+		discoverAllPlugins(context, AsterixApiProviderPlugin.class, new AsterixLibraryProviderPlugin()); // TODO: no need to pass default instance
 	}
 	
+	private static <T> void discoverAllPlugins(AsterixContext context, Class<T> type, T defaultProvider) {
+		List<T> plugins = AsterixPluginDiscovery.discoverAllPlugins(type);
+		if (plugins.isEmpty()) {
+			log.debug("No plugin discovered for {}, using default {}", type.getName(), defaultProvider.getClass().getName());
+			plugins.add(defaultProvider);
+		}
+		for (T plugin : plugins) {
+			log.debug("Found plugin for {}, provider={}", type.getName(), plugin.getClass().getName());
+			context.registerPlugin(type, plugin);
+		}
+	}
+
 	private void configureVersioning(AsterixContext context) {
 		if (enableVersioning) {
-			AsterixPluginDiscovery.discoverOnePlugin(context, AsterixVersioningPlugin.class);
+			discoverOnePlugin(context, AsterixVersioningPlugin.class);
 		} else {
 			context.registerPlugin(AsterixVersioningPlugin.class, AsterixVersioningPlugin.Default.create());
 		}
@@ -71,10 +99,16 @@ public class AsterixConfigurer {
 
 	private void configureFaultTolerance(AsterixContext context) {
 		if (useFaultTolerance) {
-			AsterixPluginDiscovery.discoverOnePlugin(context, AsterixFaultTolerancePlugin.class);
+			discoverOnePlugin(context, AsterixFaultTolerancePlugin.class);
 		} else {
 			context.registerPlugin(AsterixFaultTolerancePlugin.class, AsterixFaultTolerancePlugin.Default.create());
 		}
+	}
+	
+	private static <T> void discoverOnePlugin(AsterixContext context, Class<T> type) {
+		T provider = AsterixPluginDiscovery.discoverOnePlugin(type);
+		log.debug("Found plugin for {}, using {}", type.getName(), provider.getClass().getName());
+		context.registerPlugin(type, provider);
 	}
 
 	public <T> void registerDependency(T dependency) {
