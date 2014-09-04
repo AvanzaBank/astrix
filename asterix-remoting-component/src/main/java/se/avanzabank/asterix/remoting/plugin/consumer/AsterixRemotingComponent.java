@@ -63,7 +63,7 @@ public class AsterixRemotingComponent implements AsterixServiceRegistryComponent
 		AsterixRemotingTransport remotingTransport = AsterixRemotingTransport.remoteSpace(space); // TODO: caching of created proxies, fault tolerance?
 		
 		T proxy = AsterixRemotingProxy.create(api, remotingTransport, objectSerializer);
-		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(api, proxy);
+		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(api, proxy, targetSpace);
 		return proxyWithFaultTolerance;
 	}
 
