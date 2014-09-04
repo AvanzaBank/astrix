@@ -19,7 +19,7 @@
   	</dependency>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
-  		<artifactId>asterix-provider-context</artifactId>
+  		<artifactId>asterix-provider</artifactId>
   		<version>${project.version}</version>
   	</dependency>
   	<dependency>
