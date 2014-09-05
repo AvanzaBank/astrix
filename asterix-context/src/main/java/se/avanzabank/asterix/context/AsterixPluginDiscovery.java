@@ -29,32 +29,18 @@ class AsterixPluginDiscovery {
 	
 	private static final Logger log = LoggerFactory.getLogger(AsterixPluginDiscovery.class);
 	
-	static <T> void discoverAllPlugins(AsterixContext context, Class<T> type, T defaultProvider) {
-		List<T> plugins = discoverPlugins(type);
-		if (plugins.isEmpty()) {
-			log.debug("No plugin discovered for {}, using default {}", type.getName(), defaultProvider.getClass().getName());
-			plugins.add(defaultProvider);
-		}
-		for (T plugin : plugins) {
-			log.debug("Found plugin for {}, provider={}", type.getName(), plugin.getClass().getName());
-			context.registerPlugin(type, plugin);
-		}
-	}
-
-	static <T> void discoverOnePlugin(AsterixContext context, Class<T> type) {
-		List<T> plugins = discoverPlugins(type);
+	static <T> T discoverOnePlugin(Class<T> type) {
+		List<T> plugins = discoverAllPlugins(type);
 		if (plugins.isEmpty()) {
 			throw new IllegalStateException("No provider found on classpath for: " + type + ". This typically means that you forgot to put the providing jar on the classpath.");
 		}
 		if (plugins.size() > 1) {
 			throw new IllegalStateException("Multiple providers found for plugin: " + type + ". Plugins: " + plugins);
 		}
-		T provider = plugins.get(0);
-		log.debug("Found plugin for {}, using {}", type.getName(), provider.getClass().getName());
-		context.registerPlugin(type, provider);
+		return plugins.get(0);
 	}
-	
-	static <T> List<T> discoverPlugins(Class<T> type) {
+
+	static <T> List<T> discoverAllPlugins(Class<T> type) {
 		Iterator<T> plugins = ServiceLoader.load(type).iterator();		
 		List<T> result = new ArrayList<>();
 		while (plugins.hasNext()) {

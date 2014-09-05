@@ -42,7 +42,7 @@ public class AsterixApiProviderFactory {
 		for (AsterixApiProviderPlugin plugin : apiProviderPlugins) {
 			AsterixApiProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
-				// TODO: how to handle multiple providers for same annotation type? Is it allowed
+				// TODO: how to handle multiple providers for same annotation type? Is it allowed?
 				log.warn("Multiple AsterixApiProviderPlugin's found for annotation={}. p1={} p2={}", new Object[]{plugin, previous});
 			}
 		}
@@ -52,21 +52,19 @@ public class AsterixApiProviderFactory {
 		return pluginByAnnotationType.keySet();
 	}
 	
-	public AsterixApiProvider create(AsterixApiDescriptor descriptorHolder) {
-		// TODO: descriptor is not the actual annotation type, but rather the class holding the given annotation
-		AsterixApiProviderPlugin providerFactoryPlugin = getProviderFactoryPlugin(descriptorHolder);
-		List<AsterixFactoryBean<?>> factoryBeans = providerFactoryPlugin.createFactoryBeans(descriptorHolder);
-		return new AsterixApiProvider(factoryBeans, descriptorHolder); 
+	public AsterixApiProvider create(AsterixApiDescriptor descriptor) {
+		AsterixApiProviderPlugin providerFactoryPlugin = getProviderPlugin(descriptor);
+		List<AsterixFactoryBean<?>> factoryBeans = providerFactoryPlugin.createFactoryBeans(descriptor);
+		return new AsterixApiProvider(factoryBeans, descriptor); 
 	}
 
-	private AsterixApiProviderPlugin getProviderFactoryPlugin(AsterixApiDescriptor descriptorHolder) {
+	private AsterixApiProviderPlugin getProviderPlugin(AsterixApiDescriptor descriptor) {
 		for (AsterixApiProviderPlugin plugin : pluginByAnnotationType.values()) {
-			if (plugin.consumes(descriptorHolder)) {
-				// TODO: what if multiple plugins consumes same annotation?
+			if (descriptor.isAnnotationPresent(plugin.getProviderAnnotationType())) {
 				return plugin;
 			}
 		}
-		throw new IllegalArgumentException("No plugin registered that can handle descriptor: " + descriptorHolder);
+		throw new IllegalArgumentException("No plugin registered that can handle descriptor: " + descriptor);
 	}
 	
 }

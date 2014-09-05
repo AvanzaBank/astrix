@@ -52,31 +52,47 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	 * 
 	 * Server side components will have their dependencies injected by spring as
 	 * it stands now. Server side components are registered by AsterixBeanRegistryPlugin's. 
-	 * 
-	 * 
 	 */
 	
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		/*
-		 * NOTE: its important to avoid premature instantiation of spring-beans, hence
-		 * we may not query the spring ApplicationContext from asterix-classes, since we
-		 * don't know in what order spring will instantiate beans.
+		 * IMPLEMENTATION NOTE:
 		 * 
-		 * Therefore we init process looks like this:
-		 * 
-		 * 1. Discover all plugins using asterix-plugin-discovery
-		 * 2. Scan for api-providers on classpath and build AsterixBeanFactories
-		 *  -> Its important that no "xxxAware" injected dependency is used in this phase,
-		 *  especially no ExternalDependencyBean since we have created the ApplicationContext yet.
+		 * This is where the asterix-framework register all its required beans in the BeanDefinitionRegistry,
+		 * as well as all asterix-beans consumed by the current application (consumedAsterixBeans). 
+		 * Both consumer side as well as server side asterix-beans will be registered depending on 
+		 * configuration provided by the user of the framework.
 		 *  
-		 * 3. For each consumedApi register a AsterixSpringFactoryBean.
+		 * Its important to avoid premature instantiation of spring-beans. We might do that unintentionally 
+		 * if we start pulling beans required by asterix-plugins out from the spring ApplicationContext during
+		 * registration of asterix-framework beans. Beans required by different parts of asterix that are 
+		 * expected to be provided in the ApplicationContext by the user of the asterix-framework are
+		 * called ExternalDependencies (see ExternalDependencyAware). 
 		 * 
-		 * 4. Let other service-providing component register it's spring beans. TODO: how to do this in clean way?
+		 * Hence we must ensure that we don't query the spring ApplicationContext from 
+		 * any asterix-plugin during registration of spring beans which starts here.
+		 * 
+		 * The process for registering all asterix beans required for consuming consumedAsterixBeans 
+		 * looks like this:
+
+		 * 1a. Discover all plugins using asterix-plugin-discovery mechanism (spring not involved)
+		 * 1b. Scan for api-providers on classpath and build AsterixBeanFactories (spring not involved)
+		 *  -> Its important that NO "xxxAware" injected dependency is used in this phase
+		 *     especially no ExternalDependencyBean since we have created the ApplicationContext
+		 *     which will eventually "wire" the external dependencies into asterix yet.
+		 * 1c. For each consumedAsterixBean: Register an AsterixSpringFactoryBean.
+		 * 
+		 * At this stage all bean-consuming dependencies are in place. 
+		 * 
+		 * If this application also export a set of services (for instance to the AsterixServiceRegistery), 
+		 * then we must also register all required beans/components:
+		 * 
+		 * 2. Let all AsterixBeanRegistryPlugin's register their required spring beans.
 		 * 
 		 */
 		
-		// TODO: avoid creating two AsterixContext's  (here and as spring bean)
+		// TODO: avoid creating two AsterixContext's  (here and as spring bean). Creating two AsterixContext causes two scannings for providers
 		AsterixContext asterixContext = new AsterixConfigurer().configure(); 
 		
 		// For each consumedApi, either directly or indirectly (for instance via a library), 
@@ -121,6 +137,7 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 			return;
 		}
 		
+		// Register service-descriptor in application-context for autowiring by other components
 		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixApiDescriptor.class);
 		beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues(){{
 			addIndexedArgumentValue(0, serviceDescriptor);

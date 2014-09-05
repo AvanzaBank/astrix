@@ -19,17 +19,26 @@ import java.util.List;
 
 import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 
-/**
- * This is the service-provider part of the service registry.
- * 
- * It's used on the server side to publish a set of services
- * provided to the service registry. <p>
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface ServiceRegistryExporter {
+public class ServiceRegistryExporterHolder {
 	
-	List<AsterixServiceProperties> getProvidedServices();
+	// TODO: find better name of this class and possibly even ServiceRegistryExporter
 	
+	private final ServiceRegistryExporter exporter;
+	private final String componentName;
+
+	public ServiceRegistryExporterHolder(
+			ServiceRegistryExporter exporter,
+			String componentName) {
+		this.exporter = exporter;
+		this.componentName = componentName;
+	}
+
+	public List<AsterixServiceProperties> getProvidedServices() {
+		return exporter.getProvidedServices();
+	}
+	
+	public String getComponentName() {
+		return componentName;
+	}
+
 }

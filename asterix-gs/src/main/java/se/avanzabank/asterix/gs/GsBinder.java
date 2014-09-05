@@ -28,11 +28,10 @@ import com.j_spaces.core.client.SpaceURL;
 
 public class GsBinder {
 	
-	public static GsFactory createGsFactory(AsterixServiceProperties properties, String targetSpace) {
-//		String lookupType = properties.getProperty("lookupType");
-//		String lookupType = properties.getProperty("lookupType");
+	public static GsFactory createGsFactory(AsterixServiceProperties properties) {
 		String locators = properties.getProperty("locators");
 		String groups = properties.getProperty("groups");
+		String targetSpace = properties.getQualifier();
 		if (locators != null) {
 			return new GsFactory(new UsesLookupLocatorsSpaceLocator(locators), targetSpace);
 		}

@@ -34,6 +34,6 @@ public @interface AsterixRemoteApiDescriptor {
 	
 	Class<?>[] exportedApis();
 
-	String targetSpaceName() default ""; // TODO: default?
+	String targetSpaceName();
 
 }

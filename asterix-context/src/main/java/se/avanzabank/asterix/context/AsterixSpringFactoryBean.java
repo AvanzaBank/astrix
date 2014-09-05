@@ -17,7 +17,14 @@ package se.avanzabank.asterix.context;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
-
+/**
+ * Bridges between spring and asterix to make asterix-beans available in
+ * spring-application context.   
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ * @param <T>
+ */
 public class AsterixSpringFactoryBean<T> implements FactoryBean<T> {
 	
 	private Class<T> type;

@@ -36,16 +36,10 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 	@Override
 	public List<AsterixFactoryBean<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
 		List<AsterixFactoryBean<?>> result = new ArrayList<>();
-		for (AsterixServiceRegistryComponent component : getAllComponents()) {
-			for (Class<?> exportedApi : component.getExportedServices(descriptor)) {
-				result.add(new ServiceRegistryLookupFactory<>(descriptor, exportedApi, component));
-			}
+		for (Class<?> exportedApi : descriptor.getAnnotation(AsterixServiceRegistryApi.class).exportedApis()) {
+			result.add(new ServiceRegistryLookupFactory<>(descriptor, exportedApi, plugins));
 		}
 		return result;
-	}
-
-	private List<AsterixServiceRegistryComponent> getAllComponents() {
-		return plugins.getPlugins(AsterixServiceRegistryComponent.class);
 	}
 
 	@Override
@@ -53,11 +47,6 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 		return AsterixServiceRegistryApi.class;
 	}
 
-	@Override
-	public boolean consumes(AsterixApiDescriptor descriptor) {
-		return descriptor.isAnnotationPresent(getProviderAnnotationType());
-	}
-	
 	@Override
 	public void setPlugins(AsterixPlugins plugins) {
 		this.plugins = plugins;

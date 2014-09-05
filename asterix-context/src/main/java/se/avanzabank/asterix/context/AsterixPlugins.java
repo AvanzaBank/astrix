@@ -96,7 +96,7 @@ public class AsterixPlugins {
 		}
 		
 		public static <T> Plugin<T> autoDiscover(Class<T> type, AsterixPluginInitializer initializer) {
-			List<T> plugins = AsterixPluginDiscovery.discoverPlugins(type);
+			List<T> plugins = AsterixPluginDiscovery.discoverAllPlugins(type);
 			if (plugins.isEmpty()) {
 				Method defaultFactory = getDefaultFactory(type);
 				if (defaultFactory != null) {

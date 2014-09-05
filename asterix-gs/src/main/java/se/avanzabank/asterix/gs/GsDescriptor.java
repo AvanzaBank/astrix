@@ -13,32 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.integration.tests.domain.apiruntime;
+package se.avanzabank.asterix.gs;
 
-import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
+import org.openspaces.core.GigaSpace;
+
 import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponents;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
-import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 
-
-// The API is versioned.
-@AsterixVersioned(
-	apiMigrations = {
-		LunchApiV1Migration.class
-	},	
-	version = 2,
-	objectMapperConfigurer = LunchApiObjectMapperConfigurer.class
-)
-// The service is exported to the service-registry. Consumers queries the service-registry to bind to servers.
 @AsterixServiceRegistryApi(
 	exportedApis = {
-		LunchService.class
+		GigaSpace.class
 	},
 	components = {
 		AsterixServiceRegistryComponents.GS_REMOTING
 	}
+	
 )
-public class LunchApiDescriptor {
+public class GsDescriptor {
+	
 }
-
-

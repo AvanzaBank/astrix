@@ -36,7 +36,7 @@ public class AsterixLibraryFactory<T> implements AsterixFactoryBean<T>, AsterixB
 	}
 
 	@Override
-	public T create() {
+	public T create(String qualifier) {
 		Object[] args = new Object[factoryMethod.getParameterTypes().length];
 		// TODO: analyze each factory for what dependencies they have?
 		for (int argumentIndex = 0; argumentIndex < factoryMethod.getParameterTypes().length; argumentIndex++) {

@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.gs;
-
-import se.avanzabank.asterix.provider.library.AsterixExport;
-import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
-
-@AsterixLibraryProvider
-public class GsServiceDescriptor {
+package se.avanzabank.asterix.provider.component;
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public class AsterixServiceRegistryComponents {
 	
-	@AsterixExport
-	public GigaSpaceRegistry createGigaSpaceRegistry(AsterixServiceRegistry serviceRegistry) {
-		return new GigaSpaceRegistryImpl(serviceRegistry);
-	}
+	// TODO: avoid name conflict with se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponents
+	
+	public static final String GS = "gs";
+	public static final String GS_REMOTING = "gs-remoting";
 
 }

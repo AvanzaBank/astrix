@@ -13,19 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.ft.plugin;
+package se.avanzabank.asterix.service.registry.client;
 
-import org.kohsuke.MetaInfServices;
-
-import se.avanzabank.asterix.context.AsterixFaultTolerancePlugin;
-import se.avanzabank.asterix.ft.HystrixAdapter;
-
-
-@MetaInfServices(value = AsterixFaultTolerancePlugin.class)
-public class HystrixFaultTolerancePlugin implements AsterixFaultTolerancePlugin {
-	@Override
-	public <T> T addFaultTolerance(Class<T> api, T provider, String group) {
-		return HystrixAdapter.create(api, provider, group);
-	}
+public interface AsterixServiceRegistryComponents {
+	
+	AsterixServiceRegistryComponent getComponent(String name); 
 
 }

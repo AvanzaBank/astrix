@@ -16,14 +16,19 @@
 package se.avanzabank.asterix.service.registry.server;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.kohsuke.MetaInfServices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.annotation.Autowire;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
@@ -32,6 +37,7 @@ import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponents;
 
 @MetaInfServices(AsterixBeanRegistryPlugin.class)
 public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegistryPlugin, AsterixPluginsAware {
@@ -47,6 +53,7 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegi
 	 * 
 	 */
 
+	private final Logger log = LoggerFactory.getLogger(AsterixServiceRegistryBeanRegistryPlugin.class);
 	private AsterixPlugins plugins;
 	
 	@Override
@@ -55,28 +62,46 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegi
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_asterixServiceBusExporterWorker", beanDefinition);
 	
-		// TODO: how to detect what exporters are required in the given context (depending on serviceDescriptor).
-		// Only required exporters should be registered.
-		// How to handle dependencies for service-exporters?
-		Set<Class<? extends ServiceRegistryExporter>> serviceRegistryExporters = getRequiredExporters(descriptor);
-		for (Class<? extends ServiceRegistryExporter> exporter : serviceRegistryExporters) {
-			beanDefinition = new AnnotatedGenericBeanDefinition(exporter);
+		for (final AsterixServiceRegistryComponent component : getActiveComponents(descriptor)) {
+			// Register exporter
+			beanDefinition = new AnnotatedGenericBeanDefinition(component.getServiceExporterClass());
 			beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-			registry.registerBeanDefinition("_asterixServiceBusExporter-" + exporter.getName(), beanDefinition);
+			registry.registerBeanDefinition("_asterixServiceBusExporter-" + component.getName(), beanDefinition);
+			
+			// Register exporter holder
+			beanDefinition = new AnnotatedGenericBeanDefinition(ServiceRegistryExporterHolder.class);
+			beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues() {{
+				addIndexedArgumentValue(0, new RuntimeBeanReference("_asterixServiceBusExporter-" + component.getName()));
+				addIndexedArgumentValue(1, component.getName());
+			}});
+			registry.registerBeanDefinition("_asterixServiceBusExporterHolder-" + component.getName(), beanDefinition);
+			
+			// TODO: How to ensure beans for component not registered multiple times? (If also used without service-registry, or is it impossible?)
+			component.registerBeans(registry);
 		}
 	}
-
-	private Set<Class<? extends ServiceRegistryExporter>> getRequiredExporters(AsterixApiDescriptor descriptor) {
-		List<AsterixServiceRegistryComponent> serverComponents = plugins.getPlugins(AsterixServiceRegistryComponent.class);
-		Set<Class<? extends ServiceRegistryExporter>> result = new HashSet<>();
-		for (AsterixServiceRegistryComponent serverComponent : serverComponents) {
-			if (!serverComponent.isActivatedBy(descriptor)) {
-				continue;
-			}
-			result.addAll(serverComponent.getRequiredExporterClasses());
+	
+	private Set<AsterixServiceRegistryComponent> getActiveComponents(AsterixApiDescriptor descriptor) {
+		Set<AsterixServiceRegistryComponent> result = new HashSet<>();
+		for (String componentName : descriptor.getAnnotation(AsterixServiceRegistryApi.class).components()) {
+			AsterixServiceRegistryComponent component = plugins.getPlugin(AsterixServiceRegistryComponents.class).getComponent(componentName);
+			result.add(component);
+			result.addAll(getTransitiveDependencies(component));
 		}
 		return result;
 	}
+	
+	private Collection<? extends AsterixServiceRegistryComponent> getTransitiveDependencies(AsterixServiceRegistryComponent component) {
+		List<String> componentDepenencies = component.getComponentDepenencies();
+		Set<AsterixServiceRegistryComponent> result = new HashSet<>();
+		for (String componentDependencyName: componentDepenencies) {
+			AsterixServiceRegistryComponent dependency = plugins.getPlugin(AsterixServiceRegistryComponents.class).getComponent(componentDependencyName);
+			result.add(dependency);
+			result.addAll(getTransitiveDependencies(dependency));
+		}
+		return result;
+	}
+
 
 	@Override
 	public Class<? extends Annotation> getDescriptorType() {

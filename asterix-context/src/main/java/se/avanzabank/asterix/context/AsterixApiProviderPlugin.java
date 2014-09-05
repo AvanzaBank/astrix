@@ -26,7 +26,7 @@ import java.util.List;
  * for an api-provider to use to make the different part's of the api available for consumption.
  * 
  * For instance, one type of api is "library", which is handled by the AsterixLibraryProviderPlugin. It
- * allows api-providers to export api's that require "a lot" of wiring on the "client side" by annotation
+ * allows api-providers to export api's that require "a lot" of wiring on the client side by annotation
  * a class with @AsterixLibraryProvider an export different api-elements by annotating factory methods
  * for different api elements with @AsterixExport. 
  * 
@@ -40,11 +40,8 @@ import java.util.List;
  */
 public interface AsterixApiProviderPlugin {
 	
-	List<AsterixFactoryBean<?>> createFactoryBeans(AsterixApiDescriptor descriptorHolder);
+	List<AsterixFactoryBean<?>> createFactoryBeans(AsterixApiDescriptor descriptor);
 	
-	@Deprecated // TODO: remove, replaced by consumes
 	Class<? extends Annotation> getProviderAnnotationType();
-	
-	boolean consumes(AsterixApiDescriptor descriptor);
 	
 }

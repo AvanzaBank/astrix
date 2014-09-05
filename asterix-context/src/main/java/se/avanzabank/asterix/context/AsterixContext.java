@@ -21,7 +21,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
+/**
+ * An AstrixContext is the runtime-environment for the astrix-framework. It is used
+ * both by consuming applications as well as server applications. AsterixContext providers access
+ * to different asterix-plugins at runtime and is used as a factory to create asterix-beans.
+ * 
+ * @author Elias Lindholm (elilin)
+ */
 public class AsterixContext implements Asterix {
 	
 	private final AsterixPlugins plugins;
@@ -73,6 +79,14 @@ public class AsterixContext implements Asterix {
 				}
 				return AsterixContext.this.getBean(beanType);
 			}
+			
+			@Override
+			public <T> T getBean(Class<T> beanType, String qualifier) {
+				if (!beanDependenciesAware.getBeanDependencies().contains(beanType)) {
+					throw new RuntimeException("Undeclared bean dependency: " + beanType);
+				}
+				return AsterixContext.this.getBean(beanType, qualifier);
+			}
 		});
 	}
 
@@ -92,7 +106,15 @@ public class AsterixContext implements Asterix {
 		// TODO: fix caching of created bean
 		AsterixFactoryBean<T> factory = getFactoryBean(beanType);
 		injectDependencies(factory); // TODO: what the place where it makes most sense to inject dependencies to a AsterixFactory?  
-		return factory.create();
+		return factory.create(null);
+	}
+	
+	public <T> T getBean(Class<T> beanType, String qualifier) {
+		// TODO: synchronize creation of bean
+		// TODO: fix caching of created bean
+		AsterixFactoryBean<T> factory = getFactoryBean(beanType);
+		injectDependencies(factory); // TODO: what the place where it makes most sense to inject dependencies to a AsterixFactory?  
+		return factory.create(qualifier);
 	}
 	
 	private <T> AsterixFactoryBean<T> getFactoryBean(Class<T> beanType) {

@@ -51,10 +51,4 @@ public class AsterixRemotingPlugin implements AsterixApiProviderPlugin {
 		return AsterixRemoteApiDescriptor.class;
 	}
 
-	@Override
-	public boolean consumes(AsterixApiDescriptor descriptorHolder) {
-		return descriptorHolder.isAnnotationPresent(getProviderAnnotationType()) 
-				&& !descriptorHolder.isAnnotationPresent(AsterixServiceRegistryApi.class);
-	}
-	
 }

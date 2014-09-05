@@ -31,7 +31,7 @@ package se.avanzabank.asterix.context;
  */
 public interface AsterixFactoryBean<T> {
 	
-	T create();
+	T create(String optionalQualifier);
 	
 	Class<T> getBeanType();
 	
