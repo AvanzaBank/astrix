@@ -20,6 +20,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
@@ -35,6 +38,8 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	private Class<T> api;
 	private String group;
 
+	private static final Logger log = LoggerFactory.getLogger(HystrixAdapter.class);
+	
 	public HystrixAdapter(Class<T> api, T provider, String group) {
 		this.api = api;
 		this.provider = provider;
@@ -42,6 +47,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	}
 
 	public static <T> T create(Class<T> api, T provider, String group) {
+		log.debug("Adding fault tolerance, api=" + api + ", provider class=" + provider.getClass() + " group=" + group);
 		if (!api.isInterface()) {
 			throw new IllegalArgumentException(
 					"Can only add fault tolerance to an api exposed using an interface. Exposed api=" + api);
