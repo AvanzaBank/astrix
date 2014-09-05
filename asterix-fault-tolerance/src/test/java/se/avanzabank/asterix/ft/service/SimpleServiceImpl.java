@@ -22,4 +22,22 @@ public class SimpleServiceImpl implements SimpleService {
 		return s;
 	}
 
+	@Override
+	public void sleep(long millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+		}
+	}
+
+	@Override
+	public void throwException(Class<? extends RuntimeException> exceptionClass) {
+		try {
+			throw exceptionClass.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+
 }

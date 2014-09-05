@@ -15,6 +15,8 @@
  */
 package se.avanzabank.asterix.ft.plugin;
 
+import java.util.Objects;
+
 import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.asterix.context.AsterixFaultTolerancePlugin;
@@ -25,6 +27,9 @@ import se.avanzabank.asterix.ft.HystrixAdapter;
 public class HystrixFaultTolerancePlugin implements AsterixFaultTolerancePlugin {
 	@Override
 	public <T> T addFaultTolerance(Class<T> api, T provider, String group) {
+		Objects.requireNonNull(api);
+		Objects.requireNonNull(provider);
+		Objects.requireNonNull(group);
 		return HystrixAdapter.create(api, provider, group);
 	}
 

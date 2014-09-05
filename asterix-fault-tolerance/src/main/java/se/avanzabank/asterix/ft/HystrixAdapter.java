@@ -19,9 +19,12 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import se.avanzabank.asterix.core.ServiceUnavailableException;
 
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommandKey;
@@ -47,7 +50,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	}
 
 	public static <T> T create(Class<T> api, T provider, String group) {
-		log.debug("Adding fault tolerance, api=" + api + ", provider=" + provider + " group=" + group);
+		log.debug("Adding fault tolerance: api={}, group={}", api, group);
 		if (!api.isInterface()) {
 			throw new IllegalArgumentException(
 					"Can only add fault tolerance to an api exposed using an interface. Exposed api=" + api);
@@ -72,8 +75,15 @@ public class HystrixAdapter<T> implements InvocationHandler {
 				}
 			}.execute();
 		} catch (HystrixRuntimeException e) {
-			InvocationTargetException ex = (InvocationTargetException) e.getCause();
-			throw ex.getCause();
+			Throwable cause = e.getCause();
+			if (cause instanceof InvocationTargetException) {
+				InvocationTargetException ex = (InvocationTargetException) e.getCause();
+				throw ex.getCause();
+			}
+			if (cause instanceof TimeoutException) {
+				throw new ServiceUnavailableException(cause);
+			}
+			throw cause;
 		}
 	}
 

@@ -20,6 +20,9 @@ import static org.hamcrest.Matchers.*;
 
 import org.junit.Test;
 
+import com.google.common.base.Throwables;
+
+import se.avanzabank.asterix.core.ServiceUnavailableException;
 import se.avanzabank.asterix.ft.plugin.HystrixFaultTolerancePlugin;
 import se.avanzabank.asterix.ft.service.SimpleService;
 import se.avanzabank.asterix.ft.service.SimpleServiceImpl;
@@ -35,5 +38,45 @@ public class FaultToleranceIntegrationTest {
 		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, "test");
 		assertThat(serviceWithFt.echo("foo"), is(equalTo("foo")));
 	}
+	
+	@Test(expected=ServiceUnavailableException.class)
+	public void timeoutThrowsServiceUnavailableException() {
+		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, "test");
+		serviceWithFt.sleep(5000l);
+	}
+	
+	@Test(expected=TestException.class)
+	public void serviceExceptionIsThrown() throws Exception {
+		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, "test");
+		serviceWithFt.throwException(TestException.class);
+	}
+	
+	@Test
+	public void callerStackIsAddedToExceptionOnServiceException() throws Exception {
+		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, "test");
+		try {
+			serviceWithFt.throwException(TestException.class);
+			fail("Expected TestException");
+		} catch (TestException e) {
+			assertThat(Throwables.getStackTraceAsString(e).contains(getClass().getName() + ".callerStackIsAddedToException"), is(true));
+		}
+	}
+	
+	@Test
+	public void callerStackIsAddedToExceptionOnTimeout() throws Exception {
+		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, "test");
+		try {
+			serviceWithFt.sleep(5000l);
+			fail("Expected ServiceUnavailableException");
+		} catch (ServiceUnavailableException e) {
+			assertThat(Throwables.getStackTraceAsString(e).contains(getClass().getName() + ".callerStackIsAddedToException"), is(true));
+		}
+	}
 
+	
+	@SuppressWarnings("serial")
+	public static class TestException extends RuntimeException {
+		
+	}
 }
+

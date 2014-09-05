@@ -17,5 +17,9 @@ package se.avanzabank.asterix.ft.service;
 
 public interface SimpleService {
 
-	public String echo(String s);
+	String echo(String s);
+	
+	void sleep(long millis);
+
+	void throwException(Class<? extends RuntimeException> exceptionClass);
 }
