@@ -69,6 +69,9 @@ public class HystrixAdapter<T> implements InvocationHandler {
 		 */
 		try {
 			return new HystrixCommand<Object>(getKeys()) {
+				
+				// TODO only count towards error on ServiceUnavailable exceptions
+				
 				@Override
 				protected Object run() throws Exception {
 					return method.invoke(provider, args);
@@ -95,7 +98,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 		// We use a high value for MaxQueueSize in order to allow QueueSizeRejectionThreshold to change dynamically using archaius.
 		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =
 				HystrixThreadPoolProperties.Setter().withMaxQueueSize(1_000_000)
-						.withQueueSizeRejectionThreshold(10);
+						.withQueueSizeRejectionThreshold(10).withCoreSize(10);
 
 		return Setter.withGroupKey(getGroupKey())
 				.andCommandKey(getCommandKey())
