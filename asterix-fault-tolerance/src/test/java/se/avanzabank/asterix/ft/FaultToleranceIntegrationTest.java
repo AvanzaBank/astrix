@@ -16,6 +16,7 @@
 package se.avanzabank.asterix.ft;
 
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
 import org.junit.Test;
 
@@ -25,13 +26,14 @@ import se.avanzabank.asterix.ft.service.SimpleServiceImpl;
 
 public class FaultToleranceIntegrationTest {
 
+	private HystrixFaultTolerancePlugin plugin = new HystrixFaultTolerancePlugin();
+	private Class<SimpleService> api = SimpleService.class;
+	private SimpleService provider = new SimpleServiceImpl();
+
 	@Test
-	public void test() {
-		
-		HystrixFaultTolerancePlugin plugin = new HystrixFaultTolerancePlugin();
-		Class<SimpleService> api = SimpleService.class;
-		SimpleService provider = new SimpleServiceImpl();
-		plugin.addFaultTolerance(api , provider, "test");
+	public void callFtService() {
+		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, "test");
+		assertThat(serviceWithFt.echo("foo"), is(equalTo("foo")));
 	}
 
 }

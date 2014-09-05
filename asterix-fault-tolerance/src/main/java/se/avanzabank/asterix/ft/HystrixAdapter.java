@@ -47,7 +47,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	}
 
 	public static <T> T create(Class<T> api, T provider, String group) {
-		log.debug("Adding fault tolerance, api=" + api + ", provider class=" + provider.getClass() + " group=" + group);
+		log.debug("Adding fault tolerance, api=" + api + ", provider=" + provider + " group=" + group);
 		if (!api.isInterface()) {
 			throw new IllegalArgumentException(
 					"Can only add fault tolerance to an api exposed using an interface. Exposed api=" + api);
