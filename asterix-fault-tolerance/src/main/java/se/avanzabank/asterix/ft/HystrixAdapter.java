@@ -33,6 +33,7 @@ import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.hystrix.HystrixThreadPoolProperties;
 import com.netflix.hystrix.HystrixCommand.Setter;
 import com.netflix.hystrix.HystrixCommandGroupKey;
+import com.netflix.hystrix.exception.HystrixBadRequestException;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 
 public class HystrixAdapter<T> implements InvocationHandler {
@@ -77,31 +78,77 @@ public class HystrixAdapter<T> implements InvocationHandler {
 		 *   1. Use HystrixObservableCommand with semaphore isolation for non-blocking operations (methods returning Observable's/Futures)
 		 *   2. Use HystrixCommand with thread isolation for all blocking operations (any method NOT returning an Observable/Future)
 		 */
-		try {
-			return new HystrixCommand<Object>(getKeys()) {
-				
-				// TODO only count towards error on ServiceUnavailable exceptions
-				
-				@Override
-				protected Object run() throws Exception {
-					return method.invoke(provider, args);
-				}
-			}.execute();
-		} catch (HystrixRuntimeException e) {
-			Throwable cause = e.getCause();
-			if (cause == null) {
-				throw new ServiceUnavailableException(e);
-			}
-			if (cause instanceof InvocationTargetException) {
-				InvocationTargetException ex = (InvocationTargetException) e.getCause();
-				// TODO handle null cause
-				throw ex.getCause();
-			}
-			if (cause instanceof TimeoutException) {
-				throw new ServiceUnavailableException(cause);
-			}
-			throw cause;
+		HystrixResult result = createHystrixCommand(method, args).execute();
+		if (result.getException() != null) {
+			throw result.getException();
 		}
+		return result.getResult();
+	}
+
+	private Exception handleException(RuntimeException e) throws Throwable {
+		Throwable cause = e.getCause();
+		if (cause instanceof InvocationTargetException) {
+			InvocationTargetException ex = (InvocationTargetException) e.getCause();
+			// TODO handle null cause
+			throw ex.getCause();
+		}
+		throw cause;
+	}
+
+	
+	private HystrixCommand<HystrixResult> createHystrixCommand(final Method method, final Object[] args) {
+		return new HystrixCommand<HystrixResult>(getKeys()) {
+			
+			@Override
+			protected HystrixResult run() throws Exception {
+				try {
+					return HystrixResult.success(method.invoke(provider, args));
+				} catch (InvocationTargetException e) {
+					Throwable cause = e.getCause();
+					if (cause instanceof ServiceUnavailableException) {
+						throw (ServiceUnavailableException)cause;
+					}
+					return HystrixResult.exception(e.getCause());
+				}
+				catch (Exception e) {
+					return HystrixResult.exception(e);
+				}
+			}
+
+			@Override
+			protected HystrixResult getFallback() {
+				return HystrixResult.exception(new ServiceUnavailableException());
+			}
+			
+			
+		};
+	}
+	
+	private static class HystrixResult {
+		
+		private Object result;
+		private Throwable exception;
+		
+		public static HystrixResult success(Object result) {
+			return new HystrixResult(result, null);
+		}
+		
+		public static HystrixResult exception(Throwable exception) {
+			return new HystrixResult(null, exception);
+		}
+		
+		public HystrixResult(Object result, Throwable exception) {
+			this.result = result;
+			this.exception = exception;
+		}
+		public Object getResult() {
+			return result;
+		}
+
+		public Throwable getException() {
+			return exception;
+		}
+		
 	}
 
 	private Setter getKeys() {

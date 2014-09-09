@@ -24,13 +24,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import se.avanzabank.asterix.core.ServiceUnavailableException;
 import se.avanzabank.asterix.ft.service.SimpleService;
+import se.avanzabank.asterix.ft.service.SimpleServiceException;
 import se.avanzabank.asterix.ft.service.SimpleServiceImpl;
 
 import com.google.common.base.Throwables;
@@ -40,34 +41,54 @@ public class FaultToleranceIntegrationTest {
 	private static final long SLEEP_FOR_TIMEOUT = 1100l;
 	private Class<SimpleService> api = SimpleService.class;
 	private SimpleService provider = new SimpleServiceImpl();
+	private SimpleService testService;
 
+	@Before
+	public void createService() {
+		testService = HystrixAdapter.create(api , provider, randomString(), settingsRandomCommandKey());
+	}
+	
 	@Test
 	public void callFtService() {
-		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString(), settingsRandomCommandKey());
-		assertThat(serviceWithFt.echo("foo"), is(equalTo("foo")));
+		assertThat(testService.echo("foo"), is(equalTo("foo")));
 	}
 	
 	@Test(expected=ServiceUnavailableException.class)
 	public void timeoutThrowsServiceUnavailableException() {
-		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString(), settingsRandomCommandKey());
-		serviceWithFt.sleep(SLEEP_FOR_TIMEOUT);
+		testService.sleep(SLEEP_FOR_TIMEOUT);
 	}
 	
-	@Test(expected=TestException.class)
+	@Test(expected=SimpleServiceException.class)
 	public void serviceExceptionIsThrown() throws Exception {
-		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString(), settingsRandomCommandKey());
-		serviceWithFt.throwException(TestException.class);
+		testService.throwException(SimpleServiceException.class);
 	}
 	
 	@Test(expected=ServiceUnavailableException.class)
-	public void circuitBreaker() throws Exception {
-		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString(), settingsRandomCommandKey());
+	public void circuitBreakerOpens() throws Exception {
 		// Hystrix needs a service to be invoked at least 20 times in a rolling window of one second for the circuit breaker to open
 		for (int i = 0; i < 21; i++) {
-			callServiceThrowServiceUnavailable(serviceWithFt);
+			callServiceThrowServiceUnavailable(testService);
 		}
 		Thread.sleep(1200);
-		serviceWithFt.echo("foo");
+		testService.echo("foo");
+	}
+	
+	@Test
+	public void circuitBreakerDoesNotOpenOnServiceExceptions() throws Exception {
+		// Hystrix needs a service to be invoked at least 20 times in a rolling window of one second for the circuit breaker to open
+		for (int i = 0; i < 21; i++) {
+			try {
+				testService.throwException(SimpleServiceException.class);
+			} catch (SimpleServiceException e) {
+				// Ignore
+			}
+		}
+		Thread.sleep(1200);
+		try {
+			testService.echo("foo");
+		} catch (ServiceUnavailableException e) {
+			fail("Should not throw ServiceUnavailableException - circuit breaker should be closed");
+		}
 	}
 	
 	private void callServiceThrowServiceUnavailable(SimpleService serviceWithFt) {
@@ -102,11 +123,7 @@ public class FaultToleranceIntegrationTest {
 			if (e == null) {
 				continue;
 			}
-			else if (!(e instanceof RejectedExecutionException)) {
-				fail("Unexpected exception type: " + e);
-			} else {
-				numRejectionErrors++;
-			}
+			numRejectionErrors++;
 		}
 		assertThat(numRejectionErrors, is(4));
 	}
@@ -125,7 +142,6 @@ public class FaultToleranceIntegrationTest {
 			try {
 				service.sleep(200);
 			} catch (Exception e) {
-				e.printStackTrace();
 				this.exception  = e;
 			}
 		}
@@ -137,30 +153,22 @@ public class FaultToleranceIntegrationTest {
 	
 	@Test
 	public void callerStackIsAddedToExceptionOnServiceException() throws Exception {
-		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString());
 		try {
-			serviceWithFt.throwException(TestException.class);
+			testService.throwException(SimpleServiceException.class);
 			fail("Expected TestException");
-		} catch (TestException e) {
+		} catch (SimpleServiceException e) {
 			assertThat(Throwables.getStackTraceAsString(e).contains(getClass().getName() + ".callerStackIsAddedToException"), is(true));
 		}
 	}
 	
 	@Test
 	public void callerStackIsAddedToExceptionOnTimeout() throws Exception {
-		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString());
 		try {
-			serviceWithFt.sleep(SLEEP_FOR_TIMEOUT);
+			testService.sleep(SLEEP_FOR_TIMEOUT);
 			fail("Expected ServiceUnavailableException");
 		} catch (ServiceUnavailableException e) {
 			assertThat(Throwables.getStackTraceAsString(e).contains(getClass().getName() + ".callerStackIsAddedToException"), is(true));
 		}
-	}
-
-	
-	@SuppressWarnings("serial")
-	public static class TestException extends RuntimeException {
-		
 	}
 	
 	private HystrixCommandSettings settingsRandomCommandKey() {
