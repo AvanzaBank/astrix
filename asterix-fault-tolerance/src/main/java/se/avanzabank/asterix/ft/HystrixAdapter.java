@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
@@ -36,27 +37,36 @@ import com.netflix.hystrix.exception.HystrixRuntimeException;
 
 public class HystrixAdapter<T> implements InvocationHandler {
 
-	private static final int DEFAULT_THREAD_TIMEOUT_MILLIS = 1000;
 	private T provider;
 	private Class<T> api;
 	private String group;
+	private HystrixCommandSettings settings;
 
 	private static final Logger log = LoggerFactory.getLogger(HystrixAdapter.class);
 	
 	public HystrixAdapter(Class<T> api, T provider, String group) {
+		this(api, provider, group, new HystrixCommandSettings());
+	}
+	
+	public HystrixAdapter(Class<T> api, T provider, String group, HystrixCommandSettings settings) {
 		this.api = api;
 		this.provider = provider;
 		this.group = group;
+		this.settings = Objects.requireNonNull(settings);
 	}
 
-	public static <T> T create(Class<T> api, T provider, String group) {
+	public static <T> T create(Class<T> api, T provider, String group, HystrixCommandSettings settings) {
 		log.debug("Adding fault tolerance: api={}, group={}", api, group);
 		if (!api.isInterface()) {
 			throw new IllegalArgumentException(
 					"Can only add fault tolerance to an api exposed using an interface. Exposed api=" + api);
 		}
 		return api.cast(Proxy.newProxyInstance(HystrixAdapter.class.getClassLoader(), new Class[] { api },
-				new HystrixAdapter<T>(api, provider, group)));
+				new HystrixAdapter<T>(api, provider, group, settings)));
+	}
+	
+	public static <T> T create(Class<T> api, T provider, String group) {
+		return create(api, provider, group, new HystrixCommandSettings());
 	}
 
 	@Override
@@ -79,7 +89,9 @@ public class HystrixAdapter<T> implements InvocationHandler {
 			}.execute();
 		} catch (HystrixRuntimeException e) {
 			Throwable cause = e.getCause();
-			// TODO handle null cause
+			if (cause == null) {
+				throw new ServiceUnavailableException(e);
+			}
 			if (cause instanceof InvocationTargetException) {
 				InvocationTargetException ex = (InvocationTargetException) e.getCause();
 				// TODO handle null cause
@@ -95,12 +107,12 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	private Setter getKeys() {
 		HystrixCommandProperties.Setter commandPropertiesDefault =
 				HystrixCommandProperties.Setter().withExecutionIsolationThreadTimeoutInMilliseconds(
-						DEFAULT_THREAD_TIMEOUT_MILLIS);
+						settings.getExecutionIsolationThreadTimeoutInMilliseconds());
 		// MaxQueueSize must be set to a non negative value in order for QueueSizeRejectionThreshold to have any effect.
 		// We use a high value for MaxQueueSize in order to allow QueueSizeRejectionThreshold to change dynamically using archaius.
 		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =
 				HystrixThreadPoolProperties.Setter().withMaxQueueSize(1_000_000)
-						.withQueueSizeRejectionThreshold(10).withCoreSize(10);
+						.withQueueSizeRejectionThreshold(settings.getQueueSizeRejectionThreshold()).withCoreSize(settings.getCoreSize());
 
 		return Setter.withGroupKey(getGroupKey())
 				.andCommandKey(getCommandKey())
@@ -109,7 +121,10 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	}
 
 	private HystrixCommandKey getCommandKey() {
-		return HystrixCommandKey.Factory.asKey(api.getSimpleName());
+		if (settings.getCommandKey() == null) {
+			return HystrixCommandKey.Factory.asKey(api.getSimpleName());
+		}
+		return HystrixCommandKey.Factory.asKey(settings.getCommandKey());
 	}
 
 	private HystrixCommandGroupKey getGroupKey() {

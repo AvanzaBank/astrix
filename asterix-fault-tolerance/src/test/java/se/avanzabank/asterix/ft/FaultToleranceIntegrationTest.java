@@ -15,8 +15,10 @@
  */
 package se.avanzabank.asterix.ft;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,60 +27,65 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.base.Throwables;
-
 import se.avanzabank.asterix.core.ServiceUnavailableException;
-import se.avanzabank.asterix.ft.plugin.HystrixFaultTolerancePlugin;
 import se.avanzabank.asterix.ft.service.SimpleService;
 import se.avanzabank.asterix.ft.service.SimpleServiceImpl;
 
+import com.google.common.base.Throwables;
+
 public class FaultToleranceIntegrationTest {
 
-	private static final String TEST_GROUP = "testGroup";
 	private static final long SLEEP_FOR_TIMEOUT = 1100l;
-	private HystrixFaultTolerancePlugin plugin = new HystrixFaultTolerancePlugin();
 	private Class<SimpleService> api = SimpleService.class;
 	private SimpleService provider = new SimpleServiceImpl();
 
 	@Test
 	public void callFtService() {
-		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, randomGroupName());
+		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString(), settingsRandomCommandKey());
 		assertThat(serviceWithFt.echo("foo"), is(equalTo("foo")));
 	}
 	
 	@Test(expected=ServiceUnavailableException.class)
 	public void timeoutThrowsServiceUnavailableException() {
-		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, randomGroupName());
+		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString(), settingsRandomCommandKey());
 		serviceWithFt.sleep(SLEEP_FOR_TIMEOUT);
 	}
 	
 	@Test(expected=TestException.class)
 	public void serviceExceptionIsThrown() throws Exception {
-		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, randomGroupName());
+		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString(), settingsRandomCommandKey());
 		serviceWithFt.throwException(TestException.class);
 	}
 	
-	// TODO FIXME
-	@Test @Ignore
+	@Test(expected=ServiceUnavailableException.class)
 	public void circuitBreaker() throws Exception {
-		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, randomGroupName());
-		try {
-			serviceWithFt.throwException(ServiceUnavailableException.class);
-			serviceWithFt.throwException(ServiceUnavailableException.class);
-			serviceWithFt.throwException(ServiceUnavailableException.class);
-		} catch (ServiceUnavailableException e) {
+		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString(), settingsRandomCommandKey());
+		// Hystrix needs a service to be invoked at least 20 times in a rolling window of one second for the circuit breaker to open
+		for (int i = 0; i < 21; i++) {
+			callServiceThrowServiceUnavailable(serviceWithFt);
 		}
-		Thread.sleep(1);
+		Thread.sleep(1200);
 		serviceWithFt.echo("foo");
 	}
 	
+	private void callServiceThrowServiceUnavailable(SimpleService serviceWithFt) {
+		try {
+			serviceWithFt.throwException(ServiceUnavailableException.class);
+		} catch (ServiceUnavailableException e) {
+		}
+	}
+	
+	// TODO test that service exceptions are not counted towards opening circuit breaker
+	
 	@Test
 	public void rejectsWhenPoolIsFull() throws Exception {
-		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, TEST_GROUP);
-		// TODO for some reason calls are not rejected unless we "warm up" with this call first. Why?
+		HystrixCommandSettings settings = settingsRandomCommandKey();
+		settings.setCoreSize(3);
+		settings.setQueueSizeRejectionThreshold(3);
+		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString(), settings);
+		// For some reason calls are not rejected unless we "warm up" with this call first. Why?
 		serviceWithFt.echo("");
 		ExecutorService pool = Executors.newCachedThreadPool();
 		Collection<R> runners = new ArrayList<R>();
@@ -130,7 +137,7 @@ public class FaultToleranceIntegrationTest {
 	
 	@Test
 	public void callerStackIsAddedToExceptionOnServiceException() throws Exception {
-		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, randomGroupName());
+		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString());
 		try {
 			serviceWithFt.throwException(TestException.class);
 			fail("Expected TestException");
@@ -141,7 +148,7 @@ public class FaultToleranceIntegrationTest {
 	
 	@Test
 	public void callerStackIsAddedToExceptionOnTimeout() throws Exception {
-		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, randomGroupName());
+		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString());
 		try {
 			serviceWithFt.sleep(SLEEP_FOR_TIMEOUT);
 			fail("Expected ServiceUnavailableException");
@@ -156,8 +163,17 @@ public class FaultToleranceIntegrationTest {
 		
 	}
 	
-	private String randomGroupName() {
+	private HystrixCommandSettings settingsRandomCommandKey() {
+		HystrixCommandSettings settings = new HystrixCommandSettings();
+		settings.setCommandKey(randomString());
+		return settings;
+	}
+	
+	
+	private String randomString() {
 		return "" + Math.random();
 	}
+	
+	
 }
 
