@@ -25,6 +25,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.base.Throwables;
@@ -37,32 +38,48 @@ import se.avanzabank.asterix.ft.service.SimpleServiceImpl;
 public class FaultToleranceIntegrationTest {
 
 	private static final String TEST_GROUP = "testGroup";
-	private static final long SLEEP_FOR_TIMEOUT = 200l;
+	private static final long SLEEP_FOR_TIMEOUT = 1100l;
 	private HystrixFaultTolerancePlugin plugin = new HystrixFaultTolerancePlugin();
 	private Class<SimpleService> api = SimpleService.class;
 	private SimpleService provider = new SimpleServiceImpl();
 
 	@Test
 	public void callFtService() {
-		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, TEST_GROUP);
+		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, randomGroupName());
 		assertThat(serviceWithFt.echo("foo"), is(equalTo("foo")));
 	}
 	
 	@Test(expected=ServiceUnavailableException.class)
 	public void timeoutThrowsServiceUnavailableException() {
-		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, TEST_GROUP);
+		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, randomGroupName());
 		serviceWithFt.sleep(SLEEP_FOR_TIMEOUT);
 	}
 	
 	@Test(expected=TestException.class)
 	public void serviceExceptionIsThrown() throws Exception {
-		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, TEST_GROUP);
+		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, randomGroupName());
 		serviceWithFt.throwException(TestException.class);
+	}
+	
+	// TODO FIXME
+	@Test @Ignore
+	public void circuitBreaker() throws Exception {
+		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, randomGroupName());
+		try {
+			serviceWithFt.throwException(ServiceUnavailableException.class);
+			serviceWithFt.throwException(ServiceUnavailableException.class);
+			serviceWithFt.throwException(ServiceUnavailableException.class);
+		} catch (ServiceUnavailableException e) {
+		}
+		Thread.sleep(1);
+		serviceWithFt.echo("foo");
 	}
 	
 	@Test
 	public void rejectsWhenPoolIsFull() throws Exception {
 		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, TEST_GROUP);
+		// TODO for some reason calls are not rejected unless we "warm up" with this call first. Why?
+		serviceWithFt.echo("");
 		ExecutorService pool = Executors.newCachedThreadPool();
 		Collection<R> runners = new ArrayList<R>();
 		for (int i = 0; i < 10; i++) {
@@ -70,14 +87,15 @@ public class FaultToleranceIntegrationTest {
 			runners.add(runner);
 			pool.execute(runner);
 		}
-		pool.awaitTermination(500, TimeUnit.MILLISECONDS);
+		pool.shutdown();
+		pool.awaitTermination(2000, TimeUnit.MILLISECONDS);
 		int numRejectionErrors = 0;
 		for (R runner : runners) {
 			Exception e = runner.getException();
 			if (e == null) {
 				continue;
 			}
-			if (!(e instanceof RejectedExecutionException)) {
+			else if (!(e instanceof RejectedExecutionException)) {
 				fail("Unexpected exception type: " + e);
 			} else {
 				numRejectionErrors++;
@@ -89,7 +107,7 @@ public class FaultToleranceIntegrationTest {
 	private static class R implements Runnable {
 
 		private SimpleService service;
-		private Exception exception;
+		private volatile Exception exception;
 
 		public R(SimpleService service) {
 			this.service = service;
@@ -98,8 +116,9 @@ public class FaultToleranceIntegrationTest {
 		@Override
 		public void run() {
 			try {
-				service.sleep(30);
+				service.sleep(200);
 			} catch (Exception e) {
+				e.printStackTrace();
 				this.exception  = e;
 			}
 		}
@@ -111,7 +130,7 @@ public class FaultToleranceIntegrationTest {
 	
 	@Test
 	public void callerStackIsAddedToExceptionOnServiceException() throws Exception {
-		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, TEST_GROUP);
+		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, randomGroupName());
 		try {
 			serviceWithFt.throwException(TestException.class);
 			fail("Expected TestException");
@@ -122,7 +141,7 @@ public class FaultToleranceIntegrationTest {
 	
 	@Test
 	public void callerStackIsAddedToExceptionOnTimeout() throws Exception {
-		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, TEST_GROUP);
+		SimpleService serviceWithFt = plugin.addFaultTolerance(api , provider, randomGroupName());
 		try {
 			serviceWithFt.sleep(SLEEP_FOR_TIMEOUT);
 			fail("Expected ServiceUnavailableException");
@@ -135,6 +154,10 @@ public class FaultToleranceIntegrationTest {
 	@SuppressWarnings("serial")
 	public static class TestException extends RuntimeException {
 		
+	}
+	
+	private String randomGroupName() {
+		return "" + Math.random();
 	}
 }
 

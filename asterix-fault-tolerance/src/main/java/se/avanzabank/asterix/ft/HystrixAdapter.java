@@ -79,8 +79,10 @@ public class HystrixAdapter<T> implements InvocationHandler {
 			}.execute();
 		} catch (HystrixRuntimeException e) {
 			Throwable cause = e.getCause();
+			// TODO handle null cause
 			if (cause instanceof InvocationTargetException) {
 				InvocationTargetException ex = (InvocationTargetException) e.getCause();
+				// TODO handle null cause
 				throw ex.getCause();
 			}
 			if (cause instanceof TimeoutException) {
