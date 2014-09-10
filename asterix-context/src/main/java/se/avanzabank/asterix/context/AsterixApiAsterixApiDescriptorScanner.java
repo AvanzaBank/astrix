@@ -38,7 +38,7 @@ public class AsterixApiAsterixApiDescriptorScanner {
 	
 	private static final Map<String, List<AsterixApiDescriptor>> apiDescriptorsByBasePackage = new HashMap<String, List<AsterixApiDescriptor>>();
 	private String basePackage = "se.avanzabank";
-
+	
 	public AsterixApiAsterixApiDescriptorScanner(String basePackage) {
 		this.basePackage = basePackage;
 	}

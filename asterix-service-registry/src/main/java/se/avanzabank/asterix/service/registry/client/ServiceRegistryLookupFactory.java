@@ -41,11 +41,9 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 
 	@Override
 	public T create(String qualifier) {
-		// TODO: always return a proxy-instance, no matter in which of the steps below that the lookup fails
 		AsterixServiceRegistry serviceRegistry = beans.getBean(AsterixServiceRegistry.class);
 		AsterixServiceProperties serviceProperties = serviceRegistry.lookup(api, qualifier); // TODO: might fail
 		if (serviceProperties == null) {
-			// TODO: manage non discovered services
 			throw new RuntimeException(String.format("Misssing entry in service-registry api=%s qualifier=%s: ", api.getName(), qualifier));
 		}
 		AsterixServiceRegistryComponent serviceRegistryComponent = getComponent(serviceProperties);
@@ -74,15 +72,5 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 	public void setAsterixBeans(AsterixBeans beans) {
 		this.beans = beans;
 	}
-
-	/*
-	 * TODO: skapa en mekanism som upprätthåller en GigaSpace-koppling:
-	 * 
-	 * 1. Lazy uppkoppling om inte aktuellt space är tillgängligt vid uppstart
-	 * 2. Återanslutning om ett space försvinner temporärt
-	 * 
-	 * Vad händer om ett space flyttas permanent? Vem ansvarar för ned-koppling och återanslutning?
-	 * 
-	 */
 
 }

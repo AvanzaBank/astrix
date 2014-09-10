@@ -15,14 +15,22 @@
  */
 package se.avanzabank.asterix.context;
 
+public class AsterixBeanStateChangedEvent {
+	
+	private final AsterixBeanKey beanKey;
+	private final AsterixBeanState beanState;
 
+	public AsterixBeanStateChangedEvent(AsterixBeanKey beanKey, AsterixBeanState beanState) {
+		this.beanKey = beanKey;
+		this.beanState = beanState;
+	}
 
-public interface Asterix {
+	public AsterixBeanKey getBeanKey() {
+		return beanKey;
+	}
 
-	<T> T getBean(Class<T> beanType);
-
-	void waitForBean(Class<?> type, long timeoutMillis) throws InterruptedException;
-
-	void waitForBean(Class<?> beanType, String qualifier, long timeoutMillis) throws InterruptedException;
-
+	public AsterixBeanState getBeanState() {
+		return this.beanState;
+	}
+	
 }

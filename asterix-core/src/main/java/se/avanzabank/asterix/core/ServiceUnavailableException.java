@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.context;
+package se.avanzabank.asterix.core;
 
+public class ServiceUnavailableException extends RuntimeException {
 
-
-public interface Asterix {
-
-	<T> T getBean(Class<T> beanType);
-
-	void waitForBean(Class<?> type, long timeoutMillis) throws InterruptedException;
-
-	void waitForBean(Class<?> beanType, String qualifier, long timeoutMillis) throws InterruptedException;
+	private static final long serialVersionUID = 1L;
+	
+	public ServiceUnavailableException(String msg) {
+		super(msg);
+	}
 
 }

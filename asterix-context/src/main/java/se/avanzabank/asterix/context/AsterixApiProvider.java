@@ -55,5 +55,5 @@ public class AsterixApiProvider {
 	public <T> AsterixFactoryBean<T> getFactory(Class<T> type) {
 		return (AsterixFactoryBean<T>) this.factoryByProvidedType.get(type);
 	}
-	
+
 }

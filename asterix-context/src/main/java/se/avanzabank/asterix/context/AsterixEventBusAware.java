@@ -15,14 +15,8 @@
  */
 package se.avanzabank.asterix.context;
 
-
-
-public interface Asterix {
-
-	<T> T getBean(Class<T> beanType);
-
-	void waitForBean(Class<?> type, long timeoutMillis) throws InterruptedException;
-
-	void waitForBean(Class<?> beanType, String qualifier, long timeoutMillis) throws InterruptedException;
+public interface AsterixEventBusAware {
+	
+	void setEventBus(AsterixEventBus eventBus);
 
 }

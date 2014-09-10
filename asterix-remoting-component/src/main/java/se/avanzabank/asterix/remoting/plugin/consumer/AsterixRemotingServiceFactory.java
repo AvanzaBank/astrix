@@ -24,6 +24,7 @@ import se.avanzabank.asterix.context.AsterixFaultTolerancePlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
+import se.avanzabank.asterix.context.ExternalDependency;
 import se.avanzabank.asterix.context.ExternalDependencyAware;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
@@ -35,7 +36,7 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, 
 	private final Class<T> serviceApi;
 	private final String targetSpace;
     private final AsterixApiDescriptor descriptor;
-	private AsterixRemotingPluginDependencies dependencies;
+	private ExternalDependency<AsterixRemotingPluginDependencies> dependencies;
 	private AsterixPlugins plugins;
 	
 	private static final Logger log = LoggerFactory.getLogger(AsterixRemotingServiceFactory.class);
@@ -69,7 +70,7 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, 
 	}
 
 	private AsterixRemotingTransport createRemotingTransport() {
-		SpaceLocator spaceLocator = dependencies.getSpaceLocator();
+		SpaceLocator spaceLocator = dependencies.get().getSpaceLocator();
 		 // TODO: caching of created proxies, fault tolerance?
 		return AsterixRemotingTransport.remoteSpace(spaceLocator.createClusteredProxy(targetSpace));
 	}
@@ -80,7 +81,7 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, 
 	}
 	
 	@Override
-	public void setDependency(AsterixRemotingPluginDependencies dependencies) {
+	public void setDependency(ExternalDependency<AsterixRemotingPluginDependencies> dependencies) {
 		this.dependencies = dependencies;
 	}
 

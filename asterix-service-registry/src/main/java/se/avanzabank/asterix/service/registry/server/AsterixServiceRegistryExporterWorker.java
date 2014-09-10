@@ -29,6 +29,7 @@ import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
+import se.avanzabank.asterix.core.ServiceUnavailableException;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
@@ -47,6 +48,7 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	private List<ServiceRegistryExporterHolder> serviceExporters = Collections.emptyList();
 	private final AsterixServiceRegistry serviceRegistry;
 	private final Logger log = LoggerFactory.getLogger(AsterixServiceRegistryExporterWorker.class);
+	private volatile long exportIntervallMillis = 60_000;
 
 	@Autowired
 	public AsterixServiceRegistryExporterWorker(
@@ -79,11 +81,16 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	@Override
 	public void run() {
 		while (!interrupted()) {
-			exportProvidedServcies();
 			try {
-				sleep(60_000L);// TODO: intervall of lease renewal
+				exportProvidedServcies();
+				exportIntervallMillis = 60_000;
+				sleep(exportIntervallMillis);// TODO: intervall of lease renewal
 			} catch (InterruptedException e) {
 				interrupt();
+			} catch (ServiceUnavailableException e) {
+				// No bound to service registry
+				log.info("Failed to export serivces to registry");
+				exportIntervallMillis = 250;
 			} 
 		}
 	}
@@ -91,9 +98,9 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	private void exportProvidedServcies() {
 		for (ServiceRegistryExporterHolder exporter : serviceExporters) {
 			for (AsterixServiceProperties serviceProperties : exporter.getProvidedServices()) {
-				log.debug("Exporting to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 				serviceProperties.setComponent(exporter.getComponentName()); // TODO: should this be moved to ServiceRegistryServiceExporterHolder?
 				serviceRegistry.register(serviceProperties.getApi(), serviceProperties);
+				log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			}
 		}
 	}

@@ -15,14 +15,15 @@
  */
 package se.avanzabank.asterix.context;
 
+/**
+ * Used internally by asterix 'decorator' classes to allow AsterixContext
+ * to inject dependencies to decorated asterix classes.
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public interface AsterixDecorator {
 
-
-public interface Asterix {
-
-	<T> T getBean(Class<T> beanType);
-
-	void waitForBean(Class<?> type, long timeoutMillis) throws InterruptedException;
-
-	void waitForBean(Class<?> beanType, String qualifier, long timeoutMillis) throws InterruptedException;
+	Object getTarget();
 
 }
