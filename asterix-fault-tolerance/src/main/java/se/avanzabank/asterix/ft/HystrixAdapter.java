@@ -79,11 +79,15 @@ public class HystrixAdapter<T> implements InvocationHandler {
 		HystrixCommand<HystrixResult> command = createHystrixCommand(method, args);
 		AsterixCallStackTrace trace = new AsterixCallStackTrace();
 		HystrixResult result = command.execute();
+		throwExceptionIfExecutionFailed(trace, result);
+		return result.getResult();
+	}
+
+	private void throwExceptionIfExecutionFailed(AsterixCallStackTrace trace, HystrixResult result) throws Throwable {
 		if (result.getException() != null) {
 			appendStackTrace(result.getException(), trace);
 			throw result.getException();
 		}
-		return result.getResult();
 	}
 
 	private void appendStackTrace(Throwable exception, AsterixCallStackTrace trace) {
@@ -95,7 +99,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	}
 
 	private HystrixCommand<HystrixResult> createHystrixCommand(final Method method, final Object[] args) {
-		return new HystrixCommand<HystrixResult>(getKeys()) {
+		return new HystrixCommand<HystrixResult>(getHystrixConfiguration()) {
 
 			@Override
 			protected HystrixResult run() throws Exception {
@@ -128,13 +132,12 @@ public class HystrixAdapter<T> implements InvocationHandler {
 				// getFallback is only invoked when the underlying api threw an ServiceUnavailableException, or the
 				// when the invocation reached timeout. In any case, treat this as service unavailable.
 				ServiceUnavailableCause cause = AsterixUtil.resolveUnavailableCause(this);
-				// TODO cause into ServiceUnavailableException
 				if (isFailedExecution()) {
 					// Underlying service threw ServiceUnavailableException
 					return HystrixResult.exception(AsterixUtil.wrapFailedExecutionException(this));
 				}
 				// Timeout or rejected in queue
-				return HystrixResult.exception(new ServiceUnavailableException()); // TODO cause
+				return HystrixResult.exception(new ServiceUnavailableException(Objects.toString(cause)));
 			}
 
 		};
@@ -168,7 +171,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 
 	}
 
-	private Setter getKeys() {
+	private Setter getHystrixConfiguration() {
 		HystrixCommandProperties.Setter commandPropertiesDefault =
 				HystrixCommandProperties.Setter().withExecutionIsolationThreadTimeoutInMilliseconds(
 						settings.getExecutionIsolationThreadTimeoutInMilliseconds());

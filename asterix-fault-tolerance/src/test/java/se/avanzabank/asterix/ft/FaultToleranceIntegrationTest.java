@@ -97,8 +97,6 @@ public class FaultToleranceIntegrationTest {
 		}
 	}
 	
-	// TODO test that service exceptions are not counted towards opening circuit breaker
-	
 	@Test
 	public void rejectsWhenPoolIsFull() throws Exception {
 		HystrixCommandSettings settings = settingsRandomCommandKey();
@@ -166,7 +164,6 @@ public class FaultToleranceIntegrationTest {
 			testService.throwException(ServiceUnavailableException.class);
 			fail("Expected SimpleServiceException");
 		} catch (ServiceUnavailableException e) {
-			e.printStackTrace();
 			assertThat(Throwables.getStackTraceAsString(e), containsString(getClass().getName() + ".callerStackIsAddedToException"));
 		}
 	}
