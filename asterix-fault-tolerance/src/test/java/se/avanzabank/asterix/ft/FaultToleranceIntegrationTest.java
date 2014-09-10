@@ -15,8 +15,7 @@
  */
 package se.avanzabank.asterix.ft;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -155,9 +154,20 @@ public class FaultToleranceIntegrationTest {
 	public void callerStackIsAddedToExceptionOnServiceException() throws Exception {
 		try {
 			testService.throwException(SimpleServiceException.class);
-			fail("Expected TestException");
+			fail("Expected SimpleServiceException");
 		} catch (SimpleServiceException e) {
-			assertThat(Throwables.getStackTraceAsString(e).contains(getClass().getName() + ".callerStackIsAddedToException"), is(true));
+			assertThat(Throwables.getStackTraceAsString(e), containsString(getClass().getName() + ".callerStackIsAddedToException"));
+		}
+	}
+	
+	@Test
+	public void callerStackIsAddedToExceptionOnServiceUnavailableException() throws Exception {
+		try {
+			testService.throwException(ServiceUnavailableException.class);
+			fail("Expected SimpleServiceException");
+		} catch (ServiceUnavailableException e) {
+			e.printStackTrace();
+			assertThat(Throwables.getStackTraceAsString(e), containsString(getClass().getName() + ".callerStackIsAddedToException"));
 		}
 	}
 	
@@ -167,7 +177,7 @@ public class FaultToleranceIntegrationTest {
 			testService.sleep(SLEEP_FOR_TIMEOUT);
 			fail("Expected ServiceUnavailableException");
 		} catch (ServiceUnavailableException e) {
-			assertThat(Throwables.getStackTraceAsString(e).contains(getClass().getName() + ".callerStackIsAddedToException"), is(true));
+			assertThat(Throwables.getStackTraceAsString(e), containsString(getClass().getName() + ".callerStackIsAddedToException"));
 		}
 	}
 	

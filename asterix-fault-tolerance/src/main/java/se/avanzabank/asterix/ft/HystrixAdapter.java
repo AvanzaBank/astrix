@@ -20,21 +20,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.avanzabank.asterix.core.AsterixCallStackTrace;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
 
 import com.netflix.hystrix.HystrixCommand;
+import com.netflix.hystrix.HystrixCommand.Setter;
+import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.hystrix.HystrixThreadPoolProperties;
-import com.netflix.hystrix.HystrixCommand.Setter;
-import com.netflix.hystrix.HystrixCommandGroupKey;
-import com.netflix.hystrix.exception.HystrixBadRequestException;
-import com.netflix.hystrix.exception.HystrixRuntimeException;
 
 public class HystrixAdapter<T> implements InvocationHandler {
 
@@ -44,11 +42,11 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	private HystrixCommandSettings settings;
 
 	private static final Logger log = LoggerFactory.getLogger(HystrixAdapter.class);
-	
+
 	public HystrixAdapter(Class<T> api, T provider, String group) {
 		this(api, provider, group, new HystrixCommandSettings());
 	}
-	
+
 	public HystrixAdapter(Class<T> api, T provider, String group, HystrixCommandSettings settings) {
 		this.api = api;
 		this.provider = provider;
@@ -65,7 +63,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 		return api.cast(Proxy.newProxyInstance(HystrixAdapter.class.getClassLoader(), new Class[] { api },
 				new HystrixAdapter<T>(api, provider, group, settings)));
 	}
-	
+
 	public static <T> T create(Class<T> api, T provider, String group) {
 		return create(api, provider, group, new HystrixCommandSettings());
 	}
@@ -78,69 +76,88 @@ public class HystrixAdapter<T> implements InvocationHandler {
 		 *   1. Use HystrixObservableCommand with semaphore isolation for non-blocking operations (methods returning Observable's/Futures)
 		 *   2. Use HystrixCommand with thread isolation for all blocking operations (any method NOT returning an Observable/Future)
 		 */
-		HystrixResult result = createHystrixCommand(method, args).execute();
+		HystrixCommand<HystrixResult> command = createHystrixCommand(method, args);
+		AsterixCallStackTrace trace = new AsterixCallStackTrace();
+		HystrixResult result = command.execute();
 		if (result.getException() != null) {
+			appendStackTrace(result.getException(), trace);
 			throw result.getException();
 		}
 		return result.getResult();
 	}
 
-	private Exception handleException(RuntimeException e) throws Throwable {
-		Throwable cause = e.getCause();
-		if (cause instanceof InvocationTargetException) {
-			InvocationTargetException ex = (InvocationTargetException) e.getCause();
-			// TODO handle null cause
-			throw ex.getCause();
+	private void appendStackTrace(Throwable exception, AsterixCallStackTrace trace) {
+		Throwable lastThowableInChain = exception;
+		while (lastThowableInChain.getCause() != null) {
+			lastThowableInChain = lastThowableInChain.getCause();
 		}
-		throw cause;
+		lastThowableInChain.initCause(trace);
 	}
 
-	
 	private HystrixCommand<HystrixResult> createHystrixCommand(final Method method, final Object[] args) {
 		return new HystrixCommand<HystrixResult>(getKeys()) {
-			
+
 			@Override
 			protected HystrixResult run() throws Exception {
 				try {
 					return HystrixResult.success(method.invoke(provider, args));
 				} catch (InvocationTargetException e) {
-					Throwable cause = e.getCause();
-					if (cause instanceof ServiceUnavailableException) {
-						throw (ServiceUnavailableException)cause;
-					}
-					return HystrixResult.exception(e.getCause());
-				}
-				catch (Exception e) {
+					return handleInvocationTargetException(e);
+				} catch (Exception e) {
+					// This would be a programming error
 					return HystrixResult.exception(e);
 				}
 			}
 
+			private HystrixResult handleInvocationTargetException(InvocationTargetException e) {
+				Throwable cause = e.getCause();
+				if (cause instanceof ServiceUnavailableException) {
+					// Only ServiceUnavailableExceptions are propagated and counted as failures for the circuit breaker
+					throw (ServiceUnavailableException) cause;
+				}
+				// Any other exception is treated as a service exception and does not count as failures for the circuit breaker
+				if (cause == null) {
+					// Javadoc says that the cause can be null. Unclear if it ever happens with InvocationTargetExceptions, but let's be safe
+					return HystrixResult.exception(e);
+				}
+				return HystrixResult.exception(cause);
+			}
+
 			@Override
 			protected HystrixResult getFallback() {
-				return HystrixResult.exception(new ServiceUnavailableException());
+				// getFallback is only invoked when the underlying api threw an ServiceUnavailableException, or the
+				// when the invocation reached timeout. In any case, treat this as service unavailable.
+				ServiceUnavailableCause cause = AsterixUtil.resolveUnavailableCause(this);
+				// TODO cause into ServiceUnavailableException
+				if (isFailedExecution()) {
+					// Underlying service threw ServiceUnavailableException
+					return HystrixResult.exception(AsterixUtil.wrapFailedExecutionException(this));
+				}
+				// Timeout or rejected in queue
+				return HystrixResult.exception(new ServiceUnavailableException()); // TODO cause
 			}
-			
-			
+
 		};
 	}
-	
+
 	private static class HystrixResult {
-		
+
 		private Object result;
 		private Throwable exception;
-		
+
 		public static HystrixResult success(Object result) {
 			return new HystrixResult(result, null);
 		}
-		
+
 		public static HystrixResult exception(Throwable exception) {
 			return new HystrixResult(null, exception);
 		}
-		
+
 		public HystrixResult(Object result, Throwable exception) {
 			this.result = result;
 			this.exception = exception;
 		}
+
 		public Object getResult() {
 			return result;
 		}
@@ -148,7 +165,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 		public Throwable getException() {
 			return exception;
 		}
-		
+
 	}
 
 	private Setter getKeys() {
@@ -159,7 +176,8 @@ public class HystrixAdapter<T> implements InvocationHandler {
 		// We use a high value for MaxQueueSize in order to allow QueueSizeRejectionThreshold to change dynamically using archaius.
 		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =
 				HystrixThreadPoolProperties.Setter().withMaxQueueSize(1_000_000)
-						.withQueueSizeRejectionThreshold(settings.getQueueSizeRejectionThreshold()).withCoreSize(settings.getCoreSize());
+						.withQueueSizeRejectionThreshold(settings.getQueueSizeRejectionThreshold())
+						.withCoreSize(settings.getCoreSize());
 
 		return Setter.withGroupKey(getGroupKey())
 				.andCommandKey(getCommandKey())
