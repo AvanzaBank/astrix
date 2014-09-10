@@ -13,29 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.core;
+package se.avanzabank.asterix.ft.service;
 
-/**
- * Exception thrown when a service is unavailable. For example if a call to it times out.
- * 
- * @author Kristoffer Erlandsson (krierl)
- */
-public class ServiceUnavailableException extends RuntimeException {
+public class SimpleServiceImpl implements SimpleService {
 
-	private static final long serialVersionUID = 1L;
-
-	public ServiceUnavailableException() {
+	@Override
+	public String echo(String s) {
+		return s;
 	}
 
-	public ServiceUnavailableException(String message) {
-		super(message);
+	@Override
+	public void sleep(long millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+		}
 	}
 
-	public ServiceUnavailableException(String message, Throwable cause) {
-		super(message, cause);
+	@Override
+	public void throwException(Class<? extends RuntimeException> exceptionClass) {
+		try {
+			throw exceptionClass.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public ServiceUnavailableException(Throwable cause) {
-		super(cause);
-	}
+
 }
