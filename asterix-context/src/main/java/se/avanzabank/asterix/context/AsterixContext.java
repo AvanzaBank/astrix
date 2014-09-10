@@ -34,8 +34,11 @@ public class AsterixContext implements Asterix {
 	private final AsterixBeanFactoryRegistry beanFactoryRegistry = new AsterixBeanFactoryRegistry();
 	private ConcurrentMap<Class<?>, ExternalDependencyBean> externalDependencyBean = new ConcurrentHashMap<>();
 	private List<Object> externalDependencies = new ArrayList<>();
+	private final AsterixEventBus eventBus = new AsterixEventBus();
+	private final AsterixBeanStates beanStates = new AsterixBeanStates();
 	
 	public AsterixContext() {
+		this.eventBus.addEventListener(AsterixBeanStateChangedEvent.class, beanStates);
 		this.plugins = new AsterixPlugins(new AsterixPluginInitializer() {
 			@Override
 			public void init(Object plugin) {
@@ -56,17 +59,23 @@ public class AsterixContext implements Asterix {
 		this.beanFactoryRegistry.registerProvider(apiProvider);
 	}
 	
-	private void injectDependencies(Object plugin) {
-		if (plugin instanceof ExternalDependencyAware) {
+	private void injectDependencies(Object object) {
+		if (object instanceof ExternalDependencyAware) {
 			// TODO: use indirection layer to avoid depending on unused external dependencies?
 			// As implemented now, if an unused plugin has an external dependency it is still required
-			injectExternalDependencies((ExternalDependencyAware<?>)plugin);
+			injectExternalDependencies((ExternalDependencyAware<?>)object);
 		}
-		if (plugin instanceof AsterixBeanAware) {
-			injectBeanDependencies((AsterixBeanAware)plugin);
+		if (object instanceof AsterixBeanAware) {
+			injectBeanDependencies((AsterixBeanAware)object);
 		}
-		if (plugin instanceof AsterixPluginsAware) {
-			AsterixPluginsAware.class.cast(plugin).setPlugins(getPlugins());
+		if (object instanceof AsterixPluginsAware) {
+			AsterixPluginsAware.class.cast(object).setPlugins(getPlugins());
+		}
+		if (object instanceof AsterixDecorator) {
+			injectDependencies(AsterixDecorator.class.cast(object).getTarget());
+		}
+		if (object instanceof AsterixEventBusAware) {
+			AsterixEventBusAware.class.cast(object).setEventBus(eventBus);
 		}
 	}
 	
@@ -90,9 +99,13 @@ public class AsterixContext implements Asterix {
 		});
 	}
 
-	private <D extends ExternalDependencyBean> void injectExternalDependencies(ExternalDependencyAware<D> externalDependencyAware) {
-		D dependency = getExternalDependency(externalDependencyAware.getDependencyBeanClass());
-		externalDependencyAware.setDependency(dependency);
+	private <D extends ExternalDependencyBean> void injectExternalDependencies(final ExternalDependencyAware<D> externalDependencyAware) {
+		externalDependencyAware.setDependency(new ExternalDependency<D>() {
+			@Override
+			public D get() {
+				return getExternalDependency(externalDependencyAware.getDependencyBeanClass());
+			}
+		});
 	}
 
 	/**
@@ -103,9 +116,9 @@ public class AsterixContext implements Asterix {
 	 */
 	public <T> T getBean(Class<T> beanType) {
 		// TODO: synchronize creation of bean
-		// TODO: fix caching of created bean
+		// TODO: fix caching of created beans
 		AsterixFactoryBean<T> factory = getFactoryBean(beanType);
-		injectDependencies(factory); // TODO: what the place where it makes most sense to inject dependencies to a AsterixFactory?  
+		injectDependencies(factory); // TODO: what the place where it makes most sense to inject dependencies to a AsterixFactory?
 		return factory.create(null);
 	}
 	
@@ -130,8 +143,15 @@ public class AsterixContext implements Asterix {
 	 */
 	public Class<? extends ExternalDependencyBean> getExternalDependencyBean(Class<?> beanType) {
 		AsterixFactoryBean<?> factoryBean = getFactoryBean(beanType);
-		if (factoryBean instanceof ExternalDependencyAware) {
-			return ExternalDependencyAware.class.cast(factoryBean).getDependencyBeanClass();
+		return deepGetExternalDependencyBean(factoryBean);
+	}
+	
+	private Class<? extends ExternalDependencyBean> deepGetExternalDependencyBean(Object asterixObject) {
+		if (asterixObject instanceof ExternalDependencyAware) {
+			return ExternalDependencyAware.class.cast(asterixObject).getDependencyBeanClass();
+		}
+		if (asterixObject instanceof AsterixDecorator) {
+			return deepGetExternalDependencyBean(AsterixDecorator.class.cast(asterixObject).getTarget());
 		}
 		return null;
 	}
@@ -145,8 +165,13 @@ public class AsterixContext implements Asterix {
 	}
 
 	@Override
-	public <T> T waitForBean(Class<T> class1, long timeoutMillis) {
-		throw new UnsupportedOperationException();
+	public void waitForBean(Class<?> beanType, long timeoutMillis) throws InterruptedException {
+		beanStates.waitForBeanToBeBound(AsterixBeanKey.create(beanType, null), timeoutMillis);
+	}
+	
+	@Override
+	public void waitForBean(Class<?> beanType, String qualifier, long timeoutMillis) throws InterruptedException {
+		beanStates.waitForBeanToBeBound(AsterixBeanKey.create(beanType, qualifier), timeoutMillis);
 	}
 
 	public void setExternalDependencyBeans(List<ExternalDependencyBean> externalDependencies) {
@@ -159,7 +184,7 @@ public class AsterixContext implements Asterix {
 		this.externalDependencies = externalDependencies;
 	}
 	
-	public <T extends ExternalDependencyBean> T getExternalDependency(Class<T> dependencyType) {
+	private <T extends ExternalDependencyBean> T getExternalDependency(Class<T> dependencyType) {
 		ExternalDependencyBean externalDependencyBean = this.externalDependencyBean.get(dependencyType);
 		if (externalDependencyBean == null) {
 			return createExternalDependencyBean(dependencyType);
@@ -193,7 +218,7 @@ public class AsterixContext implements Asterix {
 				return type.cast(dep);
 			}
 		}
-		throw new RuntimeException("Missing dependency: " + type.getName());
+		throw new MissingExternalDependencyException(type);
 	}
 
 	/**
@@ -205,8 +230,16 @@ public class AsterixContext implements Asterix {
 	 */
 	public List<Class<?>> getTransitiveBeanDependencies(Class<?> beanType) {
 		AsterixFactoryBean<?> beanFactory = getFactoryBean(beanType);
-		if (beanFactory instanceof AsterixBeanAware) {
-			return AsterixBeanAware.class.cast(beanFactory).getBeanDependencies();
+		return deepGetTransitiveBeanDependencies(beanFactory);
+	}
+	
+	public List<Class<?>> deepGetTransitiveBeanDependencies(Object asterixObject) {
+		if (asterixObject instanceof AsterixBeanAware) {
+			return AsterixBeanAware.class.cast(asterixObject).getBeanDependencies();
+		}
+		if (asterixObject instanceof AsterixDecorator) {
+			Object decoratedObject = AsterixDecorator.class.cast(asterixObject).getTarget();
+			return deepGetTransitiveBeanDependencies(decoratedObject);
 		}
 		return Collections.emptyList();
 	}

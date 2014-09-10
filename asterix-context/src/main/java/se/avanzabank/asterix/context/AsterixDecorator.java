@@ -13,29 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.core;
+package se.avanzabank.asterix.context;
 
 /**
- * Exception thrown when a service is unavailable. For example if a call to it times out.
+ * Used internally by asterix 'decorator' classes to allow AsterixContext
+ * to inject dependencies to decorated asterix classes.
  * 
- * @author Kristoffer Erlandsson (krierl)
+ * @author Elias Lindholm (elilin)
+ *
  */
-public class ServiceUnavailableException extends RuntimeException {
+public interface AsterixDecorator {
 
-	private static final long serialVersionUID = 1L;
+	Object getTarget();
 
-	public ServiceUnavailableException() {
-	}
-
-	public ServiceUnavailableException(String message) {
-		super(message);
-	}
-
-	public ServiceUnavailableException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public ServiceUnavailableException(Throwable cause) {
-		super(cause);
-	}
 }

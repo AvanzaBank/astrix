@@ -13,29 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.core;
+package se.avanzabank.asterix.context;
 
-/**
- * Exception thrown when a service is unavailable. For example if a call to it times out.
- * 
- * @author Kristoffer Erlandsson (krierl)
- */
-public class ServiceUnavailableException extends RuntimeException {
+public class MissingExternalDependencyException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
-
-	public ServiceUnavailableException() {
+	
+	public MissingExternalDependencyException(Class<?> type) {
+		super("Missing external dependency: " + type.getName());
 	}
 
-	public ServiceUnavailableException(String message) {
-		super(message);
-	}
-
-	public ServiceUnavailableException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public ServiceUnavailableException(Throwable cause) {
-		super(cause);
-	}
 }

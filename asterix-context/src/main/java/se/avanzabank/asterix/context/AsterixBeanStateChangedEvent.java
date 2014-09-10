@@ -13,29 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.core;
+package se.avanzabank.asterix.context;
 
-/**
- * Exception thrown when a service is unavailable. For example if a call to it times out.
- * 
- * @author Kristoffer Erlandsson (krierl)
- */
-public class ServiceUnavailableException extends RuntimeException {
+public class AsterixBeanStateChangedEvent {
+	
+	private final AsterixBeanKey beanKey;
+	private final AsterixBeanState beanState;
 
-	private static final long serialVersionUID = 1L;
-
-	public ServiceUnavailableException() {
+	public AsterixBeanStateChangedEvent(AsterixBeanKey beanKey, AsterixBeanState beanState) {
+		this.beanKey = beanKey;
+		this.beanState = beanState;
 	}
 
-	public ServiceUnavailableException(String message) {
-		super(message);
+	public AsterixBeanKey getBeanKey() {
+		return beanKey;
 	}
 
-	public ServiceUnavailableException(String message, Throwable cause) {
-		super(message, cause);
+	public AsterixBeanState getBeanState() {
+		return this.beanState;
 	}
-
-	public ServiceUnavailableException(Throwable cause) {
-		super(cause);
-	}
+	
 }

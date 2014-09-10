@@ -26,7 +26,7 @@ package se.avanzabank.asterix.context;
  */
 public interface ExternalDependencyAware<T extends ExternalDependencyBean> {
 	
-	void setDependency(T instance);
+	void setDependency(ExternalDependency<T> instance);
 	
 	Class<T> getDependencyBeanClass();
 

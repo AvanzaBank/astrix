@@ -50,20 +50,26 @@ import se.avanzabank.space.junit.pu.RunningPu;
  */
 public class AsterixIntegrationTest {
 	
+	@ClassRule
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
+											  .startAsync(true)
 											  .configure();
 	
+	@ClassRule
+	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
+														.numberOfPrimaries(1)
+														.numberOfBackups(0)
+														.startAsync(true)
+														.configure();
+
 	public static RunningPu serviceRegistrypu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
 													  .numberOfPrimaries(1)
 													  .numberOfBackups(0)
+													  .startAsync(true)
 													  .configure();
-	
-	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
-																  .numberOfPrimaries(1)
-																  .numberOfBackups(0)
-																  .configure();
+
 	
 	public static JndiServerRule jndi = new JndiServerRule(new JndiServerRuleHook() {
 		@Override
@@ -71,9 +77,13 @@ public class AsterixIntegrationTest {
 			jndiServer.addValueEntry("service-registry-space", "jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
 		}
 	});
-	
+
+//	@ClassRule
+//	public static RuleChain order = RuleChain.outerRule(serviceRegistrypu).around(jndi).around(lunchPu).around(lunchGraderPu);
 	@ClassRule
-	public static RuleChain order = RuleChain.outerRule(serviceRegistrypu).around(jndi).around(lunchPu).around(lunchGraderPu);
+	public static RuleChain order = RuleChain.outerRule(serviceRegistrypu).around(jndi);
+//	@ClassRule
+//	public static RuleChain order = RuleChain.outerRule(lunchGraderPu).around(lunchPu).around(serviceRegistrypu).around(jndi);
 
 	
 	
@@ -98,12 +108,13 @@ public class AsterixIntegrationTest {
 		configurer.useFaultTolerance(true);
 		configurer.enableVersioning(true);
 		Asterix asterix = configurer.configure();
-//		this.lunchService = asterix.waitForService(LunchService.class, 5000);
-//		this.lunchUtil = asterix.waitForService(LunchUtil.class, 5000);
 		this.lunchService = asterix.getBean(LunchService.class);
 		this.lunchUtil = asterix.getBean(LunchUtil.class);
 		this.lunchRestaurantGrader = asterix.getBean(LunchRestaurantGrader.class);
-
+		asterix.waitForBean(LunchService.class, 2000);
+		asterix.waitForBean(LunchUtil.class, 2000);
+		asterix.waitForBean(LunchRestaurantGrader.class, 2000);
+		asterix.waitForBean(GigaSpace.class, "service-demo-space", 2000);
 	}
 	
 	@Test

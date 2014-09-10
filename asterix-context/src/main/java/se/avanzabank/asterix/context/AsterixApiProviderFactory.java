@@ -16,6 +16,7 @@
 package se.avanzabank.asterix.context;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -54,7 +55,12 @@ public class AsterixApiProviderFactory {
 	
 	public AsterixApiProvider create(AsterixApiDescriptor descriptor) {
 		AsterixApiProviderPlugin providerFactoryPlugin = getProviderPlugin(descriptor);
-		List<AsterixFactoryBean<?>> factoryBeans = providerFactoryPlugin.createFactoryBeans(descriptor);
+		List<AsterixFactoryBean<?>> factoryBeans = new ArrayList<>();
+		for (AsterixFactoryBean<?> factoryBean : providerFactoryPlugin.createFactoryBeans(descriptor)) {
+//			factoryBeans.add(factoryBean);
+			// Don't add StatefulAsterixFactoryBean for libraries???
+			factoryBeans.add(new CachingAsterixFactoryBean<>(new StatefulAsterixFactoryBean<>(factoryBean)));
+		}
 		return new AsterixApiProvider(factoryBeans, descriptor); 
 	}
 
