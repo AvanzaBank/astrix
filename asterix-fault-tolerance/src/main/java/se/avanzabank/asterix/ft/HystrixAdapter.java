@@ -34,6 +34,10 @@ import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.hystrix.HystrixThreadPoolProperties;
 
+/**
+ * @author Kristoffer Erlandsson (krierl)
+ * @author Elias Lindholm (elilin)
+ */
 public class HystrixAdapter<T> implements InvocationHandler {
 
 	private T provider;
