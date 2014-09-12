@@ -22,15 +22,17 @@ import java.util.Objects;
 import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.asterix.context.AsterixMetricsLoggerPlugin;
+import se.avanzabank.core.support.jndi.lookup.BasicJNDILookup;
 import se.avanzabank.system.graphite.Graphite;
+import se.avanzabank.system.graphite.GraphiteFactory;
 
 @MetaInfServices(AsterixMetricsLoggerPlugin.class)
 public class GraphiteMetricsLogger implements AsterixMetricsLoggerPlugin {
 
-	private Graphite graphite;
+	private final Graphite graphite;
 
 	public GraphiteMetricsLogger() {
-		
+		this.graphite = new GraphiteFactory().getBatchGraphite(new BasicJNDILookup());
 	}
 	
 	public GraphiteMetricsLogger(Graphite graphite) {
@@ -43,5 +45,4 @@ public class GraphiteMetricsLogger implements AsterixMetricsLoggerPlugin {
 			graphite.logHostMetric(entry.getKey(), entry.getValue());
 		}
 	}
-
 }
