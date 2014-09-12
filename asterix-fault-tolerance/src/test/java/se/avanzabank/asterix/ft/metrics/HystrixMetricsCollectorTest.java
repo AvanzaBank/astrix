@@ -30,11 +30,13 @@ import com.netflix.hystrix.HystrixCommand.Setter;
 public class HystrixMetricsCollectorTest {
 
 	@Test
-	public void test() {
+	public void getMetrics() throws Exception {
 		HystrixMetricsCollector collector = new HystrixMetricsCollector();
+		String group = randomString();
+		String command = randomString();
 		Setter commandConfig = Setter
-				.withGroupKey(HystrixCommandGroupKey.Factory.asKey("group"))
-				.andCommandKey(HystrixCommandKey.Factory.asKey("command"));
+				.withGroupKey(HystrixCommandGroupKey.Factory.asKey(group))
+				.andCommandKey(HystrixCommandKey.Factory.asKey(command));
 		new HystrixCommand<Integer>(commandConfig) {
 
 			@Override
@@ -44,10 +46,13 @@ public class HystrixMetricsCollectorTest {
 
 		}.execute();
 		Map<String, Number> metrics = collector.getMetrics();
-		assertThat(metrics.get("hystrix.${host}.group.command.isCircuitBreakerOpen").intValue(), is(0));
-		assertThat(metrics.get("hystrix.${host}.group.currentQueueSize").intValue(), is(0));
-		// ...and verify one thread pool property
-//		assertEquals(0L, metrics.get("hystrix.host.group.currentQueueSize"));
+		assertThat(metrics.get(String.format("hystrix.${host}.%s.%s.isCircuitBreakerOpen", group, command)).intValue(), is(0));
+		assertThat(metrics.get(String.format("hystrix.${host}.%s.currentQueueSize", group)).intValue(), is(0));
+		assertThat(metrics.get(String.format("hystrix.${host}.%s.currentCompletedTaskCount", group)).intValue(), is(1));
+	}
+
+	private String randomString() {
+		return "" + Math.random();
 	}
 	
 
