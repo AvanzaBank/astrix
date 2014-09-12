@@ -18,14 +18,24 @@ package se.avanzabank.asterix.ft.metrics;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.kohsuke.MetaInfServices;
+
+import se.avanzabank.asterix.context.AsterixMetricsCollectorPlugin;
+
 import com.netflix.hystrix.HystrixCircuitBreaker;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
 import com.netflix.hystrix.HystrixCommandMetrics.HealthCounts;
 import com.netflix.hystrix.HystrixThreadPoolMetrics;
 
-public class HystrixMetricsCollector {
+/**
+ * @author Andreas Skoog (andsko)
+ * @author Kristoffer Erlandsson (krierl)
+ */
+@MetaInfServices(AsterixMetricsCollectorPlugin.class)
+public final class HystrixMetricsCollector implements AsterixMetricsCollectorPlugin {
 	
+	@Override
 	public Map<String, Number> getMetrics() {
 		Map<String, Number> metrics = new HashMap<>();
 		for (HystrixCommandMetrics commandMetrics : HystrixCommandMetrics.getInstances()) {
@@ -37,6 +47,7 @@ public class HystrixMetricsCollector {
 		return metrics;
 	}
 
+	// Most of the code in this methods is based on code in HystrixMetricsPoller
 	private void addCommandMetrics(HystrixCommandMetrics commandMetrics, Map<String, Number> metrics) {
 		HystrixCommandKey key = commandMetrics.getCommandKey();
 		HystrixCircuitBreaker circuitBreaker = HystrixCircuitBreaker.Factory.getInstance(key);
