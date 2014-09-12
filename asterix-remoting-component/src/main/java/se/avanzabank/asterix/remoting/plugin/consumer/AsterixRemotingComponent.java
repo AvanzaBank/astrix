@@ -42,14 +42,6 @@ import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 @MetaInfServices(AsterixServiceRegistryComponent.class)
 public class AsterixRemotingComponent implements AsterixServiceRegistryComponent, AsterixBeanAware, AsterixPluginsAware {
 	
-	// TODO: rename to AsterixRemotingComponent
-
-	// TODO: what if lookup of service-properties fails? whose responsible of making new attempts to discover provider?
-	// Multiple cases exists:
-	// 1. No service registry available (i.e. server instance not running)
-	// 2. No service registered in service registry (i.e. service registry instance running but no provider registered with it yet).
-	//
-	
 	private AsterixPlugins plugins;
 	private AsterixBeans beans;
 	

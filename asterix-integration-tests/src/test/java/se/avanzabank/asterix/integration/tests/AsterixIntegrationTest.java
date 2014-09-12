@@ -78,12 +78,8 @@ public class AsterixIntegrationTest {
 		}
 	});
 
-//	@ClassRule
-//	public static RuleChain order = RuleChain.outerRule(serviceRegistrypu).around(jndi).around(lunchPu).around(lunchGraderPu);
 	@ClassRule
 	public static RuleChain order = RuleChain.outerRule(serviceRegistrypu).around(jndi);
-//	@ClassRule
-//	public static RuleChain order = RuleChain.outerRule(lunchGraderPu).around(lunchPu).around(serviceRegistrypu).around(jndi);
 
 	
 	
@@ -114,7 +110,7 @@ public class AsterixIntegrationTest {
 		asterix.waitForBean(LunchService.class, 2000);
 		asterix.waitForBean(LunchUtil.class, 2000);
 		asterix.waitForBean(LunchRestaurantGrader.class, 2000);
-		asterix.waitForBean(GigaSpace.class, "service-demo-space", 2000);
+//		asterix.waitForBean(GigaSpace.class, "service-demo-space", 2000); //
 	}
 	
 	@Test

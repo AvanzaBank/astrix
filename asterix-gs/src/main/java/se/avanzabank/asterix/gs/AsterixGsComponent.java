@@ -15,7 +15,6 @@
  */
 package se.avanzabank.asterix.gs;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

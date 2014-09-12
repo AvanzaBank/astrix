@@ -46,7 +46,11 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 	public static <T> T create(AsterixFactoryBean<T> beanFactory, String optionalQualifier, AsterixEventBus eventBus) {
 		// TODO: attempt to bind synchronously on startup
 		StatefulAsterixBean<T> handler = new StatefulAsterixBean<>(beanFactory, optionalQualifier, eventBus);
-		new AsterixBeanStateWorker<>(handler).start(); // TODO: manage worker thread lifecycle. Use single worker for all beans?
+		try {
+			handler.bind();
+		} catch (Exception e) {
+			new AsterixBeanStateWorker<>(handler).start(); // TODO: manage worker thread lifecycle. Use single worker for all beans?
+		}
 		return beanFactory.getBeanType().cast(Proxy.newProxyInstance(beanFactory.getClass().getClassLoader(), new Class<?>[]{beanFactory.getBeanType()}, handler));
 	}
 

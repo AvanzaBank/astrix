@@ -1,11 +1,14 @@
 === IN PROGRESS ===
 
-* Hur ska AsterixBeanDefnitionRegistryPlugin's hantera beroenden? De bönor som dessa registrerar kommer inte
-hanteras av Asterix. Hur ska då AsterixPlugins/ExternalDepenendencies/ServiceDependencies hanteras?
-
-* AsterixApiProviderPlugin.getProviderAnnotationType och AsterixApiProviderPlugin.consumes: En av dessa metoder ska bort 
+* När man skapar en asterix-böna ska första bindingsförsöket ske synkront
 
 === BACKLOG ===
+
+* Se över namngivning av de olika space som används från integrationstester.
+
+* Hur ska AsterixBeanDefnitionRegistryPlugin/AsterixServiceRegistryComponent's hantera beroenden? De bönor som dessa registrerar kommer inte
+  hanteras av Asterix. Hur ska då AsterixPlugins/ExternalDepenendencies/ServiceDependencies hanteras?
+  
 
 * Lägg till stöd så att man kan skapa asterix-bönor genom super-interface till de faktiska tjänsterna. 
 	Ex: InstrumentService => ReferenceDataServicer. Om vi har en registrerad provider för InstrumentService så ska 
@@ -60,4 +63,5 @@ en astrix-runtime.
 
 * Se över namngivning på moduler/klasser
   - service-bus -> service-registry
-	
+  
+* AsterixApiProviderPlugin.getProviderAnnotationType och AsterixApiProviderPlugin.consumes: En av dessa metoder ska bort
