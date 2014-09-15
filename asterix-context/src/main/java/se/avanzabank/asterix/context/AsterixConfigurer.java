@@ -17,9 +17,6 @@ package se.avanzabank.asterix.context;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +27,7 @@ public class AsterixConfigurer {
 
 	private static final Logger log = LoggerFactory.getLogger(AsterixConfigurer.class);
 	
+	private AsterixApiDescriptors asterixApiDescriptors = new AsterixApiDescriptorScanner("se.avanzabank");
 	private boolean useFaultTolerance = false;
 	private boolean enableVersioning = true;
 	private List<ExternalDependencyBean> externalDependencyBeans = new ArrayList<>();
@@ -44,17 +42,16 @@ public class AsterixConfigurer {
 		discoverApiProviderPlugins(context);
 		List<AsterixApiProviderPlugin> apiProviderPlugins = context.getPlugins(AsterixApiProviderPlugin.class);
 		AsterixApiProviderFactory apiProviderFactory = new AsterixApiProviderFactory(apiProviderPlugins);
-		List<AsterixApiProvider> apiProviders = findAsterixApiProviders(apiProviderFactory, "se.avanzabank");
+		List<AsterixApiProvider> apiProviders = createApiProviders(apiProviderFactory);
 		for (AsterixApiProvider apiProvider : apiProviders) {
 			context.registerApiProvider(apiProvider);
 		}
 		return context;
 	}
 	
-	private List<AsterixApiProvider> findAsterixApiProviders(AsterixApiProviderFactory apiProviderFactory, String basePackage) {
-		List<AsterixApiDescriptor> apiDescriptors = new AsterixApiAsterixApiDescriptorScanner(basePackage).scan();
+	private List<AsterixApiProvider> createApiProviders(AsterixApiProviderFactory apiProviderFactory) {
 		List<AsterixApiProvider> result = new ArrayList<>();
-		for (AsterixApiDescriptor descriptor : apiDescriptors) {
+		for (AsterixApiDescriptor descriptor : asterixApiDescriptors.getAll()) {
 			result.add(apiProviderFactory.create(descriptor));
 		}
 		return result;
@@ -117,6 +114,11 @@ public class AsterixConfigurer {
 
 	public void registerDependency(ExternalDependencyBean externalDependency) {
 		this.externalDependencyBeans.add(externalDependency);
+	}
+
+	// package private. Used for internal testing only
+	void setAsterixApiDescriptors(AsterixApiDescriptors asterixApiDescriptors) {
+		this.asterixApiDescriptors = asterixApiDescriptors;
 	}
 	
 }

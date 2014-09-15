@@ -48,10 +48,17 @@ public class AsterixApiProvider {
 		return apiDescriptor;
 	}
 
+	/**
+	 * Returns the set of all provided bean-types by this api. <p>
+	 *  
+	 * 
+	 * @return
+	 */
 	public Collection<Class<?>> providedApis() {
 		return this.factoryByProvidedType.keySet();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public <T> AsterixFactoryBean<T> getFactory(Class<T> type) {
 		return (AsterixFactoryBean<T>) this.factoryByProvidedType.get(type);
 	}

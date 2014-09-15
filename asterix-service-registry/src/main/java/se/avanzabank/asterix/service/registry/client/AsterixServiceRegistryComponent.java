@@ -37,8 +37,25 @@ import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
  */
 public interface AsterixServiceRegistryComponent {
 	
+	/**
+	 * Used on the client side to bind to the service using AsterixServiceProperties received
+	 * from the service-registry.
+	 * 
+	 * @param apiDescriptor
+	 * @param type
+	 * @param serviceProperties
+	 * @return
+	 */
 	<T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, AsterixServiceProperties serviceProperties);
 
+	/**
+	 * The name of this component.
+	 * 
+	 *  1. Used by clients to identify the component to use from AsterixServiceProperies received from the service-registry.
+	 *  2. Used by the server to identify plugin when registering with service-registry 
+	 *   
+	 * @return
+	 */
 	String getName();
 	
 	/**
@@ -57,6 +74,11 @@ public interface AsterixServiceRegistryComponent {
 	List<String> getComponentDepenencies();
 	
 
+	/**
+	 * Used on the server-side register beans required by this component. <p>
+	 * 
+	 * @param registry
+	 */
 	void registerBeans(BeanDefinitionRegistry registry);
 	
 }

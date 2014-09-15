@@ -42,7 +42,7 @@ public class AsterixBeanStates implements AsterixEventListener<AsterixBeanStateC
 
 	@Override
 	public void onEvent(AsterixBeanStateChangedEvent event) {
-		getBeanState(event.getBeanKey()).set(event.getBeanState());
+		getBeanState(event.getBeanKey()).set(event.getNewBeanState());
 	}
 	
 	static class ListenableEnumReference<T extends Enum<T>> {

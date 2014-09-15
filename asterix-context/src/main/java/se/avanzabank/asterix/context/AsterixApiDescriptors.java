@@ -15,22 +15,10 @@
  */
 package se.avanzabank.asterix.context;
 
-public class AsterixBeanStateChangedEvent {
-	
-	private final AsterixBeanKey beanKey;
-	private final AsterixBeanState newBeanState;
+import java.util.Collection;
 
-	public AsterixBeanStateChangedEvent(AsterixBeanKey beanKey, AsterixBeanState beanState) {
-		this.beanKey = beanKey;
-		this.newBeanState = beanState;
-	}
+public interface AsterixApiDescriptors {
 
-	public AsterixBeanKey getBeanKey() {
-		return beanKey;
-	}
-
-	public AsterixBeanState getNewBeanState() {
-		return this.newBeanState;
-	}
+	Collection<AsterixApiDescriptor> getAll();
 	
 }
