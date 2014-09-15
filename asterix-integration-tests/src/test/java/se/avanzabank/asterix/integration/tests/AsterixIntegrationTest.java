@@ -114,7 +114,7 @@ public class AsterixIntegrationTest {
 	}
 	
 	@Test
-	public void testPuThatConsumesOtherServcies() throws Exception {
+	public void testPuThatConsumesAnotherServcies() throws Exception {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		
 		lunchRestaurantGrader.grade("Martins Green Room", 2);
@@ -124,7 +124,7 @@ public class AsterixIntegrationTest {
 	}
 
 	@Test
-	public void routedRequestDemo() throws Exception {
+	public void routedRemotingRequest() throws Exception {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		
 		GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
@@ -135,7 +135,7 @@ public class AsterixIntegrationTest {
 	}
 	
 	@Test
-	public void broadcastedRequest_InteractingWithServiceActivator() throws Exception {
+	public void broadcastedRemotingRequest() throws Exception {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		
 		LunchRestaurant r = lunchService.suggestRandomLunchRestaurant("vegetarian");
@@ -143,7 +143,7 @@ public class AsterixIntegrationTest {
 	}
 	
 	@Test
-	public void routedRequest_throwsException() throws Exception {
+	public void routedRemotingRequest_throwsException() throws Exception {
 		try {
 			GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
 			request.setName("throwException"); // LunchServiceImpl is hard-coded to throw exception for this name.
@@ -155,7 +155,7 @@ public class AsterixIntegrationTest {
 	}
 	
 	@Test
-	public void useLibrary() throws Exception {
+	public void libraryUsageTest() throws Exception {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").withFoodType("vegetarian").build());
 		LunchRestaurant r = lunchUtil.suggestVegetarianRestaurant();
 		assertEquals("Martins Green Room", r.getName());

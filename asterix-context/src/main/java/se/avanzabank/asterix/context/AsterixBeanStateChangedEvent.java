@@ -18,19 +18,19 @@ package se.avanzabank.asterix.context;
 public class AsterixBeanStateChangedEvent {
 	
 	private final AsterixBeanKey beanKey;
-	private final AsterixBeanState beanState;
+	private final AsterixBeanState newBeanState;
 
 	public AsterixBeanStateChangedEvent(AsterixBeanKey beanKey, AsterixBeanState beanState) {
 		this.beanKey = beanKey;
-		this.beanState = beanState;
+		this.newBeanState = beanState;
 	}
 
 	public AsterixBeanKey getBeanKey() {
 		return beanKey;
 	}
 
-	public AsterixBeanState getBeanState() {
-		return this.beanState;
+	public AsterixBeanState getNewBeanState() {
+		return this.newBeanState;
 	}
 	
 }

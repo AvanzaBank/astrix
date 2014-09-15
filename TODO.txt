@@ -1,10 +1,18 @@
 === IN PROGRESS ===
 
-* Se över namngivning av de olika space som används från integrationstester.
+* Feltolerans - implementera
+
+* Inför en modell för "omfattande" enhetstester av Asterix.
 
 === BACKLOG ===
 
+
 * Hantera att en tjänst uppslagen via tjänsteregistret "flyttas" till en ny endpoint.
+
+* Tjänster som registreras i service-registret måste leasas
+	- konsumenter: ska fortlöpande slå upp tjänster på bussen
+	- service-bus-pu: ska ta bort tjänster från registret om leasen inte förnyats
+	- server: ska regelbundet förnya leasen för de tjänster som tillhandahålls
 
 * Hur ska AsterixBeanDefnitionRegistryPlugin/AsterixServiceRegistryComponent's hantera beroenden? De bönor som dessa registrerar kommer inte
   hanteras av Asterix. Hur ska då AsterixPlugins/ExternalDepenendencies/ServiceDependencies hanteras?
@@ -24,20 +32,13 @@
 
 * Versionshantering av tjänster - implementera
 
-* Feltolerans - implementera
 
 * Hantera att tjänsteregistret inte är tillgänglig när man skapar en tjänst. Done?
 
-* ServiceUnavailable
 
 * Skapa struktur som tillåter enhetstestning i större omfattning
 
 * Se över modulstruktur
-
-* Tjänster som registreras i service-registret måste leasas
-	- konsumenter: ska fortlöpande slå upp tjänster på bussen
-	- service-bus-pu: ska ta bort tjänster från registret om leasen inte förnyats
-	- server: ska regelbundet förnya leasen för de tjänster som tillhandahålls
 	
 * Inrapportering av metrics från olika astrix-pluginer
 
@@ -67,3 +68,7 @@ en astrix-runtime.
 * AsterixApiProviderPlugin.getProviderAnnotationType och AsterixApiProviderPlugin.consumes: En av dessa metoder ska bort
 
 * När man skapar en asterix-böna ska första bindingsförsöket ske synkront
+
+* Se över namngivning av de olika space som används från integrationstester.
+
+* ServiceUnavailable
