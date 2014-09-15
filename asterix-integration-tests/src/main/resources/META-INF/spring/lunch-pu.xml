@@ -8,7 +8,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <context:annotation-config/>
-    <os-core:space id="space" url="/./service-demo-space" mirror="false"/>
+    <os-core:space id="space" url="/./lunch-space" mirror="false"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
     
     <!-- Asterix service framework (provider and consumer) -->

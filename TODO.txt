@@ -1,24 +1,24 @@
 === IN PROGRESS ===
 
-* När man skapar en asterix-böna ska första bindingsförsöket ske synkront
+* Se över namngivning av de olika space som används från integrationstester.
 
 === BACKLOG ===
 
-* Se över namngivning av de olika space som används från integrationstester.
+* Hantera att en tjänst uppslagen via tjänsteregistret "flyttas" till en ny endpoint.
 
 * Hur ska AsterixBeanDefnitionRegistryPlugin/AsterixServiceRegistryComponent's hantera beroenden? De bönor som dessa registrerar kommer inte
   hanteras av Asterix. Hur ska då AsterixPlugins/ExternalDepenendencies/ServiceDependencies hanteras?
   
 
 * Lägg till stöd så att man kan skapa asterix-bönor genom super-interface till de faktiska tjänsterna. 
-	Ex: InstrumentService => ReferenceDataServicer. Om vi har en registrerad provider för InstrumentService så ska 
+	Ex: InstrumentService => ReferenceDataService. Om vi har en registrerad provider för InstrumentService så ska 
 		man kunna fråga astrerix efter en böna av typen ReferenceDataService, och få tillbaka den InstrumentService som har registrerats. 
 
 * Cleanup: Se över strukturen på service-suite-context. Ta bort oanvända abstraktioner.
 
 * Se över de felemeddelanden som en användare får om något ExternalDependency saknas i app-contextet.
 
-* Skapa enbart en instans av varje tjänst.
+* Skapa enbart en instans av varje tjänst. Done?
 
 * LifeCycle-hantering av tjänster och andra astrix-komponenter.
 
@@ -26,7 +26,7 @@
 
 * Feltolerans - implementera
 
-* Hantera att tjänstebussen inte är tillgänglig när man skapar en tjänst
+* Hantera att tjänsteregistret inte är tillgänglig när man skapar en tjänst. Done?
 
 * ServiceUnavailable
 
@@ -34,7 +34,7 @@
 
 * Se över modulstruktur
 
-* Tjänster som registreras i service-bussen måste leasas
+* Tjänster som registreras i service-registret måste leasas
 	- konsumenter: ska fortlöpande slå upp tjänster på bussen
 	- service-bus-pu: ska ta bort tjänster från registret om leasen inte förnyats
 	- server: ska regelbundet förnya leasen för de tjänster som tillhandahålls
@@ -65,3 +65,5 @@ en astrix-runtime.
   - service-bus -> service-registry
   
 * AsterixApiProviderPlugin.getProviderAnnotationType och AsterixApiProviderPlugin.consumes: En av dessa metoder ska bort
+
+* När man skapar en asterix-böna ska första bindingsförsöket ske synkront
