@@ -38,9 +38,8 @@ public class CachingAsterixFactoryBean<T> implements AsterixFactoryBean<T>, Aste
 		if (cachedBean != null) {
 			return cachedBean;
 		}
-		// TODO: How to avoid dead-locks in case of circular bean creation? Can that happen?
+		beanCreationLock.lock();
 		try {
-			beanCreationLock.lock();
 			return doCreateBean(optionalQualifier);
 		} finally {
 			beanCreationLock.unlock();

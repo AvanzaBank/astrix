@@ -53,4 +53,12 @@ public class AsterixBeanFactoryRegistry {
 		}
 	}
 
+	public boolean hasBeanFactoryFor(Class<?> beanType) {
+		AsterixApiProvider apiProvider = this.apiProviderByBeanType.get(beanType);
+		if (apiProvider == null) {
+			return false;
+		}
+		return apiProvider.providedApis().contains(beanType);
+	}
+
 }

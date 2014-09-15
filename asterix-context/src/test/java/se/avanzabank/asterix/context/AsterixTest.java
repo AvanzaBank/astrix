@@ -15,7 +15,8 @@
  */
 package se.avanzabank.asterix.context;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
@@ -27,45 +28,158 @@ public class AsterixTest {
 	
 	
 	@Test
-	public void testName() throws Exception {
+	public void asterixSupportSimpleLibraries() throws Exception {
 		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
-		asterixConfigurer.registerApiDescriptor(TestLibraryDescriptor.class);
+		asterixConfigurer.registerApiDescriptor(MyLibraryDescriptor.class);
 		AsterixContext asterixContext = asterixConfigurer.configure();
 		
-		TestLibraryBean libraryBean = asterixContext.getBean(TestLibraryBean.class);
+		HelloBean libraryBean = asterixContext.getBean(HelloBean.class);
 		assertEquals("hello: kalle", libraryBean.hello("kalle"));
 	}
 	
-//	@Test
+	@Test
 	public void supportsLibrariesExportedUsingClasses() throws Exception {
 		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
-		asterixConfigurer.registerApiDescriptor(TestLibraryDescriptor.class);
+		asterixConfigurer.registerApiDescriptor(MyLibraryDescriptorNoInterface.class);
 		AsterixContext asterixContext = asterixConfigurer.configure();
-		
-		TestLibraryBean libraryBean = asterixContext.getBean(TestLibraryBean.class);
+
+		HelloBeanImpl libraryBean = asterixContext.getBean(HelloBeanImpl.class);
 		assertEquals("hello: kalle", libraryBean.hello("kalle"));
 	}
 	
-	
-	interface TestLibraryBean {
-		String hello(String msg);
+	@Test(expected = AsterixCircularDependency.class)
+	public void detectsCircularDependenciesAmoungLibraries() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		asterixConfigurer.registerApiDescriptor(CircularApiA.class);
+		asterixConfigurer.registerApiDescriptor(CircularApiB.class);
+		asterixConfigurer.registerApiDescriptor(CircularApiC.class);
+		AsterixContext asterixContext = asterixConfigurer.configure();
+
+		asterixContext.getBean(HelloBeanImpl.class);
 	}
 	
-	static class TestLibraryBeanImpl implements TestLibraryBean {
-		public String hello(String msg) {
-			return "hello: " + msg;
+	@Test(expected = AsterixMissingBeanDependency.class)
+	public void detectsMissingBeanDependencies() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		asterixConfigurer.registerApiDescriptor(DependentApi.class);
+		AsterixContext asterixContext = asterixConfigurer.configure();
+
+		asterixContext.getBean(DependentBean.class);
+	}
+	
+	@Test
+	public void doesNotForceDependenciesForUnusedApis() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		asterixConfigurer.registerApiDescriptor(DependentApi.class);
+		asterixConfigurer.registerApiDescriptor(IndependentApi.class);
+		AsterixContext asterixContext = asterixConfigurer.configure();
+
+		IndependentApi bean = asterixContext.getBean(IndependentApi.class);
+		assertNotNull(bean);
+	}
+	
+	@AsterixLibraryProvider
+	static class MyLibraryDescriptor {
+		
+		@AsterixExport
+		public HelloBean create() {
+			return new HelloBeanImpl();
+		}
+	}
+	
+	@AsterixLibraryProvider
+	static class MyLibraryDescriptorNoInterface {
+		
+		@AsterixExport
+		public HelloBeanImpl create() {
+			return new HelloBeanImpl();
+		}
+	}
+	
+	@AsterixLibraryProvider
+	static class CircularApiA {
+		
+		@AsterixExport
+		public HelloBeanImpl create(GoodbyeBeanImpl goodbyeBean) {
+			// we don't actually need to use goodbyeBean
+			return new HelloBeanImpl();
+		}
+	}
+	
+	@AsterixLibraryProvider
+	static class CircularApiB {
+		
+		@AsterixExport
+		public GoodbyeBeanImpl create(ChatBeanImpl chatBean) {
+			return new GoodbyeBeanImpl();
+		}
+	}
+	
+	@AsterixLibraryProvider
+	static class CircularApiC {
+		
+		@AsterixExport
+		public ChatBeanImpl create(HelloBeanImpl helloBean) {
+			return new ChatBeanImpl();
 		}
 	}
 
 	@AsterixLibraryProvider
-	static class TestLibraryDescriptor {
+	static class DependentApi {
 		
 		@AsterixExport
-		public TestLibraryBean testLibraryBean() {
-			return new TestLibraryBeanImpl();
+		public DependentBean create(NonProvidedBean bean) {
+			return new DependentBean();
 		}
 	}
 	
+	@AsterixLibraryProvider
+	static class IndependentApi {
+		
+		@AsterixExport
+		public IndependentApi create() {
+			return new IndependentApi();
+		}
+	}
 	
+	interface HelloBean {
+		String hello(String msg);
+	}
+	
+	static class HelloBeanImpl implements HelloBean {
+		public String hello(String msg) {
+			return "hello: " + msg;
+		}
+	}
+	
+	static class GoodbyeBeanImpl {
+		public String goodbye(String msg) {
+			return "goodbye: " + msg;
+		}
+	}
+	
+	static class ChatBeanImpl {
+		public String chat(String msg) {
+			return "yada yada yada: " + msg;
+		}
+	}
+	
+	static class DependentBean {
+		public String chat(String msg) {
+			return "yada yada yada: " + msg;
+		}
+	}
+
+	static class IndependentBean {
+		public String chat(String msg) {
+			return "yada yada yada: " + msg;
+		}
+	}
+
+	static class NonProvidedBean {
+		public String chat(String msg) {
+			return "yada yada yada: " + msg;
+		}
+	}
 
 }

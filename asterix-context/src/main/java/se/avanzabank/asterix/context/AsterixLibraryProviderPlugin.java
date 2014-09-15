@@ -53,4 +53,9 @@ public class AsterixLibraryProviderPlugin implements AsterixApiProviderPlugin {
 		return AsterixLibraryProvider.class;
 	}
 	
+	@Override
+	public boolean useStatefulBeanFactory() {
+		return false;
+	}
+	
 }

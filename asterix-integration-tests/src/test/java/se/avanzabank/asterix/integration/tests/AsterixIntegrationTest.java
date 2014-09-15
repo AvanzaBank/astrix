@@ -108,7 +108,7 @@ public class AsterixIntegrationTest {
 		this.lunchUtil = asterix.getBean(LunchUtil.class);
 		this.lunchRestaurantGrader = asterix.getBean(LunchRestaurantGrader.class);
 		asterix.waitForBean(LunchService.class, 2000);
-		asterix.waitForBean(LunchUtil.class, 2000);
+		asterix.waitForBean(LunchUtil.class, 2000); // TODO: it does not make sense to wait for a library. How to cluelessly design waiting for libraries?
 		asterix.waitForBean(LunchRestaurantGrader.class, 2000);
 //		asterix.waitForBean(GigaSpace.class, "service-demo-space", 2000); //
 	}

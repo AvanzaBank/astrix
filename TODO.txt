@@ -6,6 +6,9 @@
 
 === BACKLOG ===
 
+* Ta bort top-level AsterixBeanDependencyResolver.
+
+* Inför gemensam klass för alla AsterixBeanFactory som håller rätt på vilken AsterixApiDescriptor som en given factory är skapad ur. 
 
 * Hantera att en tjänst uppslagen via tjänsteregistret "flyttas" till en ny endpoint.
 

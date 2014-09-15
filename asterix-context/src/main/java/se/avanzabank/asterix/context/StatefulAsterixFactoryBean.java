@@ -15,13 +15,23 @@
  */
 package se.avanzabank.asterix.context;
 
-
-public class StatefulAsterixFactoryBean<T> implements AsterixFactoryBean<T>, AsterixDecorator, AsterixEventBusAware {
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ * @param <T>
+ */
+final class StatefulAsterixFactoryBean<T> implements AsterixFactoryBean<T>, AsterixDecorator, AsterixEventBusAware {
 
 	private final AsterixFactoryBean<T> targetFactory;
 	private AsterixEventBus eventBus;
 	
 	public StatefulAsterixFactoryBean(AsterixFactoryBean<T> targetFactory) {
+		if (!targetFactory.getBeanType().isInterface()) {
+			throw new IllegalArgumentException("Can only create stateful asterix beans if bean is exported using an interface." +
+											   " targetBeanType=" + targetFactory.getBeanType().getName() + 
+											   " beanFactoryType=" + targetFactory.getClass().getName());
+		}
 		this.targetFactory = targetFactory;
 	}
 

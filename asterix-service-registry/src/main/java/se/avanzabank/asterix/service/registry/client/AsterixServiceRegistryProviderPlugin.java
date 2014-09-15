@@ -51,5 +51,10 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 	public void setPlugins(AsterixPlugins plugins) {
 		this.plugins = plugins;
 	}
+	
+	@Override
+	public boolean useStatefulBeanFactory() {
+		return true;
+	}
 
 }

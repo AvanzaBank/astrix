@@ -31,9 +31,11 @@ public class AsterixApiProvider {
 	
 	private final ConcurrentMap<Class<?>, AsterixFactoryBean<?>> factoryByProvidedType = new ConcurrentHashMap<>();
 	private final AsterixApiDescriptor apiDescriptor;
+	private final boolean hasStatefulBeans;
 	
-	public AsterixApiProvider(List<AsterixFactoryBean<?>> factories, AsterixApiDescriptor descriptorHolder) {
+	public AsterixApiProvider(List<AsterixFactoryBean<?>> factories, AsterixApiDescriptor descriptorHolder, boolean hasStatefulBeans) {
 		this.apiDescriptor = descriptorHolder;
+		this.hasStatefulBeans = hasStatefulBeans;
 		for (AsterixFactoryBean<?> factory : factories) {
 			AsterixFactoryBean<?> previous = this.factoryByProvidedType.putIfAbsent(factory.getBeanType(), factory);
 			if (previous != null) {
@@ -61,6 +63,10 @@ public class AsterixApiProvider {
 	@SuppressWarnings("unchecked")
 	public <T> AsterixFactoryBean<T> getFactory(Class<T> type) {
 		return (AsterixFactoryBean<T>) this.factoryByProvidedType.get(type);
+	}
+
+	public boolean hasStatefulBeans() {
+		return this.hasStatefulBeans;
 	}
 
 }

@@ -17,7 +17,6 @@ package se.avanzabank.asterix.context;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class AsterixBeanDependencyResolver {
@@ -35,14 +34,14 @@ public class AsterixBeanDependencyResolver {
 	 * @param beanTypes
 	 * @return
 	 */
-	public Collection<Class<?>> resolveTransitiveBeanDependencies(List<Class<?>> beanTypes) {
+	public Collection<Class<?>> resolveTransitiveBeanDependencies(Collection<Class<?>> beanTypes) {
 		Set<Class<?>> result = new HashSet<>();
 		for (Class<?> consumedBeanType : beanTypes) {
 			result.add(consumedBeanType);
-			List<Class<?>> transitiveDependencies = context.getTransitiveBeanDependencies(consumedBeanType);
+			Collection<Class<?>> transitiveDependencies = context.getTransitiveBeanDependenciesForBean(consumedBeanType);
 			result.addAll(resolveTransitiveBeanDependencies(transitiveDependencies));
 		}
 		return result;
 	}
-
+	
 }

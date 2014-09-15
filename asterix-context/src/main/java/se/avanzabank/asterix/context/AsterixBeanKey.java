@@ -19,11 +19,11 @@ import java.util.Objects;
 
 public class AsterixBeanKey {
 	
-	private String beanType;
+	private Class<?> beanType;
 	private String qualifier;
 
 	private AsterixBeanKey(Class<?> beanType, String qualifier) {
-		this.beanType = beanType.getName();
+		this.beanType = beanType;
 		this.qualifier = qualifier;
 	}
 	
@@ -33,10 +33,22 @@ public class AsterixBeanKey {
 		} 
 		return new AsterixBeanKey(beanType, qualifier);
 	}
+	
+	public Class<?> getBeanType() {
+		return beanType;
+	}
+	
+	public String getQualifier() {
+		return qualifier;
+	}
+	
+	private String getBeanTypeName() {
+		return beanType.getName();
+	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(beanType, qualifier);
+		return Objects.hash(getBeanTypeName(), qualifier);
 	}
 
 	@Override
@@ -48,12 +60,12 @@ public class AsterixBeanKey {
 		if (getClass() != obj.getClass())
 			return false;
 		AsterixBeanKey other = (AsterixBeanKey) obj;
-		return this.beanType.equals(other.beanType) && this.qualifier.equals(other.qualifier);
+		return this.getBeanTypeName().equals(other.getBeanTypeName()) && this.qualifier.equals(other.qualifier);
 	}
 	
 	@Override
 	public String toString() {
-		return beanType + "-" + beanType;
+		return getBeanTypeName() + "-" + qualifier;
 	}
 	
 	
