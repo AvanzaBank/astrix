@@ -28,22 +28,24 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 /**
+ * Uses classpath scanning to locate api-descriptors. <p>
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AsterixApiAsterixApiDescriptorScanner {
+public class AsterixApiDescriptorScanner implements AsterixApiDescriptors {
 
-	private final Logger log = LoggerFactory.getLogger(AsterixApiAsterixApiDescriptorScanner.class);
+	private final Logger log = LoggerFactory.getLogger(AsterixApiDescriptorScanner.class);
 	
 	private static final Map<String, List<AsterixApiDescriptor>> apiDescriptorsByBasePackage = new HashMap<String, List<AsterixApiDescriptor>>();
 	private String basePackage = "se.avanzabank";
 	
-	public AsterixApiAsterixApiDescriptorScanner(String basePackage) {
+	public AsterixApiDescriptorScanner(String basePackage) {
 		this.basePackage = basePackage;
 	}
 
-	public List<AsterixApiDescriptor> scan() {
+	@Override
+	public List<AsterixApiDescriptor> getAll() {
 		List<AsterixApiDescriptor> descriptors = apiDescriptorsByBasePackage.get(basePackage);
 		if (descriptors != null) {
 			log.debug("Returning cached api-descriptors found on earlier scan types={}", descriptors);
