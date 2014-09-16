@@ -4,11 +4,11 @@
 
 === BACKLOG ===
 
-* Ta bort top-level AsterixBeanDependencyResolver.
+* LifeCycle-hantering av tjänster och andra astrix-komponenter.
 
 * Inför gemensam klass för alla AsterixBeanFactory som håller rätt på vilken AsterixApiDescriptor som en given factory är skapad ur. 
 
-* Hantera att en tjänst uppslagen via tjänsteregistret "flyttas" till en ny endpoint.
+* Hantera att en tjänst uppslagen via tjänsteregistret "flyttas" till en ny endpoint. (RELATERAT TILL NÄSTA PUNKT)
 
 * Tjänster som registreras i service-registret måste leasas
 	- konsumenter: ska fortlöpande slå upp tjänster på bussen
@@ -29,15 +29,10 @@
 
 * Skapa enbart en instans av varje tjänst. Done?
 
-* LifeCycle-hantering av tjänster och andra astrix-komponenter.
-
 * Versionshantering av tjänster - implementera
 
 
 * Hantera att tjänsteregistret inte är tillgänglig när man skapar en tjänst. Done?
-
-
-* Skapa struktur som tillåter enhetstestning i större omfattning
 
 * Se över modulstruktur
 	
@@ -46,6 +41,8 @@
 * Övervakning av tjänsteregistret
 
 === DONE ===
+
+* Ta bort top-level AsterixBeanDependencyResolver.
 
 * Inför en modell för "omfattande" enhetstester av Asterix.
 
