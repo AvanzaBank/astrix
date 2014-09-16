@@ -44,6 +44,14 @@ public class TestAsterixConfigurer {
 	public void registerApiDescriptor(Class<?> descriptor) {
 		descriptors.add(new AsterixApiDescriptor(descriptor));
 	}
+
+	public <T> void registerPlugin(Class<T> c, T provider) {
+		configurer.registerPlugin(c, provider);
+	}
+	
+	public void enableMonitoring(boolean enabled) {
+		configurer.enableMonitoring(enabled);
+	}
 	
 	
 }

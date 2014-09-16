@@ -17,7 +17,6 @@ package se.avanzabank.asterix.monitoring;
 
 import static org.hamcrest.Matchers.*;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,49 +26,45 @@ import org.junit.Test;
 
 import se.avanzabank.asterix.context.AsterixMetricsCollectorPlugin;
 import se.avanzabank.asterix.context.AsterixMetricsLoggerPlugin;
+import se.avanzabank.asterix.context.TestAsterixConfigurer;
 import se.avanzabank.core.test.util.async.Poller;
 import se.avanzabank.core.test.util.async.Probe;
 
 public class GraphiteMetricsPollerTest {
 
 	@Test
-	public void pollsAndSends() throws Exception {
-		AsterixMetricsCollectorPlugin collectorPlugin = new FakeCollectorPlugin();
-		FakeLoggerPlugin loggerPlugin = new FakeLoggerPlugin();
-		DefaultMetricsPoller poller = new DefaultMetricsPoller();
-		poller.setMetricsCollectors(Arrays.asList(collectorPlugin));
-		poller.setMetricsLogger(loggerPlugin);
-		poller.start();
-		assertEventually(loggedMetrics(loggerPlugin, hasEntry("foo", (Number) 1)));
+	public void test() throws Exception {
+		TestAsterixConfigurer configurer = new TestAsterixConfigurer();
+		configurer.enableMonitoring(true);
+		configurer.registerPlugin(AsterixMetricsCollectorPlugin.class, new FakeCollector());
+		FakeLogger logger = new FakeLogger();
+		configurer.registerPlugin(AsterixMetricsLoggerPlugin.class, logger);
+		configurer.configure();
+		assertEventually(loggedMetrics(logger, hasEntry("foo", (Number) 1)));
 	}
 
-	private void assertEventually(Probe probe) throws Exception {
-		new Poller(1000L, 50L).check(probe);
-	}
-
-	class FakeCollectorPlugin implements AsterixMetricsCollectorPlugin {
+	static class FakeCollector implements AsterixMetricsCollectorPlugin {
 
 		@Override
 		public Map<String, Number> getMetrics() {
-			HashMap<String, Number> m = new HashMap<String, Number>();
+			Map<String, Number> m = new HashMap<String, Number>();
 			m.put("foo", 1);
 			return m;
 		}
-
 	}
 
-	class FakeLoggerPlugin implements AsterixMetricsLoggerPlugin {
+	static class FakeLogger implements AsterixMetricsLoggerPlugin {
 
-		Map<String, Number> loggedMetrics = new HashMap<String, Number>();
-
+		private Map<String, Number> lastLogged = new HashMap<>();
+		
 		@Override
 		public void logMetrics(Map<String, Number> metrics) {
-			loggedMetrics.putAll(metrics);
+			lastLogged = metrics;
 		}
 
 	}
-
-	public Probe loggedMetrics(final FakeLoggerPlugin logger,
+	
+	public Probe loggedMetrics(final FakeLogger logger,
 			final Matcher<Map<? extends String, ? extends Number>> matcher) {
 		return new Probe() {
 
@@ -77,7 +72,7 @@ public class GraphiteMetricsPollerTest {
 
 			@Override
 			public void sample() {
-				metrics = new HashMap<String, Number>(logger.loggedMetrics);
+				metrics = new HashMap<String, Number>(logger.lastLogged);
 			}
 
 			@Override
@@ -91,6 +86,10 @@ public class GraphiteMetricsPollerTest {
 						.appendText(" but logged metrics were ").appendValue(metrics);
 			}
 		};
+	}
+	
+	private void assertEventually(Probe probe) throws Exception {
+		new Poller(1000L, 50L).check(probe);
 	}
 
 }
