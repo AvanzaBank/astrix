@@ -43,7 +43,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	private T provider;
 	private Class<T> api;
 	private String group;
-	private HystrixCommandSettings settings;
+	private final Setter hystrixConfiguration;
 
 	private static final Logger log = LoggerFactory.getLogger(HystrixAdapter.class);
 
@@ -51,14 +51,18 @@ public class HystrixAdapter<T> implements InvocationHandler {
 		this(api, provider, group, new HystrixCommandSettings());
 	}
 
-	public HystrixAdapter(Class<T> api, T provider, String group, HystrixCommandSettings settings) {
+	private HystrixAdapter(Class<T> api, T provider, String group, HystrixCommandSettings settings) {
 		this.api = api;
 		this.provider = provider;
 		this.group = group;
-		this.settings = Objects.requireNonNull(settings);
+		this.hystrixConfiguration = getHystrixConfiguration(settings);
 	}
 
 	public static <T> T create(Class<T> api, T provider, String group, HystrixCommandSettings settings) {
+		Objects.requireNonNull(api);
+		Objects.requireNonNull(provider);
+		Objects.requireNonNull(group);
+		Objects.requireNonNull(settings);
 		log.debug("Adding fault tolerance: api={}, group={}", api, group);
 		if (!api.isInterface()) {
 			throw new IllegalArgumentException(
@@ -103,7 +107,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	}
 
 	private HystrixCommand<HystrixResult> createHystrixCommand(final Method method, final Object[] args) {
-		return new HystrixCommand<HystrixResult>(getHystrixConfiguration()) {
+		return new HystrixCommand<HystrixResult>(hystrixConfiguration) {
 
 			@Override
 			protected HystrixResult run() throws Exception {
@@ -175,7 +179,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 
 	}
 
-	private Setter getHystrixConfiguration() {
+	private Setter getHystrixConfiguration(HystrixCommandSettings settings) {
 		HystrixCommandProperties.Setter commandPropertiesDefault =
 				HystrixCommandProperties.Setter().withExecutionIsolationThreadTimeoutInMilliseconds(
 						settings.getExecutionIsolationThreadTimeoutInMilliseconds());
@@ -187,14 +191,16 @@ public class HystrixAdapter<T> implements InvocationHandler {
 						.withCoreSize(settings.getCoreSize());
 
 		return Setter.withGroupKey(getGroupKey())
-				.andCommandKey(getCommandKey())
+				.andCommandKey(getCommandKey(settings))
 				.andCommandPropertiesDefaults(commandPropertiesDefault)
 				.andThreadPoolPropertiesDefaults(threadPoolPropertiesDefaults);
 	}
 
-	private HystrixCommandKey getCommandKey() {
+	private HystrixCommandKey getCommandKey(HystrixCommandSettings settings) {
 		if (settings.getCommandKey() == null) {
-			return HystrixCommandKey.Factory.asKey(api.getSimpleName());
+			// Circuit breakers are per command (disregarding group). Hence we append the group name
+			// to ensure we do not use the same circuit breaker for different groups.
+			return HystrixCommandKey.Factory.asKey(group + "_" + api.getSimpleName());
 		}
 		return HystrixCommandKey.Factory.asKey(settings.getCommandKey());
 	}

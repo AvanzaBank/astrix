@@ -16,8 +16,7 @@
 package se.avanzabank.asterix.ft;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +44,12 @@ public class FaultToleranceIntegrationTest {
 	@Before
 	public void createService() {
 		testService = HystrixAdapter.create(api , provider, randomString(), settingsRandomCommandKey());
+	}
+	
+	@Test
+	public void createWithDefaultSettings() throws Exception {
+		SimpleService create = HystrixAdapter.create(api , provider, randomString());
+		create.echo("");
 	}
 	
 	@Test

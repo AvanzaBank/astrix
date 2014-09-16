@@ -33,15 +33,15 @@ public class AsterixConfigurer {
 	private boolean enableMonitoring = true; 
 	private List<ExternalDependencyBean> externalDependencyBeans = new ArrayList<>();
 	private List<Object> externalDependencies = new ArrayList<>();
+	AsterixContext context = new AsterixContext();
 	
 	public AsterixContext configure() {
-		AsterixContext context = new AsterixContext();
 		context.setExternalDependencyBeans(externalDependencyBeans);
 		context.setExternalDependencies(externalDependencies);
-		configureFaultTolerance(context);
-		configureVersioning(context);
-		configureMonitoring(context);
-		discoverApiProviderPlugins(context);
+		configureFaultTolerance();
+		configureVersioning();
+		configureMonitoring();
+		discoverApiProviderPlugins();
 		List<AsterixApiProviderPlugin> apiProviderPlugins = context.getPlugins(AsterixApiProviderPlugin.class);
 		AsterixApiProviderFactory apiProviderFactory = new AsterixApiProviderFactory(apiProviderPlugins);
 		List<AsterixApiProvider> apiProviders = createApiProviders(apiProviderFactory);
@@ -76,7 +76,7 @@ public class AsterixConfigurer {
 		this.enableMonitoring = enableMonitoring;
 	}
 
-	private void discoverApiProviderPlugins(AsterixContext context) {
+	private void discoverApiProviderPlugins() {
 		discoverAllPlugins(context, AsterixApiProviderPlugin.class, new AsterixLibraryProviderPlugin()); // TODO: no need to pass default instance
 	}
 	
@@ -92,7 +92,7 @@ public class AsterixConfigurer {
 		}
 	}
 
-	private void configureVersioning(AsterixContext context) {
+	private void configureVersioning() {
 		if (enableVersioning) {
 			discoverOnePlugin(context, AsterixVersioningPlugin.class);
 		} else {
@@ -100,7 +100,7 @@ public class AsterixConfigurer {
 		}
 	}
 	
-	private void configureMonitoring(AsterixContext context) {
+	private void configureMonitoring() {
 		// TODO stop poller
 		if (enableMonitoring) {
 			AsterixMetricsPollerPlugin metricsPoller = discoverOnePlugin(context, AsterixMetricsPollerPlugin.class);
@@ -111,7 +111,7 @@ public class AsterixConfigurer {
 		
 	}
 
-	private void configureFaultTolerance(AsterixContext context) {
+	private void configureFaultTolerance() {
 		if (useFaultTolerance) {
 			discoverOnePlugin(context, AsterixFaultTolerancePlugin.class);
 		} else {
@@ -137,6 +137,11 @@ public class AsterixConfigurer {
 	// package private. Used for internal testing only
 	void setAsterixApiDescriptors(AsterixApiDescriptors asterixApiDescriptors) {
 		this.asterixApiDescriptors = asterixApiDescriptors;
+	}
+	
+	// package private. Used for internal testing only
+	<T> void registerPlugin(Class<T> c, T provider) {
+		context.registerPlugin(c, provider);
 	}
 	
 }

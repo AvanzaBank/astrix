@@ -53,7 +53,7 @@ public class DefaultMetricsPoller implements AsterixMetricsPollerPlugin, Asterix
 		int delayTime = getDelayTimeFromJndiOrFallback();
 		log.info("Starting metrics poller using logger {} and collectors {}", logger, collectors);
 		executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("DefaultMetricsPoller")); 
-		executor.scheduleAtFixedRate(new MetricPollerTask(logger, collectors), 500, delayTime, TimeUnit.MILLISECONDS);
+		executor.scheduleAtFixedRate(new MetricPollerTask(logger, collectors), 0, delayTime, TimeUnit.MILLISECONDS);
 	}
 	
 	private void initializeFromPlugins() {
