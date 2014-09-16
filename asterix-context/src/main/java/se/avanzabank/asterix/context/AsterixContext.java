@@ -88,25 +88,22 @@ public class AsterixContext implements Asterix {
 		beanDependenciesAware.setAsterixBeans(new AsterixBeans() {
 			@Override
 			public <T> T getBean(Class<T> beanType) {
-				if (!beanDependenciesAware.getBeanDependencies().contains(beanType)) {
-					throw new RuntimeException("Undeclared bean dependency: " + beanType);
-				}
-				try {
-					return AsterixContext.this.getBean(beanType);
-				} catch (MissingBeanException e) {
-					throw new MissingBeanDependencyException(beanDependenciesAware, beanType);
-				}
+				return getBean(AsterixBeanKey.create(beanType, null));
 			}
 			
 			@Override
 			public <T> T getBean(Class<T> beanType, String qualifier) {
-				if (!beanDependenciesAware.getBeanDependencies().contains(beanType)) {
-					throw new RuntimeException("Undeclared bean dependency: " + beanType);
+				return getBean(AsterixBeanKey.create(beanType, qualifier));
+			}
+			
+			private <T> T getBean(AsterixBeanKey<T> beanKey) {
+				if (!beanDependenciesAware.getBeanDependencies().contains(beanKey.getBeanType())) {
+					throw new RuntimeException("Undeclared bean dependency: " + beanKey.getBeanType());
 				}
 				try {
-					return AsterixContext.this.getBean(beanType, qualifier);
+					return AsterixContext.this.getBean(beanKey);
 				} catch (MissingBeanException e) {
-					throw new MissingBeanDependencyException(beanDependenciesAware, beanType);
+					throw new MissingBeanDependencyException(beanDependenciesAware, beanKey.getBeanType());
 				}
 			}
 		});
@@ -132,13 +129,16 @@ public class AsterixContext implements Asterix {
 	 * @return
 	 */
 	public <T> T getBean(Class<T> beanType) {
-		getTransitiveBeanDependenciesForBean(beanType); // TODO: find cleaner way to detect circular dependencies
-		return getFactoryBean(beanType).create(null);
+		return getBean(AsterixBeanKey.create(beanType, null));
 	}
 	
 	public <T> T getBean(Class<T> beanType, String qualifier) {
-		getTransitiveBeanDependenciesForBean(beanType); // TODO: find cleaner way to detect circular dependencies
-		return getFactoryBean(beanType).create(qualifier);
+		return getBean(AsterixBeanKey.create(beanType, qualifier));
+	}
+	
+	private <T> T getBean(AsterixBeanKey<T> asterixBeanKey) {
+		getTransitiveBeanDependenciesForBean(asterixBeanKey.getBeanType()); // TODO: find cleaner way to detect circular dependencies
+		return getFactoryBean(asterixBeanKey.getBeanType()).create(asterixBeanKey.getQualifier());
 	}
 
 	private <T> AsterixFactoryBean<T> getFactoryBean(Class<T> beanType) {

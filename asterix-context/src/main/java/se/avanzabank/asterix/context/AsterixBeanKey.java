@@ -17,28 +17,31 @@ package se.avanzabank.asterix.context;
 
 import java.util.Objects;
 
-public class AsterixBeanKey {
+public class AsterixBeanKey<T> {
 	
-	private Class<?> beanType;
+	private Class<T> beanType;
 	private String qualifier;
 
-	private AsterixBeanKey(Class<?> beanType, String qualifier) {
+	private AsterixBeanKey(Class<T> beanType, String qualifier) {
 		this.beanType = beanType;
 		this.qualifier = qualifier;
 	}
 	
-	public static AsterixBeanKey create(Class<?> beanType, String qualifier) {
+	public static <T> AsterixBeanKey<T> create(Class<T> beanType, String qualifier) {
 		if (qualifier == null) {
 			return new AsterixBeanKey(beanType, "-");
 		} 
 		return new AsterixBeanKey(beanType, qualifier);
 	}
 	
-	public Class<?> getBeanType() {
+	public Class<T> getBeanType() {
 		return beanType;
 	}
 	
 	public String getQualifier() {
+		if (qualifier.equals("-")) {
+			return null;
+		}
 		return qualifier;
 	}
 	
