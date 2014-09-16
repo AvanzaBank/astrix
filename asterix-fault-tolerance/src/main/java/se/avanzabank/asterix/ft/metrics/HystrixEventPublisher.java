@@ -28,6 +28,8 @@ import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;
 
 public final class HystrixEventPublisher extends HystrixEventNotifier implements AsterixPluginsAware {
 
+	// TODO register as listener
+	
 	private static final Logger log = LoggerFactory.getLogger(HystrixEventPublisher.class);
 	private AsterixEventLoggerPlugin eventLogger;
 	private AsterixPlugins plugins = null;
