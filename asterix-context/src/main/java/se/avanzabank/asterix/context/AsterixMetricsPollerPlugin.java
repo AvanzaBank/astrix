@@ -15,6 +15,9 @@
  */
 package se.avanzabank.asterix.context;
 
+/**
+ * @author Kristoffer Erlandsson (krierl)
+ */
 public interface AsterixMetricsPollerPlugin {
 
 	void start();
