@@ -137,7 +137,9 @@ public class AsterixContext implements Asterix {
 	}
 	
 	private <T> T getBean(AsterixBeanKey<T> asterixBeanKey) {
-		getTransitiveBeanDependenciesForBean(asterixBeanKey.getBeanType()); // TODO: find cleaner way to detect circular dependencies
+		// Detect circular dependencies by retrieving transitive bean dependencies
+		// "just in time" when an asterix-bean is created.
+		getTransitiveBeanDependenciesForBean(asterixBeanKey.getBeanType()); 
 		return getFactoryBean(asterixBeanKey.getBeanType()).create(asterixBeanKey.getQualifier());
 	}
 
