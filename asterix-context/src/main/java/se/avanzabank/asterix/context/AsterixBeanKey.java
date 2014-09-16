@@ -16,25 +16,29 @@
 package se.avanzabank.asterix.context;
 
 import java.util.Objects;
-
-public class AsterixBeanKey<T> {
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public final class AsterixBeanKey {
 	
-	private Class<T> beanType;
+	private Class<?> beanType;
 	private String qualifier;
 
-	private AsterixBeanKey(Class<T> beanType, String qualifier) {
+	private AsterixBeanKey(Class<?> beanType, String qualifier) {
 		this.beanType = beanType;
 		this.qualifier = qualifier;
 	}
 	
-	public static <T> AsterixBeanKey<T> create(Class<T> beanType, String qualifier) {
+	public static AsterixBeanKey create(Class<?> beanType, String qualifier) {
 		if (qualifier == null) {
 			return new AsterixBeanKey(beanType, "-");
 		} 
 		return new AsterixBeanKey(beanType, qualifier);
 	}
 	
-	public Class<T> getBeanType() {
+	public Class<?> getBeanType() {
 		return beanType;
 	}
 	

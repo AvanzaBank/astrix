@@ -28,6 +28,7 @@ public class AsterixLibraryFactory<T> implements AsterixFactoryBean<T>, AsterixB
 	private List<Class<?>> asterixBeanDependencies = new ArrayList<>();
 	private AsterixBeans beans;
 	
+	@SuppressWarnings("unchecked")
 	public AsterixLibraryFactory(Object factoryInstance, Method factoryMethod) {
 		this.factoryInstance = factoryInstance;
 		this.factoryMethod = factoryMethod;

@@ -88,24 +88,21 @@ public class AsterixContext implements Asterix {
 		beanDependenciesAware.setAsterixBeans(new AsterixBeans() {
 			@Override
 			public <T> T getBean(Class<T> beanType) {
-				return getBean(AsterixBeanKey.create(beanType, null));
+				return getBean(beanType, null);
 			}
 			
 			@Override
 			public <T> T getBean(Class<T> beanType, String qualifier) {
-				return getBean(AsterixBeanKey.create(beanType, qualifier));
-			}
-			
-			private <T> T getBean(AsterixBeanKey<T> beanKey) {
-				if (!beanDependenciesAware.getBeanDependencies().contains(beanKey.getBeanType())) {
-					throw new RuntimeException("Undeclared bean dependency: " + beanKey.getBeanType());
+				if (!beanDependenciesAware.getBeanDependencies().contains(beanType)) {
+					throw new RuntimeException("Undeclared bean dependency: " + beanType);
 				}
 				try {
-					return AsterixContext.this.getBean(beanKey);
+					return AsterixContext.this.getBean(beanType, qualifier);
 				} catch (MissingBeanException e) {
-					throw new MissingBeanDependencyException(beanDependenciesAware, beanKey.getBeanType());
+					throw new MissingBeanDependencyException(beanDependenciesAware, beanType);
 				}
 			}
+			
 		});
 	}
 
@@ -129,18 +126,14 @@ public class AsterixContext implements Asterix {
 	 * @return
 	 */
 	public <T> T getBean(Class<T> beanType) {
-		return getBean(AsterixBeanKey.create(beanType, null));
+		return getBean(beanType, null);
 	}
 	
 	public <T> T getBean(Class<T> beanType, String qualifier) {
-		return getBean(AsterixBeanKey.create(beanType, qualifier));
-	}
-	
-	private <T> T getBean(AsterixBeanKey<T> asterixBeanKey) {
 		// Detect circular dependencies by retrieving transitive bean dependencies
 		// "just in time" when an asterix-bean is created.
-		getTransitiveBeanDependenciesForBean(asterixBeanKey.getBeanType()); 
-		return getFactoryBean(asterixBeanKey.getBeanType()).create(asterixBeanKey.getQualifier());
+		getTransitiveBeanDependenciesForBean(beanType); 
+		return getFactoryBean(beanType).create(qualifier);
 	}
 
 	private <T> AsterixFactoryBean<T> getFactoryBean(Class<T> beanType) {
@@ -162,6 +155,7 @@ public class AsterixContext implements Asterix {
 		return deepGetExternalDependencyBean(factoryBean);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Class<? extends ExternalDependencyBean> deepGetExternalDependencyBean(Object asterixObject) {
 		if (asterixObject instanceof ExternalDependencyAware) {
 			return ExternalDependencyAware.class.cast(asterixObject).getDependencyBeanClass();
