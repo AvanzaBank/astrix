@@ -2,8 +2,6 @@
 
 * Feltolerans - implementera
 
-* Inför en modell för "omfattande" enhetstester av Asterix.
-
 === BACKLOG ===
 
 * Ta bort top-level AsterixBeanDependencyResolver.
@@ -49,7 +47,9 @@
 
 === DONE ===
 
-* Cleanup: Tydlig life-cycle för plugins. När de skapas ska alla dess dependencies injectas.
+* Inför en modell för "omfattande" enhetstester av Asterix.
+
+* Cleanup: Tydlig dependency-hantering för plugins. När de skapas ska alla dess dependencies injectas.
 Det innebär att enbart AsterixContext får skapa plugin:er, och att AsterixContext injectar 
 dependencies i samband med skapandet.
 

@@ -16,9 +16,19 @@
 package se.avanzabank.asterix.context;
 
 import java.util.Collection;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public interface AsterixApiDescriptors {
 
+	/**
+	 * Strategy for locating all AsterixApiDescriptor's available in
+	 * the current runtime. <p>
+	 * 
+	 * @return
+	 */
 	Collection<AsterixApiDescriptor> getAll();
 	
 }

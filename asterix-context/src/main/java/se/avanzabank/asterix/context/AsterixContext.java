@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import se.avanzabank.asterix.context.AsterixBeanStates.ListenableEnumReference;
 /**
  * An AstrixContext is the runtime-environment for the astrix-framework. It is used
  * both by consuming applications as well as server applications. AsterixContext providers access
