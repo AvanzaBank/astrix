@@ -33,8 +33,11 @@ import se.avanzabank.core.support.jndi.lookup.BasicJNDILookup;
 import se.avanzabank.core.support.jndi.lookup.http.JndiLookupFailedException;
 import se.avanzabank.core.util.thread.NamedThreadFactory;
 
+/**
+ * @author Kristoffer Erlandsson (krierl)
+ */
 @MetaInfServices(AsterixMetricsPollerPlugin.class)
-public class GraphiteMetricsPoller implements AsterixMetricsPollerPlugin, AsterixPluginsAware {
+public class DefaultMetricsPoller implements AsterixMetricsPollerPlugin, AsterixPluginsAware {
 
 	private static final Integer DEFAULT_DELAY = 5000;
 	private AsterixPlugins plugins;
@@ -42,13 +45,14 @@ public class GraphiteMetricsPoller implements AsterixMetricsPollerPlugin, Asteri
 	private Collection<AsterixMetricsCollectorPlugin> collectors;
 	ScheduledExecutorService executor;
 
-	private static final Logger log = LoggerFactory.getLogger(GraphiteMetricsPoller.class);
+	private static final Logger log = LoggerFactory.getLogger(DefaultMetricsPoller.class);
 	
 	@Override
 	public void start() {
 		initializeFromPlugins();
 		int delayTime = getDelayTimeFromJndiOrFallback();
-		executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("GraphiteMetricsPoller")); 
+		log.info("Starting metrics poller using logger {} and collectors {}", logger, collectors);
+		executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("DefaultMetricsPoller")); 
 		executor.scheduleAtFixedRate(new MetricPollerTask(logger, collectors), 500, delayTime, TimeUnit.MILLISECONDS);
 	}
 	
@@ -76,6 +80,7 @@ public class GraphiteMetricsPoller implements AsterixMetricsPollerPlugin, Asteri
 	 */
 	@Override
 	public void stop() {
+		log.info("Stopping metrics poller");
 		if (executor != null) {
 			executor.shutdown();
 		}

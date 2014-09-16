@@ -109,4 +109,11 @@ public final class HystrixMetricsCollector implements AsterixMetricsCollectorPlu
 		metrics.put(String.format("%s.%s", keyPrefix, metricsKey), value);
 	}
 
+	@Override
+	public String toString() {
+		return "HystrixMetricsCollector";
+	}
+	
+	
+
 }

@@ -36,7 +36,7 @@ public class GraphiteMetricsPollerTest {
 	public void pollsAndSends() throws Exception {
 		AsterixMetricsCollectorPlugin collectorPlugin = new FakeCollectorPlugin();
 		FakeLoggerPlugin loggerPlugin = new FakeLoggerPlugin();
-		GraphiteMetricsPoller poller = new GraphiteMetricsPoller();
+		DefaultMetricsPoller poller = new DefaultMetricsPoller();
 		poller.setMetricsCollectors(Arrays.asList(collectorPlugin));
 		poller.setMetricsLogger(loggerPlugin);
 		poller.start();

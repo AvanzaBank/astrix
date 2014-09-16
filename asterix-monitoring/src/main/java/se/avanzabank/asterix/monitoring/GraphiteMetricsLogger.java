@@ -26,6 +26,9 @@ import se.avanzabank.core.support.jndi.lookup.BasicJNDILookup;
 import se.avanzabank.system.graphite.Graphite;
 import se.avanzabank.system.graphite.GraphiteFactory;
 
+/**
+ * @author Kristoffer Erlandsson (krierl)
+ */
 @MetaInfServices(AsterixMetricsLoggerPlugin.class)
 public class GraphiteMetricsLogger implements AsterixMetricsLoggerPlugin {
 
@@ -45,4 +48,11 @@ public class GraphiteMetricsLogger implements AsterixMetricsLoggerPlugin {
 			graphite.logHostMetric(entry.getKey(), entry.getValue());
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "GraphiteMetricsLogger";
+	}
+	
+	
 }

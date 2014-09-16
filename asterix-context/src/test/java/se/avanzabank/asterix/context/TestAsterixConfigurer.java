@@ -34,6 +34,7 @@ public class TestAsterixConfigurer {
 		});
 		configurer.enableVersioning(false);
 		configurer.useFaultTolerance(false);
+		configurer.enableMonitoring(false);
 	}
 
 	public AsterixContext configure() {

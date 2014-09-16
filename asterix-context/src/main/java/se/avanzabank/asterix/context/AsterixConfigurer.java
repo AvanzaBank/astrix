@@ -30,6 +30,7 @@ public class AsterixConfigurer {
 	private AsterixApiDescriptors asterixApiDescriptors = new AsterixApiDescriptorScanner("se.avanzabank");
 	private boolean useFaultTolerance = false;
 	private boolean enableVersioning = true;
+	private boolean enableMonitoring = true; 
 	private List<ExternalDependencyBean> externalDependencyBeans = new ArrayList<>();
 	private List<Object> externalDependencies = new ArrayList<>();
 	
@@ -39,6 +40,7 @@ public class AsterixConfigurer {
 		context.setExternalDependencies(externalDependencies);
 		configureFaultTolerance(context);
 		configureVersioning(context);
+		configureMonitoring(context);
 		discoverApiProviderPlugins(context);
 		List<AsterixApiProviderPlugin> apiProviderPlugins = context.getPlugins(AsterixApiProviderPlugin.class);
 		AsterixApiProviderFactory apiProviderFactory = new AsterixApiProviderFactory(apiProviderPlugins);
@@ -69,6 +71,10 @@ public class AsterixConfigurer {
 	public void enableVersioning(boolean enableVersioning) {
 		this.enableVersioning = enableVersioning;
 	}
+	
+	public void enableMonitoring(boolean enableMonitoring) {
+		this.enableMonitoring = enableMonitoring;
+	}
 
 	private void discoverApiProviderPlugins(AsterixContext context) {
 		discoverAllPlugins(context, AsterixApiProviderPlugin.class, new AsterixLibraryProviderPlugin()); // TODO: no need to pass default instance
@@ -93,6 +99,17 @@ public class AsterixConfigurer {
 			context.registerPlugin(AsterixVersioningPlugin.class, AsterixVersioningPlugin.Default.create());
 		}
 	}
+	
+	private void configureMonitoring(AsterixContext context) {
+		// TODO stop poller
+		if (enableMonitoring) {
+			AsterixMetricsPollerPlugin metricsPoller = discoverOnePlugin(context, AsterixMetricsPollerPlugin.class);
+			metricsPoller.start();
+		} else {
+			context.registerPlugin(AsterixMetricsPollerPlugin.class, AsterixMetricsPollerPlugin.Default.create());
+		}
+		
+	}
 
 	private void configureFaultTolerance(AsterixContext context) {
 		if (useFaultTolerance) {
@@ -102,10 +119,11 @@ public class AsterixConfigurer {
 		}
 	}
 	
-	private static <T> void discoverOnePlugin(AsterixContext context, Class<T> type) {
+	private static <T> T discoverOnePlugin(AsterixContext context, Class<T> type) {
 		T provider = AsterixPluginDiscovery.discoverOnePlugin(type);
 		log.debug("Found plugin for {}, using {}", type.getName(), provider.getClass().getName());
 		context.registerPlugin(type, provider);
+		return provider;
 	}
 
 	public <T> void registerDependency(T dependency) {
