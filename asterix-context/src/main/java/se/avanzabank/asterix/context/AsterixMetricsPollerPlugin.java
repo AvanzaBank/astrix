@@ -18,7 +18,23 @@ package se.avanzabank.asterix.context;
 public interface AsterixMetricsPollerPlugin {
 
 	void start();
-	
+
 	void stop();
-	
+
+	public static class Default {
+		public static AsterixMetricsPollerPlugin create() {
+			return new AsterixMetricsPollerPlugin() {
+
+				@Override
+				public void start() {
+				}
+
+				@Override
+				public void stop() {
+				}
+
+			};
+		}
+
+	}
 }
