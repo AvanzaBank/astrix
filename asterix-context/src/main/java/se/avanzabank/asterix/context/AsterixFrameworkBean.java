@@ -59,7 +59,7 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		/*
 		 * IMPLEMENTATION NOTE:
 		 * 
-		 * This is where the asterix-framework register all its required beans in the BeanDefinitionRegistry,
+		 * This is where the asterix-framework register all its required spring-beans in the BeanDefinitionRegistry,
 		 * as well as all asterix-beans consumed by the current application (consumedAsterixBeans). 
 		 * Both consumer side as well as server side asterix-beans will be registered depending on 
 		 * configuration provided by the user of the framework.
@@ -78,17 +78,17 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 
 		 * 1a. Discover all plugins using asterix-plugin-discovery mechanism (spring not involved)
 		 * 1b. Scan for api-providers on classpath and build AsterixBeanFactories (spring not involved)
-		 *  -> Its important that NO "xxxAware" injected dependency is used in this phase
-		 *     especially no ExternalDependencyBean since we have created the ApplicationContext
+		 *  -> Its important that NO "xxxAware" injected dependency is used in this phase.
+		 *     Especially no ExternalDependencyBean since we have not created the ApplicationContext
 		 *     which will eventually "wire" the external dependencies into asterix yet.
 		 * 1c. For each consumedAsterixBean: Register an AsterixSpringFactoryBean.
 		 * 
 		 * At this stage all bean-consuming dependencies are in place. 
 		 * 
-		 * If this application also export a set of services (for instance to the AsterixServiceRegistery), 
+		 * If this application also export a set of services (for instance to the AsterixServiceRegistry), 
 		 * then we must also register all required beans/components:
 		 * 
-		 * 2. Let all AsterixBeanRegistryPlugin's register their required spring beans.
+		 * 2. Let all AsterixBeanRegistryPlugin's register their required spring-beans.
 		 * 
 		 */
 		
@@ -175,7 +175,11 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	}
 
 	private Collection<Class<?>> resolveAllConsumedBeans(AsterixContext asterixContext) {
-		return new AsterixBeanDependencyResolver(asterixContext).resolveTransitiveBeanDependencies(consumedAsterixBeans);
+		Set<Class<?>> result = new HashSet<>(consumedAsterixBeans);
+		for (Class<?> directBeanDependency : this.consumedAsterixBeans) {
+			result.addAll(asterixContext.getTransitiveBeanDependenciesForBean(directBeanDependency));
+		}
+		return result;
 	}
 
 	@Override
