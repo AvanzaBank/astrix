@@ -17,8 +17,10 @@ package se.avanzabank.asterix.context;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.BeansException;
@@ -39,6 +41,7 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	
 	private List<Class<?>> consumedAsterixBeans = new ArrayList<>();
 	private Class<?> serviceDescriptor;
+	private Map<String, String> settings = new HashMap<>();
 
 	/*
 	 * We must distinguish between server-side components (those used to export different SERVICES) and
@@ -189,6 +192,14 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	
 	public void setConsumedAsterixBeans(List<Class<?>> consumedAsterixBeans) {
 		this.consumedAsterixBeans = consumedAsterixBeans;
+	}
+	
+	public void setSettings(Map<String, String> settings) {
+		this.settings = settings;
+	}
+	
+	public Map<String, String> getSettings() {
+		return settings;
 	}
 	
 	/**

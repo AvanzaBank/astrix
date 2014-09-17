@@ -33,7 +33,8 @@ public class AsterixConfigurer {
 	private boolean enableMonitoring = true; 
 	private List<ExternalDependencyBean> externalDependencyBeans = new ArrayList<>();
 	private List<Object> externalDependencies = new ArrayList<>();
-	AsterixContext context = new AsterixContext();
+	private AsterixSettings settings = new AsterixSettings();
+	private AsterixContext context = new AsterixContext(settings);
 	
 	public AsterixContext configure() {
 		context.setExternalDependencyBeans(externalDependencyBeans);
@@ -142,6 +143,10 @@ public class AsterixConfigurer {
 	// package private. Used for internal testing only
 	<T> void registerPlugin(Class<T> c, T provider) {
 		context.registerPlugin(c, provider);
+	}
+
+	public void set(String settingName, long value) {
+		this.settings.set(settingName, value);
 	}
 	
 }

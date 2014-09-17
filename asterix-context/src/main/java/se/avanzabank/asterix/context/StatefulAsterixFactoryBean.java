@@ -21,10 +21,11 @@ package se.avanzabank.asterix.context;
  *
  * @param <T>
  */
-final class StatefulAsterixFactoryBean<T> implements AsterixFactoryBean<T>, AsterixDecorator, AsterixEventBusAware {
+final class StatefulAsterixFactoryBean<T> implements AsterixFactoryBean<T>, AsterixDecorator, AsterixEventBusAware, AsterixSettingsAware {
 
 	private final AsterixFactoryBean<T> targetFactory;
 	private AsterixEventBus eventBus;
+	private AsterixSettings settings;
 	
 	public StatefulAsterixFactoryBean(AsterixFactoryBean<T> targetFactory) {
 		if (!targetFactory.getBeanType().isInterface()) {
@@ -37,7 +38,7 @@ final class StatefulAsterixFactoryBean<T> implements AsterixFactoryBean<T>, Aste
 
 	@Override
 	public T create(String optionalQualifier) {
-		return StatefulAsterixBean.create(targetFactory, optionalQualifier, eventBus);
+		return StatefulAsterixBean.create(targetFactory, optionalQualifier, eventBus, settings);
 	}
 
 	@Override
@@ -53,6 +54,11 @@ final class StatefulAsterixFactoryBean<T> implements AsterixFactoryBean<T>, Aste
 	@Override
 	public void setEventBus(AsterixEventBus eventBus) {
 		this.eventBus = eventBus;
+	}
+
+	@Override
+	public void setSettings(AsterixSettings settings) {
+		this.settings = settings;
 	}
 
 }

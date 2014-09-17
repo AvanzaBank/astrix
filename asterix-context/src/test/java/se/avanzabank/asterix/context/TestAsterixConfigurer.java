@@ -56,6 +56,10 @@ public class TestAsterixConfigurer {
 	public void enableFaultTolerance(boolean enabled) {
 		configurer.enableFaultTolerance(enabled);
 	}
+
+	public void set(String name, long value) {
+		configurer.set(name, value);
+	}
 	
 	
 }

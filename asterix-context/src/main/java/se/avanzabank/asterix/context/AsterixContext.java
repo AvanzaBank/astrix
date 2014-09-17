@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -34,12 +35,14 @@ public class AsterixContext implements Asterix {
 	
 	private final AsterixPlugins plugins;
 	private final AsterixBeanFactoryRegistry beanFactoryRegistry = new AsterixBeanFactoryRegistry();
-	private ConcurrentMap<Class<?>, ExternalDependencyBean> externalDependencyBean = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Class<?>, ExternalDependencyBean> externalDependencyBean = new ConcurrentHashMap<>();
 	private List<Object> externalDependencies = new ArrayList<>();
 	private final AsterixEventBus eventBus = new AsterixEventBus();
 	private final AsterixBeanStates beanStates = new AsterixBeanStates();
+	private final AsterixSettings settings;
 	
-	public AsterixContext() {
+	public AsterixContext(AsterixSettings settings) {
+		this.settings = Objects.requireNonNull(settings);
 		this.eventBus.addEventListener(AsterixBeanStateChangedEvent.class, beanStates);
 		this.plugins = new AsterixPlugins(new AsterixPluginInitializer() {
 			@Override
@@ -81,6 +84,9 @@ public class AsterixContext implements Asterix {
 		}
 		if (object instanceof AsterixEventBusAware) {
 			AsterixEventBusAware.class.cast(object).setEventBus(eventBus);
+		}
+		if (object instanceof AsterixSettingsAware) {
+			AsterixSettingsAware.class.cast(object).setSettings(settings);
 		}
 	}
 	

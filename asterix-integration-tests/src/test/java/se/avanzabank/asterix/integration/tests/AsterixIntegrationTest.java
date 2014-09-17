@@ -31,6 +31,7 @@ import org.openspaces.core.GigaSpace;
 
 import se.avanzabank.asterix.context.Asterix;
 import se.avanzabank.asterix.context.AsterixConfigurer;
+import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
@@ -103,6 +104,7 @@ public class AsterixIntegrationTest {
 		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceRegistrypu.getLookupGroupName())); // For service-registry-discovery
 		configurer.enableFaultTolerance(true);
 		configurer.enableVersioning(true);
+		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMP_INTERVAL, 500);
 		Asterix asterix = configurer.configure();
 		this.lunchService = asterix.getBean(LunchService.class);
 		this.lunchUtil = asterix.getBean(LunchUtil.class);

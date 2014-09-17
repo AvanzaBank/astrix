@@ -43,13 +43,13 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 		this.state = new Unbound();
 	}
 
-	public static <T> T create(AsterixFactoryBean<T> beanFactory, String optionalQualifier, AsterixEventBus eventBus) {
+	public static <T> T create(AsterixFactoryBean<T> beanFactory, String optionalQualifier, AsterixEventBus eventBus, AsterixSettings settings) {
 		// TODO: attempt to bind synchronously on startup
 		StatefulAsterixBean<T> handler = new StatefulAsterixBean<>(beanFactory, optionalQualifier, eventBus);
 		try {
 			handler.bind();
 		} catch (Exception e) {
-			new AsterixBeanStateWorker<>(handler).start(); // TODO: manage worker thread lifecycle. Use single worker for all beans?
+			new AsterixBeanStateWorker<>(handler, settings.getLong(AsterixSettings.BEAN_REBIND_ATTEMP_INTERVAL, 10_000L)).start(); // TODO: manage worker thread lifecycle. Use single worker for all beans?
 		}
 		return beanFactory.getBeanType().cast(Proxy.newProxyInstance(beanFactory.getClass().getClassLoader(), new Class<?>[]{beanFactory.getBeanType()}, handler));
 	}
@@ -73,9 +73,11 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 	private static class AsterixBeanStateWorker<T> extends Thread {
 		
 		private final StatefulAsterixBean<T> asterixBean;
+		private final long beanRebindAttemptIntervalMillis;
 		
-		public AsterixBeanStateWorker(StatefulAsterixBean<T> asterixBean) {
+		public AsterixBeanStateWorker(StatefulAsterixBean<T> asterixBean, long beanRebindAttemptIntervalMillis) {
 			this.asterixBean = asterixBean;
+			this.beanRebindAttemptIntervalMillis = beanRebindAttemptIntervalMillis;
 			setName("asterix-BeanStateWorker-" + asterixBean.beanFactory.getBeanType().getSimpleName());
 		}
 		
@@ -94,7 +96,7 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 					}
 				}
 				try {
-					Thread.sleep(500);// TODO: intervall for new attempt to bind
+					Thread.sleep(this.beanRebindAttemptIntervalMillis);
 				} catch (InterruptedException e) {
 					interrupt();
 				} 

@@ -18,6 +18,9 @@
 
 === V 1.0 "Account Performance" ===
 
+* Undersök varför det inte går att minska StatefulAsterixBean.beanRebindAttemptInterval från 500 till 100 ms för AsterixIntegrationTest.
+  Är det testerna eller ramverket som är timing-beroende?
+
 * Inför gemensam klass för alla AsterixBeanFactory som håller rätt på vilken AsterixApiDescriptor som en given factory är skapad ur. 
 
 * Hur ska AsterixBeanDefnitionRegistryPlugin/AsterixServiceRegistryComponent's hantera beroenden? De bönor som dessa registrerar kommer inte
@@ -43,6 +46,8 @@
 * Övervakning av tjänsteregistret
 
 === DONE ===
+
+* Stöd för multipla service-descriptorer för en enskild tjänst
 
 * Ta bort top-level AsterixBeanDependencyResolver.
 
