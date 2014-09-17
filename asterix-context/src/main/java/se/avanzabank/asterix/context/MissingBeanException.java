@@ -15,10 +15,17 @@
  */
 package se.avanzabank.asterix.context;
 
-public class AsterixMissingBeanDependency extends RuntimeException {
-	
-	public AsterixMissingBeanDependency(AsterixBeanAware beanDependenciesAware, Class<?> beanType) {
-		super("Missing bean dependency required by: " + beanDependenciesAware.getClass().getName() + ". dependencyBean=" + beanType.getName());
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public class MissingBeanException extends RuntimeException {
+
+	private static final long serialVersionUID = 1L;
+
+	public MissingBeanException(Class<?> beanType) {
+		super("No provider found for bean: " + beanType);
 	}
 
 }

@@ -16,8 +16,12 @@
 package se.avanzabank.asterix.context;
 
 import java.util.Objects;
-
-public class AsterixBeanKey {
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public final class AsterixBeanKey {
 	
 	private Class<?> beanType;
 	private String qualifier;
@@ -39,6 +43,9 @@ public class AsterixBeanKey {
 	}
 	
 	public String getQualifier() {
+		if (qualifier.equals("-")) {
+			return null;
+		}
 		return qualifier;
 	}
 	

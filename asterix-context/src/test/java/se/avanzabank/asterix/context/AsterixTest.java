@@ -58,13 +58,21 @@ public class AsterixTest {
 		asterixContext.getBean(HelloBeanImpl.class);
 	}
 	
-	@Test(expected = AsterixMissingBeanDependency.class)
+	@Test(expected = MissingBeanDependencyException.class)
 	public void detectsMissingBeanDependencies() throws Exception {
 		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
 		asterixConfigurer.registerApiDescriptor(DependentApi.class);
 		AsterixContext asterixContext = asterixConfigurer.configure();
 
 		asterixContext.getBean(DependentBean.class);
+	}
+	
+	@Test(expected = MissingBeanException.class)
+	public void detectsMissingBeans() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		AsterixContext asterixContext = asterixConfigurer.configure();
+
+		asterixContext.getBean(HelloBeanImpl.class);
 	}
 	
 	@Test

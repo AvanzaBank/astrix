@@ -58,6 +58,9 @@ public class AsterixContext implements Asterix {
 	}
 	
 	public void registerApiProvider(AsterixApiProvider apiProvider) {
+		for (Class<?> beanType : apiProvider.providedApis()) {
+			injectDependencies(apiProvider.getFactory(beanType));
+		}
 		this.beanFactoryRegistry.registerProvider(apiProvider);
 	}
 	
@@ -82,18 +85,10 @@ public class AsterixContext implements Asterix {
 	}
 	
 	private void injectBeanDependencies(final AsterixBeanAware beanDependenciesAware) {
-		for (Class<?> beanType : beanDependenciesAware.getBeanDependencies()) {
-			if (!hasBeanFactoryFor(beanType)) {
-				throw new AsterixMissingBeanDependency(beanDependenciesAware, beanType);
-			}
-		}
 		beanDependenciesAware.setAsterixBeans(new AsterixBeans() {
 			@Override
 			public <T> T getBean(Class<T> beanType) {
-				if (!beanDependenciesAware.getBeanDependencies().contains(beanType)) {
-					throw new RuntimeException("Undeclared bean dependency: " + beanType);
-				}
-				return AsterixContext.this.getBean(beanType);
+				return getBean(beanType, null);
 			}
 			
 			@Override
@@ -101,8 +96,13 @@ public class AsterixContext implements Asterix {
 				if (!beanDependenciesAware.getBeanDependencies().contains(beanType)) {
 					throw new RuntimeException("Undeclared bean dependency: " + beanType);
 				}
-				return AsterixContext.this.getBean(beanType, qualifier);
+				try {
+					return AsterixContext.this.getBean(beanType, qualifier);
+				} catch (MissingBeanException e) {
+					throw new MissingBeanDependencyException(beanDependenciesAware, beanType);
+				}
 			}
+			
 		});
 	}
 
@@ -126,22 +126,20 @@ public class AsterixContext implements Asterix {
 	 * @return
 	 */
 	public <T> T getBean(Class<T> beanType) {
-		// TODO: why do we have to inject dependencies in this phase? Know when we are using ExternalDependency<>-wrapper we
-		// should be able to inject dependencies when factory-bean
-		AsterixFactoryBean<T> factory = getFactoryBean(beanType);
-		injectDependencies(factory); // TODO: what the place where it makes most sense to inject dependencies to a AsterixFactory?
-		Collection<Class<?>> transitiveBeanDependencies = getTransitiveBeanDependenciesForBean(beanType);
-		return factory.create(null);
+		return getBean(beanType, null);
 	}
 	
 	public <T> T getBean(Class<T> beanType, String qualifier) {
-		AsterixFactoryBean<T> factory = getFactoryBean(beanType);
-		injectDependencies(factory); // TODO: what the place where it makes most sense to inject dependencies to a AsterixFactory?  
-		Collection<Class<?>> transitiveBeanDependencies = getTransitiveBeanDependenciesForBean(beanType); // TODO: find cleaner way to detect circular dependencies
-		return factory.create(qualifier);
+		// Detect circular dependencies by retrieving transitive bean dependencies
+		// "just in time" when an asterix-bean is created.
+		getTransitiveBeanDependenciesForBean(beanType); 
+		return getFactoryBean(beanType).create(qualifier);
 	}
-	
+
 	private <T> AsterixFactoryBean<T> getFactoryBean(Class<T> beanType) {
+		if (!hasBeanFactoryFor(beanType)) {
+			throw new MissingBeanException(beanType);
+		}
 		return this.beanFactoryRegistry.getFactoryBean(beanType);
 	}
 	
@@ -157,6 +155,7 @@ public class AsterixContext implements Asterix {
 		return deepGetExternalDependencyBean(factoryBean);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Class<? extends ExternalDependencyBean> deepGetExternalDependencyBean(Object asterixObject) {
 		if (asterixObject instanceof ExternalDependencyAware) {
 			return ExternalDependencyAware.class.cast(asterixObject).getDependencyBeanClass();
@@ -270,12 +269,17 @@ public class AsterixContext implements Asterix {
 
 		private void resolveTransitiveDependencies(AsterixFactoryBean<?> beanFactory) {
 			if (beanFactory instanceof AsterixBeanAware) {
-				for (Class<?> transitiveDependency : AsterixBeanAware.class.cast(beanFactory).getBeanDependencies()) {
+				AsterixBeanAware beanAwareFactory = AsterixBeanAware.class.cast(beanFactory);
+				for (Class<?> transitiveDependency : beanAwareFactory.getBeanDependencies()) {
 					if (this.rootFactory.getBeanType().equals(transitiveDependency)) {
 						throw new AsterixCircularDependency(rootFactory, beanFactory);
 					}
 					transitiveDependencies.add(transitiveDependency);
-					resolveTransitiveDependencies(getFactoryBean(transitiveDependency));
+					try {
+						resolveTransitiveDependencies(getFactoryBean(transitiveDependency));
+					} catch (MissingBeanException e) {
+						throw new MissingBeanDependencyException(beanAwareFactory, transitiveDependency);
+					}
 				}
 			}
 			if (beanFactory instanceof AsterixDecorator) {
