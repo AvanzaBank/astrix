@@ -25,7 +25,7 @@ public class MissingBeanException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	public MissingBeanException(Class<?> beanType) {
-		super("No provider found for bean: " + beanType);
+		super("No provider found for bean: " + beanType.getName());
 	}
 
 }

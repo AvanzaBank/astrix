@@ -30,7 +30,7 @@ import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponents;
+import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
 import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingBeanRegistryPlugin;
@@ -81,12 +81,12 @@ public class AsterixRemotingComponent implements AsterixServiceRegistryComponent
 	
 	@Override
 	public List<String> getComponentDepenencies() {
-		return Arrays.asList(AsterixServiceRegistryComponents.GS);
+		return Arrays.asList(AsterixServiceRegistryComponentNames.GS);
 	}
 
 	@Override
 	public String getName() {
-		return AsterixServiceRegistryComponents.GS_REMOTING;
+		return AsterixServiceRegistryComponentNames.GS_REMOTING;
 	}
 	
 	@Override

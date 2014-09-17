@@ -13,50 +13,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.gs;
+package se.avanzabank.asterix.service.registry.client;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.kohsuke.MetaInfServices;
-import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
 import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
-@MetaInfServices(AsterixServiceRegistryComponent.class)
-public class AsterixGsComponent implements AsterixServiceRegistryComponent {
+public class AsterixDirectComponent implements AsterixServiceRegistryComponent {
+	
+	private Map<String, Object> providerByName = new ConcurrentHashMap<String, Object>();
 	
 	@Override
 	public <T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, AsterixServiceProperties serviceProperties) {
-		if (!GigaSpace.class.isAssignableFrom(type)) {
-			throw new IllegalStateException("Programming error, attempted to create: " + type);
+		String providerName = serviceProperties.getProperty("providerName");
+		Object result = providerByName.get(providerName);
+		if (result == null) {
+			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + type);
 		}
-		return type.cast(GsBinder.createGsFactory(serviceProperties).create()); // TODO: fault tolerance
+		return type.cast(result);
 	}
 
-	@Override
-	public Class<? extends ServiceRegistryExporter> getServiceExporterClass() {
-		return GigaSpaceServiceRegistryExporter.class;
-	}
-	
-	@Override
-	public List<String> getComponentDepenencies() {
-		return Collections.emptyList();
+	public void register(String name, Object provider) {
+		this.providerByName.put(name, provider);
 	}
 
 	@Override
 	public String getName() {
-		return AsterixServiceRegistryComponentNames.GS;
+		return AsterixServiceRegistryComponentNames.DIRECT;
 	}
-	
+
+	@Override
+	public Class<? extends ServiceRegistryExporter> getServiceExporterClass() {
+		return null; // NOT USED. Client side component only 
+	}
+
+	@Override
+	public List<String> getComponentDepenencies() {
+		return Collections.emptyList(); // NOT USED. Client side component only 
+	}
+
 	@Override
 	public void registerBeans(BeanDefinitionRegistry registry) {
-		
+		 // NOT USED. Client side component only 
 	}
-	
 }

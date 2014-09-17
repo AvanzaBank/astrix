@@ -18,7 +18,7 @@ package se.avanzabank.asterix.context;
 public class MissingBeanDependencyException extends RuntimeException {
 	
 	public MissingBeanDependencyException(AsterixBeanAware beanDependenciesAware, Class<?> beanType) {
-		super("Missing bean dependency required by: " + beanDependenciesAware.getClass().getName() + ". dependencyBean=" + beanType.getName());
+		super("Missing bean dependency: type=" + beanType.getName() + ", requiredBy=" + beanDependenciesAware.getClass().getName());
 	}
 
 }

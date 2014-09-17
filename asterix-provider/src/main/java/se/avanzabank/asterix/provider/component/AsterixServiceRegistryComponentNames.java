@@ -19,9 +19,13 @@ package se.avanzabank.asterix.provider.component;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AsterixServiceRegistryComponents {
+public class AsterixServiceRegistryComponentNames {
 	
-	// TODO: avoid name conflict with se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponents
+	/**
+	 * The direct component allows services to bind to provider instances within the same
+	 * jvm. Its mainly intended for testing purposes.
+	 */
+	public static final String DIRECT = "direct";
 	
 	public static final String GS = "gs";
 	public static final String GS_REMOTING = "gs-remoting";

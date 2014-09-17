@@ -4,9 +4,9 @@
 
 === BACKLOG ===
 
-* LifeCycle-hantering av tjänster och andra astrix-komponenter.
+=== V 1.0 "Account Performance" ===
 
-* Inför gemensam klass för alla AsterixBeanFactory som håller rätt på vilken AsterixApiDescriptor som en given factory är skapad ur. 
+* LifeCycle-hantering av tjänster och andra astrix-komponenter.
 
 * Hantera att en tjänst uppslagen via tjänsteregistret "flyttas" till en ny endpoint. (RELATERAT TILL NÄSTA PUNKT)
 
@@ -14,11 +14,16 @@
 	- konsumenter: ska fortlöpande slå upp tjänster på bussen
 	- service-bus-pu: ska ta bort tjänster från registret om leasen inte förnyats
 	- server: ska regelbundet förnya leasen för de tjänster som tillhandahålls
+	
+* Städa bort alla TODO:s från kodbasen.
+
+=== V 1.0 "Account Performance" ===
+
+* Inför gemensam klass för alla AsterixBeanFactory som håller rätt på vilken AsterixApiDescriptor som en given factory är skapad ur. 
 
 * Hur ska AsterixBeanDefnitionRegistryPlugin/AsterixServiceRegistryComponent's hantera beroenden? De bönor som dessa registrerar kommer inte
   hanteras av Asterix. Hur ska då AsterixPlugins/ExternalDepenendencies/ServiceDependencies hanteras?
   
-
 * Lägg till stöd så att man kan skapa asterix-bönor genom super-interface till de faktiska tjänsterna. 
 	Ex: InstrumentService => ReferenceDataService. Om vi har en registrerad provider för InstrumentService så ska 
 		man kunna fråga astrerix efter en böna av typen ReferenceDataService, och få tillbaka den InstrumentService som har registrerats. 
@@ -29,7 +34,7 @@
 
 * Skapa enbart en instans av varje tjänst. Done?
 
-* Versionshantering av tjänster - implementera
+* Versionshantering av tjänster - implementera - testa
 
 
 * Hantera att tjänsteregistret inte är tillgänglig när man skapar en tjänst. Done?

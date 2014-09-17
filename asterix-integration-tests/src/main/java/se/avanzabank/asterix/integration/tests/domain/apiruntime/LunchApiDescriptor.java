@@ -16,7 +16,7 @@
 package se.avanzabank.asterix.integration.tests.domain.apiruntime;
 
 import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponents;
+import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 
@@ -35,7 +35,7 @@ import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 		LunchService.class
 	},
 	components = {
-		AsterixServiceRegistryComponents.GS_REMOTING
+		AsterixServiceRegistryComponentNames.GS_REMOTING
 	}
 )
 public class LunchApiDescriptor {

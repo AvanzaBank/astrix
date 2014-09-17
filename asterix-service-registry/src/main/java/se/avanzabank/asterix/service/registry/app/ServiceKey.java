@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.service.registry.pu;
+package se.avanzabank.asterix.service.registry.app;
 
 import java.util.Objects;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class ServiceKey {
 	
 	private String apiClassName;

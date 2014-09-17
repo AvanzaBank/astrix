@@ -20,13 +20,14 @@ import org.openspaces.remoting.Routing;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteServiceExport;
+import se.avanzabank.asterix.service.registry.app.ServiceKey;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
 
 @AsterixRemoteServiceExport(AsterixServiceRegistry.class)
 public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {
 	
-	private GigaSpace gigaSpace;
+	private final GigaSpace gigaSpace;
 	
 	@Autowired
 	public AsterixServiceRegistryImpl(GigaSpace gigaSpace) {
@@ -42,7 +43,7 @@ public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {
 	public <T> AsterixServiceProperties lookup(@Routing Class<T> type, String qualifier) {
 		ServiceProperitesInfo info = gigaSpace.readById(ServiceProperitesInfo.class, new ServiceKey(type.getName(), qualifier));
 		if (info == null) {
-			return null; // TODO: hande non registered servies
+			return null; // TODO: handle non registered services
 		}
 		return info.getProperties();
 	}
@@ -51,6 +52,8 @@ public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {
 	public <T> void register(Class<T> api, AsterixServiceProperties properties) {
 		ServiceProperitesInfo info = new ServiceProperitesInfo();
 		info.setApiType(properties.getApi());
+		// TODO: this method signature is weird. It used apiType from fist 
+		// argument and qualifier from properties. It does not make sense.
 		info.setServiceKey(new ServiceKey(api.getName(), properties.getQualifier()));
 		info.setProperties(properties);
 		// TODO: lease

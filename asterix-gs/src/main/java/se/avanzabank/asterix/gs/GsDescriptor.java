@@ -17,7 +17,7 @@ package se.avanzabank.asterix.gs;
 
 import org.openspaces.core.GigaSpace;
 
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponents;
+import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 
 @AsterixServiceRegistryApi(
@@ -25,7 +25,7 @@ import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 		GigaSpace.class
 	},
 	components = {
-		AsterixServiceRegistryComponents.GS_REMOTING
+		AsterixServiceRegistryComponentNames.GS_REMOTING
 	}
 	
 )

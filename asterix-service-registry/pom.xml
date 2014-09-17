@@ -25,6 +25,19 @@
 	<dependency>
 		<groupId>com.gigaspaces</groupId>
 		<artifactId>gs-openspaces</artifactId>
-	</dependency>  
+	</dependency>
+	<!-- TEST -->
+	<dependency>
+		<groupId>${project.groupId}</groupId>
+		<artifactId>asterix-context</artifactId>
+		<version>${project.version}</version>
+		<type>test-jar</type>
+		<scope>test</scope>
+	</dependency>
+	<dependency>
+		<groupId>junit</groupId>
+		<artifactId>junit</artifactId>
+		<scope>test</scope>
+	</dependency>    
   </dependencies>
 </project>
