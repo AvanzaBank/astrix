@@ -41,10 +41,10 @@ import com.netflix.hystrix.HystrixThreadPoolProperties;
  * @author Elias Lindholm (elilin)
  */
 public class HystrixAdapter<T> implements InvocationHandler {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(HystrixAdapter.class);
-	private static final DelegatingHystrixEventNotifier delegatingEventNotifier = new DelegatingHystrixEventNotifier(); 
-	
+	private static final DelegatingHystrixEventNotifier delegatingEventNotifier = new DelegatingHystrixEventNotifier();
+
 	static {
 		try {
 			HystrixPlugins.getInstance().registerEventNotifier(delegatingEventNotifier);
@@ -57,7 +57,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	private final Class<T> api;
 	private final String group;
 	private final Setter hystrixConfiguration;
-	
+
 	public static DelegatingHystrixEventNotifier getEventNotifier() {
 		return delegatingEventNotifier;
 	}
@@ -196,8 +196,12 @@ public class HystrixAdapter<T> implements InvocationHandler {
 
 	private Setter getHystrixConfiguration(HystrixCommandSettings settings) {
 		HystrixCommandProperties.Setter commandPropertiesDefault =
-				HystrixCommandProperties.Setter().withExecutionIsolationThreadTimeoutInMilliseconds(
-						settings.getExecutionIsolationThreadTimeoutInMilliseconds());
+				HystrixCommandProperties
+						.Setter()
+						.withExecutionIsolationThreadTimeoutInMilliseconds(
+								settings.getExecutionIsolationThreadTimeoutInMilliseconds())
+						.withMetricsRollingStatisticalWindowInMilliseconds(
+								settings.getMetricsRollingStatisticalWindowInMilliseconds());
 		// MaxQueueSize must be set to a non negative value in order for QueueSizeRejectionThreshold to have any effect.
 		// We use a high value for MaxQueueSize in order to allow QueueSizeRejectionThreshold to change dynamically using archaius.
 		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =

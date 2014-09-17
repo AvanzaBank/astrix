@@ -24,6 +24,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,6 +33,8 @@ import se.avanzabank.asterix.core.ServiceUnavailableException;
 import se.avanzabank.asterix.ft.service.SimpleService;
 import se.avanzabank.asterix.ft.service.SimpleServiceException;
 import se.avanzabank.asterix.ft.service.SimpleServiceImpl;
+import se.avanzabank.core.test.util.async.Poller;
+import se.avanzabank.core.test.util.async.Probe;
 
 import com.google.common.base.Throwables;
 
@@ -67,20 +71,49 @@ public class FaultToleranceIntegrationTest {
 		testService.throwException(SimpleServiceException.class);
 	}
 	
-	@Test(expected=ServiceUnavailableException.class)
+	@Test
 	public void circuitBreakerOpens() throws Exception {
 		// Hystrix needs a service to be invoked at least 20 times in a rolling window of one second for the circuit breaker to open
 		for (int i = 0; i < 21; i++) {
 			callServiceThrowServiceUnavailable(testService);
 		}
-		// TODO remove Thread.sleep
-		Thread.sleep(1200);
-		testService.echo("foo");
+		assertEventually(serviceException(testService, isA(ServiceUnavailableException.class)));
+	}
+	
+	public void assertEventually(Probe probe) throws Exception {
+		new Poller(2000, 100).check(probe);
+	}
+	
+	public Probe serviceException(final SimpleService service, final Matcher<? extends Throwable> matcher) {
+		return new Probe() {
+			
+			private Throwable lastThrown = null;
+			
+			@Override
+			public void sample() {
+				try {
+					service.echo("foo");
+				} catch (Throwable t) {
+					lastThrown = t;
+				}
+			}
+			
+			@Override
+			public boolean isSatisfied() {
+				return matcher.matches(lastThrown);
+			}
+			
+			@Override
+			public void describeFailureTo(Description description) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
 	}
 	
 	@Test
 	public void circuitBreakerDoesNotOpenOnServiceExceptions() throws Exception {
-		// Hystrix needs a service to be invoked at least 20 times in a rolling window of one second for the circuit breaker to open
+		// Hystrix needs a service to be invoked at least 20 times in the statistical window for the circuit breaker to open
 		for (int i = 0; i < 21; i++) {
 			try {
 				testService.throwException(SimpleServiceException.class);
@@ -88,7 +121,8 @@ public class FaultToleranceIntegrationTest {
 				// Ignore
 			}
 		}
-		Thread.sleep(1200);
+		// We must sleep for a bit to ensure the window is saved
+		Thread.sleep(400);
 		try {
 			testService.echo("foo");
 		} catch (ServiceUnavailableException e) {
@@ -187,6 +221,7 @@ public class FaultToleranceIntegrationTest {
 	private HystrixCommandSettings settingsRandomCommandKey() {
 		HystrixCommandSettings settings = new HystrixCommandSettings();
 		settings.setCommandKey(randomString());
+		settings.setMetricsRollingStatisticalWindowInMilliseconds(2000);
 		return settings;
 	}
 	
