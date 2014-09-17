@@ -32,9 +32,8 @@ public class HystrixEventPublisherTest {
 
 	@Test
 	public void test() {
-		HystrixEventPublisher publisher = new HystrixEventPublisher();
 		FakeEventLogger eventLogger = new FakeEventLogger();
-		publisher.setEventLogger(eventLogger);
+		HystrixEventPublisher publisher = new HystrixEventPublisher(eventLogger);
 		publisher.markEvent(HystrixEventType.SUCCESS, HystrixCommandKey.Factory.asKey("space_foo"));
 		assertThat(eventLogger.incrementedEvents, contains("hystrix.space.foo.SUCCESS"));
 	}

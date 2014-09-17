@@ -26,9 +26,11 @@ import org.slf4j.LoggerFactory;
 
 import se.avanzabank.asterix.core.AsterixCallStackTrace;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
+import se.avanzabank.asterix.ft.metrics.DelegatingHystrixEventNotifier;
 
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommand.Setter;
+import com.netflix.hystrix.strategy.HystrixPlugins;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
@@ -39,13 +41,26 @@ import com.netflix.hystrix.HystrixThreadPoolProperties;
  * @author Elias Lindholm (elilin)
  */
 public class HystrixAdapter<T> implements InvocationHandler {
-
-	private T provider;
-	private Class<T> api;
-	private String group;
-	private final Setter hystrixConfiguration;
-
+	
 	private static final Logger log = LoggerFactory.getLogger(HystrixAdapter.class);
+	private static final DelegatingHystrixEventNotifier delegatingEventNotifier = new DelegatingHystrixEventNotifier(); 
+	
+	static {
+		try {
+			HystrixPlugins.getInstance().registerEventNotifier(delegatingEventNotifier);
+		} catch (IllegalStateException e) {
+			log.warn("Failed to register delegating event notifier", e);
+		}
+	}
+
+	private final T provider;
+	private final Class<T> api;
+	private final String group;
+	private final Setter hystrixConfiguration;
+	
+	public static DelegatingHystrixEventNotifier getEventNotifier() {
+		return delegatingEventNotifier;
+	}
 
 	public HystrixAdapter(Class<T> api, T provider, String group) {
 		this(api, provider, group, new HystrixCommandSettings());

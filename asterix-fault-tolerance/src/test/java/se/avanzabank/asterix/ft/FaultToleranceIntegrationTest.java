@@ -73,6 +73,7 @@ public class FaultToleranceIntegrationTest {
 		for (int i = 0; i < 21; i++) {
 			callServiceThrowServiceUnavailable(testService);
 		}
+		// TODO remove Thread.sleep
 		Thread.sleep(1200);
 		testService.echo("foo");
 	}
