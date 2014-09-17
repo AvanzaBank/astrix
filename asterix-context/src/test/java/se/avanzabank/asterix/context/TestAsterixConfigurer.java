@@ -33,7 +33,7 @@ public class TestAsterixConfigurer {
 			}
 		});
 		configurer.enableVersioning(false);
-		configurer.useFaultTolerance(false);
+		configurer.enableFaultTolerance(false);
 		configurer.enableMonitoring(false);
 	}
 
@@ -51,6 +51,10 @@ public class TestAsterixConfigurer {
 	
 	public void enableMonitoring(boolean enabled) {
 		configurer.enableMonitoring(enabled);
+	}
+	
+	public void enableFaultTolerance(boolean enabled) {
+		configurer.enableFaultTolerance(enabled);
 	}
 	
 	

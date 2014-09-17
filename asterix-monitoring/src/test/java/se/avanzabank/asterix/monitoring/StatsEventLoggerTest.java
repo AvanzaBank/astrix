@@ -23,7 +23,7 @@ public class StatsEventLoggerTest {
 
 	
 	@Test
-	public void testName() throws Exception {
+	public void test() throws Exception {
 //		fail("todo");
 	}
 }
