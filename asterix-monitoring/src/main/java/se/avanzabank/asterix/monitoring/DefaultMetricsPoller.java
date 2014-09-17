@@ -34,6 +34,9 @@ import se.avanzabank.core.support.jndi.lookup.http.JndiLookupFailedException;
 import se.avanzabank.core.util.thread.NamedThreadFactory;
 
 /**
+ * Periodically polls all AsterixMetricsCollectorPlugins and sends the data they provide to an
+ * AsterixMetricLoggerPlugin.
+ * 
  * @author Kristoffer Erlandsson (krierl)
  */
 @MetaInfServices(AsterixMetricsPollerPlugin.class)
@@ -46,27 +49,24 @@ public class DefaultMetricsPoller implements AsterixMetricsPollerPlugin, Asterix
 	ScheduledExecutorService executor;
 
 	private static final Logger log = LoggerFactory.getLogger(DefaultMetricsPoller.class);
-	
+
 	@Override
 	public void start() {
 		initializeFromPlugins();
 		int delayTime = getDelayTimeFromJndiOrFallback();
 		log.info("Starting metrics poller using logger {} and collectors {}", logger, collectors);
-		executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("DefaultMetricsPoller")); 
+		executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("DefaultMetricsPoller"));
 		executor.scheduleAtFixedRate(new MetricPollerTask(logger, collectors), 0, delayTime, TimeUnit.MILLISECONDS);
 	}
-	
+
 	private void initializeFromPlugins() {
-		if (logger == null) {
-			logger = plugins.getPlugin(AsterixMetricsLoggerPlugin.class);
-		}
-		if (collectors == null) {
-			collectors = plugins.getPlugins(AsterixMetricsCollectorPlugin.class);
-		}
+		logger = plugins.getPlugin(AsterixMetricsLoggerPlugin.class);
+		collectors = plugins.getPlugins(AsterixMetricsCollectorPlugin.class);
 	}
 
 	private int getDelayTimeFromJndiOrFallback() {
 		try {
+			// TODO do not JNDI lookup here
 			return new BasicJNDILookup().lookup("HYSTRIX_GRAPHITE_DELAY_TIME", DEFAULT_DELAY);
 		} catch (JndiLookupFailedException e) {
 			// Handle missing JNDI property or servers
@@ -90,20 +90,12 @@ public class DefaultMetricsPoller implements AsterixMetricsPollerPlugin, Asterix
 	public void setPlugins(AsterixPlugins plugins) {
 		this.plugins = plugins;
 	}
-	
-	public void setMetricsLogger(AsterixMetricsLoggerPlugin logger) {
-		this.logger = logger;
-	}
-	
-	public void setMetricsCollectors(Collection<AsterixMetricsCollectorPlugin> collectors) {
-		this.collectors = collectors;
-	}
-	
+
 	private static class MetricPollerTask implements Runnable {
 
 		private AsterixMetricsLoggerPlugin logger;
 		private Collection<AsterixMetricsCollectorPlugin> collectors;
-		
+
 		public MetricPollerTask(AsterixMetricsLoggerPlugin logger, Collection<AsterixMetricsCollectorPlugin> collectors) {
 			this.logger = logger;
 			this.collectors = collectors;

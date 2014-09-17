@@ -44,6 +44,7 @@ public class ServiceProperitesInfo {
 		this.serviceKey = serviceKey;
 	}
 	
+	// TODO routing? - class does not have a stable hashCode across jvms
 	@SpaceRouting
 	public Class<?> getApiType() {
 		return apiType; 

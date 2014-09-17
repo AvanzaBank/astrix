@@ -27,6 +27,15 @@ class HystrixCommandSettings {
 	private int coreSize = 10;
 	private String commandKey = null; // null means use api name as command key
 	private int executionIsolationThreadTimeoutInMilliseconds = 1000;
+	private int metricsRollingStatisticalWindowInMilliseconds = 10000;
+
+	public int getMetricsRollingStatisticalWindowInMilliseconds() {
+		return metricsRollingStatisticalWindowInMilliseconds;
+	}
+
+	public void setMetricsRollingStatisticalWindowInMilliseconds(int metricsRollingStatisticalWindowInMilliseconds) {
+		this.metricsRollingStatisticalWindowInMilliseconds = metricsRollingStatisticalWindowInMilliseconds;
+	}
 
 	public int getQueueSizeRejectionThreshold() {
 		return queueSizeRejectionThreshold;

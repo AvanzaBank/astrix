@@ -15,24 +15,25 @@
  */
 package se.avanzabank.asterix.ft.metrics;
 
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.avanzabank.asterix.context.AsterixEventLoggerPlugin;
-import se.avanzabank.asterix.context.AsterixPlugins;
-import se.avanzabank.asterix.context.AsterixPluginsAware;
 
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixEventType;
 import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;
 
-public final class HystrixEventPublisher extends HystrixEventNotifier implements AsterixPluginsAware {
+public final class HystrixEventPublisher extends HystrixEventNotifier {
 
-	// TODO register as listener
-	
 	private static final Logger log = LoggerFactory.getLogger(HystrixEventPublisher.class);
 	private AsterixEventLoggerPlugin eventLogger;
-	private AsterixPlugins plugins = null;
+
+	public HystrixEventPublisher(AsterixEventLoggerPlugin eventLogger) {
+		this.eventLogger = Objects.requireNonNull(eventLogger);
+	}
 
 	@Override
 	public void markEvent(HystrixEventType eventType, HystrixCommandKey key) {
@@ -65,15 +66,4 @@ public final class HystrixEventPublisher extends HystrixEventNotifier implements
 		String statsMetric = String.format("hystrix.%s.%s", commandName.replace('_', '.'), eventType);
 		return statsMetric;
 	}
-	
-	// Test hook
-	void setEventLogger(AsterixEventLoggerPlugin eventLogger) {
-		this.eventLogger = eventLogger;
-	}
-
-	@Override
-	public void setPlugins(AsterixPlugins plugins) {
-		this.plugins  = plugins;
-	}
-
-}
+}	

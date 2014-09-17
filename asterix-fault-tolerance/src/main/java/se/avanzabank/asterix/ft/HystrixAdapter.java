@@ -26,9 +26,11 @@ import org.slf4j.LoggerFactory;
 
 import se.avanzabank.asterix.core.AsterixCallStackTrace;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
+import se.avanzabank.asterix.ft.metrics.DelegatingHystrixEventNotifier;
 
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommand.Setter;
+import com.netflix.hystrix.strategy.HystrixPlugins;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
@@ -40,12 +42,25 @@ import com.netflix.hystrix.HystrixThreadPoolProperties;
  */
 public class HystrixAdapter<T> implements InvocationHandler {
 
-	private T provider;
-	private Class<T> api;
-	private String group;
+	private static final Logger log = LoggerFactory.getLogger(HystrixAdapter.class);
+	private static final DelegatingHystrixEventNotifier delegatingEventNotifier = new DelegatingHystrixEventNotifier();
+
+	static {
+		try {
+			HystrixPlugins.getInstance().registerEventNotifier(delegatingEventNotifier);
+		} catch (IllegalStateException e) {
+			log.warn("Failed to register delegating event notifier", e);
+		}
+	}
+
+	private final T provider;
+	private final Class<T> api;
+	private final String group;
 	private final Setter hystrixConfiguration;
 
-	private static final Logger log = LoggerFactory.getLogger(HystrixAdapter.class);
+	public static DelegatingHystrixEventNotifier getEventNotifier() {
+		return delegatingEventNotifier;
+	}
 
 	public HystrixAdapter(Class<T> api, T provider, String group) {
 		this(api, provider, group, new HystrixCommandSettings());
@@ -181,8 +196,12 @@ public class HystrixAdapter<T> implements InvocationHandler {
 
 	private Setter getHystrixConfiguration(HystrixCommandSettings settings) {
 		HystrixCommandProperties.Setter commandPropertiesDefault =
-				HystrixCommandProperties.Setter().withExecutionIsolationThreadTimeoutInMilliseconds(
-						settings.getExecutionIsolationThreadTimeoutInMilliseconds());
+				HystrixCommandProperties
+						.Setter()
+						.withExecutionIsolationThreadTimeoutInMilliseconds(
+								settings.getExecutionIsolationThreadTimeoutInMilliseconds())
+						.withMetricsRollingStatisticalWindowInMilliseconds(
+								settings.getMetricsRollingStatisticalWindowInMilliseconds());
 		// MaxQueueSize must be set to a non negative value in order for QueueSizeRejectionThreshold to have any effect.
 		// We use a high value for MaxQueueSize in order to allow QueueSizeRejectionThreshold to change dynamically using archaius.
 		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =

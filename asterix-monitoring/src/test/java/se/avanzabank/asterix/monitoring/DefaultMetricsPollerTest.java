@@ -30,7 +30,7 @@ import se.avanzabank.asterix.context.TestAsterixConfigurer;
 import se.avanzabank.core.test.util.async.Poller;
 import se.avanzabank.core.test.util.async.Probe;
 
-public class GraphiteMetricsPollerTest {
+public class DefaultMetricsPollerTest {
 
 	@Test
 	public void test() throws Exception {

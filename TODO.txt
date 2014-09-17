@@ -1,6 +1,5 @@
 === IN PROGRESS ===
 
-* Feltolerans - implementera
 
 === BACKLOG ===
 
@@ -41,8 +40,6 @@
 
 * Se över modulstruktur
 	
-* Inrapportering av metrics från olika astrix-pluginer
-
 * Övervakning av tjänsteregistret
 
 === DONE ===
@@ -77,3 +74,7 @@ en astrix-runtime.
 * Se över namngivning av de olika space som används från integrationstester.
 
 * ServiceUnavailable
+
+* Feltolerans - implementera
+
+* Inrapportering av metrics från olika astrix-pluginer

@@ -28,7 +28,7 @@ public class AsterixConfigurer {
 	private static final Logger log = LoggerFactory.getLogger(AsterixConfigurer.class);
 	
 	private AsterixApiDescriptors asterixApiDescriptors = new AsterixApiDescriptorScanner("se.avanzabank");
-	private boolean useFaultTolerance = false;
+	private boolean enableFaultTolerance = false;
 	private boolean enableVersioning = true;
 	private boolean enableMonitoring = true; 
 	private List<ExternalDependencyBean> externalDependencyBeans = new ArrayList<>();
@@ -64,8 +64,8 @@ public class AsterixConfigurer {
 		this.externalDependencyBeans = externalDependencies;
 	}
 	
-	public void useFaultTolerance(boolean useFaultTolerance) {
-		this.useFaultTolerance  = useFaultTolerance;
+	public void enableFaultTolerance(boolean enableFaultTolerance) {
+		this.enableFaultTolerance  = enableFaultTolerance;
 	}
 	
 	public void enableVersioning(boolean enableVersioning) {
@@ -112,7 +112,7 @@ public class AsterixConfigurer {
 	}
 
 	private void configureFaultTolerance() {
-		if (useFaultTolerance) {
+		if (enableFaultTolerance) {
 			discoverOnePlugin(context, AsterixFaultTolerancePlugin.class);
 		} else {
 			context.registerPlugin(AsterixFaultTolerancePlugin.class, AsterixFaultTolerancePlugin.Default.create());

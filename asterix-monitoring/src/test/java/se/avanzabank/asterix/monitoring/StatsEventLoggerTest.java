@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.ft.metrics;
+package se.avanzabank.asterix.monitoring;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -23,29 +23,33 @@ import java.util.Collection;
 
 import org.junit.Test;
 
-import se.avanzabank.asterix.context.AsterixEventLoggerPlugin;
+import se.avanzabank.system.stats.Stats;
 
-import com.netflix.hystrix.HystrixCommandKey;
-import com.netflix.hystrix.HystrixEventType;
-
-public class HystrixEventPublisherTest {
+public class StatsEventLoggerTest {
 
 	@Test
-	public void test() {
-		FakeEventLogger eventLogger = new FakeEventLogger();
-		HystrixEventPublisher publisher = new HystrixEventPublisher(eventLogger);
-		publisher.markEvent(HystrixEventType.SUCCESS, HystrixCommandKey.Factory.asKey("space_foo"));
-		assertThat(eventLogger.incrementedEvents, contains("hystrix.space.foo.SUCCESS"));
+	public void increments() throws Exception {
+		FakeStats stats = new FakeStats();
+		StatsEventLogger eventLogger = new StatsEventLogger(stats);
+		eventLogger.increment("foo.bar");
+		assertThat(stats.incremented, contains("foo.bar"));
 	}
-	
 
-	static class FakeEventLogger implements AsterixEventLoggerPlugin {
+	class FakeStats implements Stats {
 
-		Collection<String> incrementedEvents = new ArrayList<String>();
-		
+		private Collection<String> incremented = new ArrayList<String>();
+
 		@Override
-		public void increment(String event) {
-			incrementedEvents.add(event);
+		public void recordExecutionTime(String key, long executionTimeInMillis) {
+		}
+
+		@Override
+		public void count(String key, int count) {
+		}
+
+		@Override
+		public void increment(String key) {
+			incremented.add(key);
 		}
 
 	}
