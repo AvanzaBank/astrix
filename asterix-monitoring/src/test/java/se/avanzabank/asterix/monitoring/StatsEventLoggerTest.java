@@ -15,15 +15,43 @@
  */
 package se.avanzabank.asterix.monitoring;
 
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.junit.Test;
 
+import se.avanzabank.system.stats.Stats;
+
 public class StatsEventLoggerTest {
 
-	
 	@Test
-	public void test() throws Exception {
-//		fail("todo");
+	public void increments() throws Exception {
+		FakeStats stats = new FakeStats();
+		StatsEventLogger eventLogger = new StatsEventLogger(stats);
+		eventLogger.increment("foo.bar");
+		assertThat(stats.incremented, contains("foo.bar"));
 	}
+
+	class FakeStats implements Stats {
+
+		private Collection<String> incremented = new ArrayList<String>();
+
+		@Override
+		public void recordExecutionTime(String key, long executionTimeInMillis) {
+		}
+
+		@Override
+		public void count(String key, int count) {
+		}
+
+		@Override
+		public void increment(String key) {
+			incremented.add(key);
+		}
+
+	}
+
 }

@@ -34,6 +34,9 @@ import se.avanzabank.core.support.jndi.lookup.http.JndiLookupFailedException;
 import se.avanzabank.core.util.thread.NamedThreadFactory;
 
 /**
+ * Periodically polls all AsterixMetricsCollectorPlugins and sends the data they provide to an
+ * AsterixMetricLoggerPlugin.
+ * 
  * @author Kristoffer Erlandsson (krierl)
  */
 @MetaInfServices(AsterixMetricsPollerPlugin.class)
@@ -63,6 +66,7 @@ public class DefaultMetricsPoller implements AsterixMetricsPollerPlugin, Asterix
 
 	private int getDelayTimeFromJndiOrFallback() {
 		try {
+			// TODO do not JNDI lookup here
 			return new BasicJNDILookup().lookup("HYSTRIX_GRAPHITE_DELAY_TIME", DEFAULT_DELAY);
 		} catch (JndiLookupFailedException e) {
 			// Handle missing JNDI property or servers

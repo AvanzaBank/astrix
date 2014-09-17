@@ -23,6 +23,9 @@ import se.avanzabank.asterix.context.AsterixEventLoggerPlugin;
 import se.avanzabank.system.graphite.GraphiteFactory;
 import se.avanzabank.system.stats.Stats;
 
+/**
+ * @author Kristoffer Erlandsson (krierl)
+ */
 @MetaInfServices(value = AsterixEventLoggerPlugin.class)
 public class StatsEventLogger implements AsterixEventLoggerPlugin {
 
