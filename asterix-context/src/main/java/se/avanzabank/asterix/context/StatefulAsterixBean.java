@@ -92,10 +92,11 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 						log.error("Runtime configuration error. Failed to create " + asterixBean.beanFactory.getBeanType(), e);
 						return;
 					} catch (Exception e) {
-						log.info("Failed to bind to " + asterixBean.beanFactory.getBeanType(), e);
+						log.info("Failed to bind to " + asterixBean.beanFactory.getBeanType().getName(), e);
 					}
 				}
 				try {
+					log.debug("Waiting " + this.beanRebindAttemptIntervalMillis + " ms until next bind attempt");
 					Thread.sleep(this.beanRebindAttemptIntervalMillis);
 				} catch (InterruptedException e) {
 					interrupt();

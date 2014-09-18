@@ -17,6 +17,7 @@ package se.avanzabank.asterix.context;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +34,8 @@ public class AsterixConfigurer {
 	private boolean enableMonitoring = true; 
 	private List<ExternalDependencyBean> externalDependencyBeans = new ArrayList<>();
 	private List<Object> externalDependencies = new ArrayList<>();
-	private AsterixSettings settings = new AsterixSettings();
-	private AsterixContext context = new AsterixContext(settings);
+	private final AsterixSettings settings = new AsterixSettings();
+	private final AsterixContext context = new AsterixContext(settings);
 	
 	public AsterixContext configure() {
 		context.setExternalDependencyBeans(externalDependencyBeans);
@@ -149,4 +150,7 @@ public class AsterixConfigurer {
 		this.settings.set(settingName, value);
 	}
 	
+	public void setSettings(Map<String, String> settings) {
+		this.settings.setAll(settings);
+	}
 }

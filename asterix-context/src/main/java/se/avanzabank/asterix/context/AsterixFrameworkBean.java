@@ -96,7 +96,9 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		 */
 		
 		// TODO: avoid creating two AsterixContext's  (here and as spring bean). Creating two AsterixContext causes two scannings for providers
-		AsterixContext asterixContext = new AsterixConfigurer().configure(); 
+		AsterixConfigurer configurer = new AsterixConfigurer();
+		configurer.setSettings(this.settings);
+		AsterixContext asterixContext = configurer.configure(); 
 		
 		// For each consumedApi, either directly or indirectly (for instance via a library), 
 		// we must register a bean definition for the ExternalDependencyBean to "collect" the dependencies from
@@ -108,9 +110,13 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 			registry.registerBeanDefinition(dependencyBeanName, dependenciesBeanDefinition);
 		}
 		
+		
 		// AsterixConfigurer must be created AFTER all dependency-beans have bean created.
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixConfigurer.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
+		MutablePropertyValues asterixConfigurerProps = new MutablePropertyValues();
+		asterixConfigurerProps.add("settings", this.settings);
+		beanDefinition.setPropertyValues(asterixConfigurerProps);
 		beanDefinition.setDependsOn(getDependencyBeanNames(externalDependencyBeanTypes));
 		registry.registerBeanDefinition("_asterixConfigurer", beanDefinition);
 

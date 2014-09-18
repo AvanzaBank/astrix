@@ -104,7 +104,7 @@ public class AsterixIntegrationTest {
 		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceRegistrypu.getLookupGroupName())); // For service-registry-discovery
 		configurer.enableFaultTolerance(true);
 		configurer.enableVersioning(true);
-		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMP_INTERVAL, 500);
+		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMP_INTERVAL, 100);
 		Asterix asterix = configurer.configure();
 		this.lunchService = asterix.getBean(LunchService.class);
 		this.lunchUtil = asterix.getBean(LunchUtil.class);
@@ -112,7 +112,6 @@ public class AsterixIntegrationTest {
 		asterix.waitForBean(LunchService.class, 2000);
 		asterix.waitForBean(LunchUtil.class, 2000); // TODO: it does not make sense to wait for a library. How to cluelessly design waiting for libraries?
 		asterix.waitForBean(LunchRestaurantGrader.class, 2000);
-//		asterix.waitForBean(GigaSpace.class, "service-demo-space", 2000); //
 	}
 	
 	@Test

@@ -20,7 +20,7 @@
 		</property>
 		<property name="settings">
 			<util:map>
-				<entry key="StatefulAsterixBean.beanRebindAttemptInterval" value="500" />
+				<entry key="StatefulAsterixBean.beanRebindAttemptInterval" value="100" />
 			</util:map>
 		</property>
 		<property name="serviceDescriptor" value="se.avanzabank.asterix.integration.tests.domain2.apiruntime.LunchGradeApiDescriptor" />

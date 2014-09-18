@@ -18,19 +18,20 @@ package se.avanzabank.asterix.service.registry.client;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static se.avanzabank.asterix.context.AsterixTestUtil.serviceInvocationResult;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.openspaces.remoting.Routing;
 
+import se.avanzabank.asterix.context.AsterixTestUtil;
 import se.avanzabank.asterix.context.AsterixContext;
 import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.Poller;
 import se.avanzabank.asterix.context.Probe;
+import se.avanzabank.asterix.context.Supplier;
 import se.avanzabank.asterix.context.TestAsterixConfigurer;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
 import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
@@ -89,46 +90,34 @@ public class AsterixServiceRegistryTest {
 				return dummyService.hello("kalle");
 			}
 		}, equalTo("hello: kalle")));
+	}
+	
+	@Test
+	public void serviceIsReboundIfServiceIsMovedInRegistry() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		AsterixDirectComponent directComponent = new AsterixDirectComponent();
+		asterixConfigurer.registerPlugin(AsterixServiceRegistryComponent.class, directComponent);
+		asterixConfigurer.registerApiDescriptor(DummyServiceApiDescriptor.class);
+		asterixConfigurer.registerApiDescriptor(FakeServiceRegistryDescriptor.class);
+		AsterixContext context = asterixConfigurer.configure();
 		
+		directComponent.register("dummyImpl", new DummyServiceImpl());
+		context.getBean(AsterixServiceRegistry.class).register(DummyService.class, new AsterixServiceProperties() {{
+			setProperty("providerName", "dummyImpl");
+			setComponent("direct");
+		}});
+		
+		final DummyService dummyService = context.getBean(DummyService.class);
+		assertEquals(new DummyServiceImpl().hello("kalle"), dummyService.hello("kalle"));
+		
+		assertEventually(serviceInvocationResult(new Supplier<String>() {
+			@Override
+			public String get() {
+				return dummyService.hello("kalle");
+			}
+		}, equalTo("hello: kalle")));
 	}
 	
-	interface Supplier<T> {
-		T get();
-	}
-	
-	private <T> Probe serviceInvocationResult(final Supplier<T> serviceInvocation, final Matcher<T> matcher) {
-		return new Probe() {
-			
-			private T lastResult;
-			private Exception lastException;
-
-			@Override
-			public void sample() {
-				try {
-					this.lastResult = serviceInvocation.get();
-				} catch (Exception e) {
-					this.lastException = e;
-				}
-			}
-			
-			@Override
-			public boolean isSatisfied() {
-				return matcher.matches(lastResult);
-			}
-			
-			@Override
-			public void describeFailureTo(Description description) {
-				description.appendText("Expected serviceInovcation to return: ");
-				matcher.describeTo(description);
-				if (lastException != null) {
-					description.appendText("\nBut last serviceInvocation threw exception: " + lastException.toString());
-				} else {
-					description.appendText("\nBut last serviceInvocation returnded " + lastResult);
-				}
-			}
-		};
-	}
-
 	private void assertEventually(Probe probe) throws InterruptedException {
 		new Poller(1000, 1).check(probe);
 	}

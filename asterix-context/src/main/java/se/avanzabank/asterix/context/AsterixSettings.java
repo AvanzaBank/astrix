@@ -29,15 +29,36 @@ public class AsterixSettings {
 	private final Map<String, Object> settings = new ConcurrentHashMap<>();
 	
 	public long getLong(String settingsName, long deafualtValue) {
-		Object setting = settings.get(settingsName);
-		if (setting == null) {
+		Object value = settings.get(settingsName);
+		if (value == null) {
 			return deafualtValue;
 		}
-		return Long.class.cast(setting).longValue();
+		if (value instanceof String) {
+			return Long.parseLong((String)value);
+		}
+		return Long.class.cast(value).longValue();
 	}
 
 	public void set(String settingName, long value) {
 		this.settings.put(settingName, Long.valueOf(value));
+	}
+	
+	public void set(String settingName, String value) {
+		this.settings.put(settingName, value);
+	}
+
+	public static AsterixSettings from(Map<String, String> settings) {
+		AsterixSettings result = new AsterixSettings();
+		for (Map.Entry<String, String> setting : settings.entrySet()) {
+			settings.put(setting.getKey(), setting.getValue());
+		}
+		return result;
+	}
+
+	public void setAll(Map<String, String> settings) {
+		for (Map.Entry<String, String> setting : settings.entrySet()) {
+			this.settings.put(setting.getKey(), setting.getValue());
+		}
 	}
 	
 
