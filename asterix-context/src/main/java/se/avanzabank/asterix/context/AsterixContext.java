@@ -295,5 +295,16 @@ public class AsterixContext implements Asterix {
 		}
 		
 	}
+
+	public <T> T getPluginInstance(Class<T> providerType) {
+		for (Class<?> pluginTypeCandidate : providerType.getInterfaces()) {
+			for (Object pluginProvider : this.plugins.getPlugins(pluginTypeCandidate)) {
+				if (pluginProvider.getClass().equals(providerType)) {
+					return providerType.cast(pluginProvider);
+				}
+			}
+		}
+		throw new IllegalArgumentException("Plugin provider not found: " + providerType.getName());
+	}
 	
 }

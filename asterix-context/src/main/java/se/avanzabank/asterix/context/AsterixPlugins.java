@@ -45,7 +45,7 @@ public class AsterixPlugins {
 	 * @return
 	 */
 	public <T> T getPlugin(Class<T> type) {
-		Plugin<T> plugin = getPluginInstance(type);
+		Plugin<T> plugin = getPluginHolder(type);
 		return plugin.getOne();
 	}
 	
@@ -57,10 +57,10 @@ public class AsterixPlugins {
 	 * @return
 	 */
 	public <T> List<T> getPlugins(Class<T> type) {
-		Plugin<T> plugin = getPluginInstance(type);
+		Plugin<T> plugin = getPluginHolder(type);
 		return plugin.getAll();
 	}
-
+	
 	public <T> void registerPlugin(Class<T> pluginType, T pluginProvider) {
 		this.pluginInitializer.init(pluginProvider);
 		this.pluginsByType.putIfAbsent(pluginType, new Plugin<>(pluginType));
@@ -68,7 +68,7 @@ public class AsterixPlugins {
 		plugin.add(pluginProvider);
 	}
 	
-	private <T> Plugin<T> getPluginInstance(Class<T> type) {
+	private <T> Plugin<T> getPluginHolder(Class<T> type) {
 		 Plugin<T> plugin = (Plugin<T>) pluginsByType.get(type);
 		 if (plugin != null) {
 			 return plugin;
@@ -93,6 +93,10 @@ public class AsterixPlugins {
 			for (Object pluginProvider : providers) {
 				
 			}
+		}
+		
+		public Class<T> getType() {
+			return type;
 		}
 		
 		public static <T> Plugin<T> autoDiscover(Class<T> type, AsterixPluginInitializer initializer) {

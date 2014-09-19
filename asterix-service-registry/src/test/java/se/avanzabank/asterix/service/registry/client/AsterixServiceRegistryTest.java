@@ -23,10 +23,10 @@ import static se.avanzabank.asterix.context.AsterixTestUtil.serviceInvocationRes
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.openspaces.remoting.Routing;
 
-import se.avanzabank.asterix.context.AsterixTestUtil;
 import se.avanzabank.asterix.context.AsterixContext;
 import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.Poller;
@@ -43,47 +43,49 @@ import se.avanzabank.asterix.service.registry.app.ServiceKey;
 
 public class AsterixServiceRegistryTest {
 	
+	private AsterixDirectComponent directComponent;
+	private AsterixServiceRegistry serviceRegistry;
+	private AsterixContext context;
+
+	@Before
+	public void setup() {
+		TestAsterixConfigurer configurer = new TestAsterixConfigurer();
+		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMP_INTERVAL, 10);
+		configurer.registerApiDescriptor(GreetingApiDescriptor.class);
+		configurer.registerApiDescriptor(FakeServiceRegistryDescriptor.class);
+		context = configurer.configure();
+		directComponent = context.getPluginInstance(AsterixDirectComponent.class);
+		serviceRegistry = context.getBean(AsterixServiceRegistry.class);
+	}
+	
 	@Test
 	public void lookupServiceInRegistryAndBind() throws Exception {
-		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
-		AsterixDirectComponent directComponent = new AsterixDirectComponent();
-		asterixConfigurer.registerPlugin(AsterixServiceRegistryComponent.class, directComponent);
-		asterixConfigurer.registerApiDescriptor(DummyServiceApiDescriptor.class);
-		asterixConfigurer.registerApiDescriptor(FakeServiceRegistryDescriptor.class);
-		AsterixContext context = asterixConfigurer.configure();
+		final String objectId = directComponent.register(new GreetingServiceImpl("hello: "));
 		
-		directComponent.register("dummyImpl", new DummyServiceImpl());
-		context.getBean(AsterixServiceRegistry.class).register(DummyService.class, new AsterixServiceProperties() {{
-			setProperty("providerName", "dummyImpl");
+		context.getBean(AsterixServiceRegistry.class).register(GreetingService.class, new AsterixServiceProperties() {{
+			setProperty("providerName", objectId);
 			setComponent("direct");
 		}});
 		
-		DummyService dummyService = context.getBean(DummyService.class);
-		assertEquals(new DummyServiceImpl().hello("kalle"), dummyService.hello("kalle"));
+		GreetingService greetingService = context.getBean(GreetingService.class);
+		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), greetingService.hello("kalle"));
 	}
 	
 	@Test
 	public void serviceIsEventuallyBoundWhenServiceNotAvailableInRegistryOnFirstLookup() throws Exception {
-		AsterixDirectComponent directComponent = new AsterixDirectComponent();
-		TestAsterixConfigurer configurer = new TestAsterixConfigurer();
-		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMP_INTERVAL, 50);
-		configurer.registerPlugin(AsterixServiceRegistryComponent.class, directComponent);
-		configurer.registerApiDescriptor(DummyServiceApiDescriptor.class);
-		configurer.registerApiDescriptor(FakeServiceRegistryDescriptor.class);
-		AsterixContext context = configurer.configure();
-		
-		context.getBean(AsterixServiceRegistry.class).register(DummyService.class, new AsterixServiceProperties() {{
-			setProperty("providerName", "dummyImpl");
-			setComponent("direct");
-		}});
-		final DummyService dummyService = context.getBean(DummyService.class);
+		final String objectId = directComponent.register(new GreetingServiceImpl("hello: "));
+		final GreetingService dummyService = context.getBean(GreetingService.class);
 		
 		try {
 			dummyService.hello("kalle");
 			fail("Excpected service not to be registered in registry");
 		} catch (ServiceUnavailableException e) {
 		}
-		directComponent.register("dummyImpl", new DummyServiceImpl());
+		
+		serviceRegistry.register(GreetingService.class, new AsterixServiceProperties() {{
+			setProperty("providerName", objectId);
+			setComponent("direct");
+		}});
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
 			public String get() {
@@ -92,30 +94,29 @@ public class AsterixServiceRegistryTest {
 		}, equalTo("hello: kalle")));
 	}
 	
-	@Test
+//	@Test
 	public void serviceIsReboundIfServiceIsMovedInRegistry() throws Exception {
-		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
-		AsterixDirectComponent directComponent = new AsterixDirectComponent();
-		asterixConfigurer.registerPlugin(AsterixServiceRegistryComponent.class, directComponent);
-		asterixConfigurer.registerApiDescriptor(DummyServiceApiDescriptor.class);
-		asterixConfigurer.registerApiDescriptor(FakeServiceRegistryDescriptor.class);
-		AsterixContext context = asterixConfigurer.configure();
-		
-		directComponent.register("dummyImpl", new DummyServiceImpl());
-		context.getBean(AsterixServiceRegistry.class).register(DummyService.class, new AsterixServiceProperties() {{
-			setProperty("providerName", "dummyImpl");
+		final String id = directComponent.register(new GreetingServiceImpl("hello: "));
+		serviceRegistry.register(GreetingService.class, new AsterixServiceProperties() {{
+			setProperty("providerName", id);
 			setComponent("direct");
 		}});
 		
-		final DummyService dummyService = context.getBean(DummyService.class);
-		assertEquals(new DummyServiceImpl().hello("kalle"), dummyService.hello("kalle"));
+		final GreetingService dummyService = context.getBean(GreetingService.class);
+		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), dummyService.hello("kalle"));
+		
+		final String newId = directComponent.register(new GreetingServiceImpl("hej : "));
+		serviceRegistry.register(GreetingService.class, new AsterixServiceProperties() {{
+			setProperty("providerName", newId);
+			setComponent("direct");
+		}});
 		
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
 			public String get() {
 				return dummyService.hello("kalle");
 			}
-		}, equalTo("hello: kalle")));
+		}, equalTo("hej: kalle")));
 	}
 	
 	private void assertEventually(Probe probe) throws InterruptedException {
@@ -150,24 +151,31 @@ public class AsterixServiceRegistryTest {
 	
 	@AsterixServiceRegistryApi(
 		exportedApis = { 
-			DummyService.class
+			GreetingService.class
 		},
 		components = {
 			AsterixServiceRegistryComponentNames.DIRECT
 		} 
 	)
-	public static class DummyServiceApiDescriptor {
+	public static class GreetingApiDescriptor {
 		
 	}
 	
-	public interface DummyService {
+	public interface GreetingService {
 		String hello(String msg);
 	}
 	
-	public static class DummyServiceImpl implements DummyService {
+	public static class GreetingServiceImpl implements GreetingService {
+		
+		private String greeting;
+
+		public GreetingServiceImpl(String greeting) {
+			this.greeting = greeting;
+		}
+		
 		@Override
 		public String hello(String msg) {
-			return "hello: " + msg;
+			return greeting + msg;
 		}
 	}
 	

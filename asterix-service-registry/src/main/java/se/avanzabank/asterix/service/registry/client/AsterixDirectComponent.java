@@ -19,16 +19,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
+import org.kohsuke.MetaInfServices;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
 import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
+@MetaInfServices(AsterixServiceRegistryComponent.class)
 public class AsterixDirectComponent implements AsterixServiceRegistryComponent {
 	
-	private Map<String, Object> providerByName = new ConcurrentHashMap<String, Object>();
+	private final static AtomicLong idGen = new AtomicLong();
+	private final static Map<String, Object> providerByName = new ConcurrentHashMap<String, Object>();
 	
 	@Override
 	public <T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, AsterixServiceProperties serviceProperties) {
@@ -41,7 +45,7 @@ public class AsterixDirectComponent implements AsterixServiceRegistryComponent {
 	}
 
 	public void register(String name, Object provider) {
-		this.providerByName.put(name, provider);
+		providerByName.put(name, provider);
 	}
 
 	@Override
@@ -62,5 +66,12 @@ public class AsterixDirectComponent implements AsterixServiceRegistryComponent {
 	@Override
 	public void registerBeans(BeanDefinitionRegistry registry) {
 		 // NOT USED. Client side component only 
+	}
+
+	public String register(Object provider) {
+		// TODO: detect multiple registrations of same instance
+		String id = String.valueOf(idGen.incrementAndGet());
+		providerByName.put(id, provider);
+		return id;
 	}
 }
