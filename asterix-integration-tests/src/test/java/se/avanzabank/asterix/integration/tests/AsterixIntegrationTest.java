@@ -16,9 +16,11 @@
 package se.avanzabank.asterix.integration.tests;
 
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static se.avanzabank.asterix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
+
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -35,6 +37,7 @@ import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
+import se.avanzabank.asterix.integration.tests.domain.api.LunchServiceAsync;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchUtil;
 import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
 import se.avanzabank.asterix.remoting.client.AsterixRemoteServiceException;
@@ -87,6 +90,7 @@ public class AsterixIntegrationTest {
 	private LunchService lunchService;
 	private LunchUtil lunchUtil;
 	private LunchRestaurantGrader lunchRestaurantGrader;
+	private LunchServiceAsync asyncLunchService;
 	
 	static {
 		// TODO: remove debugging information
@@ -109,9 +113,11 @@ public class AsterixIntegrationTest {
 		this.lunchService = asterix.getBean(LunchService.class);
 		this.lunchUtil = asterix.getBean(LunchUtil.class);
 		this.lunchRestaurantGrader = asterix.getBean(LunchRestaurantGrader.class);
+		this.asyncLunchService = asterix.getBean(LunchServiceAsync.class);
 		asterix.waitForBean(LunchService.class, 2000);
 		asterix.waitForBean(LunchUtil.class, 2000); // TODO: it does not make sense to wait for a library. How to cluelessly design waiting for libraries?
 		asterix.waitForBean(LunchRestaurantGrader.class, 2000);
+		asterix.waitForBean(LunchServiceAsync.class, 2000);
 	}
 	
 	@Test
@@ -159,6 +165,17 @@ public class AsterixIntegrationTest {
 	public void libraryUsageTest() throws Exception {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").withFoodType("vegetarian").build());
 		LunchRestaurant r = lunchUtil.suggestVegetarianRestaurant();
+		assertEquals("Martins Green Room", r.getName());
+	}
+	
+	@Test
+	public void asyncService() throws Exception {
+		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
+		GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
+		request.setName("Martins Green Room");
+		
+		Future<LunchRestaurant> f = asyncLunchService.getLunchRestaurant(request);
+		LunchRestaurant r = f.get(300, TimeUnit.MILLISECONDS);
 		assertEquals("Martins Green Room", r.getName());
 	}
 }

@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openspaces.core.GigaSpace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -34,6 +36,8 @@ public class AsterixRemotingServiceRegistryExporter implements ServiceRegistryEx
 	
 	private ApplicationContext applicationContext;
 	private GigaSpace gigaSpace;
+	
+	private static final Logger log = LoggerFactory.getLogger(AsterixRemotingServiceRegistryExporter.class);
 	
 	@Autowired
 	public AsterixRemotingServiceRegistryExporter(GigaSpace gigaSpace) {
@@ -51,16 +55,45 @@ public class AsterixRemotingServiceRegistryExporter implements ServiceRegistryEx
 		for (Object service : applicationContext.getBeansWithAnnotation(AsterixRemoteServiceExport.class).values()) {
 			AsterixRemoteServiceExport remoteServiceExport = service.getClass().getAnnotation(AsterixRemoteServiceExport.class);
 			for (Class<?> providedApi : remoteServiceExport.value()) {
-				AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
 				if (!providedApi.isAssignableFrom(service.getClass())) {
 					throw new IllegalArgumentException("Cannot export: " + service.getClass() + " as " + providedApi);
 				}
-				serviceProperties.setApi(providedApi);
-				serviceProperties.setProperty(SPACE_NAME_PROPERTY, gigaSpace.getSpace().getName());
-				result.add(serviceProperties);
+				addSyncServiceProperties(result, service, providedApi);
+				addAsyncServicePropertiesIfInterfaceExists(result, service, providedApi);
 			}
 		}
+		log.debug("Found the following services for service registry export: {}", result);
 		return result;
 	}
 
+	private void addSyncServiceProperties(List<AsterixServiceProperties> result, Object service, Class<?> providedApi) {
+		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
+		serviceProperties.setApi(providedApi);
+		serviceProperties.setProperty(SPACE_NAME_PROPERTY, gigaSpace.getSpace().getName());
+		result.add(serviceProperties);
+	}
+	
+	private void addAsyncServicePropertiesIfInterfaceExists(List<AsterixServiceProperties> result, Object service,
+			Class<?> providedApi) {
+		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
+		Class<?> asyncInterface = loadInterfaceIfExists(providedApi.getName() + "Async");
+		if (asyncInterface != null) {
+			serviceProperties.setApi(asyncInterface);
+			serviceProperties.setProperty(SPACE_NAME_PROPERTY, gigaSpace.getSpace().getName());
+			result.add(serviceProperties);
+		}
+	}
+
+	private Class<?> loadInterfaceIfExists(String interfaceName) {
+		try {
+			Class<?> c = Class.forName(interfaceName);
+			if (c.isInterface()) {
+				return c;
+			}
+		} catch (ClassNotFoundException e) {
+			// fall through and return null
+		}
+		return null;
+	}
+	
 }
