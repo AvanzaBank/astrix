@@ -37,7 +37,7 @@ import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryApiDescriptor;
 import se.avanzabank.space.SpaceLocator;
 /**
- * The service registry worker is a server-side component responsible for continiously publishing 
+ * The service registry worker is a server-side component responsible for continuously publishing 
  * all exported services from the current application onto the service registry.
  * 
  * @author Elias Lindholm (elilin)

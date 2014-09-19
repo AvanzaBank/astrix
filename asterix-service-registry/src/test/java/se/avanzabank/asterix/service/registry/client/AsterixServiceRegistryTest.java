@@ -23,6 +23,9 @@ import static se.avanzabank.asterix.context.AsterixTestUtil.serviceInvocationRes
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.openspaces.remoting.Routing;
@@ -46,6 +49,13 @@ public class AsterixServiceRegistryTest {
 	private AsterixDirectComponent directComponent;
 	private AsterixServiceRegistry serviceRegistry;
 	private AsterixContext context;
+	
+	static {
+		// TODO: remove debugging information
+		BasicConfigurator.configure();
+		Logger.getRootLogger().setLevel(Level.WARN);
+		Logger.getLogger("se.avanzabank.asterix").setLevel(Level.DEBUG);
+	}
 
 	@Before
 	public void setup() {
@@ -60,12 +70,8 @@ public class AsterixServiceRegistryTest {
 	
 	@Test
 	public void lookupServiceInRegistryAndBind() throws Exception {
-		final String objectId = directComponent.register(new GreetingServiceImpl("hello: "));
-		
-		context.getBean(AsterixServiceRegistry.class).register(GreetingService.class, new AsterixServiceProperties() {{
-			setProperty("providerName", objectId);
-			setComponent("direct");
-		}});
+		final String objectId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		serviceRegistry.register(GreetingService.class, directComponent.getServiceProperties(objectId));
 		
 		GreetingService greetingService = context.getBean(GreetingService.class);
 		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), greetingService.hello("kalle"));
@@ -73,7 +79,7 @@ public class AsterixServiceRegistryTest {
 	
 	@Test
 	public void serviceIsEventuallyBoundWhenServiceNotAvailableInRegistryOnFirstLookup() throws Exception {
-		final String objectId = directComponent.register(new GreetingServiceImpl("hello: "));
+		final String objectId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		
 		try {
@@ -81,11 +87,8 @@ public class AsterixServiceRegistryTest {
 			fail("Excpected service not to be registered in registry");
 		} catch (ServiceUnavailableException e) {
 		}
-		
-		serviceRegistry.register(GreetingService.class, new AsterixServiceProperties() {{
-			setProperty("providerName", objectId);
-			setComponent("direct");
-		}});
+
+		serviceRegistry.register(GreetingService.class, directComponent.getServiceProperties(objectId));
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
 			public String get() {
@@ -96,20 +99,14 @@ public class AsterixServiceRegistryTest {
 	
 //	@Test
 	public void serviceIsReboundIfServiceIsMovedInRegistry() throws Exception {
-		final String id = directComponent.register(new GreetingServiceImpl("hello: "));
-		serviceRegistry.register(GreetingService.class, new AsterixServiceProperties() {{
-			setProperty("providerName", id);
-			setComponent("direct");
-		}});
+		final String providerId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		serviceRegistry.register(GreetingService.class, directComponent.getServiceProperties(providerId));
 		
 		final GreetingService dummyService = context.getBean(GreetingService.class);
-		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), dummyService.hello("kalle"));
+		assertEquals("hello: kalle", dummyService.hello("kalle"));
 		
-		final String newId = directComponent.register(new GreetingServiceImpl("hej : "));
-		serviceRegistry.register(GreetingService.class, new AsterixServiceProperties() {{
-			setProperty("providerName", newId);
-			setComponent("direct");
-		}});
+		final String newProviderId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hej: "));
+		serviceRegistry.register(GreetingService.class, directComponent.getServiceProperties(newProviderId));
 		
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override

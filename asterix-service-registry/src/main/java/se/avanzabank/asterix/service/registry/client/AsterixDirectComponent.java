@@ -15,6 +15,7 @@
  */
 package se.avanzabank.asterix.service.registry.client;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,20 +33,16 @@ import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 public class AsterixDirectComponent implements AsterixServiceRegistryComponent {
 	
 	private final static AtomicLong idGen = new AtomicLong();
-	private final static Map<String, Object> providerByName = new ConcurrentHashMap<String, Object>();
+	private final static Map<String, ServiceProvider<?>> providerById = new ConcurrentHashMap<>();
 	
 	@Override
 	public <T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, AsterixServiceProperties serviceProperties) {
-		String providerName = serviceProperties.getProperty("providerName");
-		Object result = providerByName.get(providerName);
+		String providerName = serviceProperties.getProperty("providerId");
+		ServiceProvider<?> result = providerById.get(providerName);
 		if (result == null) {
 			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + type);
 		}
-		return type.cast(result);
-	}
-
-	public void register(String name, Object provider) {
-		providerByName.put(name, provider);
+		return type.cast(result.getProvider());
 	}
 
 	@Override
@@ -68,10 +65,49 @@ public class AsterixDirectComponent implements AsterixServiceRegistryComponent {
 		 // NOT USED. Client side component only 
 	}
 
-	public String register(Object provider) {
-		// TODO: detect multiple registrations of same instance
+	public <T> String register(Class<T> type, T provider) {
 		String id = String.valueOf(idGen.incrementAndGet());
-		providerByName.put(id, provider);
+		providerById.put(id, new ServiceProvider<T>(id, type, provider));
 		return id;
 	}
+	
+	public AsterixServiceProperties getServiceProperties(String id) {
+		ServiceProvider<?> provider = providerById.get(id);
+		if (provider == null) {
+			throw new IllegalArgumentException("No provider registered with id: " + id);
+		}
+		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
+		serviceProperties.setProperty("providerId", id);
+		serviceProperties.setComponent(AsterixServiceRegistryComponentNames.DIRECT);
+		return serviceProperties;
+	}
+	
+	static class ServiceProvider<T> {
+		private String id;
+		private Class<T> type;
+		private T provider;
+		
+		public ServiceProvider(String id, Class<T> type, T provider) {
+			this.id = id;
+			this.type = type;
+			this.provider = provider;
+		}
+		
+		public String getId() {
+			return id;
+		}
+		
+		public Class<T> getType() {
+			return type;
+		}
+		
+		public T getProvider() {
+			return provider;
+		}
+	}
+
+	public Collection<ServiceProvider<?>> listProviders() {
+		return providerById.values();
+	}
+	
 }
