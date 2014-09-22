@@ -24,6 +24,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 /**
  * An AstrixContext is the runtime-environment for the astrix-framework. It is used
  * both by consuming applications as well as server applications. AsterixContext providers access
@@ -40,9 +45,12 @@ public class AsterixContext implements Asterix {
 	private final AsterixEventBus eventBus = new AsterixEventBus();
 	private final AsterixBeanStates beanStates = new AsterixBeanStates();
 	private final AsterixSettings settings;
+	private final AsterixBeanStateWorker beanStateWorker;
 	
 	public AsterixContext(AsterixSettings settings) {
 		this.settings = Objects.requireNonNull(settings);
+		this.beanStateWorker = new AsterixBeanStateWorker(settings, eventBus); // TODO: manage life cycle
+		this.beanStateWorker.start(); // TODO: avoid starting bean-state-worker if no statful beans are created.
 		this.eventBus.addEventListener(AsterixBeanStateChangedEvent.class, beanStates);
 		this.plugins = new AsterixPlugins(new AsterixPluginInitializer() {
 			@Override
@@ -87,6 +95,9 @@ public class AsterixContext implements Asterix {
 		}
 		if (object instanceof AsterixSettingsAware) {
 			AsterixSettingsAware.class.cast(object).setSettings(settings);
+		}
+		if (object instanceof AsterixBeanStateWorkerAware) {
+			AsterixBeanStateWorkerAware.class.cast(object).setBeanStateWorker(beanStateWorker);
 		}
 	}
 	

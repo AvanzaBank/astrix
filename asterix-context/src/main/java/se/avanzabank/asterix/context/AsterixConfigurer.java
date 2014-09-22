@@ -35,15 +35,19 @@ public class AsterixConfigurer {
 	private List<ExternalDependencyBean> externalDependencyBeans = new ArrayList<>();
 	private List<Object> externalDependencies = new ArrayList<>();
 	private final AsterixSettings settings = new AsterixSettings();
-	private final AsterixContext context = new AsterixContext(settings);
+	private final List<PluginHolder<?>> plugins = new ArrayList<>();
 	
 	public AsterixContext configure() {
+		AsterixContext context = new AsterixContext(settings);
+		for (PluginHolder<?> plugin : plugins) {
+			registerPlugin(context, plugin);
+		}
 		context.setExternalDependencyBeans(externalDependencyBeans);
 		context.setExternalDependencies(externalDependencies);
-		configureFaultTolerance();
-		configureVersioning();
-		configureMonitoring();
-		discoverApiProviderPlugins();
+		configureFaultTolerance(context);
+		configureVersioning(context);
+		configureMonitoring(context);
+		discoverApiProviderPlugins(context);
 		List<AsterixApiProviderPlugin> apiProviderPlugins = context.getPlugins(AsterixApiProviderPlugin.class);
 		AsterixApiProviderFactory apiProviderFactory = new AsterixApiProviderFactory(apiProviderPlugins);
 		List<AsterixApiProvider> apiProviders = createApiProviders(apiProviderFactory);
@@ -53,6 +57,10 @@ public class AsterixConfigurer {
 		return context;
 	}
 	
+	private <T> void registerPlugin(AsterixContext context, PluginHolder<T> pluginHolder) {
+		context.registerPlugin(pluginHolder.pluginType, pluginHolder.pluginProvider);
+	}
+
 	private List<AsterixApiProvider> createApiProviders(AsterixApiProviderFactory apiProviderFactory) {
 		List<AsterixApiProvider> result = new ArrayList<>();
 		for (AsterixApiDescriptor descriptor : asterixApiDescriptors.getAll()) {
@@ -78,7 +86,7 @@ public class AsterixConfigurer {
 		this.enableMonitoring = enableMonitoring;
 	}
 
-	private void discoverApiProviderPlugins() {
+	private void discoverApiProviderPlugins(AsterixContext context) {
 		discoverAllPlugins(context, AsterixApiProviderPlugin.class, new AsterixLibraryProviderPlugin()); // TODO: no need to pass default instance
 	}
 	
@@ -94,7 +102,7 @@ public class AsterixConfigurer {
 		}
 	}
 
-	private void configureVersioning() {
+	private void configureVersioning(AsterixContext context) {
 		if (enableVersioning) {
 			discoverOnePlugin(context, AsterixVersioningPlugin.class);
 		} else {
@@ -102,7 +110,7 @@ public class AsterixConfigurer {
 		}
 	}
 	
-	private void configureMonitoring() {
+	private void configureMonitoring(AsterixContext context) {
 		// TODO stop poller
 		if (enableMonitoring) {
 			AsterixMetricsPollerPlugin metricsPoller = discoverOnePlugin(context, AsterixMetricsPollerPlugin.class);
@@ -113,7 +121,7 @@ public class AsterixConfigurer {
 		
 	}
 
-	private void configureFaultTolerance() {
+	private void configureFaultTolerance(AsterixContext context) {
 		if (enableFaultTolerance) {
 			discoverOnePlugin(context, AsterixFaultTolerancePlugin.class);
 		} else {
@@ -143,7 +151,8 @@ public class AsterixConfigurer {
 	
 	// package private. Used for internal testing only
 	<T> void registerPlugin(Class<T> c, T provider) {
-		context.registerPlugin(c, provider);
+		plugins .add(new PluginHolder<>(c, provider));
+//		context.registerPlugin(c, provider);
 	}
 
 	public void set(String settingName, long value) {
@@ -152,5 +161,14 @@ public class AsterixConfigurer {
 	
 	public void setSettings(Map<String, String> settings) {
 		this.settings.setAll(settings);
+	}
+	
+	private static class PluginHolder<T> {
+		private Class<T> pluginType;
+		private T pluginProvider;
+		public PluginHolder(Class<T> pluginType, T pluginProvider) {
+			this.pluginType = pluginType;
+			this.pluginProvider = pluginProvider;
+		}
 	}
 }

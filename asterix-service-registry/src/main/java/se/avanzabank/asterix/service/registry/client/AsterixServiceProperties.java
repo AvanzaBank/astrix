@@ -18,11 +18,17 @@ package se.avanzabank.asterix.service.registry.client;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-
-public class AsterixServiceProperties implements Serializable {
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public final class AsterixServiceProperties implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
+	
 	private final Map<String, String> properties = new HashMap<>();
 	
 	public String getProperty(String name) {
@@ -66,7 +72,22 @@ public class AsterixServiceProperties implements Serializable {
 	public void setComponent(String component) {
 		setProperty("_component", component);
 	}
-	
-	
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.properties);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AsterixServiceProperties other = (AsterixServiceProperties) obj;
+		return Objects.equals(this.properties, other.properties);
+	}
 	
 }

@@ -15,17 +15,19 @@
  */
 package se.avanzabank.asterix.context;
 
+import java.lang.reflect.Proxy;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  * @param <T>
  */
-final class StatefulAsterixFactoryBean<T> implements AsterixFactoryBean<T>, AsterixDecorator, AsterixEventBusAware, AsterixSettingsAware {
+final class StatefulAsterixFactoryBean<T> implements AsterixFactoryBean<T>, AsterixDecorator, AsterixEventBusAware, AsterixBeanStateWorkerAware {
 
 	private final AsterixFactoryBean<T> targetFactory;
 	private AsterixEventBus eventBus;
-	private AsterixSettings settings;
+	private AsterixBeanStateWorker beanStateWorker;
 	
 	public StatefulAsterixFactoryBean(AsterixFactoryBean<T> targetFactory) {
 		if (!targetFactory.getBeanType().isInterface()) {
@@ -38,7 +40,13 @@ final class StatefulAsterixFactoryBean<T> implements AsterixFactoryBean<T>, Aste
 
 	@Override
 	public T create(String optionalQualifier) {
-		return StatefulAsterixBean.create(targetFactory, optionalQualifier, eventBus, settings);
+		StatefulAsterixBean<T> handler = new StatefulAsterixBean<>(targetFactory, optionalQualifier, eventBus);
+		try {
+			handler.bind();
+		} catch (Exception e) {
+		}
+		beanStateWorker.add(handler);
+		return targetFactory.getBeanType().cast(Proxy.newProxyInstance(targetFactory.getBeanType().getClassLoader(), new Class<?>[]{targetFactory.getBeanType()}, handler));
 	}
 
 	@Override
@@ -57,8 +65,8 @@ final class StatefulAsterixFactoryBean<T> implements AsterixFactoryBean<T>, Aste
 	}
 
 	@Override
-	public void setSettings(AsterixSettings settings) {
-		this.settings = settings;
+	public void setBeanStateWorker(AsterixBeanStateWorker worker) {
+		this.beanStateWorker = worker;
 	}
 
 }

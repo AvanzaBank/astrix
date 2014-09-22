@@ -52,5 +52,38 @@ public class AsterixTestUtil {
 			}
 		};
 	}
+	
+	public static <T extends Exception> Probe serviceInvocationException(final Supplier<?> serviceInvocation, final Matcher<T> matcher) {
+		return new Probe() {
+			
+			private Object lastResult;
+			private Exception lastException;
+
+			@Override
+			public void sample() {
+				try {
+					this.lastResult = serviceInvocation.get();
+				} catch (Exception e) {
+					this.lastException = e;
+				}
+			}
+			
+			@Override
+			public boolean isSatisfied() {
+				return matcher.matches(lastException);
+			}
+			
+			@Override
+			public void describeFailureTo(Description description) {
+				description.appendText("Expected serviceInovcation to throw exception: ");
+				matcher.describeTo(description);
+				if (lastException != null) {
+					description.appendText("\nBut last serviceInvocation threw exception: " + lastException.toString());
+				} else {
+					description.appendText("\nBut last serviceInvocation returnded " + lastResult);
+				}
+			}
+		};
+	}
 
 }

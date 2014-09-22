@@ -18,14 +18,18 @@ package se.avanzabank.asterix.context;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.avanzabank.asterix.core.ServiceUnavailableException;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ * @param <T>
+ */
 public class StatefulAsterixBean<T> implements InvocationHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(StatefulAsterixBean.class);
@@ -36,24 +40,22 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 	private final String id = nextId.incrementAndGet() + ""; // TODO remove beanId? its used for debugging
 	private final AsterixEventBus eventBus;
 	
-	private StatefulAsterixBean(AsterixFactoryBean<T> beanFactory, String optionalQualifier, AsterixEventBus eventBus) {
+	StatefulAsterixBean(AsterixFactoryBean<T> beanFactory, String optionalQualifier, AsterixEventBus eventBus) {
 		this.beanFactory = beanFactory;
 		this.optionalQualifier = optionalQualifier;
 		this.eventBus = eventBus;
 		this.state = new Unbound();
 	}
-
-	public static <T> T create(AsterixFactoryBean<T> beanFactory, String optionalQualifier, AsterixEventBus eventBus, AsterixSettings settings) {
-		// TODO: attempt to bind synchronously on startup
-		StatefulAsterixBean<T> handler = new StatefulAsterixBean<>(beanFactory, optionalQualifier, eventBus);
-		try {
-			handler.bind();
-		} catch (Exception e) {
-			new AsterixBeanStateWorker<>(handler, settings.getLong(AsterixSettings.BEAN_REBIND_ATTEMP_INTERVAL, 10_000L)).start(); // TODO: manage worker thread lifecycle. Use single worker for all beans?
-		}
-		return beanFactory.getBeanType().cast(Proxy.newProxyInstance(beanFactory.getClass().getClassLoader(), new Class<?>[]{beanFactory.getBeanType()}, handler));
+	
+	
+	public String getId() {
+		return id;
 	}
-
+	
+	public AsterixFactoryBean<T> getBeanFactory() {
+		return beanFactory;
+	}
+	
 	public boolean isBound() {
 		return this.state.getClass().equals(Bound.class);
 	}
@@ -64,45 +66,17 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 		this.eventBus.fireEvent(new AsterixBeanStateChangedEvent(AsterixBeanKey.create(beanFactory.getBeanType(), optionalQualifier), AsterixBeanState.BOUND));
 		log.info("Successfully bound to " + beanFactory.getBeanType() + ", asterixBeanId=" + id);
 	}
+	
+	public void rebind() {
+		T bean = this.beanFactory.create(optionalQualifier);
+		this.state = new Bound(bean);
+		log.info("Successfully rebound to " + beanFactory.getBeanType() + ", asterixBeanId=" + id);
+	}
+	
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		return state.invoke(proxy, method, args);
-	}
-	
-	private static class AsterixBeanStateWorker<T> extends Thread {
-		
-		private final StatefulAsterixBean<T> asterixBean;
-		private final long beanRebindAttemptIntervalMillis;
-		
-		public AsterixBeanStateWorker(StatefulAsterixBean<T> asterixBean, long beanRebindAttemptIntervalMillis) {
-			this.asterixBean = asterixBean;
-			this.beanRebindAttemptIntervalMillis = beanRebindAttemptIntervalMillis;
-			setName("asterix-BeanStateWorker-" + asterixBean.beanFactory.getBeanType().getSimpleName());
-		}
-		
-		@Override
-		public void run() {
-			while(!interrupted()) {
-				if (!asterixBean.isBound()) {
-					log.debug("Binding bean. asterixBeanId=" + asterixBean.id);
-					try {
-						asterixBean.bind();
-					} catch (MissingExternalDependencyException e) {
-						log.error("Runtime configuration error. Failed to create " + asterixBean.beanFactory.getBeanType(), e);
-						return;
-					} catch (Exception e) {
-						log.info("Failed to bind to " + asterixBean.beanFactory.getBeanType().getName(), e);
-					}
-				}
-				try {
-					log.debug("Waiting " + this.beanRebindAttemptIntervalMillis + " ms until next bind attempt");
-					Thread.sleep(this.beanRebindAttemptIntervalMillis);
-				} catch (InterruptedException e) {
-					interrupt();
-				} 
-			}
-		}
 	}
 	
 	private class Bound implements InvocationHandler {
@@ -119,6 +93,7 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 			try {
 				return method.invoke(bean, args);
 			} catch (InvocationTargetException e) {
+				e.printStackTrace();
 				throw e.getTargetException();
 			}
 		}

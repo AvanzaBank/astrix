@@ -37,6 +37,7 @@
 
 * Versionshantering av tjänster - implementera - testa
 
+* Optimerad trafik mot tjänsteregistret. Låt klienten fråga efter flera tjänster i samma slagning.
 
 * Hantera att tjänsteregistret inte är tillgänglig när man skapar en tjänst. Done?
 

@@ -23,21 +23,23 @@ import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixApiProviderPlugin;
+import se.avanzabank.asterix.context.AsterixDecorator;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 
 @MetaInfServices(AsterixApiProviderPlugin.class)
-public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderPlugin, AsterixPluginsAware {
+public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderPlugin, AsterixPluginsAware, AsterixDecorator {
 	
 	private AsterixPlugins plugins;
-
+	private AsterixServiceRegistryLeaseManager leaseManager = new AsterixServiceRegistryLeaseManager();
+	
 	@Override
 	public List<AsterixFactoryBean<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
 		List<AsterixFactoryBean<?>> result = new ArrayList<>();
 		for (Class<?> exportedApi : descriptor.getAnnotation(AsterixServiceRegistryApi.class).exportedApis()) {
-			result.add(new ServiceRegistryLookupFactory<>(descriptor, exportedApi, plugins));
+			result.add(new ServiceRegistryLookupFactory<>(descriptor, exportedApi, plugins, leaseManager));
 		}
 		return result;
 	}
@@ -57,4 +59,8 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 		return true;
 	}
 
+	@Override
+	public Object getTarget() {
+		return leaseManager; // TODO: this is a hack. Introduce possibility for plugins to inject dependencies into objects that the create on their own?
+	}
 }

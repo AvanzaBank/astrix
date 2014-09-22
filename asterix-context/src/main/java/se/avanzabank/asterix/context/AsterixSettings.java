@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AsterixSettings {
 	
 	public static final String BEAN_REBIND_ATTEMP_INTERVAL = "StatefulAsterixBean.beanRebindAttemptInterval";
+	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AsterixServiceRegistryLeaseManager.leaseRenewInterval";
 	
 	private final Map<String, Object> settings = new ConcurrentHashMap<>();
 	

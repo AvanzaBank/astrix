@@ -109,5 +109,9 @@ public class AsterixDirectComponent implements AsterixServiceRegistryComponent {
 	public Collection<ServiceProvider<?>> listProviders() {
 		return providerById.values();
 	}
+
+	public void clear(String id) {
+		providerById.remove(id);
+	}
 	
 }

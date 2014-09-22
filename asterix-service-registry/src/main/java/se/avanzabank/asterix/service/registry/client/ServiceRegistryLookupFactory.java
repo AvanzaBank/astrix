@@ -30,19 +30,27 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 	private AsterixApiDescriptor descriptor;
 	private AsterixBeans beans;
 	private AsterixPlugins plugins;
+	private AsterixServiceRegistryLeaseManager leaseManager;
 
 	public ServiceRegistryLookupFactory(AsterixApiDescriptor descriptor,
 										Class<T> api,
-										AsterixPlugins plugins) {
+										AsterixPlugins plugins,
+										AsterixServiceRegistryLeaseManager leaseManager) {
 		this.descriptor = descriptor;
 		this.api = api;
 		this.plugins = plugins;
+		this.leaseManager = leaseManager;
 	}
 
 	@Override
 	public T create(String qualifier) {
 		AsterixServiceRegistry serviceRegistry = beans.getBean(AsterixServiceRegistry.class);
-		AsterixServiceProperties serviceProperties = serviceRegistry.lookup(api, qualifier); // TODO: might fail
+		AsterixServiceProperties serviceProperties = serviceRegistry.lookup(api, qualifier);
+		T service = create(qualifier, serviceProperties);
+		return leaseManager.startManageLease(service, serviceProperties, qualifier, this);
+	}
+	
+	public T create(String qualifier, AsterixServiceProperties serviceProperties) {
 		if (serviceProperties == null) {
 			throw new RuntimeException(String.format("Misssing entry in service-registry api=%s qualifier=%s: ", api.getName(), qualifier));
 		}

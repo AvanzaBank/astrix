@@ -18,6 +18,7 @@ package se.avanzabank.asterix.service.registry.client;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static se.avanzabank.asterix.context.AsterixTestUtil.serviceInvocationException;
 import static se.avanzabank.asterix.context.AsterixTestUtil.serviceInvocationResult;
 
 import java.util.Map;
@@ -26,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.openspaces.remoting.Routing;
@@ -47,29 +50,30 @@ import se.avanzabank.asterix.service.registry.app.ServiceKey;
 public class AsterixServiceRegistryTest {
 	
 	private AsterixDirectComponent directComponent;
-	private AsterixServiceRegistry serviceRegistry;
+	private FakeServiceRegistry serviceRegistry;
 	private AsterixContext context;
 	
-	static {
-		// TODO: remove debugging information
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.WARN);
-		Logger.getLogger("se.avanzabank.asterix").setLevel(Level.DEBUG);
-	}
+//	static {
+//		// TODO: remove debugging information
+//		BasicConfigurator.configure();
+//		Logger.getRootLogger().setLevel(Level.WARN);
+//		Logger.getLogger("se.avanzabank.asterix").setLevel(Level.DEBUG);
+//	}
 
 	@Before
 	public void setup() {
 		TestAsterixConfigurer configurer = new TestAsterixConfigurer();
 		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMP_INTERVAL, 10);
+		configurer.set(AsterixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 10);
 		configurer.registerApiDescriptor(GreetingApiDescriptor.class);
 		configurer.registerApiDescriptor(FakeServiceRegistryDescriptor.class);
 		context = configurer.configure();
 		directComponent = context.getPluginInstance(AsterixDirectComponent.class);
-		serviceRegistry = context.getBean(AsterixServiceRegistry.class);
+		serviceRegistry = (FakeServiceRegistry) context.getBean(AsterixServiceRegistry.class);
 	}
 	
 	@Test
-	public void lookupServiceInRegistryAndBind() throws Exception {
+	public void lookupService_serviceAvailableInRegistry_ServiceIsImmediatlyBound() throws Exception {
 		final String objectId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		serviceRegistry.register(GreetingService.class, directComponent.getServiceProperties(objectId));
 		
@@ -78,7 +82,7 @@ public class AsterixServiceRegistryTest {
 	}
 	
 	@Test
-	public void serviceIsEventuallyBoundWhenServiceNotAvailableInRegistryOnFirstLookup() throws Exception {
+	public void lookupService_ServiceAvailableInRegistryButItsNotPossibleToBindToIt_ServiceIsBoundWhenServiceBecamesAvailable() throws Exception {
 		final String objectId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		
@@ -97,7 +101,7 @@ public class AsterixServiceRegistryTest {
 		}, equalTo("hello: kalle")));
 	}
 	
-//	@Test
+	@Test
 	public void serviceIsReboundIfServiceIsMovedInRegistry() throws Exception {
 		final String providerId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		serviceRegistry.register(GreetingService.class, directComponent.getServiceProperties(providerId));
@@ -114,6 +118,33 @@ public class AsterixServiceRegistryTest {
 				return dummyService.hello("kalle");
 			}
 		}, equalTo("hej: kalle")));
+	}
+	
+	@Test
+	public void whenServiceIsRemovedFromRegistryItShouldStartThrowingServiceUnavailable() throws Exception {
+		final String providerId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		serviceRegistry.register(GreetingService.class, directComponent.getServiceProperties(providerId));
+		
+		final GreetingService dummyService = context.getBean(GreetingService.class);
+		assertEquals("hello: kalle", dummyService.hello("kalle"));
+		
+		serviceRegistry.clear();
+		
+		assertEventually(serviceInvocationException(new Supplier<String>() {
+			@Override
+			public String get() {
+				return dummyService.hello("kalle");
+			}
+		}, new TypeSafeMatcher<ServiceUnavailableException>() {
+			@Override
+			public void describeTo(Description description) {
+				description.appendText("Expected ServiceUnavailableException to be thrown");
+			}
+			@Override
+			protected boolean matchesSafely(ServiceUnavailableException item) {
+				return true;
+			}
+		}));
 	}
 	
 	private void assertEventually(Probe probe) throws InterruptedException {
@@ -143,6 +174,10 @@ public class AsterixServiceRegistryTest {
 		@Override
 		public <T> void register(@Routing Class<T> type, AsterixServiceProperties properties) {
 			this.servicePropertiesByKey.put(new ServiceKey(type.getName(), properties.getQualifier()), properties);
+		}
+		
+		public void clear() {
+			this.servicePropertiesByKey.clear();
 		}
 	}
 	
