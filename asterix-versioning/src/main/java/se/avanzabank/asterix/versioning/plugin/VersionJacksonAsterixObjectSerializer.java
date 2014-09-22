@@ -57,11 +57,17 @@ public class VersionJacksonAsterixObjectSerializer implements AsterixObjectSeria
 
 	@Override
 	public <T> T deserialize(Object element, Class<T> type, int fromVersion) {
+		if (fromVersion == NoVersioningSupport.NO_VERSIONING) {
+			return type.cast(element);
+		}
 		return objectMapper.deserialize((String) element, type, fromVersion);
 	}
 
 	@Override
 	public Object serialize(Object element, int version) {
+		if (version == NoVersioningSupport.NO_VERSIONING) {
+			return element;
+		}
 		return objectMapper.serialize(element, version);
 	}
 

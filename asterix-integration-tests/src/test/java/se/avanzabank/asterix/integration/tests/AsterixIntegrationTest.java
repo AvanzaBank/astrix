@@ -16,7 +16,8 @@
 package se.avanzabank.asterix.integration.tests;
 
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static se.avanzabank.asterix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
 
 import java.util.concurrent.Future;
@@ -33,13 +34,17 @@ import org.openspaces.core.GigaSpace;
 
 import se.avanzabank.asterix.context.Asterix;
 import se.avanzabank.asterix.context.AsterixConfigurer;
+import se.avanzabank.asterix.context.AsterixContext;
 import se.avanzabank.asterix.context.AsterixSettings;
+import se.avanzabank.asterix.context.IllegalSubsystemException;
 import se.avanzabank.asterix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchServiceAsync;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchUtil;
+import se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder.InternalLunchFeeder;
 import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
+import se.avanzabank.asterix.integration.tests.domain2.apiruntime.PublicLunchFeeder;
 import se.avanzabank.asterix.remoting.client.AsterixRemoteServiceException;
 import se.avanzabank.core.test.util.jndi.EmbeddedJndiServer;
 import se.avanzabank.core.test.util.jndi.JndiServerRule;
@@ -91,6 +96,8 @@ public class AsterixIntegrationTest {
 	private LunchUtil lunchUtil;
 	private LunchRestaurantGrader lunchRestaurantGrader;
 	private LunchServiceAsync asyncLunchService;
+	private PublicLunchFeeder publicLunchFeeder;
+	private AsterixContext asterix;
 	
 	static {
 		// TODO: remove debugging information
@@ -109,15 +116,18 @@ public class AsterixIntegrationTest {
 		configurer.enableFaultTolerance(true);
 		configurer.enableVersioning(true);
 		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMP_INTERVAL, 100);
-		Asterix asterix = configurer.configure();
+		configurer.setSubsystem("test-sub-system");
+		asterix = configurer.configure();
 		this.lunchService = asterix.getBean(LunchService.class);
 		this.lunchUtil = asterix.getBean(LunchUtil.class);
 		this.lunchRestaurantGrader = asterix.getBean(LunchRestaurantGrader.class);
 		this.asyncLunchService = asterix.getBean(LunchServiceAsync.class);
+		this.publicLunchFeeder = asterix.getBean(PublicLunchFeeder.class);
 		asterix.waitForBean(LunchService.class, 2000);
 		asterix.waitForBean(LunchUtil.class, 2000); // TODO: it does not make sense to wait for a library. How to cluelessly design waiting for libraries?
 		asterix.waitForBean(LunchRestaurantGrader.class, 2000);
 		asterix.waitForBean(LunchServiceAsync.class, 2000);
+		asterix.waitForBean(PublicLunchFeeder.class, 2000);
 	}
 	
 	@Test
@@ -177,5 +187,23 @@ public class AsterixIntegrationTest {
 		Future<LunchRestaurant> f = asyncLunchService.getLunchRestaurant(request);
 		LunchRestaurant r = f.get(300, TimeUnit.MILLISECONDS);
 		assertEquals("Martins Green Room", r.getName());
+	}
+	
+	@Test
+	public void itsOkToInvokeUnversionedServicesWithinSameSubSystem() throws Exception {
+		// Lunch feeder indirectly invokes "internal" service 
+		publicLunchFeeder.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
+		GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
+		request.setName("Martins Green Room");
+		
+		Future<LunchRestaurant> f = asyncLunchService.getLunchRestaurant(request);
+		LunchRestaurant r = f.get(300, TimeUnit.MILLISECONDS);
+		assertEquals("Martins Green Room", r.getName());
+	}
+	
+	// TODO: implement me
+//	@Test(expected = IllegalSubsystemException.class)
+	public void itsNotAlloewsToCreateServicesBeansThatBindsToServicesInAgainstOtherSubSystems() throws Exception {
+		asterix.getBean(InternalLunchFeeder.class);
 	}
 }

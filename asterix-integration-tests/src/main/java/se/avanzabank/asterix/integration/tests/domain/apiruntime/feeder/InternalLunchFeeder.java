@@ -13,22 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.integration.tests.domain2.apiruntime;
+package se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder;
 
-import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
-import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
+import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 
-@AsterixServiceRegistryApi(
-	exportedApis = {
-		LunchRestaurantGrader.class,
-		PublicLunchFeeder.class
-	},
-	components = {
-		AsterixServiceRegistryComponentNames.GS_REMOTING
-	}
-)
-public class LunchGradeApiDescriptor {
+public interface InternalLunchFeeder {
+
+	void addLunchRestaurant(LunchRestaurant restaurant);
+
 }
-
-

@@ -21,10 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import se.avanzabank.asterix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
+import se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder.InternalLunchFeeder;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteServiceExport;
 
-@AsterixRemoteServiceExport(LunchService.class)
-public class LunchServiceImpl implements LunchService {
+@AsterixRemoteServiceExport({LunchService.class, InternalLunchFeeder.class})
+public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 
 	private final GigaSpace gigaSpace;
 	

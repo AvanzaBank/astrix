@@ -36,6 +36,7 @@ public class AsterixConfigurer {
 	private List<Object> externalDependencies = new ArrayList<>();
 	private final AsterixSettings settings = new AsterixSettings();
 	private final List<PluginHolder<?>> plugins = new ArrayList<>();
+	private String subsystem;
 	
 	public AsterixContext configure() {
 		AsterixContext context = new AsterixContext(settings);
@@ -170,5 +171,16 @@ public class AsterixConfigurer {
 			this.pluginType = pluginType;
 			this.pluginProvider = pluginProvider;
 		}
+	}
+
+	/**
+	 * Optional property that identifies what subsystem the current context belongs to. Its only
+	 * allowed to invoke non-versioned services within the same subsystem. Attempting
+	 * to create an bean in another subsystem will throw an exception. <p>
+	 * 
+	 * @param string
+	 */
+	public void setSubsystem(String subsystem) {
+		this.subsystem = subsystem;
 	}
 }

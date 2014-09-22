@@ -16,6 +16,7 @@
 		<property name="consumedAsterixBeans">
 			<list>
 				<value>se.avanzabank.asterix.integration.tests.domain.api.LunchService</value>
+				<value>se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder.InternalLunchFeeder</value>
 			</list>
 		</property>
 		<property name="settings">
@@ -28,6 +29,7 @@
 
 	<bean id="spaceLocator" class="se.avanzabank.space.UsesJndiLookupSpaceLocator" />
 	<bean id="lunchRestaurantGrader" class="se.avanzabank.asterix.integration.tests.domain2.pu.LunchRestaurantGraderImpl" />
+	<bean id="lunchFeeder" class="se.avanzabank.asterix.integration.tests.domain2.pu.PublicLunchFeederImpl"/>
 
 
 </beans>

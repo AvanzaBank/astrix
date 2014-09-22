@@ -15,20 +15,9 @@
  */
 package se.avanzabank.asterix.integration.tests.domain2.apiruntime;
 
-import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
-import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
+import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 
-@AsterixServiceRegistryApi(
-	exportedApis = {
-		LunchRestaurantGrader.class,
-		PublicLunchFeeder.class
-	},
-	components = {
-		AsterixServiceRegistryComponentNames.GS_REMOTING
-	}
-)
-public class LunchGradeApiDescriptor {
+public interface PublicLunchFeeder {
+
+	void addLunchRestaurant(LunchRestaurant restaurant);
 }
-
-

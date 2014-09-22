@@ -27,7 +27,7 @@ public class AsterixBeanStates implements AsterixEventListener<AsterixBeanStateC
 		ListenableEnumReference<AsterixBeanState> beanState = getBeanState(beanKey);
 		boolean bound = beanState.waitForValue(AsterixBeanState.BOUND, timeoutMillis);
 		if (!bound) {
-			throw new RuntimeException("Bean of type=" + beanState + " was not bound before timeout");
+			throw new RuntimeException("Bean with key=" + beanKey + " was not bound before timeout");
 		}
 	}
 

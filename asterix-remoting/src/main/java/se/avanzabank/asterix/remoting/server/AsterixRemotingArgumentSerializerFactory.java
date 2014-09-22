@@ -15,10 +15,7 @@
  */
 package se.avanzabank.asterix.remoting.server;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixPlugins;
@@ -27,41 +24,17 @@ import se.avanzabank.asterix.core.AsterixObjectSerializer;
 
 public class AsterixRemotingArgumentSerializerFactory {
 	
-//	private Class<?> apiDescriptorHolder;
-//	private ApplicationContext applicationContext;
-	private AsterixPlugins plugins;
-	private AsterixApiDescriptor apiDescriptor;
+	private final AsterixPlugins plugins;
+	private final AsterixApiDescriptor apiDescriptor;
 
 	@Autowired
-	public AsterixRemotingArgumentSerializerFactory(AsterixPlugins plugins, AsterixApiDescriptor apiDescriptor) { // plugin dependency
+	public AsterixRemotingArgumentSerializerFactory(AsterixPlugins plugins, AsterixApiDescriptor apiDescriptor) {
 		this.plugins = plugins;
 		this.apiDescriptor = apiDescriptor;
 	}
 
 	public AsterixObjectSerializer create() {
 		AsterixVersioningPlugin versioningPlugin = plugins.getPlugin(AsterixVersioningPlugin.class);
-//		Class<? extends Object> descriptorClass = apiDescriptorHolder;
 		return versioningPlugin.create(apiDescriptor);
 	}
-	
-//	@PostConstruct
-//	public void readDescriptor() {
-//		Collection<Object> remoteServiceDescriptors = applicationContext.getBeansWithAnnotation(AsterixGsApiDescriptor.class).values();
-//		if (remoteServiceDescriptors.size() != 1) {
-//			List<String> remoteServiceDescriptorTypes = new ArrayList<>();
-//			for (Object rsd : remoteServiceDescriptors) {
-//				remoteServiceDescriptorTypes.add(rsd.getClass().getName());
-//			}
-//			throw new IllegalStateException("Exactly one bean annotated with @AsterixGsApiDescriptor should exists in application context. found: " + remoteServiceDescriptorTypes);
-//		}
-//		this.apiDescriptorHolder = remoteServiceDescriptors.iterator().next().getClass();
-//	}
-
-//	@Override
-//	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-//		this.applicationContext = applicationContext;
-//	}
-	
-	
-
 }

@@ -17,6 +17,8 @@
 
 === V 1.0 "Account Performance" ===
 
+* Det ska kastas ett exception vid uppstart om inte alla tjänster som specifieras i tjänste-deskriptorn faktiskt exporteras från aktuell applikation
+
 * Inför gemensam klass för alla AsterixBeanFactory som håller rätt på vilken AsterixApiDescriptor som en given factory är skapad ur. 
 
 * Hur ska AsterixBeanDefnitionRegistryPlugin/AsterixServiceRegistryComponent's hantera beroenden? De bönor som dessa registrerar kommer inte

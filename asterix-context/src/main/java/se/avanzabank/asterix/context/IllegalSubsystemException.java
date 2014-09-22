@@ -13,22 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.integration.tests.domain2.apiruntime;
+package se.avanzabank.asterix.context;
 
-import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
-import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
+public class IllegalSubsystemException extends RuntimeException {
 
-@AsterixServiceRegistryApi(
-	exportedApis = {
-		LunchRestaurantGrader.class,
-		PublicLunchFeeder.class
-	},
-	components = {
-		AsterixServiceRegistryComponentNames.GS_REMOTING
-	}
-)
-public class LunchGradeApiDescriptor {
+	private static final long serialVersionUID = 1L;
+
 }
-
-

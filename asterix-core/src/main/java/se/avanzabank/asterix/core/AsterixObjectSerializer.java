@@ -16,7 +16,7 @@
 package se.avanzabank.asterix.core;
 
 public interface AsterixObjectSerializer {
-
+	
 	<T> T deserialize(Object element, Class<T> type, int version);
 
 	Object serialize(Object element, int version);
@@ -24,6 +24,9 @@ public interface AsterixObjectSerializer {
 	int version();
 
 	public static class NoVersioningSupport implements AsterixObjectSerializer {
+		
+		public static final int NO_VERSIONING = -21;
+		
 		@Override
 		public <T> T deserialize(Object element, Class<T> type, int version) {
 			if (type.isPrimitive()) {
@@ -37,7 +40,7 @@ public interface AsterixObjectSerializer {
 		}
 		@Override
 		public int version() {
-			return 0;
+			return NO_VERSIONING;
 		}
 	}
 }
