@@ -1,20 +1,17 @@
 === IN PROGRESS ===
 
-
-=== BACKLOG ===
-
-=== V 1.0 "Account Performance" ===
-
-* DirectComponent ska kunna användas utan att den behöver registreras programmatiskt.
-
-* LifeCycle-hantering av tjänster och andra astrix-komponenter.
-
 * Hantera att en tjänst uppslagen via tjänsteregistret "flyttas" till en ny endpoint. (RELATERAT TILL NÄSTA PUNKT)
 
 * Tjänster som registreras i service-registret måste leasas
 	- konsumenter: ska fortlöpande slå upp tjänster på bussen
 	- service-bus-pu: ska ta bort tjänster från registret om leasen inte förnyats
 	- server: ska regelbundet förnya leasen för de tjänster som tillhandahålls
+
+=== BACKLOG ===
+
+=== V 1.0 "Account Performance" ===
+
+* LifeCycle-hantering av tjänster och andra astrix-komponenter.
 	
 * Städa bort alla TODO:s från kodbasen.
 
@@ -83,3 +80,5 @@ en astrix-runtime.
 * Feltolerans - implementera
 
 * Inrapportering av metrics från olika astrix-pluginer
+
+* DirectComponent ska kunna användas utan att den behöver registreras programmatiskt.
