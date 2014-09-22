@@ -40,8 +40,24 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 		List<AsterixFactoryBean<?>> result = new ArrayList<>();
 		for (Class<?> exportedApi : descriptor.getAnnotation(AsterixServiceRegistryApi.class).exportedApis()) {
 			result.add(new ServiceRegistryLookupFactory<>(descriptor, exportedApi, plugins, leaseManager));
+			Class<?> asyncInterface = loadInterfaceIfExists(exportedApi.getName() + "Async");
+			if (asyncInterface != null) {
+				result.add(new ServiceRegistryLookupFactory<>(descriptor, asyncInterface, plugins, leaseManager));
+			}
 		}
 		return result;
+	}
+	
+	private Class<?> loadInterfaceIfExists(String interfaceName) {
+		try {
+			Class<?> c = Class.forName(interfaceName);
+			if (c.isInterface()) {
+				return c;
+			}
+		} catch (ClassNotFoundException e) {
+			// fall through and return null
+		}
+		return null;
 	}
 
 	@Override
