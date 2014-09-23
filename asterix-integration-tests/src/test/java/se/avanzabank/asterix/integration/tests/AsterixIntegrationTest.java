@@ -113,7 +113,7 @@ public class AsterixIntegrationTest {
 		
 		AsterixConfigurer configurer = new AsterixConfigurer();
 		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceRegistrypu.getLookupGroupName())); // For service-registry-discovery
-		configurer.enableFaultTolerance(true);
+		configurer.enableFaultTolerance(false); // TODO: enable fault tolerance
 		configurer.enableVersioning(true);
 		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMP_INTERVAL, 100);
 		configurer.setSubsystem("test-sub-system");

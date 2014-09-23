@@ -40,7 +40,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor {
 	
 	private List<Class<?>> consumedAsterixBeans = new ArrayList<>();
-	private Class<?> serviceDescriptor;
+	private AsterixServiceDescriptor serviceDescriptor;
 	private Map<String, String> settings = new HashMap<>();
 
 	/*
@@ -147,9 +147,9 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		}
 		
 		// Register service-descriptor in application-context for autowiring by other components
-		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixApiDescriptor.class);
+		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceDescriptor.class);
 		beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues(){{
-			addIndexedArgumentValue(0, serviceDescriptor);
+			addIndexedArgumentValue(0, serviceDescriptor.getHolder());
 		}});
 		registry.registerBeanDefinition("_asterixServiceDescriptor", beanDefinition); // TODO: rename to apiDescriptor?
 		for (AsterixBeanRegistryPlugin beanRegistryPlugin :
@@ -157,7 +157,7 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 			if (!this.serviceDescriptor.isAnnotationPresent(beanRegistryPlugin.getDescriptorType())) {
 				continue;
 			}
-			beanRegistryPlugin.registerBeanDefinitions(registry, new AsterixApiDescriptor(serviceDescriptor));
+			beanRegistryPlugin.registerBeanDefinitions(registry, serviceDescriptor);
 		}
 	}
 
@@ -215,7 +215,7 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	 * @param serviceDescriptor
 	 */
 	public void setServiceDescriptor(Class<?> serviceDescriptor) {
-		this.serviceDescriptor = serviceDescriptor;
+		this.serviceDescriptor = new AsterixServiceDescriptor(serviceDescriptor);
 	}
 	
 	public List<Class<?>> getConsumedApis() {

@@ -21,8 +21,8 @@ import org.kohsuke.MetaInfServices;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
-import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixBeanRegistryPlugin;
+import se.avanzabank.asterix.context.AsterixServiceDescriptor;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 import se.avanzabank.asterix.remoting.server.AsterixRemotingFrameworkBean;
 
@@ -34,7 +34,7 @@ import se.avanzabank.asterix.remoting.server.AsterixRemotingFrameworkBean;
 public class AsterixRemotingBeanRegistryPlugin implements AsterixBeanRegistryPlugin {
 
 	@Override
-	public void registerBeanDefinitions(BeanDefinitionRegistry registry, AsterixApiDescriptor descriptor) throws BeansException {
+	public void registerBeanDefinitions(BeanDefinitionRegistry registry, AsterixServiceDescriptor descriptor) throws BeansException {
 		new AsterixRemotingFrameworkBean().postProcessBeanDefinitionRegistry(registry);
 	}
 

@@ -17,24 +17,24 @@ package se.avanzabank.asterix.remoting.server;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixPlugins;
+import se.avanzabank.asterix.context.AsterixServiceDescriptor;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
 
 public class AsterixRemotingArgumentSerializerFactory {
 	
 	private final AsterixPlugins plugins;
-	private final AsterixApiDescriptor apiDescriptor;
+	private final AsterixServiceDescriptor serviceDescriptor;
 
 	@Autowired
-	public AsterixRemotingArgumentSerializerFactory(AsterixPlugins plugins, AsterixApiDescriptor apiDescriptor) {
+	public AsterixRemotingArgumentSerializerFactory(AsterixPlugins plugins, AsterixServiceDescriptor serviceDescriptor) {
 		this.plugins = plugins;
-		this.apiDescriptor = apiDescriptor;
+		this.serviceDescriptor = serviceDescriptor;
 	}
 
 	public AsterixObjectSerializer create() {
 		AsterixVersioningPlugin versioningPlugin = plugins.getPlugin(AsterixVersioningPlugin.class);
-		return versioningPlugin.create(apiDescriptor);
+		return versioningPlugin.create(serviceDescriptor.getApiDescriptor());
 	}
 }

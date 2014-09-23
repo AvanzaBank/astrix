@@ -29,6 +29,6 @@ public @interface AsterixService {
 
 	Class<?>[] apiDescriptors();
 	
-	String system();
+	String system() default "-";
 	
 }

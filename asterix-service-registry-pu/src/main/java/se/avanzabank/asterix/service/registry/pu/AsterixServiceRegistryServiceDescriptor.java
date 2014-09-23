@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.context;
+package se.avanzabank.asterix.service.registry.pu;
 
-import java.lang.annotation.Annotation;
+import se.avanzabank.asterix.provider.core.AsterixService;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryApiDescriptor;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+
 /**
+ * The service registry api uses asterix-remoting to export its service. Note that
+ * it doesn't use the service registry to bind to the providers, but rather uses a
+ * SpaceLocator and the space-name provided here. 
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AsterixBeanRegistryPlugin {
-	
-	// This is a server-side only component. Change name to reflect that
-	
-	void registerBeanDefinitions(BeanDefinitionRegistry registry, AsterixServiceDescriptor descriptor) throws BeansException;
-	
-	Class<? extends Annotation> getDescriptorType();
-	
-	
+@AsterixService(
+	apiDescriptors = {
+		AsterixServiceRegistryApiDescriptor.class
+	}
+)
+public class AsterixServiceRegistryServiceDescriptor {
 }
+
+

@@ -35,6 +35,7 @@ import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixBeanRegistryPlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
+import se.avanzabank.asterix.context.AsterixServiceDescriptor;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponents;
@@ -57,7 +58,7 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegi
 	private AsterixPlugins plugins;
 	
 	@Override
-	public void registerBeanDefinitions(BeanDefinitionRegistry registry, AsterixApiDescriptor descriptor) throws BeansException {
+	public void registerBeanDefinitions(BeanDefinitionRegistry registry, AsterixServiceDescriptor descriptor) throws BeansException {
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceRegistryExporterWorker.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_asterixServiceBusExporterWorker", beanDefinition);
@@ -81,7 +82,7 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixBeanRegi
 		}
 	}
 	
-	private Set<AsterixServiceRegistryComponent> getActiveComponents(AsterixApiDescriptor descriptor) {
+	private Set<AsterixServiceRegistryComponent> getActiveComponents(AsterixServiceDescriptor descriptor) {
 		Set<AsterixServiceRegistryComponent> result = new HashSet<>();
 		for (String componentName : descriptor.getAnnotation(AsterixServiceRegistryApi.class).components()) {
 			AsterixServiceRegistryComponent component = plugins.getPlugin(AsterixServiceRegistryComponents.class).getComponent(componentName);

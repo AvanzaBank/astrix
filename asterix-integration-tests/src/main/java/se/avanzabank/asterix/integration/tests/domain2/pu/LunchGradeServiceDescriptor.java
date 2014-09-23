@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.integration.tests.domain2.apiruntime;
+package se.avanzabank.asterix.integration.tests.domain2.pu;
 
+import se.avanzabank.asterix.integration.tests.domain2.apiruntime.LunchGradeApiDescriptor;
 import se.avanzabank.asterix.provider.core.AsterixService;
 
 

@@ -16,6 +16,8 @@
 package se.avanzabank.asterix.context;
 
 import java.lang.annotation.Annotation;
+
+import se.avanzabank.asterix.provider.core.AsterixService;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -24,30 +26,38 @@ import java.lang.annotation.Annotation;
 public class AsterixServiceDescriptor {
 
 	private final Class<?> descriptorHolder;
+	private final AsterixApiDescriptor apiDescriptor;
+	private AsterixService asterixService;
 
 	public AsterixServiceDescriptor(Class<?> descriptorHolder) {
+		this.asterixService = descriptorHolder.getAnnotation(AsterixService.class);
 		this.descriptorHolder = descriptorHolder;
+		this.apiDescriptor = new AsterixApiDescriptor(asterixService.apiDescriptors()[0]);
 	}
 
 	public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-		return descriptorHolder.isAnnotationPresent(annotationClass);
+		return apiDescriptor.isAnnotationPresent(annotationClass);
 	}
 
 	public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-		return descriptorHolder.getAnnotation(annotationClass);
+		return apiDescriptor.getAnnotation(annotationClass);
 	}
 	
 	public String getName() {
 		return this.descriptorHolder.getName();
 	}
 
-	public Class<?> getDescriptorClass() {
-		return descriptorHolder;
-	}
-	
 	@Override
 	public String toString() {
 		return descriptorHolder.getName().toString();
+	}
+
+	public Class<?> getHolder() {
+		return descriptorHolder;
+	}
+
+	public AsterixApiDescriptor getApiDescriptor() {
+		return this.apiDescriptor;
 	}
 	
 }
