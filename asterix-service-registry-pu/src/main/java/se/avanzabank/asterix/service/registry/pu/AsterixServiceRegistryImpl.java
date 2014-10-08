@@ -19,12 +19,14 @@ import org.openspaces.core.GigaSpace;
 import org.openspaces.remoting.Routing;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.provider.core.AsterixServiceExport;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteServiceExport;
 import se.avanzabank.asterix.service.registry.app.ServiceKey;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
 
-@AsterixRemoteServiceExport(AsterixServiceRegistry.class)
+//@AsterixRemoteServiceExport(AsterixServiceRegistry.class)
+@AsterixServiceExport(AsterixServiceRegistry.class)
 public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {
 	
 	private final GigaSpace gigaSpace;

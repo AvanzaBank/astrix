@@ -15,15 +15,24 @@
  */
 package se.avanzabank.asterix.context;
 
+import java.lang.annotation.Annotation;
 /**
- * This interface allows server-side components to get the service-descriptor for
- * the current server to be injected. 
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AsterixServiceProviderDescriptorAware {
+public interface AsterixServiceApiPlugin {
 	
-	void setServiceProviderDescriptor(AsterixApiDescriptor descriptor);
+	// This is a server-side only component. Change name to reflect that
+	
+//	void registerBeanDefinitions(BeanDefinitionRegistry registry, AsterixServiceDescriptor descriptor) throws BeansException;
+	
+//	void registerBeanDefinitions(BeanDefinitionRegistry registry);
+	
+	// TODO: move these methods to asterixservicetransport
+	
+	Class<? extends Annotation> getServiceDescriptorType();
+	
+	String getTransport();
 
 }

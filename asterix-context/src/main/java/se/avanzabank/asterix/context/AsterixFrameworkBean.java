@@ -40,7 +40,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor {
 	
 	private List<Class<?>> consumedAsterixBeans = new ArrayList<>();
-	private AsterixServiceDescriptor serviceDescriptor;
+	private Class<?> serviceDescriptorHolder;
 	private Map<String, String> settings = new HashMap<>();
 
 	/*
@@ -54,7 +54,7 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	 * Client side components will have their dependencies injected by AsterixContext (xxxAware).
 	 * 
 	 * Server side components will have their dependencies injected by spring as
-	 * it stands now. Server side components are registered by AsterixBeanRegistryPlugin's. 
+	 * it stands now. Server side components are registered by AsterixServiceApiPlugin's. 
 	 */
 	
 	@Override
@@ -91,10 +91,15 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		 * If this application also export a set of services (for instance to the AsterixServiceRegistry), 
 		 * then we must also register all required beans/components:
 		 * 
-		 * 2. Let all AsterixBeanRegistryPlugin's register their required spring-beans.
+		 * 2. Let all AsterixServiceApiPlugin's register their required spring-beans.
 		 * 
 		 */
 		
+		AsterixContext asterixContext = createConsumerRuntime(registry);
+		createServerRuntime(registry, asterixContext);
+	}
+
+	private AsterixContext createConsumerRuntime(BeanDefinitionRegistry registry) {
 		// TODO: avoid creating two AsterixContext's  (here and as spring bean). Creating two AsterixContext causes two scannings for providers
 		AsterixConfigurer configurer = new AsterixConfigurer();
 		configurer.setSettings(this.settings);
@@ -140,25 +145,33 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 			beanDefinition.setPropertyValues(props);
 			registry.registerBeanDefinition("_" + consumedAsterixBean.getName(), beanDefinition);
 		}
-		
-		if (serviceDescriptor == null) {
+		return asterixContext;
+	}
+
+	private void createServerRuntime(BeanDefinitionRegistry registry,
+			AsterixContext asterixContext) {
+		if (serviceDescriptorHolder == null) {
 			// Does not export any services, don't load any service-providing components
 			return;
 		}
-		
-		// Register service-descriptor in application-context for autowiring by other components
-		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceDescriptor.class);
-		beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues(){{
-			addIndexedArgumentValue(0, serviceDescriptor.getHolder());
-		}});
-		registry.registerBeanDefinition("_asterixServiceDescriptor", beanDefinition); // TODO: rename to apiDescriptor?
-		for (AsterixBeanRegistryPlugin beanRegistryPlugin :
-			asterixContext.getPlugins(AsterixBeanRegistryPlugin.class)) {
-			if (!this.serviceDescriptor.isAnnotationPresent(beanRegistryPlugin.getDescriptorType())) {
-				continue;
-			}
-			beanRegistryPlugin.registerBeanDefinitions(registry, serviceDescriptor);
+		try {
+			new AsterixServerRuntimeBuilder(asterixContext.getPlugins()).registerBeanDefinitions(registry, AsterixServiceDescriptor.create(serviceDescriptorHolder, asterixContext));
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("Failed to build server runtime", e);
 		}
+//		// Register service-descriptor in application-context for autowiring by other components
+//		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceDescriptor.class);
+//		beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues(){{
+//			addIndexedArgumentValue(0, serviceDescriptor.getHolder());
+//		}});
+//		registry.registerBeanDefinition("_asterixServiceDescriptor", beanDefinition);
+//		
+//		for (AsterixServiceApiPlugin beanRegistryPlugin : asterixContext.getPlugins(AsterixServiceApiPlugin.class)) {
+//			if (!this.serviceDescriptor.isAnnotationPresent(beanRegistryPlugin.getServiceDescriptorType())) {
+//				continue;
+//			}
+//			beanRegistryPlugin.registerBeanDefinitions(registry, serviceDescriptor);
+//		}
 	}
 
 	private String[] getDependencyBeanNames(
@@ -214,8 +227,8 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	 * 
 	 * @param serviceDescriptor
 	 */
-	public void setServiceDescriptor(Class<?> serviceDescriptor) {
-		this.serviceDescriptor = new AsterixServiceDescriptor(serviceDescriptor);
+	public void setServiceDescriptor(Class<?> serviceDescriptorHolder) {
+		this.serviceDescriptorHolder = serviceDescriptorHolder;
 	}
 	
 	public List<Class<?>> getConsumedApis() {

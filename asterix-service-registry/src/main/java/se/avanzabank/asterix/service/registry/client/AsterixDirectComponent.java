@@ -26,11 +26,14 @@ import org.kohsuke.MetaInfServices;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
+import se.avanzabank.asterix.context.AsterixServiceExporterBean;
+import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.context.AsterixServiceBuilder;
+import se.avanzabank.asterix.context.AsterixServiceTransport;
 import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
-import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
-@MetaInfServices(AsterixServiceRegistryComponent.class)
-public class AsterixDirectComponent implements AsterixServiceRegistryComponent {
+@MetaInfServices(AsterixServiceTransport.class)
+public class AsterixDirectComponent implements AsterixServiceRegistryComponent, AsterixServiceTransport {
 	
 	private final static AtomicLong idGen = new AtomicLong();
 	private final static Map<String, ServiceProvider<?>> providerById = new ConcurrentHashMap<>();
@@ -51,13 +54,13 @@ public class AsterixDirectComponent implements AsterixServiceRegistryComponent {
 	}
 
 	@Override
-	public Class<? extends ServiceRegistryExporter> getServiceExporterClass() {
-		return null; // NOT USED. Client side component only 
+	public Class<? extends AsterixServiceBuilder> getServiceExporterClass() {
+		return null; // NOT USED. This is a client side component only 
 	}
 
 	@Override
 	public List<String> getComponentDepenencies() {
-		return Collections.emptyList(); // NOT USED. Client side component only 
+		return Collections.emptyList(); // NOT USED. This is a client side component only 
 	}
 
 	@Override
@@ -78,7 +81,7 @@ public class AsterixDirectComponent implements AsterixServiceRegistryComponent {
 		}
 		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
 		serviceProperties.setProperty("providerId", id);
-		serviceProperties.setComponent(AsterixServiceRegistryComponentNames.DIRECT);
+		serviceProperties.setTransport(AsterixServiceRegistryComponentNames.DIRECT);
 		return serviceProperties;
 	}
 	
@@ -112,6 +115,23 @@ public class AsterixDirectComponent implements AsterixServiceRegistryComponent {
 
 	public void clear(String id) {
 		providerById.remove(id);
+	}
+
+	@Override
+	public <T> AsterixServiceProperties getServiceProperties(AsterixApiDescriptor apiDescriptor, Class<T> type) {
+		throw new UnsupportedOperationException("Direct component cannot be used without service registry");
+	}
+
+	@Override
+	public Class<? extends AsterixServiceExporterBean> getExporterBean() {
+		// NOT USED. This is a client side component only
+		return null;
+	}
+
+	@Override
+	public Class<? extends AsterixServiceBuilder> getServiceBuilder() {
+		// NOT USED. This is a client side component only
+		return null;
 	}
 	
 }

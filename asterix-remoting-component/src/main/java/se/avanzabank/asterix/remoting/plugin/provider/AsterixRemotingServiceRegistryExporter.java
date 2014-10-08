@@ -26,11 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.context.AsterixServiceBuilder;
+import se.avanzabank.asterix.gs.GsBinder;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteServiceExport;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
-import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
-public class AsterixRemotingServiceRegistryExporter implements ServiceRegistryExporter, ApplicationContextAware {
+public class AsterixRemotingServiceRegistryExporter implements AsterixServiceBuilder, ApplicationContextAware {
 	
 	public static final String SPACE_NAME_PROPERTY = "space";
 	
@@ -65,12 +66,22 @@ public class AsterixRemotingServiceRegistryExporter implements ServiceRegistryEx
 		log.debug("Found the following services for service registry export: {}", result);
 		return result;
 	}
+	
+	@Override
+	public boolean supportsAsyncApis() {
+		return true;
+	}
 
 	private void addSyncServiceProperties(List<AsterixServiceProperties> result, Object service, Class<?> providedApi) {
-		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
-		serviceProperties.setApi(providedApi);
-		serviceProperties.setProperty(SPACE_NAME_PROPERTY, gigaSpace.getSpace().getName());
+		AsterixServiceProperties serviceProperties = exportServiceProperties(providedApi);
 		result.add(serviceProperties);
+	}
+
+	@Override
+	public AsterixServiceProperties exportServiceProperties(Class<?> providedApi) {
+		AsterixServiceProperties serviceProperties = GsBinder.createProperties(this.gigaSpace);
+		serviceProperties.setQualifier(null); // TODO: this is a hack. Qualifier should not be managed internally in service-proprties-exporters
+		return serviceProperties;
 	}
 	
 	private void addAsyncServicePropertiesIfInterfaceExists(List<AsterixServiceProperties> result, Object service,

@@ -21,22 +21,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
- * Used to indicate that this api should be exported(published) to the
- * service registry as well as looked up on the service registry by
- * consumers.
- * 
  * @author Elias Lindholm (elilin)
  */
 @Target(value = { ElementType.TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
-public @interface AsterixServiceRegistryApi {
+public @interface AsterixServiceExport {
 
-	Class<?>[] exportedApis();
-	
-	// TODO: remove this property from this annotation and identify component on AsterixService/AsterixServiceExport
-//	String[] components();
-	
+	Class<?>[] value();
+
 }

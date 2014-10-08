@@ -26,9 +26,19 @@ import java.lang.annotation.Target;
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
 public @interface AsterixService {
+	
+	// TODO: rename to AsterixServer?
 
 	Class<?>[] apiDescriptors();
 	
 	String system() default "-";
+
+	// String[] components(); ???
+	
+	/**
+	 * Default component used when exporting services.
+	 * @return
+	 */
+	String component(); // TODO: remove
 	
 }

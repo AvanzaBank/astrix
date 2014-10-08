@@ -19,7 +19,7 @@ import net.jini.core.discovery.LookupLocator;
 
 import org.openspaces.core.GigaSpace;
 
-import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
+import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.space.UsesLookupGroupsSpaceLocator;
 import se.avanzabank.space.UsesLookupLocatorsSpaceLocator;
 
@@ -28,10 +28,12 @@ import com.j_spaces.core.client.SpaceURL;
 
 public class GsBinder {
 	
+	
 	public static GsFactory createGsFactory(AsterixServiceProperties properties) {
 		String locators = properties.getProperty("locators");
 		String groups = properties.getProperty("groups");
-		String targetSpace = properties.getQualifier();
+		String targetSpace = properties.getProperty("space");
+//		String targetSpace = properties.getQualifier();
 		if (locators != null) {
 			return new GsFactory(new UsesLookupLocatorsSpaceLocator(locators), targetSpace);
 		}
@@ -45,6 +47,7 @@ public class GsBinder {
 		AsterixServiceProperties result = new AsterixServiceProperties();
 		result.setApi(GigaSpace.class);
 		result.setQualifier(space.getSpace().getName()); // TODO: note that gigaSpace.getName returns "GigaSpace" on embedded space
+		result.setProperty("space", space.getSpace().getName()); // TODO: note that gigaSpace.getName returns "GigaSpace" on embedded space
 		SpaceURL finderURL = space.getSpace().getFinderURL();
 		LookupLocator[] locators = finderURL.getLookupLocators();
 		if (locators != null) {

@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
 
+import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
 /**
  * 

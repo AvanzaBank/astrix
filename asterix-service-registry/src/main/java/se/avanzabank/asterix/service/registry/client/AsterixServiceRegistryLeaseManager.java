@@ -22,6 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import se.avanzabank.asterix.context.AsterixBeanAware;
 import se.avanzabank.asterix.context.AsterixBeans;
+import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.AsterixSettingsAware;
 

@@ -20,9 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 import se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder.InternalLunchFeeder;
 import se.avanzabank.asterix.integration.tests.domain2.apiruntime.PublicLunchFeeder;
-import se.avanzabank.asterix.provider.remoting.AsterixRemoteServiceExport;
+import se.avanzabank.asterix.provider.core.AsterixServiceExport;
 
-@AsterixRemoteServiceExport(PublicLunchFeeder.class)
+@AsterixServiceExport(PublicLunchFeeder.class)
 public class PublicLunchFeederImpl implements PublicLunchFeeder {
 
 	// Since this is part of the same subsystem, this app is allowed to invoke it

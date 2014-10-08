@@ -46,6 +46,7 @@ public class AsterixContext implements Asterix {
 	private final AsterixBeanStates beanStates = new AsterixBeanStates();
 	private final AsterixSettings settings;
 	private final AsterixBeanStateWorker beanStateWorker;
+	private AsterixApiProviderPlugins apiProviderPlugins;
 	
 	public AsterixContext(AsterixSettings settings) {
 		this.settings = Objects.requireNonNull(settings);
@@ -316,6 +317,14 @@ public class AsterixContext implements Asterix {
 			}
 		}
 		throw new IllegalArgumentException("Plugin provider not found: " + providerType.getName());
+	}
+
+	public List<Class<?>> getExportedBeans(AsterixApiDescriptor apiDescriptor) {
+		return apiProviderPlugins.getExportedBeans(apiDescriptor);
+	}
+
+	void setApiProviderPlugins(AsterixApiProviderPlugins apiProviderPlugins) {
+		this.apiProviderPlugins = apiProviderPlugins;
 	}
 	
 }

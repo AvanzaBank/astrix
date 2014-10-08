@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.service.registry.client;
+package se.avanzabank.asterix.context;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -65,12 +65,12 @@ public final class AsterixServiceProperties implements Serializable {
 		return properties.toString();
 	}
 
-	public String getComponent() {
+	public String getTransport() {
 		return getProperty("_component");
 	}
 	
-	public void setComponent(String component) {
-		setProperty("_component", component);
+	public void setTransport(String transport) {
+		setProperty("_component", transport);
 	}
 
 	@Override

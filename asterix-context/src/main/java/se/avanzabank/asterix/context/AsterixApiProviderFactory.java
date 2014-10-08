@@ -23,30 +23,23 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
- * This is a component used to create runtime factory representations (AsterixApiProvider) for api's hooked
- * into asterix. Given an descriptorHolder this factory creates an AsterixApiProvider for a given api. <p>
+ * This component is used to create runtime factory representations (AsterixApiProvider) for api's hooked
+ * into asterix. An API is defined by an AsterixApiDescriptor, which in turn uses different annotations for
+ * different types of apis. This class is responsible for interpreting such annotations and create an
+ * AsterixApiProvider for the given api. <p>
  *  
  * @author Elias Lindholm (elilin)
  *
  */
 public class AsterixApiProviderFactory {
 	
-	private final Logger log = LoggerFactory.getLogger(AsterixApiProviderFactory.class);
 	private final ConcurrentMap<Class<? extends Annotation>, AsterixApiProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
+	private final AsterixApiProviderPlugins apiProviderPlugins;
 	
-	public AsterixApiProviderFactory(Collection<AsterixApiProviderPlugin> apiProviderPlugins) {
-		for (AsterixApiProviderPlugin plugin : apiProviderPlugins) {
-			AsterixApiProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
-			if (previous != null) {
-				// TODO: how to handle multiple providers for same annotation type? Is it allowed?
-				log.warn("Multiple AsterixApiProviderPlugin's found for annotation={}. p1={} p2={}", new Object[]{plugin, previous});
-			}
-		}
+	public AsterixApiProviderFactory(AsterixApiProviderPlugins apiProviderPlugins) {
+		this.apiProviderPlugins = apiProviderPlugins;
 	}
 	
 	public Set<Class<? extends Annotation>> getProvidedAnnotationTypes() {
@@ -65,14 +58,9 @@ public class AsterixApiProviderFactory {
 		}
 		return new AsterixApiProvider(factoryBeans, descriptor, providerFactoryPlugin.useStatefulBeanFactory()); 
 	}
-
+	
 	private AsterixApiProviderPlugin getProviderPlugin(AsterixApiDescriptor descriptor) {
-		for (AsterixApiProviderPlugin plugin : pluginByAnnotationType.values()) {
-			if (descriptor.isAnnotationPresent(plugin.getProviderAnnotationType())) {
-				return plugin;
-			}
-		}
-		throw new IllegalArgumentException("No plugin registered that can handle descriptor: " + descriptor);
+		return this.apiProviderPlugins.getProviderPlugin(descriptor);
 	}
 	
 }

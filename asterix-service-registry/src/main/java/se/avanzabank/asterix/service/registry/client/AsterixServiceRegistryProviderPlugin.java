@@ -17,6 +17,7 @@ package se.avanzabank.asterix.service.registry.client;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
@@ -45,6 +46,14 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 				result.add(new ServiceRegistryLookupFactory<>(descriptor, asyncInterface, plugins, leaseManager));
 			}
 		}
+		return result;
+	}
+	
+	@Override
+	public List<Class<?>> getProvidedBeans(AsterixApiDescriptor descriptor) {
+		AsterixServiceRegistryApi remoteApiDescriptor = descriptor.getAnnotation(AsterixServiceRegistryApi.class);
+		List<Class<?>> result = new ArrayList<>();
+		result.addAll(Arrays.asList(remoteApiDescriptor.exportedApis()));
 		return result;
 	}
 	

@@ -21,10 +21,10 @@ import java.util.List;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
-import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
+import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.context.AsterixServiceBuilder;
 
-public class GigaSpaceServiceRegistryExporter implements ServiceRegistryExporter {
+public class GigaSpaceServiceRegistryExporter implements AsterixServiceBuilder {
 	
 	private final GigaSpace space;
 
@@ -36,6 +36,19 @@ public class GigaSpaceServiceRegistryExporter implements ServiceRegistryExporter
 	@Override
 	public List<AsterixServiceProperties> getProvidedServices() {
 		return Arrays.asList(GsBinder.createProperties(space));
+	}
+
+	@Override
+	public AsterixServiceProperties exportServiceProperties(Class<?> type) {
+		if (!type.equals(GigaSpace.class)) {
+			throw new IllegalArgumentException("Can't export: " + type);
+		}
+		return GsBinder.createProperties(space);
+	}
+	
+	@Override
+	public boolean supportsAsyncApis() {
+		return false;
 	}
 
 }

@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
+import se.avanzabank.asterix.context.AsterixServiceDescriptor;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.remoting.client.AsterixMissingServiceException;
 import se.avanzabank.asterix.remoting.client.AsterixMissingServiceMethodException;
@@ -48,9 +50,11 @@ public class AsterixServiceActivator {
 
 		private final T service;
 		private final Map<String, Method> methodBySignature = new HashMap<>();
+		private final AsterixObjectSerializer objectSerializer;
 
-		public PublishedService(T service, Class<?>... providedApis) {
+		public PublishedService(T service, AsterixObjectSerializer serializer, Class<?>... providedApis) {
 			this.service = service;
+			this.objectSerializer = serializer;
 			for (Class<?> api : providedApis) {
 				for (Method m : api.getMethods()) {
 					methodBySignature.put(MethodSignatureBuilder.build(m), m);
@@ -62,22 +66,44 @@ public class AsterixServiceActivator {
 			return service;
 		}
 		
+		public AsterixServiceInvocationResponse doInvoke(AsterixServiceInvocationRequest request, int version, String serviceApi) throws Exception {
+			String serviceMethodSignature = request.getHeader("serviceMethodSignature");
+			Method serviceMethod = methodBySignature.get(serviceMethodSignature);
+			if (serviceMethod == null) {
+				throw new AsterixMissingServiceMethodException(String.format("Missing service method: service=%s method=%s", serviceApi, serviceMethodSignature));
+			}
+			
+			Object[] arguments = unmarshal(request.getArguments(), serviceMethod.getParameterTypes(), version);
+			Object result = serviceMethod.invoke(service, arguments);
+			AsterixServiceInvocationResponse invocationResponse = new AsterixServiceInvocationResponse();
+			if (!serviceMethod.getReturnType().equals(Void.TYPE)) {
+				invocationResponse.setResponseBody(objectSerializer.serialize(result, version));
+			}
+			return invocationResponse;
+		}
+
+		private Object[] unmarshal(Object[] elements, Class<?>[] types, int version) {
+			Object[] result = new Object[elements.length];
+			for (int i = 0; i < result.length; i++) {
+				result[i] = objectSerializer.deserialize(elements[i], types[i], version);
+			}
+			return result;
+		}
+		
 	}
 	
 	private final ConcurrentMap<String, PublishedService<?>> serviceByType = new ConcurrentHashMap<>();
-	private final AsterixObjectSerializer objectSerializer;
-
-	public AsterixServiceActivator(AsterixObjectSerializer objectSerializer) {
-		this.objectSerializer = objectSerializer;
-	}
+	private final AsterixRemotingArgumentSerializerFactory objectSerializerFactory;
 	
 	@Autowired
 	public AsterixServiceActivator(AsterixRemotingArgumentSerializerFactory objectSerializerFactory) {
-		this.objectSerializer = objectSerializerFactory.create();
+		this.objectSerializerFactory = objectSerializerFactory;
 	}
 
-	public void register(Object provider, Class<?>... publishedApis) {
-		PublishedService<?> publishedService = new PublishedService<>(provider, publishedApis);
+	public void register(Object provider, AsterixApiDescriptor apiDescriptor, Class<?>... publishedApis) {
+		// TODO allow different apis to have different object serializer?
+		AsterixObjectSerializer objectSerializer = objectSerializerFactory.create(apiDescriptor); 
+		PublishedService<?> publishedService = new PublishedService<>(provider, objectSerializer, publishedApis);
 		for (Class<?> publishedApi : publishedApis) {
 			this.serviceByType.put(publishedApi.getName(), publishedService);
 		}
@@ -89,7 +115,13 @@ public class AsterixServiceActivator {
 	 */
 	public AsterixServiceInvocationResponse invokeService(AsterixServiceInvocationRequest request) {
 		try {
-			return doInvoke(request);
+			int version = Integer.parseInt(request.getHeader("apiVersion")); // TODO: allow version to be null?
+			String serviceApi = request.getHeader("serviceApi");
+			PublishedService<?> publishedService = this.serviceByType.get(serviceApi);
+			if (publishedService == null) {
+				throw new AsterixMissingServiceException("No such service: " + serviceApi);
+			}
+			return publishedService.doInvoke(request, version, serviceApi);
 		} catch (Exception e) {
 			Throwable exceptionThrownByService = resolveException(e);
 			AsterixServiceInvocationResponse invocationResponse = new AsterixServiceInvocationResponse();
@@ -107,36 +139,6 @@ public class AsterixServiceActivator {
 			return InvocationTargetException.class.cast(e).getTargetException();
 		}
 		return e;
-	}
-
-	private AsterixServiceInvocationResponse doInvoke(AsterixServiceInvocationRequest request) throws Exception {
-		int version = Integer.parseInt(request.getHeader("apiVersion")); // TODO: allow version to be null?
-		String serviceApi = request.getHeader("serviceApi");
-		PublishedService<?> publishedService = this.serviceByType.get(serviceApi);
-		if (publishedService == null) {
-			throw new AsterixMissingServiceException("No such service: " + serviceApi);
-		}
-		String serviceMethodSignature = request.getHeader("serviceMethodSignature");
-		Method serviceMethod = publishedService.methodBySignature.get(serviceMethodSignature);
-		if (serviceMethod == null) {
-			throw new AsterixMissingServiceMethodException(String.format("Missing service method: service=%s method=%s", serviceApi, serviceMethodSignature));
-		}
-		
-		Object[] arguments = unmarshal(request.getArguments(), serviceMethod.getParameterTypes(), version);
-		Object result = serviceMethod.invoke(publishedService.service, arguments);
-		AsterixServiceInvocationResponse invocationResponse = new AsterixServiceInvocationResponse();
-		if (!serviceMethod.getReturnType().equals(Void.TYPE)) {
-			invocationResponse.setResponseBody(objectSerializer.serialize(result, version));
-		}
-		return invocationResponse;
-	}
-
-	private Object[] unmarshal(Object[] elements, Class<?>[] types, int version) {
-		Object[] result = new Object[elements.length];
-		for (int i = 0; i < result.length; i++) {
-			result[i] = objectSerializer.deserialize(elements[i], types[i], version);
-		}
-		return result;
 	}
 
 }

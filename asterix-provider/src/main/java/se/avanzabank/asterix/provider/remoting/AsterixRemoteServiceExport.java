@@ -21,12 +21,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
+import se.avanzabank.asterix.provider.core.AsterixServiceExport;
+
 /**
  * @author Elias Lindholm (elilin)
  */
 @Target(value = { ElementType.TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
+//@AsterixServiceExport
 public @interface AsterixRemoteServiceExport {
 
 	Class<?>[] value();

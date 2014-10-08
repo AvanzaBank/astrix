@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.integration.tests.domain.apiruntime;
+package se.avanzabank.asterix.gs;
 
-import se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder.LunchFeederApiDescriptor;
+import org.openspaces.core.GigaSpace;
+
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
+import se.avanzabank.asterix.context.AsterixServiceExporterBean;
 import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
-import se.avanzabank.asterix.provider.core.AsterixService;
 
+public class GsServiceExporter implements AsterixServiceExporterBean {
 
-@AsterixService(
-	apiDescriptors = {
-		LunchApiDescriptor.class,
-		LunchFeederApiDescriptor.class
-	},
-	system = "lunch-service",
-	component = AsterixServiceRegistryComponentNames.GS_REMOTING
-)
-public class LunchServiceDescriptor {
+	@Override
+	public void register(Object provider, AsterixApiDescriptor apiDescriptor, Class<?> providedApi) {
+		if (!providedApi.equals(GigaSpace.class)) {
+			throw new IllegalArgumentException("Cannot export: " + providedApi);
+		}
+		// Nothing required to export GigaSpace.
+	}
+	
+	@Override
+	public String getTransport() {
+		return AsterixServiceRegistryComponentNames.GS;
+	}
+
 }
-
-

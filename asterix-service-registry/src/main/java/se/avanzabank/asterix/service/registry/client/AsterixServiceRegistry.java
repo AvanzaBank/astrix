@@ -17,6 +17,8 @@ package se.avanzabank.asterix.service.registry.client;
 
 import org.openspaces.remoting.Routing;
 
+import se.avanzabank.asterix.context.AsterixServiceProperties;
+
 
 
 public interface AsterixServiceRegistry {

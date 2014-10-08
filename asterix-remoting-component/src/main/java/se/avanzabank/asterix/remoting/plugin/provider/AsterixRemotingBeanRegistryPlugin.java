@@ -21,8 +21,9 @@ import org.kohsuke.MetaInfServices;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
-import se.avanzabank.asterix.context.AsterixBeanRegistryPlugin;
+import se.avanzabank.asterix.context.AsterixServiceApiPlugin;
 import se.avanzabank.asterix.context.AsterixServiceDescriptor;
+import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 import se.avanzabank.asterix.remoting.server.AsterixRemotingFrameworkBean;
 
@@ -30,17 +31,28 @@ import se.avanzabank.asterix.remoting.server.AsterixRemotingFrameworkBean;
  * @author Elias Lindholm (elilin)
  *
  */
-@MetaInfServices(AsterixBeanRegistryPlugin.class)
-public class AsterixRemotingBeanRegistryPlugin implements AsterixBeanRegistryPlugin {
+@MetaInfServices(AsterixServiceApiPlugin.class)
+public class AsterixRemotingBeanRegistryPlugin implements AsterixServiceApiPlugin {
 
+//	@Override
+//	public void registerBeanDefinitions(BeanDefinitionRegistry registry, AsterixServiceDescriptor descriptor) throws BeansException {
+//		new AsterixRemotingFrameworkBean().postProcessBeanDefinitionRegistry(registry);
+//	}
+	
 	@Override
-	public void registerBeanDefinitions(BeanDefinitionRegistry registry, AsterixServiceDescriptor descriptor) throws BeansException {
-		new AsterixRemotingFrameworkBean().postProcessBeanDefinitionRegistry(registry);
-	}
-
-	@Override
-	public Class<? extends Annotation> getDescriptorType() {
+	public Class<? extends Annotation> getServiceDescriptorType() {
 		return AsterixRemoteApiDescriptor.class;
 	}
+
+	@Override
+	public String getTransport() {
+		return AsterixServiceRegistryComponentNames.GS_REMOTING;
+	}
+	
+//	@Override
+//	public void registerBeanDefinitions(BeanDefinitionRegistry registry) {
+//		// Intentionally empty
+//	}
+	
 	
 }

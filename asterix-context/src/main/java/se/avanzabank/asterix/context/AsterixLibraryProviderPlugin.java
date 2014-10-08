@@ -57,5 +57,16 @@ public class AsterixLibraryProviderPlugin implements AsterixApiProviderPlugin {
 	public boolean useStatefulBeanFactory() {
 		return false;
 	}
+
+	@Override
+	public List<Class<?>> getProvidedBeans(AsterixApiDescriptor descriptor) {
+		List<Class<?>> result = new ArrayList<>();
+		for (Method m : descriptor.getDescriptorClass().getMethods()) {
+			if (m.isAnnotationPresent(AsterixExport.class)) {
+				result.add(m.getReturnType());
+			}
+		}
+		return result;
+	}
 	
 }

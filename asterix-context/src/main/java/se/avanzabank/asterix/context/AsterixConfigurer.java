@@ -49,7 +49,8 @@ public class AsterixConfigurer {
 		configureVersioning(context);
 		configureMonitoring(context);
 		discoverApiProviderPlugins(context);
-		List<AsterixApiProviderPlugin> apiProviderPlugins = context.getPlugins(AsterixApiProviderPlugin.class);
+		AsterixApiProviderPlugins apiProviderPlugins = new AsterixApiProviderPlugins(context.getPlugins(AsterixApiProviderPlugin.class));
+		context.setApiProviderPlugins(apiProviderPlugins);
 		AsterixApiProviderFactory apiProviderFactory = new AsterixApiProviderFactory(apiProviderPlugins);
 		List<AsterixApiProvider> apiProviders = createApiProviders(apiProviderFactory);
 		for (AsterixApiProvider apiProvider : apiProviders) {

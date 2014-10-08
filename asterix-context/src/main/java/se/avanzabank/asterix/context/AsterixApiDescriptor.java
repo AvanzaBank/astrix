@@ -16,20 +16,14 @@
 package se.avanzabank.asterix.context;
 
 import java.lang.annotation.Annotation;
+
+import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public class AsterixApiDescriptor {
-	
-	/*
-	 *TODO: is an api-descriptor the same as a service-descriptor?
-	 *
-	 *Every api-provider has an corresponding api-descriptor, but only
-	 *services has a descriptor that's used on the server side. Does the difference require separate representations?
-	 * 
-	 */
 	
 	private final Class<?> descriptorHolder;
 
@@ -56,6 +50,14 @@ public class AsterixApiDescriptor {
 	@Override
 	public String toString() {
 		return descriptorHolder.getName().toString();
+	}
+	
+	/**
+	 * Whether this api uses the service registry or not.
+	 * @return
+	 */
+	public boolean usesServiceRegistry() {
+		return descriptorHolder.isAnnotationPresent(AsterixServiceRegistryApi.class);
 	}
 	
 }

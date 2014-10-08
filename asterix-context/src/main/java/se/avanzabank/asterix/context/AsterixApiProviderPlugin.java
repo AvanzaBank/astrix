@@ -42,6 +42,8 @@ public interface AsterixApiProviderPlugin {
 	
 	List<AsterixFactoryBean<?>> createFactoryBeans(AsterixApiDescriptor descriptor);
 	
+	List<Class<?>> getProvidedBeans(AsterixApiDescriptor descriptor);
+	
 	Class<? extends Annotation> getProviderAnnotationType();
 	
 	/**

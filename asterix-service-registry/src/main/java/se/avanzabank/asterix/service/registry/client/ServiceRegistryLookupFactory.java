@@ -23,6 +23,9 @@ import se.avanzabank.asterix.context.AsterixBeanAware;
 import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
 import se.avanzabank.asterix.context.AsterixPlugins;
+import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.context.AsterixServiceTransport;
+import se.avanzabank.asterix.context.AsterixServiceTransports;
 
 public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, AsterixBeanAware {
 
@@ -54,12 +57,22 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 		if (serviceProperties == null) {
 			throw new RuntimeException(String.format("Misssing entry in service-registry api=%s qualifier=%s: ", api.getName(), qualifier));
 		}
-		AsterixServiceRegistryComponent serviceRegistryComponent = getComponent(serviceProperties);
-		return serviceRegistryComponent.createService(descriptor, api, serviceProperties);
+//		AsterixServiceRegistryComponent serviceRegistryComponent = getComponent(serviceProperties);
+//		return serviceRegistryComponent.createService(descriptor, api, serviceProperties);
+		AsterixServiceTransport serviceTransport = getServiceTransport(serviceProperties);
+		return serviceTransport.createService(descriptor, api, serviceProperties);
 	}
 	
+	private AsterixServiceTransport getServiceTransport(AsterixServiceProperties serviceProperties) {
+		String transportName = serviceProperties.getTransport();
+		if (transportName == null) {
+			throw new IllegalArgumentException("Expected a componentName to be set on serviceProperties: " + serviceProperties);
+		}
+		return plugins.getPlugin(AsterixServiceTransports.class).getTransport(transportName);
+	}
+
 	private AsterixServiceRegistryComponent getComponent(AsterixServiceProperties serviceProperties) {
-		String componentName = serviceProperties.getComponent();
+		String componentName = serviceProperties.getTransport();
 		if (componentName == null) {
 			throw new IllegalArgumentException("Expected a componentName to be set on serviceProperties: " + serviceProperties);
 		}

@@ -31,10 +31,6 @@ public class AsterixRemotingFrameworkBean implements BeanDefinitionRegistryPostP
 	/*
 	 * This is a server side component required to export gs-remoting-services. We don't want those
 	 * beans from non-pu's like a web-application.
-	 * 
-	 * As it stands now this Those will be registered from non-pus since AsterixRemotingBeanRegistryPlugin
-	 * is supposed to be available from all clients. <p>
-	 * 
 	 */
 	
 	@Override
@@ -43,7 +39,7 @@ public class AsterixRemotingFrameworkBean implements BeanDefinitionRegistryPostP
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_serviceActivator", beanDefinition);
 		
-		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceExporterBean.class);
+		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixRemotingServiceExporterBean.class);
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_asterixServiceExporterBean", beanDefinition);
 		

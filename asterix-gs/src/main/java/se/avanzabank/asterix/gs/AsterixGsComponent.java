@@ -23,13 +23,15 @@ import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
+import se.avanzabank.asterix.context.AsterixServiceExporterBean;
+import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.context.AsterixServiceBuilder;
+import se.avanzabank.asterix.context.AsterixServiceTransport;
 import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
-import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
-@MetaInfServices(AsterixServiceRegistryComponent.class)
-public class AsterixGsComponent implements AsterixServiceRegistryComponent {
+@MetaInfServices(AsterixServiceTransport.class)
+public class AsterixGsComponent implements AsterixServiceRegistryComponent, AsterixServiceTransport {
 	
 	@Override
 	public <T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, AsterixServiceProperties serviceProperties) {
@@ -40,7 +42,7 @@ public class AsterixGsComponent implements AsterixServiceRegistryComponent {
 	}
 
 	@Override
-	public Class<? extends ServiceRegistryExporter> getServiceExporterClass() {
+	public Class<? extends AsterixServiceBuilder> getServiceExporterClass() {
 		return GigaSpaceServiceRegistryExporter.class;
 	}
 	
@@ -56,7 +58,23 @@ public class AsterixGsComponent implements AsterixServiceRegistryComponent {
 	
 	@Override
 	public void registerBeans(BeanDefinitionRegistry registry) {
-		
+		// Does not require any spring-beans
+	}
+
+	@Override
+	public <T> AsterixServiceProperties getServiceProperties(
+			AsterixApiDescriptor apiDescriptor, Class<T> type) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Class<? extends AsterixServiceExporterBean> getExporterBean() {
+		return null;
+	}
+
+	@Override
+	public Class<? extends AsterixServiceBuilder> getServiceBuilder() {
+		return GigaSpaceServiceRegistryExporter.class;
 	}
 	
 }

@@ -15,6 +15,7 @@
  */
 package se.avanzabank.asterix.service.registry.pu;
 
+import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
 import se.avanzabank.asterix.provider.core.AsterixService;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryApiDescriptor;
 
@@ -30,7 +31,8 @@ import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryApiDe
 @AsterixService(
 	apiDescriptors = {
 		AsterixServiceRegistryApiDescriptor.class
-	}
+	},
+	component = AsterixServiceRegistryComponentNames.GS_REMOTING
 )
 public class AsterixServiceRegistryServiceDescriptor {
 }

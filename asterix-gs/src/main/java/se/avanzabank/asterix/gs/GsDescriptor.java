@@ -17,18 +17,25 @@ package se.avanzabank.asterix.gs;
 
 import org.openspaces.core.GigaSpace;
 
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 
 @AsterixServiceRegistryApi(
 	exportedApis = {
 		GigaSpace.class
-	},
-	components = {
-		AsterixServiceRegistryComponentNames.GS_REMOTING
 	}
-	
+//	components = {
+//		AsterixServiceRegistryComponentNames.GS_REMOTING
+//	}
 )
 public class GsDescriptor {
+	
+	/*
+	 * TODO:
+	 * GigaSpace should not be exported generically from this class. It should
+	 * rather be exported as any other service by a service provider that
+	 * exports GigaSpace and a corresponding space-name as a service. 
+	 * 
+	 * 
+	 */
 	
 }

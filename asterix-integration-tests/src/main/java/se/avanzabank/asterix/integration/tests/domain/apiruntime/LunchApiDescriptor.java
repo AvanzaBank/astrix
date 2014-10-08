@@ -33,9 +33,6 @@ import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 @AsterixServiceRegistryApi(
 	exportedApis = {
 		LunchService.class
-	},
-	components = {
-		AsterixServiceRegistryComponentNames.GS_REMOTING
 	}
 )
 public class LunchApiDescriptor {

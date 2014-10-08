@@ -23,27 +23,30 @@ import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
-import se.avanzabank.asterix.context.AsterixBeanAware;
-import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixFaultTolerancePlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
+import se.avanzabank.asterix.context.AsterixServiceBuilder;
+import se.avanzabank.asterix.context.AsterixServiceExporterBean;
+import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.context.AsterixServiceTransport;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
+import se.avanzabank.asterix.gs.GsBinder;
 import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
+import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
-import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingBeanRegistryPlugin;
 import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
+import se.avanzabank.asterix.remoting.server.AsterixRemotingFrameworkBean;
+import se.avanzabank.asterix.remoting.server.AsterixRemotingServiceExporterBean;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
-import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
 
-@MetaInfServices(AsterixServiceRegistryComponent.class)
-public class AsterixRemotingComponent implements AsterixServiceRegistryComponent, AsterixBeanAware, AsterixPluginsAware {
+@MetaInfServices(AsterixServiceTransport.class)
+public class AsterixRemotingComponent implements AsterixServiceRegistryComponent, /*AsterixBeanAware,*/ AsterixPluginsAware, AsterixServiceTransport {
 	
 	private AsterixPlugins plugins;
-	private AsterixBeans beans;
+//	private AsterixBeans beans;
 	
 	@Override
 	public <T> T createService(AsterixApiDescriptor descriptor, Class<T> api, AsterixServiceProperties serviceProperties) {
@@ -51,23 +54,32 @@ public class AsterixRemotingComponent implements AsterixServiceRegistryComponent
 		AsterixFaultTolerancePlugin faultTolerance = plugins.getPlugin(AsterixFaultTolerancePlugin.class);
 		
 		String targetSpace = serviceProperties.getProperty(AsterixRemotingServiceRegistryExporter.SPACE_NAME_PROPERTY);
-		GigaSpace space = beans.getBean(GigaSpace.class, targetSpace);
+		GigaSpace space = GsBinder.createGsFactory(serviceProperties).create();
 		AsterixRemotingTransport remotingTransport = AsterixRemotingTransport.remoteSpace(space); // TODO: caching of created proxies, fault tolerance?
 		
 		T proxy = AsterixRemotingProxy.create(api, remotingTransport, objectSerializer);
 		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(api, proxy, targetSpace);
 		return proxyWithFaultTolerance;
 	}
-
-	@Override
-	public List<Class<?>> getBeanDependencies() {
-		return Arrays.<Class<?>>asList(GigaSpace.class);
-	}
 	
 	@Override
-	public void setAsterixBeans(AsterixBeans beans) {
-		this.beans = beans;
+	public <T> AsterixServiceProperties getServiceProperties(AsterixApiDescriptor apiDescriptor, Class<T> type) {
+		String targetSpaceName = apiDescriptor.getAnnotation(AsterixRemoteApiDescriptor.class).targetSpaceName();
+		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
+		serviceProperties.setApi(type); // TODO: let invoker set this property?
+		serviceProperties.setProperty(AsterixRemotingServiceRegistryExporter.SPACE_NAME_PROPERTY, targetSpaceName);
+		return serviceProperties;
 	}
+
+//	@Override
+//	public List<Class<?>> getBeanDependencies() {
+//		return Arrays.<Class<?>>asList(GigaSpace.class);
+//	}
+//	
+//	@Override
+//	public void setAsterixBeans(AsterixBeans beans) {
+//		this.beans = beans;
+//	}
 
 	@Override
 	public void setPlugins(AsterixPlugins plugins) {
@@ -75,7 +87,7 @@ public class AsterixRemotingComponent implements AsterixServiceRegistryComponent
 	}
 
 	@Override
-	public Class<? extends ServiceRegistryExporter> getServiceExporterClass() {
+	public Class<? extends AsterixServiceBuilder> getServiceExporterClass() {
 		return AsterixRemotingServiceRegistryExporter.class;
 	}
 	
@@ -91,7 +103,17 @@ public class AsterixRemotingComponent implements AsterixServiceRegistryComponent
 	
 	@Override
 	public void registerBeans(BeanDefinitionRegistry registry) {
-		new AsterixRemotingBeanRegistryPlugin().registerBeanDefinitions(registry, null);
+		new AsterixRemotingFrameworkBean().postProcessBeanDefinitionRegistry(registry);
+	}
+	
+	@Override
+	public Class<? extends AsterixServiceExporterBean> getExporterBean() {
+		return AsterixRemotingServiceExporterBean.class;
+	}
+	
+	@Override
+	public Class<? extends AsterixServiceBuilder> getServiceBuilder() {
+		return AsterixRemotingServiceRegistryExporter.class;
 	}
 
 }

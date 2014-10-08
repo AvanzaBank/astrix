@@ -15,22 +15,8 @@
  */
 package se.avanzabank.asterix.context;
 
-import java.lang.annotation.Annotation;
+public interface AsterixServiceTransports {
+	
+	AsterixServiceTransport getTransport(String name);
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface AsterixBeanRegistryPlugin {
-	
-	// This is a server-side only component. Change name to reflect that
-	
-	void registerBeanDefinitions(BeanDefinitionRegistry registry, AsterixServiceDescriptor descriptor) throws BeansException;
-	
-	Class<? extends Annotation> getDescriptorType();
-	
-	
 }

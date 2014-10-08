@@ -23,9 +23,6 @@ import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 	exportedApis = {
 		LunchRestaurantGrader.class,
 		PublicLunchFeeder.class
-	},
-	components = {
-		AsterixServiceRegistryComponentNames.GS_REMOTING
 	}
 )
 public class LunchGradeApiDescriptor {

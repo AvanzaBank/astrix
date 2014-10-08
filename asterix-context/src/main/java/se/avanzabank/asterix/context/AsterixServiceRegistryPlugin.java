@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder;
+package se.avanzabank.asterix.context;
 
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
-import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
+import java.util.Collection;
 
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
-@AsterixServiceRegistryApi(
-	exportedApis = {
-		InternalLunchFeeder.class
-	},
-	components = {
-		AsterixServiceRegistryComponentNames.GS_REMOTING
-	}
-)
-public class LunchFeederDescriptor {
+public interface AsterixServiceRegistryPlugin {
+
+	void registerBeanDefinitions(BeanDefinitionRegistry registry,
+			Collection<AsterixExportedServiceInfo> publishedServices) throws BeansException;
+
 }
-
-

@@ -24,9 +24,6 @@ import static se.avanzabank.asterix.context.AsterixTestUtil.serviceInvocationRes
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
@@ -34,13 +31,13 @@ import org.junit.Test;
 import org.openspaces.remoting.Routing;
 
 import se.avanzabank.asterix.context.AsterixContext;
+import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.Poller;
 import se.avanzabank.asterix.context.Probe;
 import se.avanzabank.asterix.context.Supplier;
 import se.avanzabank.asterix.context.TestAsterixConfigurer;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.provider.library.AsterixExport;
 import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
@@ -184,10 +181,10 @@ public class AsterixServiceRegistryTest {
 	@AsterixServiceRegistryApi(
 		exportedApis = { 
 			GreetingService.class
-		},
-		components = {
-			AsterixServiceRegistryComponentNames.DIRECT
-		} 
+		}
+//		components = {
+//			AsterixServiceRegistryComponentNames.DIRECT
+//		} 
 	)
 	public static class GreetingApiDescriptor {
 		

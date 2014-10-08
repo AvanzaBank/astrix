@@ -16,6 +16,9 @@
 package se.avanzabank.asterix.context;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import se.avanzabank.asterix.provider.core.AsterixService;
 /**
@@ -26,21 +29,30 @@ import se.avanzabank.asterix.provider.core.AsterixService;
 public class AsterixServiceDescriptor {
 
 	private final Class<?> descriptorHolder;
-	private final AsterixApiDescriptor apiDescriptor;
-	private AsterixService asterixService;
+	private final AsterixService asterixService;
+	private final Map<Class<?>, AsterixApiDescriptor> apiDescriptorByProvideService;
 
-	public AsterixServiceDescriptor(Class<?> descriptorHolder) {
-		this.asterixService = descriptorHolder.getAnnotation(AsterixService.class);
+	public AsterixServiceDescriptor(AsterixService asterixService, Class<?> descriptorHolder, Map<Class<?>, AsterixApiDescriptor> apiDescriptorByProvideService) {
+		this.asterixService = asterixService;
 		this.descriptorHolder = descriptorHolder;
-		this.apiDescriptor = new AsterixApiDescriptor(asterixService.apiDescriptors()[0]);
+		this.apiDescriptorByProvideService = apiDescriptorByProvideService;
 	}
-
-	public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-		return apiDescriptor.isAnnotationPresent(annotationClass);
+	
+	public static AsterixServiceDescriptor create(Class<?> descriptorHolder, AsterixContext context) {
+		AsterixService asterixService = descriptorHolder.getAnnotation(AsterixService.class);
+		Map<Class<?>, AsterixApiDescriptor> apiDescriptorByProvideService = new HashMap<>();
+		for (Class<?> apiDescriptorHolder : asterixService.apiDescriptors()) {
+			AsterixApiDescriptor apiDescriptor = new AsterixApiDescriptor(apiDescriptorHolder);
+			for (Class<?> beanType : context.getExportedBeans(apiDescriptor)) {
+				apiDescriptorByProvideService.put(beanType, apiDescriptor);
+			}
+		}
+		return new AsterixServiceDescriptor(asterixService, descriptorHolder, apiDescriptorByProvideService);
 	}
-
-	public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-		return apiDescriptor.getAnnotation(annotationClass);
+	
+	// To simplify creating using srping bean definitions
+	public static AsterixServiceDescriptor create(AsterixServiceDescriptor asterixServiceDescriptor) {
+		return asterixServiceDescriptor;
 	}
 	
 	public String getName() {
@@ -56,8 +68,34 @@ public class AsterixServiceDescriptor {
 		return descriptorHolder;
 	}
 
-	public AsterixApiDescriptor getApiDescriptor() {
-		return this.apiDescriptor;
+	public AsterixApiDescriptor getApiDescriptor(Class<?> serviceType) {
+		AsterixApiDescriptor result = this.apiDescriptorByProvideService.get(serviceType);
+		if (result == null) {
+			throw new IllegalArgumentException("Service descriptor does not export service. descriptor: " + getHolder().getName() + ", service: " + serviceType.getName());
+		}
+		return result;
+	}
+
+	public boolean containsApiType(Class<? extends Annotation> serviceDescriptorType) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public <T extends Annotation> Collection<AsterixApiDescriptor> getApis(Class<T> apiDescriptorAnnotation) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/**
+	 * Default transport used for services exported to service registry.
+	 * @return
+	 */
+	public String getTransport() {
+		return asterixService.component();
+	}
+
+	public boolean publishesService(Class<?> providedServiceType) {
+		return this.apiDescriptorByProvideService.containsKey(providedServiceType);
 	}
 	
 }

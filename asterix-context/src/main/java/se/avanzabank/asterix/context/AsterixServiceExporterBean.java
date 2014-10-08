@@ -13,23 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.service.registry.server;
+package se.avanzabank.asterix.context;
 
-import java.util.List;
-
-import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
-
-/**
- * This is the service-provider part of the service registry.
- * 
- * It's used on the server side to publish a set of services
- * provided to the service registry. <p>
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface ServiceRegistryExporter {
+public interface AsterixServiceExporterBean {
 	
-	List<AsterixServiceProperties> getProvidedServices();
+	void register(Object provider, AsterixApiDescriptor apiDescriptor, Class<?> providedApi);
+	
+	String getTransport();
 	
 }

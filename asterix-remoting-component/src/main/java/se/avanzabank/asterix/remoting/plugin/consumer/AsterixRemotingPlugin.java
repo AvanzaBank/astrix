@@ -17,6 +17,7 @@ package se.avanzabank.asterix.remoting.plugin.consumer;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
@@ -46,6 +47,14 @@ public class AsterixRemotingPlugin implements AsterixApiProviderPlugin {
 	}
 
 	@Override
+	public List<Class<?>> getProvidedBeans(AsterixApiDescriptor descriptor) {
+		AsterixRemoteApiDescriptor remoteApiDescriptor = descriptor.getAnnotation(AsterixRemoteApiDescriptor.class);
+		List<Class<?>> result = new ArrayList<>();
+		result.addAll(Arrays.asList(remoteApiDescriptor.exportedApis()));
+		return result;
+	}
+	
+	@Override
 	public Class<? extends Annotation> getProviderAnnotationType() {
 		return AsterixRemoteApiDescriptor.class;
 	}
@@ -54,5 +63,6 @@ public class AsterixRemotingPlugin implements AsterixApiProviderPlugin {
 	public boolean useStatefulBeanFactory() {
 		return true;
 	}
+
 
 }

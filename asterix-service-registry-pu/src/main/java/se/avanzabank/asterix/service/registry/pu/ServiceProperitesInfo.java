@@ -18,8 +18,8 @@ package se.avanzabank.asterix.service.registry.pu;
 import com.gigaspaces.annotation.pojo.SpaceId;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 
+import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.service.registry.app.ServiceKey;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceProperties;
 
 public class ServiceProperitesInfo {
 

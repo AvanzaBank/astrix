@@ -20,7 +20,10 @@ import java.util.List;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
-import se.avanzabank.asterix.service.registry.server.ServiceRegistryExporter;
+import se.avanzabank.asterix.context.AsterixServiceExporterBean;
+import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.context.AsterixServiceBuilder;
+import se.avanzabank.asterix.context.AsterixServiceTransport;
 
 /**
  * This is the service-consumer part of the service registry.
@@ -63,7 +66,7 @@ public interface AsterixServiceRegistryComponent {
 	 * 
 	 * @return
 	 */
-	Class<? extends ServiceRegistryExporter> getServiceExporterClass();
+	Class<? extends AsterixServiceBuilder> getServiceExporterClass();
 	
 	/**
 	 * Used on the server-side to express if this component requires other component to
@@ -74,11 +77,14 @@ public interface AsterixServiceRegistryComponent {
 	List<String> getComponentDepenencies();
 	
 
-	/**
-	 * Used on the server-side register beans required by this component. <p>
-	 * 
-	 * @param registry
-	 */
-	void registerBeans(BeanDefinitionRegistry registry);
+//	/**
+//	 * Used on the server-side register beans required by this component. <p>
+//	 * 
+//	 * @param registry
+//	 */
+//	void registerBeans(BeanDefinitionRegistry registry);
+	
+	// Identified by getName() ???
+//	String getServiceTransport();
 	
 }
