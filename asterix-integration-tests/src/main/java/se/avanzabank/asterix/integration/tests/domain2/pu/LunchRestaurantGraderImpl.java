@@ -24,7 +24,6 @@ import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
 import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
 import se.avanzabank.asterix.provider.core.AsterixServiceExport;
 
-//@AsterixRemoteServiceExport(LunchRestaurantGrader.class)
 @AsterixServiceExport(LunchRestaurantGrader.class)
 public class LunchRestaurantGraderImpl implements LunchRestaurantGrader {
 	

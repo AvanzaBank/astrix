@@ -57,8 +57,6 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 		if (serviceProperties == null) {
 			throw new RuntimeException(String.format("Misssing entry in service-registry api=%s qualifier=%s: ", api.getName(), qualifier));
 		}
-//		AsterixServiceRegistryComponent serviceRegistryComponent = getComponent(serviceProperties);
-//		return serviceRegistryComponent.createService(descriptor, api, serviceProperties);
 		AsterixServiceTransport serviceTransport = getServiceTransport(serviceProperties);
 		return serviceTransport.createService(descriptor, api, serviceProperties);
 	}
