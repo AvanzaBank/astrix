@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
+import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 /**
  * This bean makes all beans annotated with AsterixRemoteServiceExport invokable using the remoting 
  * framework. 
@@ -45,7 +45,7 @@ public class AsterixRemotingServiceExporterBean implements AsterixServiceExporte
 	
 	@Override
 	public String getTransport() {
-		return AsterixServiceRegistryComponentNames.GS_REMOTING;
+		return AsterixServiceComponentNames.GS_REMOTING;
 	}
 
 }

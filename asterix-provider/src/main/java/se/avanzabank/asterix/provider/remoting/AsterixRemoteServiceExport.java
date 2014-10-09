@@ -21,7 +21,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
+import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 import se.avanzabank.asterix.provider.core.AsterixServiceExport;
 
 /**

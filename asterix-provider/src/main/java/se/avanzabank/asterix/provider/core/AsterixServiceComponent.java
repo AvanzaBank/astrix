@@ -21,7 +21,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
+import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 
 /**
  * @author Elias Lindholm (elilin)
@@ -34,7 +34,7 @@ public @interface AsterixServiceComponent {
 	/**
 	 * The name of the component to use to export a given service.
 	 * 
-	 * See {@link AsterixServiceRegistryComponentNames}. 
+	 * See {@link AsterixServiceComponentNames}. 
 	 * 
 	 * 
 	 * @return

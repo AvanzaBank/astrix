@@ -29,7 +29,7 @@ import se.avanzabank.asterix.context.AsterixServiceBuilder;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixServiceTransport;
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
+import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 
 @MetaInfServices(AsterixServiceTransport.class)
 public class AsterixDirectComponent implements AsterixServiceTransport {
@@ -49,7 +49,7 @@ public class AsterixDirectComponent implements AsterixServiceTransport {
 
 	@Override
 	public String getName() {
-		return AsterixServiceRegistryComponentNames.DIRECT;
+		return AsterixServiceComponentNames.DIRECT;
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class AsterixDirectComponent implements AsterixServiceTransport {
 		}
 		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
 		serviceProperties.setProperty("providerId", id);
-		serviceProperties.setTransport(AsterixServiceRegistryComponentNames.DIRECT);
+		serviceProperties.setTransport(AsterixServiceComponentNames.DIRECT);
 		return serviceProperties;
 	}
 	

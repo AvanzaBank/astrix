@@ -19,7 +19,7 @@ package se.avanzabank.asterix.provider.component;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AsterixServiceRegistryComponentNames {
+public class AsterixServiceComponentNames {
 	
 	/**
 	 * The direct component allows services to bind to provider instances within the same

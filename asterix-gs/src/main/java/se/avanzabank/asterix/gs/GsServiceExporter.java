@@ -19,7 +19,7 @@ import org.openspaces.core.GigaSpace;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
+import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 
 public class GsServiceExporter implements AsterixServiceExporterBean {
 
@@ -33,7 +33,7 @@ public class GsServiceExporter implements AsterixServiceExporterBean {
 	
 	@Override
 	public String getTransport() {
-		return AsterixServiceRegistryComponentNames.GS;
+		return AsterixServiceComponentNames.GS;
 	}
 
 }

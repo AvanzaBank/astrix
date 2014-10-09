@@ -16,7 +16,7 @@
 package se.avanzabank.asterix.integration.tests.domain2.apiruntime;
 
 import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
+import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 
 @AsterixServiceRegistryApi(

@@ -26,7 +26,7 @@ import se.avanzabank.asterix.context.AsterixServiceBuilder;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixServiceTransport;
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
+import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 
 @MetaInfServices(AsterixServiceTransport.class)
 public class AsterixGsComponent implements AsterixServiceTransport {
@@ -42,7 +42,7 @@ public class AsterixGsComponent implements AsterixServiceTransport {
 
 	@Override
 	public String getName() {
-		return AsterixServiceRegistryComponentNames.GS;
+		return AsterixServiceComponentNames.GS;
 	}
 	
 	@Override

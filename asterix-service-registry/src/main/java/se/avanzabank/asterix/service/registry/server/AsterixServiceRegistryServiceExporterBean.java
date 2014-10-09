@@ -17,7 +17,7 @@ package se.avanzabank.asterix.service.registry.server;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
+import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 import se.avanzabank.asterix.provider.core.AsterixServiceComponent;
 
 public class AsterixServiceRegistryServiceExporterBean implements AsterixServiceExporterBean {

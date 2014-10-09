@@ -183,7 +183,7 @@ public class AsterixServiceRegistryTest {
 			GreetingService.class
 		}
 //		components = {
-//			AsterixServiceRegistryComponentNames.DIRECT
+//			AsterixServiceComponentNames.DIRECT
 //		} 
 	)
 	public static class GreetingApiDescriptor {

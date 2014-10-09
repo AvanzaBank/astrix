@@ -22,11 +22,11 @@ import se.avanzabank.asterix.integration.tests.domain.api.GetLunchRestaurantRequ
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
 import se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder.InternalLunchFeeder;
-import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
+import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 import se.avanzabank.asterix.provider.core.AsterixServiceComponent;
 import se.avanzabank.asterix.provider.core.AsterixServiceExport;
 
-@AsterixServiceComponent(AsterixServiceRegistryComponentNames.GS_REMOTING)
+@AsterixServiceComponent(AsterixServiceComponentNames.GS_REMOTING)
 @AsterixServiceExport({LunchService.class, InternalLunchFeeder.class})
 public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 
