@@ -19,6 +19,8 @@ import java.lang.annotation.Annotation;
 
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
+import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
+import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
@@ -37,8 +39,9 @@ import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
 import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter;
-import se.avanzabank.asterix.remoting.server.AsterixRemotingFrameworkBean;
+import se.avanzabank.asterix.remoting.server.AsterixRemotingArgumentSerializerFactory;
 import se.avanzabank.asterix.remoting.server.AsterixRemotingServiceExporterBean;
+import se.avanzabank.asterix.remoting.server.AsterixServiceActivator;
 
 @MetaInfServices(AsterixServiceTransport.class)
 public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixServiceTransport {
@@ -80,7 +83,13 @@ public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixSer
 	
 	@Override
 	public void registerBeans(BeanDefinitionRegistry registry) {
-		new AsterixRemotingFrameworkBean().postProcessBeanDefinitionRegistry(registry);
+		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceActivator.class);
+		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
+		registry.registerBeanDefinition("_serviceActivator", beanDefinition);
+		
+		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixRemotingArgumentSerializerFactory.class);
+		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
+		registry.registerBeanDefinition("_asterixRemotingArgumentSerializerFactory", beanDefinition);
 	}
 	
 	@Override

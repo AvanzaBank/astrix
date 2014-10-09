@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
-import se.avanzabank.asterix.context.AsterixServiceDescriptor;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.remoting.client.AsterixMissingServiceException;
 import se.avanzabank.asterix.remoting.client.AsterixMissingServiceMethodException;

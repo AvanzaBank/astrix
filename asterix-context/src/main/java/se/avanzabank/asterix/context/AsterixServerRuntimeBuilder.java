@@ -50,6 +50,11 @@ public class AsterixServerRuntimeBuilder {
 		Collection<AsterixServiceTransport> usedServiceTransports = getUsedServiceTransports(exportedServices);
 		for (AsterixServiceTransport serviceTransport : usedServiceTransports) {
 			serviceTransport.registerBeans(registry); // No exporting of services, registration of transport required beans
+			Class<? extends AsterixServiceExporterBean> exporterBean = serviceTransport.getExporterBean();
+			if (exporterBean != null) {
+				beanDefinition = new AnnotatedGenericBeanDefinition(exporterBean);
+				registry.registerBeanDefinition("_asterixServiceExporterBean-" + serviceTransport.getName(), beanDefinition);
+			}
 		}
 		
 		Collection<AsterixExportedServiceInfo> publishedOnServiceRegistryServices = new HashSet<>();

@@ -27,7 +27,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  */
 public interface AsterixServiceTransport {
 	
-	// TODO: rename to AsterixServiceComponent? or AsterixServiceBuilder? or AsterixServiceBinder?
+	// TODO: rename to AsterixServiceComponent?
 
 	// TODO: move info from api-descriptor to AsterixServiceProperties?
 	<T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, AsterixServiceProperties serviceProperties);
