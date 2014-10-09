@@ -29,7 +29,7 @@ import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 @Target(value = { ElementType.TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
-public @interface AsterixServiceComponent {
+public @interface AsterixServiceComponentName {
 
 	/**
 	 * The name of the component to use to export a given service.

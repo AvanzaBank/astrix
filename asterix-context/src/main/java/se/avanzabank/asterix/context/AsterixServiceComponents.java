@@ -15,10 +15,10 @@
  */
 package se.avanzabank.asterix.context;
 
-public interface AsterixServiceTransports {
+public interface AsterixServiceComponents {
 	
-	AsterixServiceTransport getTransport(String name);
+	AsterixServiceComponent getComponent(String name);
 	
-	AsterixServiceTransport getTransport(AsterixApiDescriptor apiDescriptor);
+	AsterixServiceComponent getComponent(AsterixApiDescriptor apiDescriptor);
 
 }

@@ -32,8 +32,8 @@ import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.context.AsterixServiceBuilderHolder;
 import se.avanzabank.asterix.context.AsterixServiceRegistryPlugin;
-import se.avanzabank.asterix.context.AsterixServiceTransport;
-import se.avanzabank.asterix.context.AsterixServiceTransports;
+import se.avanzabank.asterix.context.AsterixServiceComponent;
+import se.avanzabank.asterix.context.AsterixServiceComponents;
 
 @MetaInfServices(AsterixServiceRegistryPlugin.class)
 public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixServiceRegistryPlugin, AsterixPluginsAware {
@@ -48,7 +48,7 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixServiceR
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_asterixServiceBusExporterWorker", beanDefinition);
 		
-		Set<AsterixServiceTransport> serviceTransport = new HashSet<>();
+		Set<AsterixServiceComponent> serviceTransport = new HashSet<>();
 		for (final AsterixExportedServiceInfo exportedService : publishedServices) {
 			serviceTransport.add(getTransport(exportedService.getTransportName()));
 			
@@ -61,14 +61,14 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixServiceR
 			beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 			registry.registerBeanDefinition("_asterixServiceBuilderHolder-" + exportedService.getProvidingBeanName() + "-" + exportedService.getProvidedService().getName(), beanDefinition);
 		}
-		for (AsterixServiceTransport asterixServiceTransport : serviceTransport) {
+		for (AsterixServiceComponent asterixServiceTransport : serviceTransport) {
 			beanDefinition = new AnnotatedGenericBeanDefinition(asterixServiceTransport.getServiceBuilder());
 			registry.registerBeanDefinition("_asterixServiceBuilderBean-" + asterixServiceTransport.getName(), beanDefinition);
 		}
 	}
 	
-	private AsterixServiceTransport getTransport(String transportName) {
-		return plugins.getPlugin(AsterixServiceTransports.class).getTransport(transportName);
+	private AsterixServiceComponent getTransport(String transportName) {
+		return plugins.getPlugin(AsterixServiceComponents.class).getComponent(transportName);
 	}
 
 	@Override

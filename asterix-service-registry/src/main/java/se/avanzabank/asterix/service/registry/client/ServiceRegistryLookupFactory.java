@@ -24,8 +24,8 @@ import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
-import se.avanzabank.asterix.context.AsterixServiceTransport;
-import se.avanzabank.asterix.context.AsterixServiceTransports;
+import se.avanzabank.asterix.context.AsterixServiceComponent;
+import se.avanzabank.asterix.context.AsterixServiceComponents;
 
 public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, AsterixBeanAware {
 
@@ -57,16 +57,16 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 		if (serviceProperties == null) {
 			throw new RuntimeException(String.format("Misssing entry in service-registry api=%s qualifier=%s: ", api.getName(), qualifier));
 		}
-		AsterixServiceTransport serviceTransport = getServiceTransport(serviceProperties);
+		AsterixServiceComponent serviceTransport = getServiceTransport(serviceProperties);
 		return serviceTransport.createService(descriptor, api, serviceProperties);
 	}
 	
-	private AsterixServiceTransport getServiceTransport(AsterixServiceProperties serviceProperties) {
+	private AsterixServiceComponent getServiceTransport(AsterixServiceProperties serviceProperties) {
 		String transportName = serviceProperties.getTransport();
 		if (transportName == null) {
 			throw new IllegalArgumentException("Expected a componentName to be set on serviceProperties: " + serviceProperties);
 		}
-		return plugins.getPlugin(AsterixServiceTransports.class).getTransport(transportName);
+		return plugins.getPlugin(AsterixServiceComponents.class).getComponent(transportName);
 	}
 
 	@Override

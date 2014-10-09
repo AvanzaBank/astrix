@@ -20,14 +20,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.kohsuke.MetaInfServices;
 
-@MetaInfServices(AsterixServiceTransports.class)
-public class AsterixServiceTransportsImpl implements AsterixServiceTransports, AsterixPluginsAware {
+@MetaInfServices(AsterixServiceComponents.class)
+public class AsterixServiceComponentsImpl implements AsterixServiceComponents, AsterixPluginsAware {
 
-	private final Map<String, AsterixServiceTransport> transportByName = new ConcurrentHashMap<>();
+	private final Map<String, AsterixServiceComponent> transportByName = new ConcurrentHashMap<>();
 	
 	@Override
-	public AsterixServiceTransport getTransport(String name) {
-		AsterixServiceTransport serviceTransport = transportByName.get(name);
+	public AsterixServiceComponent getComponent(String name) {
+		AsterixServiceComponent serviceTransport = transportByName.get(name);
 		if (serviceTransport == null) {
 			throw new IllegalStateException("No transport found with name: " + name);
 		}
@@ -35,9 +35,9 @@ public class AsterixServiceTransportsImpl implements AsterixServiceTransports, A
 	}
 
 	@Override
-	public AsterixServiceTransport getTransport(AsterixApiDescriptor apiDescriptor) {
-		// TODO: avoid iterating over AsterixServiceTransports. In order to do so we must be able to lookup up the descriptorType from a given AsterixApiDescriptor.
-		for (AsterixServiceTransport serviceTransport : this.transportByName.values()) {
+	public AsterixServiceComponent getComponent(AsterixApiDescriptor apiDescriptor) {
+		// TODO: avoid iterating over AsterixServiceComponents. In order to do so we must be able to lookup up the descriptorType from a given AsterixApiDescriptor.
+		for (AsterixServiceComponent serviceTransport : this.transportByName.values()) {
 			if (serviceTransport.getServiceDescriptorType() == null) {
 				continue;
 			}
@@ -50,7 +50,7 @@ public class AsterixServiceTransportsImpl implements AsterixServiceTransports, A
 
 	@Override
 	public void setPlugins(AsterixPlugins plugins) {
-		for (AsterixServiceTransport serviceTransport : plugins.getPlugins(AsterixServiceTransport.class)) {
+		for (AsterixServiceComponent serviceTransport : plugins.getPlugins(AsterixServiceComponent.class)) {
 			transportByName.put(serviceTransport.getName(), serviceTransport);
 		}
 	}

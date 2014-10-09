@@ -30,7 +30,7 @@ import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.context.AsterixServiceBuilder;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
-import se.avanzabank.asterix.context.AsterixServiceTransport;
+import se.avanzabank.asterix.context.AsterixServiceComponent;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.gs.GsBinder;
@@ -43,8 +43,8 @@ import se.avanzabank.asterix.remoting.server.AsterixRemotingArgumentSerializerFa
 import se.avanzabank.asterix.remoting.server.AsterixRemotingServiceExporterBean;
 import se.avanzabank.asterix.remoting.server.AsterixServiceActivator;
 
-@MetaInfServices(AsterixServiceTransport.class)
-public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixServiceTransport {
+@MetaInfServices(AsterixServiceComponent.class)
+public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixServiceComponent {
 	
 	private AsterixPlugins plugins;
 	

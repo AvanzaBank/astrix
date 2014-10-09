@@ -25,11 +25,11 @@ import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixServiceBuilder;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
-import se.avanzabank.asterix.context.AsterixServiceTransport;
+import se.avanzabank.asterix.context.AsterixServiceComponent;
 import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 
-@MetaInfServices(AsterixServiceTransport.class)
-public class AsterixGsComponent implements AsterixServiceTransport {
+@MetaInfServices(AsterixServiceComponent.class)
+public class AsterixGsComponent implements AsterixServiceComponent {
 	
 	@Override
 	public <T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, AsterixServiceProperties serviceProperties) {

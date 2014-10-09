@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 package se.avanzabank.asterix.context;
-
+/**
+ * Strategy to export beans using this component that are annotated with @AsterixServiceExport, typically
+ * to allow invocation from a remote process.
+ * 
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public interface AsterixServiceExporterBean {
 	
 	void register(Object provider, AsterixApiDescriptor apiDescriptor, Class<?> providedApi);

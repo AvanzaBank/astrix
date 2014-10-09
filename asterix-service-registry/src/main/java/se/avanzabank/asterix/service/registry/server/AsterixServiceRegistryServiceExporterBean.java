@@ -18,7 +18,7 @@ package se.avanzabank.asterix.service.registry.server;
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
 import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
-import se.avanzabank.asterix.provider.core.AsterixServiceComponent;
+import se.avanzabank.asterix.provider.core.AsterixServiceComponentName;
 
 public class AsterixServiceRegistryServiceExporterBean implements AsterixServiceExporterBean {
 	
@@ -45,10 +45,10 @@ public class AsterixServiceRegistryServiceExporterBean implements AsterixService
 	}
 
 	private String getComponent(Object provider) {
-		if (!provider.getClass().isAnnotationPresent(AsterixServiceComponent.class)) {
-			throw new IllegalStateException("All services exported using service-registry must annotate provider instanes with " + AsterixServiceComponent.class.getSimpleName());
+		if (!provider.getClass().isAnnotationPresent(AsterixServiceComponentName.class)) {
+			throw new IllegalStateException("All services exported using service-registry must annotate provider instanes with " + AsterixServiceComponentName.class.getSimpleName());
 		}
-		AsterixServiceComponent serviceComponent = provider.getClass().getAnnotation(AsterixServiceComponent.class);
+		AsterixServiceComponentName serviceComponent = provider.getClass().getAnnotation(AsterixServiceComponentName.class);
 		return serviceComponent.value();
 	}
 

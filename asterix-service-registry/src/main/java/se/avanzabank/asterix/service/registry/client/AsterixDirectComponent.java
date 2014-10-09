@@ -28,11 +28,11 @@ import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixServiceBuilder;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
-import se.avanzabank.asterix.context.AsterixServiceTransport;
+import se.avanzabank.asterix.context.AsterixServiceComponent;
 import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 
-@MetaInfServices(AsterixServiceTransport.class)
-public class AsterixDirectComponent implements AsterixServiceTransport {
+@MetaInfServices(AsterixServiceComponent.class)
+public class AsterixDirectComponent implements AsterixServiceComponent {
 	
 	private final static AtomicLong idGen = new AtomicLong();
 	private final static Map<String, ServiceProvider<?>> providerById = new ConcurrentHashMap<>();

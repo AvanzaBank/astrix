@@ -25,10 +25,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AsterixServiceTransport {
+public interface AsterixServiceComponent {
 	
-	// TODO: rename to AsterixServiceComponent?
-
 	// TODO: move info from api-descriptor to AsterixServiceProperties?
 	<T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, AsterixServiceProperties serviceProperties);
 	
@@ -40,14 +38,14 @@ public interface AsterixServiceTransport {
 	<T> AsterixServiceProperties getServiceProperties(AsterixApiDescriptor apiDescriptor, Class<T> type);
 	
 	/**
-	 * The name of this transport.
+	 * The name of this component.
 	 * 
 	 * @return
 	 */
 	String getName();
 	
 	/**
-	 * Used on server side to register all required spring-beans to use this transport.
+	 * Used on server side to register all required spring-beans to use this component.
 	 * 
 	 * @param registry
 	 * @param serviceDescriptor 
@@ -56,7 +54,7 @@ public interface AsterixServiceTransport {
 	
 	/**
 	 * Server side component used to make a given provider instance invokable
-	 * using this transport mechanism.
+	 * using this component.
 	 * @return
 	 */
 	Class<? extends AsterixServiceExporterBean> getExporterBean();
@@ -70,7 +68,7 @@ public interface AsterixServiceTransport {
 	
 
 	/**
-	 * For service-transports that might be used standalone (that is: whithout the serviceregistry).
+	 * For service-components that might be used standalone (that is: whithout the serviceregistry).
 	 * 
 	 * This method defines a unique annotation used to describe the given api.
 	 * 

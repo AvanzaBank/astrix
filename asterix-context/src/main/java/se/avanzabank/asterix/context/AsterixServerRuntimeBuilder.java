@@ -47,8 +47,8 @@ public class AsterixServerRuntimeBuilder {
 		
 		// Register beans required by all used service-transports
 		final Collection<AsterixExportedServiceInfo> exportedServices = getExportedServices(registry, serviceDescriptor);
-		Collection<AsterixServiceTransport> usedServiceTransports = getUsedServiceTransports(exportedServices);
-		for (AsterixServiceTransport serviceTransport : usedServiceTransports) {
+		Collection<AsterixServiceComponent> usedServiceTransports = getUsedServiceTransports(exportedServices);
+		for (AsterixServiceComponent serviceTransport : usedServiceTransports) {
 			serviceTransport.registerBeans(registry); // No exporting of services, registration of transport required beans
 			Class<? extends AsterixServiceExporterBean> exporterBean = serviceTransport.getExporterBean();
 			if (exporterBean != null) {
@@ -77,11 +77,11 @@ public class AsterixServerRuntimeBuilder {
 		registry.registerBeanDefinition("_asterixServiceExporterBeans", beanDefinition);
 	}
 
-	private Set<AsterixServiceTransport> getUsedServiceTransports(Collection<AsterixExportedServiceInfo> exportedServiceInfos) {
-		Set<AsterixServiceTransport> result = new HashSet<>();
+	private Set<AsterixServiceComponent> getUsedServiceTransports(Collection<AsterixExportedServiceInfo> exportedServiceInfos) {
+		Set<AsterixServiceComponent> result = new HashSet<>();
 		for (AsterixExportedServiceInfo serviceInfo : exportedServiceInfos) {
 			String transportName = serviceInfo.getTransportName();
-			result.add(asterixPlugins.getPlugin(AsterixServiceTransports.class).getTransport(transportName));
+			result.add(asterixPlugins.getPlugin(AsterixServiceComponents.class).getComponent(transportName));
 		}
 		return result;
 	}
@@ -112,7 +112,7 @@ public class AsterixServerRuntimeBuilder {
 	}
 
 	private String getTransport(AsterixApiDescriptor apiDescriptor) {
-		return this.asterixPlugins.getPlugin(AsterixServiceTransports.class).getTransport(apiDescriptor).getName();
+		return this.asterixPlugins.getPlugin(AsterixServiceComponents.class).getComponent(apiDescriptor).getName();
 	}
 
 }
