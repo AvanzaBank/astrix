@@ -15,22 +15,15 @@
  */
 package se.avanzabank.asterix.context;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.core.type.AnnotationMetadata;
 
 import se.avanzabank.asterix.provider.core.AsterixServiceExport;
 
@@ -41,10 +34,6 @@ public class AsterixServerRuntimeBuilder {
 	public AsterixServerRuntimeBuilder(AsterixPlugins asterixPlugins) {
 		this.asterixPlugins = asterixPlugins;
 	}
-	
-	/*
-	 * TODO: Start service registry publisher for each service using service registry
-	 */
 	
 	public void registerBeanDefinitions(BeanDefinitionRegistry registry,
 			final AsterixServiceDescriptor serviceDescriptor) throws ClassNotFoundException {
@@ -109,7 +98,6 @@ public class AsterixServerRuntimeBuilder {
 				if (apiDescriptor.usesServiceRegistry()) {
 					result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, serviceDescriptor.getTransport(), beanName));
 				} else {
-					// TODO: cleanup
 					String transport = getTransport(apiDescriptor);
 					result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, transport, beanName));
 				}	

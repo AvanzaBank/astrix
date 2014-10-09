@@ -15,66 +15,27 @@
  */
 package se.avanzabank.asterix.remoting.plugin.provider;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.openspaces.core.GigaSpace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
-import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixServiceBuilder;
+import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.gs.GsBinder;
-import se.avanzabank.asterix.provider.remoting.AsterixRemoteServiceExport;
 
-public class AsterixRemotingServiceRegistryExporter implements AsterixServiceBuilder, ApplicationContextAware {
+public class AsterixRemotingServiceRegistryExporter implements AsterixServiceBuilder {
 	
 	public static final String SPACE_NAME_PROPERTY = "space";
 	
-	private ApplicationContext applicationContext;
 	private GigaSpace gigaSpace;
-	
-	private static final Logger log = LoggerFactory.getLogger(AsterixRemotingServiceRegistryExporter.class);
 	
 	@Autowired
 	public AsterixRemotingServiceRegistryExporter(GigaSpace gigaSpace) {
 		this.gigaSpace = gigaSpace;
 	}
-	
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.applicationContext = applicationContext;
-	}
 
-	@Override
-	public List<AsterixServiceProperties> getProvidedServices() {
-		List<AsterixServiceProperties> result = new ArrayList<>();
-		for (Object service : applicationContext.getBeansWithAnnotation(AsterixRemoteServiceExport.class).values()) {
-			AsterixRemoteServiceExport remoteServiceExport = service.getClass().getAnnotation(AsterixRemoteServiceExport.class);
-			for (Class<?> providedApi : remoteServiceExport.value()) {
-				if (!providedApi.isAssignableFrom(service.getClass())) {
-					throw new IllegalArgumentException("Cannot export: " + service.getClass() + " as " + providedApi);
-				}
-				addSyncServiceProperties(result, service, providedApi);
-				addAsyncServicePropertiesIfInterfaceExists(result, service, providedApi);
-			}
-		}
-		log.debug("Found the following services for service registry export: {}", result);
-		return result;
-	}
-	
 	@Override
 	public boolean supportsAsyncApis() {
 		return true;
-	}
-
-	private void addSyncServiceProperties(List<AsterixServiceProperties> result, Object service, Class<?> providedApi) {
-		AsterixServiceProperties serviceProperties = exportServiceProperties(providedApi);
-		result.add(serviceProperties);
 	}
 
 	@Override
@@ -82,29 +43,6 @@ public class AsterixRemotingServiceRegistryExporter implements AsterixServiceBui
 		AsterixServiceProperties serviceProperties = GsBinder.createProperties(this.gigaSpace);
 		serviceProperties.setQualifier(null); // TODO: this is a hack. Qualifier should not be managed internally in service-proprties-exporters
 		return serviceProperties;
-	}
-	
-	private void addAsyncServicePropertiesIfInterfaceExists(List<AsterixServiceProperties> result, Object service,
-			Class<?> providedApi) {
-		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
-		Class<?> asyncInterface = loadInterfaceIfExists(providedApi.getName() + "Async");
-		if (asyncInterface != null) {
-			serviceProperties.setApi(asyncInterface);
-			serviceProperties.setProperty(SPACE_NAME_PROPERTY, gigaSpace.getSpace().getName());
-			result.add(serviceProperties);
-		}
-	}
-
-	private Class<?> loadInterfaceIfExists(String interfaceName) {
-		try {
-			Class<?> c = Class.forName(interfaceName);
-			if (c.isInterface()) {
-				return c;
-			}
-		} catch (ClassNotFoundException e) {
-			// fall through and return null
-		}
-		return null;
 	}
 	
 }

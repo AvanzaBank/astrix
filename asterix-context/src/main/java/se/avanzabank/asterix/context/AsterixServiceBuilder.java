@@ -15,7 +15,6 @@
  */
 package se.avanzabank.asterix.context;
 
-import java.util.List;
 
 
 /**
@@ -30,10 +29,6 @@ import java.util.List;
 public interface AsterixServiceBuilder {
 	
 	// TODO: rename this abstraction 
-	
-	// TODO: remove this method
-	@Deprecated
-	List<AsterixServiceProperties> getProvidedServices();
 
 	/**
 	 * Server side component used by service-registry to export AsterixServiceProperties

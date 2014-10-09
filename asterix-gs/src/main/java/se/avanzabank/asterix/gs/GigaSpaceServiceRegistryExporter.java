@@ -15,14 +15,11 @@
  */
 package se.avanzabank.asterix.gs;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixServiceBuilder;
+import se.avanzabank.asterix.context.AsterixServiceProperties;
 
 public class GigaSpaceServiceRegistryExporter implements AsterixServiceBuilder {
 	
@@ -31,11 +28,6 @@ public class GigaSpaceServiceRegistryExporter implements AsterixServiceBuilder {
 	@Autowired
 	public GigaSpaceServiceRegistryExporter(GigaSpace space) {
 		this.space = space;
-	}
-
-	@Override
-	public List<AsterixServiceProperties> getProvidedServices() {
-		return Arrays.asList(GsBinder.createProperties(space));
 	}
 
 	@Override
