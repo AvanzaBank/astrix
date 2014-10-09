@@ -101,7 +101,7 @@ public class AsterixServerRuntimeBuilder {
 				}
 				AsterixApiDescriptor apiDescriptor = serviceDescriptor.getApiDescriptor(providedServiceType);
 				if (apiDescriptor.usesServiceRegistry()) {
-					result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, serviceDescriptor.getTransport(), beanName));
+					result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, serviceDescriptor.getComponent(), beanName));
 				} else {
 					String transport = getTransport(apiDescriptor);
 					result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, transport, beanName));

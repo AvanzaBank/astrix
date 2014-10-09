@@ -15,8 +15,6 @@
  */
 package se.avanzabank.asterix.context;
 
-import java.lang.annotation.Annotation;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +36,11 @@ public class AsterixServiceDescriptor {
 		this.apiDescriptorByProvideService = apiDescriptorByProvideService;
 	}
 	
+	// To simplify creating using srping bean definitions
+	public static AsterixServiceDescriptor create(AsterixServiceDescriptor asterixServiceDescriptor) {
+		return asterixServiceDescriptor;
+	}
+	
 	public static AsterixServiceDescriptor create(Class<?> descriptorHolder, AsterixContext context) {
 		AsterixService asterixService = descriptorHolder.getAnnotation(AsterixService.class);
 		Map<Class<?>, AsterixApiDescriptor> apiDescriptorByProvideService = new HashMap<>();
@@ -50,21 +53,12 @@ public class AsterixServiceDescriptor {
 		return new AsterixServiceDescriptor(asterixService, descriptorHolder, apiDescriptorByProvideService);
 	}
 	
-	// To simplify creating using srping bean definitions
-	public static AsterixServiceDescriptor create(AsterixServiceDescriptor asterixServiceDescriptor) {
-		return asterixServiceDescriptor;
-	}
-	
-	public String getName() {
-		return this.descriptorHolder.getName();
-	}
-
 	@Override
 	public String toString() {
 		return descriptorHolder.getName().toString();
 	}
 
-	public Class<?> getHolder() {
+	private Class<?> getHolder() {
 		return descriptorHolder;
 	}
 
@@ -76,21 +70,11 @@ public class AsterixServiceDescriptor {
 		return result;
 	}
 
-	public boolean containsApiType(Class<? extends Annotation> serviceDescriptorType) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public <T extends Annotation> Collection<AsterixApiDescriptor> getApis(Class<T> apiDescriptorAnnotation) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 	/**
-	 * Default transport used for services exported to service registry.
+	 * Default component used for services exported to service registry.
 	 * @return
 	 */
-	public String getTransport() {
+	public String getComponent() {
 		return asterixService.component();
 	}
 
