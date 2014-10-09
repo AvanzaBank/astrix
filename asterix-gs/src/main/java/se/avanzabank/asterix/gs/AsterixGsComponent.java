@@ -16,23 +16,20 @@
 package se.avanzabank.asterix.gs;
 
 import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
+import se.avanzabank.asterix.context.AsterixServiceBuilder;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
-import se.avanzabank.asterix.context.AsterixServiceBuilder;
 import se.avanzabank.asterix.context.AsterixServiceTransport;
 import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
 
 @MetaInfServices(AsterixServiceTransport.class)
-public class AsterixGsComponent implements AsterixServiceRegistryComponent, AsterixServiceTransport {
+public class AsterixGsComponent implements AsterixServiceTransport {
 	
 	@Override
 	public <T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, AsterixServiceProperties serviceProperties) {
@@ -42,15 +39,6 @@ public class AsterixGsComponent implements AsterixServiceRegistryComponent, Aste
 		return type.cast(GsBinder.createGsFactory(serviceProperties).create()); // TODO: fault tolerance
 	}
 
-	@Override
-	public Class<? extends AsterixServiceBuilder> getServiceExporterClass() {
-		return GigaSpaceServiceRegistryExporter.class;
-	}
-	
-	@Override
-	public List<String> getComponentDepenencies() {
-		return Collections.emptyList();
-	}
 
 	@Override
 	public String getName() {

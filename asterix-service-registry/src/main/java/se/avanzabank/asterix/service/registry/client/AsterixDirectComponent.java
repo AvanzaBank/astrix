@@ -17,8 +17,6 @@ package se.avanzabank.asterix.service.registry.client;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,14 +25,14 @@ import org.kohsuke.MetaInfServices;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
+import se.avanzabank.asterix.context.AsterixServiceBuilder;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
-import se.avanzabank.asterix.context.AsterixServiceBuilder;
 import se.avanzabank.asterix.context.AsterixServiceTransport;
 import se.avanzabank.asterix.provider.component.AsterixServiceRegistryComponentNames;
 
 @MetaInfServices(AsterixServiceTransport.class)
-public class AsterixDirectComponent implements AsterixServiceRegistryComponent, AsterixServiceTransport {
+public class AsterixDirectComponent implements AsterixServiceTransport {
 	
 	private final static AtomicLong idGen = new AtomicLong();
 	private final static Map<String, ServiceProvider<?>> providerById = new ConcurrentHashMap<>();
@@ -52,16 +50,6 @@ public class AsterixDirectComponent implements AsterixServiceRegistryComponent, 
 	@Override
 	public String getName() {
 		return AsterixServiceRegistryComponentNames.DIRECT;
-	}
-
-	@Override
-	public Class<? extends AsterixServiceBuilder> getServiceExporterClass() {
-		return null; // NOT USED. This is a client side component only 
-	}
-
-	@Override
-	public List<String> getComponentDepenencies() {
-		return Collections.emptyList(); // NOT USED. This is a client side component only 
 	}
 
 	@Override

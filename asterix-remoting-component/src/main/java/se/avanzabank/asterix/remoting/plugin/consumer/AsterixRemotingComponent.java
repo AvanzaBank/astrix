@@ -16,8 +16,6 @@
 package se.avanzabank.asterix.remoting.plugin.consumer;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
@@ -41,10 +39,9 @@ import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
 import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter;
 import se.avanzabank.asterix.remoting.server.AsterixRemotingFrameworkBean;
 import se.avanzabank.asterix.remoting.server.AsterixRemotingServiceExporterBean;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryComponent;
 
 @MetaInfServices(AsterixServiceTransport.class)
-public class AsterixRemotingComponent implements AsterixServiceRegistryComponent, /*AsterixBeanAware,*/ AsterixPluginsAware, AsterixServiceTransport {
+public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixServiceTransport {
 	
 	private AsterixPlugins plugins;
 	
@@ -74,16 +71,6 @@ public class AsterixRemotingComponent implements AsterixServiceRegistryComponent
 	@Override
 	public void setPlugins(AsterixPlugins plugins) {
 		this.plugins = plugins;
-	}
-
-	@Override
-	public Class<? extends AsterixServiceBuilder> getServiceExporterClass() {
-		return AsterixRemotingServiceRegistryExporter.class;
-	}
-	
-	@Override
-	public List<String> getComponentDepenencies() {
-		return Arrays.asList(AsterixServiceRegistryComponentNames.GS);
 	}
 
 	@Override
