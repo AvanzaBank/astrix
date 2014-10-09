@@ -15,6 +15,7 @@
  */
 package se.avanzabank.asterix.remoting.plugin.consumer;
 
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,7 +47,6 @@ import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryCompo
 public class AsterixRemotingComponent implements AsterixServiceRegistryComponent, /*AsterixBeanAware,*/ AsterixPluginsAware, AsterixServiceTransport {
 	
 	private AsterixPlugins plugins;
-//	private AsterixBeans beans;
 	
 	@Override
 	public <T> T createService(AsterixApiDescriptor descriptor, Class<T> api, AsterixServiceProperties serviceProperties) {
@@ -70,16 +70,6 @@ public class AsterixRemotingComponent implements AsterixServiceRegistryComponent
 		serviceProperties.setProperty(AsterixRemotingServiceRegistryExporter.SPACE_NAME_PROPERTY, targetSpaceName);
 		return serviceProperties;
 	}
-
-//	@Override
-//	public List<Class<?>> getBeanDependencies() {
-//		return Arrays.<Class<?>>asList(GigaSpace.class);
-//	}
-//	
-//	@Override
-//	public void setAsterixBeans(AsterixBeans beans) {
-//		this.beans = beans;
-//	}
 
 	@Override
 	public void setPlugins(AsterixPlugins plugins) {
@@ -114,6 +104,11 @@ public class AsterixRemotingComponent implements AsterixServiceRegistryComponent
 	@Override
 	public Class<? extends AsterixServiceBuilder> getServiceBuilder() {
 		return AsterixRemotingServiceRegistryExporter.class;
+	}
+	
+	@Override
+	public Class<? extends Annotation> getServiceDescriptorType() {
+		return AsterixRemoteApiDescriptor.class;
 	}
 
 }

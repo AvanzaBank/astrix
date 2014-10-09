@@ -35,10 +35,25 @@ public class AsterixServiceTransportsImpl implements AsterixServiceTransports, A
 	}
 
 	@Override
+	public AsterixServiceTransport getTransport(AsterixApiDescriptor apiDescriptor) {
+		// TODO: avoid iterating over AsterixServiceTransports. In order to do so we must be able to lookup up the descriptorType from a given AsterixApiDescriptor.
+		for (AsterixServiceTransport serviceTransport : this.transportByName.values()) {
+			if (serviceTransport.getServiceDescriptorType() == null) {
+				continue;
+			}
+			if (apiDescriptor.isAnnotationPresent(serviceTransport.getServiceDescriptorType())) {
+				return serviceTransport;
+			}
+		}
+		throw new IllegalStateException("Can't find transport for apiDescriptor: " + apiDescriptor);
+	}
+
+	@Override
 	public void setPlugins(AsterixPlugins plugins) {
 		for (AsterixServiceTransport serviceTransport : plugins.getPlugins(AsterixServiceTransport.class)) {
 			transportByName.put(serviceTransport.getName(), serviceTransport);
 		}
 	}
+
 
 }

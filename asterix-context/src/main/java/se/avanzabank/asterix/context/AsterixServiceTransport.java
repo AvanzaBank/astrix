@@ -15,7 +15,7 @@
  */
 package se.avanzabank.asterix.context;
 
-import java.util.List;
+import java.lang.annotation.Annotation;
 
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
@@ -26,23 +26,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  *
  */
 public interface AsterixServiceTransport {
-	
-	/*
-	 * På client sidan (För att kunna binda mot api:er (däribland tjänster))
-	 * 
-	 * Givet ett api (en deskriptor).
-	 *  1. Vilka bönor exponeras? (Avgörs idag av AsterixApiProviderPlugin.createFactoryBeans(AsterixApiDescriptor descriptor))
-	 *  2. Hur binder man mot dessa bönor? (Avgörs av de factories som returneras av ovanstående metod)
-	 *  
-	 *  Om tjänsten använder tjänsteregistret:
-	 *   - Steg 2 av bindingen görs då av AsterixServiceRegistryComponent
-	 *  
-	 *  
-	 * På server sidan (För att kunna exponera tjänster)
-	 * 
-	 * 
-	 * 
-	 */
 	
 	// TODO: rename to AsterixServiceComponent? or AsterixServiceBuilder? or AsterixServiceBinder?
 
@@ -84,5 +67,16 @@ public interface AsterixServiceTransport {
 	 * @return
 	 */
 	Class<? extends AsterixServiceBuilder> getServiceBuilder();
+	
+
+	/**
+	 * For service-transports that might be used standalone (that is: whithout the serviceregistry).
+	 * 
+	 * This method defines a unique annotation used to describe the given api.
+	 * 
+
+	 * @return
+	 */
+	Class<? extends Annotation> getServiceDescriptorType();
 	
 }

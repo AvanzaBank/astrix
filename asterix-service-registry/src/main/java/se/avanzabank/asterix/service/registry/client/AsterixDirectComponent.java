@@ -15,6 +15,7 @@
  */
 package se.avanzabank.asterix.service.registry.client;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -131,6 +132,11 @@ public class AsterixDirectComponent implements AsterixServiceRegistryComponent, 
 	@Override
 	public Class<? extends AsterixServiceBuilder> getServiceBuilder() {
 		// NOT USED. This is a client side component only
+		return null;
+	}
+	
+	@Override
+	public Class<? extends Annotation> getServiceDescriptorType() {
 		return null;
 	}
 	

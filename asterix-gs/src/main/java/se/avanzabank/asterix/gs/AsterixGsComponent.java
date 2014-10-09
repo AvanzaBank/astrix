@@ -15,6 +15,7 @@
  */
 package se.avanzabank.asterix.gs;
 
+import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
 
@@ -75,6 +76,11 @@ public class AsterixGsComponent implements AsterixServiceRegistryComponent, Aste
 	@Override
 	public Class<? extends AsterixServiceBuilder> getServiceBuilder() {
 		return GigaSpaceServiceRegistryExporter.class;
+	}
+	
+	@Override
+	public Class<? extends Annotation> getServiceDescriptorType() {
+		return null;
 	}
 	
 }

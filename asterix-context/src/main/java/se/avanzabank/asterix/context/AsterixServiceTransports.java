@@ -18,5 +18,7 @@ package se.avanzabank.asterix.context;
 public interface AsterixServiceTransports {
 	
 	AsterixServiceTransport getTransport(String name);
+	
+	AsterixServiceTransport getTransport(AsterixApiDescriptor apiDescriptor);
 
 }

@@ -93,13 +93,7 @@ public class AsterixServerRuntimeBuilder {
 	}
 	
 	private Collection<AsterixExportedServiceInfo> getExportedServices(BeanDefinitionRegistry registry, AsterixServiceDescriptor serviceDescriptor) throws ClassNotFoundException {
-		List<AsterixServiceApiPlugin> serviceApiPlugins = asterixPlugins.getPlugins(AsterixServiceApiPlugin.class);
 		Set<AsterixExportedServiceInfo> result = new HashSet<>();
-		Map<Class<?>, String> transportByApiDescriptorType = new HashMap<>();
-		for (AsterixServiceApiPlugin serviceApiPlugin : serviceApiPlugins) {
-			transportByApiDescriptorType.put(serviceApiPlugin.getServiceDescriptorType(), serviceApiPlugin.getTransport());
-		}
-		System.out.println(Arrays.toString(registry.getBeanDefinitionNames()));
 		for (String beanName : registry.getBeanDefinitionNames()) {
 			BeanDefinition beanDefinition = registry.getBeanDefinition(beanName);
 			Class<?> possibleBeanType = Class.forName(beanDefinition.getBeanClassName());
@@ -116,55 +110,16 @@ public class AsterixServerRuntimeBuilder {
 					result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, serviceDescriptor.getTransport(), beanName));
 				} else {
 					// TODO: cleanup
-					String transport = getTransport(serviceApiPlugins, apiDescriptor);
+					String transport = getTransport(apiDescriptor);
 					result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, transport, beanName));
 				}	
 			}
-			
-//			if (!(beanDefinition instanceof AnnotatedBeanDefinition)) {
-//				continue;
-//			}
-//			AcnnotationMetadata annotationMetadata = AnnotatedBeanDefinition.class.cast(beanDefinition).getMetadata();
-//			if (!annotationMetadata.isAnnotated(AsterixServiceExport.class.getName())) {
-//				continue;
-//			}
-//			Map<String, Object> annotationAttributes = annotationMetadata.getAnnotationAttributes(AsterixServiceExport.class.getName());
-//			Class<?> providedServiceType = (Class<?>) annotationAttributes.get("value");
-//			AsterixApiDescriptor apiDescriptor = serviceDescriptor.getApiDescriptor(providedServiceType);
-//			if (apiDescriptor.usesServiceRegistry()) {
-//				// TODO: how to know if transitive service-exporting is required? For instance gs-remoting requires GigaSpace to be exported to registry.
-//				result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, serviceDescriptor.getTransport(), beanName));
-//			} else {
-//				String transport = null;
-//				for (AsterixServiceApiPlugin apiPlugin : serviceApiPlugins) {
-//					if (apiDescriptor.isAnnotationPresent(apiPlugin.getServiceDescriptorType())) {
-//						transport = apiPlugin.getTransport();
-//						break;
-//					}
-//				}
-//				if (transport == null) {
-//					throw new IllegalStateException("Can't find transport for apiDescriptor: " + apiDescriptor);
-//				}
-//				result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, transport, beanName));
-//			}
 		}
 		return result;
 	}
 
-	private String getTransport(
-			List<AsterixServiceApiPlugin> serviceApiPlugins,
-			AsterixApiDescriptor apiDescriptor) {
-		String transport = null;
-		for (AsterixServiceApiPlugin apiPlugin : serviceApiPlugins) {
-			if (apiDescriptor.isAnnotationPresent(apiPlugin.getServiceDescriptorType())) {
-				transport = apiPlugin.getTransport();
-				break;
-			}
-		}
-		if (transport == null) {
-			throw new IllegalStateException("Can't find transport for apiDescriptor: " + apiDescriptor);
-		}
-		return transport;
+	private String getTransport(AsterixApiDescriptor apiDescriptor) {
+		return this.asterixPlugins.getPlugin(AsterixServiceTransports.class).getTransport(apiDescriptor).getName();
 	}
 
 }
