@@ -15,21 +15,16 @@
  */
 package se.avanzabank.asterix.remoting.plugin.consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixFactoryBean;
-import se.avanzabank.asterix.context.AsterixFaultTolerancePlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
-import se.avanzabank.asterix.context.AsterixVersioningPlugin;
+import se.avanzabank.asterix.context.AsterixServiceComponent;
+import se.avanzabank.asterix.context.AsterixServiceComponents;
+import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.ExternalDependency;
 import se.avanzabank.asterix.context.ExternalDependencyAware;
-import se.avanzabank.asterix.core.AsterixObjectSerializer;
-import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
-import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
-import se.avanzabank.space.SpaceLocator;
+import se.avanzabank.asterix.gs.GsBinder;
 
 public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, ExternalDependencyAware<AsterixRemotingPluginDependencies>, AsterixPluginsAware {
 	
@@ -39,8 +34,6 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, 
 	private ExternalDependency<AsterixRemotingPluginDependencies> dependencies;
 	private AsterixPlugins plugins;
 	
-	private static final Logger log = LoggerFactory.getLogger(AsterixRemotingServiceFactory.class);
-	
 	public AsterixRemotingServiceFactory(Class<T> serviceApi,
 										String targetSpaceName, 
 										AsterixApiDescriptor descriptor) {
@@ -48,31 +41,13 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, 
 		this.targetSpace = targetSpaceName;
 		this.descriptor = descriptor; // TODO: inject AsterixApiDescriptor
 	}
-
+	
 	@Override
 	public T create(String qualifier) {
-		log.debug("Creating remote service proxy for {}", serviceApi);
-		AsterixRemotingTransport remotingTransport = createRemotingTransport(); // dependency
-		AsterixObjectSerializer objectSerializer = createObjectSerializer(); // plugin
-		AsterixFaultTolerancePlugin faultTolerance = createFaultTolerance(); // plugin
-		T proxy = AsterixRemotingProxy.create(serviceApi, remotingTransport, objectSerializer);
-		// TODO really use space name as command group?
-		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(serviceApi, proxy, targetSpace);
-		return proxyWithFaultTolerance;
-	}
-
-	private AsterixFaultTolerancePlugin createFaultTolerance() {
-		return plugins.getPlugin(AsterixFaultTolerancePlugin.class);
-	}
-
-	private AsterixObjectSerializer createObjectSerializer() {
-		return plugins.getPlugin(AsterixVersioningPlugin.class).create(descriptor);
-	}
-
-	private AsterixRemotingTransport createRemotingTransport() {
-		SpaceLocator spaceLocator = dependencies.get().getSpaceLocator();
-		 // TODO: caching of created proxies, fault tolerance?
-		return AsterixRemotingTransport.remoteSpace(spaceLocator.createClusteredProxy(targetSpace));
+		AsterixServiceComponent serviceComponent = plugins.getPlugin(AsterixServiceComponents.class).getComponent(descriptor);
+		AsterixServiceProperties serviceProperties = serviceComponent.getServiceProperties(descriptor, serviceApi);
+		serviceProperties.setProperty(GsBinder.SPACE_URL_PROPERTY, dependencies.get().getSpaceLocator().getSpaceUrl(targetSpace));
+		return serviceComponent.createService(descriptor, serviceApi, serviceProperties);
 	}
 
 	@Override

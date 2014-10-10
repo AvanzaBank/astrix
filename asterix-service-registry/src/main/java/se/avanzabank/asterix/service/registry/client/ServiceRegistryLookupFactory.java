@@ -57,11 +57,11 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 		if (serviceProperties == null) {
 			throw new RuntimeException(String.format("Misssing entry in service-registry api=%s qualifier=%s: ", api.getName(), qualifier));
 		}
-		AsterixServiceComponent serviceTransport = getServiceTransport(serviceProperties);
-		return serviceTransport.createService(descriptor, api, serviceProperties);
+		AsterixServiceComponent serviceComponent = getServiceComponent(serviceProperties);
+		return serviceComponent.createService(descriptor, api, serviceProperties);
 	}
 	
-	private AsterixServiceComponent getServiceTransport(AsterixServiceProperties serviceProperties) {
+	private AsterixServiceComponent getServiceComponent(AsterixServiceProperties serviceProperties) {
 		String transportName = serviceProperties.getTransport();
 		if (transportName == null) {
 			throw new IllegalArgumentException("Expected a componentName to be set on serviceProperties: " + serviceProperties);

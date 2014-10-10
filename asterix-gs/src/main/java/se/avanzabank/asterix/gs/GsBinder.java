@@ -15,63 +15,28 @@
  */
 package se.avanzabank.asterix.gs;
 
-import net.jini.core.discovery.LookupLocator;
-
 import org.openspaces.core.GigaSpace;
 
 import se.avanzabank.asterix.context.AsterixServiceProperties;
-import se.avanzabank.space.UsesLookupGroupsSpaceLocator;
-import se.avanzabank.space.UsesLookupLocatorsSpaceLocator;
-
-import com.j_spaces.core.client.SpaceURL;
 
 
 public class GsBinder {
 	
 	
+	public static final String SPACE_NAME_PROPERTY = "spaceName";
+	public static final String SPACE_URL_PROPERTY = "spaceUrl";
+
 	public static GsFactory createGsFactory(AsterixServiceProperties properties) {
-		String locators = properties.getProperty("locators");
-		String groups = properties.getProperty("groups");
-		String targetSpace = properties.getProperty("space");
-//		String targetSpace = properties.getQualifier();
-		if (locators != null) {
-			return new GsFactory(new UsesLookupLocatorsSpaceLocator(locators), targetSpace);
-		}
-		if (groups != null) {
-			return new GsFactory(new UsesLookupGroupsSpaceLocator(groups), targetSpace);
-		}
-		throw new IllegalArgumentException("Cannot create GSFactory from properties: " + properties);
+		String spaceUrl = properties.getProperty(SPACE_URL_PROPERTY);
+		return new GsFactory(spaceUrl);
 	}
 	
 	public static AsterixServiceProperties createProperties(GigaSpace space) {
 		AsterixServiceProperties result = new AsterixServiceProperties();
 		result.setApi(GigaSpace.class);
 		result.setQualifier(space.getSpace().getName()); // TODO: note that gigaSpace.getName returns "GigaSpace" on embedded space
-		result.setProperty("space", space.getSpace().getName()); // TODO: note that gigaSpace.getName returns "GigaSpace" on embedded space
-		SpaceURL finderURL = space.getSpace().getFinderURL();
-		LookupLocator[] locators = finderURL.getLookupLocators();
-		if (locators != null) {
-			StringBuilder locatorsString = new StringBuilder();
-			for (LookupLocator locator : locators) {
-				if (locatorsString.length() > 0) {
-					locatorsString.append(",");
-					
-				}
-				// TODO: how to convert locator to string?
-				locatorsString.append(locator.getHost());
-			}
-			result.setProperty("locators", locatorsString.toString()); 
-		} else {
-			StringBuilder groupsString = new StringBuilder();
-			for (String group : finderURL.getLookupGroups()) {
-				if (groupsString.length() > 0) {
-					groupsString.append(",");
-					
-				}
-				groupsString.append(group);
-			}
-			result.setProperty("groups", groupsString.toString());
-		}
+		result.setProperty(SPACE_NAME_PROPERTY, space.getSpace().getName()); // TODO: note that gigaSpace.getName returns "GigaSpace" on embedded space
+		result.setProperty(SPACE_URL_PROPERTY, space.getSpace().getFinderURL().getURL());
 		return result;
 	}
 

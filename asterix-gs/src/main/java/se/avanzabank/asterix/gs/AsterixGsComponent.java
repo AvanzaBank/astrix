@@ -67,7 +67,7 @@ public class AsterixGsComponent implements AsterixServiceComponent {
 	}
 	
 	@Override
-	public Class<? extends Annotation> getServiceDescriptorType() {
+	public Class<? extends Annotation> getApiDescriptorType() {
 		return null;
 	}
 	

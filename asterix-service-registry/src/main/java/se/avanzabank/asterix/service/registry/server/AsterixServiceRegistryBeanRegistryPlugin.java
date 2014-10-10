@@ -31,14 +31,12 @@ import se.avanzabank.asterix.context.AsterixExportedServiceInfo;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.context.AsterixServiceBuilderHolder;
-import se.avanzabank.asterix.context.AsterixServiceRegistryPlugin;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
 import se.avanzabank.asterix.context.AsterixServiceComponents;
+import se.avanzabank.asterix.context.AsterixServiceRegistryPlugin;
 
 @MetaInfServices(AsterixServiceRegistryPlugin.class)
 public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixServiceRegistryPlugin, AsterixPluginsAware {
-	
-	// TODO: service registry should implement its own interface rather than AsterixServiceApiPlugin
 	
 	private AsterixPlugins plugins;
 	
@@ -48,9 +46,9 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixServiceR
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_asterixServiceBusExporterWorker", beanDefinition);
 		
-		Set<AsterixServiceComponent> serviceTransport = new HashSet<>();
+		Set<AsterixServiceComponent> usedServiceComponents = new HashSet<>();
 		for (final AsterixExportedServiceInfo exportedService : publishedServices) {
-			serviceTransport.add(getTransport(exportedService.getTransportName()));
+			usedServiceComponents.add(getComponent(exportedService.getTransportName()));
 			
 			beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceBuilderHolder.class);
 			beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues() {{
@@ -61,13 +59,13 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixServiceR
 			beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 			registry.registerBeanDefinition("_asterixServiceBuilderHolder-" + exportedService.getProvidingBeanName() + "-" + exportedService.getProvidedService().getName(), beanDefinition);
 		}
-		for (AsterixServiceComponent asterixServiceTransport : serviceTransport) {
-			beanDefinition = new AnnotatedGenericBeanDefinition(asterixServiceTransport.getServiceBuilder());
-			registry.registerBeanDefinition("_asterixServiceBuilderBean-" + asterixServiceTransport.getName(), beanDefinition);
+		for (AsterixServiceComponent serviceComponent : usedServiceComponents) {
+			beanDefinition = new AnnotatedGenericBeanDefinition(serviceComponent.getServiceBuilder());
+			registry.registerBeanDefinition("_asterixServiceBuilderBean-" + serviceComponent.getName(), beanDefinition);
 		}
 	}
 	
-	private AsterixServiceComponent getTransport(String transportName) {
+	private AsterixServiceComponent getComponent(String transportName) {
 		return plugins.getPlugin(AsterixServiceComponents.class).getComponent(transportName);
 	}
 

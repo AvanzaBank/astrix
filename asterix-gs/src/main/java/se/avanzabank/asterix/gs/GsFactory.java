@@ -16,21 +16,26 @@
 package se.avanzabank.asterix.gs;
 
 import org.openspaces.core.GigaSpace;
+import org.openspaces.core.GigaSpaceConfigurer;
+import org.openspaces.core.space.UrlSpaceConfigurer;
 
-import se.avanzabank.space.SpaceLocator;
-
+import com.j_spaces.core.IJSpace;
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class GsFactory  {
 	
-	private SpaceLocator spaceLocator;
-	private String spaceName;
-	
-	public GsFactory(SpaceLocator spaceLocator, String spaceName) {
-		this.spaceLocator = spaceLocator;
-		this.spaceName = spaceName;
+	private final String spaceUrl;
+
+	public GsFactory(String spaceUrl) {
+		this.spaceUrl = spaceUrl;
 	}
-	
+
 	public GigaSpace create() {
-		return spaceLocator.createClusteredProxy(spaceName);
+		IJSpace space = new UrlSpaceConfigurer(spaceUrl).create();
+		return new GigaSpaceConfigurer(space).create();
 	}
 	
 }

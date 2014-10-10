@@ -35,6 +35,7 @@ public interface AsterixServiceComponent {
 	 * 
 	 * The service-properties will be used by a AsterixFactoryBean to bind to a given service
 	 */
+	@Deprecated // TODO: remove
 	<T> AsterixServiceProperties getServiceProperties(AsterixApiDescriptor apiDescriptor, Class<T> type);
 	
 	/**
@@ -75,6 +76,6 @@ public interface AsterixServiceComponent {
 
 	 * @return
 	 */
-	Class<? extends Annotation> getServiceDescriptorType();
+	Class<? extends Annotation> getApiDescriptorType();
 	
 }

@@ -38,10 +38,10 @@ public class AsterixServiceComponentsImpl implements AsterixServiceComponents, A
 	public AsterixServiceComponent getComponent(AsterixApiDescriptor apiDescriptor) {
 		// TODO: avoid iterating over AsterixServiceComponents. In order to do so we must be able to lookup up the descriptorType from a given AsterixApiDescriptor.
 		for (AsterixServiceComponent serviceTransport : this.transportByName.values()) {
-			if (serviceTransport.getServiceDescriptorType() == null) {
+			if (serviceTransport.getApiDescriptorType() == null) {
 				continue;
 			}
-			if (apiDescriptor.isAnnotationPresent(serviceTransport.getServiceDescriptorType())) {
+			if (apiDescriptor.isAnnotationPresent(serviceTransport.getApiDescriptorType())) {
 				return serviceTransport;
 			}
 		}

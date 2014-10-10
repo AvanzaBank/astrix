@@ -53,7 +53,7 @@ public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixSer
 		AsterixObjectSerializer objectSerializer = plugins.getPlugin(AsterixVersioningPlugin.class).create(descriptor);
 		AsterixFaultTolerancePlugin faultTolerance = plugins.getPlugin(AsterixFaultTolerancePlugin.class);
 		
-		String targetSpace = serviceProperties.getProperty(AsterixRemotingServiceRegistryExporter.SPACE_NAME_PROPERTY);
+		String targetSpace = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
 		GigaSpace space = GsBinder.createGsFactory(serviceProperties).create();
 		AsterixRemotingTransport remotingTransport = AsterixRemotingTransport.remoteSpace(space); // TODO: caching of created proxies, fault tolerance?
 		
@@ -103,7 +103,7 @@ public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixSer
 	}
 	
 	@Override
-	public Class<? extends Annotation> getServiceDescriptorType() {
+	public Class<? extends Annotation> getApiDescriptorType() {
 		return AsterixRemoteApiDescriptor.class;
 	}
 
