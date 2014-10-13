@@ -32,7 +32,7 @@ public class GsServiceExporter implements AsterixServiceExporterBean {
 	}
 	
 	@Override
-	public String getTransport() {
+	public String getComponent() {
 		return AsterixServiceComponentNames.GS;
 	}
 

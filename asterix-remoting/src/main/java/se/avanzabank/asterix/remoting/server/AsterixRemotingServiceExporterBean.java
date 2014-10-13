@@ -44,7 +44,7 @@ public class AsterixRemotingServiceExporterBean implements AsterixServiceExporte
 	}
 	
 	@Override
-	public String getTransport() {
+	public String getComponent() {
 		return AsterixServiceComponentNames.GS_REMOTING;
 	}
 

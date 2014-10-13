@@ -28,7 +28,7 @@ public class AsterixServiceExporterBeans {
 	@Autowired
 	public AsterixServiceExporterBeans(List<AsterixServiceExporterBean> serviceExporters) {
 		for (AsterixServiceExporterBean serviceExporter : serviceExporters) {
-			serviceExporterByComponentName.put(serviceExporter.getTransport(), serviceExporter);
+			serviceExporterByComponentName.put(serviceExporter.getComponent(), serviceExporter);
 		}
 	}
 

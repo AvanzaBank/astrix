@@ -27,6 +27,6 @@ public interface AsterixServiceExporterBean {
 	void register(Object provider, AsterixApiDescriptor apiDescriptor, Class<?> providedApi);
 	
 	// TODO: remove component name from this abstraction. It should be enough to provide it on AsterixServiceComponent
-	String getTransport();
+	String getComponent();
 	
 }
