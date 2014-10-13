@@ -89,6 +89,14 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		 */
 		
 		// TODO: avoid creating two AsterixContext's  (here and as spring bean). Creating two AsterixContext causes two scannings for providers
+		try {
+			createServiceFrameworkRuntime(registry);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("Failed to build server runtime", e);
+		}
+	}
+
+	private void createServiceFrameworkRuntime(BeanDefinitionRegistry registry) throws ClassNotFoundException {
 		AsterixConfigurer configurer = new AsterixConfigurer();
 		configurer.setSettings(this.settings);
 		AsterixContext asterixContext = configurer.configure();
@@ -96,19 +104,12 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		List<Class<?>> consumedAsterixBeans = new ArrayList<>(this.consumedAsterixBeans);
 		AsterixServerRuntimeBuilder serverRuntimeBuilder = new AsterixServerRuntimeBuilder(asterixContext.getPlugins());
 		if (serviceDescriptorHolder != null) {
-			// Application exports services, build server runtime
-			try {
-				serverRuntimeBuilder.registerBeanDefinitions(registry, AsterixServiceDescriptor.create(serviceDescriptorHolder, asterixContext));
-				consumedAsterixBeans.addAll(serverRuntimeBuilder.getConsumedAsterixBeans());
-			} catch (ClassNotFoundException e) {
-				throw new RuntimeException("Failed to build server runtime", e);
-			}
+			// This application exports services, build server runtime
+			serverRuntimeBuilder.registerBeanDefinitions(registry, AsterixServiceDescriptor.create(serviceDescriptorHolder, asterixContext));
+			consumedAsterixBeans.addAll(serverRuntimeBuilder.getConsumedAsterixBeans());
 		}
-		
 		AsterixClientRuntimeBuilder clientRuntimeBuilder = new AsterixClientRuntimeBuilder(asterixContext, this.settings, consumedAsterixBeans);
 		clientRuntimeBuilder.registerBeanDefinitions(registry);
-		
-		
 	}
 
 	@Override
@@ -138,6 +139,15 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		this.serviceDescriptorHolder = serviceDescriptorHolder;
 	}
 	
+	/**
+	 * All services consumed by the current application. Each type will be created and available
+	 * for autowiring in the current applicationContext.
+	 * 
+	 * Implementation note: This is only used defined usages of asterix beans. Any asterix-beans
+	 * used by the service-framework will not be included int this set. 
+	 * 
+	 * @return
+	 */
 	public List<Class<?>> getConsumedApis() {
 		return consumedAsterixBeans;
 	}

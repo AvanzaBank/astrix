@@ -28,7 +28,13 @@ import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.provider.core.AsterixServiceExport;
-
+/**
+ * Registers beans associated with service providers, i.e applications that exports one or many
+ * services invokable from remote processes. <p> 
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AsterixServerRuntimeBuilder {
 	
 	private AsterixPlugins asterixPlugins;

@@ -27,7 +27,12 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-
+/**
+ * Registers beans associated with consumption of asterix beans. <p>
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AsterixClientRuntimeBuilder {
 
 	private List<Class<?>> consumedAsterixBeans;
