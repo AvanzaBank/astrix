@@ -46,7 +46,6 @@ import se.avanzabank.space.SpaceLocator;
  */
 public class AsterixServiceRegistryExporterWorker extends Thread {
 	
-//	private List<ServiceRegistryExporterHolder> serviceExporters = Collections.emptyList();
 	private List<AsterixServiceBuilderHolder> serviceBuilders = Collections.emptyList();
 	private final AsterixServiceRegistry serviceRegistry;
 	private final Logger log = LoggerFactory.getLogger(AsterixServiceRegistryExporterWorker.class);
@@ -62,12 +61,6 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 		AsterixObjectSerializer serializer = versioningPlugin.create(new AsterixApiDescriptor(AsterixServiceRegistryApiDescriptor.class));
 		this.serviceRegistry = AsterixRemotingProxy.create(AsterixServiceRegistry.class, AsterixRemotingTransport.remoteSpace(serviceRegistrySpace), serializer);
 	}
-
-
-//	@Autowired(required = false)
-//	public void setServiceExporters(List<ServiceRegistryExporterHolder> serviceExporters) {
-//		this.serviceExporters = serviceExporters;
-//	}
 	
 	@Autowired(required = false)
 	public void setServiceBuilders(List<AsterixServiceBuilderHolder> serviceBuilders) {
@@ -103,13 +96,6 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	}
 
 	private void exportProvidedServcies() {
-//		for (ServiceRegistryExporterHolder exporter : serviceExporters) {
-//			for (AsterixServiceProperties serviceProperties : exporter.getProvidedServices()) {
-//				serviceProperties.setComponent(exporter.getComponentName()); // TODO: should this be moved to ServiceRegistryServiceExporterHolder?
-//				serviceRegistry.register(serviceProperties.getApi(), serviceProperties);
-//				log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
-//			}
-//		}
 		for (AsterixServiceBuilderHolder serviceBuilder : serviceBuilders) {
 			AsterixServiceProperties serviceProperties = serviceBuilder.exportServiceProperties();
 			serviceRegistry.register(serviceProperties.getApi(), serviceProperties);
