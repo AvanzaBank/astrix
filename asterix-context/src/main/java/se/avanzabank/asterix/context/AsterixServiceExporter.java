@@ -60,7 +60,7 @@ public class AsterixServiceExporter implements ApplicationContextAware {
 	public void register() {
 		for (AsterixExportedServiceInfo exportedService : exportedServices) {
 			Object provider = applicationContext.getBean(exportedService.getProvidingBeanName());
-			AsterixServiceExporterBean serviceExporterBean = asterixServiceExporterBeans.getServiceExporter(exportedService.getTransportName());
+			AsterixServiceExporterBean serviceExporterBean = asterixServiceExporterBeans.getServiceExporter(exportedService.getComponentName());
 			serviceExporterBean.register(provider, exportedService.getApiDescriptor(), exportedService.getProvidedService());
 		}
 	}

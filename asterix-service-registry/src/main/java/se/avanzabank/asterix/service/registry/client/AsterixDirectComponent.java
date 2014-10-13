@@ -70,7 +70,7 @@ public class AsterixDirectComponent implements AsterixServiceComponent {
 		}
 		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
 		serviceProperties.setProperty("providerId", id);
-		serviceProperties.setTransport(AsterixServiceComponentNames.DIRECT);
+		serviceProperties.setComponent(AsterixServiceComponentNames.DIRECT);
 		return serviceProperties;
 	}
 	

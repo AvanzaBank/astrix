@@ -45,11 +45,11 @@ public class AsterixServerRuntimeBuilder {
 		beanDefinition.setFactoryMethodName("create");
 		registry.registerBeanDefinition("_asterixServiceDescriptor", beanDefinition);
 		
-		// Register beans required by all used service-transports
+		// Register beans required by all used service-components
 		final Collection<AsterixExportedServiceInfo> exportedServices = getExportedServices(registry, serviceDescriptor);
-		Collection<AsterixServiceComponent> usedServiceTransports = getUsedServiceTransports(exportedServices);
+		Collection<AsterixServiceComponent> usedServiceTransports = getUsedServiceComponents(exportedServices);
 		for (AsterixServiceComponent serviceTransport : usedServiceTransports) {
-			serviceTransport.registerBeans(registry); // No exporting of services, registration of transport required beans
+			serviceTransport.registerBeans(registry); // No exporting of services, registration of component required beans
 			Class<? extends AsterixServiceExporterBean> exporterBean = serviceTransport.getExporterBean();
 			if (exporterBean != null) {
 				beanDefinition = new AnnotatedGenericBeanDefinition(exporterBean);
@@ -77,11 +77,11 @@ public class AsterixServerRuntimeBuilder {
 		registry.registerBeanDefinition("_asterixServiceExporterBeans", beanDefinition);
 	}
 
-	private Set<AsterixServiceComponent> getUsedServiceTransports(Collection<AsterixExportedServiceInfo> exportedServiceInfos) {
+	private Set<AsterixServiceComponent> getUsedServiceComponents(Collection<AsterixExportedServiceInfo> exportedServiceInfos) {
 		Set<AsterixServiceComponent> result = new HashSet<>();
 		for (AsterixExportedServiceInfo serviceInfo : exportedServiceInfos) {
-			String transportName = serviceInfo.getTransportName();
-			result.add(asterixPlugins.getPlugin(AsterixServiceComponents.class).getComponent(transportName));
+			String componentName = serviceInfo.getComponentName();
+			result.add(asterixPlugins.getPlugin(AsterixServiceComponents.class).getComponent(componentName));
 		}
 		return result;
 	}
@@ -103,15 +103,15 @@ public class AsterixServerRuntimeBuilder {
 				if (apiDescriptor.usesServiceRegistry()) {
 					result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, serviceDescriptor.getComponent(), beanName));
 				} else {
-					String transport = getTransport(apiDescriptor);
-					result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, transport, beanName));
+					String componentName = getServiceComponent(apiDescriptor);
+					result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, componentName, beanName));
 				}	
 			}
 		}
 		return result;
 	}
 
-	private String getTransport(AsterixApiDescriptor apiDescriptor) {
+	private String getServiceComponent(AsterixApiDescriptor apiDescriptor) {
 		return this.asterixPlugins.getPlugin(AsterixServiceComponents.class).getComponent(apiDescriptor).getName();
 	}
 

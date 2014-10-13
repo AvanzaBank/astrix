@@ -48,12 +48,12 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixServiceR
 		
 		Set<AsterixServiceComponent> usedServiceComponents = new HashSet<>();
 		for (final AsterixExportedServiceInfo exportedService : publishedServices) {
-			usedServiceComponents.add(getComponent(exportedService.getTransportName()));
+			usedServiceComponents.add(getComponent(exportedService.getComponentName()));
 			
 			beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceBuilderHolder.class);
 			beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues() {{
-				addIndexedArgumentValue(0, new RuntimeBeanReference("_asterixServiceBuilderBean-" + exportedService.getTransportName()));
-				addIndexedArgumentValue(1, exportedService.getTransportName());
+				addIndexedArgumentValue(0, new RuntimeBeanReference("_asterixServiceBuilderBean-" + exportedService.getComponentName()));
+				addIndexedArgumentValue(1, exportedService.getComponentName());
 				addIndexedArgumentValue(2, exportedService.getProvidedService());
 			}});
 			beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());

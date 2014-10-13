@@ -65,12 +65,12 @@ public final class AsterixServiceProperties implements Serializable {
 		return properties.toString();
 	}
 
-	public String getTransport() {
+	public String getComponent() {
 		return getProperty("_component");
 	}
 	
-	public void setTransport(String transport) {
-		setProperty("_component", transport);
+	public void setComponent(String component) {
+		setProperty("_component", component);
 	}
 
 	@Override

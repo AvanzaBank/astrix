@@ -40,10 +40,10 @@ public class AsterixServiceExporterBeans {
 		return asterixServiceExporterBean;
 	}
 	
-	public AsterixServiceExporterBean getServiceExporter(String transportName) {
-		AsterixServiceExporterBean asterixServiceExporterBean = serviceExporterByComponentName.get(transportName);
+	public AsterixServiceExporterBean getServiceExporter(String componentName) {
+		AsterixServiceExporterBean asterixServiceExporterBean = serviceExporterByComponentName.get(componentName);
 		if (asterixServiceExporterBean == null) {
-			throw new IllegalStateException("No AsterixServiceExporterBean found for component=" + transportName);
+			throw new IllegalStateException("No AsterixServiceExporterBean found for component=" + componentName);
 		}
 		return asterixServiceExporterBean;
 	}

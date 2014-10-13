@@ -20,7 +20,9 @@ import java.lang.annotation.Annotation;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 /**
- * Used on the server side to export a services using a given mechanism
+ * Used on the client side to bind to service exported over the service-registry. <p>
+ * 
+ * Used on the server side to export a services using a given mechanism. <p>
  * 
  * @author Elias Lindholm (elilin)
  *

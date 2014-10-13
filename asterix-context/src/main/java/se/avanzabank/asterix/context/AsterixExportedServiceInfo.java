@@ -19,7 +19,7 @@ package se.avanzabank.asterix.context;
  * 
  * This info fully identifies all relevant information for an exported 
  * service: 
- *  - transport-mechanism (component)
+ *  - service-component used (AsterixServiceComponent)
  *  - apiDescriptor
  *  - serviceType (asterixBeanType)
  * 
@@ -51,7 +51,7 @@ public class AsterixExportedServiceInfo {
 		return apiDescriptor;
 	}
 	
-	public String getTransportName() {
+	public String getComponentName() {
 		return componentName;
 	}
 	
