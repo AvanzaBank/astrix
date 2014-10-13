@@ -20,23 +20,14 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.openspaces.core.GigaSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.context.AsterixApiDescriptor;
-import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixServiceBuilderHolder;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
-import se.avanzabank.asterix.context.AsterixVersioningPlugin;
-import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
-import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
-import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryApiDescriptor;
-import se.avanzabank.space.SpaceLocator;
 /**
  * The service registry worker is a server-side component responsible for continuously publishing 
  * all exported services from the current application onto the service registry.
@@ -52,14 +43,8 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	private volatile long exportIntervallMillis = 60_000;
 
 	@Autowired
-	public AsterixServiceRegistryExporterWorker(
-			SpaceLocator sl, // External dependency
-			AsterixPlugins asterixPlugins) { // Plugin dependency
-		AsterixVersioningPlugin versioningPlugin = asterixPlugins.getPlugin(AsterixVersioningPlugin.class);
-		// TODO: AsterixServiceRegistry should be retreived from service-framework, not by hard-coding usage of remoting-framework here.
-		GigaSpace serviceRegistrySpace = sl.createClusteredProxy("service-registry-space"); // TODO: fault tolerance, connection mannagment, etc.
-		AsterixObjectSerializer serializer = versioningPlugin.create(new AsterixApiDescriptor(AsterixServiceRegistryApiDescriptor.class));
-		this.serviceRegistry = AsterixRemotingProxy.create(AsterixServiceRegistry.class, AsterixRemotingTransport.remoteSpace(serviceRegistrySpace), serializer);
+	public AsterixServiceRegistryExporterWorker(AsterixServiceRegistry serviceRegistry) {
+		this.serviceRegistry = serviceRegistry;
 	}
 	
 	@Autowired(required = false)
@@ -84,7 +69,7 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 			try {
 				exportProvidedServcies();
 				exportIntervallMillis = 60_000;
-				sleep(exportIntervallMillis);// TODO: intervall of lease renewal
+				sleep(exportIntervallMillis);// TODO: interval of lease renewal
 			} catch (InterruptedException e) {
 				interrupt();
 			} catch (ServiceUnavailableException e) {

@@ -15,6 +15,7 @@
  */
 package se.avanzabank.asterix.service.registry.server;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,6 +35,7 @@ import se.avanzabank.asterix.context.AsterixServiceBuilderHolder;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
 import se.avanzabank.asterix.context.AsterixServiceComponents;
 import se.avanzabank.asterix.context.AsterixServiceRegistryPlugin;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
 
 @MetaInfServices(AsterixServiceRegistryPlugin.class)
 public class AsterixServiceRegistryPluginImpl implements AsterixServiceRegistryPlugin, AsterixPluginsAware {
@@ -72,6 +74,11 @@ public class AsterixServiceRegistryPluginImpl implements AsterixServiceRegistryP
 	@Override
 	public void setPlugins(AsterixPlugins plugins) {
 		this.plugins = plugins;
+	}
+	
+	@Override
+	public Collection<? extends Class<?>> getConsumedBeanTypes() {
+		return Arrays.asList(AsterixServiceRegistry.class);
 	}
 	
 }

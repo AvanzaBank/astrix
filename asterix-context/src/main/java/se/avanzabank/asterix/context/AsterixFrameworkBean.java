@@ -16,17 +16,11 @@
 package se.avanzabank.asterix.context;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
@@ -94,100 +88,27 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		 * 
 		 */
 		
-		AsterixContext asterixContext = createConsumerRuntime(registry);
-		createServerRuntime(registry, asterixContext);
-	}
-
-	private AsterixContext createConsumerRuntime(BeanDefinitionRegistry registry) {
 		// TODO: avoid creating two AsterixContext's  (here and as spring bean). Creating two AsterixContext causes two scannings for providers
 		AsterixConfigurer configurer = new AsterixConfigurer();
 		configurer.setSettings(this.settings);
-		AsterixContext asterixContext = configurer.configure(); 
+		AsterixContext asterixContext = configurer.configure();
 		
-		// For each consumedApi, either directly or indirectly (for instance via a library), 
-		// we must register a bean definition for the ExternalDependencyBean to "collect" the dependencies from
-		// the application-context
-		Set<Class<? extends ExternalDependencyBean>> externalDependencyBeanTypes = resolveAllExternalDependencies(asterixContext);
-		for (Class<?> dependencBeanClass : externalDependencyBeanTypes) {
-			AnnotatedGenericBeanDefinition dependenciesBeanDefinition = new AnnotatedGenericBeanDefinition(dependencBeanClass);
-			String dependencyBeanName = "_asterixDependencyBean" + dependencBeanClass.getName();
-			registry.registerBeanDefinition(dependencyBeanName, dependenciesBeanDefinition);
-		}
-		
-		
-		// AsterixConfigurer must be created AFTER all dependency-beans have bean created.
-		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixConfigurer.class);
-		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
-		MutablePropertyValues asterixConfigurerProps = new MutablePropertyValues();
-		asterixConfigurerProps.add("settings", this.settings);
-		beanDefinition.setPropertyValues(asterixConfigurerProps);
-		beanDefinition.setDependsOn(getDependencyBeanNames(externalDependencyBeanTypes));
-		registry.registerBeanDefinition("_asterixConfigurer", beanDefinition);
-
-		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixContext.class);
-		beanDefinition.setAutowireMode(Autowire.NO.value());
-		beanDefinition.setFactoryBeanName("_asterixConfigurer");
-		beanDefinition.setFactoryMethodName("configure");
-		registry.registerBeanDefinition("_asterixContext", beanDefinition);
-		
-		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixPlugins.class);
-		beanDefinition.setAutowireMode(Autowire.NO.value());
-		beanDefinition.setFactoryBeanName("_asterixContext");
-		beanDefinition.setFactoryMethodName("getPlugins");
-		registry.registerBeanDefinition("_asterixPlugins", beanDefinition);
-		
-		
-		for (Class<?> consumedAsterixBean : consumedAsterixBeans) {
-			beanDefinition = new AnnotatedGenericBeanDefinition(AsterixSpringFactoryBean.class);
-			MutablePropertyValues props = new MutablePropertyValues();
-			props.add("type", consumedAsterixBean);
-			beanDefinition.setPropertyValues(props);
-			registry.registerBeanDefinition("_" + consumedAsterixBean.getName(), beanDefinition);
-		}
-		return asterixContext;
-	}
-
-	private void createServerRuntime(BeanDefinitionRegistry registry,
-			AsterixContext asterixContext) {
-		if (serviceDescriptorHolder == null) {
-			// Does not export any services, don't load any service-providing components
-			return;
-		}
-		try {
-			new AsterixServerRuntimeBuilder(asterixContext.getPlugins()).registerBeanDefinitions(registry, AsterixServiceDescriptor.create(serviceDescriptorHolder, asterixContext));
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException("Failed to build server runtime", e);
-		}
-	}
-
-	private String[] getDependencyBeanNames(
-			Set<Class<? extends ExternalDependencyBean>> externalDependencyBeanTypes) {
-		List<String> result = new ArrayList<>(externalDependencyBeanTypes.size());
-		for (Class<?> externalDependencyBean : externalDependencyBeanTypes) {
-			result.add("_asterixDependencyBean" + externalDependencyBean.getName());
-		}
-		return result.toArray(new String[result.size()]);
-	}
-
-	private Set<Class<? extends ExternalDependencyBean>> resolveAllExternalDependencies(
-			AsterixContext asterixContext) {
-		Set<Class<? extends ExternalDependencyBean>> result = new HashSet<>();
-		for (Class<?> consumedBeans : resolveAllConsumedBeans(asterixContext)) {
-			Class<? extends ExternalDependencyBean> externalDependencyBean =
-					asterixContext.getExternalDependencyBean(consumedBeans);
-			if (externalDependencyBean != null) {
-				result.add(externalDependencyBean);
+		List<Class<?>> consumedAsterixBeans = new ArrayList<>(this.consumedAsterixBeans);
+		AsterixServerRuntimeBuilder serverRuntimeBuilder = new AsterixServerRuntimeBuilder(asterixContext.getPlugins());
+		if (serviceDescriptorHolder != null) {
+			// Application exports services, build server runtime
+			try {
+				serverRuntimeBuilder.registerBeanDefinitions(registry, AsterixServiceDescriptor.create(serviceDescriptorHolder, asterixContext));
+				consumedAsterixBeans.addAll(serverRuntimeBuilder.getConsumedAsterixBeans());
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException("Failed to build server runtime", e);
 			}
 		}
-		return result;
-	}
-
-	private Collection<Class<?>> resolveAllConsumedBeans(AsterixContext asterixContext) {
-		Set<Class<?>> result = new HashSet<>(consumedAsterixBeans);
-		for (Class<?> directBeanDependency : this.consumedAsterixBeans) {
-			result.addAll(asterixContext.getTransitiveBeanDependenciesForBean(directBeanDependency));
-		}
-		return result;
+		
+		AsterixClientRuntimeBuilder clientRuntimeBuilder = new AsterixClientRuntimeBuilder(asterixContext, this.settings, consumedAsterixBeans);
+		clientRuntimeBuilder.registerBeanDefinitions(registry);
+		
+		
 	}
 
 	@Override

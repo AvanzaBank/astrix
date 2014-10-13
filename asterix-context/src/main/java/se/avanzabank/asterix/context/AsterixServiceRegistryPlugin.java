@@ -25,4 +25,6 @@ public interface AsterixServiceRegistryPlugin {
 	void registerBeanDefinitions(BeanDefinitionRegistry registry,
 			Collection<AsterixExportedServiceInfo> publishedServices) throws BeansException;
 
+	Collection<? extends Class<?>> getConsumedBeanTypes();
+
 }

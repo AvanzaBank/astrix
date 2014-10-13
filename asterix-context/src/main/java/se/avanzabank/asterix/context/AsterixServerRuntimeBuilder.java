@@ -15,8 +15,10 @@
  */
 package se.avanzabank.asterix.context;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.MutablePropertyValues;
@@ -30,13 +32,13 @@ import se.avanzabank.asterix.provider.core.AsterixServiceExport;
 public class AsterixServerRuntimeBuilder {
 	
 	private AsterixPlugins asterixPlugins;
+	private List<Class<?>> consumedAsterixBeans = new ArrayList<>(1);
 	
 	public AsterixServerRuntimeBuilder(AsterixPlugins asterixPlugins) {
 		this.asterixPlugins = asterixPlugins;
 	}
 	
-	public void registerBeanDefinitions(BeanDefinitionRegistry registry,
-			final AsterixServiceDescriptor serviceDescriptor) throws ClassNotFoundException {
+	public void registerBeanDefinitions(BeanDefinitionRegistry registry, final AsterixServiceDescriptor serviceDescriptor) throws ClassNotFoundException {
 		// Register service-descriptor
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceDescriptor.class);
 		beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues(){{
@@ -64,7 +66,9 @@ public class AsterixServerRuntimeBuilder {
 			}
 		}
 		if (!publishedOnServiceRegistryServices.isEmpty()) {
-			asterixPlugins.getPlugin(AsterixServiceRegistryPlugin.class).registerBeanDefinitions(registry, publishedOnServiceRegistryServices);
+			AsterixServiceRegistryPlugin serviceRegistryPlugin = asterixPlugins.getPlugin(AsterixServiceRegistryPlugin.class);
+			serviceRegistryPlugin.registerBeanDefinitions(registry, publishedOnServiceRegistryServices);
+			this.consumedAsterixBeans.addAll(serviceRegistryPlugin.getConsumedBeanTypes());
 		}
 		
 		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceExporter.class);
@@ -113,6 +117,16 @@ public class AsterixServerRuntimeBuilder {
 
 	private String getServiceComponent(AsterixApiDescriptor apiDescriptor) {
 		return this.asterixPlugins.getPlugin(AsterixServiceComponents.class).getComponent(apiDescriptor).getName();
+	}
+
+	/**
+	 * Asterix beans consumed by the service framework. For instance: The service-registry components
+	 * uses the AsterixServiceRegistry bean to publish services to the service registry. <p>
+	 * 
+	 * @return
+	 */
+	public Collection<? extends Class<?>> getConsumedAsterixBeans() {
+		return this.consumedAsterixBeans;
 	}
 
 }
