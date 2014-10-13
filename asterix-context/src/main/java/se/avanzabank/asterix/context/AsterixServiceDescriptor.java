@@ -29,11 +29,13 @@ public class AsterixServiceDescriptor {
 	private final Class<?> descriptorHolder;
 	private final AsterixService asterixService;
 	private final Map<Class<?>, AsterixApiDescriptor> apiDescriptorByProvideService;
+	private final String subsystem;
 
 	public AsterixServiceDescriptor(AsterixService asterixService, Class<?> descriptorHolder, Map<Class<?>, AsterixApiDescriptor> apiDescriptorByProvideService) {
 		this.asterixService = asterixService;
 		this.descriptorHolder = descriptorHolder;
 		this.apiDescriptorByProvideService = apiDescriptorByProvideService;
+		this.subsystem = asterixService.subsystem();
 	}
 	
 	// To simplify creating using srping bean definitions

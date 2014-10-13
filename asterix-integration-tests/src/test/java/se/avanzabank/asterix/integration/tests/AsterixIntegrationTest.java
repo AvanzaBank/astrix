@@ -203,7 +203,7 @@ public class AsterixIntegrationTest {
 	
 	// TODO: implement me
 //	@Test(expected = IllegalSubsystemException.class)
-	public void itsNotAlloewsToCreateServicesBeansThatBindsToServicesInAgainstOtherSubSystems() throws Exception {
+	public void itsNotAllowedToCreateServicesBeansThatBindsToServicesInOtherSubSystems() throws Exception {
 		asterix.getBean(InternalLunchFeeder.class);
 	}
 }

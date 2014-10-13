@@ -27,18 +27,14 @@ import java.lang.annotation.Target;
 @Documented
 public @interface AsterixService {
 	
-	// TODO: rename to AsterixServer?
-
 	Class<?>[] apiDescriptors();
 	
-	String system() default "-";
+	String subsystem() default "-";
 
-	// String[] components(); ???
-	
 	/**
 	 * Default component used when exporting services.
 	 * @return
 	 */
-	String component(); // TODO: remove
+	String component();
 	
 }

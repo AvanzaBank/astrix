@@ -24,7 +24,7 @@ import se.avanzabank.asterix.provider.core.AsterixService;
 	apiDescriptors = {
 		LunchGradeApiDescriptor.class
 	},
-	system = "lunch-service",
+	subsystem = "lunch-service",
 	component = AsterixServiceComponentNames.GS_REMOTING
 )
 public class LunchGradeServiceDescriptor {

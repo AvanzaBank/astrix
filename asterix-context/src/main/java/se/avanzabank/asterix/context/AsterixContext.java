@@ -158,7 +158,10 @@ public class AsterixContext implements Asterix {
 		if (!hasBeanFactoryFor(beanType)) {
 			throw new MissingBeanException(beanType);
 		}
-		return this.beanFactoryRegistry.getFactoryBean(beanType);
+		AsterixFactoryBean<T> factoryBean = this.beanFactoryRegistry.getFactoryBean(beanType);
+		// TODO: verify that its allowed to use the given factory in the current context
+		// for intstance: Its not allowed to invoke unversioned services in other subsystems.
+		return factoryBean;
 	}
 	
 	/**
