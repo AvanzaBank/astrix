@@ -36,7 +36,7 @@ import se.avanzabank.asterix.context.AsterixServiceComponents;
 import se.avanzabank.asterix.context.AsterixServiceRegistryPlugin;
 
 @MetaInfServices(AsterixServiceRegistryPlugin.class)
-public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixServiceRegistryPlugin, AsterixPluginsAware {
+public class AsterixServiceRegistryPluginImpl implements AsterixServiceRegistryPlugin, AsterixPluginsAware {
 	
 	private AsterixPlugins plugins;
 	

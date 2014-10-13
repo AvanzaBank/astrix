@@ -28,7 +28,6 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 
@@ -159,19 +158,6 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Failed to build server runtime", e);
 		}
-//		// Register service-descriptor in application-context for autowiring by other components
-//		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceDescriptor.class);
-//		beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues(){{
-//			addIndexedArgumentValue(0, serviceDescriptor.getHolder());
-//		}});
-//		registry.registerBeanDefinition("_asterixServiceDescriptor", beanDefinition);
-//		
-//		for (AsterixServiceApiPlugin beanRegistryPlugin : asterixContext.getPlugins(AsterixServiceApiPlugin.class)) {
-//			if (!this.serviceDescriptor.isAnnotationPresent(beanRegistryPlugin.getServiceDescriptorType())) {
-//				continue;
-//			}
-//			beanRegistryPlugin.registerBeanDefinitions(registry, serviceDescriptor);
-//		}
 	}
 
 	private String[] getDependencyBeanNames(

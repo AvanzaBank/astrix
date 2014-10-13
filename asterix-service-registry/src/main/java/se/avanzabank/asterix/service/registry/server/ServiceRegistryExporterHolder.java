@@ -15,9 +15,6 @@
  */
 package se.avanzabank.asterix.service.registry.server;
 
-import java.util.List;
-
-import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixServicePropertiesBuilder;
 
 public class ServiceRegistryExporterHolder {
@@ -34,11 +31,6 @@ public class ServiceRegistryExporterHolder {
 		this.componentName = componentName;
 	}
 
-//	@Deprecated
-//	public List<AsterixServiceProperties> getProvidedServices() {
-//		return exporter.getProvidedServices();
-//	}
-	
 	public AsterixServicePropertiesBuilder getExporter() {
 		return exporter;
 	}

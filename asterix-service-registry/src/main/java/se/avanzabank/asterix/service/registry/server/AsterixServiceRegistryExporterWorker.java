@@ -89,7 +89,7 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 				interrupt();
 			} catch (ServiceUnavailableException e) {
 				// No bound to service registry
-				log.info("Failed to export serivces to registry");
+				log.info("Failed to export serivces to registry", e);
 				exportIntervallMillis = 250; // TODO: interval when service registry not available?
 			} 
 		}
