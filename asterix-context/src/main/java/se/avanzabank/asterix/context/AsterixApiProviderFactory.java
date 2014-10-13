@@ -17,7 +17,6 @@ package se.avanzabank.asterix.context;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +28,8 @@ import java.util.concurrent.ConcurrentMap;
  * into asterix. An API is defined by an AsterixApiDescriptor, which in turn uses different annotations for
  * different types of apis. This class is responsible for interpreting such annotations and create an
  * AsterixApiProvider for the given api. <p>
+ * 
+ * The factory is extendable by adding more {@link AsterixApiProviderPlugin}'s. <p>
  *  
  * @author Elias Lindholm (elilin)
  *

@@ -21,7 +21,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AsterixApiProviderPlugins {
 	
 	private final ConcurrentMap<Class<? extends Annotation>, AsterixApiProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
@@ -30,9 +34,8 @@ public class AsterixApiProviderPlugins {
 		for (AsterixApiProviderPlugin plugin : apiProviderPlugins) {
 			AsterixApiProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
-				// TODO: how to handle multiple providers for same annotation type? Is it allowed?
-				throw new IllegalArgumentException(String.format("Multiple AsterixApiProviderPlugin's found for annotation={}. p1=%s p2=%s", 
-						plugin.getClass().getName(), previous.getClass().getName()));
+				throw new IllegalArgumentException(String.format("Multiple AsterixApiProviderPlugin's found for providerAnnotationType=%s. p1=%s p2=%s", 
+						plugin.getProviderAnnotationType().getName(), plugin.getClass().getName(), previous.getClass().getName()));
 			}
 		}
 	}
