@@ -22,7 +22,7 @@ import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
-import se.avanzabank.asterix.context.AsterixServiceBuilder;
+import se.avanzabank.asterix.context.AsterixServicePropertiesBuilder;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
@@ -62,7 +62,7 @@ public class AsterixGsComponent implements AsterixServiceComponent {
 	}
 
 	@Override
-	public Class<? extends AsterixServiceBuilder> getServiceBuilder() {
+	public Class<? extends AsterixServicePropertiesBuilder> getServiceBuilder() {
 		return GigaSpaceServiceRegistryExporter.class;
 	}
 	

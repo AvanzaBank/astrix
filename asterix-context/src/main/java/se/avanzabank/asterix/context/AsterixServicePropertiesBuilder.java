@@ -26,7 +26,7 @@ package se.avanzabank.asterix.context;
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AsterixServiceBuilder {
+public interface AsterixServicePropertiesBuilder {
 	
 	// TODO: rename this abstraction 
 
@@ -37,7 +37,7 @@ public interface AsterixServiceBuilder {
 	 * @param type
 	 * @return
 	 */
-	AsterixServiceProperties exportServiceProperties(Class<?> type);
+	AsterixServiceProperties buildServiceProperties(Class<?> type);
 	
 	boolean supportsAsyncApis();
 	

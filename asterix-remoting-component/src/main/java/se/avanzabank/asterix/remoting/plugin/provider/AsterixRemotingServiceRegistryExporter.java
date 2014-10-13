@@ -18,11 +18,11 @@ package se.avanzabank.asterix.remoting.plugin.provider;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.context.AsterixServiceBuilder;
+import se.avanzabank.asterix.context.AsterixServicePropertiesBuilder;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.gs.GsBinder;
 
-public class AsterixRemotingServiceRegistryExporter implements AsterixServiceBuilder {
+public class AsterixRemotingServiceRegistryExporter implements AsterixServicePropertiesBuilder {
 	
 	public static final String SPACE_NAME_PROPERTY = "space";
 	
@@ -39,7 +39,7 @@ public class AsterixRemotingServiceRegistryExporter implements AsterixServiceBui
 	}
 
 	@Override
-	public AsterixServiceProperties exportServiceProperties(Class<?> providedApi) {
+	public AsterixServiceProperties buildServiceProperties(Class<?> providedApi) {
 		AsterixServiceProperties serviceProperties = GsBinder.createProperties(this.gigaSpace);
 		serviceProperties.setQualifier(null); // TODO: this is a hack. Qualifier should not be managed internally in service-proprties-exporters
 		return serviceProperties;

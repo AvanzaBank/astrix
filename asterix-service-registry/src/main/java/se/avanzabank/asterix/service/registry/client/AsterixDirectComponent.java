@@ -25,7 +25,7 @@ import org.kohsuke.MetaInfServices;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
-import se.avanzabank.asterix.context.AsterixServiceBuilder;
+import se.avanzabank.asterix.context.AsterixServicePropertiesBuilder;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
@@ -118,7 +118,7 @@ public class AsterixDirectComponent implements AsterixServiceComponent {
 	}
 
 	@Override
-	public Class<? extends AsterixServiceBuilder> getServiceBuilder() {
+	public Class<? extends AsterixServicePropertiesBuilder> getServiceBuilder() {
 		// NOT USED. This is a client side component only
 		return null;
 	}

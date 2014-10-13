@@ -18,17 +18,17 @@ package se.avanzabank.asterix.service.registry.server;
 import java.util.List;
 
 import se.avanzabank.asterix.context.AsterixServiceProperties;
-import se.avanzabank.asterix.context.AsterixServiceBuilder;
+import se.avanzabank.asterix.context.AsterixServicePropertiesBuilder;
 
 public class ServiceRegistryExporterHolder {
 	
-	// TODO: find better name of this class and possibly even AsterixServiceBuilder
+	// TODO: find better name of this class and possibly even AsterixServicePropertiesBuilder
 	
-	private final AsterixServiceBuilder exporter;
+	private final AsterixServicePropertiesBuilder exporter;
 	private final String componentName;
 
 	public ServiceRegistryExporterHolder(
-			AsterixServiceBuilder exporter,
+			AsterixServicePropertiesBuilder exporter,
 			String componentName) {
 		this.exporter = exporter;
 		this.componentName = componentName;
@@ -39,7 +39,7 @@ public class ServiceRegistryExporterHolder {
 //		return exporter.getProvidedServices();
 //	}
 	
-	public AsterixServiceBuilder getExporter() {
+	public AsterixServicePropertiesBuilder getExporter() {
 		return exporter;
 	}
 	

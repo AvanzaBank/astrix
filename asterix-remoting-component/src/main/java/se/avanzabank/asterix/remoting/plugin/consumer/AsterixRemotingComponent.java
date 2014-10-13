@@ -27,7 +27,7 @@ import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixFaultTolerancePlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
-import se.avanzabank.asterix.context.AsterixServiceBuilder;
+import se.avanzabank.asterix.context.AsterixServicePropertiesBuilder;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
@@ -98,7 +98,7 @@ public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixSer
 	}
 	
 	@Override
-	public Class<? extends AsterixServiceBuilder> getServiceBuilder() {
+	public Class<? extends AsterixServicePropertiesBuilder> getServiceBuilder() {
 		return AsterixRemotingServiceRegistryExporter.class;
 	}
 	

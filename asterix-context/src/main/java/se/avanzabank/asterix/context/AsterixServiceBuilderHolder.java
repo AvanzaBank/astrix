@@ -17,12 +17,12 @@ package se.avanzabank.asterix.context;
 
 public class AsterixServiceBuilderHolder {
 	
-	private AsterixServiceBuilder serviceBuilder;
+	private AsterixServicePropertiesBuilder serviceBuilder;
 	private String transportName;
 	private Class<?> exportedService;
 	private Class<?> asyncService;
 	
-	public AsterixServiceBuilderHolder(AsterixServiceBuilder serviceBuilder, String transportName, Class<?> exportedService) {
+	public AsterixServiceBuilderHolder(AsterixServicePropertiesBuilder serviceBuilder, String transportName, Class<?> exportedService) {
 		this.serviceBuilder = serviceBuilder;
 		this.transportName = transportName;
 		this.exportedService = exportedService;
@@ -48,7 +48,7 @@ public class AsterixServiceBuilderHolder {
 	}
 
 	public AsterixServiceProperties exportServiceProperties() {
-		AsterixServiceProperties serviceProperties = serviceBuilder.exportServiceProperties(exportedService);
+		AsterixServiceProperties serviceProperties = serviceBuilder.buildServiceProperties(exportedService);
 		serviceProperties.setApi(exportedService);
 		serviceProperties.setTransport(transportName);
 		// TODO: move responsibility to set qualifier to this class
@@ -56,7 +56,7 @@ public class AsterixServiceBuilderHolder {
 	}
 	
 	public AsterixServiceProperties exportAsyncServiceProperties() {
-		AsterixServiceProperties serviceProperties = serviceBuilder.exportServiceProperties(exportedService);
+		AsterixServiceProperties serviceProperties = serviceBuilder.buildServiceProperties(exportedService);
 		serviceProperties.setApi(asyncService);
 		serviceProperties.setTransport(transportName);
 		// TODO: move responsibility to set qualifier to this class

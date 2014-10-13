@@ -18,10 +18,10 @@ package se.avanzabank.asterix.gs;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.context.AsterixServiceBuilder;
+import se.avanzabank.asterix.context.AsterixServicePropertiesBuilder;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 
-public class GigaSpaceServiceRegistryExporter implements AsterixServiceBuilder {
+public class GigaSpaceServiceRegistryExporter implements AsterixServicePropertiesBuilder {
 	
 	private final GigaSpace space;
 
@@ -31,7 +31,7 @@ public class GigaSpaceServiceRegistryExporter implements AsterixServiceBuilder {
 	}
 
 	@Override
-	public AsterixServiceProperties exportServiceProperties(Class<?> type) {
+	public AsterixServiceProperties buildServiceProperties(Class<?> type) {
 		if (!type.equals(GigaSpace.class)) {
 			throw new IllegalArgumentException("Can't export: " + type);
 		}
