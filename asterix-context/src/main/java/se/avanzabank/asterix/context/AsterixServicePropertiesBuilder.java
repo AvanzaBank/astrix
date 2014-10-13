@@ -18,27 +18,38 @@ package se.avanzabank.asterix.context;
 
 
 /**
- * This is the service-provider part of the service registry.
+ * Responsible for building service-properties for a given asterixBeanType.<p>
  * 
- * It's used on the server side to publish a set of services
- * provided to the service registry. <p>
+ * It's used on the server side by the AsterixServiceRegistryExporterWorker to build
+ * service-properties for each type published to the registry.<p>
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public interface AsterixServicePropertiesBuilder {
 	
-	// TODO: rename this abstraction 
-
 	/**
-	 * Server side component used by service-registry to export AsterixServiceProperties
-	 * for a given service. <p>
+	 * Builds AsterixServiceProperties for a given service. <p>
 	 *  
 	 * @param type
 	 * @return
 	 */
 	AsterixServiceProperties buildServiceProperties(Class<?> type);
 	
+	/**
+	 * Whether the api supports an async version based on the following naming
+	 * convention:
+	 *  
+	 * <pre>
+	 * MyService
+	 * 	MyResult mySyncMethod(Argument)
+	 * 
+	 * MyServiceAsync
+	 * 	Future<MyResult> mySyncMethod(Argument)
+	 * </pre>
+	 * 
+	 * @return
+	 */
 	boolean supportsAsyncApis();
 	
 }
