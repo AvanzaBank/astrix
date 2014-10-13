@@ -21,8 +21,6 @@ import se.avanzabank.asterix.core.AsterixObjectSerializer.NoVersioningSupport;
 
 public interface AsterixVersioningPlugin {
 	
-	// TODO: rename to AsterixVersioningPlugin???
-	
 	public AsterixObjectSerializer create(AsterixApiDescriptor descriptor);
 	
 	public static class Default {
