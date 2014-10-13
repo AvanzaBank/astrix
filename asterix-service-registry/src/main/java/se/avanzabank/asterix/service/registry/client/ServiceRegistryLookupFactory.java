@@ -62,11 +62,11 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBean<T>, A
 	}
 	
 	private AsterixServiceComponent getServiceComponent(AsterixServiceProperties serviceProperties) {
-		String transportName = serviceProperties.getComponent();
-		if (transportName == null) {
+		String componentName = serviceProperties.getComponent();
+		if (componentName == null) {
 			throw new IllegalArgumentException("Expected a componentName to be set on serviceProperties: " + serviceProperties);
 		}
-		return plugins.getPlugin(AsterixServiceComponents.class).getComponent(transportName);
+		return plugins.getPlugin(AsterixServiceComponents.class).getComponent(componentName);
 	}
 
 	@Override

@@ -65,8 +65,8 @@ public class AsterixServiceRegistryBeanRegistryPlugin implements AsterixServiceR
 		}
 	}
 	
-	private AsterixServiceComponent getComponent(String transportName) {
-		return plugins.getPlugin(AsterixServiceComponents.class).getComponent(transportName);
+	private AsterixServiceComponent getComponent(String componentName) {
+		return plugins.getPlugin(AsterixServiceComponents.class).getComponent(componentName);
 	}
 
 	@Override

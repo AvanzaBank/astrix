@@ -47,13 +47,13 @@ public class AsterixServerRuntimeBuilder {
 		
 		// Register beans required by all used service-components
 		final Collection<AsterixExportedServiceInfo> exportedServices = getExportedServices(registry, serviceDescriptor);
-		Collection<AsterixServiceComponent> usedServiceTransports = getUsedServiceComponents(exportedServices);
-		for (AsterixServiceComponent serviceTransport : usedServiceTransports) {
-			serviceTransport.registerBeans(registry); // No exporting of services, registration of component required beans
-			Class<? extends AsterixServiceExporterBean> exporterBean = serviceTransport.getExporterBean();
+		Collection<AsterixServiceComponent> usedServiceComponents = getUsedServiceComponents(exportedServices);
+		for (AsterixServiceComponent serviceComponent : usedServiceComponents) {
+			serviceComponent.registerBeans(registry); // No exporting of services, registration of component required beans
+			Class<? extends AsterixServiceExporterBean> exporterBean = serviceComponent.getExporterBean();
 			if (exporterBean != null) {
 				beanDefinition = new AnnotatedGenericBeanDefinition(exporterBean);
-				registry.registerBeanDefinition("_asterixServiceExporterBean-" + serviceTransport.getName(), beanDefinition);
+				registry.registerBeanDefinition("_asterixServiceExporterBean-" + serviceComponent.getName(), beanDefinition);
 			}
 		}
 		
