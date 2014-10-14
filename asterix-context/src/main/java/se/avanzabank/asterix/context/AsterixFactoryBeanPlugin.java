@@ -16,14 +16,9 @@
 package se.avanzabank.asterix.context;
 
 /**
- * An AsterixFactoryBean is a factory for creating one element that is part of a given api,
- * see {@link AsterixApiProvider}. <p>
+ * Strategy for creating a given bean type.
  * 
- * Bean is a generic term used for an instance of any api element that asterix can create. 
- * It might be in the form of a service ('remoting service') or in the form of a library,
- * or any other object that is part of an api that asterix manages. <p>
- * 
- * Bean is the generic term used for an instance of a given type. <p>
+ * See {@link AsterixApiProviderPlugin}. <p>
  * 
  * @author Elias Lindholm (elilin)
  *

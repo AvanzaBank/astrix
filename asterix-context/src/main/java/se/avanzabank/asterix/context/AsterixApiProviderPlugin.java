@@ -20,7 +20,7 @@ import java.util.List;
 
 
 /**
- * An AsterixApiProviderPlugin is responsible for creating AsterixFactoryBean's for
+ * An AsterixApiProviderPlugin is responsible for creating AsterixFactoryBeanPlugin for
  * all parts of a given "type" of api. By "type" in this context, we don't mean the
  * different api's that are hooked into asterix for consumption, but rather a mechanism
  * for an api-provider to use to make the different part's of the api available for consumption.
