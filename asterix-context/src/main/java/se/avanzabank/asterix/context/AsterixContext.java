@@ -46,7 +46,7 @@ public class AsterixContext implements Asterix {
 	public AsterixContext(AsterixSettings settings) {
 		this.settings = Objects.requireNonNull(settings);
 		this.beanStateWorker = new AsterixBeanStateWorker(settings, eventBus); // TODO: manage life cycle
-		this.beanStateWorker.start(); // TODO: avoid starting bean-state-worker if no statful beans are created.
+		this.beanStateWorker.start(); // TODO: avoid starting bean-state-worker if no stateful beans are created. + manage lifecycle
 		this.eventBus.addEventListener(AsterixBeanStateChangedEvent.class, beanStates);
 		this.plugins = new AsterixPlugins(new AsterixPluginInitializer() {
 			@Override

@@ -15,8 +15,10 @@
  */
 package se.avanzabank.asterix.context;
 
+import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -85,6 +87,19 @@ public class AsterixTest {
 		IndependentApi bean = asterixContext.getBean(IndependentApi.class);
 		assertNotNull(bean);
 	}
+	
+	
+	@Test
+	public void cachesCreatedApis() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		asterixConfigurer.registerApiDescriptor(MyLibraryDescriptor.class);
+		AsterixContext asterixContext = asterixConfigurer.configure();
+
+		HelloBean beanA = asterixContext.getBean(HelloBean.class);
+		HelloBean beanB = asterixContext.getBean(HelloBean.class);
+		assertSame(beanA, beanB);
+	}
+	
 	
 	@AsterixLibraryProvider
 	static class MyLibraryDescriptor {

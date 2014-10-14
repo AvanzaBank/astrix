@@ -32,9 +32,11 @@ package se.avanzabank.asterix.context;
 public final class AsterixFactoryBean<T> implements AsterixDecorator {
 	
 	private final AsterixFactoryBeanPlugin <T> plugin;
+	private final Class<T> beanType;
 	
 	public AsterixFactoryBean(AsterixFactoryBeanPlugin<T> plugin) {
 		this.plugin = plugin;
+		this.beanType = plugin.getBeanType();
 	}
 
 	public T create(String optionalQualifier) {
@@ -42,7 +44,7 @@ public final class AsterixFactoryBean<T> implements AsterixDecorator {
 	}
 	
 	public Class<T> getBeanType() {
-		return this.plugin.getBeanType();
+		return this.beanType;
 	}
 
 	@Override
