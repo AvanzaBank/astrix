@@ -33,14 +33,14 @@ import se.avanzabank.asterix.core.ServiceUnavailableException;
 public class StatefulAsterixBean<T> implements InvocationHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(StatefulAsterixBean.class);
-	private final AsterixFactoryBean<T> beanFactory;
+	private final AsterixFactoryBeanPlugin<T> beanFactory;
 	private final String optionalQualifier;
 	private volatile InvocationHandler state;
 	private static final AtomicInteger nextId = new AtomicInteger(0);
 	private final String id = nextId.incrementAndGet() + ""; // TODO remove beanId? its used for debugging
 	private final AsterixEventBus eventBus;
 	
-	StatefulAsterixBean(AsterixFactoryBean<T> beanFactory, String optionalQualifier, AsterixEventBus eventBus) {
+	StatefulAsterixBean(AsterixFactoryBeanPlugin<T> beanFactory, String optionalQualifier, AsterixEventBus eventBus) {
 		this.beanFactory = beanFactory;
 		this.optionalQualifier = optionalQualifier;
 		this.eventBus = eventBus;
@@ -52,7 +52,7 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 		return id;
 	}
 	
-	public AsterixFactoryBean<T> getBeanFactory() {
+	public AsterixFactoryBeanPlugin<T> getBeanFactory() {
 		return beanFactory;
 	}
 	

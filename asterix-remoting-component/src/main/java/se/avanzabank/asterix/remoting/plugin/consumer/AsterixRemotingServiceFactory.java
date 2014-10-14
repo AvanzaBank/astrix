@@ -16,7 +16,7 @@
 package se.avanzabank.asterix.remoting.plugin.consumer;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
-import se.avanzabank.asterix.context.AsterixFactoryBean;
+import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
@@ -26,7 +26,7 @@ import se.avanzabank.asterix.context.ExternalDependency;
 import se.avanzabank.asterix.context.ExternalDependencyAware;
 import se.avanzabank.asterix.gs.GsBinder;
 
-public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBean<T>, ExternalDependencyAware<AsterixRemotingPluginDependencies>, AsterixPluginsAware {
+public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBeanPlugin<T>, ExternalDependencyAware<AsterixRemotingPluginDependencies>, AsterixPluginsAware {
 	
 	private final Class<T> serviceApi;
 	private final String targetSpace;

@@ -24,21 +24,21 @@ import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixApiProviderPlugin;
-import se.avanzabank.asterix.context.AsterixFactoryBean;
+import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 
 @MetaInfServices(AsterixApiProviderPlugin.class)
 public class AsterixRemotingPlugin implements AsterixApiProviderPlugin {
 	
 	@Override
-	public List<AsterixFactoryBean<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
+	public List<AsterixFactoryBeanPlugin<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
 		AsterixRemoteApiDescriptor remoteApiDescriptor = descriptor.getAnnotation(AsterixRemoteApiDescriptor.class);
 		final String targetSpace = remoteApiDescriptor.targetSpaceName();
 		if (targetSpace.isEmpty()) {
 			throw new IllegalArgumentException("No space name found on: " + descriptor);
 		}
 		Class<?>[] exportedApis = remoteApiDescriptor.exportedApis();
-		List<AsterixFactoryBean<?>> result = new ArrayList<>();
+		List<AsterixFactoryBeanPlugin<?>> result = new ArrayList<>();
 		for (Class<?> api : exportedApis) {
 			result.add(
 					new AsterixRemotingServiceFactory<>(api, targetSpace, descriptor));

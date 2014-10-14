@@ -40,7 +40,7 @@ import java.util.List;
  */
 public interface AsterixApiProviderPlugin {
 	
-	List<AsterixFactoryBean<?>> createFactoryBeans(AsterixApiDescriptor descriptor);
+	List<AsterixFactoryBeanPlugin<?>> createFactoryBeans(AsterixApiDescriptor descriptor);
 	
 	List<Class<?>> getProvidedBeans(AsterixApiDescriptor descriptor);
 	

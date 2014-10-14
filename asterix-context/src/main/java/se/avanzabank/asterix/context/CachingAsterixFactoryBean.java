@@ -20,15 +20,15 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class CachingAsterixFactoryBean<T> implements AsterixFactoryBean<T>, AsterixDecorator {
+public class CachingAsterixFactoryBean<T> implements AsterixFactoryBeanPlugin<T>, AsterixDecorator {
 	
 	private static final String nullKey = "-no-qualifier";
 	
-	private final AsterixFactoryBean<T> target;
+	private final AsterixFactoryBeanPlugin<T> target;
 	private final ConcurrentMap<String, T> cacheByQualifier = new ConcurrentHashMap<>();
 	private final Lock beanCreationLock = new ReentrantLock();
 	
-	public CachingAsterixFactoryBean(AsterixFactoryBean<T> target) {
+	public CachingAsterixFactoryBean(AsterixFactoryBeanPlugin<T> target) {
 		this.target = target;
 	}
 

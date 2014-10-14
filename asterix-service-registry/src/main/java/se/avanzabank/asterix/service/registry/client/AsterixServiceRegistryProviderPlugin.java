@@ -25,7 +25,7 @@ import org.kohsuke.MetaInfServices;
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixApiProviderPlugin;
 import se.avanzabank.asterix.context.AsterixDecorator;
-import se.avanzabank.asterix.context.AsterixFactoryBean;
+import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
@@ -37,8 +37,8 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 	private AsterixServiceRegistryLeaseManager leaseManager = new AsterixServiceRegistryLeaseManager();
 	
 	@Override
-	public List<AsterixFactoryBean<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
-		List<AsterixFactoryBean<?>> result = new ArrayList<>();
+	public List<AsterixFactoryBeanPlugin<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
+		List<AsterixFactoryBeanPlugin<?>> result = new ArrayList<>();
 		for (Class<?> exportedApi : descriptor.getAnnotation(AsterixServiceRegistryApi.class).exportedApis()) {
 			result.add(new ServiceRegistryLookupFactory<>(descriptor, exportedApi, plugins, leaseManager));
 			Class<?> asyncInterface = loadInterfaceIfExists(exportedApi.getName() + "Async");

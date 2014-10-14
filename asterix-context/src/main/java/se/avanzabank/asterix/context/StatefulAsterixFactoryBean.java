@@ -23,13 +23,13 @@ import java.lang.reflect.Proxy;
  *
  * @param <T>
  */
-final class StatefulAsterixFactoryBean<T> implements AsterixFactoryBean<T>, AsterixDecorator, AsterixEventBusAware, AsterixBeanStateWorkerAware {
+final class StatefulAsterixFactoryBean<T> implements AsterixFactoryBeanPlugin<T>, AsterixDecorator, AsterixEventBusAware, AsterixBeanStateWorkerAware {
 
-	private final AsterixFactoryBean<T> targetFactory;
+	private final AsterixFactoryBeanPlugin<T> targetFactory;
 	private AsterixEventBus eventBus;
 	private AsterixBeanStateWorker beanStateWorker;
 	
-	public StatefulAsterixFactoryBean(AsterixFactoryBean<T> targetFactory) {
+	public StatefulAsterixFactoryBean(AsterixFactoryBeanPlugin<T> targetFactory) {
 		if (!targetFactory.getBeanType().isInterface()) {
 			throw new IllegalArgumentException("Can only create stateful asterix beans if bean is exported using an interface." +
 											   " targetBeanType=" + targetFactory.getBeanType().getName() + 

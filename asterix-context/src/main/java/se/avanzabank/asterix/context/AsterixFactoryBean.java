@@ -29,10 +29,25 @@ package se.avanzabank.asterix.context;
  *
  * @param <T>
  */
-public interface AsterixFactoryBean<T> {
+public final class AsterixFactoryBean<T> implements AsterixDecorator {
 	
-	T create(String optionalQualifier);
+	private final AsterixFactoryBeanPlugin <T> plugin;
 	
-	Class<T> getBeanType();
+	public AsterixFactoryBean(AsterixFactoryBeanPlugin<T> plugin) {
+		this.plugin = plugin;
+	}
+
+	public T create(String optionalQualifier) {
+		return this.plugin.create(optionalQualifier);
+	}
+	
+	public Class<T> getBeanType() {
+		return this.plugin.getBeanType();
+	}
+
+	@Override
+	public Object getTarget() {
+		return plugin;
+	}
 	
 }

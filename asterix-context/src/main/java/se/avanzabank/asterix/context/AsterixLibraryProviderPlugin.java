@@ -29,9 +29,9 @@ import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
 public class AsterixLibraryProviderPlugin implements AsterixApiProviderPlugin {
 	
 	@Override
-	public List<AsterixFactoryBean<?>> createFactoryBeans(AsterixApiDescriptor descriptorHolder) {
+	public List<AsterixFactoryBeanPlugin<?>> createFactoryBeans(AsterixApiDescriptor descriptorHolder) {
 		Object libraryProviderInstance = initInstanceProvider(descriptorHolder); // TODO: who manages lifecycle for the libraryProviderInstance?
-		List<AsterixFactoryBean<?>> result = new ArrayList<>();
+		List<AsterixFactoryBeanPlugin<?>> result = new ArrayList<>();
 		for (Method m : descriptorHolder.getDescriptorClass().getMethods()) {
 			if (m.isAnnotationPresent(AsterixExport.class)) {
 				result.add(new AsterixLibraryFactory<>(libraryProviderInstance, m));

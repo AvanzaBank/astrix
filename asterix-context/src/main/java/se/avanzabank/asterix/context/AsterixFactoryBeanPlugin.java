@@ -15,13 +15,24 @@
  */
 package se.avanzabank.asterix.context;
 
-public class AsterixCircularDependency extends RuntimeException {
-
-	private static final long serialVersionUID = 1L;
-
-	public AsterixCircularDependency(Class<?> beanA, Class<?> beanB) {
-		// TODO: Identify api-descriptor for beanFactoryA and beanFactoryB
-		super("Circular dependency detected. beanA=" + beanA.getName() + ", beanB=" + beanB.getName());
-	}
-
+/**
+ * An AsterixFactoryBean is a factory for creating one element that is part of a given api,
+ * see {@link AsterixApiProvider}. <p>
+ * 
+ * Bean is a generic term used for an instance of any api element that asterix can create. 
+ * It might be in the form of a service ('remoting service') or in the form of a library,
+ * or any other object that is part of an api that asterix manages. <p>
+ * 
+ * Bean is the generic term used for an instance of a given type. <p>
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ * @param <T>
+ */
+public interface AsterixFactoryBeanPlugin<T> {
+	
+	T create(String optionalQualifier);
+	
+	Class<T> getBeanType();
+	
 }

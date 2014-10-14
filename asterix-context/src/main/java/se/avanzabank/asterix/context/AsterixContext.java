@@ -24,11 +24,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 /**
  * An AstrixContext is the runtime-environment for the astrix-framework. It is used
  * both by consuming applications as well as server applications. AsterixContext providers access
@@ -276,11 +271,13 @@ public class AsterixContext implements Asterix {
 	
 	private class TransitiveBeanDependencyResolver {
 
-		private AsterixFactoryBean<?> rootFactory;
+		private AsterixFactoryBeanPlugin<?> rootFactory;
+		private AsterixFactoryBean<?> root;
 		private Set<Class<?>> transitiveDependencies = new HashSet<>();
 		
 		public TransitiveBeanDependencyResolver(AsterixFactoryBean<?> rootFactory) {
-			this.rootFactory = rootFactory;
+			this.root = rootFactory;			
+			this.rootFactory = (AsterixFactoryBeanPlugin<?>) rootFactory.getTarget();
 		}
 
 		public Set<Class<?>> resolve() {
@@ -288,12 +285,12 @@ public class AsterixContext implements Asterix {
 			return transitiveDependencies;
 		}
 
-		private void resolveTransitiveDependencies(AsterixFactoryBean<?> beanFactory) {
+		private void resolveTransitiveDependencies(AsterixFactoryBeanPlugin<?> beanFactory) {
 			if (beanFactory instanceof AsterixBeanAware) {
 				AsterixBeanAware beanAwareFactory = AsterixBeanAware.class.cast(beanFactory);
 				for (Class<?> transitiveDependency : beanAwareFactory.getBeanDependencies()) {
 					if (this.rootFactory.getBeanType().equals(transitiveDependency)) {
-						throw new AsterixCircularDependency(rootFactory, beanFactory);
+						throw new AsterixCircularDependency(root.getBeanType(), beanFactory.getBeanType());
 					}
 					transitiveDependencies.add(transitiveDependency);
 					try {
@@ -304,9 +301,13 @@ public class AsterixContext implements Asterix {
 				}
 			}
 			if (beanFactory instanceof AsterixDecorator) {
-				AsterixFactoryBean<?> decoratedFactory = (AsterixFactoryBean<?>)AsterixDecorator.class.cast(beanFactory).getTarget();
+				AsterixFactoryBeanPlugin<?> decoratedFactory = (AsterixFactoryBeanPlugin<?>)AsterixDecorator.class.cast(beanFactory).getTarget();
 				resolveTransitiveDependencies(decoratedFactory);
 			}
+		}
+		
+		private void resolveTransitiveDependencies(AsterixFactoryBean<?> beanFactory) {
+			resolveTransitiveDependencies(AsterixFactoryBeanPlugin.class.cast(beanFactory.getTarget()));
 		}
 		
 	}

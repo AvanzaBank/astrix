@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AsterixLibraryFactory<T> implements AsterixFactoryBean<T>, AsterixBeanAware {
+public class AsterixLibraryFactory<T> implements AsterixFactoryBeanPlugin<T>, AsterixBeanAware {
 
 	private Object factoryInstance;
 	private Method factoryMethod;
