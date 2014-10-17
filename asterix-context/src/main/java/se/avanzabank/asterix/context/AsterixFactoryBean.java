@@ -35,19 +35,6 @@ public final class AsterixFactoryBean<T> implements AsterixDecorator {
 	private final Class<T> beanType;
 	private final AsterixApiDescriptor apiDescriptor;
 	private volatile AsterixBean<T> asterixBean;
-	private final Object creationLock = new Object();
-	
-	public static class AsterixBean<T> {
-		private final T instance;
-		
-		public AsterixBean(T instance) {
-			this.instance = instance;
-		}
-
-		public T getInstance() {
-			return instance;
-		}
-	}
 	
 	public AsterixFactoryBean(AsterixFactoryBeanPlugin<T> factoryPlugin, AsterixApiDescriptor apiDescriptor) {
 		this.plugin = factoryPlugin;
@@ -65,7 +52,7 @@ public final class AsterixFactoryBean<T> implements AsterixDecorator {
 		if (bean != null) {
 			return bean;
 		}
-		synchronized (creationLock) {
+		synchronized (this) {
 			bean = asterixBean;
 			if (bean != null) {
 				return bean;
@@ -95,6 +82,18 @@ public final class AsterixFactoryBean<T> implements AsterixDecorator {
 
 	public String getSubsystem() {
 		return apiDescriptor.getSubsystem();
+	}
+	
+	private static class AsterixBean<T> {
+		private final T instance;
+		
+		public AsterixBean(T instance) {
+			this.instance = instance;
+		}
+
+		public T getInstance() {
+			return instance;
+		}
 	}
 	
 }
