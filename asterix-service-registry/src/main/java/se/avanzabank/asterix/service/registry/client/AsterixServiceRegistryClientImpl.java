@@ -40,11 +40,11 @@ public class AsterixServiceRegistryClientImpl implements AsterixServiceRegistryC
 	}
 
 	@Override
-	public <T> void register(@Routing Class<T> type, AsterixServiceProperties properties) {
+	public <T> void register(@Routing Class<T> type, AsterixServiceProperties properties, long lease) {
 		AsterixServiceRegistryEntry entry = new AsterixServiceRegistryEntry();
 		entry.setServiceProperties(properties.getProperties());
 		entry.setServiceBeanType(type.getName());
-		this.serviceRegistry.register(entry);
+		this.serviceRegistry.register(entry, lease);
 	}
 
 }

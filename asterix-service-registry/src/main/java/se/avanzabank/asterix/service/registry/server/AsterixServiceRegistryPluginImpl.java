@@ -31,7 +31,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import se.avanzabank.asterix.context.AsterixExportedServiceInfo;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
-import se.avanzabank.asterix.context.AsterixServiceBuilderHolder;
+import se.avanzabank.asterix.context.AsterixServicePropertiesBuilderHolder;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
 import se.avanzabank.asterix.context.AsterixServiceComponents;
 import se.avanzabank.asterix.context.AsterixServiceRegistryPlugin;
@@ -52,7 +52,7 @@ public class AsterixServiceRegistryPluginImpl implements AsterixServiceRegistryP
 		for (final AsterixExportedServiceInfo exportedService : publishedServices) {
 			usedServiceComponents.add(getComponent(exportedService.getComponentName()));
 			
-			beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceBuilderHolder.class);
+			beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServicePropertiesBuilderHolder.class);
 			beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues() {{
 				addIndexedArgumentValue(0, new RuntimeBeanReference("_asterixServiceBuilderBean-" + exportedService.getComponentName()));
 				addIndexedArgumentValue(1, exportedService.getComponentName());

@@ -22,7 +22,7 @@ import se.avanzabank.asterix.service.registry.app.ServiceKey;
 import com.gigaspaces.annotation.pojo.SpaceId;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 
-public class ServiceProperitesInfo {
+public class SpaceServiceRegistryEntry {
 
 	private Map<String, String> properties;
 	private ServiceKey serviceKey;

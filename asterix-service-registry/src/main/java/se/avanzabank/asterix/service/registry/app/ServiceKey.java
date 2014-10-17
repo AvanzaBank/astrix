@@ -38,6 +38,14 @@ public class ServiceKey {
 	public ServiceKey(String apiClassName) {
 		this(apiClassName, "-");
 	}
+	
+	public String getApiClassName() {
+		return apiClassName;
+	}
+	
+	public String getQualifier() {
+		return qualifier;
+	}
 
 	@Override
 	public int hashCode() {

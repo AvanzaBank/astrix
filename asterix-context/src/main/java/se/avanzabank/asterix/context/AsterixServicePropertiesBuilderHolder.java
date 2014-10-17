@@ -15,18 +15,18 @@
  */
 package se.avanzabank.asterix.context;
 
-public class AsterixServiceBuilderHolder {
+public class AsterixServicePropertiesBuilderHolder {
 	
-	private AsterixServicePropertiesBuilder serviceBuilder;
+	private AsterixServicePropertiesBuilder servicePropertiesBuilder;
 	private String componentName;
 	private Class<?> exportedService;
 	private Class<?> asyncService;
 	
-	public AsterixServiceBuilderHolder(AsterixServicePropertiesBuilder serviceBuilder, String componentName, Class<?> exportedService) {
-		this.serviceBuilder = serviceBuilder;
+	public AsterixServicePropertiesBuilderHolder(AsterixServicePropertiesBuilder serviceBuilder, String componentName, Class<?> exportedService) {
+		this.servicePropertiesBuilder = serviceBuilder;
 		this.componentName = componentName;
 		this.exportedService = exportedService;
-		if (this.serviceBuilder.supportsAsyncApis()) {
+		if (this.servicePropertiesBuilder.supportsAsyncApis()) {
 			this.asyncService = loadInterfaceIfExists(exportedService.getName() + "Async");
 		}
 	}
@@ -48,7 +48,7 @@ public class AsterixServiceBuilderHolder {
 	}
 
 	public AsterixServiceProperties exportServiceProperties() {
-		AsterixServiceProperties serviceProperties = serviceBuilder.buildServiceProperties(exportedService);
+		AsterixServiceProperties serviceProperties = servicePropertiesBuilder.buildServiceProperties(exportedService);
 		serviceProperties.setApi(exportedService);
 		serviceProperties.setComponent(componentName);
 		// TODO: move responsibility to set qualifier to this class
@@ -56,7 +56,7 @@ public class AsterixServiceBuilderHolder {
 	}
 	
 	public AsterixServiceProperties exportAsyncServiceProperties() {
-		AsterixServiceProperties serviceProperties = serviceBuilder.buildServiceProperties(exportedService);
+		AsterixServiceProperties serviceProperties = servicePropertiesBuilder.buildServiceProperties(exportedService);
 		serviceProperties.setApi(asyncService);
 		serviceProperties.setComponent(componentName);
 		// TODO: move responsibility to set qualifier to this class

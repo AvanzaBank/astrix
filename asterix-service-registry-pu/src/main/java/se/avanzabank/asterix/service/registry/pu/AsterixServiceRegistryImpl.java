@@ -40,28 +40,27 @@ public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {
 
 	@Override
 	public <T> AsterixServiceRegistryEntry lookup(String type, String qualifier) {
-		ServiceProperitesInfo info = gigaSpace.readById(ServiceProperitesInfo.class, new ServiceKey(type, qualifier));
-		if (info == null) {
+		SpaceServiceRegistryEntry entry = gigaSpace.readById(SpaceServiceRegistryEntry.class, new ServiceKey(type, qualifier));
+		if (entry == null) {
 			return null; // TODO: handle non registered services
 		}
 		AsterixServiceRegistryEntry result = new AsterixServiceRegistryEntry();
 		result.setQualifier(qualifier);
 		result.setServiceBeanType(type);
-		result.setServiceProperties(info.getProperties());
+		result.setServiceProperties(entry.getProperties());
 		return result;
 	}
 
 	@Override
-	public <T> void register(AsterixServiceRegistryEntry entry) {
-		ServiceProperitesInfo info = new ServiceProperitesInfo();
-		info.setApiType(entry.getServiceBeanType());
+	public <T> void register(AsterixServiceRegistryEntry entry, long lease) {
+		SpaceServiceRegistryEntry spaceEntry = new SpaceServiceRegistryEntry();
+		spaceEntry.setApiType(entry.getServiceBeanType());
 		// TODO: this method signature is weird. It used apiType from fist 
 		// argument and qualifier from properties. It does not make sense.
-		info.setServiceKey(new ServiceKey(entry.getServiceBeanType(), entry.getQualifier()));
-		info.setProperties(entry.getServiceProperties());
-		// TODO: lease
+		spaceEntry.setServiceKey(new ServiceKey(entry.getServiceBeanType(), entry.getQualifier()));
+		spaceEntry.setProperties(entry.getServiceProperties());
 		// TODO: qualifier
-		gigaSpace.write(info);
+		gigaSpace.write(spaceEntry, lease);
 	}
 
 }

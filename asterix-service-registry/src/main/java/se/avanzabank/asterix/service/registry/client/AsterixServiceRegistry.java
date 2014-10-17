@@ -25,6 +25,6 @@ public interface AsterixServiceRegistry {
 	
 	<T> AsterixServiceRegistryEntry lookup(@Routing String type, String qualifier);
 	
-	<T> void register(AsterixServiceRegistryEntry properties);
+	<T> void register(AsterixServiceRegistryEntry properties, long lease);
 	
 }

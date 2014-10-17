@@ -29,6 +29,6 @@ public interface AsterixServiceRegistryClient {
 	
 	<T> AsterixServiceProperties lookup(@Routing Class<T> type, String qualifier);
 	
-	<T> void register(@Routing Class<T> type, AsterixServiceProperties properties); // TODO: lease/renewal?
+	<T> void register(@Routing Class<T> type, AsterixServiceProperties properties, long lease); // TODO: lease/renewal?
 	
 }

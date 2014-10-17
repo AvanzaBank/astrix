@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.context.AsterixServiceBuilderHolder;
+import se.avanzabank.asterix.context.AsterixServicePropertiesBuilderHolder;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryClient;
@@ -37,10 +37,11 @@ import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryClien
  */
 public class AsterixServiceRegistryExporterWorker extends Thread {
 	
-	private List<AsterixServiceBuilderHolder> serviceBuilders = Collections.emptyList();
+	private List<AsterixServicePropertiesBuilderHolder> serviceBuilders = Collections.emptyList();
 	private final AsterixServiceRegistryClient serviceRegistryClient;
 	private final Logger log = LoggerFactory.getLogger(AsterixServiceRegistryExporterWorker.class);
-	private volatile long exportIntervallMillis = 60_000;
+	private volatile long exportIntervallMillis = 60_000; // Export every 60 seconds
+	private volatile long leaseTimeMillis = 120_000;     // Use a service lease of 120 seconds
 
 	@Autowired
 	public AsterixServiceRegistryExporterWorker(AsterixServiceRegistryClient serviceRegistry) {
@@ -48,7 +49,7 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	}
 	
 	@Autowired(required = false)
-	public void setServiceBuilders(List<AsterixServiceBuilderHolder> serviceBuilders) {
+	public void setServiceBuilders(List<AsterixServicePropertiesBuilderHolder> serviceBuilders) {
 		this.serviceBuilders = serviceBuilders;
 	}
 	
@@ -81,13 +82,13 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	}
 
 	private void exportProvidedServcies() {
-		for (AsterixServiceBuilderHolder serviceBuilder : serviceBuilders) {
+		for (AsterixServicePropertiesBuilderHolder serviceBuilder : serviceBuilders) {
 			AsterixServiceProperties serviceProperties = serviceBuilder.exportServiceProperties();
-			serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties);
+			serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, leaseTimeMillis);
 			log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			if (serviceBuilder.exportsAsyncApi()) {
 				serviceProperties = serviceBuilder.exportAsyncServiceProperties();
-				serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties);
+				serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, leaseTimeMillis);
 				log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			}
 		}
