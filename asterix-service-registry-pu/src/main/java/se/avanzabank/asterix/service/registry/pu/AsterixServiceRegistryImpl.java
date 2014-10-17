@@ -42,7 +42,7 @@ public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {
 	public <T> AsterixServiceRegistryEntry lookup(String type, String qualifier) {
 		SpaceServiceRegistryEntry entry = gigaSpace.readById(SpaceServiceRegistryEntry.class, new ServiceKey(type, qualifier));
 		if (entry == null) {
-			return null; // TODO: handle non registered services
+			return null;
 		}
 		AsterixServiceRegistryEntry result = new AsterixServiceRegistryEntry();
 		result.setQualifier(qualifier);
@@ -55,11 +55,8 @@ public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {
 	public <T> void register(AsterixServiceRegistryEntry entry, long lease) {
 		SpaceServiceRegistryEntry spaceEntry = new SpaceServiceRegistryEntry();
 		spaceEntry.setApiType(entry.getServiceBeanType());
-		// TODO: this method signature is weird. It used apiType from fist 
-		// argument and qualifier from properties. It does not make sense.
 		spaceEntry.setServiceKey(new ServiceKey(entry.getServiceBeanType(), entry.getQualifier()));
 		spaceEntry.setProperties(entry.getServiceProperties());
-		// TODO: qualifier
 		gigaSpace.write(spaceEntry, lease);
 	}
 
