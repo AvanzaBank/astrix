@@ -17,14 +17,14 @@ package se.avanzabank.asterix.service.registry.client;
 
 import org.openspaces.remoting.Routing;
 
-import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.service.registry.server.AsterixServiceRegistryEntry;
 
 public interface AsterixServiceRegistry {
 	
-	<T> AsterixServiceProperties lookup(@Routing String type);
+	<T> AsterixServiceRegistryEntry lookup(@Routing String type);
 	
-	<T> AsterixServiceProperties lookup(@Routing String type, String qualifier);
+	<T> AsterixServiceRegistryEntry lookup(@Routing String type, String qualifier);
 	
-	<T> void register(@Routing String type, AsterixServiceProperties properties);
+	<T> void register(AsterixServiceRegistryEntry properties);
 	
 }

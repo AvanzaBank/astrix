@@ -18,6 +18,7 @@ package se.avanzabank.asterix.service.registry.client;
 import org.openspaces.remoting.Routing;
 
 import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.service.registry.server.AsterixServiceRegistryEntry;
 
 public class AsterixServiceRegistryClientImpl implements AsterixServiceRegistryClient {
 	
@@ -29,17 +30,21 @@ public class AsterixServiceRegistryClientImpl implements AsterixServiceRegistryC
 
 	@Override
 	public <T> AsterixServiceProperties lookup(@Routing Class<T> type) {
-		return serviceRegistry.lookup(type.getName());
+		return lookup(type, null);
 	}
 
 	@Override
 	public <T> AsterixServiceProperties lookup(@Routing Class<T> type, String qualifier) {
-		return serviceRegistry.lookup(type.getName(), qualifier);
+		AsterixServiceRegistryEntry entry = serviceRegistry.lookup(type.getName(), qualifier);
+		return new AsterixServiceProperties(entry.getServiceProperties());
 	}
 
 	@Override
 	public <T> void register(@Routing Class<T> type, AsterixServiceProperties properties) {
-		this.serviceRegistry.register(type.getName(), properties);
+		AsterixServiceRegistryEntry entry = new AsterixServiceRegistryEntry();
+		entry.setServiceProperties(properties.getProperties());
+		entry.setServiceBeanType(type.getName());
+		this.serviceRegistry.register(entry);
 	}
 
 }

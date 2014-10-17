@@ -18,10 +18,10 @@ package se.avanzabank.asterix.service.registry.pu;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.provider.core.AsterixServiceExport;
 import se.avanzabank.asterix.service.registry.app.ServiceKey;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
+import se.avanzabank.asterix.service.registry.server.AsterixServiceRegistryEntry;
 
 @AsterixServiceExport(AsterixServiceRegistry.class)
 public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {
@@ -33,25 +33,32 @@ public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {
 		this.gigaSpace = gigaSpace;
 	}
 
-	public <T> AsterixServiceProperties lookup(String type) {
+	@Override
+	public <T> AsterixServiceRegistryEntry lookup(String type) {
 		return lookup(type, null);
 	}
-	
-	public <T> AsterixServiceProperties lookup(String type, String qualifier) {
+
+	@Override
+	public <T> AsterixServiceRegistryEntry lookup(String type, String qualifier) {
 		ServiceProperitesInfo info = gigaSpace.readById(ServiceProperitesInfo.class, new ServiceKey(type, qualifier));
 		if (info == null) {
 			return null; // TODO: handle non registered services
 		}
-		return info.getProperties();
+		AsterixServiceRegistryEntry result = new AsterixServiceRegistryEntry();
+		result.setQualifier(qualifier);
+		result.setServiceBeanType(type);
+		result.setServiceProperties(info.getProperties());
+		return result;
 	}
 
-	public <T> void register(String apiType, AsterixServiceProperties properties) {
+	@Override
+	public <T> void register(AsterixServiceRegistryEntry entry) {
 		ServiceProperitesInfo info = new ServiceProperitesInfo();
-		info.setApiType(properties.getApiType());
+		info.setApiType(entry.getServiceBeanType());
 		// TODO: this method signature is weird. It used apiType from fist 
 		// argument and qualifier from properties. It does not make sense.
-		info.setServiceKey(new ServiceKey(apiType, properties.getQualifier()));
-		info.setProperties(properties);
+		info.setServiceKey(new ServiceKey(entry.getServiceBeanType(), entry.getQualifier()));
+		info.setProperties(entry.getServiceProperties());
 		// TODO: lease
 		// TODO: qualifier
 		gigaSpace.write(info);

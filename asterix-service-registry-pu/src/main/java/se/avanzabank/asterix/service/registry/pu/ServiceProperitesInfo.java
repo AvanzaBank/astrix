@@ -15,7 +15,8 @@
  */
 package se.avanzabank.asterix.service.registry.pu;
 
-import se.avanzabank.asterix.context.AsterixServiceProperties;
+import java.util.Map;
+
 import se.avanzabank.asterix.service.registry.app.ServiceKey;
 
 import com.gigaspaces.annotation.pojo.SpaceId;
@@ -23,18 +24,18 @@ import com.gigaspaces.annotation.pojo.SpaceRouting;
 
 public class ServiceProperitesInfo {
 
-	private AsterixServiceProperties properties = new AsterixServiceProperties();
+	private Map<String, String> properties;
 	private ServiceKey serviceKey;
 	private String apiType;
 
-	public AsterixServiceProperties getProperties() {
+	public Map<String, String> getProperties() {
 		return properties;
 	}
-
-	public void setProperties(AsterixServiceProperties properties) {
+	
+	public void setProperties(Map<String, String> properties) {
 		this.properties = properties;
 	}
-	
+
 	@SpaceId(autoGenerate = false)
 	public ServiceKey getServiceKey() {
 		return serviceKey;
