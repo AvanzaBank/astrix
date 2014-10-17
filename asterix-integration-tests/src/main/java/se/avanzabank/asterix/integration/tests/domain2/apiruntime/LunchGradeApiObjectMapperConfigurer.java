@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder;
+package se.avanzabank.asterix.integration.tests.domain2.apiruntime;
 
-import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
-import se.avanzabank.asterix.provider.core.AsterixSubsystem;
+import se.avanzabank.asterix.provider.versioning.AsterixObjectMapperConfigurer;
+import se.avanzabank.asterix.provider.versioning.JacksonObjectMapperBuilder;
 
+public class LunchGradeApiObjectMapperConfigurer implements AsterixObjectMapperConfigurer {
 
-@AsterixServiceRegistryApi(
-	exportedApis = {
-		InternalLunchFeeder.class
+	@Override
+	public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
 	}
-)
-@AsterixSubsystem("lunch-service")
-public class LunchFeederApiDescriptor {
+
 }
-
-

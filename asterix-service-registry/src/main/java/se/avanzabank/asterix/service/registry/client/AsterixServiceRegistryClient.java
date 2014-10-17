@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder;
+package se.avanzabank.asterix.service.registry.client;
 
-import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
-import se.avanzabank.asterix.provider.core.AsterixSubsystem;
+import org.openspaces.remoting.Routing;
+
+import se.avanzabank.asterix.context.AsterixServiceProperties;
 
 
-@AsterixServiceRegistryApi(
-	exportedApis = {
-		InternalLunchFeeder.class
-	}
-)
-@AsterixSubsystem("lunch-service")
-public class LunchFeederApiDescriptor {
+
+public interface AsterixServiceRegistryClient {
+	
+	// TODO: use separate interface for providers and consumers?
+	
+	<T> AsterixServiceProperties lookup(@Routing Class<T> type);
+	
+	<T> AsterixServiceProperties lookup(@Routing Class<T> type, String qualifier);
+	
+	<T> void register(@Routing Class<T> type, AsterixServiceProperties properties); // TODO: lease/renewal?
+	
 }
-
-

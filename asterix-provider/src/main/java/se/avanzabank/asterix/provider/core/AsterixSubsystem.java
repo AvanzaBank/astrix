@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder;
+package se.avanzabank.asterix.provider.core;
 
-import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
-import se.avanzabank.asterix.provider.core.AsterixSubsystem;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 
-@AsterixServiceRegistryApi(
-	exportedApis = {
-		InternalLunchFeeder.class
-	}
-)
-@AsterixSubsystem("lunch-service")
-public class LunchFeederApiDescriptor {
+/**
+ * @author Elias Lindholm (elilin)
+ */
+@Target(value = { ElementType.TYPE })
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface AsterixSubsystem {
+
+	String value();
 }
-
-

@@ -16,6 +16,7 @@
 package se.avanzabank.asterix.service.registry.client;
 
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
+import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 
 /**
  * The service registry api uses asterix-remoting to export its service. Note that
@@ -25,6 +26,11 @@ import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
  * @author Elias Lindholm (elilin)
  *
  */
+@AsterixVersioned (
+	apiMigrations = {},
+	objectMapperConfigurer = ServiceRegistryObjectMapperConfigurer.class,
+	version = 1
+)
 @AsterixRemoteApiDescriptor (
 	exportedApis = {
 		AsterixServiceRegistry.class,

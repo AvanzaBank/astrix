@@ -26,6 +26,7 @@ public class AsterixSettings {
 	
 	public static final String BEAN_REBIND_ATTEMP_INTERVAL = "StatefulAsterixBean.beanRebindAttemptInterval";
 	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AsterixServiceRegistryLeaseManager.leaseRenewInterval";
+	public static final String ENFORECE_SUBSYSTEM_BOUNDARIES = "AsterixContext.enforceSubsystemBoundaries";
 	
 	private final Map<String, Object> settings = new ConcurrentHashMap<>();
 	
@@ -38,6 +39,17 @@ public class AsterixSettings {
 			return Long.parseLong((String)value);
 		}
 		return Long.class.cast(value).longValue();
+	}
+	
+	public boolean getBoolean(String settingsName, boolean deafualtValue) {
+		Object value = settings.get(settingsName);
+		if (value == null) {
+			return deafualtValue;
+		}
+		if (value instanceof String) {
+			return Boolean.parseBoolean((String)value);
+		}
+		return Boolean.class.cast(value);
 	}
 
 	public void set(String settingName, long value) {
@@ -60,6 +72,10 @@ public class AsterixSettings {
 		for (Map.Entry<String, String> setting : settings.entrySet()) {
 			this.settings.put(setting.getKey(), setting.getValue());
 		}
+	}
+
+	public void set(String settingName, boolean value) {
+		this.settings.put(settingName, value);
 	}
 	
 

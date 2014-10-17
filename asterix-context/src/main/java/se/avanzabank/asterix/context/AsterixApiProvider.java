@@ -31,11 +31,11 @@ public class AsterixApiProvider {
 	
 	private final ConcurrentMap<Class<?>, AsterixFactoryBean<?>> factoryByProvidedType = new ConcurrentHashMap<>();
 	private final AsterixApiDescriptor apiDescriptor;
-	private final boolean hasStatefulBeans;
+	private final AsterixApiProviderPlugin providerFactoryPlugin;
 	
-	public AsterixApiProvider(List<AsterixFactoryBean<?>> factories, AsterixApiDescriptor descriptorHolder, boolean hasStatefulBeans) {
+	public AsterixApiProvider(List<AsterixFactoryBean<?>> factories, AsterixApiDescriptor descriptorHolder, AsterixApiProviderPlugin providerFactoryPlugin) {
 		this.apiDescriptor = descriptorHolder;
-		this.hasStatefulBeans = hasStatefulBeans;
+		this.providerFactoryPlugin = providerFactoryPlugin;
 		for (AsterixFactoryBean<?> factory : factories) {
 			AsterixFactoryBean<?> previous = this.factoryByProvidedType.putIfAbsent(factory.getBeanType(), factory);
 			if (previous != null) {
@@ -66,7 +66,7 @@ public class AsterixApiProvider {
 	}
 
 	public boolean hasStatefulBeans() {
-		return this.hasStatefulBeans;
+		return !this.providerFactoryPlugin.isLibraryProvider();
 	}
 
 }

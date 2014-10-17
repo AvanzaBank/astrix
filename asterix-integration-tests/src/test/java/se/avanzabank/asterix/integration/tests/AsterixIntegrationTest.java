@@ -201,8 +201,7 @@ public class AsterixIntegrationTest {
 		assertEquals("Martins Green Room", r.getName());
 	}
 	
-	// TODO: implement me
-//	@Test(expected = IllegalSubsystemException.class)
+	@Test(expected = IllegalSubsystemException.class)
 	public void itsNotAllowedToCreateServicesBeansThatBindsToServicesInOtherSubSystems() throws Exception {
 		asterix.getBean(InternalLunchFeeder.class);
 	}

@@ -44,7 +44,7 @@ import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
 import se.avanzabank.asterix.service.registry.app.ServiceKey;
 
 
-public class AsterixServiceRegistryTest {
+public class AsterixServiceRegistryClientTest {
 	
 	private AsterixDirectComponent directComponent;
 	private FakeServiceRegistry serviceRegistry;
@@ -66,7 +66,7 @@ public class AsterixServiceRegistryTest {
 		configurer.registerApiDescriptor(FakeServiceRegistryDescriptor.class);
 		context = configurer.configure();
 		directComponent = context.getPluginInstance(AsterixDirectComponent.class);
-		serviceRegistry = (FakeServiceRegistry) context.getBean(AsterixServiceRegistry.class);
+		serviceRegistry = (FakeServiceRegistry) context.getBean(AsterixServiceRegistryClient.class);
 	}
 	
 	@Test
@@ -151,12 +151,12 @@ public class AsterixServiceRegistryTest {
 	@AsterixLibraryProvider
 	public static class FakeServiceRegistryDescriptor {
 		@AsterixExport
-		public AsterixServiceRegistry create() {
+		public AsterixServiceRegistryClient create() {
 			return new FakeServiceRegistry();
 		}
 	}
 	
-	static class FakeServiceRegistry implements AsterixServiceRegistry {
+	static class FakeServiceRegistry implements AsterixServiceRegistryClient {
 		
 		private Map<ServiceKey, AsterixServiceProperties> servicePropertiesByKey = new ConcurrentHashMap<>();
 		
@@ -182,9 +182,6 @@ public class AsterixServiceRegistryTest {
 		exportedApis = { 
 			GreetingService.class
 		}
-//		components = {
-//			AsterixServiceComponentNames.DIRECT
-//		} 
 	)
 	public static class GreetingApiDescriptor {
 		

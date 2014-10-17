@@ -17,6 +17,10 @@ package se.avanzabank.asterix.context;
 
 public class IllegalSubsystemException extends RuntimeException {
 
+	public IllegalSubsystemException(String currentSubsystem, AsterixFactoryBean<?> factoryBean) {
+		super(String.format("Its not allowed to inoke beanType=%s in subsystem=%s, currentSubsystem=%s", factoryBean.getBeanType().getName(), factoryBean.getSubsystem(), currentSubsystem));
+	}
+
 	private static final long serialVersionUID = 1L;
 
 }

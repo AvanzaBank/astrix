@@ -15,17 +15,17 @@
  */
 package se.avanzabank.asterix.service.registry.pu;
 
-import com.gigaspaces.annotation.pojo.SpaceId;
-import com.gigaspaces.annotation.pojo.SpaceRouting;
-
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.service.registry.app.ServiceKey;
+
+import com.gigaspaces.annotation.pojo.SpaceId;
+import com.gigaspaces.annotation.pojo.SpaceRouting;
 
 public class ServiceProperitesInfo {
 
 	private AsterixServiceProperties properties = new AsterixServiceProperties();
 	private ServiceKey serviceKey;
-	private Class<?> apiType;
+	private String apiType;
 
 	public AsterixServiceProperties getProperties() {
 		return properties;
@@ -44,13 +44,12 @@ public class ServiceProperitesInfo {
 		this.serviceKey = serviceKey;
 	}
 	
-	// TODO routing? - class does not have a stable hashCode across jvms
 	@SpaceRouting
-	public Class<?> getApiType() {
+	public String getApiType() {
 		return apiType; 
 	}
 	
-	public void setApiType(Class<?> apiType) {
+	public void setApiType(String apiType) {
 		this.apiType = apiType;
 	}
 

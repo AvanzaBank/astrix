@@ -16,7 +16,6 @@
 package se.avanzabank.asterix.service.registry.pu;
 
 import org.openspaces.core.GigaSpace;
-import org.openspaces.remoting.Routing;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import se.avanzabank.asterix.context.AsterixServiceProperties;
@@ -34,27 +33,24 @@ public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {
 		this.gigaSpace = gigaSpace;
 	}
 
-	@Override
-	public <T> AsterixServiceProperties lookup(Class<T> type) {
+	public <T> AsterixServiceProperties lookup(String type) {
 		return lookup(type, null);
 	}
 	
-	@Override
-	public <T> AsterixServiceProperties lookup(@Routing Class<T> type, String qualifier) {
-		ServiceProperitesInfo info = gigaSpace.readById(ServiceProperitesInfo.class, new ServiceKey(type.getName(), qualifier));
+	public <T> AsterixServiceProperties lookup(String type, String qualifier) {
+		ServiceProperitesInfo info = gigaSpace.readById(ServiceProperitesInfo.class, new ServiceKey(type, qualifier));
 		if (info == null) {
 			return null; // TODO: handle non registered services
 		}
 		return info.getProperties();
 	}
 
-	@Override
-	public <T> void register(Class<T> api, AsterixServiceProperties properties) {
+	public <T> void register(String apiType, AsterixServiceProperties properties) {
 		ServiceProperitesInfo info = new ServiceProperitesInfo();
-		info.setApiType(properties.getApi());
+		info.setApiType(properties.getApiType());
 		// TODO: this method signature is weird. It used apiType from fist 
 		// argument and qualifier from properties. It does not make sense.
-		info.setServiceKey(new ServiceKey(api.getName(), properties.getQualifier()));
+		info.setServiceKey(new ServiceKey(apiType, properties.getQualifier()));
 		info.setProperties(properties);
 		// TODO: lease
 		// TODO: qualifier

@@ -36,10 +36,10 @@ public class AsterixConfigurer {
 	private List<Object> externalDependencies = new ArrayList<>();
 	private final AsterixSettings settings = new AsterixSettings();
 	private final List<PluginHolder<?>> plugins = new ArrayList<>();
-	private String subsystem;
+	private String subsystem = "unknown";
 	
 	public AsterixContext configure() {
-		AsterixContext context = new AsterixContext(settings);
+		AsterixContext context = new AsterixContext(settings, subsystem);
 		for (PluginHolder<?> plugin : plugins) {
 			registerPlugin(context, plugin);
 		}
@@ -158,6 +158,10 @@ public class AsterixConfigurer {
 	}
 
 	public void set(String settingName, long value) {
+		this.settings.set(settingName, value);
+	}
+	
+	public void set(String settingName, boolean value) {
 		this.settings.set(settingName, value);
 	}
 	

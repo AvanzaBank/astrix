@@ -47,7 +47,7 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 
 	@Override
 	public T create(String qualifier) {
-		AsterixServiceRegistry serviceRegistry = beans.getBean(AsterixServiceRegistry.class);
+		AsterixServiceRegistryClient serviceRegistry = beans.getBean(AsterixServiceRegistryClient.class);
 		AsterixServiceProperties serviceProperties = serviceRegistry.lookup(api, qualifier);
 		T service = create(qualifier, serviceProperties);
 		return leaseManager.startManageLease(service, serviceProperties, qualifier, this);
@@ -71,7 +71,7 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 
 	@Override
 	public List<Class<?>> getBeanDependencies() {
-		return Arrays.<Class<?>>asList(AsterixServiceRegistry.class);
+		return Arrays.<Class<?>>asList(AsterixServiceRegistryClient.class);
 	}
 
 	@Override

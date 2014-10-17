@@ -60,6 +60,7 @@ public class AsterixClientRuntimeBuilder {
 		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		MutablePropertyValues asterixConfigurerProps = new MutablePropertyValues();
 		asterixConfigurerProps.add("settings", this.settings);
+		asterixConfigurerProps.add("subsystem", this.asterixContext.getCurrentSubsystem());
 		beanDefinition.setPropertyValues(asterixConfigurerProps);
 		beanDefinition.setDependsOn(getDependencyBeanNames(usedExternalDependencyBeanTypes));
 		registry.registerBeanDefinition("_asterixConfigurer", beanDefinition);

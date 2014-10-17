@@ -27,9 +27,11 @@ import java.util.Objects;
  */
 public final class AsterixServiceProperties implements Serializable {
 	
+	// TODO: use separate abstractions for service-properties in AsterixServiceRegistryClient and AsterixServiceRegistry
+	
 	private static final long serialVersionUID = 1L;
 	
-	private final Map<String, String> properties = new HashMap<>();
+	private Map<String, String> properties = new HashMap<>();
 	
 	public String getProperty(String name) {
 		return this.properties.get(name);
@@ -39,10 +41,20 @@ public final class AsterixServiceProperties implements Serializable {
 		this.properties.put(name, value);
 	}
 	
+	public Map<String, String> getProperties() {
+		return properties;
+	}
+	
+	public void setProperties(Map<String, String> properties) {
+		this.properties = properties;
+	}
+	
+	@Deprecated 
 	public void setApi(Class<?> api) {
 		setProperty("_api", api.getName());
 	}
 	
+	@Deprecated // TODO: remove this method as its not possible to load this type in the service-registry-pu (It does not have all registered apis on classpath)
 	public Class<?> getApi() {
 		try {
 			return Class.forName(getProperty("_api"));
@@ -88,6 +100,14 @@ public final class AsterixServiceProperties implements Serializable {
 			return false;
 		AsterixServiceProperties other = (AsterixServiceProperties) obj;
 		return Objects.equals(this.properties, other.properties);
+	}
+
+	public void setApiType(String api) {
+		setProperty("_api", api);
+	}
+	
+	public String getApiType() {
+		return getProperty("_api");
 	}
 	
 }

@@ -35,7 +35,7 @@ import se.avanzabank.asterix.context.AsterixServiceBuilderHolder;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
 import se.avanzabank.asterix.context.AsterixServiceComponents;
 import se.avanzabank.asterix.context.AsterixServiceRegistryPlugin;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryClient;
 
 @MetaInfServices(AsterixServiceRegistryPlugin.class)
 public class AsterixServiceRegistryPluginImpl implements AsterixServiceRegistryPlugin, AsterixPluginsAware {
@@ -78,7 +78,7 @@ public class AsterixServiceRegistryPluginImpl implements AsterixServiceRegistryP
 	
 	@Override
 	public Collection<? extends Class<?>> getConsumedBeanTypes() {
-		return Arrays.asList(AsterixServiceRegistry.class);
+		return Arrays.asList(AsterixServiceRegistryClient.class);
 	}
 	
 }

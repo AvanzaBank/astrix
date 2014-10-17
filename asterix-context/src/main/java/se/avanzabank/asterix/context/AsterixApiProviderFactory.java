@@ -52,12 +52,12 @@ public class AsterixApiProviderFactory {
 		List<AsterixFactoryBean<?>> factoryBeans = new ArrayList<>();
 		for (AsterixFactoryBeanPlugin<?> factoryBean : providerFactoryPlugin.createFactoryBeans(descriptor)) {
 			AsterixFactoryBeanPlugin<?> decoratatedFactory = factoryBean;
-			if (providerFactoryPlugin.useStatefulBeanFactory()) {
+			if (!providerFactoryPlugin.isLibraryProvider()) {
 				decoratatedFactory = new StatefulAsterixFactoryBean<>(factoryBean);
 			}
-			factoryBeans.add(new AsterixFactoryBean<>(new CachingAsterixFactoryBean<>(decoratatedFactory)));
+			factoryBeans.add(new AsterixFactoryBean<>(new CachingAsterixFactoryBean<>(decoratatedFactory), descriptor));
 		}
-		return new AsterixApiProvider(factoryBeans, descriptor, providerFactoryPlugin.useStatefulBeanFactory()); 
+		return new AsterixApiProvider(factoryBeans, descriptor, providerFactoryPlugin); 
 	}
 	
 	private AsterixApiProviderPlugin getProviderPlugin(AsterixApiDescriptor descriptor) {

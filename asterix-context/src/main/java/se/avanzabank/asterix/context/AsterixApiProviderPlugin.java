@@ -47,16 +47,13 @@ public interface AsterixApiProviderPlugin {
 	Class<? extends Annotation> getProviderAnnotationType();
 	
 	/**
-	 * For api-providers that require stateful asterix-beans, mainly because they can become
-	 * "disconnected". 
-	 * 
-	 * In order to use a stateful-bean-factory all exported beanTypes (as
-	 * returned by createFactoryBeans(AsterixApiDescriptor) must be exported using
-	 * an interface.
-	 *  
+	 * Whether this is a "service provider" or a "library provider". Services providers binds its
+	 * bean types to services provided by other processes by contrast to library provider whose beans
+	 * are implemented by in memory objects. 
 	 * 
 	 * @return
 	 */
-	boolean useStatefulBeanFactory();
+	boolean isLibraryProvider();
+	
 	
 }

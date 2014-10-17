@@ -18,7 +18,13 @@ package se.avanzabank.asterix.integration.tests.domain2.apiruntime;
 import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
 import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
+import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 
+@AsterixVersioned(
+	apiMigrations = {},
+	objectMapperConfigurer = LunchGradeApiObjectMapperConfigurer.class,
+	version = 1
+)
 @AsterixServiceRegistryApi(
 	exportedApis = {
 		LunchRestaurantGrader.class,

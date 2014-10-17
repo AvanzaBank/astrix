@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import se.avanzabank.asterix.context.AsterixServiceBuilderHolder;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryClient;
 /**
  * The service registry worker is a server-side component responsible for continuously publishing 
  * all exported services from the current application onto the service registry.
@@ -38,13 +38,13 @@ import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
 public class AsterixServiceRegistryExporterWorker extends Thread {
 	
 	private List<AsterixServiceBuilderHolder> serviceBuilders = Collections.emptyList();
-	private final AsterixServiceRegistry serviceRegistry;
+	private final AsterixServiceRegistryClient serviceRegistryClient;
 	private final Logger log = LoggerFactory.getLogger(AsterixServiceRegistryExporterWorker.class);
 	private volatile long exportIntervallMillis = 60_000;
 
 	@Autowired
-	public AsterixServiceRegistryExporterWorker(AsterixServiceRegistry serviceRegistry) {
-		this.serviceRegistry = serviceRegistry;
+	public AsterixServiceRegistryExporterWorker(AsterixServiceRegistryClient serviceRegistry) {
+		this.serviceRegistryClient = serviceRegistry;
 	}
 	
 	@Autowired(required = false)
@@ -83,11 +83,11 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	private void exportProvidedServcies() {
 		for (AsterixServiceBuilderHolder serviceBuilder : serviceBuilders) {
 			AsterixServiceProperties serviceProperties = serviceBuilder.exportServiceProperties();
-			serviceRegistry.register(serviceProperties.getApi(), serviceProperties);
+			serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties);
 			log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			if (serviceBuilder.exportsAsyncApi()) {
 				serviceProperties = serviceBuilder.exportAsyncServiceProperties();
-				serviceRegistry.register(serviceProperties.getApi(), serviceProperties);
+				serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties);
 				log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			}
 		}

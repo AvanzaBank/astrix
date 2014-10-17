@@ -41,13 +41,17 @@ public class AsterixContext implements Asterix {
 	private final AsterixBeanStates beanStates = new AsterixBeanStates();
 	private final AsterixSettings settings;
 	private final AsterixBeanStateWorker beanStateWorker;
+	private final String currentSubsystem;
 	private AsterixApiProviderPlugins apiProviderPlugins;
+	private boolean enforeSubsystemBoundaries;
 	
-	public AsterixContext(AsterixSettings settings) {
+	public AsterixContext(AsterixSettings settings, String currentSubsystem) {
+		this.currentSubsystem = currentSubsystem;
 		this.settings = Objects.requireNonNull(settings);
 		this.beanStateWorker = new AsterixBeanStateWorker(settings, eventBus); // TODO: manage life cycle
 		this.beanStateWorker.start(); // TODO: avoid starting bean-state-worker if no stateful beans are created. + manage lifecycle
 		this.eventBus.addEventListener(AsterixBeanStateChangedEvent.class, beanStates);
+		this.enforeSubsystemBoundaries = settings.getBoolean(AsterixSettings.ENFORECE_SUBSYSTEM_BOUNDARIES, true);
 		this.plugins = new AsterixPlugins(new AsterixPluginInitializer() {
 			@Override
 			public void init(Object plugin) {
@@ -154,11 +158,32 @@ public class AsterixContext implements Asterix {
 			throw new MissingBeanException(beanType);
 		}
 		AsterixFactoryBean<T> factoryBean = this.beanFactoryRegistry.getFactoryBean(beanType);
-		// TODO: verify that its allowed to use the given factory in the current context
-		// for intstance: Its not allowed to invoke unversioned services in other subsystems.
-		return factoryBean;
+		if (isAllowedToInvokeBean(factoryBean)) {
+			return factoryBean;
+		}
+		throw new IllegalSubsystemException(this.currentSubsystem, factoryBean);
 	}
 	
+	private <T> boolean isAllowedToInvokeBean(AsterixFactoryBean<T> factoryBean) {
+		if (factoryBean.isLibrary()) {
+			return true; 
+		}
+		if (factoryBean.isVersioned()) {
+			return true;
+		}
+		if (Objects.equals(this.currentSubsystem, factoryBean.getSubsystem())) {
+			return true;
+		}
+		if (!enforeceSubsystemBoundaries()) {
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean enforeceSubsystemBoundaries() {
+		return this.enforeSubsystemBoundaries;
+	}
+
 	/**
 	 * Returns the external dependencies (as defined by an ExternalDependencyBean) required 
 	 * to create a given bean, or null if no external dependencies exists. <p>
@@ -329,6 +354,10 @@ public class AsterixContext implements Asterix {
 
 	void setApiProviderPlugins(AsterixApiProviderPlugins apiProviderPlugins) {
 		this.apiProviderPlugins = apiProviderPlugins;
+	}
+
+	public String getCurrentSubsystem() {
+		return this.currentSubsystem;
 	}
 	
 }

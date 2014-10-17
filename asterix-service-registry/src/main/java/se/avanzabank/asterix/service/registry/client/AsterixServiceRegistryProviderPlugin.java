@@ -80,8 +80,8 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 	}
 	
 	@Override
-	public boolean useStatefulBeanFactory() {
-		return true;
+	public boolean isLibraryProvider() {
+		return false;
 	}
 
 	@Override

@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder;
+package se.avanzabank.asterix.service.registry.client;
 
-import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
-import se.avanzabank.asterix.provider.core.AsterixSubsystem;
+import se.avanzabank.asterix.provider.library.AsterixExport;
+import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
 
-
-@AsterixServiceRegistryApi(
-	exportedApis = {
-		InternalLunchFeeder.class
+@AsterixLibraryProvider
+public class AsterixServiceRegistryLibrary {
+	
+	@AsterixExport
+	public AsterixServiceRegistryClient createClient(AsterixServiceRegistry serviceRegistry) {
+		return new AsterixServiceRegistryClientImpl(serviceRegistry);
 	}
-)
-@AsterixSubsystem("lunch-service")
-public class LunchFeederApiDescriptor {
+
 }
-
-

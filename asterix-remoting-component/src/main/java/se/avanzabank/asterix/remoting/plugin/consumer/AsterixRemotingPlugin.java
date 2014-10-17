@@ -60,8 +60,8 @@ public class AsterixRemotingPlugin implements AsterixApiProviderPlugin {
 	}
 	
 	@Override
-	public boolean useStatefulBeanFactory() {
-		return true;
+	public boolean isLibraryProvider() {
+		return false;
 	}
 
 

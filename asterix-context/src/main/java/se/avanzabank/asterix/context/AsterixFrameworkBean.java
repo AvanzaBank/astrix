@@ -25,6 +25,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 
+import se.avanzabank.asterix.provider.core.AsterixService;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -99,6 +101,10 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	private void createServiceFrameworkRuntime(BeanDefinitionRegistry registry) throws ClassNotFoundException {
 		AsterixConfigurer configurer = new AsterixConfigurer();
 		configurer.setSettings(this.settings);
+		if (this.serviceDescriptorHolder != null) {
+			AsterixService service = this.serviceDescriptorHolder.getAnnotation(AsterixService.class);
+			configurer.setSubsystem(service.subsystem());
+		}
 		AsterixContext asterixContext = configurer.configure();
 		
 		List<Class<?>> consumedAsterixBeans = new ArrayList<>(this.consumedAsterixBeans);

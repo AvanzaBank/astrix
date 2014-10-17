@@ -54,10 +54,10 @@ public class AsterixLibraryProviderPlugin implements AsterixApiProviderPlugin {
 	}
 	
 	@Override
-	public boolean useStatefulBeanFactory() {
-		return false;
+	public boolean isLibraryProvider() {
+		return true;
 	}
-
+	
 	@Override
 	public List<Class<?>> getProvidedBeans(AsterixApiDescriptor descriptor) {
 		List<Class<?>> result = new ArrayList<>();

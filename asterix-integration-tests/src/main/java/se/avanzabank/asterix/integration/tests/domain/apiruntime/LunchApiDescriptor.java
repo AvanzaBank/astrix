@@ -16,7 +16,6 @@
 package se.avanzabank.asterix.integration.tests.domain.apiruntime;
 
 import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
-import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 

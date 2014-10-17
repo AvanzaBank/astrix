@@ -18,6 +18,9 @@ package se.avanzabank.asterix.context;
 import java.lang.annotation.Annotation;
 
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
+import se.avanzabank.asterix.provider.core.AsterixSubsystem;
+import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
+import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -60,4 +63,19 @@ public class AsterixApiDescriptor {
 		return descriptorHolder.isAnnotationPresent(AsterixServiceRegistryApi.class);
 	}
 	
+	public boolean isVersioned() {
+		return descriptorHolder.isAnnotationPresent(AsterixVersioned.class);
+	}
+	
+	public boolean isLibrary() {
+		return descriptorHolder.isAnnotationPresent(AsterixLibraryProvider.class);
+	}
+
+	public String getSubsystem() {
+		if (!descriptorHolder.isAnnotationPresent(AsterixSubsystem.class)) {
+			return null;
+		}
+		AsterixSubsystem subsystem = descriptorHolder.getAnnotation(AsterixSubsystem.class);
+		return subsystem.value();
+	}
 }

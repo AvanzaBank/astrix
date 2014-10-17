@@ -33,10 +33,12 @@ public final class AsterixFactoryBean<T> implements AsterixDecorator {
 	
 	private final AsterixFactoryBeanPlugin <T> plugin;
 	private final Class<T> beanType;
+	private final AsterixApiDescriptor apiDescriptor;
 	
-	public AsterixFactoryBean(AsterixFactoryBeanPlugin<T> plugin) {
-		this.plugin = plugin;
-		this.beanType = plugin.getBeanType();
+	public AsterixFactoryBean(AsterixFactoryBeanPlugin<T> factoryPlugin, AsterixApiDescriptor apiDescriptor) {
+		this.plugin = factoryPlugin;
+		this.apiDescriptor = apiDescriptor;
+		this.beanType = factoryPlugin.getBeanType();
 	}
 
 	public T create(String optionalQualifier) {
@@ -50,6 +52,18 @@ public final class AsterixFactoryBean<T> implements AsterixDecorator {
 	@Override
 	public Object getTarget() {
 		return plugin;
+	}
+
+	public boolean isLibrary() {
+		return apiDescriptor.isLibrary();
+	}
+
+	public boolean isVersioned() {
+		return apiDescriptor.isVersioned();
+	}
+
+	public String getSubsystem() {
+		return apiDescriptor.getSubsystem();
 	}
 	
 }

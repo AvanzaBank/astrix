@@ -35,6 +35,7 @@ public class TestAsterixConfigurer {
 		configurer.enableVersioning(false);
 		configurer.enableFaultTolerance(false);
 		configurer.enableMonitoring(false);
+		configurer.set(AsterixSettings.ENFORECE_SUBSYSTEM_BOUNDARIES, false);
 	}
 
 	public AsterixContext configure() {

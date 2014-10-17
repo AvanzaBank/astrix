@@ -32,7 +32,7 @@ public class AsterixServiceRegistryLeaseManager extends Thread implements Asteri
 	// TODO: start lease-manager-thread "just in time", i.e only if leased services are really used
 	
 	private final List<LeasedService<?>> leasedServices = new CopyOnWriteArrayList<>();
-	private volatile AsterixServiceRegistry serviceRegistry;
+	private volatile AsterixServiceRegistryClient serviceRegistry;
 	private AsterixBeans beans;
 	private AsterixSettings settings;
 	
@@ -55,7 +55,7 @@ public class AsterixServiceRegistryLeaseManager extends Thread implements Asteri
 	public <T> T startManageLease(T service, AsterixServiceProperties currentProperties, String qualifier, ServiceRegistryLookupFactory<T> factory) {
 		synchronized (this) {
 			if (!isAlive()) {
-				this.serviceRegistry = beans.getBean(AsterixServiceRegistry.class);
+				this.serviceRegistry = beans.getBean(AsterixServiceRegistryClient.class);
 				start(); // TODO: what if thread is interrupted? Just allow exception to be thrown? 
 			}
 		}
@@ -67,7 +67,7 @@ public class AsterixServiceRegistryLeaseManager extends Thread implements Asteri
 
 	@Override
 	public List<Class<?>> getBeanDependencies() {
-		return Arrays.<Class<?>>asList(AsterixServiceRegistry.class);
+		return Arrays.<Class<?>>asList(AsterixServiceRegistryClient.class);
 	}
 
 	@Override
