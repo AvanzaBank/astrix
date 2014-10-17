@@ -55,8 +55,8 @@ public interface AsterixServiceComponent {
 	void registerBeans(BeanDefinitionRegistry registry);
 	
 	/**
-	 * Server side component used to make a given provider instance invokable
-	 * using this component.
+	 * Server side component used to make a given provider using this component invokable
+	 * from other processes.
 	 * @return
 	 */
 	Class<? extends AsterixServiceExporterBean> getExporterBean();
@@ -70,7 +70,7 @@ public interface AsterixServiceComponent {
 	
 
 	/**
-	 * For service-components that might be used standalone (that is: whithout the serviceregistry).
+	 * For service-components that might be used standalone (that is: without the service-registry).
 	 * 
 	 * This method defines a unique annotation used to describe the given api.
 	 * 

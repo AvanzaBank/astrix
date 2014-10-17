@@ -27,8 +27,6 @@ import java.util.Objects;
  */
 public final class AsterixServiceProperties implements Serializable {
 	
-	// TODO: use separate abstractions for service-properties in AsterixServiceRegistryClient and AsterixServiceRegistry
-	
 	private static final long serialVersionUID = 1L;
 	
 	private final Map<String, String> properties = new HashMap<>();
