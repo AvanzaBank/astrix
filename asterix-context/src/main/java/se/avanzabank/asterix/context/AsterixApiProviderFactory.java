@@ -55,7 +55,7 @@ public class AsterixApiProviderFactory {
 			if (!providerFactoryPlugin.isLibraryProvider()) {
 				decoratatedFactory = new StatefulAsterixFactoryBean<>(factoryBean);
 			}
-			factoryBeans.add(new AsterixFactoryBean<>(new CachingAsterixFactoryBean<>(decoratatedFactory), descriptor));
+			factoryBeans.add(new AsterixFactoryBean<>(decoratatedFactory, descriptor));
 		}
 		return new AsterixApiProvider(factoryBeans, descriptor, providerFactoryPlugin); 
 	}
