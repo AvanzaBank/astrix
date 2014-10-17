@@ -34,7 +34,6 @@ public class GsBinder {
 	public static AsterixServiceProperties createProperties(GigaSpace space) {
 		AsterixServiceProperties result = new AsterixServiceProperties();
 		result.setApi(GigaSpace.class);
-		result.setQualifier(space.getSpace().getName()); // TODO: note that gigaSpace.getName returns "GigaSpace" on embedded space
 		result.setProperty(SPACE_NAME_PROPERTY, space.getSpace().getName());
 		result.setProperty(SPACE_URL_PROPERTY, space.getSpace().getFinderURL().getURL());
 		return result;

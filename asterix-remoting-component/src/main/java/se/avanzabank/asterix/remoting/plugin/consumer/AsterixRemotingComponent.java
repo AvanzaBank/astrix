@@ -55,7 +55,7 @@ public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixSer
 		
 		String targetSpace = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
 		GigaSpace space = GsBinder.createGsFactory(serviceProperties).create();
-		AsterixRemotingTransport remotingTransport = AsterixRemotingTransport.remoteSpace(space); // TODO: caching of created proxies, fault tolerance?
+		AsterixRemotingTransport remotingTransport = AsterixRemotingTransport.remoteSpace(space);
 		
 		T proxy = AsterixRemotingProxy.create(api, remotingTransport, objectSerializer);
 		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(api, proxy, targetSpace);
