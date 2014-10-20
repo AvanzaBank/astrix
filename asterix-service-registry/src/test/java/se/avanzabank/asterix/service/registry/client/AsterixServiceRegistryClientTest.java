@@ -61,7 +61,7 @@ public class AsterixServiceRegistryClientTest {
 	@Before
 	public void setup() {
 		TestAsterixConfigurer configurer = new TestAsterixConfigurer();
-		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMP_INTERVAL, 10);
+		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 10);
 		configurer.set(AsterixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 10);
 		configurer.registerApiDescriptor(GreetingApiDescriptor.class);
 		configurer.registerApiDescriptor(FakeServiceRegistryDescriptor.class);

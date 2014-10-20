@@ -117,7 +117,7 @@ public class AsterixIntegrationTest {
 		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceRegistrypu.getLookupGroupName())); // For service-registry-discovery
 		configurer.enableFaultTolerance(false); // TODO: enable fault tolerance
 		configurer.enableVersioning(true);
-		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMP_INTERVAL, 100);
+		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 100);
 		configurer.setSubsystem("test-sub-system");
 		asterix = configurer.configure();
 		this.lunchService = asterix.getBean(LunchService.class);

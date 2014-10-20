@@ -51,7 +51,7 @@ public class AsterixContext implements Asterix {
 		this.beanStateWorker = new AsterixBeanStateWorker(settings, eventBus); // TODO: manage life cycle
 		this.beanStateWorker.start(); // TODO: avoid starting bean-state-worker if no stateful beans are created. + manage lifecycle
 		this.eventBus.addEventListener(AsterixBeanStateChangedEvent.class, beanStates);
-		this.enforeSubsystemBoundaries = settings.getBoolean(AsterixSettings.ENFORECE_SUBSYSTEM_BOUNDARIES, true);
+		this.enforeSubsystemBoundaries = settings.getBoolean(AsterixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
 		this.plugins = new AsterixPlugins(new AsterixPluginInitializer() {
 			@Override
 			public void init(Object plugin) {

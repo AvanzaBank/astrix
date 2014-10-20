@@ -24,9 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class AsterixSettings {
 	
-	public static final String BEAN_REBIND_ATTEMP_INTERVAL = "StatefulAsterixBean.beanRebindAttemptInterval";
+	public static final String BEAN_REBIND_ATTEMPT_INTERVAL = "StatefulAsterixBean.beanRebindAttemptInterval";
 	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AsterixServiceRegistryLeaseManager.leaseRenewInterval";
-	public static final String ENFORECE_SUBSYSTEM_BOUNDARIES = "AsterixContext.enforceSubsystemBoundaries";
+	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AsterixContext.enforceSubsystemBoundaries";
 	
 	private final Map<String, Object> settings = new ConcurrentHashMap<>();
 	

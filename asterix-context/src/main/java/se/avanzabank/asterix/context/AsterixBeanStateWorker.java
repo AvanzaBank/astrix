@@ -35,7 +35,7 @@ public class AsterixBeanStateWorker extends Thread {
 	private final ScheduledExecutorService beanStateWorkerThreadPool = Executors.newScheduledThreadPool(1); // TODO: manage life cycle
 
 	public AsterixBeanStateWorker(AsterixSettings settings, AsterixEventBus eventBus) {
-		this.beanRebindAttemptIntervalMillis = settings.getLong(AsterixSettings.BEAN_REBIND_ATTEMP_INTERVAL, 10_000L);
+		this.beanRebindAttemptIntervalMillis = settings.getLong(AsterixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 10_000L);
 	}
 	
 	public void add(StatefulAsterixBean<?> bean) {

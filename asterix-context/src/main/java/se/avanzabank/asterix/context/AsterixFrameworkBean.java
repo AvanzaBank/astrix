@@ -153,12 +153,12 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	 * All services consumed by the current application. Each type will be created and available
 	 * for autowiring in the current applicationContext.
 	 * 
-	 * Implementation note: This is only used defined usages of asterix beans. Any asterix-beans
-	 * used by the service-framework will not be included int this set. 
+	 * Implementation note: This is only application defined usages of asterix beans. Any asterix-beans
+	 * used internally by the service-framework will not be included in this set. 
 	 * 
 	 * @return
 	 */
-	public List<Class<?>> getConsumedApis() {
+	public List<Class<?>> getConsumedAsterixBeans() {
 		return consumedAsterixBeans;
 	}
 	
