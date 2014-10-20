@@ -15,6 +15,8 @@
  */
 package se.avanzabank.asterix.integration.tests;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -32,9 +34,9 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.openspaces.core.GigaSpace;
 
-import se.avanzabank.asterix.context.Asterix;
 import se.avanzabank.asterix.context.AsterixConfigurer;
 import se.avanzabank.asterix.context.AsterixContext;
+import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.IllegalSubsystemException;
 import se.avanzabank.asterix.integration.tests.domain.api.GetLunchRestaurantRequest;
@@ -46,6 +48,12 @@ import se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder.Internal
 import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
 import se.avanzabank.asterix.integration.tests.domain2.apiruntime.PublicLunchFeeder;
 import se.avanzabank.asterix.remoting.client.AsterixRemoteServiceException;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryClient;
+import se.avanzabank.asterix.test.util.AsterixTestUtil;
+import se.avanzabank.asterix.test.util.Poller;
+import se.avanzabank.asterix.test.util.Probe;
+import se.avanzabank.asterix.test.util.Supplier;
 import se.avanzabank.core.test.util.jndi.EmbeddedJndiServer;
 import se.avanzabank.core.test.util.jndi.JndiServerRule;
 import se.avanzabank.core.test.util.jndi.JndiServerRuleHook;
@@ -98,13 +106,13 @@ public class AsterixIntegrationTest {
 	private LunchServiceAsync asyncLunchService;
 	private PublicLunchFeeder publicLunchFeeder;
 	private AsterixContext asterix;
+	private AsterixServiceRegistryClient serviceRegistryClient;
 	
-	static {
-		// TODO: remove debugging information
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.WARN);
-		Logger.getLogger("se.avanzabank.asterix").setLevel(Level.DEBUG);
-	}
+//	static {
+//		BasicConfigurator.configure();
+//		Logger.getRootLogger().setLevel(Level.WARN);
+//		Logger.getLogger("se.avanzabank.asterix").setLevel(Level.DEBUG);
+//	}
 	
 	@Before
 	public void setup() throws Exception {
@@ -123,11 +131,13 @@ public class AsterixIntegrationTest {
 		this.lunchRestaurantGrader = asterix.getBean(LunchRestaurantGrader.class);
 		this.asyncLunchService = asterix.getBean(LunchServiceAsync.class);
 		this.publicLunchFeeder = asterix.getBean(PublicLunchFeeder.class);
+		this.serviceRegistryClient = asterix.getBean(AsterixServiceRegistryClient.class);
 		asterix.waitForBean(LunchService.class, 5000);
 		asterix.waitForBean(LunchUtil.class, 5000); // TODO: it does not make sense to wait for a library. How to cluelessly design waiting for libraries?
 		asterix.waitForBean(LunchRestaurantGrader.class, 5000);
 		asterix.waitForBean(LunchServiceAsync.class, 5000);
 		asterix.waitForBean(PublicLunchFeeder.class, 5000);
+		asterix.waitForBean(AsterixServiceRegistry.class, 5000);
 	}
 	
 	@Test
@@ -200,9 +210,33 @@ public class AsterixIntegrationTest {
 		LunchRestaurant r = f.get(300, TimeUnit.MILLISECONDS);
 		assertEquals("Martins Green Room", r.getName());
 	}
+
+	
+	// TODO: convert to focused integration-test of ServiceRegistryClient?
+	
+	@Test
+	public void leasesServices() throws Exception {
+		AsterixServiceProperties properties = new AsterixServiceProperties();
+		properties.setApi(FooService.class);
+		serviceRegistryClient.register(FooService.class, properties, 100);
+		
+		assertEventually(AsterixTestUtil.serviceInvocationResult(new Supplier<Object>() {
+			public Object get() {
+				return serviceRegistryClient.lookup(FooService.class);
+			};
+		}, is(nullValue())));
+	}
 	
 	@Test(expected = IllegalSubsystemException.class)
 	public void itsNotAllowedToCreateServicesBeansThatBindsToServicesInOtherSubSystems() throws Exception {
 		asterix.getBean(InternalLunchFeeder.class);
+	}
+	
+	private void assertEventually(Probe probe) throws InterruptedException {
+		new Poller(10_000, 10).check(probe);
+	}
+	
+	public interface FooService {
+		
 	}
 }

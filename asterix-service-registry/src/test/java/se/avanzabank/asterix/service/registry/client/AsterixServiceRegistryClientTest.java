@@ -18,8 +18,8 @@ package se.avanzabank.asterix.service.registry.client;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static se.avanzabank.asterix.context.AsterixTestUtil.serviceInvocationException;
-import static se.avanzabank.asterix.context.AsterixTestUtil.serviceInvocationResult;
+import static se.avanzabank.asterix.test.util.AsterixTestUtil.serviceInvocationException;
+import static se.avanzabank.asterix.test.util.AsterixTestUtil.serviceInvocationResult;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,15 +33,15 @@ import org.openspaces.remoting.Routing;
 import se.avanzabank.asterix.context.AsterixContext;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixSettings;
-import se.avanzabank.asterix.context.Poller;
-import se.avanzabank.asterix.context.Probe;
-import se.avanzabank.asterix.context.Supplier;
 import se.avanzabank.asterix.context.TestAsterixConfigurer;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.provider.library.AsterixExport;
 import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
 import se.avanzabank.asterix.service.registry.app.ServiceKey;
+import se.avanzabank.asterix.test.util.Poller;
+import se.avanzabank.asterix.test.util.Probe;
+import se.avanzabank.asterix.test.util.Supplier;
 
 
 public class AsterixServiceRegistryClientTest {

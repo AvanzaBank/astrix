@@ -13,12 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.context;
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface Supplier<T> {
-	T get();
+package se.avanzabank.asterix.test.util;
+
+
+public class Timeout {
+
+	private long endTimeMillis;
+
+	public Timeout(long timeoutMillis) {
+		this.endTimeMillis = currentTimeMillis() + timeoutMillis;
+	}
+
+	public boolean hasTimeout() {
+		return currentTimeMillis() >= endTimeMillis;
+	}
+
+	// test hook
+	long currentTimeMillis() {
+		return System.currentTimeMillis();
+	}
+	
 }

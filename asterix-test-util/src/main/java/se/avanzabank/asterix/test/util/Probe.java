@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.context;
+package se.avanzabank.asterix.test.util;
 
 import org.hamcrest.Description;
 

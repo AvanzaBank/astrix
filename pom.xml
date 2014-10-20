@@ -23,6 +23,7 @@
 		<module>asterix-service-registry-pu</module>
 		<module>asterix-remoting-component</module>
 		<module>asterix-monitoring</module>
+		<module>asterix-test-util</module>
 	</modules>
 	
 	<dependencyManagement>

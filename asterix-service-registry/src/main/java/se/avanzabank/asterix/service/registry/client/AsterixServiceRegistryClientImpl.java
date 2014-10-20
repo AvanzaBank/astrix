@@ -36,6 +36,9 @@ public class AsterixServiceRegistryClientImpl implements AsterixServiceRegistryC
 	@Override
 	public <T> AsterixServiceProperties lookup(@Routing Class<T> type, String qualifier) {
 		AsterixServiceRegistryEntry entry = serviceRegistry.lookup(type.getName(), qualifier);
+		if (entry == null) {
+			return null;
+		}
 		return new AsterixServiceProperties(entry.getServiceProperties());
 	}
 
