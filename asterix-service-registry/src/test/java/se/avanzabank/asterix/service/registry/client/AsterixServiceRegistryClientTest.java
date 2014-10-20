@@ -28,10 +28,8 @@ import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Test;
-import org.openspaces.remoting.Routing;
 
 import se.avanzabank.asterix.context.AsterixContext;
-import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.TestAsterixConfigurer;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
@@ -39,6 +37,7 @@ import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.provider.library.AsterixExport;
 import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
 import se.avanzabank.asterix.service.registry.app.ServiceKey;
+import se.avanzabank.asterix.service.registry.server.AsterixServiceRegistryEntry;
 import se.avanzabank.asterix.test.util.Poller;
 import se.avanzabank.asterix.test.util.Probe;
 import se.avanzabank.asterix.test.util.Supplier;
@@ -46,10 +45,11 @@ import se.avanzabank.asterix.test.util.Supplier;
 
 public class AsterixServiceRegistryClientTest {
 	
-	private static final long LEASE = 10_000L;
+	private static final long UNUSED_LEASE = 10_000L;
 	private AsterixDirectComponent directComponent;
-	private FakeServiceRegistry serviceRegistry;
+	private AsterixServiceRegistryClient serviceRegistryClient;
 	private AsterixContext context;
+	private FakeServiceRegistry fakeServiceRegistry;
 	
 //	static {
 //		// TODO: remove debugging information
@@ -65,15 +65,17 @@ public class AsterixServiceRegistryClientTest {
 		configurer.set(AsterixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 10);
 		configurer.registerApiDescriptor(GreetingApiDescriptor.class);
 		configurer.registerApiDescriptor(FakeServiceRegistryDescriptor.class);
+		configurer.registerApiDescriptor(AsterixServiceRegistryLibrary.class);
 		context = configurer.configure();
 		directComponent = context.getPluginInstance(AsterixDirectComponent.class);
-		serviceRegistry = (FakeServiceRegistry) context.getBean(AsterixServiceRegistryClient.class);
+		fakeServiceRegistry = (FakeServiceRegistry) context.getBean(AsterixServiceRegistry.class);
+		serviceRegistryClient = context.getBean(AsterixServiceRegistryClient.class);
 	}
 	
 	@Test
 	public void lookupService_serviceAvailableInRegistry_ServiceIsImmediatlyBound() throws Exception {
 		final String objectId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
-		serviceRegistry.register(GreetingService.class, directComponent.getServiceProperties(objectId), LEASE);
+		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(objectId), UNUSED_LEASE);
 		
 		GreetingService greetingService = context.getBean(GreetingService.class);
 		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), greetingService.hello("kalle"));
@@ -90,7 +92,7 @@ public class AsterixServiceRegistryClientTest {
 		} catch (ServiceUnavailableException e) {
 		}
 
-		serviceRegistry.register(GreetingService.class, directComponent.getServiceProperties(objectId), LEASE);
+		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(objectId), UNUSED_LEASE);
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
 			public String get() {
@@ -102,13 +104,13 @@ public class AsterixServiceRegistryClientTest {
 	@Test
 	public void serviceIsReboundIfServiceIsMovedInRegistry() throws Exception {
 		final String providerId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
-		serviceRegistry.register(GreetingService.class, directComponent.getServiceProperties(providerId), LEASE);
+		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(providerId), UNUSED_LEASE);
 		
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		assertEquals("hello: kalle", dummyService.hello("kalle"));
 		
 		final String newProviderId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hej: "));
-		serviceRegistry.register(GreetingService.class, directComponent.getServiceProperties(newProviderId), LEASE);
+		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(newProviderId), UNUSED_LEASE);
 		
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
@@ -121,12 +123,12 @@ public class AsterixServiceRegistryClientTest {
 	@Test
 	public void whenServiceIsRemovedFromRegistryItShouldStartThrowingServiceUnavailable() throws Exception {
 		final String providerId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
-		serviceRegistry.register(GreetingService.class, directComponent.getServiceProperties(providerId), LEASE);
+		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(providerId), UNUSED_LEASE);
 		
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		assertEquals("hello: kalle", dummyService.hello("kalle"));
 		
-		serviceRegistry.clear();
+		fakeServiceRegistry.clear(); // Simulate lease expiry
 		
 		assertEventually(serviceInvocationException(new Supplier<String>() {
 			@Override
@@ -152,26 +154,26 @@ public class AsterixServiceRegistryClientTest {
 	@AsterixLibraryProvider
 	public static class FakeServiceRegistryDescriptor {
 		@AsterixExport
-		public AsterixServiceRegistryClient create() {
+		public AsterixServiceRegistry create() {
 			return new FakeServiceRegistry();
 		}
 	}
 	
-	static class FakeServiceRegistry implements AsterixServiceRegistryClient {
+	static class FakeServiceRegistry implements AsterixServiceRegistry {
 		
-		private Map<ServiceKey, AsterixServiceProperties> servicePropertiesByKey = new ConcurrentHashMap<>();
+		private Map<ServiceKey, AsterixServiceRegistryEntry> servicePropertiesByKey = new ConcurrentHashMap<>();
 		
 		@Override
-		public <T> AsterixServiceProperties lookup(@Routing Class<T> type) {
-			return this.servicePropertiesByKey.get(new ServiceKey(type.getName()));
+		public <T> AsterixServiceRegistryEntry lookup(String type) {
+			return this.servicePropertiesByKey.get(new ServiceKey(type));
 		}
 		@Override
-		public <T> AsterixServiceProperties lookup(@Routing Class<T> type, String qualifier) {
-			return this.servicePropertiesByKey.get(new ServiceKey(type.getName(), qualifier));
+		public <T> AsterixServiceRegistryEntry lookup(String type, String qualifier) {
+			return this.servicePropertiesByKey.get(new ServiceKey(type, qualifier));
 		}
 		@Override
-		public <T> void register(@Routing Class<T> type, AsterixServiceProperties properties, long lease) {
-			this.servicePropertiesByKey.put(new ServiceKey(type.getName(), properties.getQualifier()), properties);
+		public <T> void register(AsterixServiceRegistryEntry properties, long lease) {
+			this.servicePropertiesByKey.put(new ServiceKey(properties.getServiceBeanType(), properties.getQualifier()), properties);
 		}
 		
 		public void clear() {
