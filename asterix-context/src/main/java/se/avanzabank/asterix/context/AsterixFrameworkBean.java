@@ -36,6 +36,7 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	
 	private List<Class<?>> consumedAsterixBeans = new ArrayList<>();
 	private Class<?> serviceDescriptorHolder;
+	private String subsystem;
 	private Map<String, String> settings = new HashMap<>();
 
 	/*
@@ -104,6 +105,9 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		if (this.serviceDescriptorHolder != null) {
 			AsterixService service = this.serviceDescriptorHolder.getAnnotation(AsterixService.class);
 			configurer.setSubsystem(service.subsystem());
+		} else if (this.subsystem != null) {
+			// TODO: use same mechanism to set subsystem for both applications that only consume apis and for apps providing services
+			configurer.setSubsystem(this.subsystem);
 		}
 		AsterixContext asterixContext = configurer.configure();
 		
@@ -157,5 +161,11 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	public List<Class<?>> getConsumedApis() {
 		return consumedAsterixBeans;
 	}
+	
+	public void setSubsystem(String subsystem) {
+		this.subsystem = subsystem;
+	}
+	
+	
 	
 }
