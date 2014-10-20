@@ -19,19 +19,18 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static se.avanzabank.asterix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
 
+import java.util.Properties;
+import java.util.Random;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
 import org.openspaces.core.GigaSpace;
 
 import se.avanzabank.asterix.context.AsterixConfigurer;
@@ -54,9 +53,6 @@ import se.avanzabank.asterix.test.util.AsterixTestUtil;
 import se.avanzabank.asterix.test.util.Poller;
 import se.avanzabank.asterix.test.util.Probe;
 import se.avanzabank.asterix.test.util.Supplier;
-import se.avanzabank.core.test.util.jndi.EmbeddedJndiServer;
-import se.avanzabank.core.test.util.jndi.JndiServerRule;
-import se.avanzabank.core.test.util.jndi.JndiServerRuleHook;
 import se.avanzabank.space.UsesLookupGroupsSpaceLocator;
 import se.avanzabank.space.junit.pu.PuConfigurers;
 import se.avanzabank.space.junit.pu.RunningPu;
@@ -68,9 +64,23 @@ import se.avanzabank.space.junit.pu.RunningPu;
 public class AsterixIntegrationTest {
 	
 	@ClassRule
+	public static RunningPu serviceRegistrypu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
+															.numberOfPrimaries(1)
+															.numberOfBackups(0)
+															.beanProperties("space", new Properties() {{
+																// Run lease-manager thread every 200 ms.
+																setProperty("space-config.lease_manager.expiration_time_interval", "200");
+															}})
+															.startAsync(true)
+															.configure();
+	
+	@ClassRule
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
+											  .contextProperties(new Properties() {{
+											     setProperty("lookupGroup", serviceRegistrypu.getLookupGroupName());
+											   }})
 											  .startAsync(true)
 											  .configure();
 	
@@ -78,28 +88,12 @@ public class AsterixIntegrationTest {
 	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
 														.numberOfPrimaries(1)
 														.numberOfBackups(0)
+														.contextProperties(new Properties() {{
+														    setProperty("lookupGroup", serviceRegistrypu.getLookupGroupName());
+														}})
 														.startAsync(true)
 														.configure();
 
-	public static RunningPu serviceRegistrypu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
-													  .numberOfPrimaries(1)
-													  .numberOfBackups(0)
-													  .startAsync(true)
-													  .configure();
-
-	
-	public static JndiServerRule jndi = new JndiServerRule(new JndiServerRuleHook() {
-		@Override
-		public void afterStart(EmbeddedJndiServer jndiServer) {
-			jndiServer.addValueEntry("service-registry-space", "jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
-		}
-	});
-
-	@ClassRule
-	public static RuleChain order = RuleChain.outerRule(serviceRegistrypu).around(jndi);
-
-	
-	
 	private LunchService lunchService;
 	private LunchUtil lunchUtil;
 	private LunchRestaurantGrader lunchRestaurantGrader;
@@ -211,14 +205,14 @@ public class AsterixIntegrationTest {
 		assertEquals("Martins Green Room", r.getName());
 	}
 
-	
-	// TODO: convert to focused integration-test of ServiceRegistryClient?
-	
 	@Test
 	public void leasesServices() throws Exception {
 		AsterixServiceProperties properties = new AsterixServiceProperties();
 		properties.setApi(FooService.class);
-		serviceRegistryClient.register(FooService.class, properties, 100);
+		serviceRegistryClient.register(FooService.class, properties, 1000);
+		
+		AsterixServiceProperties props = serviceRegistryClient.lookup(FooService.class);
+		assertNotNull("Expected properties to exists after registreation", props);
 		
 		assertEventually(AsterixTestUtil.serviceInvocationResult(new Supplier<Object>() {
 			public Object get() {
