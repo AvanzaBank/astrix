@@ -15,8 +15,8 @@
  */
 package se.avanzabank.asterix.context;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import se.avanzabank.asterix.provider.core.AsterixService;
 /**
@@ -28,14 +28,15 @@ public class AsterixServiceDescriptor {
 
 	private final Class<?> descriptorHolder;
 	private final AsterixService asterixService;
-	private final Map<Class<?>, AsterixApiDescriptor> apiDescriptorByProvideService;
-	private final String subsystem;
+	private final Collection<AsterixApiDescriptor> apiDescriptors;
 
-	public AsterixServiceDescriptor(AsterixService asterixService, Class<?> descriptorHolder, Map<Class<?>, AsterixApiDescriptor> apiDescriptorByProvideService) {
+	public AsterixServiceDescriptor(AsterixService asterixService, Class<?> descriptorHolder) {
 		this.asterixService = asterixService;
 		this.descriptorHolder = descriptorHolder;
-		this.apiDescriptorByProvideService = apiDescriptorByProvideService;
-		this.subsystem = asterixService.subsystem();
+		this.apiDescriptors = new ArrayList<>(asterixService.apiDescriptors().length);
+		for (Class<?> desc : this.asterixService.apiDescriptors()) {
+			this.apiDescriptors.add(new AsterixApiDescriptor(desc));
+		}
 	}
 	
 	// To simplify creating using srping bean definitions
@@ -43,16 +44,9 @@ public class AsterixServiceDescriptor {
 		return asterixServiceDescriptor;
 	}
 	
-	public static AsterixServiceDescriptor create(Class<?> descriptorHolder, AsterixContext context) {
+	public static AsterixServiceDescriptor create(Class<?> descriptorHolder) {
 		AsterixService asterixService = descriptorHolder.getAnnotation(AsterixService.class);
-		Map<Class<?>, AsterixApiDescriptor> apiDescriptorByProvideService = new HashMap<>();
-		for (Class<?> apiDescriptorHolder : asterixService.apiDescriptors()) {
-			AsterixApiDescriptor apiDescriptor = new AsterixApiDescriptor(apiDescriptorHolder);
-			for (Class<?> beanType : context.getExportedBeans(apiDescriptor)) {
-				apiDescriptorByProvideService.put(beanType, apiDescriptor);
-			}
-		}
-		return new AsterixServiceDescriptor(asterixService, descriptorHolder, apiDescriptorByProvideService);
+		return new AsterixServiceDescriptor(asterixService, descriptorHolder);
 	}
 	
 	@Override
@@ -64,14 +58,6 @@ public class AsterixServiceDescriptor {
 		return descriptorHolder;
 	}
 
-	public AsterixApiDescriptor getApiDescriptor(Class<?> serviceType) {
-		AsterixApiDescriptor result = this.apiDescriptorByProvideService.get(serviceType);
-		if (result == null) {
-			throw new IllegalArgumentException("Service descriptor does not export service. descriptor: " + getHolder().getName() + ", service: " + serviceType.getName());
-		}
-		return result;
-	}
-
 	/**
 	 * Default component used for services exported to service registry.
 	 * @return
@@ -80,8 +66,12 @@ public class AsterixServiceDescriptor {
 		return asterixService.component();
 	}
 
-	public boolean publishesService(Class<?> providedServiceType) {
-		return this.apiDescriptorByProvideService.containsKey(providedServiceType);
+	public Collection<AsterixApiDescriptor> getApiDescriptors() {
+		return this.apiDescriptors;
+	}
+
+	public String getSubsystem() {
+		return this.asterixService.subsystem();
 	}
 	
 }

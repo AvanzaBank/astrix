@@ -25,8 +25,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 
-import se.avanzabank.asterix.provider.core.AsterixService;
-
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -35,9 +33,9 @@ import se.avanzabank.asterix.provider.core.AsterixService;
 public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor {
 	
 	private List<Class<?>> consumedAsterixBeans = new ArrayList<>();
-	private Class<?> serviceDescriptorHolder;
 	private String subsystem;
 	private Map<String, String> settings = new HashMap<>();
+	private AsterixServiceDescriptor serviceDescriptor;
 
 	/*
 	 * We must distinguish between server-side components (those used to export different SERVICES) and
@@ -102,9 +100,8 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	private void createServiceFrameworkRuntime(BeanDefinitionRegistry registry) throws ClassNotFoundException {
 		AsterixConfigurer configurer = new AsterixConfigurer();
 		configurer.setSettings(this.settings);
-		if (this.serviceDescriptorHolder != null) {
-			AsterixService service = this.serviceDescriptorHolder.getAnnotation(AsterixService.class);
-			configurer.setSubsystem(service.subsystem());
+		if (this.serviceDescriptor != null) {
+			configurer.setSubsystem(this.serviceDescriptor.getSubsystem());
 		} else if (this.subsystem != null) {
 			// TODO: use same mechanism to set subsystem for both applications that only consume apis and for apps providing services
 			configurer.setSubsystem(this.subsystem);
@@ -112,10 +109,10 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		AsterixContext asterixContext = configurer.configure();
 		
 		List<Class<?>> consumedAsterixBeans = new ArrayList<>(this.consumedAsterixBeans);
-		AsterixServerRuntimeBuilder serverRuntimeBuilder = new AsterixServerRuntimeBuilder(asterixContext.getPlugins());
-		if (serviceDescriptorHolder != null) {
+		AsterixServerRuntimeBuilder serverRuntimeBuilder = new AsterixServerRuntimeBuilder(asterixContext, serviceDescriptor);
+		if (serviceDescriptor != null) {
 			// This application exports services, build server runtime
-			serverRuntimeBuilder.registerBeanDefinitions(registry, AsterixServiceDescriptor.create(serviceDescriptorHolder, asterixContext));
+			serverRuntimeBuilder.registerBeanDefinitions(registry);
 			consumedAsterixBeans.addAll(serverRuntimeBuilder.getConsumedAsterixBeans());
 		}
 		AsterixClientRuntimeBuilder clientRuntimeBuilder = new AsterixClientRuntimeBuilder(asterixContext, this.settings, consumedAsterixBeans);
@@ -146,7 +143,7 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	 * @param serviceDescriptor
 	 */
 	public void setServiceDescriptor(Class<?> serviceDescriptorHolder) {
-		this.serviceDescriptorHolder = serviceDescriptorHolder;
+		this.serviceDescriptor = AsterixServiceDescriptor.create(serviceDescriptorHolder);
 	}
 	
 	/**

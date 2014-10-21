@@ -359,5 +359,9 @@ public class AsterixContext implements Asterix {
 	public String getCurrentSubsystem() {
 		return this.currentSubsystem;
 	}
+
+	public <T> T getPlugin(Class<T> pluginType) {
+		return getPlugins().getPlugin(pluginType);
+	}
 	
 }

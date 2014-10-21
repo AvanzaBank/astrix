@@ -17,8 +17,10 @@ package se.avanzabank.asterix.context;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.MutablePropertyValues;
@@ -37,14 +39,23 @@ import se.avanzabank.asterix.provider.core.AsterixServiceExport;
  */
 public class AsterixServerRuntimeBuilder {
 	
-	private AsterixPlugins asterixPlugins;
-	private List<Class<?>> consumedAsterixBeans = new ArrayList<>(1);
+	private final AsterixContext asterixContext;
+	private final List<Class<?>> consumedAsterixBeans = new ArrayList<>(1);
+	private final Map<Class<?>, AsterixApiDescriptor> apiDescriptorByProvideService;
+	private final AsterixServiceDescriptor serviceDescriptor;
 	
-	public AsterixServerRuntimeBuilder(AsterixPlugins asterixPlugins) {
-		this.asterixPlugins = asterixPlugins;
+	public AsterixServerRuntimeBuilder(AsterixContext asterixContext, AsterixServiceDescriptor serviceDescriptor) {
+		this.asterixContext = asterixContext;
+		this.serviceDescriptor = serviceDescriptor;
+		this.apiDescriptorByProvideService = new HashMap<>();
+		for (AsterixApiDescriptor apiDescriptor : serviceDescriptor.getApiDescriptors()) {
+			for (Class<?> beanType : asterixContext.getExportedBeans(apiDescriptor)) {
+				apiDescriptorByProvideService.put(beanType, apiDescriptor);
+			}
+		}
 	}
 	
-	public void registerBeanDefinitions(BeanDefinitionRegistry registry, final AsterixServiceDescriptor serviceDescriptor) throws ClassNotFoundException {
+	public void registerBeanDefinitions(BeanDefinitionRegistry registry) throws ClassNotFoundException {
 		// Register service-descriptor
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceDescriptor.class);
 		beanDefinition.setConstructorArgumentValues(new ConstructorArgumentValues(){{
@@ -72,7 +83,7 @@ public class AsterixServerRuntimeBuilder {
 			}
 		}
 		if (!publishedOnServiceRegistryServices.isEmpty()) {
-			AsterixServiceRegistryPlugin serviceRegistryPlugin = asterixPlugins.getPlugin(AsterixServiceRegistryPlugin.class);
+			AsterixServiceRegistryPlugin serviceRegistryPlugin = asterixContext.getPlugin(AsterixServiceRegistryPlugin.class);
 			serviceRegistryPlugin.registerBeanDefinitions(registry, publishedOnServiceRegistryServices);
 			this.consumedAsterixBeans.addAll(serviceRegistryPlugin.getConsumedBeanTypes());
 		}
@@ -91,7 +102,7 @@ public class AsterixServerRuntimeBuilder {
 		Set<AsterixServiceComponent> result = new HashSet<>();
 		for (AsterixExportedServiceInfo serviceInfo : exportedServiceInfos) {
 			String componentName = serviceInfo.getComponentName();
-			result.add(asterixPlugins.getPlugin(AsterixServiceComponents.class).getComponent(componentName));
+			result.add(asterixContext.getPlugin(AsterixServiceComponents.class).getComponent(componentName));
 		}
 		return result;
 	}
@@ -106,10 +117,10 @@ public class AsterixServerRuntimeBuilder {
 			}
 			AsterixServiceExport serviceExport = possibleBeanType.getAnnotation(AsterixServiceExport.class);
 			for (Class<?> providedServiceType : serviceExport.value()) {
-				if (!serviceDescriptor.publishesService(providedServiceType)) {
+				if (!publishesService(providedServiceType)) {
 					continue;
 				}
-				AsterixApiDescriptor apiDescriptor = serviceDescriptor.getApiDescriptor(providedServiceType);
+				AsterixApiDescriptor apiDescriptor = getApiDescriptor(providedServiceType);
 				if (apiDescriptor.usesServiceRegistry()) {
 					result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, serviceDescriptor.getComponent(), beanName));
 				} else {
@@ -120,9 +131,21 @@ public class AsterixServerRuntimeBuilder {
 		}
 		return result;
 	}
+	
+	private AsterixApiDescriptor getApiDescriptor(Class<?> serviceType) {
+		AsterixApiDescriptor result = this.apiDescriptorByProvideService.get(serviceType);
+		if (result == null) {
+			throw new IllegalArgumentException("Service descriptor does not export service. descriptor: " + serviceDescriptor.getClass().getName() + ", service: " + serviceType.getName());
+		}
+		return result;
+	}
+	
+	private boolean publishesService(Class<?> providedServiceType) {
+		return this.apiDescriptorByProvideService.containsKey(providedServiceType);
+	}
 
 	private String getServiceComponent(AsterixApiDescriptor apiDescriptor) {
-		return this.asterixPlugins.getPlugin(AsterixServiceComponents.class).getComponent(apiDescriptor).getName();
+		return this.asterixContext.getPlugin(AsterixServiceComponents.class).getComponent(apiDescriptor).getName();
 	}
 
 	/**

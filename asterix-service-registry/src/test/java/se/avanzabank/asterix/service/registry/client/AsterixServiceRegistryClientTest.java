@@ -49,7 +49,7 @@ public class AsterixServiceRegistryClientTest {
 	private AsterixDirectComponent directComponent;
 	private AsterixServiceRegistryClient serviceRegistryClient;
 	private AsterixContext context;
-	private FakeServiceRegistry fakeServiceRegistry;
+	private InMemoryServiceRegistry fakeServiceRegistry;
 	
 //	static {
 //		// TODO: remove debugging information
@@ -64,11 +64,11 @@ public class AsterixServiceRegistryClientTest {
 		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 10);
 		configurer.set(AsterixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 10);
 		configurer.registerApiDescriptor(GreetingApiDescriptor.class);
-		configurer.registerApiDescriptor(FakeServiceRegistryDescriptor.class);
+		configurer.registerApiDescriptor(InMemoryServiceRegistryDescriptor.class);
 		configurer.registerApiDescriptor(AsterixServiceRegistryLibrary.class);
 		context = configurer.configure();
 		directComponent = context.getPluginInstance(AsterixDirectComponent.class);
-		fakeServiceRegistry = (FakeServiceRegistry) context.getBean(AsterixServiceRegistry.class);
+		fakeServiceRegistry = (InMemoryServiceRegistry) context.getBean(AsterixServiceRegistry.class);
 		serviceRegistryClient = context.getBean(AsterixServiceRegistryClient.class);
 	}
 	
@@ -152,14 +152,14 @@ public class AsterixServiceRegistryClientTest {
 	}
 	
 	@AsterixLibraryProvider
-	public static class FakeServiceRegistryDescriptor {
+	public static class InMemoryServiceRegistryDescriptor {
 		@AsterixExport
 		public AsterixServiceRegistry create() {
-			return new FakeServiceRegistry();
+			return new InMemoryServiceRegistry();
 		}
 	}
 	
-	static class FakeServiceRegistry implements AsterixServiceRegistry {
+	static class InMemoryServiceRegistry implements AsterixServiceRegistry {
 		
 		private Map<ServiceKey, AsterixServiceRegistryEntry> servicePropertiesByKey = new ConcurrentHashMap<>();
 		

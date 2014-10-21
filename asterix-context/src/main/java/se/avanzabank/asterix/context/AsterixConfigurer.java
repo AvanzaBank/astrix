@@ -154,7 +154,6 @@ public class AsterixConfigurer {
 	// package private. Used for internal testing only
 	<T> void registerPlugin(Class<T> c, T provider) {
 		plugins .add(new PluginHolder<>(c, provider));
-//		context.registerPlugin(c, provider);
 	}
 
 	public void set(String settingName, long value) {
