@@ -57,7 +57,7 @@ public class AsterixDirectComponent implements AsterixServiceComponent {
 		 // NOT USED. Client side component only 
 	}
 
-	public <T> String register(Class<T> type, T provider) {
+	public static <T> String register(Class<T> type, T provider) {
 		String id = String.valueOf(idGen.incrementAndGet());
 		providerById.put(id, new ServiceProvider<T>(id, type, provider));
 		return id;

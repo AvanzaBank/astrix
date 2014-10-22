@@ -109,9 +109,9 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		AsterixContext asterixContext = configurer.configure();
 		
 		List<Class<?>> consumedAsterixBeans = new ArrayList<>(this.consumedAsterixBeans);
-		AsterixServerRuntimeBuilder serverRuntimeBuilder = new AsterixServerRuntimeBuilder(asterixContext, serviceDescriptor);
 		if (serviceDescriptor != null) {
 			// This application exports services, build server runtime
+			AsterixServerRuntimeBuilder serverRuntimeBuilder = new AsterixServerRuntimeBuilder(asterixContext, serviceDescriptor);
 			serverRuntimeBuilder.registerBeanDefinitions(registry);
 			consumedAsterixBeans.addAll(serverRuntimeBuilder.getConsumedAsterixBeans());
 		}

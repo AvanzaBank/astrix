@@ -15,13 +15,13 @@
  */
 package se.avanzabank.asterix.service.registry.client;
 
-import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
+import se.avanzabank.asterix.provider.core.AsterixJndiApi;
 import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 
 /**
  * The service registry api uses asterix-remoting to export its service. Note that
- * it doesn't use the service registry to bind to the providers, but rather uses a
- * SpaceLocator and the space-name provided here. 
+ * it doesn't use the service registry to bind to the providers, but rather uses
+ * jndi lookup to locate a provider for the registry.
  * 
  * @author Elias Lindholm (elilin)
  *
@@ -31,11 +31,9 @@ import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 	objectMapperConfigurer = ServiceRegistryObjectMapperConfigurer.class,
 	version = 1
 )
-@AsterixRemoteApiDescriptor (
-	exportedApis = {
-		AsterixServiceRegistry.class,
-	},
-	targetSpaceName = "service-registry-space"
+@AsterixJndiApi(
+	exportedApi = AsterixServiceRegistry.class,
+	entryName = "asterixServiceRegistry"
 )
 public class AsterixServiceRegistryApiDescriptor {
 }

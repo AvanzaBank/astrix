@@ -21,9 +21,6 @@ import static org.junit.Assert.fail;
 import static se.avanzabank.asterix.test.util.AsterixTestUtil.serviceInvocationException;
 import static se.avanzabank.asterix.test.util.AsterixTestUtil.serviceInvocationResult;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
@@ -36,8 +33,7 @@ import se.avanzabank.asterix.core.ServiceUnavailableException;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.provider.library.AsterixExport;
 import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
-import se.avanzabank.asterix.service.registry.app.ServiceKey;
-import se.avanzabank.asterix.service.registry.server.AsterixServiceRegistryEntry;
+import se.avanzabank.asterix.service.registry.util.InMemoryServiceRegistry;
 import se.avanzabank.asterix.test.util.Poller;
 import se.avanzabank.asterix.test.util.Probe;
 import se.avanzabank.asterix.test.util.Supplier;
@@ -74,7 +70,7 @@ public class AsterixServiceRegistryClientTest {
 	
 	@Test
 	public void lookupService_serviceAvailableInRegistry_ServiceIsImmediatlyBound() throws Exception {
-		final String objectId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		final String objectId = AsterixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(objectId), UNUSED_LEASE);
 		
 		GreetingService greetingService = context.getBean(GreetingService.class);
@@ -83,7 +79,7 @@ public class AsterixServiceRegistryClientTest {
 	
 	@Test
 	public void lookupService_ServiceAvailableInRegistryButItsNotPossibleToBindToIt_ServiceIsBoundWhenServiceBecamesAvailable() throws Exception {
-		final String objectId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		final String objectId = AsterixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		
 		try {
@@ -103,13 +99,13 @@ public class AsterixServiceRegistryClientTest {
 	
 	@Test
 	public void serviceIsReboundIfServiceIsMovedInRegistry() throws Exception {
-		final String providerId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		final String providerId = AsterixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(providerId), UNUSED_LEASE);
 		
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		assertEquals("hello: kalle", dummyService.hello("kalle"));
 		
-		final String newProviderId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hej: "));
+		final String newProviderId = AsterixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hej: "));
 		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(newProviderId), UNUSED_LEASE);
 		
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
@@ -122,7 +118,7 @@ public class AsterixServiceRegistryClientTest {
 	
 	@Test
 	public void whenServiceIsRemovedFromRegistryItShouldStartThrowingServiceUnavailable() throws Exception {
-		final String providerId = directComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		final String providerId = AsterixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(providerId), UNUSED_LEASE);
 		
 		final GreetingService dummyService = context.getBean(GreetingService.class);
@@ -156,28 +152,6 @@ public class AsterixServiceRegistryClientTest {
 		@AsterixExport
 		public AsterixServiceRegistry create() {
 			return new InMemoryServiceRegistry();
-		}
-	}
-	
-	static class InMemoryServiceRegistry implements AsterixServiceRegistry {
-		
-		private Map<ServiceKey, AsterixServiceRegistryEntry> servicePropertiesByKey = new ConcurrentHashMap<>();
-		
-		@Override
-		public <T> AsterixServiceRegistryEntry lookup(String type) {
-			return this.servicePropertiesByKey.get(new ServiceKey(type));
-		}
-		@Override
-		public <T> AsterixServiceRegistryEntry lookup(String type, String qualifier) {
-			return this.servicePropertiesByKey.get(new ServiceKey(type, qualifier));
-		}
-		@Override
-		public <T> void register(AsterixServiceRegistryEntry properties, long lease) {
-			this.servicePropertiesByKey.put(new ServiceKey(properties.getServiceBeanType(), properties.getQualifier()), properties);
-		}
-		
-		public void clear() {
-			this.servicePropertiesByKey.clear();
 		}
 	}
 	

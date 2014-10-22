@@ -70,14 +70,16 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 			try {
 				exportProvidedServcies();
 				exportIntervallMillis = 60_000;
-				sleep(exportIntervallMillis);// TODO: interval of lease renewal
-			} catch (InterruptedException e) {
-				interrupt();
 			} catch (ServiceUnavailableException e) {
 				// No bound to service registry
 				log.info("Failed to export serivces to registry", e);
 				exportIntervallMillis = 250; // TODO: interval when service registry not available?
 			} 
+			try {
+				sleep(exportIntervallMillis); // TODO: interval of lease renewal
+			} catch (InterruptedException e) {
+				interrupt();
+			}
 		}
 	}
 
