@@ -21,8 +21,8 @@ public interface Asterix {
 
 	<T> T getBean(Class<T> beanType);
 
-	void waitForBean(Class<?> type, long timeoutMillis) throws InterruptedException;
+	<T> T waitForBean(Class<T> type, long timeoutMillis) throws InterruptedException;
 
-	void waitForBean(Class<?> beanType, String qualifier, long timeoutMillis) throws InterruptedException;
+	<T> T waitForBean(Class<T> beanType, String qualifier, long timeoutMillis) throws InterruptedException;
 
 }

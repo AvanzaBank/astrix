@@ -216,13 +216,17 @@ public class AsterixContext implements Asterix {
 	}
 
 	@Override
-	public void waitForBean(Class<?> beanType, long timeoutMillis) throws InterruptedException {
+	public <T> T waitForBean(Class<T> beanType, long timeoutMillis) throws InterruptedException {
+		T result = getBean(beanType);
 		waitForBeanToBeBound(AsterixBeanKey.create(beanType, null), timeoutMillis);
+		return result;
 	}
 	
 	@Override
-	public void waitForBean(Class<?> beanType, String qualifier, long timeoutMillis) throws InterruptedException {
+	public <T> T waitForBean(Class<T> beanType, String qualifier, long timeoutMillis) throws InterruptedException {
+		T result = getBean(beanType, qualifier);
 		waitForBeanToBeBound(AsterixBeanKey.create(beanType, qualifier), timeoutMillis);
+		return result;
 	}
 	
 	private void waitForBeanToBeBound(AsterixBeanKey beanKey, long timeoutMillis) throws InterruptedException {
