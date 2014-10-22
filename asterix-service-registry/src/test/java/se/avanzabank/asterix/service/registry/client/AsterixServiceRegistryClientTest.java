@@ -42,7 +42,6 @@ import se.avanzabank.asterix.test.util.Supplier;
 public class AsterixServiceRegistryClientTest {
 	
 	private static final long UNUSED_LEASE = 10_000L;
-	private AsterixDirectComponent directComponent;
 	private AsterixServiceRegistryClient serviceRegistryClient;
 	private AsterixContext context;
 	private InMemoryServiceRegistry fakeServiceRegistry;
@@ -63,7 +62,6 @@ public class AsterixServiceRegistryClientTest {
 		configurer.registerApiDescriptor(InMemoryServiceRegistryDescriptor.class);
 		configurer.registerApiDescriptor(AsterixServiceRegistryLibrary.class);
 		context = configurer.configure();
-		directComponent = context.getPluginInstance(AsterixDirectComponent.class);
 		fakeServiceRegistry = (InMemoryServiceRegistry) context.getBean(AsterixServiceRegistry.class);
 		serviceRegistryClient = context.getBean(AsterixServiceRegistryClient.class);
 	}
@@ -71,7 +69,7 @@ public class AsterixServiceRegistryClientTest {
 	@Test
 	public void lookupService_serviceAvailableInRegistry_ServiceIsImmediatlyBound() throws Exception {
 		final String objectId = AsterixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
-		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(objectId), UNUSED_LEASE);
+		serviceRegistryClient.register(GreetingService.class, AsterixDirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
 		
 		GreetingService greetingService = context.getBean(GreetingService.class);
 		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), greetingService.hello("kalle"));
@@ -88,7 +86,7 @@ public class AsterixServiceRegistryClientTest {
 		} catch (ServiceUnavailableException e) {
 		}
 
-		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(objectId), UNUSED_LEASE);
+		serviceRegistryClient.register(GreetingService.class, AsterixDirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
 			public String get() {
@@ -100,13 +98,13 @@ public class AsterixServiceRegistryClientTest {
 	@Test
 	public void serviceIsReboundIfServiceIsMovedInRegistry() throws Exception {
 		final String providerId = AsterixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
-		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(providerId), UNUSED_LEASE);
+		serviceRegistryClient.register(GreetingService.class, AsterixDirectComponent.getServiceProperties(providerId), UNUSED_LEASE);
 		
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		assertEquals("hello: kalle", dummyService.hello("kalle"));
 		
 		final String newProviderId = AsterixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hej: "));
-		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(newProviderId), UNUSED_LEASE);
+		serviceRegistryClient.register(GreetingService.class, AsterixDirectComponent.getServiceProperties(newProviderId), UNUSED_LEASE);
 		
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
@@ -119,7 +117,7 @@ public class AsterixServiceRegistryClientTest {
 	@Test
 	public void whenServiceIsRemovedFromRegistryItShouldStartThrowingServiceUnavailable() throws Exception {
 		final String providerId = AsterixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
-		serviceRegistryClient.register(GreetingService.class, directComponent.getServiceProperties(providerId), UNUSED_LEASE);
+		serviceRegistryClient.register(GreetingService.class, AsterixDirectComponent.getServiceProperties(providerId), UNUSED_LEASE);
 		
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		assertEquals("hello: kalle", dummyService.hello("kalle"));

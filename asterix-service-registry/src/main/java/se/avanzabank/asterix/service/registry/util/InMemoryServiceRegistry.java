@@ -60,7 +60,7 @@ public class InMemoryServiceRegistry implements AsterixServiceRegistry {
 		return AsterixServiceRegistryApiDescriptor.class.getAnnotation(AsterixJndiApi.class).entryName();
 	}
 	public Properties getJndiProperties() {
-		AsterixServiceProperties properties = new AsterixDirectComponent().getServiceProperties(id);
+		AsterixServiceProperties properties = AsterixDirectComponent.getServiceProperties(id);
 		Properties result = new Properties();
 		result.putAll(properties.getProperties());
 		return result;

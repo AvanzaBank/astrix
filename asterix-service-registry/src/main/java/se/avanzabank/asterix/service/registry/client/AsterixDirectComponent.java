@@ -63,7 +63,7 @@ public class AsterixDirectComponent implements AsterixServiceComponent {
 		return id;
 	}
 	
-	public AsterixServiceProperties getServiceProperties(String id) {
+	public static AsterixServiceProperties getServiceProperties(String id) {
 		ServiceProvider<?> provider = providerById.get(id);
 		if (provider == null) {
 			throw new IllegalArgumentException("No provider registered with id: " + id);
