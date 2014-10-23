@@ -15,8 +15,12 @@
  */
 package se.avanzabank.asterix.ft;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,8 +37,8 @@ import se.avanzabank.asterix.core.ServiceUnavailableException;
 import se.avanzabank.asterix.ft.service.SimpleService;
 import se.avanzabank.asterix.ft.service.SimpleServiceException;
 import se.avanzabank.asterix.ft.service.SimpleServiceImpl;
-import se.avanzabank.core.test.util.async.Poller;
-import se.avanzabank.core.test.util.async.Probe;
+import se.avanzabank.asterix.test.util.Poller;
+import se.avanzabank.asterix.test.util.Probe;
 
 import com.google.common.base.Throwables;
 

@@ -33,9 +33,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>se.avanzabank.core</groupId>
-			<artifactId>core-test-util</artifactId>
-			<version>DEVEL-SNAPSHOT</version>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>asterix-test-util</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
