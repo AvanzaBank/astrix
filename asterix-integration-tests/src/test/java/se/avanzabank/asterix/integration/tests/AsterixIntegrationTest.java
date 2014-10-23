@@ -63,7 +63,6 @@ import se.avanzabank.asterix.test.util.Supplier;
 import se.avanzabank.core.test.util.jndi.EmbeddedJndiServer;
 import se.avanzabank.core.test.util.jndi.JndiServerRule;
 import se.avanzabank.core.test.util.jndi.JndiServerRuleHook;
-import se.avanzabank.space.UsesLookupGroupsSpaceLocator;
 import se.avanzabank.space.junit.pu.PuConfigurers;
 import se.avanzabank.space.junit.pu.RunningPu;
 /**
@@ -88,9 +87,6 @@ public class AsterixIntegrationTest {
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
-											  .contextProperties(new Properties() {{
-											     setProperty("lookupGroup", serviceRegistrypu.getLookupGroupName());
-											   }})
 											  .startAsync(true)
 											  .configure();
 	
@@ -98,9 +94,6 @@ public class AsterixIntegrationTest {
 	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
 														.numberOfPrimaries(1)
 														.numberOfBackups(0)
-														.contextProperties(new Properties() {{
-														    setProperty("lookupGroup", serviceRegistrypu.getLookupGroupName());
-														}})
 														.startAsync(true)
 														.configure();
 
@@ -149,7 +142,7 @@ public class AsterixIntegrationTest {
 		proxy.clear(null);
 		
 		AsterixConfigurer configurer = new AsterixConfigurer();
-		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceRegistrypu.getLookupGroupName())); // For service-registry-discovery
+//		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceRegistrypu.getLookupGroupName())); // For service-registry-discovery
 		configurer.enableFaultTolerance(false); // TODO: enable fault tolerance
 		configurer.enableVersioning(true);
 		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 100);

@@ -46,7 +46,7 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBeanPlugi
 	public T create(String qualifier) {
 		AsterixServiceComponent serviceComponent = plugins.getPlugin(AsterixServiceComponents.class).getComponent(descriptor);
 		AsterixServiceProperties serviceProperties = serviceComponent.getServiceProperties(descriptor, serviceApi);
-		serviceProperties.setProperty(GsBinder.SPACE_URL_PROPERTY, dependencies.get().getSpaceLocator().getSpaceUrl(targetSpace));
+		serviceProperties.setProperty(GsBinder.SPACE_URL_PROPERTY, dependencies.get().getSpaceUrlBuilder().getSpaceUrl(targetSpace));
 		return serviceComponent.createService(descriptor, serviceApi, serviceProperties);
 	}
 

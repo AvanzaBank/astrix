@@ -27,10 +27,6 @@
 		<property name="serviceDescriptor" value="se.avanzabank.asterix.integration.tests.domain2.pu.LunchGradeServiceDescriptor" />
 	</bean>
 
-	<bean id="spaceLocator" class="se.avanzabank.space.UsesLookupGroupsSpaceLocator">
-		<constructor-arg value="${lookupGroup}"/>
-	</bean>
-	
 	<bean id="lunchRestaurantGrader" class="se.avanzabank.asterix.integration.tests.domain2.pu.LunchRestaurantGraderImpl" />
 	<bean id="lunchFeeder" class="se.avanzabank.asterix.integration.tests.domain2.pu.PublicLunchFeederImpl"/>
 

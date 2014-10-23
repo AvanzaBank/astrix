@@ -16,12 +16,6 @@
 		<property name="serviceDescriptor" value="se.avanzabank.asterix.integration.tests.domain.apiruntime.LunchServiceDescriptor"/>
 	</bean>
 	
-<!-- 	Service registry requires SpaceLocator to locate service registry, this dependency is implicit. -->
-	<bean id="spaceLocator" class="se.avanzabank.space.UsesLookupGroupsSpaceLocator">
-		<constructor-arg value="${lookupGroup}"/>
-	</bean>
-	
-
 	<!-- The actual service implementation(s) -->
     <bean id="lunchService" class="se.avanzabank.asterix.integration.tests.domain.pu.LunchServiceImpl"/>
 	

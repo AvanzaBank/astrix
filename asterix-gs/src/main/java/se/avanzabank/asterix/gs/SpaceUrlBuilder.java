@@ -13,24 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.remoting.plugin.consumer;
+package se.avanzabank.asterix.gs;
 
-import org.springframework.beans.factory.annotation.Autowired;
+public interface SpaceUrlBuilder {
 
-import se.avanzabank.asterix.context.ExternalDependencyBean;
-import se.avanzabank.asterix.gs.SpaceUrlBuilder;
+	String getSpaceUrl(String targetSpace);
 
-public class AsterixRemotingPluginDependencies implements ExternalDependencyBean {
-	
-	private final SpaceUrlBuilder spaceUrlBuilder;
-
-	@Autowired
-	public AsterixRemotingPluginDependencies(SpaceUrlBuilder spaceUrlBuilder) {
-		this.spaceUrlBuilder = spaceUrlBuilder;
-	}
-	
-	public SpaceUrlBuilder getSpaceUrlBuilder() {
-		return spaceUrlBuilder;
-	}
-	
 }

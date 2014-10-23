@@ -17,10 +17,10 @@
   		<artifactId>asterix-service-registry</artifactId>
   		<version>${project.version}</version>
   	</dependency>
-  	<dependency>
-  		<groupId>se.avanzabank.space</groupId>
-  		<artifactId>space-core</artifactId>
-  		<version>DEVEL-SNAPSHOT</version>
-  	</dependency>
+<!--   	<dependency> -->
+<!--   		<groupId>se.avanzabank.space</groupId> -->
+<!--   		<artifactId>space-core</artifactId> -->
+<!--   		<version>DEVEL-SNAPSHOT</version> -->
+<!--   	</dependency> -->
   </dependencies>
 </project>
