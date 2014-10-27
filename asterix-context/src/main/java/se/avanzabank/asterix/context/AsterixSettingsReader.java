@@ -91,6 +91,9 @@ public class AsterixSettingsReader {
 		if (properties == null) {
 			return null;
 		}
+		if (!Properties.class.isAssignableFrom(properties.getClass())) {
+			throw new IllegalArgumentException("Property not of Properties type. name=" + name + " value=" + properties);
+		}
 		return Properties.class.cast(properties);
 	}
 
