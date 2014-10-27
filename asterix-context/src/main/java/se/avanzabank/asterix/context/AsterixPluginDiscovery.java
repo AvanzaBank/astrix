@@ -20,14 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 class AsterixPluginDiscovery {
-	
-	// TODO: cache discovered plugins by type?
-	
-	private static final Logger log = LoggerFactory.getLogger(AsterixPluginDiscovery.class);
 	
 	static <T> T discoverOnePlugin(Class<T> type) {
 		List<T> plugins = discoverAllPlugins(type);

@@ -17,7 +17,7 @@ package se.avanzabank.asterix.context;
 
 import java.lang.annotation.Annotation;
 
-import se.avanzabank.asterix.provider.core.AsterixJndiApi;
+import se.avanzabank.asterix.provider.core.AsterixConfigApi;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.provider.core.AsterixSubsystem;
 import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
@@ -64,8 +64,8 @@ public class AsterixApiDescriptor {
 		return descriptorHolder.isAnnotationPresent(AsterixServiceRegistryApi.class);
 	}
 	
-	public boolean usesJndiLookup() {
-		return descriptorHolder.isAnnotationPresent(AsterixJndiApi.class);
+	public boolean usesConfigLookup() {
+		return descriptorHolder.isAnnotationPresent(AsterixConfigApi.class);
 	}
 	
 	public boolean isVersioned() {

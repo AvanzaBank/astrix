@@ -23,38 +23,47 @@ import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixApiProviderPlugin;
+import se.avanzabank.asterix.context.AsterixExternalConfig;
+import se.avanzabank.asterix.context.AsterixConfigAware;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
-import se.avanzabank.asterix.provider.core.AsterixJndiApi;
+import se.avanzabank.asterix.provider.core.AsterixConfigApi;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 @MetaInfServices(AsterixApiProviderPlugin.class)
-public class AsterixJndiProviderPlugin implements AsterixApiProviderPlugin {
+public class AsterixConfigApiProviderPlugin implements AsterixApiProviderPlugin, AsterixConfigAware {
+
+	private AsterixExternalConfig config;
 
 	@Override
 	public List<AsterixFactoryBeanPlugin<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
-		AsterixJndiApi jndiApi = descriptor.getAnnotation(AsterixJndiApi.class);
-		String entryName = jndiApi.entryName();
-		Class<?> beanType = jndiApi.exportedApi();
-		AsterixJndiLookupFactoryBean<?> factory = new AsterixJndiLookupFactoryBean<>(entryName, descriptor, beanType);
+		AsterixConfigApi configApi = descriptor.getAnnotation(AsterixConfigApi.class);
+		String entryName = configApi.entryName();
+		Class<?> beanType = configApi.exportedApi();
+		AsterixConfigFactoryBean<?> factory = new AsterixConfigFactoryBean<>(entryName, descriptor, beanType, config);
 		return Arrays.<AsterixFactoryBeanPlugin<?>>asList(factory);
 	}
 
 	@Override
 	public List<Class<?>> getProvidedBeans(AsterixApiDescriptor descriptor) {
-		return Arrays.<Class<?>>asList(descriptor.getAnnotation(AsterixJndiApi.class).exportedApi());
+		return Arrays.<Class<?>>asList(descriptor.getAnnotation(AsterixConfigApi.class).exportedApi());
 	}
 
 	@Override
 	public Class<? extends Annotation> getProviderAnnotationType() {
-		return AsterixJndiApi.class;
+		return AsterixConfigApi.class;
 	}
 
 	@Override
 	public boolean isLibraryProvider() {
 		return false;
+	}
+	
+	@Override
+	public void setConfig(AsterixExternalConfig config) {
+		this.config = config;
 	}
 
 }

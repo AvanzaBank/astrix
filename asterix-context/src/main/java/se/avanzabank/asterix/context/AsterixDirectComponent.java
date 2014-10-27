@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.service.registry.client;
+package se.avanzabank.asterix.context;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -24,11 +24,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.kohsuke.MetaInfServices;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
-import se.avanzabank.asterix.context.AsterixApiDescriptor;
-import se.avanzabank.asterix.context.AsterixServicePropertiesBuilder;
-import se.avanzabank.asterix.context.AsterixServiceExporterBean;
-import se.avanzabank.asterix.context.AsterixServiceProperties;
-import se.avanzabank.asterix.context.AsterixServiceComponent;
 import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 
 @MetaInfServices(AsterixServiceComponent.class)
@@ -72,6 +67,14 @@ public class AsterixDirectComponent implements AsterixServiceComponent {
 		serviceProperties.setProperty("providerId", id);
 		serviceProperties.setComponent(AsterixServiceComponentNames.DIRECT);
 		return serviceProperties;
+	}
+	
+	public static <T> T getServiceProvider(Class<T> expectedType, String id) {
+		ServiceProvider<T> provider = (ServiceProvider<T>) providerById.get(id);
+		if (provider == null) {
+			throw new IllegalArgumentException("No provider registered with id: " + id);
+		}
+		return provider.getProvider();
 	}
 	
 	static class ServiceProvider<T> {

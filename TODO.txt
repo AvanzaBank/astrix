@@ -15,7 +15,9 @@
 	
 * Städa bort alla TODO:s från kodbasen.
 
-=== V 1.0 "Account Performance" ===
+======
+
+* Vid @AsterixServiceExport av att interface som inte implementeras ska kasta vettigt exception vid uppstart. Allra bäst vore en compiler-proccessor som veriferar detta.
 
 * Det ska kastas ett exception vid uppstart om inte alla tjänster som specifieras i tjänste-deskriptorn faktiskt exporteras från aktuell applikation
 

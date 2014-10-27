@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import se.avanzabank.asterix.context.AsterixContext;
+import se.avanzabank.asterix.context.AsterixDirectComponent;
 import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.TestAsterixConfigurer;
 import se.avanzabank.asterix.core.ServiceUnavailableException;

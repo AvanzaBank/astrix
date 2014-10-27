@@ -164,7 +164,16 @@ public class AsterixConfigurer {
 		this.settings.set(settingName, value);
 	}
 	
+	public void set(String settingName, String value) {
+		this.settings.set(settingName, value);
+	}
+	
 	public void setSettings(Map<String, String> settings) {
+		this.settings.setAll(settings);
+	}
+	
+	@Autowired(required = false)
+	public void setAsterixSettings(AsterixSettings settings) {
 		this.settings.setAll(settings);
 	}
 	
@@ -187,4 +196,5 @@ public class AsterixConfigurer {
 	public void setSubsystem(String subsystem) {
 		this.subsystem = subsystem;
 	}
+
 }

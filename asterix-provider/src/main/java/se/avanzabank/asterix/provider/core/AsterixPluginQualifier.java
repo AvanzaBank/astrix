@@ -23,15 +23,11 @@ import java.lang.annotation.Target;
 
 
 /**
- * Similar to {@link AsterixServiceRegistryApi} but uses jndi to lookup service-properties
- * for a given api. 
- * 
  * @author Elias Lindholm (elilin)
  */
 @Target(value = { ElementType.TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
-public @interface AsterixJndiApi {
-	Class<?> exportedApi();
-	String entryName();
+public @interface AsterixPluginQualifier {
+	String value();
 }

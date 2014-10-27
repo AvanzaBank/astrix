@@ -44,6 +44,7 @@ public class AsterixContext implements Asterix {
 	private final String currentSubsystem;
 	private AsterixApiProviderPlugins apiProviderPlugins;
 	private boolean enforeSubsystemBoundaries;
+	private AsterixExternalConfig asterixConfig;
 	
 	public AsterixContext(AsterixSettings settings, String currentSubsystem) {
 		this.currentSubsystem = currentSubsystem;
@@ -58,6 +59,7 @@ public class AsterixContext implements Asterix {
 				injectDependencies(plugin);
 			}
 		});
+		this.asterixConfig = new AsterixConfigLocator(plugins, settings).getConfig();
 	}
 	
 	public <T> List<T> getPlugins(Class<T> type) {
@@ -98,6 +100,9 @@ public class AsterixContext implements Asterix {
 		}
 		if (object instanceof AsterixBeanStateWorkerAware) {
 			AsterixBeanStateWorkerAware.class.cast(object).setBeanStateWorker(beanStateWorker);
+		}
+		if (object instanceof AsterixConfigAware) {
+			AsterixConfigAware.class.cast(object).setConfig(asterixConfig);
 		}
 	}
 	

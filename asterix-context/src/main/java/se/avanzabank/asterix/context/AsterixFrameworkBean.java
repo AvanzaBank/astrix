@@ -36,7 +36,8 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	private String subsystem;
 	private Map<String, String> settings = new HashMap<>();
 	private AsterixServiceDescriptor serviceDescriptor;
-
+	
+	
 	/*
 	 * We must distinguish between server-side components (those used to export different SERVICES) and
 	 * client-side components (those used to consume BEANS (services, libraries, etc)). 
@@ -107,8 +108,8 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 			configurer.setSubsystem(this.subsystem);
 		}
 		AsterixContext asterixContext = configurer.configure();
-		
 		List<Class<?>> consumedAsterixBeans = new ArrayList<>(this.consumedAsterixBeans);
+		
 		if (serviceDescriptor != null) {
 			// This application exports services, build server runtime
 			AsterixServerRuntimeBuilder serverRuntimeBuilder = new AsterixServerRuntimeBuilder(asterixContext, serviceDescriptor);
@@ -128,6 +129,8 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		this.consumedAsterixBeans = consumedAsterixBeans;
 	}
 	
+	
+	// TODO: remove this settings method?
 	public void setSettings(Map<String, String> settings) {
 		this.settings = settings;
 	}
@@ -162,7 +165,5 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	public void setSubsystem(String subsystem) {
 		this.subsystem = subsystem;
 	}
-	
-	
 	
 }

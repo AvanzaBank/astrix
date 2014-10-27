@@ -16,6 +16,7 @@
 package se.avanzabank.asterix.context;
 
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 /**
  * 
@@ -24,11 +25,22 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class AsterixSettings {
 	
+	// TODO: rename to AsterixExternalConfig and rename current AsterixExternalConfig to ExternalAsterixConfig
+	
 	public static final String BEAN_REBIND_ATTEMPT_INTERVAL = "StatefulAsterixBean.beanRebindAttemptInterval";
 	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AsterixServiceRegistryLeaseManager.leaseRenewInterval";
 	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AsterixContext.enforceSubsystemBoundaries";
+	public static final String ASTERIX_CONFIG_URL = "AsterixConfig.url";
 	
 	private final Map<String, Object> settings = new ConcurrentHashMap<>();
+	
+	public void setAsterixConfigUrl(String asterixConfigUrl) {
+		set(ASTERIX_CONFIG_URL, asterixConfigUrl);
+	}
+	
+	public String getAsterixConfigUrl() {
+		return getString(ASTERIX_CONFIG_URL);
+	}
 	
 	public long getLong(String settingsName, long deafualtValue) {
 		Object value = settings.get(settingsName);
@@ -56,6 +68,10 @@ public class AsterixSettings {
 		this.settings.put(settingName, Long.valueOf(value));
 	}
 	
+	public void set(String settingName, Properties value) {
+		this.settings.put(settingName, value);
+	}
+	
 	public void set(String settingName, String value) {
 		this.settings.put(settingName, value);
 	}
@@ -63,7 +79,7 @@ public class AsterixSettings {
 	public static AsterixSettings from(Map<String, String> settings) {
 		AsterixSettings result = new AsterixSettings();
 		for (Map.Entry<String, String> setting : settings.entrySet()) {
-			settings.put(setting.getKey(), setting.getValue());
+			result.set(setting.getKey(), setting.getValue());
 		}
 		return result;
 	}
@@ -77,6 +93,22 @@ public class AsterixSettings {
 	public void set(String settingName, boolean value) {
 		this.settings.put(settingName, value);
 	}
+
+	public String getString(String name) {
+		Object result = this.settings.get(name);
+		if (result == null) {
+			return null;
+		}
+		return result.toString();
+	}
+
+	public void setAll(AsterixSettings settings) {
+		this.settings.putAll(settings.settings);
+	}
 	
+	@Override
+	public String toString() {
+		return this.settings.toString();
+	}
 
 }

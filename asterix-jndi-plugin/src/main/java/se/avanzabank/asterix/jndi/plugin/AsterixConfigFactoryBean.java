@@ -20,30 +20,32 @@ import java.util.Map;
 import java.util.Properties;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
+import se.avanzabank.asterix.context.AsterixExternalConfig;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
 import se.avanzabank.asterix.context.AsterixServiceComponents;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
-import se.avanzabank.core.support.jndi.lookup.BasicJNDILookup;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  * @param <T>
  */
-public class AsterixJndiLookupFactoryBean<T> implements AsterixFactoryBeanPlugin<T>, AsterixPluginsAware {
-
+public class AsterixConfigFactoryBean<T> implements AsterixFactoryBeanPlugin<T>, AsterixPluginsAware {
+	
 	private AsterixPlugins plugins;
 	private String  entryName;
 	private AsterixApiDescriptor descriptor;
 	private Class<T> api;
+	private AsterixExternalConfig config;
 
-	public AsterixJndiLookupFactoryBean(String entryName, AsterixApiDescriptor descriptor, Class<T> beanType) {
+	public AsterixConfigFactoryBean(String entryName, AsterixApiDescriptor descriptor, Class<T> beanType, AsterixExternalConfig config) {
 		this.entryName = entryName;
 		this.descriptor = descriptor;
 		this.api = beanType;
+		this.config = config;
 	}
 
 	@Override
@@ -66,11 +68,15 @@ public class AsterixJndiLookupFactoryBean<T> implements AsterixFactoryBeanPlugin
 	
 
 	private AsterixServiceProperties lookup() {
-		Properties properties = new BasicJNDILookup().lookup(entryName);
+		Properties properties = lookup(entryName);
 		if (properties == null) {
-			throw new IllegalStateException("JNDI entry not defined: " + this.entryName);
+			throw new IllegalStateException("Config entry not defined: " + this.entryName + ". Config: " + this.config);
 		}
 		return new AsterixServiceProperties(toMap(properties));
+	}
+	
+	private Properties lookup(String name) {
+		return this.config.lookup(name);
 	}
 
 	private Map<String, String> toMap(Properties properties) {

@@ -25,6 +25,8 @@ import java.util.concurrent.ConcurrentMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.avanzabank.asterix.provider.core.AsterixPluginQualifier;
+
 public class AsterixPlugins {
 	
 	private static final Logger log = LoggerFactory.getLogger(AsterixPlugins.class);
@@ -141,6 +143,18 @@ public class AsterixPlugins {
 			}
 			return providers.get(0);
 		}
+		
+		public T getOne(String qualifier) {
+			for (T provider : getAll()) {
+				if (provider.getClass().isAnnotationPresent(AsterixPluginQualifier.class)) {
+					AsterixPluginQualifier candidate = provider.getClass().getAnnotation(AsterixPluginQualifier.class);
+					if (candidate.value().equals(qualifier)) {
+						return provider;
+					}
+				}
+			}
+			throw new IllegalArgumentException(String.format("Found no provider of type: %s with qualifier %s", this.type, qualifier));
+		}
 
 		public List<T> getAll() {
 			return providers;
@@ -149,6 +163,12 @@ public class AsterixPlugins {
 		public void add(T provider) {
 			this.providers.add(Objects.requireNonNull(provider));
 		}
+
+	}
+
+	public <T> T getPlugin(Class<T> pluginType, String qualifier) {
+		Plugin<T> plugin = getPluginHolder(pluginType);
+		return plugin.getOne(qualifier);
 	}
 	
 }

@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
 import org.openspaces.core.GigaSpace;
 
 import se.avanzabank.asterix.context.AsterixConfigurer;
@@ -41,6 +40,7 @@ import se.avanzabank.asterix.context.AsterixContext;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.IllegalSubsystemException;
+import se.avanzabank.asterix.context.InMemoryAsterixConfig;
 import se.avanzabank.asterix.gs.GsBinder;
 import se.avanzabank.asterix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
@@ -51,7 +51,7 @@ import se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder.Internal
 import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
 import se.avanzabank.asterix.integration.tests.domain2.apiruntime.PublicLunchFeeder;
 import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
-import se.avanzabank.asterix.provider.core.AsterixJndiApi;
+import se.avanzabank.asterix.provider.core.AsterixConfigApi;
 import se.avanzabank.asterix.remoting.client.AsterixRemoteServiceException;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryApiDescriptor;
@@ -60,9 +60,6 @@ import se.avanzabank.asterix.test.util.AsterixTestUtil;
 import se.avanzabank.asterix.test.util.Poller;
 import se.avanzabank.asterix.test.util.Probe;
 import se.avanzabank.asterix.test.util.Supplier;
-import se.avanzabank.core.test.util.jndi.EmbeddedJndiServer;
-import se.avanzabank.core.test.util.jndi.JndiServerRule;
-import se.avanzabank.core.test.util.jndi.JndiServerRuleHook;
 import se.avanzabank.space.junit.pu.PuConfigurers;
 import se.avanzabank.space.junit.pu.RunningPu;
 /**
@@ -72,7 +69,9 @@ import se.avanzabank.space.junit.pu.RunningPu;
  */
 public class AsterixIntegrationTest {
 	
-//	@ClassRule
+	
+	
+	@ClassRule
 	public static RunningPu serviceRegistrypu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
 															.numberOfPrimaries(1)
 															.numberOfBackups(0)
@@ -83,10 +82,30 @@ public class AsterixIntegrationTest {
 															.startAsync(true)
 															.configure();
 	
+
+	private static InMemoryAsterixConfig config = new InMemoryAsterixConfig() {{
+		set(asterixServiceRegistryEntryName(), serviceRegistryProperties());
+	}};
+	
+	private static String asterixServiceRegistryEntryName() {
+		return AsterixServiceRegistryApiDescriptor.class.getAnnotation(AsterixConfigApi.class).entryName();
+	}
+	
+	private static Properties serviceRegistryProperties() {
+		// TODO: this is a hack. We are duplicating information about transport mechanism used by service-registry 
+		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
+		serviceProperties.setProperty(GsBinder.SPACE_URL_PROPERTY, "jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
+		serviceProperties.setComponent(AsterixServiceComponentNames.GS_REMOTING);
+		Properties result = new Properties();
+		result.putAll(serviceProperties.getProperties());
+		return result;
+	}
+	
 	@ClassRule
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
+											  .beanProperties("asterixSettings", asProperties("configUrl", config.getConfigUrl()))
 											  .startAsync(true)
 											  .configure();
 	
@@ -94,33 +113,15 @@ public class AsterixIntegrationTest {
 	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
 														.numberOfPrimaries(1)
 														.numberOfBackups(0)
+														.beanProperties("asterixSettings", asProperties("configUrl", config.getConfigUrl()))
 														.startAsync(true)
 														.configure();
-
-	public static JndiServerRule jndi = new JndiServerRule(new JndiServerRuleHook() {
-		@Override
-		public void afterStart(EmbeddedJndiServer jndiServer) {
-			jndiServer.addPropertiesEntry(
-					AsterixServiceRegistryApiDescriptor.class.getAnnotation(AsterixJndiApi.class).entryName(), toProperties());
-		}
-
-		private Properties toProperties() {
-			// TODO: this is a hack. We are duplicating information about transport mecanism used by service-registry 
-			AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
-			serviceProperties.setProperty(GsBinder.SPACE_URL_PROPERTY, "jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
-			serviceProperties.setComponent(AsterixServiceComponentNames.GS_REMOTING);
-			serviceProperties.setApi(AsterixServiceRegistry.class);
-//			AsterixRemotingComponent component = new AsterixRemotingComponent();
-//			AsterixServiceProperties serviceProperties = 
-//					component.getServiceProperties(new AsterixApiDescriptor(AsterixServiceRegistryApiDescriptor.class), AsterixServiceRegistry.class);
-			Properties result = new Properties();
-			result.putAll(serviceProperties.getProperties());
-			return result;
-		}
-	});
-
-	@ClassRule
-	public static RuleChain order = RuleChain.outerRule(serviceRegistrypu).around(jndi);
+	
+	private static Properties asProperties(String key, String value) {
+		Properties result = new Properties();
+		result.put(key, value);
+		return result;
+	}
 
 	private LunchService lunchService;
 	private LunchUtil lunchUtil;
@@ -142,10 +143,10 @@ public class AsterixIntegrationTest {
 		proxy.clear(null);
 		
 		AsterixConfigurer configurer = new AsterixConfigurer();
-//		configurer.registerDependency(new UsesLookupGroupsSpaceLocator(serviceRegistrypu.getLookupGroupName())); // For service-registry-discovery
 		configurer.enableFaultTolerance(false); // TODO: enable fault tolerance
 		configurer.enableVersioning(true);
 		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 100);
+		configurer.set(AsterixSettings.ASTERIX_CONFIG_URL, config.getConfigUrl());
 		configurer.setSubsystem("test-sub-system");
 		asterix = configurer.configure();
 		this.lunchService = asterix.getBean(LunchService.class);
