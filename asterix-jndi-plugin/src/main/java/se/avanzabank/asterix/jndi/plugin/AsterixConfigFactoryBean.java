@@ -20,13 +20,13 @@ import java.util.Map;
 import java.util.Properties;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
-import se.avanzabank.asterix.context.AsterixExternalConfig;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
 import se.avanzabank.asterix.context.AsterixServiceComponents;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.context.AsterixSettingsReader;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -39,13 +39,13 @@ public class AsterixConfigFactoryBean<T> implements AsterixFactoryBeanPlugin<T>,
 	private String  entryName;
 	private AsterixApiDescriptor descriptor;
 	private Class<T> api;
-	private AsterixExternalConfig config;
+	private AsterixSettingsReader settings;
 
-	public AsterixConfigFactoryBean(String entryName, AsterixApiDescriptor descriptor, Class<T> beanType, AsterixExternalConfig config) {
+	public AsterixConfigFactoryBean(String entryName, AsterixApiDescriptor descriptor, Class<T> beanType, AsterixSettingsReader settings) {
 		this.entryName = entryName;
 		this.descriptor = descriptor;
 		this.api = beanType;
-		this.config = config;
+		this.settings = settings;
 	}
 
 	@Override
@@ -70,13 +70,13 @@ public class AsterixConfigFactoryBean<T> implements AsterixFactoryBeanPlugin<T>,
 	private AsterixServiceProperties lookup() {
 		Properties properties = lookup(entryName);
 		if (properties == null) {
-			throw new IllegalStateException("Config entry not defined: " + this.entryName + ". Config: " + this.config);
+			throw new IllegalStateException("Config entry not defined: " + this.entryName + ". Config: " + this.settings);
 		}
 		return new AsterixServiceProperties(toMap(properties));
 	}
 	
 	private Properties lookup(String name) {
-		return this.config.lookup(name);
+		return this.settings.getProperties(name);
 	}
 
 	private Map<String, String> toMap(Properties properties) {

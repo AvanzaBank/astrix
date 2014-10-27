@@ -25,6 +25,7 @@ import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.AsterixSettingsAware;
+import se.avanzabank.asterix.context.AsterixSettingsReader;
 
 public class AsterixServiceRegistryLeaseManager extends Thread implements AsterixBeanAware, AsterixSettingsAware {
 	
@@ -34,7 +35,7 @@ public class AsterixServiceRegistryLeaseManager extends Thread implements Asteri
 	private final List<LeasedService<?>> leasedServices = new CopyOnWriteArrayList<>();
 	private volatile AsterixServiceRegistryClient serviceRegistry;
 	private AsterixBeans beans;
-	private AsterixSettings settings;
+	private AsterixSettingsReader settings;
 	
 	@Override
 	public void run() {
@@ -76,7 +77,7 @@ public class AsterixServiceRegistryLeaseManager extends Thread implements Asteri
 	}
 
 	@Override
-	public void setSettings(AsterixSettings settings) {
+	public void setSettings(AsterixSettingsReader settings) {
 		this.settings = settings;
 	}
 	

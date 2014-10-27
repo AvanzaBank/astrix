@@ -23,9 +23,9 @@ import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixApiProviderPlugin;
-import se.avanzabank.asterix.context.AsterixExternalConfig;
-import se.avanzabank.asterix.context.AsterixConfigAware;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
+import se.avanzabank.asterix.context.AsterixSettingsAware;
+import se.avanzabank.asterix.context.AsterixSettingsReader;
 import se.avanzabank.asterix.provider.core.AsterixConfigApi;
 /**
  * 
@@ -33,16 +33,16 @@ import se.avanzabank.asterix.provider.core.AsterixConfigApi;
  *
  */
 @MetaInfServices(AsterixApiProviderPlugin.class)
-public class AsterixConfigApiProviderPlugin implements AsterixApiProviderPlugin, AsterixConfigAware {
+public class AsterixConfigApiProviderPlugin implements AsterixApiProviderPlugin, AsterixSettingsAware {
 
-	private AsterixExternalConfig config;
+	private AsterixSettingsReader settings;
 
 	@Override
 	public List<AsterixFactoryBeanPlugin<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
 		AsterixConfigApi configApi = descriptor.getAnnotation(AsterixConfigApi.class);
 		String entryName = configApi.entryName();
 		Class<?> beanType = configApi.exportedApi();
-		AsterixConfigFactoryBean<?> factory = new AsterixConfigFactoryBean<>(entryName, descriptor, beanType, config);
+		AsterixConfigFactoryBean<?> factory = new AsterixConfigFactoryBean<>(entryName, descriptor, beanType, settings);
 		return Arrays.<AsterixFactoryBeanPlugin<?>>asList(factory);
 	}
 
@@ -62,8 +62,8 @@ public class AsterixConfigApiProviderPlugin implements AsterixApiProviderPlugin,
 	}
 	
 	@Override
-	public void setConfig(AsterixExternalConfig config) {
-		this.config = config;
+	public void setSettings(AsterixSettingsReader settings) {
+		this.settings = settings;
 	}
 
 }

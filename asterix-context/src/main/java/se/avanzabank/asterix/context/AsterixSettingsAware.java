@@ -17,6 +17,6 @@ package se.avanzabank.asterix.context;
 
 public interface AsterixSettingsAware {
 	
-	void setSettings(AsterixSettings settings);
+	void setSettings(AsterixSettingsReader settings);
 
 }

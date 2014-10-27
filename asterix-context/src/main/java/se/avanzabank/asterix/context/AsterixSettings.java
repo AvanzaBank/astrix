@@ -111,4 +111,8 @@ public class AsterixSettings {
 		return this.settings.toString();
 	}
 
+	public Object get(String settingName) {
+		return this.settings.get(settingName);
+	}
+
 }

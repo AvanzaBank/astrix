@@ -39,16 +39,14 @@ public class AsterixContext implements Asterix {
 	private List<Object> externalDependencies = new ArrayList<>();
 	private final AsterixEventBus eventBus = new AsterixEventBus();
 	private final AsterixBeanStates beanStates = new AsterixBeanStates();
-	private final AsterixSettings settings;
+	private final AsterixSettingsReader settings;
 	private final AsterixBeanStateWorker beanStateWorker;
 	private final String currentSubsystem;
 	private AsterixApiProviderPlugins apiProviderPlugins;
 	private boolean enforeSubsystemBoundaries;
-	private AsterixExternalConfig asterixConfig;
 	
 	public AsterixContext(AsterixSettings settings, String currentSubsystem) {
 		this.currentSubsystem = currentSubsystem;
-		this.settings = Objects.requireNonNull(settings);
 		this.beanStateWorker = new AsterixBeanStateWorker(settings, eventBus); // TODO: manage life cycle
 		this.beanStateWorker.start(); // TODO: avoid starting bean-state-worker if no stateful beans are created. + manage lifecycle
 		this.eventBus.addEventListener(AsterixBeanStateChangedEvent.class, beanStates);
@@ -59,7 +57,7 @@ public class AsterixContext implements Asterix {
 				injectDependencies(plugin);
 			}
 		});
-		this.asterixConfig = new AsterixConfigLocator(plugins, settings).getConfig();
+		this.settings = AsterixSettingsReader.create(plugins, settings);
 	}
 	
 	public <T> List<T> getPlugins(Class<T> type) {
@@ -100,9 +98,6 @@ public class AsterixContext implements Asterix {
 		}
 		if (object instanceof AsterixBeanStateWorkerAware) {
 			AsterixBeanStateWorkerAware.class.cast(object).setBeanStateWorker(beanStateWorker);
-		}
-		if (object instanceof AsterixConfigAware) {
-			AsterixConfigAware.class.cast(object).setConfig(asterixConfig);
 		}
 	}
 	
