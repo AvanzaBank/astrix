@@ -40,7 +40,6 @@ import se.avanzabank.asterix.context.AsterixContext;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.IllegalSubsystemException;
-import se.avanzabank.asterix.context.InMemoryAsterixConfig;
 import se.avanzabank.asterix.gs.GsBinder;
 import se.avanzabank.asterix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
@@ -82,10 +81,10 @@ public class AsterixIntegrationTest {
 															.startAsync(true)
 															.configure();
 	
-
-	private static InMemoryAsterixConfig config = new InMemoryAsterixConfig() {{
+	private static AsterixSettings config = new AsterixSettings() {{
 		set(asterixServiceRegistryEntryName(), serviceRegistryProperties());
 	}};
+	
 	
 	private static String asterixServiceRegistryEntryName() {
 		return AsterixServiceRegistryApiDescriptor.class.getAnnotation(AsterixConfigApi.class).entryName();

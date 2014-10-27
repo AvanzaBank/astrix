@@ -35,7 +35,7 @@ public class AsterixSettingsReader {
 	static AsterixSettingsReader create(AsterixPlugins plugins, AsterixSettings settings) {
 		String configUrl = settings.getAsterixConfigUrl();
 		if (configUrl == null) {
-			return new AsterixSettingsReader(settings, new InMemoryAsterixConfig());
+			return new AsterixSettingsReader(settings, new AsterixSettings());
 		}
 		int splitAt = configUrl.indexOf(":");
 		String configPlugin = configUrl;

@@ -18,14 +18,14 @@ package se.avanzabank.asterix.context;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+
+import se.avanzabank.asterix.provider.core.AsterixPluginQualifier;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AsterixSettings {
-	
-	// TODO: rename to AsterixExternalConfig and rename current AsterixExternalConfig to ExternalAsterixConfig
+public class AsterixSettings implements AsterixExternalConfig {
 	
 	public static final String BEAN_REBIND_ATTEMPT_INTERVAL = "StatefulAsterixBean.beanRebindAttemptInterval";
 	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AsterixServiceRegistryLeaseManager.leaseRenewInterval";
@@ -33,6 +33,15 @@ public class AsterixSettings {
 	public static final String ASTERIX_CONFIG_URL = "AsterixConfig.url";
 	
 	private final Map<String, Object> settings = new ConcurrentHashMap<>();
+	private String locator;
+	
+	public AsterixSettings() {
+		this.locator = AsterixDirectComponent.register(AsterixExternalConfig.class, this);
+	}
+
+	public String getConfigUrl() {
+		return AsterixSettingsExternalConfigPlugin.class.getAnnotation(AsterixPluginQualifier.class).value() + ":" + this.locator;
+	}
 	
 	public void setAsterixConfigUrl(String asterixConfigUrl) {
 		set(ASTERIX_CONFIG_URL, asterixConfigUrl);
@@ -114,5 +123,18 @@ public class AsterixSettings {
 	public Object get(String settingName) {
 		return this.settings.get(settingName);
 	}
+
+	@Override
+	public Properties lookup(String name) {
+		Object result = this.settings.get(name);
+		if (result == null) {
+			return null;
+		}
+		if (!Properties.class.isAssignableFrom(result.getClass())) {
+			throw new IllegalArgumentException("Expected settings of type Properties, was: " + result.getClass().getName() + " name=" + name + ", value=" + result);
+		}
+		return Properties.class.cast(result);
+	}
+	
 
 }

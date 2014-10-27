@@ -19,6 +19,7 @@ import java.util.Properties;
 
 public interface AsterixExternalConfig {
 
+	// TODO: rename to getProperties
 	Properties lookup(String name);
 
 }

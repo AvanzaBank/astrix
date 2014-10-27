@@ -21,8 +21,8 @@ import se.avanzabank.asterix.provider.core.AsterixPluginQualifier;
 
 @MetaInfServices(AsterixExternalConfigPlugin.class)
 @AsterixPluginQualifier("inMemory")
-public class InMemoryAsterixConfigPlugin implements AsterixExternalConfigPlugin {
-
+public class AsterixSettingsExternalConfigPlugin implements AsterixExternalConfigPlugin {
+	
 	@Override
 	public AsterixExternalConfig getConfig(String locator) {
 		return AsterixDirectComponent.getServiceProvider(AsterixExternalConfig.class, locator);
