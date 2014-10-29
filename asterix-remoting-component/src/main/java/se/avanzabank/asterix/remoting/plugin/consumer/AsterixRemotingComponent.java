@@ -27,10 +27,10 @@ import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixFaultTolerancePlugin;
 import se.avanzabank.asterix.context.AsterixPlugins;
 import se.avanzabank.asterix.context.AsterixPluginsAware;
-import se.avanzabank.asterix.context.AsterixServicePropertiesBuilder;
+import se.avanzabank.asterix.context.AsterixServiceComponent;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
-import se.avanzabank.asterix.context.AsterixServiceComponent;
+import se.avanzabank.asterix.context.AsterixServicePropertiesBuilder;
 import se.avanzabank.asterix.context.AsterixVersioningPlugin;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.gs.GsBinder;
@@ -67,15 +67,6 @@ public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixSer
 		return createService(apiDescriptor, type, GsBinder.createServiceProperties(serviceUrl));
 	}
 	
-	@Override
-	public <T> AsterixServiceProperties getServiceProperties(AsterixApiDescriptor apiDescriptor, Class<T> type) {
-		String targetSpaceName = apiDescriptor.getAnnotation(AsterixRemoteApiDescriptor.class).targetSpaceName();
-		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
-		serviceProperties.setApi(type); // TODO: let invoker set this property?
-		serviceProperties.setProperty(AsterixRemotingServiceRegistryExporter.SPACE_NAME_PROPERTY, targetSpaceName);
-		return serviceProperties;
-	}
-
 	@Override
 	public void setPlugins(AsterixPlugins plugins) {
 		this.plugins = plugins;

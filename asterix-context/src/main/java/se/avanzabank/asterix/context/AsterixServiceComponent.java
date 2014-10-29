@@ -35,13 +35,6 @@ public interface AsterixServiceComponent {
 	<T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, String serviceProperties);
 	
 	/**
-	 * Client side component used to extract service-properties for a given asterix-bean.
-	 * 
-	 * The service-properties will be used by a AsterixFactoryBean to bind to a given service
-	 */
-	<T> AsterixServiceProperties getServiceProperties(AsterixApiDescriptor apiDescriptor, Class<T> type);
-	
-	/**
 	 * The name of this component.
 	 * 
 	 * @return

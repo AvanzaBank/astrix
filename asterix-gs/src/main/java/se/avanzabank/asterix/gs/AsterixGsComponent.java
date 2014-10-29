@@ -56,12 +56,6 @@ public class AsterixGsComponent implements AsterixServiceComponent {
 	}
 
 	@Override
-	public <T> AsterixServiceProperties getServiceProperties(
-			AsterixApiDescriptor apiDescriptor, Class<T> type) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public Class<? extends AsterixServiceExporterBean> getExporterBean() {
 		return null;
 	}

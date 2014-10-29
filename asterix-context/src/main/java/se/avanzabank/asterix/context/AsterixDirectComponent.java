@@ -120,11 +120,6 @@ public class AsterixDirectComponent implements AsterixServiceComponent {
 	}
 
 	@Override
-	public <T> AsterixServiceProperties getServiceProperties(AsterixApiDescriptor apiDescriptor, Class<T> type) {
-		throw new UnsupportedOperationException("Direct component cannot be used without service registry");
-	}
-
-	@Override
 	public Class<? extends AsterixServiceExporterBean> getExporterBean() {
 		// NOT USED. This is a client side component only
 		return null;

@@ -25,6 +25,8 @@ import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.ExternalDependency;
 import se.avanzabank.asterix.context.ExternalDependencyAware;
 import se.avanzabank.asterix.gs.GsBinder;
+import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
+import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter;
 
 public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBeanPlugin<T>, ExternalDependencyAware<AsterixRemotingPluginDependencies>, AsterixPluginsAware {
 	
@@ -45,7 +47,11 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBeanPlugi
 	@Override
 	public T create(String qualifier) {
 		AsterixServiceComponent serviceComponent = plugins.getPlugin(AsterixServiceComponents.class).getComponent(descriptor);
-		AsterixServiceProperties serviceProperties = serviceComponent.getServiceProperties(descriptor, serviceApi);
+
+		String targetSpaceName = descriptor.getAnnotation(AsterixRemoteApiDescriptor.class).targetSpaceName();
+		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
+		serviceProperties.setApi(serviceApi);
+		serviceProperties.setProperty(AsterixRemotingServiceRegistryExporter.SPACE_NAME_PROPERTY, targetSpaceName);
 		serviceProperties.setProperty(GsBinder.SPACE_URL_PROPERTY, dependencies.get().getSpaceUrlBuilder().getSpaceUrl(targetSpace));
 		return serviceComponent.createService(descriptor, serviceApi, serviceProperties);
 	}
