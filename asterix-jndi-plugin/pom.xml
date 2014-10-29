@@ -12,10 +12,5 @@
 		<artifactId>asterix-context</artifactId>
 		<version>${project.version}</version>
 	</dependency>
-	<dependency>
-		<groupId>se.avanzabank.core</groupId>
-		<artifactId>core-support</artifactId>
-		<version>DEVEL-SNAPSHOT</version>
-	</dependency>  	  	
   </dependencies>
 </project>
