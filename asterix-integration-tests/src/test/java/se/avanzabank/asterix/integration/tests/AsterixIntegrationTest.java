@@ -104,7 +104,7 @@ public class AsterixIntegrationTest {
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
-											  .beanProperties("asterixSettings", asProperties("configUrl", config.getConfigUrl()))
+											  .contextProperties(asProperties("configUrl", config.getExternalConfigUrl()))
 											  .startAsync(true)
 											  .configure();
 	
@@ -112,7 +112,7 @@ public class AsterixIntegrationTest {
 	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
 														.numberOfPrimaries(1)
 														.numberOfBackups(0)
-														.beanProperties("asterixSettings", asProperties("configUrl", config.getConfigUrl()))
+														.contextProperties(asProperties("configUrl", config.getExternalConfigUrl()))
 														.startAsync(true)
 														.configure();
 	
@@ -145,7 +145,7 @@ public class AsterixIntegrationTest {
 		configurer.enableFaultTolerance(false); // TODO: enable fault tolerance
 		configurer.enableVersioning(true);
 		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 100);
-		configurer.set(AsterixSettings.ASTERIX_CONFIG_URL, config.getConfigUrl());
+		configurer.set(AsterixSettings.ASTERIX_CONFIG_URL, config.getExternalConfigUrl());
 		configurer.setSubsystem("test-sub-system");
 		asterix = configurer.configure();
 		this.lunchService = asterix.getBean(LunchService.class);

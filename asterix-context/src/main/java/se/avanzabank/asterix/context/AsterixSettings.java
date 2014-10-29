@@ -39,7 +39,7 @@ public class AsterixSettings implements AsterixExternalConfig {
 		this.locator = AsterixDirectComponent.register(AsterixExternalConfig.class, this);
 	}
 
-	public String getConfigUrl() {
+	public String getExternalConfigUrl() {
 		return AsterixSettingsExternalConfigPlugin.class.getAnnotation(AsterixPluginQualifier.class).value() + ":" + this.locator;
 	}
 	
