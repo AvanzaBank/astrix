@@ -19,7 +19,7 @@
 		<property name="serviceDescriptor" value="se.avanzabank.asterix.integration.tests.domain.apiruntime.LunchServiceDescriptor"/>
 	</bean>
 	<bean id="asterixSettings" class="se.avanzabank.asterix.context.AsterixSettings">
-		<property name="asterixConfigUrl" value="${configUrl}" />
+		<property name="externalConfigUrl" value="${configUrl}" />
 	</bean>
 	
 	<!-- The actual service implementation(s) -->

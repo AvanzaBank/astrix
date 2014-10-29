@@ -24,10 +24,10 @@
 	</bean>
 	
 	<bean id="asterixSettings" class="se.avanzabank.asterix.context.AsterixSettings" factory-method="from">
+		<property name="externalConfigUrl" value="${configUrl}"/>
 		<constructor-arg>
 			<util:map>
 				<entry key="StatefulAsterixBean.beanRebindAttemptInterval" value="100" />
-				<entry key="AsterixConfig.url" value="${configUrl}" />
 			</util:map>
 		</constructor-arg>
 	</bean>
