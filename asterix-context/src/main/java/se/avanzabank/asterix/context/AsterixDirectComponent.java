@@ -41,6 +41,16 @@ public class AsterixDirectComponent implements AsterixServiceComponent {
 		}
 		return type.cast(result.getProvider());
 	}
+	
+	@Override
+	public <T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, String componentSpecificUri) {
+		String providerName = componentSpecificUri;
+		ServiceProvider<?> result = providerById.get(providerName);
+		if (result == null) {
+			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + type);
+		}
+		return type.cast(result.getProvider());
+	}
 
 	@Override
 	public String getName() {

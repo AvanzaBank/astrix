@@ -32,6 +32,8 @@ public interface AsterixServiceComponent {
 	// TODO: move info from api-descriptor to AsterixServiceProperties?
 	<T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, AsterixServiceProperties serviceProperties);
 	
+	<T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, String serviceProperties);
+	
 	/**
 	 * Client side component used to extract service-properties for a given asterix-bean.
 	 * 

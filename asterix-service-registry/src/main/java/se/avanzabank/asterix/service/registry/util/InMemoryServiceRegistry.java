@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import se.avanzabank.asterix.context.AsterixDirectComponent;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 import se.avanzabank.asterix.provider.core.AsterixConfigApi;
 import se.avanzabank.asterix.service.registry.app.ServiceKey;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
@@ -56,13 +57,18 @@ public class InMemoryServiceRegistry implements AsterixServiceRegistry {
 	public void clear() {
 		this.servicePropertiesByKey.clear();
 	}
-	public String getJndiEntryName() {
+	public String getConfigEntryName() {
 		return AsterixServiceRegistryApiDescriptor.class.getAnnotation(AsterixConfigApi.class).entryName();
 	}
+	
 	public Properties getJndiProperties() {
 		AsterixServiceProperties properties = AsterixDirectComponent.getServiceProperties(id);
 		Properties result = new Properties();
 		result.putAll(properties.getProperties());
 		return result;
+	}
+
+	public String getServiceUri() {
+		return AsterixServiceComponentNames.DIRECT + ":" + this.id;
 	}
 }

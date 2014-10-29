@@ -39,4 +39,14 @@ public class GsBinder {
 		return result;
 	}
 
+	public static AsterixServiceProperties createServiceProperties(String spaceUrl) {
+		String spaceName = spaceUrl.split("/")[4]; // format: jini://*/*/space-name/... 
+		AsterixServiceProperties result = new AsterixServiceProperties();
+		result.setApi(GigaSpace.class);
+		result.setProperty(SPACE_NAME_PROPERTY, spaceName);
+		result.setProperty(SPACE_URL_PROPERTY, spaceUrl);
+		return result;
+		
+	}
+
 }

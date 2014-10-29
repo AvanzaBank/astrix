@@ -31,6 +31,7 @@ public class AsterixSettings implements AsterixExternalConfig {
 	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AsterixServiceRegistryLeaseManager.leaseRenewInterval";
 	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AsterixContext.enforceSubsystemBoundaries";
 	public static final String ASTERIX_CONFIG_URL = "AsterixConfig.url";
+	public static final String ASTERIX_SERVICE_REGISTRY_URI = "AsterixServiceRegistry.serviceUri";
 	
 	private final Map<String, Object> settings = new ConcurrentHashMap<>();
 	private String locator;
@@ -39,19 +40,27 @@ public class AsterixSettings implements AsterixExternalConfig {
 		this.locator = AsterixDirectComponent.register(AsterixExternalConfig.class, this);
 	}
 
-	public String getExternalConfigUrl() {
+	public final String getExternalConfigUrl() {
 		return AsterixSettingsExternalConfigPlugin.class.getAnnotation(AsterixPluginQualifier.class).value() + ":" + this.locator;
 	}
 	
-	public void setExternalConfigUrl(String asterixConfigUrl) {
+	public final void setExternalConfigUrl(String asterixConfigUrl) {
 		set(ASTERIX_CONFIG_URL, asterixConfigUrl);
 	}
 	
-	public String getAsterixConfigUrl() {
+	public final String getAsterixConfigUrl() {
 		return getString(ASTERIX_CONFIG_URL);
 	}
 	
-	public long getLong(String settingsName, long deafualtValue) {
+	public final void setServiceRegistryUri(String serviceRegistryUri) {
+		set(ASTERIX_SERVICE_REGISTRY_URI, serviceRegistryUri);
+	}
+	
+	public final String getServiceRegistryUri() {
+		return getString(ASTERIX_SERVICE_REGISTRY_URI);
+	}
+	
+	public final long getLong(String settingsName, long deafualtValue) {
 		Object value = settings.get(settingsName);
 		if (value == null) {
 			return deafualtValue;
@@ -62,7 +71,7 @@ public class AsterixSettings implements AsterixExternalConfig {
 		return Long.class.cast(value).longValue();
 	}
 	
-	public boolean getBoolean(String settingsName, boolean deafualtValue) {
+	public final boolean getBoolean(String settingsName, boolean deafualtValue) {
 		Object value = settings.get(settingsName);
 		if (value == null) {
 			return deafualtValue;
@@ -73,15 +82,15 @@ public class AsterixSettings implements AsterixExternalConfig {
 		return Boolean.class.cast(value);
 	}
 
-	public void set(String settingName, long value) {
+	public final void set(String settingName, long value) {
 		this.settings.put(settingName, Long.valueOf(value));
 	}
 	
-	public void set(String settingName, Properties value) {
+	public final void set(String settingName, Properties value) {
 		this.settings.put(settingName, value);
 	}
 	
-	public void set(String settingName, String value) {
+	public final void set(String settingName, String value) {
 		this.settings.put(settingName, value);
 	}
 
@@ -93,17 +102,17 @@ public class AsterixSettings implements AsterixExternalConfig {
 		return result;
 	}
 
-	public void setAll(Map<String, String> settings) {
+	public final void setAll(Map<String, String> settings) {
 		for (Map.Entry<String, String> setting : settings.entrySet()) {
 			this.settings.put(setting.getKey(), setting.getValue());
 		}
 	}
 
-	public void set(String settingName, boolean value) {
+	public final void set(String settingName, boolean value) {
 		this.settings.put(settingName, value);
 	}
 
-	public String getString(String name) {
+	public final String getString(String name) {
 		Object result = this.settings.get(name);
 		if (result == null) {
 			return null;
@@ -111,29 +120,22 @@ public class AsterixSettings implements AsterixExternalConfig {
 		return result.toString();
 	}
 
-	public void setAll(AsterixSettings settings) {
+	public final void setAll(AsterixSettings settings) {
 		this.settings.putAll(settings.settings);
 	}
 	
 	@Override
-	public String toString() {
+	public final String toString() {
 		return this.settings.toString();
 	}
 
-	public Object get(String settingName) {
+	public final Object get(String settingName) {
 		return this.settings.get(settingName);
 	}
 
 	@Override
-	public Properties lookup(String name) {
-		Object result = this.settings.get(name);
-		if (result == null) {
-			return null;
-		}
-		if (!Properties.class.isAssignableFrom(result.getClass())) {
-			throw new IllegalArgumentException("Expected settings of type Properties, was: " + result.getClass().getName() + " name=" + name + ", value=" + result);
-		}
-		return Properties.class.cast(result);
+	public final String lookup(String name) {
+		return getString(name);
 	}
 	
 

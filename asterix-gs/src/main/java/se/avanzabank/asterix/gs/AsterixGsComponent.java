@@ -38,6 +38,11 @@ public class AsterixGsComponent implements AsterixServiceComponent {
 		}
 		return type.cast(GsBinder.createGsFactory(serviceProperties).create()); // TODO: fault tolerance
 	}
+	
+	@Override
+	public <T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, String serviceUrl) {
+		return createService(apiDescriptor, type, GsBinder.createServiceProperties(serviceUrl));
+	}
 
 
 	@Override

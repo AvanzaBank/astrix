@@ -63,6 +63,11 @@ public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixSer
 	}
 	
 	@Override
+	public <T> T createService(AsterixApiDescriptor apiDescriptor, Class<T> type, String serviceUrl) {
+		return createService(apiDescriptor, type, GsBinder.createServiceProperties(serviceUrl));
+	}
+	
+	@Override
 	public <T> AsterixServiceProperties getServiceProperties(AsterixApiDescriptor apiDescriptor, Class<T> type) {
 		String targetSpaceName = apiDescriptor.getAnnotation(AsterixRemoteApiDescriptor.class).targetSpaceName();
 		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();

@@ -79,7 +79,7 @@ public class AsterixSettingsReader {
 	}
 
 	private Object get(String settingName) {
-		Properties setting = externalConfig.lookup(settingName);
+		String setting = externalConfig.lookup(settingName);
 		if (setting != null) {
 			return setting;
 		}

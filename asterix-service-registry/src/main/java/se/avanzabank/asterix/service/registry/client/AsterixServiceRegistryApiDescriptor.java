@@ -15,6 +15,7 @@
  */
 package se.avanzabank.asterix.service.registry.client;
 
+import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.provider.core.AsterixConfigApi;
 import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 
@@ -33,7 +34,7 @@ import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 )
 @AsterixConfigApi(
 	exportedApi = AsterixServiceRegistry.class,
-	entryName = "asterixServiceRegistry"
+	entryName = AsterixSettings.ASTERIX_SERVICE_REGISTRY_URI
 )
 public class AsterixServiceRegistryApiDescriptor {
 }

@@ -40,7 +40,6 @@ import se.avanzabank.asterix.context.AsterixContext;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.IllegalSubsystemException;
-import se.avanzabank.asterix.gs.GsBinder;
 import se.avanzabank.asterix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
@@ -50,10 +49,8 @@ import se.avanzabank.asterix.integration.tests.domain.apiruntime.feeder.Internal
 import se.avanzabank.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
 import se.avanzabank.asterix.integration.tests.domain2.apiruntime.PublicLunchFeeder;
 import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
-import se.avanzabank.asterix.provider.core.AsterixConfigApi;
 import se.avanzabank.asterix.remoting.client.AsterixRemoteServiceException;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
-import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryApiDescriptor;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryClient;
 import se.avanzabank.asterix.test.util.AsterixTestUtil;
 import se.avanzabank.asterix.test.util.Poller;
@@ -82,23 +79,8 @@ public class AsterixIntegrationTest {
 															.configure();
 	
 	private static AsterixSettings config = new AsterixSettings() {{
-		set(asterixServiceRegistryEntryName(), serviceRegistryProperties());
+		set(ASTERIX_SERVICE_REGISTRY_URI, AsterixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
 	}};
-	
-	
-	private static String asterixServiceRegistryEntryName() {
-		return AsterixServiceRegistryApiDescriptor.class.getAnnotation(AsterixConfigApi.class).entryName();
-	}
-	
-	private static Properties serviceRegistryProperties() {
-		// TODO: this is a hack. We are duplicating information about transport mechanism used by service-registry 
-		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
-		serviceProperties.setProperty(GsBinder.SPACE_URL_PROPERTY, "jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
-		serviceProperties.setComponent(AsterixServiceComponentNames.GS_REMOTING);
-		Properties result = new Properties();
-		result.putAll(serviceProperties.getProperties());
-		return result;
-	}
 	
 	@ClassRule
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")

@@ -15,15 +15,13 @@
  */
 package se.avanzabank.asterix.jndi.plugin;
 
-import java.util.Properties;
-
 import se.avanzabank.asterix.context.AsterixExternalConfig;
 import se.avanzabank.core.support.jndi.lookup.BasicJNDILookup;
 
 public class JndiConfig implements AsterixExternalConfig {
 
 	@Override
-	public Properties lookup(String name) {
+	public String lookup(String name) {
 		return new BasicJNDILookup().lookup(name);
 	}
 
