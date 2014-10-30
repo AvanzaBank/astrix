@@ -10,7 +10,6 @@
 		
 		void addLunchRestaurant(LunchRestaurant restaurant);
 		
-		LunchRestaurant getLunchRestaurant(GetLunchRestaurantRequest request); 
 	}
 
 
