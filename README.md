@@ -68,6 +68,7 @@
 		}
 	}
 
+
 ## Service implementation
 
 	@AsterixServiceExport({LunchService.class, InternalLunchFeeder.class})
@@ -75,6 +76,20 @@
 	
 		//...
 	
+	}
+	
+
+## Service Descriptor
+
+	@AsterixService(
+		apiDescriptors = {
+			LunchApiDescriptor.class,
+			LunchFeederApiDescriptor.class
+		},
+		subsystem = "lunch-service",
+		component = AsterixServiceComponentNames.GS_REMOTING
+	)
+	public class LunchServiceDescriptor {
 	}
 
 ## pu.xml
