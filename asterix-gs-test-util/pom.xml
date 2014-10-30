@@ -5,17 +5,19 @@
     <artifactId>asterix-parent</artifactId>
     <version>DEVEL-SNAPSHOT</version>
   </parent>
-  <artifactId>asterix-gs</artifactId>
+  <artifactId>asterix-gs-test-util</artifactId>
   <dependencies>
   	<dependency>
-  		<groupId>${project.groupId}</groupId>
-  		<artifactId>asterix-context</artifactId>
-  		<version>${project.version}</version>
+  		<groupId>com.gigaspaces</groupId>
+  		<artifactId>gs-openspaces</artifactId>
   	</dependency>
   	<dependency>
-  		<groupId>${project.groupId}</groupId>
-  		<artifactId>asterix-service-registry</artifactId>
-  		<version>${project.version}</version>
+  		<groupId>com.gigaspaces</groupId>
+  		<artifactId>gs-runtime</artifactId>
+  	</dependency>
+  	<dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit-dep</artifactId>
   	</dependency>
   </dependencies>
 </project>

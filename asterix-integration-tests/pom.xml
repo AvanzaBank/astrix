@@ -63,10 +63,21 @@
   		<version>DEVEL-SNAPSHOT</version>
   		<scope>test</scope>
   	</dependency>
+<!--   	<dependency> -->
+<!--   		<groupId>${project.groupId}</groupId> -->
+<!--   		<artifactId>asterix-gs-test-util</artifactId> -->
+<!--   		<version>${project.version}</version> -->
+<!--   		<scope>test</scope> -->
+<!--   	</dependency> -->
   	<dependency>
   		<groupId>${project.groupId}</groupId>
   		<artifactId>asterix-test-util</artifactId>
   		<version>${project.version}</version>
+  		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.hamcrest</groupId>
+  		<artifactId>hamcrest-library</artifactId>
   		<scope>test</scope>
   	</dependency>
   </dependencies>

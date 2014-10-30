@@ -25,6 +25,7 @@
 		<module>asterix-monitoring</module>
 		<module>asterix-test-util</module>
 		<module>asterix-jndi-plugin</module>
+		<module>asterix-gs-test-util</module>
 	</modules>
 	
 	<dependencyManagement>
