@@ -73,9 +73,6 @@
 
 	@AsterixServiceExport({LunchService.class, InternalLunchFeeder.class})
 	public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
-	
-		//...
-	
 	}
 	
 
