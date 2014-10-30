@@ -35,6 +35,14 @@
 
 ## Migration
 
+	public interface AsterixJsonApiMigration {
+		
+		int fromVersion();
+		
+		AsterixJsonMessageMigration<?>[] getMigrations();
+	
+	}
+
 	public class LunchApiV1Migration implements AsterixJsonApiMigration {
 	
 		@Override
