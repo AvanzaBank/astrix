@@ -1,8 +1,20 @@
 # Asterix
 
 
+## Api 
 
-# Api Descriptor
+	public interface LunchService {
+		
+		@AsterixBroadcast(reducer = LunchSuggestionReducer.class)
+		LunchRestaurant suggestRandomLunchRestaurant(String foodType);
+		
+		void addLunchRestaurant(LunchRestaurant restaurant);
+		
+		LunchRestaurant getLunchRestaurant(GetLunchRestaurantRequest request); 
+	}
+
+
+## Api Descriptor
 
 	// The API is versioned.
 	@AsterixVersioned(
@@ -21,8 +33,51 @@
 	public class LunchApiDescriptor {
 	}
 
+## Migration
 
-# pu.xml
+	public class LunchApiV1Migration implements AsterixJsonApiMigration {
+	
+		@Override
+		public int fromVersion() {
+			return 1;
+		}
+		
+		@Override
+		public AsterixJsonMessageMigration<?>[] getMigrations() {
+			return new AsterixJsonMessageMigration[] {
+				new LunchRestaurantV1Migration()
+			};
+		}
+		
+		private static class LunchRestaurantV1Migration implements AsterixJsonMessageMigration<LunchRestaurant> {
+	
+			@Override
+			public void upgrade(ObjectNode json) {
+				json.put("foodType", "unknown");
+			}
+			
+			@Override
+			public void downgrade(ObjectNode json) {
+				json.remove("foodType");
+			}
+	
+			@Override
+			public Class<LunchRestaurant> getJavaType() {
+				return LunchRestaurant.class;
+			}
+		}
+	}
+
+## Service implementation
+
+	@AsterixServiceExport({LunchService.class, InternalLunchFeeder.class})
+	public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
+	
+		//...
+	
+	}
+
+## pu.xml
 
     <!-- Asterix service framework (provider and consumer) -->
 	<bean id="asterixFrameworkBean" class="se.avanzabank.asterix.context.AsterixFrameworkBean">
