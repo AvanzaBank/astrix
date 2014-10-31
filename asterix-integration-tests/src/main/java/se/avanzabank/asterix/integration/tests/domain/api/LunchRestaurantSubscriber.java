@@ -15,11 +15,10 @@
  */
 package se.avanzabank.asterix.integration.tests.domain.api;
 
-import se.avanzabank.core.support.event.EventListener;
 
 
 public interface LunchRestaurantSubscriber {
 	
-	void addRestaurantAddedListener(EventListener<LunchRestaurantAddedEvent> restaurant);
+//	void addRestaurantAddedListener(EventListener<LunchRestaurantAddedEvent> restaurant);
 
 }

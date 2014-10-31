@@ -38,7 +38,7 @@ public class DefaultMetricsPoller implements AsterixMetricsPollerPlugin, Asterix
 
 	private static final Integer DEFAULT_DELAY = 5000;
 	private AsterixPlugins plugins;
-	private AsterixMetricsLoggerPlugin logger;
+	private Collection<AsterixMetricsLoggerPlugin> loggers;
 	private Collection<AsterixMetricsCollectorPlugin> collectors;
 	ScheduledExecutorService executor;
 
@@ -49,13 +49,13 @@ public class DefaultMetricsPoller implements AsterixMetricsPollerPlugin, Asterix
 	public void start() {
 		initializeFromPlugins();
 		long delayTime = getDelayTimeFromJndiOrFallback();
-		log.info("Starting metrics poller using logger {} and collectors {}", logger, collectors);
+		log.info("Starting metrics poller using logger {} and collectors {}", loggers, collectors);
 		executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("DefaultMetricsPoller"));
-		executor.scheduleAtFixedRate(new MetricPollerTask(logger, collectors), 0, delayTime, TimeUnit.MILLISECONDS);
+		executor.scheduleAtFixedRate(new MetricPollerTask(loggers, collectors), 0, delayTime, TimeUnit.MILLISECONDS);
 	}
 
 	private void initializeFromPlugins() {
-		logger = plugins.getPlugin(AsterixMetricsLoggerPlugin.class);
+		loggers = plugins.getPlugins(AsterixMetricsLoggerPlugin.class);
 		collectors = plugins.getPlugins(AsterixMetricsCollectorPlugin.class);
 	}
 
@@ -81,18 +81,20 @@ public class DefaultMetricsPoller implements AsterixMetricsPollerPlugin, Asterix
 
 	private static class MetricPollerTask implements Runnable {
 
-		private AsterixMetricsLoggerPlugin logger;
+		private Collection<AsterixMetricsLoggerPlugin> loggers;
 		private Collection<AsterixMetricsCollectorPlugin> collectors;
 
-		public MetricPollerTask(AsterixMetricsLoggerPlugin logger, Collection<AsterixMetricsCollectorPlugin> collectors) {
-			this.logger = logger;
+		public MetricPollerTask(Collection<AsterixMetricsLoggerPlugin> loggers, Collection<AsterixMetricsCollectorPlugin> collectors) {
+			this.loggers = loggers;
 			this.collectors = collectors;
 		}
 
 		@Override
 		public void run() {
 			for (AsterixMetricsCollectorPlugin collector : collectors) {
-				logger.logMetrics(collector.getMetrics());
+				for (AsterixMetricsLoggerPlugin logger : loggers) {
+					logger.logMetrics(collector.getMetrics());
+				}
 			}
 		}
 
@@ -126,14 +128,6 @@ public class DefaultMetricsPoller implements AsterixMetricsPollerPlugin, Asterix
 			this.namePrefix = Objects.requireNonNull(namePrefix);
 			group = getThreadGroup();
 			daemon = true;
-		}
-
-		/**
-		 * Creates a thread with the specified daemon mode.
-		 */
-		public NamedThreadFactory(String namePrefix, boolean daemon) {
-			this(namePrefix);
-			this.daemon = daemon;
 		}
 
 		private ThreadGroup getThreadGroup() {

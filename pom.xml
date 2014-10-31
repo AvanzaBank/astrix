@@ -17,7 +17,6 @@
 		<module>asterix-integration-tests</module>
 		<module>asterix-service-registry-pu</module>
 		<module>asterix-remoting-component</module>
-		<module>asterix-monitoring</module>
 		<module>asterix-test-util</module>
 		<module>asterix-jndi-plugin</module>
 		<module>asterix-gs-test-util</module>
