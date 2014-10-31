@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.monitoring;
+package se.avanzabank.asterix.context;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasEntry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,11 +24,8 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import se.avanzabank.asterix.context.AsterixMetricsCollectorPlugin;
-import se.avanzabank.asterix.context.AsterixMetricsLoggerPlugin;
-import se.avanzabank.asterix.context.TestAsterixConfigurer;
-import se.avanzabank.core.test.util.async.Poller;
-import se.avanzabank.core.test.util.async.Probe;
+import se.avanzabank.asterix.test.util.Poller;
+import se.avanzabank.asterix.test.util.Probe;
 
 public class DefaultMetricsPollerTest {
 
