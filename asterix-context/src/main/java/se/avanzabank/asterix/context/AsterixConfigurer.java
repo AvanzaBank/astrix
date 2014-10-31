@@ -115,12 +115,9 @@ public class AsterixConfigurer {
 	private void configureMonitoring(AsterixContext context) {
 		// TODO stop poller
 		if (enableMonitoring) {
-			AsterixMetricsPollerPlugin metricsPoller = discoverOnePlugin(context, AsterixMetricsPollerPlugin.class);
+			DefaultMetricsPoller metricsPoller = context.init(DefaultMetricsPoller.class);
 			metricsPoller.start();
-		} else {
-			context.registerPlugin(AsterixMetricsPollerPlugin.class, AsterixMetricsPollerPlugin.Default.create());
 		}
-		
 	}
 
 	private void configureFaultTolerance(AsterixContext context) {

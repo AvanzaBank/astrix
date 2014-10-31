@@ -45,15 +45,16 @@ public class AsterixBeanStateWorker extends Thread {
 	@Override
 	public void run() {
 		while(!interrupted()) {
+			// TODO: Run BeanStateWorker even when managedBeans.size == 0???
 			for (StatefulAsterixBean<?> asterixBean : managedBeans) {
 				this.beanStateWorkerThreadPool.execute(new BindCommand(asterixBean));
-				try {
-					log.debug("Waiting " + this.beanRebindAttemptIntervalMillis + " ms until next bean state inspection");
-					Thread.sleep(this.beanRebindAttemptIntervalMillis);
-				} catch (InterruptedException e) {
-					interrupt();
-				} 
 			}
+			try {
+				log.debug("Waiting " + this.beanRebindAttemptIntervalMillis + " ms until next bean state inspection");
+				Thread.sleep(this.beanRebindAttemptIntervalMillis);
+			} catch (InterruptedException e) {
+				interrupt();
+			} 
 		}
 	}
 	

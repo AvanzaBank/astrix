@@ -23,7 +23,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.kohsuke.MetaInfServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +32,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Kristoffer Erlandsson (krierl)
  */
-@MetaInfServices(AsterixMetricsPollerPlugin.class)
-public class DefaultMetricsPoller implements AsterixMetricsPollerPlugin, AsterixPluginsAware, AsterixSettingsAware {
+public class DefaultMetricsPoller implements AsterixPluginsAware, AsterixSettingsAware {
 
 	private static final Integer DEFAULT_DELAY = 5000;
 	private AsterixPlugins plugins;
@@ -45,7 +43,6 @@ public class DefaultMetricsPoller implements AsterixMetricsPollerPlugin, Asterix
 	private static final Logger log = LoggerFactory.getLogger(DefaultMetricsPoller.class);
 	private AsterixSettingsReader settings;
 
-	@Override
 	public void start() {
 		initializeFromPlugins();
 		long delayTime = getDelayTimeFromJndiOrFallback();
@@ -66,7 +63,6 @@ public class DefaultMetricsPoller implements AsterixMetricsPollerPlugin, Asterix
 	/**
 	 * Stops the scheduled poller. Does not wait for anything to terminate.
 	 */
-	@Override
 	public void stop() {
 		log.info("Stopping metrics poller");
 		if (executor != null) {
