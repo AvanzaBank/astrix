@@ -93,7 +93,7 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 			try {
 				return method.invoke(bean, args);
 			} catch (InvocationTargetException e) {
-				e.printStackTrace();
+				log.debug("Service invocation threw exception", e);
 				throw e.getTargetException();
 			}
 		}

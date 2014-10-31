@@ -87,7 +87,7 @@ final class PartitionedPu implements PuRunner {
 //		beanLevelProperties.getBeanProperties("space").put("lookup-groups", getLookupGroupName());
 		return beanLevelProperties;
 	}
-
+	
 	@Override
 	public void shutdown() {
 		container.close();
@@ -101,7 +101,7 @@ final class PartitionedPu implements PuRunner {
 	@Override
 	public GigaSpace getClusteredGigaSpace() {
 		IntegratedProcessingUnitContainer container = (IntegratedProcessingUnitContainer) this.container.getProcessingUnitContainers()[0];
-		return (GigaSpace) container.getApplicationContext().getBean(this.gigaSpaceBeanName);
+		return GigaSpace.class.cast(container.getApplicationContext().getBean(this.gigaSpaceBeanName)).getClustered();
 	}
 
 }

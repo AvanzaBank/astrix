@@ -40,6 +40,8 @@ import se.avanzabank.asterix.context.AsterixContext;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.IllegalSubsystemException;
+import se.avanzabank.asterix.gs.test.util.PuConfigurers;
+import se.avanzabank.asterix.gs.test.util.RunningPu;
 import se.avanzabank.asterix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchRestaurant;
 import se.avanzabank.asterix.integration.tests.domain.api.LunchService;
@@ -56,8 +58,6 @@ import se.avanzabank.asterix.test.util.AsterixTestUtil;
 import se.avanzabank.asterix.test.util.Poller;
 import se.avanzabank.asterix.test.util.Probe;
 import se.avanzabank.asterix.test.util.Supplier;
-import se.avanzabank.space.junit.pu.PuConfigurers;
-import se.avanzabank.space.junit.pu.RunningPu;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -145,7 +145,7 @@ public class AsterixIntegrationTest {
 	}
 	
 	@Test
-	public void testPuThatConsumesAnotherServcies() throws Exception {
+	public void testPuThatConsumesAnotherService() throws Exception {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		
 		lunchRestaurantGrader.grade("Martins Green Room", 2);
