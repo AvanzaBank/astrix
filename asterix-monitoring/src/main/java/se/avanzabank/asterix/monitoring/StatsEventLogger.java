@@ -18,6 +18,8 @@ package se.avanzabank.asterix.monitoring;
 import java.util.Objects;
 
 import org.kohsuke.MetaInfServices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.avanzabank.asterix.context.AsterixEventLoggerPlugin;
 import se.avanzabank.system.graphite.GraphiteFactory;
@@ -29,14 +31,24 @@ import se.avanzabank.system.stats.Stats;
 @MetaInfServices(value = AsterixEventLoggerPlugin.class)
 public class StatsEventLogger implements AsterixEventLoggerPlugin {
 
-	private Stats stats;
+	private StatsFacade stats;
+	private final static Logger logger = LoggerFactory.getLogger(StatsEventLogger.class);
 
 	public StatsEventLogger() {
-		this(new GraphiteFactory().getStats());
+		this.stats = createStats();
 	}
 	
 	public StatsEventLogger(Stats stats) {
-		this.stats = Objects.requireNonNull(stats);
+		this.stats = new StatsAdapter(Objects.requireNonNull(stats));
+	}
+
+	private static StatsFacade createStats() {
+		try {
+			return new StatsAdapter(new GraphiteFactory().getStats());
+		} catch (Exception e) {
+			logger.warn("Failed to create Stats instance. No data will be published to graphite", e);
+			return new NullStats();
+		}
 	}
 	
 	@Override

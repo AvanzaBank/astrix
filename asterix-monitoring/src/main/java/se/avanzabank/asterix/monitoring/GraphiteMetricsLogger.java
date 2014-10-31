@@ -20,6 +20,8 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.kohsuke.MetaInfServices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.avanzabank.asterix.context.AsterixMetricsLoggerPlugin;
 import se.avanzabank.core.support.jndi.lookup.BasicJNDILookup;
@@ -32,14 +34,24 @@ import se.avanzabank.system.graphite.GraphiteFactory;
 @MetaInfServices(AsterixMetricsLoggerPlugin.class)
 public class GraphiteMetricsLogger implements AsterixMetricsLoggerPlugin {
 
-	private final Graphite graphite;
+	private final GraphiteFacade graphite;
+	private final Logger logger = LoggerFactory.getLogger(GraphiteMetricsLogger.class);
 
 	public GraphiteMetricsLogger() {
-		this.graphite = new GraphiteFactory().getBatchGraphite(new BasicJNDILookup());
+		this.graphite = createGraphite();
+	}
+
+	private GraphiteFacade createGraphite() {
+		try {
+			return new GraphiteAdapter(new GraphiteFactory().getBatchGraphite(new BasicJNDILookup()));
+		} catch (Exception e) {
+			logger.warn("Failed to create Graphite instance. No data will be published to graphite", e);
+			return new NullGraphite();
+		}
 	}
 	
 	public GraphiteMetricsLogger(Graphite graphite) {
-		this.graphite = Objects.requireNonNull(graphite);
+		this.graphite = new GraphiteAdapter(Objects.requireNonNull(graphite));
 	}
 
 	@Override
