@@ -17,5 +17,9 @@
   		<artifactId>asterix-service-registry</artifactId>
   		<version>${project.version}</version>
   	</dependency>
+  	<dependency>
+  		<groupId>com.gigaspaces</groupId>
+  		<artifactId>gs-openspaces</artifactId>
+  	</dependency>
   </dependencies>
 </project>
