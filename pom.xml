@@ -12,7 +12,6 @@
 		<module>asterix-versioning</module>
 		<module>asterix-fault-tolerance</module>
 		<module>asterix-service-registry</module>
-		<module>asterix-gs</module>
 		<module>asterix-integration-tests</module>
 		<module>asterix-service-registry-pu</module>
 		<module>asterix-remoting-component</module>
