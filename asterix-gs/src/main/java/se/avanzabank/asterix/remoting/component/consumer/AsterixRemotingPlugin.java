@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.remoting.plugin.consumer;
+package se.avanzabank.asterix.remoting.component.consumer;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;

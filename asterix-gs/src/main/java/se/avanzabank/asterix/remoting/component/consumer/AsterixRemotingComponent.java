@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.remoting.plugin.consumer;
+package se.avanzabank.asterix.remoting.component.consumer;
 
 import java.lang.annotation.Annotation;
 
@@ -38,7 +38,7 @@ import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
-import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter;
+import se.avanzabank.asterix.remoting.component.provider.AsterixRemotingServiceRegistryExporter;
 import se.avanzabank.asterix.remoting.server.AsterixRemotingArgumentSerializerFactory;
 import se.avanzabank.asterix.remoting.server.AsterixRemotingServiceExporterBean;
 import se.avanzabank.asterix.remoting.server.AsterixServiceActivator;

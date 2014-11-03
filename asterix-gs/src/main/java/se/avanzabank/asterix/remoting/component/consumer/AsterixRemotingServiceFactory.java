@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.remoting.plugin.consumer;
+package se.avanzabank.asterix.remoting.component.consumer;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
@@ -26,7 +26,7 @@ import se.avanzabank.asterix.context.ExternalDependency;
 import se.avanzabank.asterix.context.ExternalDependencyAware;
 import se.avanzabank.asterix.gs.GsBinder;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
-import se.avanzabank.asterix.remoting.plugin.provider.AsterixRemotingServiceRegistryExporter;
+import se.avanzabank.asterix.remoting.component.provider.AsterixRemotingServiceRegistryExporter;
 
 public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBeanPlugin<T>, ExternalDependencyAware<AsterixRemotingPluginDependencies>, AsterixPluginsAware {
 	
