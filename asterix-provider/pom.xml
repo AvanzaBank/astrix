@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.avanza.asterix</groupId>
 		<artifactId>asterix-parent</artifactId>
-		<version>0.0.8-SNAPSHOT</version>
+		<version>0.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>asterix-provider</artifactId>
 	<!-- TODO: Consider whether we should expose depdency to jackson through asterix-core -->
