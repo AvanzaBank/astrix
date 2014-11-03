@@ -26,6 +26,13 @@
 		<connection>scm:git:git@git01.test.aza.se:asterix/asterix.git</connection>
 		<url>http://http://git01.test.aza.se/asterix/asterix/tree/master</url>
 	</scm>
+	<distributionManagement>
+		<repository>
+			<id>aza.nexus</id>
+			<layout>default</layout>
+			<url>http://nexus.aza.se/content/repositories/releases</url>
+		</repository>	
+	</distributionManagement>
 	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
