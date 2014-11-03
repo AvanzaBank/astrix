@@ -24,17 +24,7 @@
   	</dependency>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
-  		<artifactId>asterix-gs</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>${project.groupId}</groupId>
   		<artifactId>asterix-jndi-plugin</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>${project.groupId}</groupId>
-  		<artifactId>asterix-remoting-component</artifactId>
   		<version>${project.version}</version>
   	</dependency>
   	<dependency>
