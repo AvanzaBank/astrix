@@ -5,7 +5,7 @@
 		<artifactId>asterix-parent</artifactId>
 		<version>0.0.8-SNAPSHOT</version>
 	</parent>
-	<artifactId>asterix-remoting</artifactId>
+	<artifactId>asterix-gs</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

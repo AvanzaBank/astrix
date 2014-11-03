@@ -7,7 +7,7 @@
 	<modules>
 		<module>asterix-core</module>
 		<module>asterix-provider</module>
-		<module>asterix-remoting</module>
+		<module>asterix-gs</module>
 		<module>asterix-context</module>
 		<module>asterix-versioning</module>
 		<module>asterix-fault-tolerance</module>

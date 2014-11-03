@@ -15,7 +15,7 @@
   	<!-- TODO: use asterix-remoting for service registry???? -->
   	<dependency>
   		<groupId>${project.groupId}</groupId>
-  		<artifactId>asterix-remoting</artifactId>
+  		<artifactId>asterix-gs</artifactId>
   		<version>${project.version}</version>
   	</dependency>
   	<dependency>
