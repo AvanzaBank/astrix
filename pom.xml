@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>se.avanzabank.asterix</groupId>
 	<artifactId>asterix-parent</artifactId>
@@ -20,20 +21,20 @@
 		<module>asterix-jndi-plugin</module>
 		<module>asterix-gs-test-util</module>
 	</modules>
-	
+
 	<scm>
 		<connection>scm:git:git@git01.test.aza.se:asterix/asterix.git</connection>
 		<url>http://http://git01.test.aza.se/asterix/asterix/tree/master</url>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 	<distributionManagement>
 		<repository>
 			<id>aza.nexus</id>
 			<layout>default</layout>
 			<url>http://nexus.aza.se/content/repositories/releases</url>
-		</repository>	
+		</repository>
 	</distributionManagement>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.7</java.version>
@@ -42,15 +43,15 @@
 		<spring.groupId>org.springframework</spring.groupId>
 		<slf4j.version>1.6.4</slf4j.version>
 		<gigaspaces.version>9.7.0-10560-RELEASE</gigaspaces.version>
-        <rxjava.version>0.20.1</rxjava.version>
-        <hystrix.version>1.3.17</hystrix.version>
-        <jackson1.version>1.9.12</jackson1.version>
-        <guava.version>14.0.1</guava.version>
-        <junit.version>4.10</junit.version>
+		<rxjava.version>0.20.1</rxjava.version>
+		<hystrix.version>1.3.17</hystrix.version>
+		<jackson1.version>1.9.12</jackson1.version>
+		<guava.version>14.0.1</guava.version>
+		<junit.version>4.10</junit.version>
 		<hamcrest.version>1.2.1</hamcrest.version>
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-    </properties>
-	
+	</properties>
+
 	<dependencyManagement>
 		<!-- Third party dependencies -->
 		<dependencies>
@@ -131,15 +132,15 @@
 				<artifactId>spring-aspects</artifactId>
 				<version>${spring.version}</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
 				<version>${guava.version}</version>
 			</dependency>
 
-            <!-- Jackson 1.x -->
-            <dependency>
+			<!-- Jackson 1.x -->
+			<dependency>
 				<groupId>org.codehaus.jackson</groupId>
 				<artifactId>jackson-mapper-asl</artifactId>
 				<version>${jackson1.version}</version>
@@ -160,7 +161,7 @@
 				<artifactId>slf4j-log4j12</artifactId>
 				<version>${slf4j.version}</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>com.gigaspaces</groupId>
 				<artifactId>gs-openspaces</artifactId>
@@ -171,7 +172,7 @@
 				<artifactId>gs-runtime</artifactId>
 				<version>${gigaspaces.version}</version>
 			</dependency>
-			
+
 			<!-- TEST -->
 			<dependency>
 				<groupId>junit</groupId>
@@ -189,23 +190,24 @@
 				<version>${hamcrest.version}</version>
 			</dependency>
 
-            <dependency>
-                <groupId>com.netflix.rxjava</groupId>
-                <artifactId>rxjava-core</artifactId>
-                <version>${rxjava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.netflix.hystrix</groupId>
-                <artifactId>hystrix-core</artifactId>
-                <version>${hystrix.version}</version>
-            </dependency>
+			<dependency>
+				<groupId>com.netflix.rxjava</groupId>
+				<artifactId>rxjava-core</artifactId>
+				<version>${rxjava.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.netflix.hystrix</groupId>
+				<artifactId>hystrix-core</artifactId>
+				<version>${hystrix.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<build>
 		<pluginManagement>
 			<plugins>
-				<!-- define version numbers for all core plugins to have deterministic build -->
+				<!-- define version numbers for all core plugins to have deterministic 
+					build -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-shade-plugin</artifactId>
@@ -355,7 +357,8 @@
 				</configuration>
 			</plugin>
 
-			<!-- This plugin makes sure that a source jar is always built together with the binary jar -->
+			<!-- This plugin makes sure that a source jar is always built together 
+				with the binary jar -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -377,7 +380,8 @@
 				</configuration>
 			</plugin>
 
-			<!-- TODO: Configuration of the versions plugin, so that only asterix version numbers are considered -->
+			<!-- TODO: Configuration of the versions plugin, so that only asterix 
+				version numbers are considered -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>versions-maven-plugin</artifactId>
