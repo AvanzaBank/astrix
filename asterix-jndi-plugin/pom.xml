@@ -3,7 +3,7 @@
   <parent>
     <groupId>se.avanzabank.asterix</groupId>
     <artifactId>asterix-parent</artifactId>
-    <version>0.0.6-SNAPSHOT</version>
+    <version>0.0.6</version>
   </parent>
   <artifactId>asterix-jndi-plugin</artifactId>
   <dependencies>
