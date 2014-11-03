@@ -29,13 +29,6 @@
 	<!-- TEST -->
 	<dependency>
 		<groupId>${project.groupId}</groupId>
-		<artifactId>asterix-context</artifactId>
-		<version>${project.version}</version>
-		<type>test-jar</type>
-		<scope>test</scope>
-	</dependency>
-	<dependency>
-		<groupId>${project.groupId}</groupId>
 		<artifactId>asterix-test-util</artifactId>
 		<version>${project.version}</version>
 		<scope>test</scope>
