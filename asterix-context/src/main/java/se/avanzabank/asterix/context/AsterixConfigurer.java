@@ -115,7 +115,7 @@ public class AsterixConfigurer {
 	private void configureMonitoring(AsterixContext context) {
 		// TODO stop poller
 		if (enableMonitoring) {
-			DefaultMetricsPoller metricsPoller = context.init(DefaultMetricsPoller.class);
+			MetricsPoller metricsPoller = context.newInstance(MetricsPoller.class);
 			metricsPoller.start();
 		}
 	}

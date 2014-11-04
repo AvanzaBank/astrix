@@ -27,7 +27,7 @@ import org.junit.Test;
 import se.avanzabank.asterix.test.util.Poller;
 import se.avanzabank.asterix.test.util.Probe;
 
-public class DefaultMetricsPollerTest {
+public class MetricsPollerTest {
 
 	@Test
 	public void test() throws Exception {

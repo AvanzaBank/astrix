@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Kristoffer Erlandsson (krierl)
  */
-public class DefaultMetricsPoller implements AsterixPluginsAware, AsterixSettingsAware {
+public class MetricsPoller implements AsterixPluginsAware, AsterixSettingsAware {
 
 	private static final Integer DEFAULT_DELAY = 5000;
 	private AsterixPlugins plugins;
@@ -40,14 +40,14 @@ public class DefaultMetricsPoller implements AsterixPluginsAware, AsterixSetting
 	private Collection<AsterixMetricsCollectorPlugin> collectors;
 	ScheduledExecutorService executor;
 
-	private static final Logger log = LoggerFactory.getLogger(DefaultMetricsPoller.class);
+	private static final Logger log = LoggerFactory.getLogger(MetricsPoller.class);
 	private AsterixSettingsReader settings;
 
 	public void start() {
 		initializeFromPlugins();
 		long delayTime = getDelayTimeFromJndiOrFallback();
 		log.info("Starting metrics poller using logger {} and collectors {}", loggers, collectors);
-		executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("DefaultMetricsPoller"));
+		executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("MetricsPoller"));
 		executor.scheduleAtFixedRate(new MetricPollerTask(loggers, collectors), 0, delayTime, TimeUnit.MILLISECONDS);
 	}
 

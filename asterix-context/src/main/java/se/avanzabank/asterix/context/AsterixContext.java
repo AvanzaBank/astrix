@@ -368,8 +368,7 @@ public class AsterixContext implements Asterix {
 		return getPlugins().getPlugin(pluginType);
 	}
 
-	// TODO: rename to newInstance(Class<T>)?
-	public <T> T init(Class<T> type) {
+	public <T> T newInstance(Class<T> type) {
 		try {
 			T instance = type.newInstance();
 			injectDependencies(instance);
