@@ -24,11 +24,6 @@
   	</dependency>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
-  		<artifactId>asterix-jndi-plugin</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>${project.groupId}</groupId>
   		<artifactId>asterix-fault-tolerance</artifactId>
   		<version>${project.version}</version>
   	</dependency>

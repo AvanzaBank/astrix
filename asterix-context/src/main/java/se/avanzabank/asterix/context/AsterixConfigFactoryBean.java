@@ -13,14 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.jndi.plugin;
+package se.avanzabank.asterix.context;
 
-import se.avanzabank.asterix.context.AsterixApiDescriptor;
-import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
-import se.avanzabank.asterix.context.AsterixInject;
-import se.avanzabank.asterix.context.AsterixServiceComponent;
-import se.avanzabank.asterix.context.AsterixServiceComponents;
-import se.avanzabank.asterix.context.AsterixSettingsReader;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -33,7 +27,7 @@ public class AsterixConfigFactoryBean<T> implements AsterixFactoryBeanPlugin<T> 
 	private AsterixApiDescriptor descriptor;
 	private Class<T> api;
 	private AsterixSettingsReader settings;
-	private AsterixServiceComponents serviceComponenets;
+	private AsterixServiceComponents serviceComponents;
 
 	public AsterixConfigFactoryBean(String entryName, AsterixApiDescriptor descriptor, Class<T> beanType, AsterixSettingsReader settings) {
 		this.entryName = entryName;
@@ -52,7 +46,7 @@ public class AsterixConfigFactoryBean<T> implements AsterixFactoryBeanPlugin<T> 
 	}
 
 	private AsterixServiceComponent getServiceComponent(String componentName) {
-		return serviceComponenets.getComponent(componentName);
+		return serviceComponents.getComponent(componentName);
 	}
 	
 
@@ -70,8 +64,8 @@ public class AsterixConfigFactoryBean<T> implements AsterixFactoryBeanPlugin<T> 
 	}
 
 	@AsterixInject
-	public void setServiceComponenets(AsterixServiceComponents serviceComponenets) {
-		this.serviceComponenets = serviceComponenets;
+	public void setServiceComponenets(AsterixServiceComponents serviceComponents) {
+		this.serviceComponents = serviceComponents;
 	}
 
 }

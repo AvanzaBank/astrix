@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.jndi.plugin;
+package se.avanzabank.asterix.context;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -21,11 +21,6 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
-import se.avanzabank.asterix.context.AsterixApiDescriptor;
-import se.avanzabank.asterix.context.AsterixApiProviderPlugin;
-import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
-import se.avanzabank.asterix.context.AsterixSettingsAware;
-import se.avanzabank.asterix.context.AsterixSettingsReader;
 import se.avanzabank.asterix.provider.core.AsterixConfigApi;
 /**
  * 
