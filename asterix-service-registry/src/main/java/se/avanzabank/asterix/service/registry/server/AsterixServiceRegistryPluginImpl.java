@@ -31,7 +31,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import se.avanzabank.asterix.context.AsterixExportedServiceInfo;
 import se.avanzabank.asterix.context.AsterixInject;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
-import se.avanzabank.asterix.context.AsterixServiceComponentsImpl;
+import se.avanzabank.asterix.context.AsterixServiceComponents;
 import se.avanzabank.asterix.context.AsterixServicePropertiesBuilderHolder;
 import se.avanzabank.asterix.context.AsterixServiceRegistryPlugin;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryClient;
@@ -39,7 +39,7 @@ import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryClien
 @MetaInfServices(AsterixServiceRegistryPlugin.class)
 public class AsterixServiceRegistryPluginImpl implements AsterixServiceRegistryPlugin {
 	
-	private AsterixServiceComponentsImpl serviceComponents;
+	private AsterixServiceComponents serviceComponents;
 	
 	@Override
 	public void registerBeanDefinitions(BeanDefinitionRegistry registry, Collection<AsterixExportedServiceInfo> publishedServices) throws BeansException {
@@ -71,7 +71,7 @@ public class AsterixServiceRegistryPluginImpl implements AsterixServiceRegistryP
 	}
 	
 	@AsterixInject
-	public void setServiceComponents(AsterixServiceComponentsImpl serviceComponents) {
+	public void setServiceComponents(AsterixServiceComponents serviceComponents) {
 		this.serviceComponents = serviceComponents;
 	}
 	

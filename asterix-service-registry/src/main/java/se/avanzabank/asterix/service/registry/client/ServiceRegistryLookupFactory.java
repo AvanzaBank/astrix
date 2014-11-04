@@ -24,7 +24,7 @@ import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
 import se.avanzabank.asterix.context.AsterixInject;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
-import se.avanzabank.asterix.context.AsterixServiceComponentsImpl;
+import se.avanzabank.asterix.context.AsterixServiceComponents;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 
 public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin<T>, AsterixBeanAware {
@@ -33,7 +33,7 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 	private AsterixApiDescriptor descriptor;
 	private AsterixBeans beans;
 	private AsterixServiceRegistryLeaseManager leaseManager;
-	private AsterixServiceComponentsImpl serviceComponents;
+	private AsterixServiceComponents serviceComponents;
 
 	public ServiceRegistryLookupFactory(AsterixApiDescriptor descriptor,
 										Class<T> api,
@@ -83,7 +83,7 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 	}
 	
 	@AsterixInject
-	public void setServiceComponents(AsterixServiceComponentsImpl serviceComponents) {
+	public void setServiceComponents(AsterixServiceComponents serviceComponents) {
 		this.serviceComponents = serviceComponents;
 	}
 

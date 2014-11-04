@@ -19,7 +19,7 @@ import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
 import se.avanzabank.asterix.context.AsterixInject;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
-import se.avanzabank.asterix.context.AsterixServiceComponentsImpl;
+import se.avanzabank.asterix.context.AsterixServiceComponents;
 import se.avanzabank.asterix.context.AsterixSettingsReader;
 /**
  * 
@@ -33,7 +33,7 @@ public class AsterixConfigFactoryBean<T> implements AsterixFactoryBeanPlugin<T> 
 	private AsterixApiDescriptor descriptor;
 	private Class<T> api;
 	private AsterixSettingsReader settings;
-	private AsterixServiceComponentsImpl serviceComponenets;
+	private AsterixServiceComponents serviceComponenets;
 
 	public AsterixConfigFactoryBean(String entryName, AsterixApiDescriptor descriptor, Class<T> beanType, AsterixSettingsReader settings) {
 		this.entryName = entryName;
@@ -70,7 +70,7 @@ public class AsterixConfigFactoryBean<T> implements AsterixFactoryBeanPlugin<T> 
 	}
 
 	@AsterixInject
-	public void setServiceComponenets(AsterixServiceComponentsImpl serviceComponenets) {
+	public void setServiceComponenets(AsterixServiceComponents serviceComponenets) {
 		this.serviceComponenets = serviceComponenets;
 	}
 

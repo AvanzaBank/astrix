@@ -19,7 +19,7 @@ import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
 import se.avanzabank.asterix.context.AsterixInject;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
-import se.avanzabank.asterix.context.AsterixServiceComponentsImpl;
+import se.avanzabank.asterix.context.AsterixServiceComponents;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.ExternalDependency;
 import se.avanzabank.asterix.context.ExternalDependencyAware;
@@ -33,7 +33,7 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBeanPlugi
 	private final String targetSpace;
     private final AsterixApiDescriptor descriptor;
 	private ExternalDependency<AsterixRemotingPluginDependencies> dependencies;
-	private AsterixServiceComponentsImpl serviceComponents;
+	private AsterixServiceComponents serviceComponents;
 	
 	public AsterixRemotingServiceFactory(Class<T> serviceApi,
 										String targetSpaceName, 
@@ -71,7 +71,7 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBeanPlugi
 	}
 
 	@AsterixInject
-	public void setServiceComponents(AsterixServiceComponentsImpl serviceComponents) {
+	public void setServiceComponents(AsterixServiceComponents serviceComponents) {
 		this.serviceComponents = serviceComponents;
 	}
 	
