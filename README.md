@@ -1,6 +1,13 @@
 # Asterix
 
-Asterix is a service framework used to create an application runtime for an application that consumes other services. It's the like a dependency-injection framework on a service-level.
+Asterix is a service framework used to build distributed applications consisting of many services located in different processes. 
+
+Its designed to support an organization where many teams develop services that are used by other teams. On can think of Asterix as a dependency-injection framework at the service-level. 
+
+A typical use case is to use a dependency injection framework like spring to assemble a given application that consumes a set of Asterix-services, 
+and use Asterix as factory for creating 'service'-beans.
+
+Why not use a dependency injection framework to create the service-beans?
 
 
 Typical module-layout when creating a service using Asterix: 
