@@ -98,7 +98,7 @@ public class AsterixTest {
 	}
 	
 	@Test
-	public void canInitRegularClases() throws Exception {
+	public void canInitRegularClasses() throws Exception {
 		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
 		AsterixContext asterixContext = asterixConfigurer.configure();
 		SimpleClass simple = asterixContext.getInstance(SimpleClass.class);
@@ -107,7 +107,7 @@ public class AsterixTest {
 	}
 	
 	@Test
-	public void cachesCreatedInstancesOfRegularClases() throws Exception {
+	public void cachesCreatedInstancesOfRegularClasses() throws Exception {
 		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
 		AsterixContext asterixContext = asterixConfigurer.configure();
 		SimpleClass simple1 = asterixContext.getInstance(SimpleClass.class);
