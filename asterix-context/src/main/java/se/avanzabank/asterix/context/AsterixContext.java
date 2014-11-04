@@ -44,6 +44,12 @@ public class AsterixContext implements Asterix {
 	private final String currentSubsystem;
 	private AsterixApiProviderPlugins apiProviderPlugins;
 	private boolean enforeSubsystemBoundaries;
+	private final InstanceCache instanceCache = new InstanceCache(new InstanceCache.ObjectInitializer() {
+		@Override
+		public void init(Object object) {
+			injectDependencies(object);
+		}
+	});
 	
 	public AsterixContext(AsterixSettings settings, String currentSubsystem) {
 		this.currentSubsystem = currentSubsystem;
@@ -367,7 +373,7 @@ public class AsterixContext implements Asterix {
 	public <T> T getPlugin(Class<T> pluginType) {
 		return getPlugins().getPlugin(pluginType);
 	}
-
+	
 	public <T> T newInstance(Class<T> type) {
 		try {
 			T instance = type.newInstance();
@@ -376,6 +382,10 @@ public class AsterixContext implements Asterix {
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to init instance of: " + type, e);
 		}
+	}
+
+	public <T> T getInstance(Class<T> classType) {
+		return this.instanceCache.getInstance(classType);
 	}
 	
 }
