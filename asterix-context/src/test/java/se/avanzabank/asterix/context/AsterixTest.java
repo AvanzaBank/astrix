@@ -116,6 +116,67 @@ public class AsterixTest {
 		assertSame(simple1, simple2);
 	}
 	
+	@Test
+	public void asterixContextShouldInstantiateAndInjectRequiredClasses() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		AsterixContext asterixContext = asterixConfigurer.configure();
+		SimpleDependenctClass dependentClass = asterixContext.getInstance(SimpleDependenctClass.class);
+		
+		assertNotNull(dependentClass.dependency);
+	}
+	
+	@Test
+	public void asterixContextShouldInstantiateAndInjectRequiredClasses2() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		AsterixContext asterixContext = asterixConfigurer.configure();
+		MultipleDependentClass dependentClass = asterixContext.getInstance(MultipleDependentClass.class);
+		
+		assertNotNull(dependentClass.dep);
+		assertNotNull(dependentClass.dep2);
+		assertNotNull(dependentClass.dep3);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void injectAnnotatedMethodMustAcceptAtLeastOneDependency() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		AsterixContext asterixContext = asterixConfigurer.configure();
+		asterixContext.getInstance(IllegalDependendclass.class);
+	}
+	
+	public static class IllegalDependendclass {
+		@AsterixInject
+		public void setVersioningPlugin() {
+		}
+	}
+	
+	public static class MultipleDependentClass {
+		
+		private SimpleClass dep;
+		private SimpleDependenctClass dep2;
+		private SimpleClass dep3;
+
+		@AsterixInject
+		public void setVersioningPlugin(SimpleClass dep, SimpleDependenctClass dep2) {
+			this.dep = dep;
+			this.dep2 = dep2;
+		}
+		
+		@AsterixInject
+		public void setVersioningPlugin(SimpleClass dep3) {
+			this.dep3 = dep3;
+		}
+	}
+	
+	public static class SimpleDependenctClass {
+		
+		private SimpleClass dependency;
+
+		@AsterixInject
+		public void setVersioningPlugin(SimpleClass dep) {
+			this.dependency = dep;
+		}
+	}
+	
 	public static class SimpleClass implements AsterixSettingsAware {
 		private AsterixSettingsReader settings;
 
