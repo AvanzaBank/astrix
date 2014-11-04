@@ -1,19 +1,39 @@
 # Asterix
 
+Asterix is a service framework used to create an application runtime for an application that consumes other services. It's the like a dependency-injection framework on a service-level.
 
-## Api 
+
+Typical module-layout when creating a service using Asterix: 
+* API
+* API provider
+* Server
+
+## Example - The LunchApi
+
+Modules
+* lunch-api
+* lunch-api-provider
+* lunch-server 
+
+
+## API (lunch-api) 
 
 	public interface LunchService {
-		
 		@AsterixBroadcast(reducer = LunchSuggestionReducer.class)
 		LunchRestaurant suggestRandomLunchRestaurant(String foodType);
-		
-		void addLunchRestaurant(LunchRestaurant restaurant);
-		
 	}
+	
+	public interface LunchRestaurantAdministrator {
+		void addLunchRestaurant(LunchRestaurant restaurant);
+	}
+	
+	public interface LunchRestaurantGrader {
+		void grade(@Routing String restaurantName, int grade);
+		double getAvarageGrade(@Routing String restaurantName);
+	}
+	
 
-
-## Api Descriptor
+## API descriptor (lunch-api-provider)
 
 	// The API is versioned.
 	@AsterixVersioned(
@@ -23,16 +43,18 @@
 		version = 2,
 		objectMapperConfigurer = LunchApiObjectMapperConfigurer.class
 	)
-	// The service is exported to the service-registry. Consumers queries the service-registry to bind to servers.
+	// The service is exported to the service-registry. Service is bound by Asterix at runtime using service-registry
 	@AsterixServiceRegistryApi(
 		exportedApis = {
-			LunchService.class
+			LunchService.class,
+			LunchAdministrator.class,
+			LunchRestaurantGrader.class
 		}
 	)
 	public class LunchApiDescriptor {
 	}
 
-## Migration
+## Migration (lunch-api-provider)
 
 	public interface AsterixJsonApiMigration {
 		
@@ -76,11 +98,13 @@
 	}
 
 
-## Service implementation
+## Service implementations
 
 	@AsterixServiceExport({LunchService.class, InternalLunchFeeder.class})
 	public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 	}
+	
+	// And other service-implementations
 	
 
 ## Service Descriptor
