@@ -18,16 +18,16 @@ Modules
 
 ## API (lunch-api) 
 
-	public interface LunchService {
+	interface LunchService {
 		@AsterixBroadcast(reducer = LunchSuggestionReducer.class)
 		LunchRestaurant suggestRandomLunchRestaurant(String foodType);
 	}
 	
-	public interface LunchRestaurantAdministrator {
+	interface LunchRestaurantAdministrator {
 		void addLunchRestaurant(LunchRestaurant restaurant);
 	}
 	
-	public interface LunchRestaurantGrader {
+	interface LunchRestaurantGrader {
 		void grade(@Routing String restaurantName, int grade);
 		double getAvarageGrade(@Routing String restaurantName);
 	}
