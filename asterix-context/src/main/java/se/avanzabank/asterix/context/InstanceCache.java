@@ -49,7 +49,7 @@ final class InstanceCache {
 			initializer.init(instance);
 			this.instanceByType.put(type, instance);
 			return instance;
-		} catch (Exception e) {
+		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException("Failed to create instance of: " + type);
 		}
 	}

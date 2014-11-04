@@ -16,6 +16,8 @@
 package se.avanzabank.asterix.context;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -82,6 +84,34 @@ public class AsterixContext implements Asterix {
 	}
 	
 	private void injectDependencies(Object object) {
+		injectAwareDependencies(object);
+		injectAsterixClasses(object);
+	}
+
+	private void injectAsterixClasses(Object object) {
+		for (Method m : object.getClass().getMethods()) {
+			if (!m.isAnnotationPresent(AsterixInject.class)) {
+				continue;
+			}
+			if (m.getParameterTypes().length == 0) {
+				throw new IllegalArgumentException(String.format("@AsterixInject annotated methods must accept at least one dependency. Class: %s, method: %s"
+						, object.getClass().getName()
+						, m.getName()));
+			}
+			Object[] deps = new Object[m.getParameterTypes().length];
+			for (int argIndex = 0; argIndex < deps.length; argIndex++) {
+				Class<?> dep = m.getParameterTypes()[argIndex];
+				deps[argIndex] = getInstance(dep);
+			}
+			try {
+				m.invoke(object, deps);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new RuntimeException("Failed to inject dependencies into asterix managed component: " + object.getClass().getName(), e);
+			}
+		}
+	}
+
+	private void injectAwareDependencies(Object object) {
 		if (object instanceof ExternalDependencyAware) {
 			// TODO: use indirection layer to avoid depending on unused external dependencies?
 			// As implemented now, if an unused plugin has an external dependency it is still required

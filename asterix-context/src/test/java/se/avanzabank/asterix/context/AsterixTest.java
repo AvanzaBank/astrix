@@ -116,7 +116,59 @@ public class AsterixTest {
 		assertSame(simple1, simple2);
 	}
 	
-	public static class SimpleClass implements AsterixSettingsAware {
+	@Test
+	public void asterixContextShouldInstantiateAndInjectRequiredClasses() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		AsterixContext asterixContext = asterixConfigurer.configure();
+		MultipleDependentClass dependentClass = asterixContext.getInstance(MultipleDependentClass.class);
+		
+		assertNotNull(dependentClass.dep);
+		assertNotNull(dependentClass.dep2);
+		assertNotNull(dependentClass.dep3);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void injectAnnotatedMethodMustAcceptAtLeastOneDependency() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		AsterixContext asterixContext = asterixConfigurer.configure();
+		asterixContext.getInstance(IllegalDependendclass.class);
+	}
+	
+	static class IllegalDependendclass {
+		@AsterixInject
+		public void setVersioningPlugin() {
+		}
+	}
+	
+	static class MultipleDependentClass {
+		
+		private SimpleClass dep;
+		private SimpleDependenctClass dep2;
+		private SimpleClass dep3;
+
+		@AsterixInject
+		public void setVersioningPlugin(SimpleClass dep, SimpleDependenctClass dep2) {
+			this.dep = dep;
+			this.dep2 = dep2;
+		}
+		
+		@AsterixInject
+		public void setVersioningPlugin(SimpleClass dep3) {
+			this.dep3 = dep3;
+		}
+	}
+	
+	static class SimpleDependenctClass {
+		
+		private SimpleClass dependency;
+
+		@AsterixInject
+		public void setVersioningPlugin(SimpleClass dep) {
+			this.dependency = dep;
+		}
+	}
+	
+	static class SimpleClass implements AsterixSettingsAware {
 		private AsterixSettingsReader settings;
 
 		@Override
