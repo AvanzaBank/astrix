@@ -120,15 +120,6 @@ public class AsterixTest {
 	public void asterixContextShouldInstantiateAndInjectRequiredClasses() throws Exception {
 		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
 		AsterixContext asterixContext = asterixConfigurer.configure();
-		SimpleDependenctClass dependentClass = asterixContext.getInstance(SimpleDependenctClass.class);
-		
-		assertNotNull(dependentClass.dependency);
-	}
-	
-	@Test
-	public void asterixContextShouldInstantiateAndInjectRequiredClasses2() throws Exception {
-		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
-		AsterixContext asterixContext = asterixConfigurer.configure();
 		MultipleDependentClass dependentClass = asterixContext.getInstance(MultipleDependentClass.class);
 		
 		assertNotNull(dependentClass.dep);
