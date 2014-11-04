@@ -18,7 +18,6 @@ package se.avanzabank.asterix.context;
 import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -27,7 +26,6 @@ import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
 
 
 public class AsterixTest {
-	
 	
 	@Test
 	public void asterixSupportSimpleLibraries() throws Exception {
@@ -88,7 +86,6 @@ public class AsterixTest {
 		assertNotNull(bean);
 	}
 	
-	
 	@Test
 	public void cachesCreatedApis() throws Exception {
 		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
@@ -98,6 +95,34 @@ public class AsterixTest {
 		HelloBean beanA = asterixContext.getBean(HelloBean.class);
 		HelloBean beanB = asterixContext.getBean(HelloBean.class);
 		assertSame(beanA, beanB);
+	}
+	
+	@Test
+	public void canInitRegularClases() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		AsterixContext asterixContext = asterixConfigurer.configure();
+		SimpleClass simple = asterixContext.getInstance(SimpleClass.class);
+		
+		assertNotNull(simple.settings);
+	}
+	
+	@Test
+	public void cachesCreatedInstancesOfRegularClases() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		AsterixContext asterixContext = asterixConfigurer.configure();
+		SimpleClass simple1 = asterixContext.getInstance(SimpleClass.class);
+		SimpleClass simple2 = asterixContext.getInstance(SimpleClass.class);
+		
+		assertSame(simple1, simple2);
+	}
+	
+	public static class SimpleClass implements AsterixSettingsAware {
+		private AsterixSettingsReader settings;
+
+		@Override
+		public void setSettings(AsterixSettingsReader settings) {
+			this.settings = settings;
+		}
 	}
 	
 	
