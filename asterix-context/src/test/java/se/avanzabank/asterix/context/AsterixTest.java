@@ -143,13 +143,13 @@ public class AsterixTest {
 		asterixContext.getInstance(IllegalDependendclass.class);
 	}
 	
-	public static class IllegalDependendclass {
+	static class IllegalDependendclass {
 		@AsterixInject
 		public void setVersioningPlugin() {
 		}
 	}
 	
-	public static class MultipleDependentClass {
+	static class MultipleDependentClass {
 		
 		private SimpleClass dep;
 		private SimpleDependenctClass dep2;
@@ -167,7 +167,7 @@ public class AsterixTest {
 		}
 	}
 	
-	public static class SimpleDependenctClass {
+	static class SimpleDependenctClass {
 		
 		private SimpleClass dependency;
 
@@ -177,7 +177,7 @@ public class AsterixTest {
 		}
 	}
 	
-	public static class SimpleClass implements AsterixSettingsAware {
+	static class SimpleClass implements AsterixSettingsAware {
 		private AsterixSettingsReader settings;
 
 		@Override
