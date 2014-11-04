@@ -17,10 +17,9 @@ package se.avanzabank.asterix.remoting.component.consumer;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
-import se.avanzabank.asterix.context.AsterixPlugins;
-import se.avanzabank.asterix.context.AsterixPluginsAware;
+import se.avanzabank.asterix.context.AsterixInject;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
-import se.avanzabank.asterix.context.AsterixServiceComponents;
+import se.avanzabank.asterix.context.AsterixServiceComponentsImpl;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.context.ExternalDependency;
 import se.avanzabank.asterix.context.ExternalDependencyAware;
@@ -28,13 +27,13 @@ import se.avanzabank.asterix.gs.GsBinder;
 import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 import se.avanzabank.asterix.remoting.component.provider.AsterixRemotingServiceRegistryExporter;
 
-public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBeanPlugin<T>, ExternalDependencyAware<AsterixRemotingPluginDependencies>, AsterixPluginsAware {
+public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBeanPlugin<T>, ExternalDependencyAware<AsterixRemotingPluginDependencies> {
 	
 	private final Class<T> serviceApi;
 	private final String targetSpace;
     private final AsterixApiDescriptor descriptor;
 	private ExternalDependency<AsterixRemotingPluginDependencies> dependencies;
-	private AsterixPlugins plugins;
+	private AsterixServiceComponentsImpl serviceComponents;
 	
 	public AsterixRemotingServiceFactory(Class<T> serviceApi,
 										String targetSpaceName, 
@@ -46,7 +45,7 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBeanPlugi
 	
 	@Override
 	public T create(String qualifier) {
-		AsterixServiceComponent serviceComponent = plugins.getPlugin(AsterixServiceComponents.class).getComponent(descriptor);
+		AsterixServiceComponent serviceComponent = serviceComponents.getComponent(descriptor);
 
 		String targetSpaceName = descriptor.getAnnotation(AsterixRemoteApiDescriptor.class).targetSpaceName();
 		AsterixServiceProperties serviceProperties = new AsterixServiceProperties();
@@ -71,9 +70,9 @@ public class AsterixRemotingServiceFactory<T> implements AsterixFactoryBeanPlugi
 		return AsterixRemotingPluginDependencies.class;
 	}
 
-	@Override
-	public void setPlugins(AsterixPlugins plugins) {
-		this.plugins = plugins;
+	@AsterixInject
+	public void setServiceComponents(AsterixServiceComponentsImpl serviceComponents) {
+		this.serviceComponents = serviceComponents;
 	}
 	
 }
