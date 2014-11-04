@@ -17,10 +17,9 @@ package se.avanzabank.asterix.jndi.plugin;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
-import se.avanzabank.asterix.context.AsterixPlugins;
-import se.avanzabank.asterix.context.AsterixPluginsAware;
+import se.avanzabank.asterix.context.AsterixInject;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
-import se.avanzabank.asterix.context.AsterixServiceComponents;
+import se.avanzabank.asterix.context.AsterixServiceComponentsImpl;
 import se.avanzabank.asterix.context.AsterixSettingsReader;
 /**
  * 
@@ -28,13 +27,13 @@ import se.avanzabank.asterix.context.AsterixSettingsReader;
  *
  * @param <T>
  */
-public class AsterixConfigFactoryBean<T> implements AsterixFactoryBeanPlugin<T>, AsterixPluginsAware {
+public class AsterixConfigFactoryBean<T> implements AsterixFactoryBeanPlugin<T> {
 	
-	private AsterixPlugins plugins;
 	private String  entryName;
 	private AsterixApiDescriptor descriptor;
 	private Class<T> api;
 	private AsterixSettingsReader settings;
+	private AsterixServiceComponentsImpl serviceComponenets;
 
 	public AsterixConfigFactoryBean(String entryName, AsterixApiDescriptor descriptor, Class<T> beanType, AsterixSettingsReader settings) {
 		this.entryName = entryName;
@@ -53,7 +52,7 @@ public class AsterixConfigFactoryBean<T> implements AsterixFactoryBeanPlugin<T>,
 	}
 
 	private AsterixServiceComponent getServiceComponent(String componentName) {
-		return plugins.getPlugin(AsterixServiceComponents.class).getComponent(componentName);
+		return serviceComponenets.getComponent(componentName);
 	}
 	
 
@@ -70,9 +69,9 @@ public class AsterixConfigFactoryBean<T> implements AsterixFactoryBeanPlugin<T>,
 		return this.api;
 	}
 
-	@Override
-	public void setPlugins(AsterixPlugins plugins) {
-		this.plugins = plugins;
+	@AsterixInject
+	public void setServiceComponenets(AsterixServiceComponentsImpl serviceComponenets) {
+		this.serviceComponenets = serviceComponenets;
 	}
 
 }

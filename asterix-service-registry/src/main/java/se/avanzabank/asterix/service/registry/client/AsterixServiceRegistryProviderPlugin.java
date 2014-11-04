@@ -26,24 +26,21 @@ import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixApiProviderPlugin;
 import se.avanzabank.asterix.context.AsterixDecorator;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
-import se.avanzabank.asterix.context.AsterixPlugins;
-import se.avanzabank.asterix.context.AsterixPluginsAware;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 
 @MetaInfServices(AsterixApiProviderPlugin.class)
-public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderPlugin, AsterixPluginsAware, AsterixDecorator {
+public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderPlugin, AsterixDecorator {
 	
-	private AsterixPlugins plugins;
 	private AsterixServiceRegistryLeaseManager leaseManager = new AsterixServiceRegistryLeaseManager();
 	
 	@Override
 	public List<AsterixFactoryBeanPlugin<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
 		List<AsterixFactoryBeanPlugin<?>> result = new ArrayList<>();
 		for (Class<?> exportedApi : descriptor.getAnnotation(AsterixServiceRegistryApi.class).exportedApis()) {
-			result.add(new ServiceRegistryLookupFactory<>(descriptor, exportedApi, plugins, leaseManager));
+			result.add(new ServiceRegistryLookupFactory<>(descriptor, exportedApi, leaseManager));
 			Class<?> asyncInterface = loadInterfaceIfExists(exportedApi.getName() + "Async");
 			if (asyncInterface != null) {
-				result.add(new ServiceRegistryLookupFactory<>(descriptor, asyncInterface, plugins, leaseManager));
+				result.add(new ServiceRegistryLookupFactory<>(descriptor, asyncInterface, leaseManager));
 			}
 		}
 		return result;
@@ -72,11 +69,6 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 	@Override
 	public Class<? extends Annotation> getProviderAnnotationType() {
 		return AsterixServiceRegistryApi.class;
-	}
-
-	@Override
-	public void setPlugins(AsterixPlugins plugins) {
-		this.plugins = plugins;
 	}
 	
 	@Override

@@ -22,9 +22,9 @@ import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixBeanAware;
 import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
-import se.avanzabank.asterix.context.AsterixPlugins;
+import se.avanzabank.asterix.context.AsterixInject;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
-import se.avanzabank.asterix.context.AsterixServiceComponents;
+import se.avanzabank.asterix.context.AsterixServiceComponentsImpl;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
 
 public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin<T>, AsterixBeanAware {
@@ -32,16 +32,14 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 	private Class<T> api;
 	private AsterixApiDescriptor descriptor;
 	private AsterixBeans beans;
-	private AsterixPlugins plugins;
 	private AsterixServiceRegistryLeaseManager leaseManager;
+	private AsterixServiceComponentsImpl serviceComponents;
 
 	public ServiceRegistryLookupFactory(AsterixApiDescriptor descriptor,
 										Class<T> api,
-										AsterixPlugins plugins,
 										AsterixServiceRegistryLeaseManager leaseManager) {
 		this.descriptor = descriptor;
 		this.api = api;
-		this.plugins = plugins;
 		this.leaseManager = leaseManager;
 	}
 
@@ -66,9 +64,9 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 		if (componentName == null) {
 			throw new IllegalArgumentException("Expected a componentName to be set on serviceProperties: " + serviceProperties);
 		}
-		return plugins.getPlugin(AsterixServiceComponents.class).getComponent(componentName);
+		return serviceComponents.getComponent(componentName);
 	}
-
+	
 	@Override
 	public List<Class<?>> getBeanDependencies() {
 		return Arrays.<Class<?>>asList(AsterixServiceRegistryClient.class);
@@ -82,6 +80,11 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 	@Override
 	public void setAsterixBeans(AsterixBeans beans) {
 		this.beans = beans;
+	}
+	
+	@AsterixInject
+	public void setServiceComponents(AsterixServiceComponentsImpl serviceComponents) {
+		this.serviceComponents = serviceComponents;
 	}
 
 }

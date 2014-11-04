@@ -102,7 +102,7 @@ public class AsterixServerRuntimeBuilder {
 		Set<AsterixServiceComponent> result = new HashSet<>();
 		for (AsterixExportedServiceInfo serviceInfo : exportedServiceInfos) {
 			String componentName = serviceInfo.getComponentName();
-			result.add(asterixContext.getPlugin(AsterixServiceComponents.class).getComponent(componentName));
+			result.add(asterixContext.getInstance(AsterixServiceComponentsImpl.class).getComponent(componentName));
 		}
 		return result;
 	}
@@ -143,9 +143,9 @@ public class AsterixServerRuntimeBuilder {
 	private boolean publishesService(Class<?> providedServiceType) {
 		return this.apiDescriptorByProvideService.containsKey(providedServiceType);
 	}
-
+	
 	private String getServiceComponent(AsterixApiDescriptor apiDescriptor) {
-		return this.asterixContext.getPlugin(AsterixServiceComponents.class).getComponent(apiDescriptor).getName();
+		return this.asterixContext.getInstance(AsterixServiceComponentsImpl.class).getComponent(apiDescriptor).getName();
 	}
 
 	/**

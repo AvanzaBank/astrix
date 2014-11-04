@@ -29,18 +29,17 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixExportedServiceInfo;
-import se.avanzabank.asterix.context.AsterixPlugins;
-import se.avanzabank.asterix.context.AsterixPluginsAware;
-import se.avanzabank.asterix.context.AsterixServicePropertiesBuilderHolder;
+import se.avanzabank.asterix.context.AsterixInject;
 import se.avanzabank.asterix.context.AsterixServiceComponent;
-import se.avanzabank.asterix.context.AsterixServiceComponents;
+import se.avanzabank.asterix.context.AsterixServiceComponentsImpl;
+import se.avanzabank.asterix.context.AsterixServicePropertiesBuilderHolder;
 import se.avanzabank.asterix.context.AsterixServiceRegistryPlugin;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryClient;
 
 @MetaInfServices(AsterixServiceRegistryPlugin.class)
-public class AsterixServiceRegistryPluginImpl implements AsterixServiceRegistryPlugin, AsterixPluginsAware {
+public class AsterixServiceRegistryPluginImpl implements AsterixServiceRegistryPlugin {
 	
-	private AsterixPlugins plugins;
+	private AsterixServiceComponentsImpl serviceComponents;
 	
 	@Override
 	public void registerBeanDefinitions(BeanDefinitionRegistry registry, Collection<AsterixExportedServiceInfo> publishedServices) throws BeansException {
@@ -68,12 +67,12 @@ public class AsterixServiceRegistryPluginImpl implements AsterixServiceRegistryP
 	}
 	
 	private AsterixServiceComponent getComponent(String componentName) {
-		return plugins.getPlugin(AsterixServiceComponents.class).getComponent(componentName);
+		return serviceComponents.getComponent(componentName);
 	}
-
-	@Override
-	public void setPlugins(AsterixPlugins plugins) {
-		this.plugins = plugins;
+	
+	@AsterixInject
+	public void setServiceComponents(AsterixServiceComponentsImpl serviceComponents) {
+		this.serviceComponents = serviceComponents;
 	}
 	
 	@Override
