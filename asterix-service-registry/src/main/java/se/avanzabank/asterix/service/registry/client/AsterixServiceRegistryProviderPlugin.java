@@ -24,14 +24,14 @@ import org.kohsuke.MetaInfServices;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixApiProviderPlugin;
-import se.avanzabank.asterix.context.AsterixDecorator;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
+import se.avanzabank.asterix.context.AsterixInject;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 
 @MetaInfServices(AsterixApiProviderPlugin.class)
-public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderPlugin, AsterixDecorator {
+public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderPlugin {
 	
-	private AsterixServiceRegistryLeaseManager leaseManager = new AsterixServiceRegistryLeaseManager();
+	private AsterixServiceRegistryLeaseManager leaseManager;
 	
 	@Override
 	public List<AsterixFactoryBeanPlugin<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
@@ -75,9 +75,9 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 	public boolean isLibraryProvider() {
 		return false;
 	}
-
-	@Override
-	public Object getTarget() {
-		return leaseManager; // TODO: this is a hack. Introduce possibility for plugins to inject dependencies into objects that the create on their own?
+	
+	@AsterixInject
+	public void setLeaseManager(AsterixServiceRegistryLeaseManager leaseManager) {
+		this.leaseManager = leaseManager;
 	}
 }
