@@ -1,6 +1,5 @@
 # Asterix
-
-Asterix is a framework designed to simplify development and maintenance of microservices. It is used by service providers to publish provided services, and by service comsumers to bind to published services. Most applications do both, they provide services as well as comsume other services.
+Asterix is a framework designed to simplify development and maintenance of microservices. It is used by service providers to publish provided services, and by service consumers to bind to published services. Most applications do both, they provide services as well as consume other services.
 
 Some of the features provided:
 - service publishing/discovery
@@ -11,7 +10,7 @@ Some of the features provided:
 It's designed to support an organization where many teams develop different services and make those services available for other teams using Asterix.
 
 ## Service Registry
-A core component in the framework is the service registry. It’s an application that allows service-providers to register all services hey provide. The service-registry is also used by service-consumers to discover providers of a cobsumed service.
+A core component in the framework is the service registry. It’s an application that allows service-providers to register all services hey provide. The service-registry is also used by service-consumers to discover providers of a consumed service.
 
 
 ## Service Binding
@@ -25,6 +24,12 @@ Service binding is done in three steps:
 It's also possible to locate providers without using the service-registry, for instance using configuration.
 
 If the service is discovered using the service-registry, then a lease-manager thread will run for the given service in the background. The lease-manager will periodically ask the service-registry for information about where the given service is located, and if the service has moved the lease-manager will rebind the to the new provider.
+
+## Service Versioning
+A key goal of Asterix is to allow for an independent release cycle of different microservices. To support that Asterix has built in support for data-format versioning.
+
+## Fault tolerance
+Asterix uses a fault-tolerance layer built using Hystrix. Depending on the type of service consumed, Asterix will decide what isolation mechanism to use and protect each service-invocation using the given mechanism.
 
 ## Spring Integration
 Asterix is well integrated with spring.
