@@ -134,6 +134,7 @@ public class LunchApiV1Migration implements AsterixJsonApiMigration {
 }
 ```
 
+## Providing the lunch-api
 
 ### Service implementations
 
@@ -170,4 +171,18 @@ public class LunchServiceDescriptor {
 
 <!-- The actual service implementation(s) -->
 <bean id="lunchService" class="se.avanzabank.asterix.integration.tests.domain.pu.LunchServiceImpl"/>
+```
+
+
+
+## Consuming the lunch-api
+
+```xml
+<bean id="asterixFrameworkBean" class="se.avanzabank.asterix.context.AsterixFrameworkBean">
+	<property name="consumedAsterixBeans">
+		<list>
+			<value>se.avanzabank.asterix.integration.tests.domain.api.LunchService</value>
+		</list>
+	</property>
+</bean>
 ```
