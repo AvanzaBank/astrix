@@ -177,6 +177,8 @@ public class LunchServiceDescriptor {
 
 ## Consuming the lunch-api
 
+### pu.xml (or an ordinary spring.xml)
+
 ```xml
 <bean id="asterixFrameworkBean" class="se.avanzabank.asterix.context.AsterixFrameworkBean">
 	<property name="consumedAsterixBeans">
