@@ -19,7 +19,7 @@ One of the main responsibilities for Asterix is service binding.
 
 Service binding is done in three steps. 
 1. Asterix discovers a provider of a given service, typically using the service-registry.
-2. Asterix uses information retrieved from discovery to identifies what mechanism, "ServiceComponent", to use to bind to the given service provider 
+2. Asterix uses information retrieved from discovery to identifies what mechanism, `ServiceComponent`, to use to bind to the given service provider 
 3. Asterix uses the ServiceCompnonent and to bind to the given provider
 
 It's also possible to locate providers without using the service-registry, for instance using configuration.
