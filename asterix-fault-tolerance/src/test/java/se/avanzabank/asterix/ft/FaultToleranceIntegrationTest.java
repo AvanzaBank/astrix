@@ -185,7 +185,6 @@ public class FaultToleranceIntegrationTest {
 			try {
 				service.sleep(200);
 			} catch (Exception e) {
-				e.printStackTrace();
 				this.exception  = e;
 			}
 		}
