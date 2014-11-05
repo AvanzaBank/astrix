@@ -17,9 +17,9 @@ A core component in the framework is the service registry. It’s an application
 ## Service Binding
 One of the main responsibilities for Asterix is service binding. 
 
-Service binding is done in three steps. 
-1. Asterix discovers a provider of a given service, typically using the service-registry.
-2. Asterix uses information retrieved from discovery to identifies what mechanism, `ServiceComponent`, to use to bind to the given service provider 
+Service binding is done in three steps: 
+1. Asterix discovers a provider of a given service, typically using the service-registry
+2. Asterix uses information retrieved from discovery to identifies what mechanism, (`ServiceComponent`), to use to bind to the given service provider 
 3. Asterix uses the ServiceCompnonent and to bind to the given provider
 
 It's also possible to locate providers without using the service-registry, for instance using configuration.
@@ -30,6 +30,7 @@ If the service is discovered using the service-registry, then a lease-manager th
 Asterix is well integrated with spring.
 
 
+## Generic module layout
 Typical module-layout when creating a service using Asterix: 
 * API
 * API provider
@@ -43,7 +44,7 @@ Modules
 * lunch-server 
 
 
-## API (lunch-api) 
+### API (lunch-api) 
 ```java
 interface LunchService {
 	@AsterixBroadcast(reducer = LunchSuggestionReducer.class)
@@ -60,7 +61,7 @@ interface LunchRestaurantGrader {
 }
 ```
 
-## API descriptor (lunch-api-provider)
+### API descriptor (lunch-api-provider)
 
 ```java
 // The API is versioned.
@@ -83,7 +84,7 @@ public class LunchApiDescriptor {
 }
 ```
 
-## Migration (lunch-api-provider)
+### Migration (lunch-api-provider)
 
 ```java
 public interface AsterixJsonApiMigration {
@@ -129,7 +130,7 @@ public class LunchApiV1Migration implements AsterixJsonApiMigration {
 ```
 
 
-## Service implementations
+### Service implementations
 
 ```java
 @AsterixServiceExport({LunchService.class, InternalLunchFeeder.class})
@@ -139,7 +140,7 @@ public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 // And other service-implementations
 ```
 
-## Service Descriptor
+### Service Descriptor
 
 ```java
 @AsterixService(
@@ -154,7 +155,7 @@ public class LunchServiceDescriptor {
 }
 ```
 
-## pu.xml
+### pu.xml
 
 ```xml
 <!-- Asterix service framework (provider and consumer) -->
