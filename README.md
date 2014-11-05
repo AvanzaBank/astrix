@@ -1,13 +1,26 @@
 # Asterix
 
-Asterix is a service framework used to build distributed applications consisting of many services located in different processes. 
+Asterix is a framework designed to simplify development and maintenance of microservices. It is used by service providers to publish its provided services, and by service comsumers to bind to published services. Most applications do both, they provide services as well as comsume other services.
 
-Its designed to support an organization where many teams develop services that are used by other teams. On can think of Asterix as a dependency-injection framework at the service-level. 
+Some of the features provided:
+- service publishing/discovery
+- service binding
+- service versioning
+- fault tolerance
 
-A typical use case is to use a dependency injection framework like spring to assemble a given application that consumes a set of Asterix-services, 
-and use Asterix as factory for creating 'service'-beans.
+It's designed to support an organization where many teams develop different services and make those services available for other teams using Asterix.
 
-Why not use a dependency injection framework to create the service-beans?
+## Service Registry
+A core component in the framework is the service registry. It’s an application that allows service-providers to register all services hey provide. The service-registry is also used by service-consumers to discover providers of a cobsumed service.
+
+
+## Service Binding
+One of the main responsibilities for Asterix is service binding. It requires Asterix to somehow locate a provider for a given service, and then bind the current client to that service. Typically this involves using the service-registry to dynamicallt discover service providers, and then use the information retrieved to bind directly to the service-provider. It's also possible to locate providers without using the service-registry, for instance using configuration.
+
+If the service is located using the service-registry, then a lease-manager thread will run for the given service in the background. The lease-manager will periodically ask the service-registry for information about where the given service is located, and if the service has moved the lease-manager will rebind the to the new provider.
+
+## Spring Integration
+Asterix is well integrated with spring.
 
 
 Typical module-layout when creating a service using Asterix: 
