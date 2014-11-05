@@ -16,6 +16,7 @@
 		<module>asterix-service-registry-pu</module>
 		<module>asterix-test-util</module>
 		<module>asterix-gs-test-util</module>
+		<module>asterix-dashboard</module>
 	</modules>
 
 	<scm>

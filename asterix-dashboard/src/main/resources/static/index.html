@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html ng-app="AsterixDashboard">
+
+<head>
+<link rel="stylesheet" href="css/bootstrap.min.css" />
+<link href="app.css" rel="stylesheet" />
+<script type="text/javascript" src="script/angular.min.js"></script>
+<script type="text/javascript" src="app.js"></script>
+</head>
+
+	<body>
+		<div class="container-fluid" ng-controller="ServiceRegistryController">
+			<h1>Asterix Service Registry</h1>
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Provided Api</th>
+						<th>Component</th>
+						<th>Service URL</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="service in services">
+						<td>{{service.providedApi}}</td>
+						<td>{{service.component}}</td>
+						<td>{{service.url}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>
