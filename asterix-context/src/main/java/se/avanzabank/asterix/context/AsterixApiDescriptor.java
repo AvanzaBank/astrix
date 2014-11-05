@@ -64,10 +64,6 @@ public class AsterixApiDescriptor {
 		return descriptorHolder.isAnnotationPresent(AsterixServiceRegistryApi.class);
 	}
 	
-	public boolean usesConfigLookup() {
-		return descriptorHolder.isAnnotationPresent(AsterixConfigApi.class);
-	}
-	
 	public boolean isVersioned() {
 		return descriptorHolder.isAnnotationPresent(AsterixVersioned.class);
 	}

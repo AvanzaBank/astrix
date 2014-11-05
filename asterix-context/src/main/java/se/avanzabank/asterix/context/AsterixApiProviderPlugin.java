@@ -30,10 +30,8 @@ import java.util.List;
  * a class with @AsterixLibraryProvider an export different api-elements by annotating factory methods
  * for different api elements with @AsterixExport. 
  * 
- * Another type of api is a pure "asterix-remoting" api, which also requires a server side component to respond
- * to the incoming service-request.
- * 
- * 
+ * Another type of api is a "service-registry" api, which binds to services using the service-registry
+ * which typically also requires a server side component to respond to the service-invocation-request.
  * 
  * @author Elias Lindholm (elilin)
  *

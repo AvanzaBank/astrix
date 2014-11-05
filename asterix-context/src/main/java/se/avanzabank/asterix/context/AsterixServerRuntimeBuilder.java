@@ -121,12 +121,7 @@ public class AsterixServerRuntimeBuilder {
 					continue;
 				}
 				AsterixApiDescriptor apiDescriptor = getApiDescriptor(providedServiceType);
-				if (apiDescriptor.usesServiceRegistry() || apiDescriptor.usesConfigLookup()) {
-					result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, serviceDescriptor.getComponent(), beanName));
-				} else {
-					String componentName = getServiceComponent(apiDescriptor);
-					result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, componentName, beanName));
-				}	
+				result.add(new AsterixExportedServiceInfo(providedServiceType, apiDescriptor, serviceDescriptor.getComponent(), beanName));
 			}
 		}
 		return result;
@@ -144,10 +139,6 @@ public class AsterixServerRuntimeBuilder {
 		return this.apiDescriptorByProvideService.containsKey(providedServiceType);
 	}
 	
-	private String getServiceComponent(AsterixApiDescriptor apiDescriptor) {
-		return this.asterixContext.getInstance(AsterixServiceComponents.class).getComponent(apiDescriptor).getName();
-	}
-
 	/**
 	 * Asterix beans consumed by the service framework. For instance: The service-registry components
 	 * uses the AsterixServiceRegistry bean to publish services to the service registry. <p>
