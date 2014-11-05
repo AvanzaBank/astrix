@@ -15,7 +15,6 @@
  */
 package se.avanzabank.asterix.context;
 
-import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -128,11 +127,6 @@ public class AsterixDirectComponent implements AsterixServiceComponent {
 	@Override
 	public Class<? extends AsterixServicePropertiesBuilder> getServiceBuilder() {
 		// NOT USED. This is a client side component only
-		return null;
-	}
-	
-	@Override
-	public Class<? extends Annotation> getApiDescriptorType() {
 		return null;
 	}
 	

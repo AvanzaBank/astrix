@@ -30,19 +30,6 @@ public class AsterixServiceComponents implements AsterixPluginsAware {
 		return serviceComponent;
 	}
 
-	public AsterixServiceComponent getComponent(AsterixApiDescriptor apiDescriptor) {
-		// TODO: avoid iterating over AsterixServiceComponents. In order to do so we must be able to lookup up the descriptorType from a given AsterixApiDescriptor.
-		for (AsterixServiceComponent serviceComponent : this.componentsByName.values()) {
-			if (serviceComponent.getApiDescriptorType() == null) {
-				continue;
-			}
-			if (apiDescriptor.isAnnotationPresent(serviceComponent.getApiDescriptorType())) {
-				return serviceComponent;
-			}
-		}
-		throw new IllegalStateException("Can't find AsterixServiceComponent for apiDescriptor: " + apiDescriptor);
-	}
-
 	@Override
 	public void setPlugins(AsterixPlugins plugins) {
 		for (AsterixServiceComponent serviceComponent : plugins.getPlugins(AsterixServiceComponent.class)) {

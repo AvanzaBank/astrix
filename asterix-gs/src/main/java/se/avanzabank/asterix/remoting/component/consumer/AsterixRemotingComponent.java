@@ -15,8 +15,6 @@
  */
 package se.avanzabank.asterix.remoting.component.consumer;
 
-import java.lang.annotation.Annotation;
-
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
@@ -97,8 +95,4 @@ public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixSer
 		return AsterixRemotingServiceRegistryExporter.class;
 	}
 	
-	public Class<? extends Annotation> getApiDescriptorType() {
-		return null;
-	}
-
 }

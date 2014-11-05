@@ -15,8 +15,6 @@
  */
 package se.avanzabank.asterix.context;
 
-import java.lang.annotation.Annotation;
-
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 /**
@@ -62,17 +60,5 @@ public interface AsterixServiceComponent {
 	 * @return
 	 */
 	Class<? extends AsterixServicePropertiesBuilder> getServiceBuilder();
-	
-
-	/**
-	 * For service-components that might be used standalone (that is: without the service-registry).
-	 * 
-	 * This method defines a unique annotation used to describe the given api.
-	 * 
-
-	 * @return
-	 */
-	@Deprecated
-	Class<? extends Annotation> getApiDescriptorType();
 	
 }
