@@ -143,7 +143,7 @@ public class FaultToleranceIntegrationTest {
 	}
 	
 	@Test
-	@Ignore("Unstable")
+//	@Ignore("Unstable")
 	public void rejectsWhenPoolIsFull() throws Exception {
 		HystrixCommandSettings settings = settingsRandomCommandKey();
 		settings.setCoreSize(3);
