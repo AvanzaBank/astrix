@@ -72,6 +72,7 @@ public interface AsterixServiceComponent {
 
 	 * @return
 	 */
+	@Deprecated
 	Class<? extends Annotation> getApiDescriptorType();
 	
 }

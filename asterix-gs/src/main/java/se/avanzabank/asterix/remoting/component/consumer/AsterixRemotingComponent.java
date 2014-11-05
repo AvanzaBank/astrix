@@ -35,7 +35,6 @@ import se.avanzabank.asterix.context.AsterixVersioningPlugin;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.gs.GsBinder;
 import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
-import se.avanzabank.asterix.provider.remoting.AsterixRemoteApiDescriptor;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
 import se.avanzabank.asterix.remoting.component.provider.AsterixRemotingServiceRegistryExporter;
@@ -98,9 +97,8 @@ public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixSer
 		return AsterixRemotingServiceRegistryExporter.class;
 	}
 	
-	@Override
 	public Class<? extends Annotation> getApiDescriptorType() {
-		return AsterixRemoteApiDescriptor.class;
+		return null;
 	}
 
 }
