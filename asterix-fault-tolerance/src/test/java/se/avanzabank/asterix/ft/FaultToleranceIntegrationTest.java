@@ -15,12 +15,8 @@
  */
 package se.avanzabank.asterix.ft;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isA;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import se.avanzabank.asterix.core.ServiceUnavailableException;
@@ -143,23 +138,25 @@ public class FaultToleranceIntegrationTest {
 	}
 	
 	@Test
-//	@Ignore("Unstable")
 	public void rejectsWhenPoolIsFull() throws Exception {
 		HystrixCommandSettings settings = settingsRandomCommandKey();
 		settings.setCoreSize(3);
 		settings.setQueueSizeRejectionThreshold(3);
+		settings.setExecutionIsolationThreadTimeoutInMilliseconds(5000);
 		SimpleService serviceWithFt = HystrixAdapter.create(api , provider, randomString(), settings);
-		// For some reason calls are not rejected unless we "warm up" with this call first. Why?
-		serviceWithFt.echo("");
 		ExecutorService pool = Executors.newCachedThreadPool();
 		Collection<R> runners = new ArrayList<R>();
 		for (int i = 0; i < 10; i++) {
 			R runner = new R(serviceWithFt);
 			runners.add(runner);
+			// We need a delay between starting the tasks since Hystrix has its own check to see if stuff fits
+			// in the queue. This check is done once before tasks are submitted to the executor. If we start a lot
+			// of calls in parallel they will all pass that check since none of them has been queued yet.
+			Thread.sleep(50);
 			pool.execute(runner);
 		}
 		pool.shutdown();
-		pool.awaitTermination(2000, TimeUnit.MILLISECONDS);
+		pool.awaitTermination(4000, TimeUnit.MILLISECONDS);
 		int numRejectionErrors = 0;
 		for (R runner : runners) {
 			Exception e = runner.getException();
@@ -183,8 +180,8 @@ public class FaultToleranceIntegrationTest {
 		@Override
 		public void run() {
 			try {
-				service.sleep(200);
-			} catch (Exception e) {
+				service.sleep(1000);
+			} catch (ServiceUnavailableException e) {
 				this.exception  = e;
 			}
 		}
