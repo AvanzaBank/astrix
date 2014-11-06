@@ -17,11 +17,15 @@ package se.avanzabank.asterix.versioning;
 
 import static org.junit.Assert.assertEquals;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.jackson.node.ObjectNode;
 import org.junit.Test;
+
+import com.google.common.reflect.TypeToken;
 
 import se.avanzabank.asterix.provider.versioning.AsterixJsonApiMigration;
 import se.avanzabank.asterix.provider.versioning.AsterixJsonMessageMigration;
@@ -76,6 +80,44 @@ public class VersionedJsonObjectMapperTest {
 		assertEquals("f1", v1Pojo.getFoo());
 	}
 	
+	@Test
+	@SuppressWarnings("serial")
+	public void deserializesGenericTypes() throws Exception {
+		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
+		VersionedJsonObjectMapper objectMapper = objectMapperBuilder.build();
+		
+		TestPojoV1 testPojo1 = new TestPojoV1("p1");
+		List<TestPojoV1> testPojos = new ArrayList<>();
+		testPojos.add(testPojo1);
+		String jsonPojo = objectMapper.serialize(testPojos, 1);
+		
+		TypeToken<List<TestPojoV1>> genericListType = new TypeToken<List<TestPojoV1>>() {};
+		
+		List<TestPojoV1> deserializedPojos = objectMapper.deserialize(jsonPojo, genericListType.getType(), 1);
+		assertEquals(1, deserializedPojos.size());
+		assertEquals("p1", deserializedPojos.get(0).getFoo());
+	}
+	
+
+	@Test
+	@SuppressWarnings("serial")
+	public void migratesGenericTypes() throws Exception {
+		apiMigrations.add(new TestPojoV1ToV2Migration());
+		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
+		VersionedJsonObjectMapper objectMapper = objectMapperBuilder.build();
+		
+		TestPojoV1 testPojo1 = new TestPojoV1("p1");
+		List<TestPojoV1> testPojos = new ArrayList<>();
+		testPojos.add(testPojo1);
+		String jsonPojo = objectMapper.serialize(testPojos, 1);
+		
+		TypeToken<List<TestPojoV2>> genericListType = new TypeToken<List<TestPojoV2>>() {};
+		
+		List<TestPojoV2> deserializedPojos = objectMapper.deserialize(jsonPojo, genericListType.getType(), 1);
+		assertEquals(1, deserializedPojos.size());
+		assertEquals("p1", deserializedPojos.get(0).getFoo());
+		assertEquals("defaultBar", deserializedPojos.get(0).getBar());
+	}
 	
 	private final class TestPojoV1ToV2Migration implements AsterixJsonApiMigration {
 		@Override
