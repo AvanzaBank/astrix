@@ -18,6 +18,7 @@ package se.avanzabank.asterix.remoting.server;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -70,7 +71,7 @@ public class AsterixServiceActivator {
 				throw new AsterixMissingServiceMethodException(String.format("Missing service method: service=%s method=%s", serviceApi, serviceMethodSignature));
 			}
 			
-			Object[] arguments = unmarshal(request.getArguments(), serviceMethod.getParameterTypes(), version);
+			Object[] arguments = unmarshal(request.getArguments(), serviceMethod.getGenericParameterTypes(), version);
 			Object result = serviceMethod.invoke(service, arguments);
 			AsterixServiceInvocationResponse invocationResponse = new AsterixServiceInvocationResponse();
 			if (!serviceMethod.getReturnType().equals(Void.TYPE)) {
@@ -79,7 +80,7 @@ public class AsterixServiceActivator {
 			return invocationResponse;
 		}
 
-		private Object[] unmarshal(Object[] elements, Class<?>[] types, int version) {
+		private Object[] unmarshal(Object[] elements, Type[] types, int version) {
 			Object[] result = new Object[elements.length];
 			for (int i = 0; i < result.length; i++) {
 				result[i] = objectSerializer.deserialize(elements[i], types[i], version);

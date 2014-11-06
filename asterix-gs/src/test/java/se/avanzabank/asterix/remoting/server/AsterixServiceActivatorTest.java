@@ -21,6 +21,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -28,14 +30,19 @@ import org.junit.Test;
 import org.openspaces.remoting.Routing;
 
 import rx.Observable;
+import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.core.AsterixBroadcast;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.core.AsterixRemoteResult;
 import se.avanzabank.asterix.core.AsterixRemoteResultReducer;
+import se.avanzabank.asterix.provider.versioning.AsterixObjectMapperConfigurer;
+import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
+import se.avanzabank.asterix.provider.versioning.JacksonObjectMapperBuilder;
 import se.avanzabank.asterix.remoting.client.AsterixMissingServiceException;
 import se.avanzabank.asterix.remoting.client.AsterixRemoteServiceException;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingProxy;
 import se.avanzabank.asterix.remoting.client.AsterixRemotingTransport;
+import se.avanzabank.asterix.versioning.plugin.JacksonVersioningPlugin;
 
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 
@@ -45,12 +52,27 @@ import com.gigaspaces.annotation.pojo.SpaceRouting;
  *
  */
 public class AsterixServiceActivatorTest {
+
+	public static class DummyConfigurer implements AsterixObjectMapperConfigurer {
+		@Override
+		public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
+		}
+	}
 	
-	AsterixObjectSerializer objectSerializer = new AsterixObjectSerializer.NoVersioningSupport();
+	@AsterixVersioned(
+			apiMigrations = {},
+			objectMapperConfigurer = DummyConfigurer.class,
+			version = 1
+	)
+	public static class DummyDescriptor {
+		
+	}
+	
+	AsterixObjectSerializer objectSerializer = new JacksonVersioningPlugin().create(new AsterixApiDescriptor(DummyDescriptor.class));
 	AsterixServiceActivator activator = new AsterixServiceActivator();
 	
 	@Test
-	public void invokesAServiceThrougTransportAndServiceActivator() throws Exception {
+	public void invokesAServiceThroughTransportAndServiceActivator() throws Exception {
 		TestService impl = new TestService() {
 			@Override
 			public HelloResponse hello(HelloRequest message) {
@@ -275,11 +297,59 @@ public class AsterixServiceActivatorTest {
 		message.toBlocking().first();
 	}
 	
+	@Test
+	public void supportServicesThatAcceptAndReturnGenericTypes() throws Exception {
+		GenericReturnTypeService impl = new GenericReturnTypeService() {
+			@Override
+			public List<HelloResponse> hello(String routing, List<HelloRequest> greetings) {
+				List<HelloResponse> responses = new ArrayList<>();
+				for (HelloRequest request : greetings) {
+					responses.add(new HelloResponse("reply-" + request.getMesssage()));
+				}
+				return responses;
+			}
+		};
+		activator.register(impl, objectSerializer, GenericReturnTypeService.class);
+		
+		GenericReturnTypeService testService = AsterixRemotingProxy.create(GenericReturnTypeService.class, AsterixRemotingTransport.direct(activator), objectSerializer);
+
+		HelloRequest request = new HelloRequest("kalle");
+		List<HelloResponse> reply = testService.hello("foo-routing", Arrays.<HelloRequest>asList(request));
+		assertEquals(1, reply.size());
+		assertEquals("reply-kalle", reply.get(0).getGreeting());
+	}
+	
+	@Test
+	public void supportServicesThatAcceptAndReturnGenericOnBroadcast() throws Exception {
+		BroadcastingGenericReturnTypeService impl = new BroadcastingGenericReturnTypeService() {
+			@Override
+			public List<HelloResponse> hello(List<HelloRequest> greetings) {
+				List<HelloResponse> responses = new ArrayList<>();
+				for (HelloRequest request : greetings) {
+					responses.add(new HelloResponse("reply-" + request.getMesssage()));
+				}
+				return responses;
+			}
+		};
+		activator.register(impl, objectSerializer, BroadcastingGenericReturnTypeService.class);
+		
+		BroadcastingGenericReturnTypeService testService = AsterixRemotingProxy.create(BroadcastingGenericReturnTypeService.class, AsterixRemotingTransport.direct(activator), objectSerializer);
+
+		HelloRequest request = new HelloRequest("kalle");
+		List<HelloResponse> reply = testService.hello(Arrays.<HelloRequest>asList(request));
+		assertEquals(1, reply.size());
+		assertEquals("reply-kalle", reply.get(0).getGreeting());
+	}
+	
+	
 	public static class HelloRequest {
 		private String messsage;
 		
 		public HelloRequest(String messsage) {
 			this.messsage = messsage;
+		}
+		
+		public HelloRequest() {
 		}
 		
 		@SpaceRouting
@@ -299,6 +369,9 @@ public class AsterixServiceActivatorTest {
 			this.messsage = messsage;
 		}
 		
+		public BroadcastRequest() {
+		}
+		
 		public String getMesssage() {
 			return messsage;
 		}
@@ -310,6 +383,9 @@ public class AsterixServiceActivatorTest {
 	
 	public static class HelloResponse {
 		private String greeting;
+		
+		public HelloResponse() {
+		}
 		
 		public HelloResponse(String greeting) {
 			this.greeting = greeting;
@@ -347,6 +423,15 @@ public class AsterixServiceActivatorTest {
 	
 	interface NoArgumentService {
 		String hello();
+	}
+	
+	interface GenericReturnTypeService {
+		List<HelloResponse> hello(@Routing String routingKey, List<HelloRequest> greeting);
+	}
+	
+	interface BroadcastingGenericReturnTypeService {
+		@AsterixBroadcast
+		List<HelloResponse> hello(List<HelloRequest> greeting);
 	}
 	
 	interface TestService {
