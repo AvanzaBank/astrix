@@ -15,12 +15,7 @@
  */
 package se.avanzabank.asterix.versioning;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.codehaus.jackson.map.ObjectMapper;
+import java.lang.reflect.Type;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -50,70 +45,22 @@ public class JsonObjectMapper {
 		}
 	}
 	
+	public <T> T deserialize(String json, Type target, int fromVersion) {
+		try {
+			return impl.deserialize(json, target, fromVersion);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to deserialize: " + json + " into type: " + target, e);
+		}
+	}
+	
 	public static JsonObjectMapper create(Impl impl) {
 		return new JsonObjectMapper(impl);
 	}
 	
-	public static JsonObjectMapper simpleJacksonObjectMapper(ObjectMapper objectMapper) {
-		return new JsonObjectMapper(new SimpleJacksonJsonMessageMapper(objectMapper));
-	}
-	
-	// TODO: remove direct version: replaced by AsterixObjectSerializer abstraction
-	public static JsonObjectMapper direct() {
-		return direct(new DirectMessageMapper());
-	}
-	
-	public static JsonObjectMapper direct(DirectMessageMapper messageMapper) {
-		return new JsonObjectMapper(messageMapper);
-	}
 	
 	public interface Impl {
 		String serialize(Object object, int toVersion) throws Exception;
-		<T> T deserialize(String json, Class<T> target, int fromVersion) throws Exception;
+		<T> T deserialize(String json, Type target, int fromVersion) throws Exception;
 	}
-	
-	private static class SimpleJacksonJsonMessageMapper implements Impl {
-		
-		private ObjectMapper objectMapper;
-
-		public SimpleJacksonJsonMessageMapper(ObjectMapper objectMapper) {
-			this.objectMapper = objectMapper;
-		}
-
-		@Override
-		public String serialize(Object object, int toVersion) throws Exception {
-			return objectMapper.writeValueAsString(object);
-		}
-
-		@Override
-		public <T> T deserialize(String json, Class<T> target, int fromVersion) throws Exception {
-			return objectMapper.readValue(json, target);
-		}
-	}
-	
-	public static class DirectMessageMapper implements Impl {
-		
-		// TODO: rename to IdentityMessageMapper?
-		
-		private Map<String, Object> mappings = new HashMap<>();
-		private AtomicInteger idSequence = new AtomicInteger();
-
-		@Override
-		public String serialize(Object object, int toVersion) throws Exception {
-			String messageId = Integer.toString(idSequence.incrementAndGet());
-			this.mappings.put(messageId, object);
-			return messageId;
-		}
-
-		@Override
-		public <T> T deserialize(String json, Class<T> target, int fromVersion) throws Exception {
-			T mapping = target.cast(this.mappings.get(json));
-			if (mapping == null) {
-				throw new IllegalArgumentException("No mapping found for json: " + json + ". An object must be written to the same DirectMessageMapper instance before deserializeing");
-			}
-			return mapping;
-		}		
-	}
-	
 	
 }

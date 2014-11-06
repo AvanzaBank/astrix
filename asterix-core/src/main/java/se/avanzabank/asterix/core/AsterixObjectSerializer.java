@@ -15,9 +15,11 @@
  */
 package se.avanzabank.asterix.core;
 
+import java.lang.reflect.Type;
+
 public interface AsterixObjectSerializer {
 	
-	<T> T deserialize(Object element, Class<T> type, int version);
+	<T> T deserialize(Object element, Type type, int version);
 
 	Object serialize(Object element, int version);
 	
@@ -28,11 +30,8 @@ public interface AsterixObjectSerializer {
 		public static final int NO_VERSIONING = -21;
 		
 		@Override
-		public <T> T deserialize(Object element, Class<T> type, int version) {
-			if (type.isPrimitive()) {
-				return (T) element;
-			}
-			return type.cast(element);
+		public <T> T deserialize(Object element, Type type, int version) {
+			return (T) element;
 		}
 		@Override
 		public Object serialize(Object element, int version) {

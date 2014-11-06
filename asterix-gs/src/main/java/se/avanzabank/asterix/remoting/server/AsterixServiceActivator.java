@@ -18,6 +18,7 @@ package se.avanzabank.asterix.remoting.server;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -26,9 +27,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.remoting.client.AsterixMissingServiceException;
 import se.avanzabank.asterix.remoting.client.AsterixMissingServiceMethodException;
@@ -72,7 +71,7 @@ public class AsterixServiceActivator {
 				throw new AsterixMissingServiceMethodException(String.format("Missing service method: service=%s method=%s", serviceApi, serviceMethodSignature));
 			}
 			
-			Object[] arguments = unmarshal(request.getArguments(), serviceMethod.getParameterTypes(), version);
+			Object[] arguments = unmarshal(request.getArguments(), serviceMethod.getGenericParameterTypes(), version);
 			Object result = serviceMethod.invoke(service, arguments);
 			AsterixServiceInvocationResponse invocationResponse = new AsterixServiceInvocationResponse();
 			if (!serviceMethod.getReturnType().equals(Void.TYPE)) {
@@ -81,7 +80,7 @@ public class AsterixServiceActivator {
 			return invocationResponse;
 		}
 
-		private Object[] unmarshal(Object[] elements, Class<?>[] types, int version) {
+		private Object[] unmarshal(Object[] elements, Type[] types, int version) {
 			Object[] result = new Object[elements.length];
 			for (int i = 0; i < result.length; i++) {
 				result[i] = objectSerializer.deserialize(elements[i], types[i], version);
@@ -92,20 +91,10 @@ public class AsterixServiceActivator {
 	}
 	
 	private final ConcurrentMap<String, PublishedService<?>> serviceByType = new ConcurrentHashMap<>();
-	private final AsterixRemotingArgumentSerializerFactory objectSerializerFactory;
 	
-	@Autowired
-	public AsterixServiceActivator(AsterixRemotingArgumentSerializerFactory objectSerializerFactory) {
-		this.objectSerializerFactory = objectSerializerFactory;
-	}
-
-	public void register(Object provider, AsterixApiDescriptor apiDescriptor, Class<?>... publishedApis) {
-		// TODO allow different apis to have different object serializer?
-		AsterixObjectSerializer objectSerializer = objectSerializerFactory.create(apiDescriptor); 
-		PublishedService<?> publishedService = new PublishedService<>(provider, objectSerializer, publishedApis);
-		for (Class<?> publishedApi : publishedApis) {
-			this.serviceByType.put(publishedApi.getName(), publishedService);
-		}
+	public void register(Object provider, AsterixObjectSerializer objectSerializer, Class<?> publishedApi) {
+		PublishedService<?> publishedService = new PublishedService<>(provider, objectSerializer, publishedApi);
+		this.serviceByType.put(publishedApi.getName(), publishedService);
 	}
 	
 	/**

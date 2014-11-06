@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -91,7 +92,7 @@ public class AsterixRemotingProxy implements InvocationHandler {
 		RemoteServiceMethod serviceMethod = this.remoteServiceMethodByMethod.get(method);
 		GsRoutingKey routingKey = serviceMethod.getRoutingKey(args);
 		
-		Class<?> returnType = getReturnType(method);
+		Type returnType = getReturnType(method);
 		AsterixServiceInvocationRequest invocationRequest = new AsterixServiceInvocationRequest();
 		
 		invocationRequest.setHeader("apiVersion", Integer.toString(this.apiVersion));
@@ -184,12 +185,11 @@ public class AsterixRemotingProxy implements InvocationHandler {
 		
 	}
 
-	private Class<?> getReturnType(Method method) {
+	private Type getReturnType(Method method) {
 		if (isObservableApi || isAsyncApi) {
-			return (Class<?>)(ParameterizedType.class.cast(method.getGenericReturnType()).getActualTypeArguments()[0]);
+			return ParameterizedType.class.cast(method.getGenericReturnType()).getActualTypeArguments()[0];
 		}
-		Class<?> returnType = method.getReturnType();
-		return returnType;
+		return method.getGenericReturnType();
 	}
 
 	private String getTargetServiceName() {
@@ -197,7 +197,7 @@ public class AsterixRemotingProxy implements InvocationHandler {
 	}
 
 	private <T> Observable<T> observeProcessBroadcastRequest(
-			final Class<T> returnType, AsterixServiceInvocationRequest request,
+			final Type returnType, AsterixServiceInvocationRequest request,
 			Method method) throws InstantiationException,
 			IllegalAccessException {
 		AsterixBroadcast broadcast = method.getAnnotation(AsterixBroadcast.class);
@@ -219,7 +219,8 @@ public class AsterixRemotingProxy implements InvocationHandler {
 			public T call(List<AsterixServiceInvocationResponse> t1) {
 				List<AsterixRemoteResult<T>> unmarshalledResponses = new ArrayList<>();
 				for (AsterixServiceInvocationResponse response : t1) {
-					unmarshalledResponses.add(toRemoteResult(response, returnType, apiVersion));
+					AsterixRemoteResult<T> result = toRemoteResult(response, returnType, apiVersion);
+					unmarshalledResponses.add(result);
 				}
 				return reducer.reduce(unmarshalledResponses);
 			}
@@ -227,7 +228,7 @@ public class AsterixRemotingProxy implements InvocationHandler {
 	}
 
 	private Observable<Object> observeProcessRoutedRequest(
-			final Class<?> returnType, AsterixServiceInvocationRequest request,
+			final Type returnType, AsterixServiceInvocationRequest request,
 			GsRoutingKey routingKey) {
 		Observable<AsterixServiceInvocationResponse> response = this.serviceTransport.observeProcessRoutedRequest(request, routingKey);
 		return response.map(new Func1<AsterixServiceInvocationResponse, Object>() {
@@ -239,6 +240,10 @@ public class AsterixRemotingProxy implements InvocationHandler {
 	}
 	
 	private Object[] marshall(Object[] elements) {
+		if (elements == null) {
+			// No argument method
+			return new Object[0];
+		}
 		Object[] result = new Object[elements.length];
 		for (int i = 0; i < result.length; i++) {
 			result[i] = this.objectSerializer.serialize(elements[i], apiVersion);
@@ -246,17 +251,18 @@ public class AsterixRemotingProxy implements InvocationHandler {
 		return result;
 	}
 
-	private <T> AsterixRemoteResult<T> toRemoteResult(AsterixServiceInvocationResponse response, Class<T> returnType, int version) {
+	private <T> AsterixRemoteResult<T> toRemoteResult(AsterixServiceInvocationResponse response, Type returnType, int version) {
 		if (response.hasThrownException()) {
 			return AsterixRemoteResult.failure(new AsterixRemoteServiceException(response.getExceptionMsg(), response.getThrownExceptionType(), response.getCorrelationId()));
 		}
 		if (returnType.equals(Void.TYPE)) {
 			return AsterixRemoteResult.voidResult();
 		}
-		return AsterixRemoteResult.successful(unmarshall(response, returnType, version));
+		T result = unmarshall(response, returnType, version);
+		return AsterixRemoteResult.successful(result);
 	}
 
-	private <T> T unmarshall(AsterixServiceInvocationResponse response, Class<T> returnType, int version) {
+	private <T> T unmarshall(AsterixServiceInvocationResponse response, Type returnType, int version) {
 		return objectSerializer.deserialize(response.getResponseBody(), returnType, version);
 	}
 

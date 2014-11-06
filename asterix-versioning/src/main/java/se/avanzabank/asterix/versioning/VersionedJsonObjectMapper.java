@@ -16,6 +16,7 @@
 package se.avanzabank.asterix.versioning;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,9 @@ import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.module.SimpleModule;
+import org.codehaus.jackson.map.type.TypeFactory;
 import org.codehaus.jackson.node.ObjectNode;
+import org.codehaus.jackson.type.JavaType;
 
 import se.avanzabank.asterix.provider.versioning.AsterixJsonApiMigration;
 import se.avanzabank.asterix.provider.versioning.AsterixJsonMessageMigration;
@@ -62,10 +65,11 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 	}
 
 	@Override
-	public <T> T deserialize(String json, Class<T> target, int fromVersion) throws Exception {
+	public <T> T deserialize(String json, Type target, int fromVersion) throws Exception {
 		versionHolder.set(fromVersion);
 		try {
-			return migratingMapper.readValue(json, target);
+			JavaType javaType = migratingMapper.getTypeFactory().constructType(target);
+			return migratingMapper.readValue(json, javaType);
 		} finally {
 			versionHolder.remove();
 		}
