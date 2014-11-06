@@ -57,7 +57,7 @@ public class AsterixClientRuntimeBuilder {
 		
 		// AsterixConfigurer must be created AFTER all dependency-beans have bean created.
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixConfigurer.class);
-		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
+		beanDefinition.setAutowireMode(Autowire.NO.value());
 		MutablePropertyValues asterixConfigurerProps = new MutablePropertyValues();
 //		asterixConfigurerProps.add("settings", this.settings);
 		asterixConfigurerProps.add("subsystem", this.asterixContext.getCurrentSubsystem());
