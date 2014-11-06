@@ -16,6 +16,7 @@
 package se.avanzabank.asterix.versioning;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,10 +63,11 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 	}
 
 	@Override
-	public <T> T deserialize(String json, Class<T> target, int fromVersion) throws Exception {
+	public <T> T deserialize(String json, Type target, int fromVersion) throws Exception {
 		versionHolder.set(fromVersion);
 		try {
-			return migratingMapper.readValue(json, target);
+//			throw new UnsupportedOperationException("TODO");
+			return migratingMapper.readValue(json, (Class<T>)target);
 		} finally {
 			versionHolder.remove();
 		}
