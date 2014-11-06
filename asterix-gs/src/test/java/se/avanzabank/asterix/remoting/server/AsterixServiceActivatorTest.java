@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -245,7 +246,7 @@ public class AsterixServiceActivatorTest {
 	public void ioExceptionThrownDuringDeserializationAreProppagatedAsRuntimeExceptions() throws Exception {
 		AsterixObjectSerializer corruptDeserializer = new AsterixObjectSerializer.NoVersioningSupport() {
 			@Override
-			public <T> T deserialize(Object element, Class<T> target, int version) {
+			public <T> T deserialize(Object element, Type target, int version) {
 				if (target.equals(HelloResponse.class)) {
 					// simulate failure in deserializing service invocation response
 					throw new IllegalArgumentException("phew.. I/O, huh?");

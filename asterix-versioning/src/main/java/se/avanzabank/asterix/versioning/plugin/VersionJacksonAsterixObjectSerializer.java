@@ -15,6 +15,7 @@
  */
 package se.avanzabank.asterix.versioning.plugin;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,9 +57,9 @@ public class VersionJacksonAsterixObjectSerializer implements AsterixObjectSeria
 	}
 
 	@Override
-	public <T> T deserialize(Object element, Class<T> type, int fromVersion) {
+	public <T> T deserialize(Object element, Type type, int fromVersion) {
 		if (fromVersion == NoVersioningSupport.NO_VERSIONING) {
-			return type.cast(element);
+			return (T) element;
 		}
 		return objectMapper.deserialize((String) element, type, fromVersion);
 	}
