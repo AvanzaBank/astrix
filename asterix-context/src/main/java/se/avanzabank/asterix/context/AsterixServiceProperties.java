@@ -29,6 +29,10 @@ public final class AsterixServiceProperties implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
+	public static final String QUALIFIER = "_qualifier";
+	public static final String API = "_api";
+	public static final String COMPONENT = "_component";
+	
 	private final Map<String, String> properties = new HashMap<>();
 	
 	public AsterixServiceProperties(Map<String, String> serviceProperties) {
@@ -51,12 +55,12 @@ public final class AsterixServiceProperties implements Serializable {
 	}
 	
 	public void setApi(Class<?> api) {
-		setProperty("_api", api.getName());
+		setProperty(API, api.getName());
 	}
 	
 	public Class<?> getApi() {
 		try {
-			return Class.forName(getProperty("_api"));
+			return Class.forName(getProperty(API));
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
@@ -64,11 +68,11 @@ public final class AsterixServiceProperties implements Serializable {
 	}
 	
 	public void setQualifier(String qualifier) {
-		setProperty("_qualifier", qualifier);
+		setProperty(QUALIFIER, qualifier);
 	}
 	
 	public String getQualifier() {
-		return getProperty("_qualifier");
+		return getProperty(QUALIFIER);
 	}
 	
 	@Override
@@ -77,11 +81,11 @@ public final class AsterixServiceProperties implements Serializable {
 	}
 
 	public String getComponent() {
-		return getProperty("_component");
+		return getProperty(COMPONENT);
 	}
 	
 	public void setComponent(String component) {
-		setProperty("_component", component);
+		setProperty(COMPONENT, component);
 	}
 
 	@Override

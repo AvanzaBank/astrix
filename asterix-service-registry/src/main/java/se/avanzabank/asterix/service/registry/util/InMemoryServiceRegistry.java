@@ -15,12 +15,15 @@
  */
 package se.avanzabank.asterix.service.registry.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import se.avanzabank.asterix.context.AsterixDirectComponent;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.core.AsterixBroadcast;
 import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 import se.avanzabank.asterix.provider.core.AsterixConfigApi;
 import se.avanzabank.asterix.service.registry.app.ServiceKey;
@@ -42,16 +45,13 @@ public class InMemoryServiceRegistry implements AsterixServiceRegistry {
 	}
 	
 	@Override
-	public <T> AsterixServiceRegistryEntry lookup(String type) {
-		return this.servicePropertiesByKey.get(new ServiceKey(type));
-	}
-	@Override
 	public <T> AsterixServiceRegistryEntry lookup(String type, String qualifier) {
 		return this.servicePropertiesByKey.get(new ServiceKey(type, qualifier));
 	}
 	@Override
 	public <T> void register(AsterixServiceRegistryEntry properties, long lease) {
-		this.servicePropertiesByKey.put(new ServiceKey(properties.getServiceBeanType(), properties.getQualifier()), properties);
+		ServiceKey key = new ServiceKey(properties.getServiceBeanType(), properties.getServiceProperties().get(AsterixServiceProperties.QUALIFIER));
+		this.servicePropertiesByKey.put(key, properties);
 	}
 	
 	public void clear() {
@@ -63,5 +63,10 @@ public class InMemoryServiceRegistry implements AsterixServiceRegistry {
 	
 	public String getServiceUri() {
 		return AsterixServiceComponentNames.DIRECT + ":" + this.id;
+	}
+
+	@Override
+	public List<AsterixServiceRegistryEntry> listServices() {
+		return new ArrayList<>(servicePropertiesByKey.values());
 	}
 }

@@ -16,6 +16,4 @@
 	</bean>
 	<bean name="serviceRegistryImpl"
 		class="se.avanzabank.asterix.service.registry.pu.AsterixServiceRegistryImpl" />
-	<bean name="serviceRegistryAdminImpl"
-		class="se.avanzabank.asterix.service.registry.pu.AsterixServiceRegistryAdministratorImpl" />
 </beans>

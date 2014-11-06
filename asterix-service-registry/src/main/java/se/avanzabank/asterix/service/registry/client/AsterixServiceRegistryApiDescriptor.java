@@ -34,8 +34,7 @@ import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 )
 @AsterixConfigApi(
 	exportedApis = {
-			AsterixServiceRegistry.class,
-			AsterixServiceRegistryAdministrator.class
+			AsterixServiceRegistry.class
 	},
 	entryName = AsterixSettings.ASTERIX_SERVICE_REGISTRY_URI
 )

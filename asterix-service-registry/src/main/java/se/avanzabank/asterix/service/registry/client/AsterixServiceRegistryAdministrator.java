@@ -17,12 +17,10 @@ package se.avanzabank.asterix.service.registry.client;
 
 import java.util.List;
 
-import se.avanzabank.asterix.core.AsterixBroadcast;
 import se.avanzabank.asterix.service.registry.server.AsterixServiceRegistryEntry;
 
 public interface AsterixServiceRegistryAdministrator {
 
-	@AsterixBroadcast
 	List<AsterixServiceRegistryEntry> listServices();
 	
 }

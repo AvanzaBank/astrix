@@ -22,8 +22,8 @@
 				<tbody>
 					<tr ng-repeat="service in services | orderBy: 'providedApi'">
 						<td>{{service.providedApi | StringReplace: "se.avanzabank.":"" }}</td>
-						<td>{{service.component}}</td>
-						<td><pre style="max-width: 1000px;">{{service.url | json}}</pre></td>
+						<td><pre style="max-width: 500px;">{{service.serviceMetadata | json}}</td>
+						<td><pre style="max-width: 500px;">{{service.serviceProperties | json}}</pre></td>
 					</tr>
 				</tbody>
 			</table>

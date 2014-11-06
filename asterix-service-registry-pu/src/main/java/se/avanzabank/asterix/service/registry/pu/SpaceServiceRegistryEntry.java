@@ -21,20 +21,20 @@ import se.avanzabank.asterix.service.registry.app.ServiceKey;
 
 import com.gigaspaces.annotation.pojo.SpaceId;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
-import com.gigaspaces.query.ISpaceQuery;
 
 public class SpaceServiceRegistryEntry {
 
-	private Map<String, String> properties;
+	private Map<String, String> serviceProperties;
+	private Map<String, String> serviceMetadata;
 	private ServiceKey serviceKey;
 	private String apiType;
 
 	public Map<String, String> getProperties() {
-		return properties;
+		return serviceProperties;
 	}
 	
 	public void setProperties(Map<String, String> properties) {
-		this.properties = properties;
+		this.serviceProperties = properties;
 	}
 
 	@SpaceId(autoGenerate = false)
@@ -57,6 +57,14 @@ public class SpaceServiceRegistryEntry {
 
 	public static SpaceServiceRegistryEntry template() {
 		return new SpaceServiceRegistryEntry();
+	}
+
+	public void setServiceMetadata(Map<String, String> serviceMetadata) {
+		this.serviceMetadata = serviceMetadata;
+	}
+	
+	public Map<String, String> getServiceMetadata() {
+		return serviceMetadata;
 	}
 
 }

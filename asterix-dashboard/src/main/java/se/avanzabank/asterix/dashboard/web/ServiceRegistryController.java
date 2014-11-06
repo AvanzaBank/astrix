@@ -47,8 +47,8 @@ public class ServiceRegistryController {
 		for (AsterixServiceRegistryEntry entry : services) {
 			Service s = new Service();
 			s.setProvidedApi(entry.getServiceBeanType());
-			s.setComponent(new AsterixServiceProperties(entry.getServiceProperties()).getComponent());
-			s.setUrl(entry.getServiceProperties());
+			s.setServiceMetadata(entry.getServiceMetadata());
+			s.setServiceProperties(entry.getServiceProperties());
 			result.add(s);
 		}
 		return result;
@@ -56,33 +56,31 @@ public class ServiceRegistryController {
 
 	public static class Service {
 		private String providedApi;
-		private String component;
-		private Map<String, String> url;
+		private Map<String, String> serviceProperties;
+		private Map<String, String> serviceMetadata;
 
 		public String getProvidedApi() {
 			return providedApi;
+		}
+		
+		public void setServiceMetadata(Map<String, String> serviceMetadata) {
+			this.serviceMetadata = serviceMetadata;
+		}
+		public Map<String, String> getServiceMetadata() {
+			return serviceMetadata;
 		}
 
 		public void setProvidedApi(String providedApi) {
 			this.providedApi = providedApi;
 		}
 
-		public String getComponent() {
-			return component;
-		}
-
-		public void setComponent(String component) {
-			this.component = component;
+		public void setServiceProperties(Map<String, String> serviceProperties) {
+			this.serviceProperties = serviceProperties;
 		}
 		
-		public void setUrl(Map<String, String> url) {
-			this.url = url;
+		public Map<String, String> getServiceProperties() {
+			return serviceProperties;
 		}
-		
-		public Map<String, String> getUrl() {
-			return url;
-		}
-
 
 	}
 

@@ -15,9 +15,16 @@
  */
 package se.avanzabank.asterix.service.registry.pu;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.provider.core.AsterixServiceExport;
 import se.avanzabank.asterix.service.registry.app.ServiceKey;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistry;
@@ -34,20 +41,15 @@ public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {
 	}
 
 	@Override
-	public <T> AsterixServiceRegistryEntry lookup(String type) {
-		return lookup(type, null);
-	}
-
-	@Override
 	public <T> AsterixServiceRegistryEntry lookup(String type, String qualifier) {
 		SpaceServiceRegistryEntry entry = gigaSpace.readById(SpaceServiceRegistryEntry.class, new ServiceKey(type, qualifier));
 		if (entry == null) {
 			return null;
 		}
 		AsterixServiceRegistryEntry result = new AsterixServiceRegistryEntry();
-		result.setQualifier(qualifier);
 		result.setServiceBeanType(type);
 		result.setServiceProperties(entry.getProperties());
+		result.setServiceMetadata(result.getServiceMetadata());
 		return result;
 	}
 
@@ -55,9 +57,28 @@ public class AsterixServiceRegistryImpl implements AsterixServiceRegistry {
 	public <T> void register(AsterixServiceRegistryEntry entry, long lease) {
 		SpaceServiceRegistryEntry spaceEntry = new SpaceServiceRegistryEntry();
 		spaceEntry.setApiType(entry.getServiceBeanType());
-		spaceEntry.setServiceKey(new ServiceKey(entry.getServiceBeanType(), entry.getQualifier()));
+		spaceEntry.setServiceKey(new ServiceKey(entry.getServiceBeanType(), entry.getServiceProperties().get(AsterixServiceProperties.QUALIFIER)));
 		spaceEntry.setProperties(entry.getServiceProperties());
+		Map<String, String> metadata = new HashMap<>();
+		Date now = new Date();
+		metadata.put("lastLeaseRenewalTime", now.toString());
+		metadata.put("leaseExpireTime", new Date(now.getTime() + lease).toString());
+		spaceEntry.setServiceMetadata(metadata);
 		gigaSpace.write(spaceEntry, lease);
+	}
+
+	@Override
+	public List<AsterixServiceRegistryEntry> listServices() {
+		SpaceServiceRegistryEntry[] entries = gigaSpace.readMultiple(SpaceServiceRegistryEntry.template());
+		List<AsterixServiceRegistryEntry> result = new ArrayList<>();
+		for (SpaceServiceRegistryEntry spaceEntry : entries) {
+			AsterixServiceRegistryEntry entry = new AsterixServiceRegistryEntry();
+			entry.setServiceBeanType(spaceEntry.getApiType());
+			entry.setServiceProperties(spaceEntry.getProperties());
+			entry.setServiceMetadata(spaceEntry.getServiceMetadata());
+			result.add(entry);
+		}
+		return result;
 	}
 
 }
