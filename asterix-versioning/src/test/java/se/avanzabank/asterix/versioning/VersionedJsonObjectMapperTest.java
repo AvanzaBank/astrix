@@ -45,7 +45,7 @@ public class VersionedJsonObjectMapperTest {
 	}
 	
 	@Test
-	public void migratesOldDocuments() throws Exception {
+	public void upgradesOldDocuments() throws Exception {
 		this.apiMigrations.add(new TestPojoV1ToV2Migration());
 		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
 		VersionedJsonObjectMapper objectMapper = objectMapperBuilder.build();
@@ -58,6 +58,22 @@ public class VersionedJsonObjectMapperTest {
 		assertEquals("kalle", v1Pojo.getFoo());
 		assertEquals("kalle", v2Pojo.getFoo());
 		assertEquals("defaultBar", v2Pojo.getBar());
+	}
+	
+
+	@Test
+	public void downgradesToOldDocuments() throws Exception {
+		this.apiMigrations.add(new TestPojoV1ToV2Migration());
+		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
+		VersionedJsonObjectMapper objectMapper = objectMapperBuilder.build();
+		
+		TestPojoV2 testPojo = new TestPojoV2();
+		testPojo.setBar("b1");
+		testPojo.setFoo("f1");
+		String pojoJsonV2 = objectMapper.serialize(testPojo, 1);
+		
+		TestPojoV1 v1Pojo = objectMapper.deserialize(pojoJsonV2, TestPojoV1.class, 1);
+		assertEquals("f1", v1Pojo.getFoo());
 	}
 	
 	
