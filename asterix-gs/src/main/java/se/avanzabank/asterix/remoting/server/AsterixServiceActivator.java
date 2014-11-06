@@ -26,9 +26,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.remoting.client.AsterixMissingServiceException;
 import se.avanzabank.asterix.remoting.client.AsterixMissingServiceMethodException;
@@ -92,20 +90,10 @@ public class AsterixServiceActivator {
 	}
 	
 	private final ConcurrentMap<String, PublishedService<?>> serviceByType = new ConcurrentHashMap<>();
-	private final AsterixRemotingArgumentSerializerFactory objectSerializerFactory;
 	
-	@Autowired
-	public AsterixServiceActivator(AsterixRemotingArgumentSerializerFactory objectSerializerFactory) {
-		this.objectSerializerFactory = objectSerializerFactory;
-	}
-
-	public void register(Object provider, AsterixApiDescriptor apiDescriptor, Class<?>... publishedApis) {
-		// TODO allow different apis to have different object serializer?
-		AsterixObjectSerializer objectSerializer = objectSerializerFactory.create(apiDescriptor); 
-		PublishedService<?> publishedService = new PublishedService<>(provider, objectSerializer, publishedApis);
-		for (Class<?> publishedApi : publishedApis) {
-			this.serviceByType.put(publishedApi.getName(), publishedService);
-		}
+	public void register(Object provider, AsterixObjectSerializer objectSerializer, Class<?> publishedApi) {
+		PublishedService<?> publishedService = new PublishedService<>(provider, objectSerializer, publishedApi);
+		this.serviceByType.put(publishedApi.getName(), publishedService);
 	}
 	
 	/**
