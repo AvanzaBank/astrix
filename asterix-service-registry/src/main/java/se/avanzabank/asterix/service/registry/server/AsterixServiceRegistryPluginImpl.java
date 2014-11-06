@@ -23,7 +23,6 @@ import java.util.Set;
 import org.kohsuke.MetaInfServices;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -44,7 +43,6 @@ public class AsterixServiceRegistryPluginImpl implements AsterixServiceRegistryP
 	@Override
 	public void registerBeanDefinitions(BeanDefinitionRegistry registry, Collection<AsterixExportedServiceInfo> publishedServices) throws BeansException {
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceRegistryExporterWorker.class);
-		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_asterixServiceBusExporterWorker", beanDefinition);
 		
 		Set<AsterixServiceComponent> usedServiceComponents = new HashSet<>();
@@ -57,7 +55,6 @@ public class AsterixServiceRegistryPluginImpl implements AsterixServiceRegistryP
 				addIndexedArgumentValue(1, exportedService.getComponentName());
 				addIndexedArgumentValue(2, exportedService.getProvidedService());
 			}});
-			beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 			registry.registerBeanDefinition("_asterixServiceBuilderHolder-" + exportedService.getProvidingBeanName() + "-" + exportedService.getProvidedService().getName(), beanDefinition);
 		}
 		for (AsterixServiceComponent serviceComponent : usedServiceComponents) {
