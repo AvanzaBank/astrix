@@ -16,8 +16,8 @@
 package se.avanzabank.asterix.dashboard.web;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import se.avanzabank.asterix.context.AsterixServiceProperties;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryAdministrator;
 import se.avanzabank.asterix.service.registry.server.AsterixServiceRegistryEntry;
 
@@ -46,28 +47,17 @@ public class ServiceRegistryController {
 		for (AsterixServiceRegistryEntry entry : services) {
 			Service s = new Service();
 			s.setProvidedApi(entry.getServiceBeanType());
-			s.setComponent(entry.getQualifier());
-			s.setUrl(entry.getServiceProperties().toString());
+			s.setComponent(new AsterixServiceProperties(entry.getServiceProperties()).getComponent());
+			s.setUrl(entry.getServiceProperties());
 			result.add(s);
 		}
 		return result;
-//		Service s = new Service();
-//		s.setProvidedApi("se.avanzabank.trading.TradingService");
-//		s.setComponent("GS-REMOTING");
-//		s.setUrl("jini://*/*/trading-space?groups=ax2332ssw");
-//		
-//		
-//		Service s1 = new Service();
-//		s1.setProvidedApi("se.avanzabank.market.InstrumentService");
-//		s1.setComponent("GS-REMOTING");
-//		s1.setUrl("jini://*/*/market-data-space?groups=" + Math.random());
-//		return Arrays.<Service>asList(s, s1);
 	}
 
 	public static class Service {
 		private String providedApi;
 		private String component;
-		private String url;
+		private Map<String, String> url;
 
 		public String getProvidedApi() {
 			return providedApi;
@@ -84,14 +74,15 @@ public class ServiceRegistryController {
 		public void setComponent(String component) {
 			this.component = component;
 		}
-
-		public String getUrl() {
+		
+		public void setUrl(Map<String, String> url) {
+			this.url = url;
+		}
+		
+		public Map<String, String> getUrl() {
 			return url;
 		}
 
-		public void setUrl(String url) {
-			this.url = url;
-		}
 
 	}
 

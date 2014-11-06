@@ -29,13 +29,22 @@ AsterixDashboard.factory("ServiceRegistry", [ "$http", function($http) {
 
 AsterixDashboard.controller("ServiceRegistryController", ["$scope", "ServiceRegistry", "$interval", function ($scope, ServiceRegistry, $interval) {
 	$scope.services = [];
+	var getServices = function () {
+		var servicesPromise = ServiceRegistry.list();
+		servicesPromise.success(function (data, status) {
+			$scope.services = data;
+		})
+	}
 	var init = function() {
-		$interval(function() {
-			var servicesPromise = ServiceRegistry.list();
-			servicesPromise.success(function (data, status) {
-				$scope.services = data;
-			})
-		}, 1000);
+		getServices();
+		$interval(getServices, 10000);
+		
 	}
 	init();
 }]);
+
+AsterixDashboard.filter("StringReplace", function () {
+	return function (input, what, whith) {
+		return input.replace(what, whith);
+	};
+})
