@@ -7,11 +7,6 @@
   </parent>
   <artifactId>asterix-service-registry-pu</artifactId>
   <dependencies>
-  	<dependency>
-  		<groupId>${project.groupId}</groupId>
-  		<artifactId>asterix-service-registry</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
   	<!-- TODO: use asterix-remoting for service registry???? -->
   	<dependency>
   		<groupId>${project.groupId}</groupId>
