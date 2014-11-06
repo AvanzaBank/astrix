@@ -240,6 +240,10 @@ public class AsterixRemotingProxy implements InvocationHandler {
 	}
 	
 	private Object[] marshall(Object[] elements) {
+		if (elements == null) {
+			// No argument method
+			return new Object[0];
+		}
 		Object[] result = new Object[elements.length];
 		for (int i = 0; i < result.length; i++) {
 			result[i] = this.objectSerializer.serialize(elements[i], apiVersion);

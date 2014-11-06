@@ -341,6 +341,23 @@ public class AsterixServiceActivatorTest {
 		assertEquals("reply-kalle", reply.get(0).getGreeting());
 	}
 	
+	@Test
+	public void supportServicesWithNoArgument() throws Exception {
+		NoArgumentService impl = new NoArgumentService() {
+			@Override
+			public List<String> hello() {
+				return Arrays.asList("response");
+			}
+		};
+		activator.register(impl, objectSerializer, NoArgumentService.class);
+		
+		NoArgumentService testService = AsterixRemotingProxy.create(NoArgumentService.class, AsterixRemotingTransport.direct(activator), objectSerializer);
+
+		List<String> reply = testService.hello();
+		assertEquals(1, reply.size());
+		assertEquals("response", reply.get(0));
+	}
+	
 	
 	public static class HelloRequest {
 		private String messsage;
@@ -422,7 +439,8 @@ public class AsterixServiceActivatorTest {
 	}
 	
 	interface NoArgumentService {
-		String hello();
+		@AsterixBroadcast
+		List<String> hello();
 	}
 	
 	interface GenericReturnTypeService {
