@@ -13,26 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.provider.core;
+package se.avanzabank.asterix.integration.tests;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.IOException;
 
+import se.avanzabank.asterix.gs.test.util.PartitionedPu;
+import se.avanzabank.asterix.gs.test.util.PuConfigurers;
 
-/**
- * Similar to {@link AsterixServiceRegistryApi} but uses configuration mechanism to lookup service-properties
- * for a given api. 
- * 
- * @author Elias Lindholm (elilin)
- */
-@Target(value = { ElementType.TYPE })
-@Retention(value = RetentionPolicy.RUNTIME)
-@Documented
-public @interface AsterixConfigApi {
+public class ServiceRegistryRunner {
 	
-	Class<?>[] exportedApis();
-	String entryName();
+	public static void main(String[] args) throws IOException {
+		System.setProperty("com.gs.jini_lus.groups", "service-registry");
+		PartitionedPu partitionedPu = new PartitionedPu(PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
+				.numberOfPrimaries(1)
+				.numberOfBackups(0));
+		partitionedPu.run();
+	}
 }

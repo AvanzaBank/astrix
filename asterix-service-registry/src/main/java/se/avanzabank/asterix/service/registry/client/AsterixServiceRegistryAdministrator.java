@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.provider.core;
+package se.avanzabank.asterix.service.registry.client;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.List;
 
+import se.avanzabank.asterix.core.AsterixBroadcast;
+import se.avanzabank.asterix.service.registry.server.AsterixServiceRegistryEntry;
 
-/**
- * Similar to {@link AsterixServiceRegistryApi} but uses configuration mechanism to lookup service-properties
- * for a given api. 
- * 
- * @author Elias Lindholm (elilin)
- */
-@Target(value = { ElementType.TYPE })
-@Retention(value = RetentionPolicy.RUNTIME)
-@Documented
-public @interface AsterixConfigApi {
+public interface AsterixServiceRegistryAdministrator {
+
+	@AsterixBroadcast
+	List<AsterixServiceRegistryEntry> listServices();
 	
-	Class<?>[] exportedApis();
-	String entryName();
 }

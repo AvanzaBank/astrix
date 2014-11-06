@@ -27,13 +27,15 @@ AsterixDashboard.factory("ServiceRegistry", [ "$http", function($http) {
 
 
 
-AsterixDashboard.controller("ServiceRegistryController", ["$scope", "ServiceRegistry", function ($scope, ServiceRegistry) {
+AsterixDashboard.controller("ServiceRegistryController", ["$scope", "ServiceRegistry", "$interval", function ($scope, ServiceRegistry, $interval) {
 	$scope.services = [];
 	var init = function() {
-		var servicesPromise = ServiceRegistry.list();
-		servicesPromise.success(function (data, status) {
-			$scope.services = data;
-		});
+		$interval(function() {
+			var servicesPromise = ServiceRegistry.list();
+			servicesPromise.success(function (data, status) {
+				$scope.services = data;
+			})
+		}, 1000);
 	}
 	init();
 }]);

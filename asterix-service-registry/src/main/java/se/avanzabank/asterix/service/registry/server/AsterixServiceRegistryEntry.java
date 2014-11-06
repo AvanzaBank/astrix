@@ -49,5 +49,11 @@ public class AsterixServiceRegistryEntry {
 	public void setQualifier(String qualifier) {
 		this.qualifier = qualifier;
 	}
+
+	public static AsterixServiceRegistryEntry template() {
+		AsterixServiceRegistryEntry result = new AsterixServiceRegistryEntry();
+		result.serviceProperties = null;
+		return result;
+	}
 	
 }

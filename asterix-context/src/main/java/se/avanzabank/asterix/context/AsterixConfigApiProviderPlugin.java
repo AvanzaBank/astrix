@@ -16,6 +16,7 @@
 package se.avanzabank.asterix.context;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,14 +37,17 @@ public class AsterixConfigApiProviderPlugin implements AsterixApiProviderPlugin,
 	public List<AsterixFactoryBeanPlugin<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
 		AsterixConfigApi configApi = descriptor.getAnnotation(AsterixConfigApi.class);
 		String entryName = configApi.entryName();
-		Class<?> beanType = configApi.exportedApi();
-		AsterixConfigFactoryBean<?> factory = new AsterixConfigFactoryBean<>(entryName, descriptor, beanType, settings);
-		return Arrays.<AsterixFactoryBeanPlugin<?>>asList(factory);
+		List<AsterixFactoryBeanPlugin<?>> result = new ArrayList<>();
+		for (Class<?> beanType : configApi.exportedApis()) {
+			AsterixConfigFactoryBean<?> factory = new AsterixConfigFactoryBean<>(entryName, descriptor, beanType, settings);
+			result.add(factory);
+		}
+		return result;
 	}
 
 	@Override
 	public List<Class<?>> getProvidedBeans(AsterixApiDescriptor descriptor) {
-		return Arrays.<Class<?>>asList(descriptor.getAnnotation(AsterixConfigApi.class).exportedApi());
+		return Arrays.<Class<?>>asList(descriptor.getAnnotation(AsterixConfigApi.class).exportedApis());
 	}
 
 	@Override

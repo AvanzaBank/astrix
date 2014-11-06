@@ -21,6 +21,7 @@ import se.avanzabank.asterix.service.registry.app.ServiceKey;
 
 import com.gigaspaces.annotation.pojo.SpaceId;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
+import com.gigaspaces.query.ISpaceQuery;
 
 public class SpaceServiceRegistryEntry {
 
@@ -52,6 +53,10 @@ public class SpaceServiceRegistryEntry {
 	
 	public void setApiType(String apiType) {
 		this.apiType = apiType;
+	}
+
+	public static SpaceServiceRegistryEntry template() {
+		return new SpaceServiceRegistryEntry();
 	}
 
 }

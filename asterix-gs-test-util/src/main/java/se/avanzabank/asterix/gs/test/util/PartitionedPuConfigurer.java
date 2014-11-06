@@ -55,6 +55,11 @@ public final class PartitionedPuConfigurer {
 		return this;
 	}
 
+	public PartitionedPuConfigurer lookupGroup(String group) {
+		this.lookupGroupName = group;
+		return this;
+	}
+
 	public RunningPu configure() {
 		if (startAsync) {
 			return new RunningPuImpl(new AsyncPuRunner(new PartitionedPu(this)));

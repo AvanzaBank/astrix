@@ -13,32 +13,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.dashboard;
+package se.avanzabank.asterix.dashboard.web;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryAdministrator;
+import se.avanzabank.asterix.service.registry.server.AsterixServiceRegistryEntry;
+
 @RestController
 @RequestMapping("/services")
 public class ServiceRegistryController {
+	
+	private AsterixServiceRegistryAdministrator serviceRegistryAdmin;
+	
+	@Autowired
+	public ServiceRegistryController(AsterixServiceRegistryAdministrator serviceRegistryAdmin) {
+		this.serviceRegistryAdmin = Objects.requireNonNull(serviceRegistryAdmin);
+	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public List<Service> services() {
-		Service s = new Service();
-		s.setProvidedApi("se.avanzabank.trading.TradingService");
-		s.setComponent("GS-REMOTING");
-		s.setUrl("jini://*/*/trading-space?groups=ax2332ssw");
-		
-		
-		Service s1 = new Service();
-		s1.setProvidedApi("se.avanzabank.market.InstrumentService");
-		s1.setComponent("GS-REMOTING");
-		s1.setUrl("jini://*/*/market-data-space?groups=" + Math.random());
-		return Arrays.<Service>asList(s, s1);
+		List<AsterixServiceRegistryEntry> services = serviceRegistryAdmin.listServices();
+		List<Service> result = new ArrayList<>();
+		for (AsterixServiceRegistryEntry entry : services) {
+			Service s = new Service();
+			s.setProvidedApi(entry.getServiceBeanType());
+			s.setComponent(entry.getQualifier());
+			s.setUrl(entry.getServiceProperties().toString());
+			result.add(s);
+		}
+		return result;
+//		Service s = new Service();
+//		s.setProvidedApi("se.avanzabank.trading.TradingService");
+//		s.setComponent("GS-REMOTING");
+//		s.setUrl("jini://*/*/trading-space?groups=ax2332ssw");
+//		
+//		
+//		Service s1 = new Service();
+//		s1.setProvidedApi("se.avanzabank.market.InstrumentService");
+//		s1.setComponent("GS-REMOTING");
+//		s1.setUrl("jini://*/*/market-data-space?groups=" + Math.random());
+//		return Arrays.<Service>asList(s, s1);
 	}
 
 	public static class Service {

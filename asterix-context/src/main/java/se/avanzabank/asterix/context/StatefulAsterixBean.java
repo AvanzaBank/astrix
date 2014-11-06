@@ -103,7 +103,7 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			throw new ServiceUnavailableException("asterixBeanId=" + id + " beanFactoryType="+ beanFactory.getBeanType().getName() + " qualifier=" + optionalQualifier);
+			throw new ServiceUnavailableException("asterixBeanId=" + id + " beanType="+ beanFactory.getBeanType().getName() + " qualifier=" + optionalQualifier);
 		}
 	}
 
