@@ -3,15 +3,10 @@
   <parent>
     <groupId>com.avanza.asterix</groupId>
     <artifactId>asterix-parent</artifactId>
-    <version>0.1.2-SNAPSHOT</version>
+    <version>0.1.5-SNAPSHOT</version>
   </parent>
   <artifactId>asterix-service-registry-pu</artifactId>
   <dependencies>
-  	<dependency>
-  		<groupId>${project.groupId}</groupId>
-  		<artifactId>asterix-service-registry</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
   	<!-- TODO: use asterix-remoting for service registry???? -->
   	<dependency>
   		<groupId>${project.groupId}</groupId>

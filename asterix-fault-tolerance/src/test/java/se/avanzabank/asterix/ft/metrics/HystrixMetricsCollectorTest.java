@@ -46,6 +46,7 @@ public class HystrixMetricsCollectorTest {
 
 		}.execute();
 		Map<String, Number> metrics = collector.getMetrics();
+		Thread.sleep(1000); // TODO assertEventually
 		assertThat(metrics.get(String.format("hystrix.${host}.%s.%s.isCircuitBreakerOpen", group, command)).intValue(), is(0));
 		assertThat(metrics.get(String.format("hystrix.${host}.%s.currentQueueSize", group)).intValue(), is(0));
 		assertThat(metrics.get(String.format("hystrix.${host}.%s.currentCompletedTaskCount", group)).intValue(), is(1));

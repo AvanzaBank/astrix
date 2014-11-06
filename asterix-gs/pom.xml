@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.avanza.asterix</groupId>
 		<artifactId>asterix-parent</artifactId>
-		<version>0.1.2-SNAPSHOT</version>
+		<version>0.1.5-SNAPSHOT</version>
 	</parent>
 	<artifactId>asterix-gs</artifactId>
 	<dependencies>
@@ -37,6 +37,19 @@
 		<dependency>
 			<groupId>com.gigaspaces</groupId>
 			<artifactId>gs-openspaces</artifactId>
+		</dependency>
+		
+		<!-- TEST -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit-dep</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>asterix-versioning</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

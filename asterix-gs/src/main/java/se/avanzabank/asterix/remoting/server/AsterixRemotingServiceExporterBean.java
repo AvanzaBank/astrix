@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixServiceExporterBean;
+import se.avanzabank.asterix.core.AsterixObjectSerializer;
 import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 /**
  * This bean makes all beans annotated with AsterixRemoteServiceExport invokable using the remoting 
@@ -32,15 +33,18 @@ import se.avanzabank.asterix.provider.component.AsterixServiceComponentNames;
 public class AsterixRemotingServiceExporterBean implements AsterixServiceExporterBean {
 	
 	private AsterixServiceActivator serviceActivator;
+	private AsterixRemotingArgumentSerializerFactory objectSerializerFactory;
 
 	@Autowired
-	public AsterixRemotingServiceExporterBean(AsterixServiceActivator serviceActivator) {
+	public AsterixRemotingServiceExporterBean(AsterixServiceActivator serviceActivator, AsterixRemotingArgumentSerializerFactory objectSerializerFactory) {
 		this.serviceActivator = serviceActivator;
+		this.objectSerializerFactory = objectSerializerFactory;
 	}
 
 	@Override
 	public void register(Object provider, AsterixApiDescriptor apiDescriptor, Class<?> providedApi) {
-		this.serviceActivator.register(provider, apiDescriptor, providedApi);
+		AsterixObjectSerializer objectSerializer = objectSerializerFactory.create(apiDescriptor); 
+		this.serviceActivator.register(provider, objectSerializer, providedApi);
 	}
 	
 	@Override

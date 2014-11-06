@@ -18,7 +18,6 @@ package se.avanzabank.asterix.remoting.component.consumer;
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
@@ -77,11 +76,9 @@ public class AsterixRemotingComponent implements AsterixPluginsAware, AsterixSer
 	@Override
 	public void registerBeans(BeanDefinitionRegistry registry) {
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceActivator.class);
-		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_serviceActivator", beanDefinition);
 		
 		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixRemotingArgumentSerializerFactory.class);
-		beanDefinition.setAutowireMode(Autowire.BY_TYPE.value());
 		registry.registerBeanDefinition("_asterixRemotingArgumentSerializerFactory", beanDefinition);
 	}
 	
