@@ -36,11 +36,9 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 	private AsterixServiceComponents serviceComponents;
 
 	public ServiceRegistryLookupFactory(AsterixApiDescriptor descriptor,
-										Class<T> api,
-										AsterixServiceRegistryLeaseManager leaseManager) {
+										Class<T> api) {
 		this.descriptor = descriptor;
 		this.api = api;
-		this.leaseManager = leaseManager;
 	}
 
 	@Override
@@ -85,6 +83,11 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 	@AsterixInject
 	public void setServiceComponents(AsterixServiceComponents serviceComponents) {
 		this.serviceComponents = serviceComponents;
+	}
+	
+	@AsterixInject
+	public void setServiceComponents(AsterixServiceRegistryLeaseManager leaseManager) {
+		this.leaseManager = leaseManager;
 	}
 
 }
