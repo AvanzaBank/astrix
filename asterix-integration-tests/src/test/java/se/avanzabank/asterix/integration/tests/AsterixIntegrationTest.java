@@ -80,13 +80,14 @@ public class AsterixIntegrationTest {
 	
 	private static AsterixSettings config = new AsterixSettings() {{
 		set(ASTERIX_SERVICE_REGISTRY_URI, AsterixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
+		set(SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
 	}};
 	
 	@ClassRule
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
-											  .contextProperties(asProperties("configUrl", config.getExternalConfigUrl()))
+											  .contextProperty("configUrl", config.getExternalConfigUrl())
 											  .startAsync(true)
 											  .configure();
 	
@@ -94,15 +95,9 @@ public class AsterixIntegrationTest {
 	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
 														.numberOfPrimaries(1)
 														.numberOfBackups(0)
-														.contextProperties(asProperties("configUrl", config.getExternalConfigUrl()))
+														.contextProperty("configUrl", config.getExternalConfigUrl())
 														.startAsync(true)
 														.configure();
-	
-	private static Properties asProperties(String key, String value) {
-		Properties result = new Properties();
-		result.put(key, value);
-		return result;
-	}
 
 	private LunchService lunchService;
 	private LunchUtil lunchUtil;

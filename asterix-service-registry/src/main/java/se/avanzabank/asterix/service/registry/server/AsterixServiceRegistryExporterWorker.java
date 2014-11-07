@@ -19,13 +19,17 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se.avanzabank.asterix.context.AsterixServicePropertiesBuilderHolder;
+import se.avanzabank.asterix.context.AsterixContext;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
+import se.avanzabank.asterix.context.AsterixServicePropertiesBuilderHolder;
+import se.avanzabank.asterix.context.AsterixSettings;
+import se.avanzabank.asterix.context.AsterixSettingsReader;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
 import se.avanzabank.asterix.service.registry.client.AsterixServiceRegistryClient;
 /**
@@ -40,12 +44,17 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	private List<AsterixServicePropertiesBuilderHolder> serviceBuilders = Collections.emptyList();
 	private final AsterixServiceRegistryClient serviceRegistryClient;
 	private final Logger log = LoggerFactory.getLogger(AsterixServiceRegistryExporterWorker.class);
-	private volatile long exportIntervallMillis = 60_000; // Export every 60 seconds
-	private volatile long leaseTimeMillis = 120_000;     // Use a service lease of 120 seconds
+	private final long exportIntervallMillis;		  
+	private final long serviceLeaseTimeMillis;
+	private final long retryIntervallMillis;
 
 	@Autowired
-	public AsterixServiceRegistryExporterWorker(AsterixServiceRegistryClient serviceRegistry) {
+	public AsterixServiceRegistryExporterWorker(AsterixServiceRegistryClient serviceRegistry, AsterixContext context) {
 		this.serviceRegistryClient = serviceRegistry;
+		AsterixSettingsReader settings = context.getSettings();
+		this.exportIntervallMillis = settings.getLong(AsterixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 60_000L);
+		this.retryIntervallMillis = settings.getLong(AsterixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 10_000L);
+		this.serviceLeaseTimeMillis = settings.getLong(AsterixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
 	}
 	
 	@Autowired(required = false)
@@ -61,22 +70,28 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 		}
 		start();
 	}
+	
+	@PreDestroy
+	public void destroy() {
+		interrupt();
+	}
 
-	// TODO: proper logging and management of exporter thread
 	// TODO: For pu's: only run on one primary instance (typically the one with id "1")
 	@Override
 	public void run() {
 		while (!interrupted()) {
+			long sleepTimeUntilNextAttempt = this.exportIntervallMillis;
 			try {
 				exportProvidedServcies();
-				exportIntervallMillis = 60_000;
 			} catch (ServiceUnavailableException e) {
-				// No bound to service registry
-				log.info("Failed to export serivces to registry", e);
-				exportIntervallMillis = 250; // TODO: interval when service registry not available?
+				// Not bound to service registry
+				sleepTimeUntilNextAttempt = this.retryIntervallMillis;
+				log.info(String.format("Failed to export serivces to registry. Sleeping %s millis until next attempt.", sleepTimeUntilNextAttempt), e);
+			} catch (Exception e) {
+				log.info(String.format("Failed to export serivces to registry. Sleeping %s millis until next attempt.", sleepTimeUntilNextAttempt), e);
 			} 
 			try {
-				sleep(exportIntervallMillis); // TODO: interval of lease renewal
+				sleep(sleepTimeUntilNextAttempt);
 			} catch (InterruptedException e) {
 				interrupt();
 			}
@@ -86,11 +101,11 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	private void exportProvidedServcies() {
 		for (AsterixServicePropertiesBuilderHolder serviceBuilder : serviceBuilders) {
 			AsterixServiceProperties serviceProperties = serviceBuilder.exportServiceProperties();
-			serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, leaseTimeMillis);
+			serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis);
 			log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			if (serviceBuilder.exportsAsyncApi()) {
 				serviceProperties = serviceBuilder.exportAsyncServiceProperties();
-				serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, leaseTimeMillis);
+				serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis);
 				log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			}
 		}
