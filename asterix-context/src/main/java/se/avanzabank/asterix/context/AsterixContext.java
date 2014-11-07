@@ -418,4 +418,8 @@ public class AsterixContext implements Asterix {
 		return this.instanceCache.getInstance(classType);
 	}
 	
+	public AsterixSettingsReader getSettings() {
+		return settings;
+	}
+	
 }

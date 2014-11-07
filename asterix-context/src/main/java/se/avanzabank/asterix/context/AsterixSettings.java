@@ -32,6 +32,9 @@ public class AsterixSettings implements AsterixExternalConfig {
 	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AsterixContext.enforceSubsystemBoundaries";
 	public static final String ASTERIX_CONFIG_URL = "AsterixConfig.url";
 	public static final String ASTERIX_SERVICE_REGISTRY_URI = "AsterixServiceRegistry.serviceUri";
+	public static final String SERVICE_REGISTRY_EXPORT_INTERVAL = "AsterixServiceRegistryExporterWorker.exportIntervalMillis";
+	public static final String SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL = "AsterixServiceRegistryExporterWorker.retryIntervallMillis";
+	public static final String SERVICE_REGISTRY_LEASE = "AsterixServiceRegistryExporterWorker.serviceLeaseTimeMillis";
 	
 	private final Map<String, Object> settings = new ConcurrentHashMap<>();
 	private String locator;
