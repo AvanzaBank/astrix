@@ -17,12 +17,14 @@ package se.avanzabank.asterix.context;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 public class TestAsterixConfigurer {
 	
 	private AsterixConfigurer configurer;
 	private final Set<AsterixApiDescriptor> descriptors = new HashSet<>();
+	private final Collection<AsterixFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	
 	public TestAsterixConfigurer() {
 		configurer = new AsterixConfigurer();
@@ -32,6 +34,9 @@ public class TestAsterixConfigurer {
 				return descriptors;
 			}
 		});
+		for (AsterixFactoryBean<?> factoryBean : standaloneFactories) {
+			configurer.addFactoryBean(factoryBean);
+		}
 		configurer.enableVersioning(false);
 		configurer.enableFaultTolerance(false);
 		configurer.enableMonitoring(false);
@@ -48,10 +53,10 @@ public class TestAsterixConfigurer {
 	
 
 	public <T> void registerApi(Class<T> beanType, T provider) {
-		InstantiatedFactoryBean<T> factory = new InstantiatedFactoryBean<>(beanType, provider);
+		StandaloneFactoryBean<T> factoryPlugin = new StandaloneFactoryBean<>(beanType, provider);
 		AsterixApiDescriptor apiDescriptor = AsterixApiDescriptor.simple(provider.getClass().getName(), "not important - is library");
-		AsterixFactoryBean<T> factoryBean = new AsterixFactoryBean<>(factory, apiDescriptor, true);
-		
+		AsterixFactoryBean<T> factoryBean = new AsterixFactoryBean<>(factoryPlugin, apiDescriptor, true);
+		standaloneFactories.add(factoryBean);
 	}
 
 	public <T> void registerPlugin(Class<T> c, T provider) {
@@ -70,11 +75,11 @@ public class TestAsterixConfigurer {
 		configurer.set(name, value);
 	}
 	
-	private static class InstantiatedFactoryBean<T> implements AsterixFactoryBeanPlugin<T> {
+	private static class StandaloneFactoryBean<T> implements AsterixFactoryBeanPlugin<T> {
 		private Class<T> type;
 		private T instance;
 
-		public InstantiatedFactoryBean(Class<T> type, T instance) {
+		public StandaloneFactoryBean(Class<T> type, T instance) {
 			this.type = type;
 			this.instance = instance;
 		}
