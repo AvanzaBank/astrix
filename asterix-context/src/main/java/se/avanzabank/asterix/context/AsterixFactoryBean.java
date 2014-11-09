@@ -86,6 +86,10 @@ public final class AsterixFactoryBean<T> implements AsterixDecorator {
 		return apiDescriptor.getSubsystem();
 	}
 	
+	public AsterixApiDescriptor getApiDescriptor() {
+		return apiDescriptor;
+	}
+	
 	private static class AsterixBean<T> {
 		private final T instance;
 		

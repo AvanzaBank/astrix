@@ -23,42 +23,36 @@ import org.slf4j.LoggerFactory;
 
 public class AsterixBeanFactoryRegistry {
 	
-	private final ConcurrentMap<Class<?>, AsterixApiProvider> apiProviderByBeanType = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Class<?>, AsterixFactoryBean<?>> factoryByBeanType = new ConcurrentHashMap<>();
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
+	@SuppressWarnings("unchecked")
 	public <T> AsterixFactoryBean<T> getFactoryBean(Class<T> beanType) {
-		AsterixApiProvider apiProvider = getApiProvider(beanType);
-		return apiProvider.getFactory(beanType);
+		AsterixFactoryBean<T> factoryBean = (AsterixFactoryBean<T>) this.factoryByBeanType.get(beanType);
+		if (factoryBean == null) {
+			throw new IllegalStateException(String.format("No providers found for beanType=%s",
+				 		  beanType.getName())); 
+		}
+		return factoryBean;
 	}
 	
-	public <T> AsterixApiProvider getApiProvider(Class<T> beanType) {
-		AsterixApiProvider apiProvider = this.apiProviderByBeanType.get(beanType);
-		if (apiProvider == null) {
-			throw new IllegalStateException(String.format("No providers found for beanType=%s",
-			 		  beanType.getName())); 
-		}
-		return apiProvider;
-	}
 
 	public void registerProvider(AsterixApiProvider apiProvider) {
 		for (Class<?> providedApi : apiProvider.providedApis()) {
-			AsterixApiProvider duplicateProvider = apiProviderByBeanType.putIfAbsent(providedApi, apiProvider);
+			AsterixFactoryBean<?> factory = apiProvider.getFactory(providedApi);
+			AsterixFactoryBean<?> duplicateFactory = factoryByBeanType.putIfAbsent(providedApi, factory);
 			log.debug("Registering provider: api={} provider={}", providedApi.getName(), apiProvider.getDescriptor().getName());
-			if (duplicateProvider != null) {
+			if (duplicateFactory != null) {
 				throw new IllegalStateException(String.format("Multiple providers discovered for api=%s. %s and %s",
 													 		  providedApi.getName(), 
-													 		  apiProvider.getDescriptor(), 
-													 		  duplicateProvider.getDescriptor()));
+													 		  factory.getApiDescriptor().getName(), 
+													 		  duplicateFactory.getApiDescriptor().getName()));
 			}
 		}
 	}
 
 	public boolean hasBeanFactoryFor(Class<?> beanType) {
-		AsterixApiProvider apiProvider = this.apiProviderByBeanType.get(beanType);
-		if (apiProvider == null) {
-			return false;
-		}
-		return apiProvider.providedApis().contains(beanType);
+		return this.factoryByBeanType.containsKey(beanType);
 	}
 
 }
