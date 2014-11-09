@@ -113,12 +113,6 @@ public class AsterixServiceRegistryLeaseManagerTest {
 		private volatile CountDownLatch exceptionsToThrow = new CountDownLatch(0);
 		
 		@Override
-		public <T> AsterixServiceRegistryEntry lookup(String type) {
-			throwIfCorrupt();
-			return super.lookup(type);
-		}
-
-		@Override
 		public <T> AsterixServiceRegistryEntry lookup(String type, String qualifier) {
 			throwIfCorrupt();
 			return super.lookup(type, qualifier);
