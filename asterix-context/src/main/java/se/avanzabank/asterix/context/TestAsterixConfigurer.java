@@ -43,7 +43,11 @@ public class TestAsterixConfigurer {
 	}
 
 	public void registerApiDescriptor(Class<?> descriptor) {
-		descriptors.add(new AsterixApiDescriptor(descriptor));
+		descriptors.add(AsterixApiDescriptor.create(descriptor));
+	}
+	
+
+	public <T> void registerApi(Class<T> beanType, T provider) {
 	}
 
 	public <T> void registerPlugin(Class<T> c, T provider) {
@@ -62,5 +66,25 @@ public class TestAsterixConfigurer {
 		configurer.set(name, value);
 	}
 	
+	private static class InstantiatedFactoryBean<T> implements AsterixFactoryBeanPlugin<T> {
+		private T instance;
+		private Class<T> type;
+		
+		public InstantiatedFactoryBean(T instance, Class<T> type) {
+			this.instance = instance;
+			this.type = type;
+		}
+
+		@Override
+		public T create(String optionalQualifier) {
+			return instance;
+		}
+
+		@Override
+		public Class<T> getBeanType() {
+			return type;
+		}
+		
+	}
 	
 }
