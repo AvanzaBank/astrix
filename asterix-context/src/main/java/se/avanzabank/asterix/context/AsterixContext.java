@@ -17,7 +17,6 @@ package se.avanzabank.asterix.context;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -227,7 +226,7 @@ public class AsterixContext implements Asterix {
 	}
 
 	private boolean isStatefulBean(AsterixBeanKey beanKey) {
-		return this.beanFactoryRegistry.getApiProvider(beanKey.getBeanType()).hasStatefulBeans();
+		return !this.beanFactoryRegistry.getFactoryBean(beanKey.getBeanType()).isLibrary();
 	}
 
 	/**
