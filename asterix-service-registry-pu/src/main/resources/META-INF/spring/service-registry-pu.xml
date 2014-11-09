@@ -10,10 +10,10 @@
 	<os-core:space id="space" url="/./service-registry-space" mirror="false"/>
 	<os-core:giga-space id="gigaSpace" space="space" />
 
-	<bean class="se.avanzabank.asterix.context.AsterixFrameworkBean">
+	<bean class="com.avanza.asterix.context.AsterixFrameworkBean">
 		<property name="serviceDescriptor"
-			value="se.avanzabank.asterix.service.registry.pu.AsterixServiceRegistryServiceDescriptor" />
+			value="com.avanza.asterix.service.registry.pu.AsterixServiceRegistryServiceDescriptor" />
 	</bean>
 	<bean name="serviceRegistryImpl"
-		class="se.avanzabank.asterix.service.registry.pu.AsterixServiceRegistryImpl" />
+		class="com.avanza.asterix.service.registry.pu.AsterixServiceRegistryImpl" />
 </beans>
