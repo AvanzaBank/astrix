@@ -34,7 +34,6 @@ public class AsterixContext implements Asterix {
 	
 	private final AsterixPlugins plugins;
 	private final AsterixBeanFactoryRegistry beanFactoryRegistry = new AsterixBeanFactoryRegistry();
-	private List<Object> externalDependencies = new ArrayList<>();
 	private final AsterixEventBus eventBus = new AsterixEventBus();
 	private final AsterixBeanStates beanStates = new AsterixBeanStates();
 	private final AsterixSettingsReader settings;
