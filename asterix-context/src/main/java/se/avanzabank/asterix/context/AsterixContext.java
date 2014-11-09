@@ -15,7 +15,6 @@
  */
 package se.avanzabank.asterix.context;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -24,8 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 /**
  * An AstrixContext is the runtime-environment for the astrix-framework. It is used
  * both by consuming applications as well as server applications. AsterixContext providers access
@@ -37,7 +34,6 @@ public class AsterixContext implements Asterix {
 	
 	private final AsterixPlugins plugins;
 	private final AsterixBeanFactoryRegistry beanFactoryRegistry = new AsterixBeanFactoryRegistry();
-	private final ConcurrentMap<Class<?>, ExternalDependencyBean> externalDependencyBean = new ConcurrentHashMap<>();
 	private List<Object> externalDependencies = new ArrayList<>();
 	private final AsterixEventBus eventBus = new AsterixEventBus();
 	private final AsterixBeanStates beanStates = new AsterixBeanStates();
@@ -112,11 +108,6 @@ public class AsterixContext implements Asterix {
 	}
 
 	private void injectAwareDependencies(Object object) {
-		if (object instanceof ExternalDependencyAware) {
-			// TODO: use indirection layer to avoid depending on unused external dependencies?
-			// As implemented now, if an unused plugin has an external dependency it is still required
-			injectExternalDependencies((ExternalDependencyAware<?>)object);
-		}
 		if (object instanceof AsterixBeanAware) {
 			injectBeanDependencies((AsterixBeanAware)object);
 		}
@@ -161,15 +152,6 @@ public class AsterixContext implements Asterix {
 
 	private boolean hasBeanFactoryFor(Class<?> beanType) {
 		return this.beanFactoryRegistry.hasBeanFactoryFor(beanType);
-	}
-
-	private <D extends ExternalDependencyBean> void injectExternalDependencies(final ExternalDependencyAware<D> externalDependencyAware) {
-		externalDependencyAware.setDependency(new ExternalDependency<D>() {
-			@Override
-			public D get() {
-				return getExternalDependency(externalDependencyAware.getDependencyBeanClass());
-			}
-		});
 	}
 
 	/**
@@ -220,29 +202,6 @@ public class AsterixContext implements Asterix {
 		return this.enforeSubsystemBoundaries;
 	}
 
-	/**
-	 * Returns the external dependencies (as defined by an ExternalDependencyBean) required 
-	 * to create a given bean, or null if no external dependencies exists. <p>
-	 * 
-	 * @param beanType
-	 * @return
-	 */
-	public Class<? extends ExternalDependencyBean> getExternalDependencyBean(Class<?> beanType) {
-		AsterixFactoryBean<?> factoryBean = getFactoryBean(beanType);
-		return deepGetExternalDependencyBean(factoryBean);
-	}
-	
-	@SuppressWarnings("unchecked")
-	private Class<? extends ExternalDependencyBean> deepGetExternalDependencyBean(Object asterixObject) {
-		if (asterixObject instanceof ExternalDependencyAware) {
-			return ExternalDependencyAware.class.cast(asterixObject).getDependencyBeanClass();
-		}
-		if (asterixObject instanceof AsterixDecorator) {
-			return deepGetExternalDependencyBean(AsterixDecorator.class.cast(asterixObject).getTarget());
-		}
-		return null;
-	}
-	
 	public AsterixPlugins getPlugins() {
 		return this.plugins;
 	}
@@ -270,53 +229,6 @@ public class AsterixContext implements Asterix {
 
 	private boolean isStatefulBean(AsterixBeanKey beanKey) {
 		return this.beanFactoryRegistry.getApiProvider(beanKey.getBeanType()).hasStatefulBeans();
-	}
-
-	public void setExternalDependencyBeans(List<ExternalDependencyBean> externalDependencies) {
-		for (ExternalDependencyBean dependency : externalDependencies) {
-			this.externalDependencyBean.put(dependency.getClass(), dependency);
-		}
-	}
-
-	public void setExternalDependencies(List<Object> externalDependencies) {
-		this.externalDependencies = externalDependencies;
-	}
-	
-	private <T extends ExternalDependencyBean> T getExternalDependency(Class<T> dependencyType) {
-		ExternalDependencyBean externalDependencyBean = this.externalDependencyBean.get(dependencyType);
-		if (externalDependencyBean == null) {
-			return createExternalDependencyBean(dependencyType);
-		}
-		return dependencyType.cast(externalDependencyBean);
-	}
-	
-	private <D extends ExternalDependencyBean> D createExternalDependencyBean(Class<D> dependencyBeanClass) {
-		if (dependencyBeanClass.getConstructors().length != 1) {
-			throw new IllegalArgumentException(
-					"Dependency bean class must have exactly one constructor. " + dependencyBeanClass);
-		}
-		Constructor<?> constructor = dependencyBeanClass.getConstructors()[0];
-		Class<?>[] parameterTypes = constructor.getParameterTypes();
-		Object[] params = new Object[parameterTypes.length];
-		for (int i = 0; i < parameterTypes.length; i++) {
-			params[i] = getDependency(parameterTypes[i]);
-		}
-		try {
-			D result = dependencyBeanClass.cast(constructor.newInstance(params));
-			this.externalDependencyBean.put(dependencyBeanClass, result);
-			return result;
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to create dependencyBean: " + dependencyBeanClass, e);
-		}
-	}
-
-	private <T> T getDependency(Class<T> type) {
-		for (Object dep : this.externalDependencies) {
-			if (type.isAssignableFrom(dep.getClass())) {
-				return type.cast(dep);
-			}
-		}
-		throw new MissingExternalDependencyException(type);
 	}
 
 	/**

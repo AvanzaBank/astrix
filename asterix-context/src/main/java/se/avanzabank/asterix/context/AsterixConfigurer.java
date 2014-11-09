@@ -32,8 +32,6 @@ public class AsterixConfigurer {
 	private boolean enableFaultTolerance = false;
 	private boolean enableVersioning = true;
 	private boolean enableMonitoring = true; 
-	private List<ExternalDependencyBean> externalDependencyBeans = new ArrayList<>();
-	private List<Object> externalDependencies = new ArrayList<>();
 	private final AsterixSettings settings = new AsterixSettings();
 	private final List<PluginHolder<?>> plugins = new ArrayList<>();
 	private String subsystem = "unknown";
@@ -43,8 +41,6 @@ public class AsterixConfigurer {
 		for (PluginHolder<?> plugin : plugins) {
 			registerPlugin(context, plugin);
 		}
-		context.setExternalDependencyBeans(externalDependencyBeans);
-		context.setExternalDependencies(externalDependencies);
 		configureFaultTolerance(context);
 		configureVersioning(context);
 		configureMonitoring(context);
@@ -69,11 +65,6 @@ public class AsterixConfigurer {
 			result.add(apiProviderFactory.create(descriptor));
 		}
 		return result;
-	}
-
-	@Autowired(required = false)
-	public void setExternalDependencies(List<ExternalDependencyBean> externalDependencies) {
-		this.externalDependencyBeans = externalDependencies;
 	}
 	
 	public void enableFaultTolerance(boolean enableFaultTolerance) {
@@ -133,14 +124,6 @@ public class AsterixConfigurer {
 		log.debug("Found plugin for {}, using {}", type.getName(), provider.getClass().getName());
 		context.registerPlugin(type, provider);
 		return provider;
-	}
-
-	public <T> void registerDependency(T dependency) {
-		this.externalDependencies.add(dependency);
-	}
-
-	public void registerDependency(ExternalDependencyBean externalDependency) {
-		this.externalDependencyBeans.add(externalDependency);
 	}
 
 	// package private. Used for internal testing only
