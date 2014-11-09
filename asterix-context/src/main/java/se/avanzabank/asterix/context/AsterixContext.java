@@ -70,11 +70,16 @@ public class AsterixContext implements Asterix {
 		plugins.registerPlugin(type, provider);
 	}
 	
-	public void registerApiProvider(AsterixApiProvider apiProvider) {
+	void registerApiProvider(AsterixApiProvider apiProvider) {
 		for (Class<?> beanType : apiProvider.providedApis()) {
-			injectDependencies(apiProvider.getFactory(beanType));
+			AsterixFactoryBean<?> beanFactory = apiProvider.getFactory(beanType);
+			registerBeanFactory(beanFactory);
 		}
-		this.beanFactoryRegistry.registerProvider(apiProvider);
+	}
+
+	<T> void registerBeanFactory(AsterixFactoryBean<T> beanFactory) {
+		injectDependencies(beanFactory);
+		this.beanFactoryRegistry.registerFactory(beanFactory);
 	}
 	
 	private void injectDependencies(Object object) {

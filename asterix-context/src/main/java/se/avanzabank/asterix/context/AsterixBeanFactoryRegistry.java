@@ -36,18 +36,15 @@ public class AsterixBeanFactoryRegistry {
 		return factoryBean;
 	}
 	
-
-	public void registerProvider(AsterixApiProvider apiProvider) {
-		for (Class<?> providedApi : apiProvider.providedApis()) {
-			AsterixFactoryBean<?> factory = apiProvider.getFactory(providedApi);
-			AsterixFactoryBean<?> duplicateFactory = factoryByBeanType.putIfAbsent(providedApi, factory);
-			log.debug("Registering provider: api={} provider={}", providedApi.getName(), apiProvider.getDescriptor().getName());
-			if (duplicateFactory != null) {
-				throw new IllegalStateException(String.format("Multiple providers discovered for api=%s. %s and %s",
-													 		  providedApi.getName(), 
-													 		  factory.getApiDescriptor().getName(), 
-													 		  duplicateFactory.getApiDescriptor().getName()));
-			}
+	public <T> void registerFactory(AsterixFactoryBean<T> factory) {
+		Class<T> providedApi = factory.getBeanType();
+		AsterixFactoryBean<?> duplicateFactory = factoryByBeanType.putIfAbsent(providedApi, factory);
+		log.debug("Registering provider: api={} provider={}", providedApi.getName(), factory.getApiDescriptor().getName());
+		if (duplicateFactory != null) {
+			throw new IllegalStateException(String.format("Multiple providers discovered for api=%s. %s and %s",
+												 		  providedApi.getName(), 
+												 		  factory.getApiDescriptor().getName(), 
+												 		  duplicateFactory.getApiDescriptor().getName()));
 		}
 	}
 
