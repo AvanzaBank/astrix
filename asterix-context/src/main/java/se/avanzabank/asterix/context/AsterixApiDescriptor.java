@@ -67,10 +67,6 @@ public class AsterixApiDescriptor {
 		return descriptorHolder.isAnnotationPresent(AsterixVersioned.class);
 	}
 	
-	public boolean isLibrary() {
-		return descriptorHolder.isAnnotationPresent(AsterixLibraryProvider.class);
-	}
-
 	public String getSubsystem() {
 		if (!descriptorHolder.isAnnotationPresent(AsterixSubsystem.class)) {
 			return null;

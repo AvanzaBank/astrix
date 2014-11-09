@@ -35,10 +35,12 @@ public final class AsterixFactoryBean<T> implements AsterixDecorator {
 	private final Class<T> beanType;
 	private final AsterixApiDescriptor apiDescriptor;
 	private volatile AsterixBean<T> asterixBean;
+	private final boolean isLibrary;
 	
-	public AsterixFactoryBean(AsterixFactoryBeanPlugin<T> factoryPlugin, AsterixApiDescriptor apiDescriptor) {
+	public AsterixFactoryBean(AsterixFactoryBeanPlugin<T> factoryPlugin, AsterixApiDescriptor apiDescriptor, boolean isLibrary) {
 		this.plugin = factoryPlugin;
 		this.apiDescriptor = apiDescriptor;
+		this.isLibrary = isLibrary;
 		this.beanType = factoryPlugin.getBeanType();
 	}
 
@@ -73,7 +75,7 @@ public final class AsterixFactoryBean<T> implements AsterixDecorator {
 	}
 
 	public boolean isLibrary() {
-		return apiDescriptor.isLibrary();
+		return isLibrary;
 	}
 
 	public boolean isVersioned() {
