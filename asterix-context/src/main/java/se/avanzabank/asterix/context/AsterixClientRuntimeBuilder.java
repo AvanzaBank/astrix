@@ -16,11 +16,8 @@
 package se.avanzabank.asterix.context;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
@@ -38,7 +35,6 @@ public class AsterixClientRuntimeBuilder {
 	private List<Class<?>> consumedAsterixBeans;
 	private AsterixContext asterixContext;
 	private Map<String, String> settings;
-	private Set<Class<? extends ExternalDependencyBean>> usedExternalDependencyBeanTypes;
 	
 	public AsterixClientRuntimeBuilder(AsterixContext asterixContext, Map<String, String> settings, List<Class<?>> consumedAsterixBeans) {
 		this.asterixContext = asterixContext;
@@ -47,22 +43,12 @@ public class AsterixClientRuntimeBuilder {
 	}
 
 	public void registerBeanDefinitions(BeanDefinitionRegistry registry) throws BeansException {
-		usedExternalDependencyBeanTypes = resolveAllExternalDependencies(asterixContext);
-		for (Class<?> dependencBeanClass : usedExternalDependencyBeanTypes) {
-			AnnotatedGenericBeanDefinition dependenciesBeanDefinition = new AnnotatedGenericBeanDefinition(dependencBeanClass);
-			String dependencyBeanName = "_asterixDependencyBean" + dependencBeanClass.getName();
-			registry.registerBeanDefinition(dependencyBeanName, dependenciesBeanDefinition);
-		}
-		
-		
-		// AsterixConfigurer must be created AFTER all dependency-beans have bean created.
 		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AsterixConfigurer.class);
 		beanDefinition.setAutowireMode(Autowire.NO.value());
 		MutablePropertyValues asterixConfigurerProps = new MutablePropertyValues();
 //		asterixConfigurerProps.add("settings", this.settings);
 		asterixConfigurerProps.add("subsystem", this.asterixContext.getCurrentSubsystem());
 		beanDefinition.setPropertyValues(asterixConfigurerProps);
-		beanDefinition.setDependsOn(getDependencyBeanNames(usedExternalDependencyBeanTypes));
 		registry.registerBeanDefinition("_asterixConfigurer", beanDefinition);
 
 		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixContext.class);
@@ -87,33 +73,4 @@ public class AsterixClientRuntimeBuilder {
 		}
 	}
 
-	private String[] getDependencyBeanNames(
-			Set<Class<? extends ExternalDependencyBean>> externalDependencyBeanTypes) {
-		List<String> result = new ArrayList<>(externalDependencyBeanTypes.size());
-		for (Class<?> externalDependencyBean : externalDependencyBeanTypes) {
-			result.add("_asterixDependencyBean" + externalDependencyBean.getName());
-		}
-		return result.toArray(new String[result.size()]);
-	}
-
-	private Set<Class<? extends ExternalDependencyBean>> resolveAllExternalDependencies(
-			AsterixContext asterixContext) {
-		Set<Class<? extends ExternalDependencyBean>> result = new HashSet<>();
-		for (Class<?> consumedBeans : resolveAllConsumedBeans(asterixContext)) {
-			Class<? extends ExternalDependencyBean> externalDependencyBean =
-					asterixContext.getExternalDependencyBean(consumedBeans);
-			if (externalDependencyBean != null) {
-				result.add(externalDependencyBean);
-			}
-		}
-		return result;
-	}
-
-	private Collection<Class<?>> resolveAllConsumedBeans(AsterixContext asterixContext) {
-		Set<Class<?>> result = new HashSet<>(consumedAsterixBeans);
-		for (Class<?> directBeanDependency : this.consumedAsterixBeans) {
-			result.addAll(asterixContext.getTransitiveBeanDependenciesForBean(directBeanDependency));
-		}
-		return result;
-	}
 }
