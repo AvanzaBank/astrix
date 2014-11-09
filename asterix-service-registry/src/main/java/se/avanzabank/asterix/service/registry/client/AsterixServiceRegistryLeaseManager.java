@@ -20,6 +20,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.avanzabank.asterix.context.AsterixBeanAware;
 import se.avanzabank.asterix.context.AsterixBeans;
 import se.avanzabank.asterix.context.AsterixServiceProperties;
@@ -29,9 +32,7 @@ import se.avanzabank.asterix.context.AsterixSettingsReader;
 
 public class AsterixServiceRegistryLeaseManager extends Thread implements AsterixBeanAware, AsterixSettingsAware {
 	
-	// TODO: is "lease" the right concept to use?
-	// TODO: start lease-manager-thread "just in time", i.e only if leased services are really used
-	
+	private final Logger log = LoggerFactory.getLogger(AsterixServiceRegistryLeaseManager.class);
 	private final List<LeasedService<?>> leasedServices = new CopyOnWriteArrayList<>();
 	private volatile AsterixServiceRegistryClient serviceRegistry;
 	private AsterixBeans beans;
@@ -42,14 +43,22 @@ public class AsterixServiceRegistryLeaseManager extends Thread implements Asteri
 		while (!interrupted()) {
 			// TODO: Effectiveness: check multiple services in each request
 			for (LeasedService<?> leasedService : leasedServices) {
-				AsterixServiceProperties serviceProperties = serviceRegistry.lookup(leasedService.getBeanType(), leasedService.getQualifier());
-				leasedService.refreshServiceProperties(serviceProperties);
+				renewLease(leasedService);
 			}
 			try {
 				Thread.sleep(settings.getLong(AsterixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 30_000L));
 			} catch (InterruptedException e) {
 				interrupt();
 			}
+		}
+	}
+
+	private void renewLease(LeasedService<?> leasedService) {
+		try {
+			AsterixServiceProperties serviceProperties = serviceRegistry.lookup(leasedService.getBeanType(), leasedService.getQualifier());
+			leasedService.refreshServiceProperties(serviceProperties);
+		} catch (Exception e) {
+			log.warn("Failed to renew lease for service: " + leasedService.getBeanType());
 		}
 	}
 
