@@ -3,4 +3,5 @@
 .classpath
 .factorypath
 .apt_generated
+.README.md.html
 target
