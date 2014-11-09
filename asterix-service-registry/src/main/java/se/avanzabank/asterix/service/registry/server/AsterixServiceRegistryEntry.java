@@ -19,12 +19,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.gigaspaces.annotation.pojo.SpaceRouting;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AsterixServiceRegistryEntry {
 	
+	/*
+	 * Intentionally designed to avoid typing properties in order to simplify service versioning.
+	 */
+	
 	private Map<String, String> serviceProperties = new HashMap<>();
+	private Map<String, String> serviceMetadata = new HashMap<>();
 	private String serviceBeanType;
-	private String qualifier;
 	
 	public Map<String, String> getServiceProperties() {
 		return serviceProperties;
@@ -32,6 +40,14 @@ public class AsterixServiceRegistryEntry {
 	
 	public void setServiceProperties(Map<String, String> serviceProperties) {
 		this.serviceProperties = serviceProperties;
+	}
+	
+	public Map<String, String> getServiceMetadata() {
+		return serviceMetadata;
+	}
+	
+	public void setServiceMetadata(Map<String, String> serviceMetadata) {
+		this.serviceMetadata = serviceMetadata;
 	}
 	
 	@SpaceRouting
@@ -42,12 +58,12 @@ public class AsterixServiceRegistryEntry {
 	public void setServiceBeanType(String serviceBeanType) {
 		this.serviceBeanType = serviceBeanType;
 	}
-	
-	public String getQualifier() {
-		return qualifier;
-	}
-	public void setQualifier(String qualifier) {
-		this.qualifier = qualifier;
+
+	public static AsterixServiceRegistryEntry template() {
+		AsterixServiceRegistryEntry result = new AsterixServiceRegistryEntry();
+		result.serviceProperties = null;
+		result.serviceMetadata = null;
+		return result;
 	}
 	
 }

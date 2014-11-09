@@ -33,6 +33,6 @@ import java.lang.annotation.Target;
 @Documented
 public @interface AsterixConfigApi {
 	
-	Class<?> exportedApi();
+	Class<?>[] exportedApis();
 	String entryName();
 }

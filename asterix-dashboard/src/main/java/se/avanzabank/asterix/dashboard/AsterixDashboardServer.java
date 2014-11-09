@@ -13,22 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.service.registry.client;
+package se.avanzabank.asterix.dashboard;
 
-import java.util.List;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 
-import org.openspaces.remoting.Routing;
+@EnableAutoConfiguration
+@ComponentScan("se.avanzabank.asterix.dashboard")
+public class AsterixDashboardServer {
 
-import se.avanzabank.asterix.core.AsterixBroadcast;
-import se.avanzabank.asterix.service.registry.server.AsterixServiceRegistryEntry;
+	public static void main(String[] args) {
+		System.setProperty("server.port", "9111");
+		SpringApplication.run(AsterixDashboardServer.class, args);
+	}
 
-public interface AsterixServiceRegistry {
-	
-	<T> AsterixServiceRegistryEntry lookup(@Routing String type, String qualifier);
-	
-	<T> void register(AsterixServiceRegistryEntry properties, long lease);
-	
-	@AsterixBroadcast
-	List<AsterixServiceRegistryEntry> listServices();
-	
 }

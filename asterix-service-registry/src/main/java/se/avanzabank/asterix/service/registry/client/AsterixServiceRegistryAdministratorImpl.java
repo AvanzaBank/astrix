@@ -17,18 +17,19 @@ package se.avanzabank.asterix.service.registry.client;
 
 import java.util.List;
 
-import org.openspaces.remoting.Routing;
-
-import se.avanzabank.asterix.core.AsterixBroadcast;
 import se.avanzabank.asterix.service.registry.server.AsterixServiceRegistryEntry;
 
-public interface AsterixServiceRegistry {
-	
-	<T> AsterixServiceRegistryEntry lookup(@Routing String type, String qualifier);
-	
-	<T> void register(AsterixServiceRegistryEntry properties, long lease);
-	
-	@AsterixBroadcast
-	List<AsterixServiceRegistryEntry> listServices();
-	
+public class AsterixServiceRegistryAdministratorImpl implements AsterixServiceRegistryAdministrator {
+
+	private AsterixServiceRegistry serviceRegistry;
+
+	public AsterixServiceRegistryAdministratorImpl(AsterixServiceRegistry serviceRegistry) {
+		this.serviceRegistry = serviceRegistry;
+	}
+
+	@Override
+	public List<AsterixServiceRegistryEntry> listServices() {
+		return serviceRegistry.listServices();
+	}
+
 }

@@ -25,5 +25,10 @@ public class AsterixServiceRegistryLibrary {
 	public AsterixServiceRegistryClient createClient(AsterixServiceRegistry serviceRegistry) {
 		return new AsterixServiceRegistryClientImpl(serviceRegistry);
 	}
+	
+	@AsterixExport
+	public AsterixServiceRegistryAdministrator createAdministrator(AsterixServiceRegistry serviceRegistry) {
+		return new AsterixServiceRegistryAdministratorImpl(serviceRegistry);
+	}
 
 }

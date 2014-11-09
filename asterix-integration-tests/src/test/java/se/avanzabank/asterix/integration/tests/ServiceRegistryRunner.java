@@ -13,22 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.service.registry.client;
+package se.avanzabank.asterix.integration.tests;
 
-import java.util.List;
+import java.io.IOException;
 
-import org.openspaces.remoting.Routing;
+import se.avanzabank.asterix.gs.test.util.PartitionedPu;
+import se.avanzabank.asterix.gs.test.util.PuConfigurers;
 
-import se.avanzabank.asterix.core.AsterixBroadcast;
-import se.avanzabank.asterix.service.registry.server.AsterixServiceRegistryEntry;
-
-public interface AsterixServiceRegistry {
+public class ServiceRegistryRunner {
 	
-	<T> AsterixServiceRegistryEntry lookup(@Routing String type, String qualifier);
-	
-	<T> void register(AsterixServiceRegistryEntry properties, long lease);
-	
-	@AsterixBroadcast
-	List<AsterixServiceRegistryEntry> listServices();
-	
+	public static void main(String[] args) throws IOException {
+		System.setProperty("com.gs.jini_lus.groups", "service-registry");
+		PartitionedPu partitionedPu = new PartitionedPu(PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
+				.numberOfPrimaries(1)
+				.numberOfBackups(0));
+		partitionedPu.run();
+	}
 }

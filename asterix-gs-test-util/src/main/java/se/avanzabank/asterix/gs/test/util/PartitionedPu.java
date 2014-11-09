@@ -32,7 +32,7 @@ import org.openspaces.pu.container.support.CompoundProcessingUnitContainer;
  * @author Elias Lindholm (elilin)
  *
  */
-final class PartitionedPu implements PuRunner {
+public final class PartitionedPu implements PuRunner {
 
 	private CompoundProcessingUnitContainer container;
 	private String gigaSpaceBeanName = "gigaSpace";
