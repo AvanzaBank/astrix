@@ -32,8 +32,6 @@ import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.TestAsterixConfigurer;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
-import se.avanzabank.asterix.provider.library.AsterixExport;
-import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
 import se.avanzabank.asterix.service.registry.util.InMemoryServiceRegistry;
 import se.avanzabank.asterix.test.util.Poller;
 import se.avanzabank.asterix.test.util.Probe;
@@ -144,14 +142,6 @@ public class AsterixServiceRegistryClientTest {
 	
 	private void assertEventually(Probe probe) throws InterruptedException {
 		new Poller(1000, 1).check(probe);
-	}
-	
-	@AsterixLibraryProvider
-	public static class InMemoryServiceRegistryDescriptor {
-		@AsterixExport
-		public AsterixServiceRegistry create() {
-			return new InMemoryServiceRegistry();
-		}
 	}
 	
 	@AsterixServiceRegistryApi(

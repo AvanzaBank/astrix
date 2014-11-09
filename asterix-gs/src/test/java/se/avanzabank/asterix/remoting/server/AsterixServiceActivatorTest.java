@@ -68,7 +68,7 @@ public class AsterixServiceActivatorTest {
 		
 	}
 	
-	AsterixObjectSerializer objectSerializer = new JacksonVersioningPlugin().create(new AsterixApiDescriptor(DummyDescriptor.class));
+	AsterixObjectSerializer objectSerializer = new JacksonVersioningPlugin().create(AsterixApiDescriptor.create(DummyDescriptor.class));
 	AsterixServiceActivator activator = new AsterixServiceActivator();
 	
 	@Test

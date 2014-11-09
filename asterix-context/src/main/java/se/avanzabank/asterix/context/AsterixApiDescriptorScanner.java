@@ -62,7 +62,7 @@ public class AsterixApiDescriptorScanner implements AsterixApiDescriptors {
 		for (BeanDefinition beanDefinition : foundCandidateComponents) {
 			try {
 				Class<?> providerClass = Class.forName(beanDefinition.getBeanClassName());
-				AsterixApiDescriptor descriptor = new AsterixApiDescriptor(providerClass);
+				AsterixApiDescriptor descriptor = AsterixApiDescriptor.create(providerClass);
 				log.debug("Found api descriptor {}", descriptor);
 				discoveredApiDescriptors.add(descriptor);
 			} catch (ClassNotFoundException e) {

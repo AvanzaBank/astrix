@@ -35,7 +35,7 @@ public class AsterixServiceDescriptor {
 		this.descriptorHolder = descriptorHolder;
 		this.apiDescriptors = new ArrayList<>(asterixService.apiDescriptors().length);
 		for (Class<?> desc : this.asterixService.apiDescriptors()) {
-			this.apiDescriptors.add(new AsterixApiDescriptor(desc));
+			this.apiDescriptors.add(AsterixApiDescriptor.create(desc));
 		}
 	}
 	

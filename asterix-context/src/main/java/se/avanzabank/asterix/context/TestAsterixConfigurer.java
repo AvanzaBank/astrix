@@ -17,12 +17,14 @@ package se.avanzabank.asterix.context;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 public class TestAsterixConfigurer {
 	
 	private AsterixConfigurer configurer;
 	private final Set<AsterixApiDescriptor> descriptors = new HashSet<>();
+	private final Collection<AsterixFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	
 	public TestAsterixConfigurer() {
 		configurer = new AsterixConfigurer();
@@ -39,11 +41,22 @@ public class TestAsterixConfigurer {
 	}
 
 	public AsterixContext configure() {
+		for (AsterixFactoryBean<?> factoryBean : standaloneFactories) {
+			configurer.addFactoryBean(factoryBean);
+		}
 		return configurer.configure();
 	}
 
 	public void registerApiDescriptor(Class<?> descriptor) {
-		descriptors.add(new AsterixApiDescriptor(descriptor));
+		descriptors.add(AsterixApiDescriptor.create(descriptor));
+	}
+	
+
+	public <T> void registerApi(Class<T> beanType, T provider) {
+		StandaloneFactoryBean<T> factoryPlugin = new StandaloneFactoryBean<>(beanType, provider);
+		AsterixApiDescriptor apiDescriptor = AsterixApiDescriptor.simple(provider.getClass().getName(), "not important - is library");
+		AsterixFactoryBean<T> factoryBean = new AsterixFactoryBean<>(factoryPlugin, apiDescriptor, true);
+		standaloneFactories.add(factoryBean);
 	}
 
 	public <T> void registerPlugin(Class<T> c, T provider) {
@@ -62,5 +75,25 @@ public class TestAsterixConfigurer {
 		configurer.set(name, value);
 	}
 	
+	private static class StandaloneFactoryBean<T> implements AsterixFactoryBeanPlugin<T> {
+		private Class<T> type;
+		private T instance;
+
+		public StandaloneFactoryBean(Class<T> type, T instance) {
+			this.type = type;
+			this.instance = instance;
+		}
+
+		@Override
+		public T create(String optionalQualifier) {
+			return instance;
+		}
+
+		@Override
+		public Class<T> getBeanType() {
+			return type;
+		}
+		
+	}
 	
 }

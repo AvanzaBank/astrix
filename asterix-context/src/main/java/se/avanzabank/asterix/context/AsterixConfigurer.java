@@ -16,6 +16,8 @@
 package se.avanzabank.asterix.context;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,13 +31,12 @@ public class AsterixConfigurer {
 	private static final Logger log = LoggerFactory.getLogger(AsterixConfigurer.class);
 	
 	private AsterixApiDescriptors asterixApiDescriptors = new AsterixApiDescriptorScanner("se.avanzabank");
+	private final Collection<AsterixFactoryBean<?>> standaloneFactories = new LinkedList<>();
+	private final List<PluginHolder<?>> plugins = new ArrayList<>();
 	private boolean enableFaultTolerance = false;
 	private boolean enableVersioning = true;
 	private boolean enableMonitoring = true; 
-	private List<ExternalDependencyBean> externalDependencyBeans = new ArrayList<>();
-	private List<Object> externalDependencies = new ArrayList<>();
 	private final AsterixSettings settings = new AsterixSettings();
-	private final List<PluginHolder<?>> plugins = new ArrayList<>();
 	private String subsystem = "unknown";
 	
 	public AsterixContext configure() {
@@ -43,8 +44,6 @@ public class AsterixConfigurer {
 		for (PluginHolder<?> plugin : plugins) {
 			registerPlugin(context, plugin);
 		}
-		context.setExternalDependencyBeans(externalDependencyBeans);
-		context.setExternalDependencies(externalDependencies);
 		configureFaultTolerance(context);
 		configureVersioning(context);
 		configureMonitoring(context);
@@ -55,6 +54,9 @@ public class AsterixConfigurer {
 		List<AsterixApiProvider> apiProviders = createApiProviders(apiProviderFactory);
 		for (AsterixApiProvider apiProvider : apiProviders) {
 			context.registerApiProvider(apiProvider);
+		}
+		for (AsterixFactoryBean<?> factoryBean : this.standaloneFactories) {
+			context.registerBeanFactory(factoryBean);
 		}
 		return context;
 	}
@@ -69,11 +71,6 @@ public class AsterixConfigurer {
 			result.add(apiProviderFactory.create(descriptor));
 		}
 		return result;
-	}
-
-	@Autowired(required = false)
-	public void setExternalDependencies(List<ExternalDependencyBean> externalDependencies) {
-		this.externalDependencyBeans = externalDependencies;
 	}
 	
 	public void enableFaultTolerance(boolean enableFaultTolerance) {
@@ -135,14 +132,6 @@ public class AsterixConfigurer {
 		return provider;
 	}
 
-	public <T> void registerDependency(T dependency) {
-		this.externalDependencies.add(dependency);
-	}
-
-	public void registerDependency(ExternalDependencyBean externalDependency) {
-		this.externalDependencyBeans.add(externalDependency);
-	}
-
 	// package private. Used for internal testing only
 	void setAsterixApiDescriptors(AsterixApiDescriptors asterixApiDescriptors) {
 		this.asterixApiDescriptors = asterixApiDescriptors;
@@ -192,6 +181,10 @@ public class AsterixConfigurer {
 	 */
 	public void setSubsystem(String subsystem) {
 		this.subsystem = subsystem;
+	}
+
+	public void addFactoryBean(AsterixFactoryBean<?> factoryBean) {
+		this.standaloneFactories.add(factoryBean);
 	}
 
 }

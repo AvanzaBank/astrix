@@ -25,22 +25,19 @@ import org.kohsuke.MetaInfServices;
 import se.avanzabank.asterix.context.AsterixApiDescriptor;
 import se.avanzabank.asterix.context.AsterixApiProviderPlugin;
 import se.avanzabank.asterix.context.AsterixFactoryBeanPlugin;
-import se.avanzabank.asterix.context.AsterixInject;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 
 @MetaInfServices(AsterixApiProviderPlugin.class)
 public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderPlugin {
 	
-	private AsterixServiceRegistryLeaseManager leaseManager;
-	
 	@Override
 	public List<AsterixFactoryBeanPlugin<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
 		List<AsterixFactoryBeanPlugin<?>> result = new ArrayList<>();
 		for (Class<?> exportedApi : descriptor.getAnnotation(AsterixServiceRegistryApi.class).exportedApis()) {
-			result.add(new ServiceRegistryLookupFactory<>(descriptor, exportedApi, leaseManager));
+			result.add(new ServiceRegistryLookupFactory<>(descriptor, exportedApi));
 			Class<?> asyncInterface = loadInterfaceIfExists(exportedApi.getName() + "Async");
 			if (asyncInterface != null) {
-				result.add(new ServiceRegistryLookupFactory<>(descriptor, asyncInterface, leaseManager));
+				result.add(new ServiceRegistryLookupFactory<>(descriptor, asyncInterface));
 			}
 		}
 		return result;
@@ -74,10 +71,5 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 	@Override
 	public boolean isLibraryProvider() {
 		return false;
-	}
-	
-	@AsterixInject
-	public void setLeaseManager(AsterixServiceRegistryLeaseManager leaseManager) {
-		this.leaseManager = leaseManager;
 	}
 }

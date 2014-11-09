@@ -15,12 +15,8 @@
  */
 package se.avanzabank.asterix.context;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -36,15 +32,10 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class AsterixApiProviderFactory {
 	
-	private final ConcurrentMap<Class<? extends Annotation>, AsterixApiProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	private final AsterixApiProviderPlugins apiProviderPlugins;
 	
 	public AsterixApiProviderFactory(AsterixApiProviderPlugins apiProviderPlugins) {
 		this.apiProviderPlugins = apiProviderPlugins;
-	}
-	
-	public Set<Class<? extends Annotation>> getProvidedAnnotationTypes() {
-		return pluginByAnnotationType.keySet();
 	}
 	
 	public AsterixApiProvider create(AsterixApiDescriptor descriptor) {
@@ -55,7 +46,7 @@ public class AsterixApiProviderFactory {
 			if (!providerFactoryPlugin.isLibraryProvider()) {
 				decoratatedFactory = new StatefulAsterixFactoryBean<>(factoryBean);
 			}
-			factoryBeans.add(new AsterixFactoryBean<>(decoratatedFactory, descriptor));
+			factoryBeans.add(new AsterixFactoryBean<>(decoratatedFactory, descriptor, providerFactoryPlugin.isLibraryProvider()));
 		}
 		return new AsterixApiProvider(factoryBeans, descriptor, providerFactoryPlugin); 
 	}

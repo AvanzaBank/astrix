@@ -17,67 +17,141 @@ package se.avanzabank.asterix.context;
 
 import java.lang.annotation.Annotation;
 
-import se.avanzabank.asterix.provider.core.AsterixConfigApi;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 import se.avanzabank.asterix.provider.core.AsterixSubsystem;
-import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
 import se.avanzabank.asterix.provider.versioning.AsterixVersioned;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AsterixApiDescriptor {
-	
-	private final Class<?> descriptorHolder;
+public abstract class AsterixApiDescriptor {
 
-	public AsterixApiDescriptor(Class<?> descriptorHolder) {
-		this.descriptorHolder = descriptorHolder;
-	}
-
-	public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-		return descriptorHolder.isAnnotationPresent(annotationClass);
-	}
-
-	public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-		return descriptorHolder.getAnnotation(annotationClass);
+	public static AsterixApiDescriptor create(Class<?> descriptorHolder) {
+		return new AnnotationApiDescriptor(descriptorHolder);
 	}
 	
-	public String getName() {
-		return this.descriptorHolder.getName();
+	public static AsterixApiDescriptor simple(String name, String subsystem) {
+		return new SimpleApiDescriptor(name, subsystem);
 	}
 
-	public Class<?> getDescriptorClass() {
-		return descriptorHolder;
-	}
+	public abstract boolean isAnnotationPresent(Class<? extends Annotation> annotationClass);
+
+	public abstract <T extends Annotation> T getAnnotation(Class<T> annotationClass);
+	
+	public abstract String getName();
+	
+	public abstract Class<?> getDescriptorClass();
 	
 	@Override
-	public String toString() {
-		return descriptorHolder.getName().toString();
+	public final String toString() {
+		return getName();
 	}
 	
 	/**
 	 * Whether this api uses the service registry or not.
 	 * @return
 	 */
-	public boolean usesServiceRegistry() {
-		return descriptorHolder.isAnnotationPresent(AsterixServiceRegistryApi.class);
-	}
+	public abstract boolean usesServiceRegistry();
 	
-	public boolean isVersioned() {
-		return descriptorHolder.isAnnotationPresent(AsterixVersioned.class);
-	}
+	public abstract boolean isVersioned();
 	
-	public boolean isLibrary() {
-		return descriptorHolder.isAnnotationPresent(AsterixLibraryProvider.class);
-	}
+	public abstract String getSubsystem();
+	
+	private static class SimpleApiDescriptor extends AsterixApiDescriptor {
 
-	public String getSubsystem() {
-		if (!descriptorHolder.isAnnotationPresent(AsterixSubsystem.class)) {
+		private String name;
+		private String subsystem;
+		private AsterixFactoryBeanPlugin<?> factory;
+		
+		public SimpleApiDescriptor(String name, String subsystem) {
+			this.name = name;
+			this.subsystem = subsystem;
+		}
+
+		@Override
+		public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+			return false;
+		}
+
+		@Override
+		public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
 			return null;
 		}
-		AsterixSubsystem subsystem = descriptorHolder.getAnnotation(AsterixSubsystem.class);
-		return subsystem.value();
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public Class<?> getDescriptorClass() {
+			return null;
+		}
+
+		@Override
+		public boolean usesServiceRegistry() {
+			return false;
+		}
+
+		@Override
+		public boolean isVersioned() {
+			return false;
+		}
+
+		@Override
+		public String getSubsystem() {
+			return subsystem;
+		}
+		
+		public AsterixFactoryBeanPlugin<?> getFactory() {
+			return factory;
+		}
+		
+	}
+	
+	private static class AnnotationApiDescriptor extends AsterixApiDescriptor {
+		private Class<?> descriptorHolder;
+
+		private AnnotationApiDescriptor(Class<?> annotationHolder) {
+			this.descriptorHolder = annotationHolder;
+		}
+		
+		public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+			return descriptorHolder.isAnnotationPresent(annotationClass);
+		}
+
+		public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+			return descriptorHolder.getAnnotation(annotationClass);
+		}
+		
+		public String getName() {
+			return this.descriptorHolder.getName();
+		}
+
+		public Class<?> getDescriptorClass() {
+			return descriptorHolder;
+		}
+		
+		/**
+		 * Whether this api uses the service registry or not.
+		 * @return
+		 */
+		public boolean usesServiceRegistry() {
+			return descriptorHolder.isAnnotationPresent(AsterixServiceRegistryApi.class);
+		}
+		
+		public boolean isVersioned() {
+			return descriptorHolder.isAnnotationPresent(AsterixVersioned.class);
+		}
+		
+		public String getSubsystem() {
+			if (!descriptorHolder.isAnnotationPresent(AsterixSubsystem.class)) {
+				return null;
+			}
+			AsterixSubsystem subsystem = descriptorHolder.getAnnotation(AsterixSubsystem.class);
+			return subsystem.value();
+		}
 	}
 
 }

@@ -45,7 +45,6 @@ public class AsterixBeanStateWorker extends Thread {
 	@Override
 	public void run() {
 		while(!interrupted()) {
-			// TODO: Run BeanStateWorker even when managedBeans.size == 0???
 			for (StatefulAsterixBean<?> asterixBean : managedBeans) {
 				this.beanStateWorkerThreadPool.execute(new BindCommand(asterixBean));
 			}
@@ -56,6 +55,7 @@ public class AsterixBeanStateWorker extends Thread {
 				interrupt();
 			} 
 		}
+		log.info("Shutting down bean state worker. Current managedBean count=" + managedBeans);
 	}
 	
 	private static class BindCommand implements Runnable {

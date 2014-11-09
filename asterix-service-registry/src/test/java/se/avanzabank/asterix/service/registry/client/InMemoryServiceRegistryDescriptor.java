@@ -13,8 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.avanzabank.asterix.context;
+package se.avanzabank.asterix.service.registry.client;
 
-public interface ExternalDependency<T extends ExternalDependencyBean> {
-	T get();
+import se.avanzabank.asterix.provider.library.AsterixExport;
+import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
+import se.avanzabank.asterix.service.registry.util.InMemoryServiceRegistry;
+
+@AsterixLibraryProvider
+public class InMemoryServiceRegistryDescriptor {
+	@AsterixExport
+	public AsterixServiceRegistry create() {
+		return new InMemoryServiceRegistry();
+	}
 }

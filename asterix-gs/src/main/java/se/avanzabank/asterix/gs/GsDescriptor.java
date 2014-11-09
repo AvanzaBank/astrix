@@ -23,9 +23,6 @@ import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
 	exportedApis = {
 		GigaSpace.class
 	}
-//	components = {
-//		AsterixServiceComponentNames.GS_REMOTING
-//	}
 )
 public class GsDescriptor {
 	

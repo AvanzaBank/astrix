@@ -23,12 +23,10 @@ import se.avanzabank.asterix.context.AsterixServiceProperties;
 
 public interface AsterixServiceRegistryClient {
 	
-	// TODO: use separate interface for providers and consumers?
-	
 	<T> AsterixServiceProperties lookup(@Routing Class<T> type);
 	
 	<T> AsterixServiceProperties lookup(@Routing Class<T> type, String qualifier);
 	
-	<T> void register(@Routing Class<T> type, AsterixServiceProperties properties, long lease); // TODO: lease/renewal?
+	<T> void register(@Routing Class<T> type, AsterixServiceProperties properties, long lease);
 	
 }
