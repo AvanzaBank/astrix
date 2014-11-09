@@ -31,8 +31,6 @@ import se.avanzabank.asterix.context.AsterixSettings;
 import se.avanzabank.asterix.context.TestAsterixConfigurer;
 import se.avanzabank.asterix.core.ServiceUnavailableException;
 import se.avanzabank.asterix.provider.core.AsterixServiceRegistryApi;
-import se.avanzabank.asterix.provider.library.AsterixExport;
-import se.avanzabank.asterix.provider.library.AsterixLibraryProvider;
 import se.avanzabank.asterix.service.registry.server.AsterixServiceRegistryEntry;
 import se.avanzabank.asterix.service.registry.util.InMemoryServiceRegistry;
 import se.avanzabank.asterix.test.util.Poller;
@@ -50,15 +48,15 @@ public class AsterixServiceRegistryLeaseManagerTest {
 	
 	@Before
 	public void setup() {
+		serviceRegistry = new CorruptableServiceRegistry();
 		TestAsterixConfigurer asterixConfig = new TestAsterixConfigurer();
 		asterixConfig.set(AsterixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 1); // No Sleep between attempts
 		asterixConfig.set(AsterixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 1);
 		asterixConfig.registerApiDescriptor(TestDescriptor.class);
-		asterixConfig.registerApiDescriptor(TestServiceRegistryDescriptor.class);
 		asterixConfig.registerApiDescriptor(AsterixServiceRegistryLibrary.class);
+		asterixConfig.registerApi(AsterixServiceRegistry.class, serviceRegistry);
 		context = asterixConfig.configure();
 		serviceRegistryClient = context.getBean(AsterixServiceRegistryClient.class);
-		serviceRegistry = (CorruptableServiceRegistry) context.getBean(AsterixServiceRegistry.class);
 		
 		TestService impl = new TestService() {
 			@Override
@@ -140,14 +138,6 @@ public class AsterixServiceRegistryLeaseManagerTest {
 			}
 		}
 		
-	}
-
-	@AsterixLibraryProvider
-	public static class TestServiceRegistryDescriptor {
-		@AsterixExport
-		public AsterixServiceRegistry serviceRegistry() {
-			return new CorruptableServiceRegistry();
-		}
 	}
 	
 	@AsterixServiceRegistryApi(

@@ -34,9 +34,6 @@ public class TestAsterixConfigurer {
 				return descriptors;
 			}
 		});
-		for (AsterixFactoryBean<?> factoryBean : standaloneFactories) {
-			configurer.addFactoryBean(factoryBean);
-		}
 		configurer.enableVersioning(false);
 		configurer.enableFaultTolerance(false);
 		configurer.enableMonitoring(false);
@@ -44,6 +41,9 @@ public class TestAsterixConfigurer {
 	}
 
 	public AsterixContext configure() {
+		for (AsterixFactoryBean<?> factoryBean : standaloneFactories) {
+			configurer.addFactoryBean(factoryBean);
+		}
 		return configurer.configure();
 	}
 
