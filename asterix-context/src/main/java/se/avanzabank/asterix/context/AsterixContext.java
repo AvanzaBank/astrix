@@ -243,10 +243,6 @@ public class AsterixContext implements Asterix {
 		return null;
 	}
 	
-	public <T> AsterixApiProvider getsApiProvider(Class<T> beanType) {
-		return this.beanFactoryRegistry.getApiProvider(beanType);
-	}
-
 	public AsterixPlugins getPlugins() {
 		return this.plugins;
 	}
