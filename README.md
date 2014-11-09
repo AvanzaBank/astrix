@@ -177,12 +177,12 @@ public class LunchServiceDescriptor {
 
 ```xml
 <!-- Asterix service framework (provider and consumer) -->
-<bean id="asterixFrameworkBean" class="se.avanzabank.asterix.context.AsterixFrameworkBean">
-	<property name="serviceDescriptor" value="se.avanzabank.asterix.integration.tests.domain.apiruntime.LunchServiceDescriptor"/>
+<bean id="asterixFrameworkBean" class="com.avanza.asterix.context.AsterixFrameworkBean">
+	<property name="serviceDescriptor" value="com.avanza.asterix.integration.tests.domain.apiruntime.LunchServiceDescriptor"/>
 </bean>
 
 <!-- The actual service implementation(s) -->
-<bean id="lunchService" class="se.avanzabank.asterix.integration.tests.domain.pu.LunchServiceImpl"/>
+<bean id="lunchService" class="com.avanza.asterix.integration.tests.domain.pu.LunchServiceImpl"/>
 ```
 
 
@@ -192,10 +192,10 @@ public class LunchServiceDescriptor {
 ### pu.xml (or an ordinary spring.xml)
 
 ```xml
-<bean id="asterixFrameworkBean" class="se.avanzabank.asterix.context.AsterixFrameworkBean">
+<bean id="asterixFrameworkBean" class="com.avanza.asterix.context.AsterixFrameworkBean">
 	<property name="consumedAsterixBeans">
 		<list>
-			<value>se.avanzabank.asterix.integration.tests.domain.api.LunchService</value>
+			<value>com.avanza.asterix.integration.tests.domain.api.LunchService</value>
 		</list>
 	</property>
 </bean>
