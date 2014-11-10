@@ -379,6 +379,24 @@ public class AsterixServiceActivatorTest {
 		assertEquals("kalle", lastReceivedRequest);
 	}
 	
+//	@Test
+	public void supportsBroadcastedServicesWithVoidReturnType() throws Exception {
+		final BlockingQueue<String> receivedRequest = new LinkedBlockingQueue<>();
+		BroadcastVoidService impl = new BroadcastVoidService() {
+			@Override
+			public void hello(String message) {
+				receivedRequest.add(message);
+			}
+		};
+		activator.register(impl, objectSerializer, BroadcastVoidService.class);
+		
+		BroadcastVoidService testService = AsterixRemotingProxy.create(BroadcastVoidService.class, AsterixRemotingTransport.direct(activator), objectSerializer);
+
+		testService.hello("kalle");
+		String lastReceivedRequest = receivedRequest.poll(1, TimeUnit.SECONDS);
+		assertEquals("kalle", lastReceivedRequest);
+	}
+	
 	
 	public static class HelloRequest {
 		private String messsage;
@@ -480,6 +498,11 @@ public class AsterixServiceActivatorTest {
 	
 	interface VoidService {
 		void hello(@Routing String message);
+	}
+	
+	interface BroadcastVoidService {
+		@AsterixBroadcast
+		void hello(String message);
 	}
 	
 	interface AnnotatedArgumentTestService {

@@ -22,10 +22,7 @@ import java.util.List;
 import org.openspaces.core.GigaSpace;
 
 import rx.Observable;
-import rx.Observable.OnSubscribeFunc;
-import rx.Observer;
-import rx.Subscription;
-import rx.subscriptions.Subscriptions;
+import rx.Subscriber;
 
 import com.avanza.asterix.remoting.server.AsterixServiceActivator;
 import com.gigaspaces.async.AsyncFuture;
@@ -57,11 +54,11 @@ public class AsterixRemotingTransport {
 	}
 
 	public AsterixServiceInvocationResponse processRoutedRequest(AsterixServiceInvocationRequest request, GsRoutingKey routingKey) {
-		return impl.processRoutedRequest(request, routingKey).toBlockingObservable().first();
+		return impl.processRoutedRequest(request, routingKey).toBlocking().first();
 	}
 	
 	public List<AsterixServiceInvocationResponse> processBroadcastRequest(AsterixServiceInvocationRequest request) {
-		List<AsterixServiceInvocationResponse> result = impl.processBroadcastRequest(request).toBlockingObservable().first();
+		List<AsterixServiceInvocationResponse> result = impl.processBroadcastRequest(request).toBlocking().first();
 		List<AsterixServiceInvocationResponse> responses = new ArrayList<>();
 		for (AsterixServiceInvocationResponse asyncInvocationResponse : result) {
 			responses.add(asyncInvocationResponse);
@@ -93,12 +90,11 @@ public class AsterixRemotingTransport {
 		@Override
 		public Observable<AsterixServiceInvocationResponse> processRoutedRequest(AsterixServiceInvocationRequest request, GsRoutingKey routingKey){
 			final AsterixServiceInvocationResponse response = activator.invokeService(request);
-			return Observable.create(new OnSubscribeFunc<AsterixServiceInvocationResponse>() {
+			return Observable.create(new Observable.OnSubscribe<AsterixServiceInvocationResponse>() {
 				@Override
-				public Subscription onSubscribe(Observer<? super AsterixServiceInvocationResponse> t1) {
+				public void call(Subscriber<? super AsterixServiceInvocationResponse> t1) {
 					t1.onNext(response);
 					t1.onCompleted();
-					return Subscriptions.empty();
 				}
 			});
 		}
@@ -106,12 +102,11 @@ public class AsterixRemotingTransport {
 		@Override
 		public Observable<List<AsterixServiceInvocationResponse>> processBroadcastRequest(AsterixServiceInvocationRequest request) {
 			final AsterixServiceInvocationResponse response = activator.invokeService(request);
-			return Observable.create(new OnSubscribeFunc<List<AsterixServiceInvocationResponse>>() {
+			return Observable.create(new Observable.OnSubscribe<List<AsterixServiceInvocationResponse>>() {
 				@Override
-				public Subscription onSubscribe(Observer<? super List<AsterixServiceInvocationResponse>> t1) {
+				public void call(Subscriber<? super List<AsterixServiceInvocationResponse>> t1) {
 					t1.onNext(Arrays.asList(response));
 					t1.onCompleted();
-					return Subscriptions.empty();
 				}
 			});
 		}
@@ -129,9 +124,9 @@ public class AsterixRemotingTransport {
 		@Override
 		public Observable<AsterixServiceInvocationResponse> processRoutedRequest(AsterixServiceInvocationRequest request, GsRoutingKey routingKey) {
 			final AsyncFuture<AsterixServiceInvocationResponse> response = this.gigaSpace.execute(new AsterixServiceInvocationTask(request), routingKey);
-			return Observable.create(new OnSubscribeFunc<AsterixServiceInvocationResponse>() {
+			return Observable.create(new Observable.OnSubscribe<AsterixServiceInvocationResponse>() {
 				@Override
-				public Subscription onSubscribe(final Observer<? super AsterixServiceInvocationResponse> t1) {
+				public void call(final Subscriber<? super AsterixServiceInvocationResponse> t1) {
 					response.setListener(new AsyncFutureListener<AsterixServiceInvocationResponse>() {
 						@Override
 						public void onResult(AsyncResult<AsterixServiceInvocationResponse> result) {
@@ -143,8 +138,6 @@ public class AsterixRemotingTransport {
 							}
 						}
 					});
-					return Subscriptions.empty(); // TODO: subscription
-
 				}
 			});
 		}
@@ -152,9 +145,9 @@ public class AsterixRemotingTransport {
 		@Override
 		public Observable<List<AsterixServiceInvocationResponse>> processBroadcastRequest(AsterixServiceInvocationRequest request) {
 			final AsyncFuture<List<AsyncResult<AsterixServiceInvocationResponse>>> responses = gigaSpace.execute(new AsterixDistributedServiceInvocationTask(request));
-			return Observable.create(new OnSubscribeFunc<List<AsterixServiceInvocationResponse>>() {
+			return Observable.create(new Observable.OnSubscribe<List<AsterixServiceInvocationResponse>>() {
 				@Override
-				public Subscription onSubscribe(final Observer<? super List<AsterixServiceInvocationResponse>> t1) {
+				public void call(final Subscriber<? super List<AsterixServiceInvocationResponse>> subscriber) {
 					responses.setListener(new AsyncFutureListener<List<AsyncResult<AsterixServiceInvocationResponse>>>() {
 						@Override
 						public void onResult(AsyncResult<List<AsyncResult<AsterixServiceInvocationResponse>>> asyncRresult) {
@@ -163,15 +156,13 @@ public class AsterixRemotingTransport {
 								for (AsyncResult<AsterixServiceInvocationResponse> asyncInvocationResponse : asyncRresult.getResult()) {
 									result.add(asyncInvocationResponse.getResult());
 								}
-								t1.onNext(result);
-								t1.onCompleted();
+								subscriber.onNext(result);
+								subscriber.onCompleted();
 							} else {
-								t1.onError(asyncRresult.getException());
+								subscriber.onError(asyncRresult.getException());
 							}
 						}
 					});
-					return Subscriptions.empty(); // TODO: subscription
-
 				}
 			});
 		}
