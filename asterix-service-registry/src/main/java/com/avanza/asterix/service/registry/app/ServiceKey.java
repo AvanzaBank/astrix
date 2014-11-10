@@ -15,13 +15,14 @@
  */
 package com.avanza.asterix.service.registry.app;
 
+import java.io.Serializable;
 import java.util.Objects;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class ServiceKey {
+public class ServiceKey implements Serializable {
 	
 	private String apiClassName;
 	private String qualifier;
