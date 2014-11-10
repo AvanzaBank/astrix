@@ -66,14 +66,14 @@ public class AsterixRemotingProxy implements InvocationHandler {
 			String packageAndEventualOuterClassName = serviceApi.getName().substring(0, serviceApi.getName().length() - serviceApi.getSimpleName().length());
 			String serviceSimpleName = serviceApi.getSimpleName().substring("Observable".length());
 			String serviceClassName = packageAndEventualOuterClassName + serviceSimpleName;
-			this.serviceApi = serviceClassName; // TODO: no need to load class 
+			this.serviceApi = serviceClassName; 
 			this.isObservableApi = true;
 			this.isAsyncApi = false;
 		} else if (serviceApi.getSimpleName().endsWith("Async")) {
 			String serviceClassName = serviceApi.getName().substring(0, serviceApi.getName().length() - "Async".length());
-			this.serviceApi = serviceClassName; // TODO: no need to load class 
+			this.serviceApi = serviceClassName; 
 			this.isObservableApi = false;
-			this.isAsyncApi = true;	 // TODO: introduce proxy hiearchy for different proxy types(async/observable/sync) 
+			this.isAsyncApi = true;	// TODO: introduce proxy hiearchy for different proxy types(async/observable/sync) 
 		} else {
 			this.serviceApi = serviceApi.getName();
 			this.isObservableApi = false;
