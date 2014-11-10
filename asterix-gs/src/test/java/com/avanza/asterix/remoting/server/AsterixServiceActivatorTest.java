@@ -24,7 +24,10 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.openspaces.remoting.Routing;
@@ -43,7 +46,6 @@ import com.avanza.asterix.remoting.client.AsterixMissingServiceException;
 import com.avanza.asterix.remoting.client.AsterixRemoteServiceException;
 import com.avanza.asterix.remoting.client.AsterixRemotingProxy;
 import com.avanza.asterix.remoting.client.AsterixRemotingTransport;
-import com.avanza.asterix.remoting.server.AsterixServiceActivator;
 import com.avanza.asterix.versioning.plugin.JacksonVersioningPlugin;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 
@@ -359,6 +361,24 @@ public class AsterixServiceActivatorTest {
 		assertEquals("response", reply.get(0));
 	}
 	
+	@Test
+	public void supportsServicesThatWithVoidReturnType() throws Exception {
+		final BlockingQueue<String> receivedRequest = new LinkedBlockingQueue<>();
+		VoidService impl = new VoidService() {
+			@Override
+			public void hello(String message) {
+				receivedRequest.add(message);
+			}
+		};
+		activator.register(impl, objectSerializer, VoidService.class);
+		
+		VoidService testService = AsterixRemotingProxy.create(VoidService.class, AsterixRemotingTransport.direct(activator), objectSerializer);
+
+		testService.hello("kalle");
+		String lastReceivedRequest = receivedRequest.poll(1, TimeUnit.SECONDS);
+		assertEquals("kalle", lastReceivedRequest);
+	}
+	
 	
 	public static class HelloRequest {
 		private String messsage;
@@ -456,6 +476,10 @@ public class AsterixServiceActivatorTest {
 	interface TestService {
 		HelloResponse hello(HelloRequest message);
 		String hello(HelloRequest message, String greeting);
+	}
+	
+	interface VoidService {
+		void hello(@Routing String message);
 	}
 	
 	interface AnnotatedArgumentTestService {
