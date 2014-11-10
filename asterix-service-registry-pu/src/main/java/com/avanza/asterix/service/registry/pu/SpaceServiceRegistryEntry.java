@@ -15,14 +15,16 @@
  */
 package com.avanza.asterix.service.registry.pu;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import com.avanza.asterix.service.registry.app.ServiceKey;
 import com.gigaspaces.annotation.pojo.SpaceId;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 
-public class SpaceServiceRegistryEntry {
+public class SpaceServiceRegistryEntry implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private Map<String, String> serviceProperties;
 	private Map<String, String> serviceMetadata;
 	private ServiceKey serviceKey;
