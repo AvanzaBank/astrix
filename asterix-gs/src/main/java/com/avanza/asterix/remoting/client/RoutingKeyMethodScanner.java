@@ -16,7 +16,6 @@
 package com.avanza.asterix.remoting.client;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 /**
@@ -33,20 +32,16 @@ final class RoutingKeyMethodScanner {
 	 * @return	the routing key method if one exists, null otherwise
 	 */
 	public Method getRoutingKeyMethod(Class<?> spaceObjectClass) {
-		AtomicReference<Method> spaceIdField = new AtomicReference<>();
+		Method result = null;
 		for (Method m : spaceObjectClass.getMethods()) {
 			if (m.isAnnotationPresent(SpaceRouting.class)) {
-				// Found space routing property, return immediately
-				// TODO: what if multiple fields are annotated with @SpaceRouting? throw exception?
-				return m;
+				if (result != null) {
+					throw new IllegalArgumentException("Multiple methods annotated with @SpaceRouting found on class: " + spaceObjectClass.getName());
+				}
+				result = m;
 			}
-			// TODO: Should we allow @SpaceId as an routing key identifier? 
-//			if (m.isAnnotationPresent(SpaceId.class)) {
-//				 Store SpaceId property for fall back if no SpaceRouting property defined.
-//				spaceIdField.set(m);
-//			}
 		}
-		return spaceIdField.get();
+		return result;
 	}
 
 }
