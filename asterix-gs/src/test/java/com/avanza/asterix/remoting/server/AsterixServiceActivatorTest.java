@@ -379,7 +379,7 @@ public class AsterixServiceActivatorTest {
 		assertEquals("kalle", lastReceivedRequest);
 	}
 	
-//	@Test
+	@Test
 	public void supportsBroadcastedServicesWithVoidReturnType() throws Exception {
 		final BlockingQueue<String> receivedRequest = new LinkedBlockingQueue<>();
 		BroadcastVoidService impl = new BroadcastVoidService() {
@@ -393,7 +393,7 @@ public class AsterixServiceActivatorTest {
 		BroadcastVoidService testService = AsterixRemotingProxy.create(BroadcastVoidService.class, AsterixRemotingTransport.direct(activator), objectSerializer);
 
 		testService.hello("kalle");
-		String lastReceivedRequest = receivedRequest.poll(1, TimeUnit.SECONDS);
+		String lastReceivedRequest = receivedRequest.poll(0, TimeUnit.SECONDS);
 		assertEquals("kalle", lastReceivedRequest);
 	}
 	

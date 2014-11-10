@@ -30,14 +30,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func1;
+
 import com.avanza.asterix.core.AsterixBroadcast;
 import com.avanza.asterix.core.AsterixObjectSerializer;
 import com.avanza.asterix.core.AsterixRemoteResult;
 import com.avanza.asterix.core.AsterixRemoteResultReducer;
-
-import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func1;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -111,7 +111,7 @@ public class AsterixRemotingProxy implements InvocationHandler {
 			if (isAsyncApi) {
 				return new FutureAdapter<>(result);
 			}
-			return result.toBlockingObservable().first();
+			return result.toBlocking().first();
 		} else {
 			Observable<Object> result = observeProcessRoutedRequest(returnType, invocationRequest, routingKey);
 			if (isObservableApi) {
@@ -120,7 +120,7 @@ public class AsterixRemotingProxy implements InvocationHandler {
 			if (isAsyncApi) {
 				return new FutureAdapter<>(result);
 			}
-			return result.toBlockingObservable().first();
+			return result.toBlocking().first();
 		}
 	}
 	
@@ -207,14 +207,14 @@ public class AsterixRemotingProxy implements InvocationHandler {
 		}
 		final AsterixRemoteResultReducer<T, T> reducer = (AsterixRemoteResultReducer<T, T>) broadcast.reducer().newInstance();
 		Observable<List<AsterixServiceInvocationResponse>> responesObservable = this.serviceTransport.observeProcessBroadcastRequest(request);
-//		if (returnType.equals(Void.TYPE)) {
-//			return responesObservable.map(new Func1<List<AsterixServiceInvocationResponse>, T>() {
-//				@Override
-//				public T call(List<AsterixServiceInvocationResponse> t1) {
-//					return null; // TODO: How to handle void?
-//				}
-//			});
-//		}
+		if (returnType.equals(Void.TYPE)) {
+			return responesObservable.map(new Func1<List<AsterixServiceInvocationResponse>, T>() {
+				@Override
+				public T call(List<AsterixServiceInvocationResponse> t1) {
+					return null;
+				}
+			});
+		}
 		return responesObservable.map(new Func1<List<AsterixServiceInvocationResponse>, T>() {
 			@Override
 			public T call(List<AsterixServiceInvocationResponse> t1) {
