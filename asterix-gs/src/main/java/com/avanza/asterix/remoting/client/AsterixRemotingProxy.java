@@ -91,8 +91,8 @@ public class AsterixRemotingProxy implements InvocationHandler {
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		// TODO: validate method signature when creating proxy rather than on each invocation
 		RemoteServiceMethod serviceMethod = this.remoteServiceMethodByMethod.get(method);
-		GsRoutingKey routingKey = serviceMethod.getRoutingKey(args);
 		
+		GsRoutingKey routingKey = serviceMethod.getRoutingKey(args);
 		Type returnType = getReturnType(method);
 		AsterixServiceInvocationRequest invocationRequest = new AsterixServiceInvocationRequest();
 		
@@ -103,25 +103,19 @@ public class AsterixRemotingProxy implements InvocationHandler {
 		invocationRequest.setHeader("serviceApi", getTargetServiceName());
 		invocationRequest.setArguments(marshall(args)); // TODO: support multiple arguments
 		
+		Observable<?> result;
 		if (routingKey == null) {
-			Observable<?> result = observeProcessBroadcastRequest(returnType, invocationRequest, method);
-			if (isObservableApi) {
-				return result;
-			}
-			if (isAsyncApi) {
-				return new FutureAdapter<>(result);
-			}
-			return result.toBlocking().first();
+			result = observeProcessBroadcastRequest(returnType, invocationRequest, method);
 		} else {
-			Observable<Object> result = observeProcessRoutedRequest(returnType, invocationRequest, routingKey);
-			if (isObservableApi) {
-				return result;
-			}
-			if (isAsyncApi) {
-				return new FutureAdapter<>(result);
-			}
-			return result.toBlocking().first();
+			result = observeProcessRoutedRequest(returnType, invocationRequest, routingKey);
 		}
+		if (isObservableApi) {
+			return result;
+		}
+		if (isAsyncApi) {
+			return new FutureAdapter<>(result);
+		}
+		return result.toBlocking().first();
 	}
 	
 	private static class FutureAdapter<T> implements Future<T> {

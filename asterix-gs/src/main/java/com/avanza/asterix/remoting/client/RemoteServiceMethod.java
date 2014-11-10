@@ -139,7 +139,7 @@ class RemoteServiceMethod {
 	private static class BroadcastRoutingStrategy implements RoutingStrategy {
 		@Override
 		public GsRoutingKey getRoutingKey(Object[] args) {
-			return null; // TODO: introduce GsRoutingKey.broadcast()?
+			return null;
 		}
 	}
 	
