@@ -73,7 +73,7 @@ public class AsterixRemotingProxy implements InvocationHandler {
 			String serviceClassName = serviceApi.getName().substring(0, serviceApi.getName().length() - "Async".length());
 			this.serviceApi = serviceClassName; 
 			this.isObservableApi = false;
-			this.isAsyncApi = true;	// TODO: introduce proxy hiearchy for different proxy types(async/observable/sync) 
+			this.isAsyncApi = true;	// TODO: refactor: introduce proxy hiearchy for different proxy types(async/observable/sync) 
 		} else {
 			this.serviceApi = serviceApi.getName();
 			this.isObservableApi = false;
@@ -89,7 +89,6 @@ public class AsterixRemotingProxy implements InvocationHandler {
 	
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		// TODO: validate method signature when creating proxy rather than on each invocation
 		RemoteServiceMethod serviceMethod = this.remoteServiceMethodByMethod.get(method);
 		
 		GsRoutingKey routingKey = serviceMethod.getRoutingKey(args);
@@ -101,7 +100,7 @@ public class AsterixRemotingProxy implements InvocationHandler {
 		
 		invocationRequest.setHeader("serviceMethodSignature", methodSignature);
 		invocationRequest.setHeader("serviceApi", getTargetServiceName());
-		invocationRequest.setArguments(marshall(args)); // TODO: support multiple arguments
+		invocationRequest.setArguments(marshall(args));
 		
 		Observable<?> result;
 		if (routingKey == null) {
