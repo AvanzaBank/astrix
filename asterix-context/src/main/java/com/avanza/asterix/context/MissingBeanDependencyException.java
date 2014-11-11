@@ -18,7 +18,7 @@ package com.avanza.asterix.context;
 public class MissingBeanDependencyException extends RuntimeException {
 	
 	public MissingBeanDependencyException(AsterixBeanAware beanDependenciesAware, Class<?> beanType) {
-		super("Missing bean dependency: type=" + beanType.getName() + ", requiredBy=" + beanDependenciesAware.getClass().getName());
+		super("Missing bean provider for dependency: type=" + beanType.getName() + ", requiredBy=" + beanDependenciesAware.getClass().getName());
 	}
 
 }

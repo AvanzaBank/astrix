@@ -117,7 +117,7 @@ public class AsterixPlugins {
 			for (T plugin : plugins) {
 				initializer.init(plugin);
 			}
-			return new Plugin(type, plugins);
+			return new Plugin<T>(type, plugins);
 		}
 		
 		// Look for inner factory class with name 'Default' and a factory method named 'create'

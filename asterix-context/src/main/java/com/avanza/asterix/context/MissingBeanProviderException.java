@@ -20,11 +20,11 @@ package com.avanza.asterix.context;
  * @author Elias Lindholm (elilin)
  *
  */
-public class MissingBeanException extends RuntimeException {
+public class MissingBeanProviderException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	public MissingBeanException(Class<?> beanType) {
+	public MissingBeanProviderException(Class<?> beanType) {
 		super("No provider found for bean: " + beanType.getName());
 	}
 

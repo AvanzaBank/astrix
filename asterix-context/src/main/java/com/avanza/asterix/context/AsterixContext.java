@@ -145,7 +145,7 @@ public class AsterixContext implements Asterix {
 				}
 				try {
 					return AsterixContext.this.getBean(beanType, qualifier);
-				} catch (MissingBeanException e) {
+				} catch (MissingBeanProviderException e) {
 					throw new MissingBeanDependencyException(beanDependenciesAware, beanType);
 				}
 			}
@@ -176,7 +176,7 @@ public class AsterixContext implements Asterix {
 
 	private <T> AsterixFactoryBean<T> getFactoryBean(Class<T> beanType) {
 		if (!hasBeanFactoryFor(beanType)) {
-			throw new MissingBeanException(beanType);
+			throw new MissingBeanProviderException(beanType);
 		}
 		AsterixFactoryBean<T> factoryBean = this.beanFactoryRegistry.getFactoryBean(beanType);
 		if (isAllowedToInvokeBean(factoryBean)) {
@@ -271,7 +271,7 @@ public class AsterixContext implements Asterix {
 					transitiveDependencies.add(transitiveDependency);
 					try {
 						resolveTransitiveDependencies(getFactoryBean(transitiveDependency));
-					} catch (MissingBeanException e) {
+					} catch (MissingBeanProviderException e) {
 						throw new MissingBeanDependencyException(beanAwareFactory, transitiveDependency);
 					}
 				}

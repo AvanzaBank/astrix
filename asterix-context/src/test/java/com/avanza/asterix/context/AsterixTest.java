@@ -27,7 +27,7 @@ import com.avanza.asterix.context.AsterixInject;
 import com.avanza.asterix.context.AsterixSettingsAware;
 import com.avanza.asterix.context.AsterixSettingsReader;
 import com.avanza.asterix.context.MissingBeanDependencyException;
-import com.avanza.asterix.context.MissingBeanException;
+import com.avanza.asterix.context.MissingBeanProviderException;
 import com.avanza.asterix.context.TestAsterixConfigurer;
 import com.avanza.asterix.provider.library.AsterixExport;
 import com.avanza.asterix.provider.library.AsterixLibraryProvider;
@@ -75,7 +75,7 @@ public class AsterixTest {
 		asterixContext.getBean(DependentBean.class);
 	}
 	
-	@Test(expected = MissingBeanException.class)
+	@Test(expected = MissingBeanProviderException.class)
 	public void detectsMissingBeans() throws Exception {
 		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
 		AsterixContext asterixContext = asterixConfigurer.configure();

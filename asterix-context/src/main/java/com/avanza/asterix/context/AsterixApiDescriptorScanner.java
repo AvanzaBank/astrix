@@ -44,7 +44,7 @@ public class AsterixApiDescriptorScanner implements AsterixApiDescriptors {
 	public AsterixApiDescriptorScanner(String... basePackages) {
 		this.basePackages.addAll(Arrays.asList(basePackages));
 	}
-
+	
 	@Override
 	public List<AsterixApiDescriptor> getAll() {
 		List<AsterixApiDescriptor> result = new ArrayList<>();

@@ -40,7 +40,7 @@ public class AsterixDashboardConfig {
 	@Bean
 	public AsterixSettings asterixSettings() {
 		return new AsterixSettings() {{
-			set(ASTERIX_SERVICE_REGISTRY_URI, AsterixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=service-registry");
+			set(ASTERIX_SERVICE_REGISTRY_URI, AsterixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=elilin");
 		}};
 	}
 	
