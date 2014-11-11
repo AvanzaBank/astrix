@@ -34,6 +34,7 @@ public class AsterixSettings implements AsterixExternalConfig {
 	public static final String SERVICE_REGISTRY_EXPORT_INTERVAL = "AsterixServiceRegistryExporterWorker.exportIntervalMillis";
 	public static final String SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL = "AsterixServiceRegistryExporterWorker.retryIntervallMillis";
 	public static final String SERVICE_REGISTRY_LEASE = "AsterixServiceRegistryExporterWorker.serviceLeaseTimeMillis";
+	public static final String API_DESCRIPTOR_SCANNER_BASE_PACKAGE = "AsterixApiDescriptorScanner.basePackage";
 	
 	private final Map<String, String> settings = new ConcurrentHashMap<>();
 	private String locator;

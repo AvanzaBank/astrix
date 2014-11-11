@@ -42,6 +42,7 @@ public class AsterixApiDescriptorScanner implements AsterixApiDescriptors {
 	private List<String> basePackages = new ArrayList<>();
 	
 	public AsterixApiDescriptorScanner(String... basePackages) {
+		this.basePackages.add("com.avanza.asterix"); // Always scan for com.avanza.asterix package
 		this.basePackages.addAll(Arrays.asList(basePackages));
 	}
 	

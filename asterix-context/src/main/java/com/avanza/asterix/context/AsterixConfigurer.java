@@ -30,7 +30,7 @@ public class AsterixConfigurer {
 
 	private static final Logger log = LoggerFactory.getLogger(AsterixConfigurer.class);
 	
-	private AsterixApiDescriptors asterixApiDescriptors = new AsterixApiDescriptorScanner("com.avanza.asterix", "se.avanzabank");
+	private AsterixApiDescriptors asterixApiDescriptors;
 	private final Collection<AsterixFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	private final List<PluginHolder<?>> plugins = new ArrayList<>();
 	private boolean enableFaultTolerance = false;
@@ -51,7 +51,7 @@ public class AsterixConfigurer {
 		AsterixApiProviderPlugins apiProviderPlugins = new AsterixApiProviderPlugins(context.getPlugins(AsterixApiProviderPlugin.class));
 		context.setApiProviderPlugins(apiProviderPlugins);
 		AsterixApiProviderFactory apiProviderFactory = new AsterixApiProviderFactory(apiProviderPlugins);
-		List<AsterixApiProvider> apiProviders = createApiProviders(apiProviderFactory);
+		List<AsterixApiProvider> apiProviders = createApiProviders(apiProviderFactory, context);
 		for (AsterixApiProvider apiProvider : apiProviders) {
 			context.registerApiProvider(apiProvider);
 		}
@@ -65,16 +65,27 @@ public class AsterixConfigurer {
 		context.registerPlugin(pluginHolder.pluginType, pluginHolder.pluginProvider);
 	}
 
-	private List<AsterixApiProvider> createApiProviders(AsterixApiProviderFactory apiProviderFactory) {
+	private List<AsterixApiProvider> createApiProviders(AsterixApiProviderFactory apiProviderFactory, AsterixContext context) {
 		List<AsterixApiProvider> result = new ArrayList<>();
-		for (AsterixApiDescriptor descriptor : asterixApiDescriptors.getAll()) {
+		for (AsterixApiDescriptor descriptor : getApiDescriptors(context).getAll()) {
 			result.add(apiProviderFactory.create(descriptor));
 		}
 		return result;
 	}
+
+	private AsterixApiDescriptors getApiDescriptors(AsterixContext context) {
+		if (this.asterixApiDescriptors != null) {
+			return asterixApiDescriptors;
+		}
+		String basePackage = context.getSettings().getString(AsterixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, "");
+		if (basePackage.trim().isEmpty()) {
+			return new AsterixApiDescriptorScanner();
+		}
+		return new AsterixApiDescriptorScanner(basePackage.split(","));
+	}
 	
 	public void setBasePackage(String basePackage) {
-		 this.asterixApiDescriptors = new AsterixApiDescriptorScanner(basePackage);
+		 this.settings.set(AsterixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, basePackage);
 	}
 	
 	public void enableFaultTolerance(boolean enableFaultTolerance) {
