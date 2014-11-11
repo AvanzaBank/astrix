@@ -15,7 +15,12 @@
  */
 package com.avanza.asterix.context;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -24,12 +29,29 @@ import java.util.Properties;
  */
 public class AsterixSettingsReader {
 
+	private final Logger log = LoggerFactory.getLogger(AsterixSettingsReader.class);
+	
 	private AsterixSettings settings;
 	private AsterixExternalConfig externalConfig;
+	private Properties classpathOverride = new Properties();
 	
 	public AsterixSettingsReader(AsterixSettings settings, AsterixExternalConfig externalConfig) {
+		this(settings, externalConfig, "META-INF/asterix/settings.properties");
+	}
+	
+	public AsterixSettingsReader(AsterixSettings settings, AsterixExternalConfig externalConfig, String defaultSettingsOverrideFile) {
 		this.settings = settings;
 		this.externalConfig = externalConfig;
+		try {
+			InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream(defaultSettingsOverrideFile);
+			if (resourceAsStream == null) {
+				log.info("No asterix classpath-override settings found. (file: " + defaultSettingsOverrideFile + ")");
+				return;
+			}
+			classpathOverride.load(resourceAsStream);
+		} catch (Exception e) {
+			log.warn("Failed to load classpath-override settings for asterix from file: " + defaultSettingsOverrideFile);
+		}
 	}
 	
 	static AsterixSettingsReader create(AsterixPlugins plugins, AsterixSettings settings) {
@@ -71,9 +93,13 @@ public class AsterixSettingsReader {
 	}
 	
 	public String getString(String name) {
+		return getString(name, null);
+	}
+	
+	public String getString(String name, String defaultValue) {
 		Object result = get(name);
 		if (result == null) {
-			return null;
+			return defaultValue;
 		}
 		return result.toString();
 	}
@@ -83,7 +109,11 @@ public class AsterixSettingsReader {
 		if (setting != null) {
 			return setting;
 		}
-		return settings.get(settingName);
+		setting = settings.get(settingName);
+		if (setting != null) {
+			return setting;
+		}
+		return this.classpathOverride.getProperty(settingName);
 	}
 
 	public Properties getProperties(String name) {

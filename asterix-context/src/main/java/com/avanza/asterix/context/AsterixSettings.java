@@ -16,7 +16,6 @@
 package com.avanza.asterix.context;
 
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.avanza.asterix.provider.core.AsterixPluginQualifier;
@@ -36,7 +35,7 @@ public class AsterixSettings implements AsterixExternalConfig {
 	public static final String SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL = "AsterixServiceRegistryExporterWorker.retryIntervallMillis";
 	public static final String SERVICE_REGISTRY_LEASE = "AsterixServiceRegistryExporterWorker.serviceLeaseTimeMillis";
 	
-	private final Map<String, Object> settings = new ConcurrentHashMap<>();
+	private final Map<String, String> settings = new ConcurrentHashMap<>();
 	private String locator;
 	
 	public AsterixSettings() {
@@ -86,11 +85,7 @@ public class AsterixSettings implements AsterixExternalConfig {
 	}
 
 	public final void set(String settingName, long value) {
-		this.settings.put(settingName, Long.valueOf(value));
-	}
-	
-	public final void set(String settingName, Properties value) {
-		this.settings.put(settingName, value);
+		this.settings.put(settingName, Long.toString(value));
 	}
 	
 	public final void set(String settingName, String value) {
@@ -112,7 +107,7 @@ public class AsterixSettings implements AsterixExternalConfig {
 	}
 
 	public final void set(String settingName, boolean value) {
-		this.settings.put(settingName, value);
+		this.settings.put(settingName, Boolean.toString(value));
 	}
 
 	public final String getString(String name) {
@@ -132,7 +127,7 @@ public class AsterixSettings implements AsterixExternalConfig {
 		return this.settings.toString();
 	}
 
-	public final Object get(String settingName) {
+	public final String get(String settingName) {
 		return this.settings.get(settingName);
 	}
 
