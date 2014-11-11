@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.avanza.asterix.ft.metrics.HystrixMetricsCollector;
@@ -30,6 +31,7 @@ import com.netflix.hystrix.HystrixCommand.Setter;
 
 public class HystrixMetricsCollectorTest {
 
+	@Ignore("Unstable")
 	@Test
 	public void getMetrics() throws Exception {
 		HystrixMetricsCollector collector = new HystrixMetricsCollector();
