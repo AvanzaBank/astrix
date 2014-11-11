@@ -49,10 +49,7 @@ public class AsterixContext implements Asterix {
 	
 	public AsterixContext(AsterixSettings settings, String currentSubsystem) {
 		this.currentSubsystem = currentSubsystem;
-		this.beanStateWorker = new AsterixBeanStateWorker(settings, eventBus); // TODO: manage life cycle
-		this.beanStateWorker.start(); // TODO: avoid starting bean-state-worker if no stateful beans are created. + manage lifecycle
 		this.eventBus.addEventListener(AsterixBeanStateChangedEvent.class, beanStates);
-		this.enforeSubsystemBoundaries = settings.getBoolean(AsterixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
 		this.plugins = new AsterixPlugins(new AsterixPluginInitializer() {
 			@Override
 			public void init(Object plugin) {
@@ -60,6 +57,9 @@ public class AsterixContext implements Asterix {
 			}
 		});
 		this.settings = AsterixSettingsReader.create(plugins, settings);
+		this.enforeSubsystemBoundaries = this.settings.getBoolean(AsterixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
+		this.beanStateWorker = new AsterixBeanStateWorker(this.settings, eventBus); // TODO: manage life cycle
+		this.beanStateWorker.start(); // TODO: avoid starting bean-state-worker if no stateful beans are created. + manage lifecycle
 	}
 	
 	public <T> List<T> getPlugins(Class<T> type) {

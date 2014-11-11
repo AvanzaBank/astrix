@@ -61,28 +61,6 @@ public class AsterixSettings implements AsterixExternalConfig {
 	public final String getServiceRegistryUri() {
 		return getString(ASTERIX_SERVICE_REGISTRY_URI);
 	}
-	
-	public final long getLong(String settingsName, long deafualtValue) {
-		Object value = settings.get(settingsName);
-		if (value == null) {
-			return deafualtValue;
-		}
-		if (value instanceof String) {
-			return Long.parseLong((String)value);
-		}
-		return Long.class.cast(value).longValue();
-	}
-	
-	public final boolean getBoolean(String settingsName, boolean deafualtValue) {
-		Object value = settings.get(settingsName);
-		if (value == null) {
-			return deafualtValue;
-		}
-		if (value instanceof String) {
-			return Boolean.parseBoolean((String)value);
-		}
-		return Boolean.class.cast(value);
-	}
 
 	public final void set(String settingName, long value) {
 		this.settings.put(settingName, Long.toString(value));
