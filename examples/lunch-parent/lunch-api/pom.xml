@@ -2,10 +2,10 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.avanza.asterix</groupId>
-    <artifactId>asterix-examples-parent</artifactId>
+    <artifactId>lunch-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>lunch-grader-api</artifactId>
+  <artifactId>lunch-api</artifactId>
   <dependencies>
   	<dependency>
 		<groupId>${asterix.groupId}</groupId>
@@ -14,11 +14,6 @@
   	<dependency>
 		<groupId>com.gigaspaces</groupId>
 		<artifactId>gs-openspaces</artifactId>  	
-  	</dependency>
-  	<dependency>
-		<groupId>${project.groupId}</groupId>
-		<artifactId>lunch-api</artifactId>
-		<version>${project.version}</version>  	
   	</dependency>
   </dependencies>
 </project>

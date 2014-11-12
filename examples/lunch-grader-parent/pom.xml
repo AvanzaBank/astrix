@@ -2,13 +2,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.avanza.asterix</groupId>
-	<artifactId>asterix-examples-parent</artifactId>
+	<artifactId>lunch-grader-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
-		<module>lunch-parent</module>
-		<module>lunch-grader-parent</module>
-		<module>lunch-asterix-extensions</module>
+		<module>lunch-grader-pu</module>
+		<module>lunch-grader-api</module>
+		<module>lunch-grader-api-provider</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
