@@ -75,6 +75,10 @@ public class TestAsterixConfigurer {
 		configurer.set(name, value);
 	}
 	
+	public void set(String name, String value) {
+		configurer.set(name, value);
+	}
+	
 	private static class StandaloneFactoryBean<T> implements AsterixFactoryBeanPlugin<T> {
 		private Class<T> type;
 		private T instance;

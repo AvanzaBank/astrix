@@ -17,6 +17,7 @@ package com.avanza.asterix.test.util;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 
 public class AsterixTestUtil {
 	
@@ -82,6 +83,19 @@ public class AsterixTestUtil {
 				} else {
 					description.appendText("\nBut last serviceInvocation returnded " + lastResult);
 				}
+			}
+		};
+	}
+	
+	public static <T extends Exception> Matcher<T> isExceptionOfType(final Class<T> type) {
+		return new TypeSafeMatcher<T>() {
+			@Override
+			public void describeTo(Description description) {
+				description.appendText("Expected " + type.getName() + " to be thrown");
+			}
+			@Override
+			protected boolean matchesSafely(T item) {
+				return true;
 			}
 		};
 	}
