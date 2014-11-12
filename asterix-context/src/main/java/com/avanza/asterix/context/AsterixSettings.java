@@ -37,14 +37,14 @@ public class AsterixSettings implements AsterixExternalConfig {
 	public static final String API_DESCRIPTOR_SCANNER_BASE_PACKAGE = "AsterixApiDescriptorScanner.basePackage";
 	
 	private final Map<String, String> settings = new ConcurrentHashMap<>();
-	private String locator;
+	private String serviceId;
 	
 	public AsterixSettings() {
-		this.locator = AsterixDirectComponent.register(AsterixExternalConfig.class, this);
+		this.serviceId = AsterixDirectComponent.register(AsterixExternalConfig.class, this);
 	}
 
 	public final String getExternalConfigUrl() {
-		return AsterixSettingsExternalConfigPlugin.class.getAnnotation(AsterixPluginQualifier.class).value() + ":" + this.locator;
+		return AsterixSettingsExternalConfigPlugin.class.getAnnotation(AsterixPluginQualifier.class).value() + ":" + this.serviceId;
 	}
 	
 	public final void setExternalConfigUrl(String asterixConfigUrl) {

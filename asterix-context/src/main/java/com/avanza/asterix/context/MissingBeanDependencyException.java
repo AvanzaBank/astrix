@@ -17,8 +17,19 @@ package com.avanza.asterix.context;
 
 public class MissingBeanDependencyException extends RuntimeException {
 	
+	private static final long serialVersionUID = 1L;
+
 	public MissingBeanDependencyException(AsterixBeanAware beanDependenciesAware, Class<?> beanType) {
-		super("Missing bean provider for dependency: type=" + beanType.getName() + ", requiredBy=" + beanDependenciesAware.getClass().getName());
+		super(createErrorMessage(beanDependenciesAware, beanType));
+	}
+
+	private static String createErrorMessage(AsterixBeanAware beanDependenciesAware, Class<?> beanType) {
+		String requiredBy = beanDependenciesAware.getClass().getName();
+		if (beanDependenciesAware instanceof AsterixFactoryBeanPlugin<?>) {
+			AsterixFactoryBeanPlugin<?> factory = (AsterixFactoryBeanPlugin<?>) beanDependenciesAware;
+			requiredBy = requiredBy + "["+ factory.getBeanType().getName() + "]";
+		}
+		return "Missing bean provider. requiredBeanType=" + beanType.getName() + " requiredBy=" + requiredBy;
 	}
 
 }

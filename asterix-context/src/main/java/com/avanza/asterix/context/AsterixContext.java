@@ -35,7 +35,8 @@ public class AsterixContext implements Asterix {
 	private final AsterixBeanFactoryRegistry beanFactoryRegistry = new AsterixBeanFactoryRegistry();
 	private final AsterixEventBus eventBus = new AsterixEventBus();
 	private final AsterixBeanStates beanStates = new AsterixBeanStates();
-	private final AsterixSettingsReader settings;
+	private final AsterixSettingsReader settingsReader;
+	private final AsterixSettingsWriter settingsWriter;
 	private final AsterixBeanStateWorker beanStateWorker;
 	private final String currentSubsystem;
 	private AsterixApiProviderPlugins apiProviderPlugins;
@@ -56,9 +57,10 @@ public class AsterixContext implements Asterix {
 				injectDependencies(plugin);
 			}
 		});
-		this.settings = AsterixSettingsReader.create(plugins, settings);
-		this.enforeSubsystemBoundaries = this.settings.getBoolean(AsterixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
-		this.beanStateWorker = new AsterixBeanStateWorker(this.settings, eventBus); // TODO: manage life cycle
+		this.settingsReader = AsterixSettingsReader.create(plugins, settings);
+		this.settingsWriter = AsterixSettingsWriter.create(settings);
+		this.enforeSubsystemBoundaries = this.settingsReader.getBoolean(AsterixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
+		this.beanStateWorker = new AsterixBeanStateWorker(this.settingsReader, eventBus); // TODO: manage life cycle
 		this.beanStateWorker.start(); // TODO: avoid starting bean-state-worker if no stateful beans are created. + manage lifecycle
 	}
 	
@@ -124,7 +126,7 @@ public class AsterixContext implements Asterix {
 			AsterixEventBusAware.class.cast(object).setEventBus(eventBus);
 		}
 		if (object instanceof AsterixSettingsAware) {
-			AsterixSettingsAware.class.cast(object).setSettings(settings);
+			AsterixSettingsAware.class.cast(object).setSettings(settingsReader);
 		}
 		if (object instanceof AsterixBeanStateWorkerAware) {
 			AsterixBeanStateWorkerAware.class.cast(object).setBeanStateWorker(beanStateWorker);
@@ -211,19 +213,25 @@ public class AsterixContext implements Asterix {
 
 	@Override
 	public <T> T waitForBean(Class<T> beanType, long timeoutMillis) throws InterruptedException {
-		T result = getBean(beanType);
-		waitForBeanToBeBound(AsterixBeanKey.create(beanType, null), timeoutMillis);
-		return result;
+		return waitForBean(beanType, null, timeoutMillis);
 	}
 	
 	@Override
 	public <T> T waitForBean(Class<T> beanType, String qualifier, long timeoutMillis) throws InterruptedException {
-		T result = getBean(beanType, qualifier);
-		waitForBeanToBeBound(AsterixBeanKey.create(beanType, qualifier), timeoutMillis);
+		T result = getBean(beanType, qualifier); // Trigger creation of bean
+		waitForBeanAndTransitiveDependenciesToBeBound(AsterixBeanKey.create(beanType, qualifier), timeoutMillis);
 		return result;
 	}
 	
-	private void waitForBeanToBeBound(AsterixBeanKey beanKey, long timeoutMillis) throws InterruptedException {
+	private void waitForBeanAndTransitiveDependenciesToBeBound(AsterixBeanKey beanKey, long timeoutMillis) throws InterruptedException {
+		for (Class<?> beanType : getTransitiveBeanDependenciesForBean(beanKey.getBeanType())) {
+			waitForBeanToBeBound(AsterixBeanKey.create(beanType, null), timeoutMillis);
+		}
+		waitForBeanToBeBound(beanKey, timeoutMillis);
+	}
+
+	private void waitForBeanToBeBound(AsterixBeanKey beanKey, long timeoutMillis)
+			throws InterruptedException {
 		if (!isStatefulBean(beanKey)) {
 			return;
 		}
@@ -330,7 +338,11 @@ public class AsterixContext implements Asterix {
 	}
 	
 	public AsterixSettingsReader getSettings() {
-		return settings;
+		return settingsReader;
+	}
+
+	void set(String settingName, String settingValue) {
+		this.settingsWriter.set(settingName, settingValue);
 	}
 	
 }
