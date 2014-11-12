@@ -7,7 +7,9 @@ Some of the features provided:
 - service versioning
 - fault tolerance
 
-Asterix designed to support an organization where many teams develop different services and make those services available for other teams using Asterix.[REMOVE? Asterix simplifies development of micro services as well as maintenance by limiting what is exposed to service consumers. That is, it gives the service provider full control over what is exposed to its consumers, and what constitutes an internal implementation detail.]
+Asterix is designed to support an organization where many teams develop different services and make those services available for other teams using Asterix. Asterix simplifies development of micro services as well as maintenance by limiting what is exposed to service consumers. That is, it gives the service provider full control over what is exposed, and what constitutes an internal implementation detail.
+
+Asterix extends the normal notion of what constitutes a (micro)service by allowing service-providers to build libraries on top of services. Such "fat clients" allow the service provider to execute domain rules on the client side or providing mashups of many sevices. Mashups are a great way to give the service provider full control over the granularity of each service.
 
 ## Service Registry
 Service registration and discovery is done using the service registry. It is an application that allows service-providers to register all services they provide and by service-consumers to discover providers of given services.
@@ -21,17 +23,17 @@ One of the main responsibilities for Asterix is service binding, which is done i
 
 It's also possible to locate providers without using the service-registry, for instance using configuration. The service-registry itself is located using the configuration mechanism.
 
-If a service is discovered using the service-registry, then a lease-manager thread will run for the given service in the background. The lease-manager will periodically ask the service-registry for information about where the given service is located, and if the service has moved the lease-manager will rebind the to the new provider.
+If a service is discovered using the service-registry, then a lease-manager thread will run for the given service in the background. The lease-manager will periodically ask the service-registry for information about where a given service is located, and if the service has moved the lease-manager will rebind the to the new provider.
 
 ## Service Versioning
-A key goal of Asterix is to support independent release cycles of different microservices. To achieve that Asterix has built in support for data-format versioning which allows a service provider to serve clients that invokes the service using an old version of the client. Asterix uses a migration framework to upgrade incoming requests and downgrade outgoing responses to the version used by the given client. 
+A key goal of Asterix is to support independent release cycles of different microservices. To achieve that Asterix has built in support for data-format versioning which allows a service provider to serve clients that invokes the service using an old version of the client. Asterix uses a migration framework to upgrade incoming requests and downgrade outgoing responses to the version requested by the given client. 
 
 
 
 ### Versioning framework design
 1. The service implementation only knows the latest version of the data-format
 2. The service-provider implement ”migrations” for each change in data-foramt which upgrade/downgrade a message from one version to the next
-3. Asterix uses the migrations in all message-exchanges (service invocations) to upgrade an incoming requests to the latest version before invoking the actual service implementation, and downgrade responses before sending them back to the client.
+3. Asterix uses the migrations in all message-exchanges (service invocations) to upgrade an incoming requests to the latest version before invoking the actual service implementation, and downgrade the response received from the service implementation before sending them back to the client.
 
 ### Service versioning workflow
 
