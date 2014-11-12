@@ -48,8 +48,7 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	 * 
 	 * Client side components will have their dependencies injected by AsterixContext (xxxAware).
 	 * 
-	 * Server side components will have their dependencies injected by spring as
-	 * it stands now. Server side components are registered by AsterixServiceApiPlugin's. 
+	 * Server side components will have their dependencies injected by spring as it stands now?
 	 */
 	
 	@Override
@@ -104,7 +103,7 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		if (this.serviceDescriptor != null) {
 			configurer.setSubsystem(this.serviceDescriptor.getSubsystem());
 		} else if (this.subsystem != null) {
-			// TODO: use same mechanism to set subsystem for both applications that only consume apis and for apps providing services
+			// TODO: use same mechanism to set subsystem for applications that only consume apis for apps providing services
 			configurer.setSubsystem(this.subsystem);
 		}
 		AsterixContext asterixContext = configurer.configure();
