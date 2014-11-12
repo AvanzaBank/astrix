@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.avanza.asterix</groupId>
 	<artifactId>asterix-parent</artifactId>
-	<version>0.5.1-SNAPSHOT</version>
+	<version>0.5.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>asterix-core</module>
