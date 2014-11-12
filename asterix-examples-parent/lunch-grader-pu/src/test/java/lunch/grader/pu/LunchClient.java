@@ -1,0 +1,49 @@
+/*
+ * Copyright 2014-2015 Avanza Bank AB
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package lunch.grader.pu;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.openspaces.core.GigaSpace;
+import org.openspaces.core.GigaSpaceConfigurer;
+import org.openspaces.core.space.UrlSpaceConfigurer;
+
+import lunch.api.LunchRestaurant;
+import lunch.api.LunchService;
+
+import com.avanza.asterix.context.AsterixConfigurer;
+import com.avanza.asterix.context.AsterixContext;
+import com.avanza.asterix.context.AsterixSettings;
+import com.j_spaces.core.IJSpace;
+
+public class LunchClient {
+	
+	public static void main(String[] args) throws InterruptedException {
+		System.setProperty("com.gs.home", "C:\\Developer\\tools\\gigaspaces\\gigaspaces-xap-premium-9.7.0-ga");
+		Logger.getLogger("com.avanza.asterix").setLevel(Level.DEBUG);
+		AsterixConfigurer configurer = new AsterixConfigurer();
+		configurer.set(AsterixSettings.ASTERIX_SERVICE_REGISTRY_URI, "gs-remoting:jini://*/*/service-registry-space?groups=elilin");
+		AsterixContext asterixContext = configurer.configure();
+		LunchService lunchService = asterixContext.waitForBean(LunchService.class, 5000);
+		
+		LunchRestaurant r = new LunchRestaurant();
+		r.setFoodType("vegetarian");
+		r.setName("Martins Green Room");
+		lunchService.addLunchRestaurant(r);
+		
+	}
+
+}

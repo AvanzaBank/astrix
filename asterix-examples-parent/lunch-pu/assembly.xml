@@ -1,0 +1,27 @@
+<assembly>
+	<id>pu</id>
+	<formats>
+		<format>jar</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<fileSets>
+		<fileSet>
+			<filtered>false</filtered>
+			<directory>target/classes</directory>
+			<lineEnding>keep</lineEnding>
+			<outputDirectory>/</outputDirectory>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<useProjectArtifact>false</useProjectArtifact>
+			<useTransitiveDependencies>true</useTransitiveDependencies>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
+			<outputDirectory>lib</outputDirectory>
+			<excludes>
+				<exclude>com.gigaspaces:gs-openspaces</exclude>
+				<exclude>com.gigaspaces:gs-runtime</exclude>
+			</excludes>
+		</dependencySet>
+	</dependencySets>
+</assembly>
