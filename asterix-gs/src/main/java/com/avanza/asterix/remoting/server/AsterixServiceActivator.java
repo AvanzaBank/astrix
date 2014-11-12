@@ -93,6 +93,9 @@ public class AsterixServiceActivator {
 	private final ConcurrentMap<String, PublishedService<?>> serviceByType = new ConcurrentHashMap<>();
 	
 	public void register(Object provider, AsterixObjectSerializer objectSerializer, Class<?> publishedApi) {
+		if (!publishedApi.isAssignableFrom(provider.getClass())) {
+			throw new IllegalArgumentException("Provider: " + provider.getClass() + " does not implement: " + publishedApi);
+		}
 		PublishedService<?> publishedService = new PublishedService<>(provider, objectSerializer, publishedApi);
 		this.serviceByType.put(publishedApi.getName(), publishedService);
 	}

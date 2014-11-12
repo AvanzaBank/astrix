@@ -16,6 +16,7 @@
 package com.avanza.asterix.remoting.server;
 
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -397,6 +398,10 @@ public class AsterixServiceActivatorTest {
 		assertEquals("kalle", lastReceivedRequest);
 	}
 	
+	@Test(expected = IllegalArgumentException.class)
+	public void throwsExceptionWhenRegisteringProviderForNonImplementedInterface() throws Exception {
+		activator.register(new Object(), objectSerializer, TestService.class);
+	}
 	
 	public static class HelloRequest {
 		private String messsage;
