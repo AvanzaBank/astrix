@@ -29,7 +29,7 @@ import org.hamcrest.StringDescription;
  * 
  * 		// 
  * 		public static void assertEventually(Probe probe) {
- * 			return new Poller(1000L, 50L).check(probe); // 1 second timeout, checks probe every 50 ms unitl timeout.
+ * 			new Poller(1000L, 50L).check(probe); // 1 second timeout, checks probe every 50 ms until timeout.
  * 		}
  * 
  * 		public static Probe fileLength(String file, Matcher<Integer> matcher) {
