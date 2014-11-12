@@ -17,7 +17,9 @@ package lunch.api;
 
 import java.util.concurrent.Future;
 
+import org.openspaces.remoting.Routing;
+
 public interface LunchServiceAsync {
 
-	Future<LunchRestaurant> getLunchRestaurant(GetLunchRestaurantRequest request);
+	Future<LunchRestaurant> getLunchRestaurant(@Routing String name);
 }

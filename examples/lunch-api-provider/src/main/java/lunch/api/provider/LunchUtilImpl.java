@@ -15,6 +15,9 @@
  */
 package lunch.api.provider;
 
+import java.util.List;
+import java.util.Random;
+
 import lunch.api.LunchRestaurant;
 import lunch.api.LunchService;
 import lunch.api.LunchUtil;
@@ -22,12 +25,17 @@ import lunch.api.LunchUtil;
 public class LunchUtilImpl implements LunchUtil {
 
 	private LunchService lunchService;
+	private Random random = new Random();
 
 	public LunchUtilImpl(LunchService lunchService) {
 		this.lunchService = lunchService;
 	}
 
 	public LunchRestaurant suggestVegetarianRestaurant() {
-		return lunchService.suggestRandomLunchRestaurant("vegetarian");		
+		List<LunchRestaurant> allRestaurants = lunchService.getAllLunchRestaurants();
+		if (allRestaurants.isEmpty()) {
+			return null;
+		}
+		return allRestaurants.get(random.nextInt(allRestaurants.size()));
 	}
 }

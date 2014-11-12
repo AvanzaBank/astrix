@@ -15,16 +15,20 @@
  */
 package lunch.api;
 
+import java.util.List;
+
+import org.openspaces.remoting.Routing;
+
 import com.avanza.asterix.core.AsterixBroadcast;
 
 
 
 public interface LunchService {
 	
-	@AsterixBroadcast(reducer = LunchSuggestionReducer.class)
-	LunchRestaurant suggestRandomLunchRestaurant(String foodType);
+	@AsterixBroadcast
+	List<LunchRestaurant> getAllLunchRestaurants();
 	
 	void addLunchRestaurant(LunchRestaurant restaurant);
 	
-	LunchRestaurant getLunchRestaurant(GetLunchRestaurantRequest request); 
+	LunchRestaurant getLunchRestaurant(@Routing String name); 
 }

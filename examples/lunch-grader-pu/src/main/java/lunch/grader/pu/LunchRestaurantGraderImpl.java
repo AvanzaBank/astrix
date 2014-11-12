@@ -15,7 +15,6 @@
  */
 package lunch.grader.pu;
 
-import lunch.api.GetLunchRestaurantRequest;
 import lunch.api.LunchRestaurant;
 import lunch.api.LunchService;
 import lunch.grader.api.LunchRestaurantGrader;
@@ -39,9 +38,7 @@ public class LunchRestaurantGraderImpl implements LunchRestaurantGrader {
 
 	@Override
 	public void grade(String restaurantName, int grade) {
-		GetLunchRestaurantRequest req = new GetLunchRestaurantRequest();
-		req.setName(restaurantName);
-		LunchRestaurant lunchRestaurant = lunchService.getLunchRestaurant(req);
+		LunchRestaurant lunchRestaurant = lunchService.getLunchRestaurant(restaurantName);
 		if (lunchRestaurant == null) {
 			throw new IllegalArgumentException("Unknown lunch restaurant: " + restaurantName);
 		}

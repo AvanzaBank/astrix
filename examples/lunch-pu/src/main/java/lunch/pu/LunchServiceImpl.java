@@ -15,7 +15,9 @@
  */
 package lunch.pu;
 
-import lunch.api.GetLunchRestaurantRequest;
+import java.util.Arrays;
+import java.util.List;
+
 import lunch.api.LunchRestaurant;
 import lunch.api.LunchService;
 import lunch.api.provider.feeder.InternalLunchFeeder;
@@ -38,12 +40,17 @@ public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 		this.gigaSpace = gigaSpace;
 	}
 
+//	@Override
+//	public List<LunchRestaurant> getAllLunchRestaurants(String foodType) {
+//		LunchRestaurant template = new LunchRestaurant();
+//		template.setFoodType(foodType);
+//		return Arrays.asList(gigaSpace.readMultiple(template));
+//	}
+	
 	@Override
-	public LunchRestaurant suggestRandomLunchRestaurant(String foodType) {
+	public List<LunchRestaurant> getAllLunchRestaurants() {
 		LunchRestaurant template = new LunchRestaurant();
-		template.setFoodType(foodType);
-		LunchRestaurant[] candiates = gigaSpace.readMultiple(template);
-		return candiates.length > 0 ? candiates[0] : null;
+		return Arrays.asList(gigaSpace.readMultiple(template));
 	}
 
 	@Override
@@ -52,11 +59,8 @@ public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 	}
 
 	@Override
-	public LunchRestaurant getLunchRestaurant(GetLunchRestaurantRequest r) {
-		if ("throwException".equals(r.getName())) {
-			throw new IllegalArgumentException("Illegal restaurant: " + r.getName());
-		}
-		return this.gigaSpace.readById(LunchRestaurant.class, r.getName());
+	public LunchRestaurant getLunchRestaurant(String name) {
+		return this.gigaSpace.readById(LunchRestaurant.class, name);
 	}
 
 }
