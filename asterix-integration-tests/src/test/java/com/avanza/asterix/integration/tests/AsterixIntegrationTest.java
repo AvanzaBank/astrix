@@ -122,7 +122,7 @@ public class AsterixIntegrationTest {
 		configurer.enableFaultTolerance(false); // TODO: enable fault tolerance
 		configurer.enableVersioning(true);
 		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 100);
-		configurer.set(AsterixSettings.ASTERIX_CONFIG_URL, config.getExternalConfigUrl());
+		configurer.set(AsterixSettings.ASTERIX_CONFIG_URI, config.getExternalConfigUrl());
 		configurer.setSubsystem("test-sub-system");
 		asterix = configurer.configure();
 		this.lunchService = asterix.getBean(LunchService.class);

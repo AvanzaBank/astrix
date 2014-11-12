@@ -29,7 +29,9 @@ public class AsterixSettings implements AsterixExternalConfig {
 	public static final String BEAN_REBIND_ATTEMPT_INTERVAL = "StatefulAsterixBean.beanRebindAttemptInterval";
 	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AsterixServiceRegistryLeaseManager.leaseRenewInterval";
 	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AsterixContext.enforceSubsystemBoundaries";
-	public static final String ASTERIX_CONFIG_URL = "AsterixConfig.url";
+	public static final String ASTERIX_CONFIG_URI = "AsterixConfig.uri";
+	@Deprecated
+	public static final String ASTERIX_CONFIG_URL = ASTERIX_CONFIG_URI;
 	public static final String ASTERIX_SERVICE_REGISTRY_URI = "AsterixServiceRegistry.serviceUri";
 	public static final String SERVICE_REGISTRY_EXPORT_INTERVAL = "AsterixServiceRegistryExporterWorker.exportIntervalMillis";
 	public static final String SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL = "AsterixServiceRegistryExporterWorker.retryIntervallMillis";
@@ -48,11 +50,11 @@ public class AsterixSettings implements AsterixExternalConfig {
 	}
 	
 	public final void setExternalConfigUrl(String asterixConfigUrl) {
-		set(ASTERIX_CONFIG_URL, asterixConfigUrl);
+		set(ASTERIX_CONFIG_URI, asterixConfigUrl);
 	}
 	
 	public final String getAsterixConfigUrl() {
-		return getString(ASTERIX_CONFIG_URL);
+		return getString(ASTERIX_CONFIG_URI);
 	}
 	
 	public final void setServiceRegistryUri(String serviceRegistryUri) {

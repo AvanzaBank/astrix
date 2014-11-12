@@ -56,11 +56,11 @@ public class AsterixSettingsReader {
 	static AsterixSettingsReader create(AsterixPlugins plugins, AsterixSettings settings) {
 		/*
 		 *  NOTE: 
-		 *  This behavior might look weird. We must create a AsterixSettingsReader too lookup the ASTERIX_CONFIG_URL setting
+		 *  This behavior might look weird. We must create a AsterixSettingsReader too lookup the ASTERIX_CONFIG_URI setting
 		 *  in order to create the AsterixExternalConfig. The reason is that we want the same chain of lookup
 		 *  to take place event when reading the external_config_url.
 		 */
-		String configUrl = new AsterixSettingsReader(settings, settings).getString(AsterixSettings.ASTERIX_CONFIG_URL);
+		String configUrl = new AsterixSettingsReader(settings, settings).getString(AsterixSettings.ASTERIX_CONFIG_URI);
 		if (configUrl == null) {
 			return new AsterixSettingsReader(settings, new AsterixSettings());
 		}
