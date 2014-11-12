@@ -78,6 +78,14 @@ public class AsterixDirectComponent implements AsterixServiceComponent {
 		return serviceProperties;
 	}
 	
+	public static String getServiceUri(String id) {
+		ServiceProvider<?> provider = providerById.get(id);
+		if (provider == null) {
+			throw new IllegalArgumentException("No provider registered with id: " + id);
+		}
+		return AsterixServiceComponentNames.DIRECT + ":" + id; 
+	}
+	
 	public static <T> T getServiceProvider(Class<T> expectedType, String id) {
 		ServiceProvider<T> provider = (ServiceProvider<T>) providerById.get(id);
 		if (provider == null) {

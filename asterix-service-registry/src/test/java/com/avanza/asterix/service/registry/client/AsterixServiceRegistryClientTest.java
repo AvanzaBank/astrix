@@ -15,6 +15,7 @@
  */
 package com.avanza.asterix.service.registry.client;
 
+import static com.avanza.asterix.test.util.AsterixTestUtil.isExceptionOfType;
 import static com.avanza.asterix.test.util.AsterixTestUtil.serviceInvocationException;
 import static com.avanza.asterix.test.util.AsterixTestUtil.serviceInvocationResult;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -36,6 +37,7 @@ import com.avanza.asterix.service.registry.client.AsterixServiceRegistry;
 import com.avanza.asterix.service.registry.client.AsterixServiceRegistryClient;
 import com.avanza.asterix.service.registry.client.AsterixServiceRegistryLibrary;
 import com.avanza.asterix.service.registry.util.InMemoryServiceRegistry;
+import com.avanza.asterix.test.util.AsterixTestUtil;
 import com.avanza.asterix.test.util.Poller;
 import com.avanza.asterix.test.util.Probe;
 import com.avanza.asterix.test.util.Supplier;
@@ -131,16 +133,7 @@ public class AsterixServiceRegistryClientTest {
 			public String get() {
 				return dummyService.hello("kalle");
 			}
-		}, new TypeSafeMatcher<ServiceUnavailableException>() {
-			@Override
-			public void describeTo(Description description) {
-				description.appendText("Expected ServiceUnavailableException to be thrown");
-			}
-			@Override
-			protected boolean matchesSafely(ServiceUnavailableException item) {
-				return true;
-			}
-		}));
+		}, isExceptionOfType(ServiceUnavailableException.class)));
 	}
 	
 	private void assertEventually(Probe probe) throws InterruptedException {
