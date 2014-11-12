@@ -17,10 +17,14 @@ package lunch.grader.api;
 
 import org.openspaces.remoting.Routing;
 
+import com.avanza.asterix.core.AsterixBroadcast;
+
 public interface LunchRestaurantGrader {
 	
 	void grade(@Routing String restaurantName, int grade);
 	
 	double getAvarageGrade(@Routing String restaurantName);
-
+	
+	@AsterixBroadcast
+	LunchRestaurantGrade getHighestGrade();
 }

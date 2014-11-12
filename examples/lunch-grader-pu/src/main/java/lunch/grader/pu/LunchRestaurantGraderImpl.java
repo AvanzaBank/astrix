@@ -17,6 +17,7 @@ package lunch.grader.pu;
 
 import lunch.api.LunchRestaurant;
 import lunch.api.LunchService;
+import lunch.grader.api.LunchRestaurantGrade;
 import lunch.grader.api.LunchRestaurantGrader;
 
 import org.openspaces.core.GigaSpace;
@@ -58,6 +59,21 @@ public class LunchRestaurantGraderImpl implements LunchRestaurantGrader {
 			return -1D;
 		}
 		return currentGrade.avarageGrade();
+	}
+
+	@Override
+	public LunchRestaurantGrade getHighestGrade() {
+		LunchRestaurantGrade[] allGradedRestaurants = gigaSpace.readMultiple(new LunchRestaurantGrade());
+		if (allGradedRestaurants.length == 0) {
+			return null;
+		}
+		LunchRestaurantGrade result = null;
+		for (LunchRestaurantGrade g : allGradedRestaurants) {
+			if (result == null || g.avarageGrade() > result.avarageGrade()) {
+				result = g;
+			}
+		}
+		return result;
 	}
 	
 	
