@@ -16,22 +16,22 @@
 package com.avanza.asterix.ft.metrics;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
 
 import java.util.Map;
 
-import org.junit.Ignore;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import com.avanza.asterix.ft.metrics.HystrixMetricsCollector;
+import com.avanza.asterix.test.util.Poller;
+import com.avanza.asterix.test.util.Probe;
 import com.netflix.hystrix.HystrixCommand;
+import com.netflix.hystrix.HystrixCommand.Setter;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
-import com.netflix.hystrix.HystrixCommand.Setter;
 
 public class HystrixMetricsCollectorTest {
 
-	@Ignore("Unstable")
 	@Test
 	public void getMetrics() throws Exception {
 		HystrixMetricsCollector collector = new HystrixMetricsCollector();
@@ -48,15 +48,39 @@ public class HystrixMetricsCollectorTest {
 			}
 
 		}.execute();
-		Map<String, Number> metrics = collector.getMetrics();
-		Thread.sleep(1000); // TODO assertEventually
-		assertThat(metrics.get(String.format("hystrix.${host}.%s.%s.isCircuitBreakerOpen", group, command)).intValue(), is(0));
-		assertThat(metrics.get(String.format("hystrix.${host}.%s.currentQueueSize", group)).intValue(), is(0));
-		assertThat(metrics.get(String.format("hystrix.${host}.%s.currentCompletedTaskCount", group)).intValue(), is(1));
+		assertEventually(metricHasValue(collector, String.format("hystrix.${host}.%s.%s.isCircuitBreakerOpen", group, command), is(0L)));
+		assertEventually(metricHasValue(collector, String.format("hystrix.${host}.%s.currentQueueSize", group), is(0L)));
+		assertEventually(metricHasValue(collector, String.format("hystrix.${host}.%s.currentCompletedTaskCount", group), is(1L)));
+	}
+
+	private Probe metricHasValue(final HystrixMetricsCollector collector, final String format, final Matcher<? extends Number> matcher) {
+		return new Probe() {
+			
+			private Map<String, Number> metrics;
+
+			@Override
+			public void sample() {
+				metrics = collector.getMetrics();
+			}
+			
+			@Override
+			public boolean isSatisfied() {
+				return matcher.matches(metrics.get(format));
+			}
+			
+			@Override
+			public void describeFailureTo(Description description) {
+				description.appendText("expected metrics").appendDescriptionOf(matcher).appendText("was").appendValue(metrics.get(format));
+			}
+		};
 	}
 
 	private String randomString() {
 		return "" + Math.random();
+	}
+	
+	private void assertEventually(Probe p) throws Exception {
+		new Poller(3000, 50).check(p);
 	}
 	
 
