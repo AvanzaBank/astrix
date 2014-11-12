@@ -15,7 +15,6 @@
  */
 package com.avanza.asterix.context;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -35,11 +34,11 @@ public class AsterixSettingsReader {
 	private AsterixExternalConfig externalConfig;
 	private Properties classpathOverride = new Properties();
 	
-	public AsterixSettingsReader(AsterixSettings settings, AsterixExternalConfig externalConfig) {
+	private AsterixSettingsReader(AsterixSettings settings, AsterixExternalConfig externalConfig) {
 		this(settings, externalConfig, "META-INF/asterix/settings.properties");
 	}
 	
-	public AsterixSettingsReader(AsterixSettings settings, AsterixExternalConfig externalConfig, String defaultSettingsOverrideFile) {
+	AsterixSettingsReader(AsterixSettings settings, AsterixExternalConfig externalConfig, String defaultSettingsOverrideFile) {
 		this.settings = settings;
 		this.externalConfig = externalConfig;
 		try {
@@ -55,7 +54,13 @@ public class AsterixSettingsReader {
 	}
 	
 	static AsterixSettingsReader create(AsterixPlugins plugins, AsterixSettings settings) {
-		String configUrl = settings.getAsterixConfigUrl();
+		/*
+		 *  NOTE: 
+		 *  This behavior might look weird. We must create a AsterixSettingsReader too lookup the ASTERIX_CONFIG_URL setting
+		 *  in order to create the AsterixExternalConfig. The reason is that we want the same chain of lookup
+		 *  to take place event when reading the external_config_url.
+		 */
+		String configUrl = new AsterixSettingsReader(settings, settings).getString(AsterixSettings.ASTERIX_CONFIG_URL);
 		if (configUrl == null) {
 			return new AsterixSettingsReader(settings, new AsterixSettings());
 		}
@@ -107,24 +112,19 @@ public class AsterixSettingsReader {
 	private Object get(String settingName) {
 		String setting = externalConfig.lookup(settingName);
 		if (setting != null) {
+			log.trace("Resolved setting using external config: name={} value={}", settingName, setting);
 			return setting;
 		}
 		setting = settings.get(settingName);
 		if (setting != null) {
+			log.trace("Resolved setting using external config: name={} value={}", settingName, setting);
 			return setting;
 		}
-		return this.classpathOverride.getProperty(settingName);
-	}
-
-	public Properties getProperties(String name) {
-		Object properties = get(name);
-		if (properties == null) {
-			return null;
+		setting = this.classpathOverride.getProperty(settingName);
+		if (setting != null) {
+			log.trace("Resolved setting using classpathOverride: name={} value={}", settingName, setting);
 		}
-		if (!Properties.class.isAssignableFrom(properties.getClass())) {
-			throw new IllegalArgumentException("Property not of Properties type. name=" + name + " value=" + properties);
-		}
-		return Properties.class.cast(properties);
+		return setting;
 	}
 
 }
