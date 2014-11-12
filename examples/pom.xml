@@ -9,6 +9,8 @@
 		<module>lunch-parent</module>
 		<module>lunch-grader-parent</module>
 		<module>lunch-asterix-extensions</module>
+		<module>example-application-runners</module>
+		<module>asterix-dashboard-runner</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -65,7 +67,22 @@
 				<artifactId>asterix-versioning</artifactId>
 				<version>${asterix.version}</version>
 			</dependency>
-
+			<dependency>
+				<groupId>${asterix.groupId}</groupId>
+				<artifactId>asterix-gs-test-util</artifactId>
+				<version>${asterix.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${asterix.groupId}</groupId>
+				<artifactId>asterix-service-registry-pu</artifactId>
+				<version>${asterix.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${asterix.groupId}</groupId>
+				<artifactId>asterix-dashboard</artifactId>
+				<version>${asterix.version}</version>
+			</dependency>
+			
 			<!-- GigaSpaces -->
 			<dependency>
 				<groupId>com.gigaspaces</groupId>

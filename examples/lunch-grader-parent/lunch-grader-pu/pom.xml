@@ -49,6 +49,11 @@
 			<groupId>${asterix.groupId}</groupId>
 			<artifactId>asterix-service-registry</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>${asterix.groupId}</groupId>
+			<artifactId>asterix-gs-test-util</artifactId>
+			<scope>test</scope>
+		</dependency>
 		
 		<dependency>
 			<groupId>com.gigaspaces</groupId>

@@ -1,28 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:os-core="http://www.openspaces.org/schema/core"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.openspaces.org/schema/core http://www.openspaces.org/schema/core/openspaces-core.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-
-	<context:property-placeholder/>
-    <context:annotation-config/>
-    <os-core:space id="space" url="/./lunch-space" mirror="false"/>
-    <os-core:giga-space id="gigaSpace" space="space"/>
-    
-    <!-- Asterix service framework (provider and consumer) -->
-	<bean id="asterixFrameworkBean" class="com.avanza.asterix.context.AsterixFrameworkBean">
-		<property name="serviceDescriptor" value="lunch.api.provider.LunchServiceDescriptor"/>
-	</bean>
-	<bean id="asterixSettings" class="com.avanza.asterix.context.AsterixSettings">
-		<property name="serviceRegistryUri" value="gs-remoting:jini://*/*/service-registry-space?groups=elilin"/>
-	</bean>	
-	    
-	<!-- The actual service implementation(s) -->
-    <bean id="lunchService" class="lunch.pu.LunchServiceImpl"/>
-	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<import resource="lunch-pu.xml"/>
 </beans>

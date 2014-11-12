@@ -1,39 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:os-core="http://www.openspaces.org/schema/core" xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.openspaces.org/schema/core http://www.openspaces.org/schema/core/openspaces-core.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-
-	<context:property-placeholder/>
-	<context:annotation-config />
-	<os-core:space id="space" url="/./lunch-grader-space"
-		mirror="false" />
-	<os-core:giga-space id="gigaSpace" space="space" />
-
-	<bean id="asterixFrameworkBean" class="com.avanza.asterix.context.AsterixFrameworkBean">
-		<property name="consumedAsterixBeans">
-			<list>
-				<value>lunch.api.LunchService</value>
-				<value>lunch.api.provider.feeder.InternalLunchFeeder</value>
-			</list>
-		</property>
-		<property name="serviceDescriptor" value="lunch.grader.pu.LunchGradeServiceDescriptor" />
-	</bean>
-	
-	<bean id="asterixSettings" class="com.avanza.asterix.context.AsterixSettings" factory-method="from">
-		<property name="serviceRegistryUri" value="gs-remoting:jini://*/*/service-registry-space?groups=elilin"/>
-		<constructor-arg>
-			<util:map>
-				<entry key="StatefulAsterixBean.beanRebindAttemptInterval" value="100" />
-			</util:map>
-		</constructor-arg>
-	</bean>
-
-	<bean id="lunchRestaurantGrader" class="lunch.grader.pu.LunchRestaurantGraderImpl" />
-	<bean id="lunchFeeder" class="lunch.grader.pu.PublicLunchFeederImpl"/>
-
-
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:os-core="http://www.openspaces.org/schema/core"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<import resource="lunch-grader-pu.xml"/>
 </beans>

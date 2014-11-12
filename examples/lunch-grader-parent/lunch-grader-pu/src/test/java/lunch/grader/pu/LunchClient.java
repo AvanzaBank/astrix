@@ -15,19 +15,15 @@
  */
 package lunch.grader.pu;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.openspaces.core.GigaSpace;
-import org.openspaces.core.GigaSpaceConfigurer;
-import org.openspaces.core.space.UrlSpaceConfigurer;
-
 import lunch.api.LunchRestaurant;
 import lunch.api.LunchService;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import com.avanza.asterix.context.AsterixConfigurer;
 import com.avanza.asterix.context.AsterixContext;
 import com.avanza.asterix.context.AsterixSettings;
-import com.j_spaces.core.IJSpace;
 
 public class LunchClient {
 	

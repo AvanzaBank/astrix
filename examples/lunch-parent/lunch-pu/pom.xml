@@ -39,13 +39,17 @@
 			<groupId>${asterix.groupId}</groupId>
 			<artifactId>asterix-service-registry</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>lunch-asterix-extensions</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>${asterix.groupId}</groupId>
+			<artifactId>asterix-gs-test-util</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
 
 		<dependency>
 			<groupId>com.gigaspaces</groupId>
