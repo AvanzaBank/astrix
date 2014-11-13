@@ -69,6 +69,7 @@ public class AsterixServerRuntimeBuilder {
 		
 		// Register beans required by all used service-components
 		final Collection<AsterixExportedServiceInfo> exportedServices = getExportedServices(registry, serviceDescriptor);
+		validateAllPublishedServicesAreProvided(exportedServices);
 		Collection<AsterixServiceComponent> usedServiceComponents = getUsedServiceComponents(exportedServices);
 		for (AsterixServiceComponent serviceComponent : usedServiceComponents) {
 			serviceComponent.registerBeans(registry); // No exporting of services, registration of component required beans
@@ -99,6 +100,22 @@ public class AsterixServerRuntimeBuilder {
 		
 		beanDefinition = new AnnotatedGenericBeanDefinition(AsterixServiceExporterBeans.class);
 		registry.registerBeanDefinition("_asterixServiceExporterBeans", beanDefinition);
+	}
+
+	private void validateAllPublishedServicesAreProvided(Collection<AsterixExportedServiceInfo> exportedServices) {
+		Set<Class<?>> providedServices = new HashSet<>();
+		for (AsterixExportedServiceInfo exportedServiceInfo : exportedServices) {
+			providedServices.add(exportedServiceInfo.getProvidedService());
+		}
+		Set<Class<?>> publishedServices = new HashSet<>(this.apiDescriptorByProvideService.keySet());
+		publishedServices.removeAll(providedServices);
+		if (!publishedServices.isEmpty()) {
+			throw new IllegalStateException(String.format(
+					"Couldn't find service provider(s) (@AsterixServiceExport annotated bean) for all " +
+					"services exported by service descriptor. Missing provider(s) for: %s. Verify that " +
+					"current application-context defines a bean providing the given service(s) and are annotated with @AsterixServiceExport",
+					publishedServices));
+		}
 	}
 
 	private Set<AsterixServiceComponent> getUsedServiceComponents(Collection<AsterixExportedServiceInfo> exportedServiceInfos) {

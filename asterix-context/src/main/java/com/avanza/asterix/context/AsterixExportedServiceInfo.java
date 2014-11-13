@@ -34,6 +34,7 @@ public class AsterixExportedServiceInfo {
 	private String componentName;
 	private String providingBeanName;
 
+	// TODO: Rename to AsterixProvidedServiceInfo?
 	
 	public AsterixExportedServiceInfo(Class<?> providedService,
 			AsterixApiDescriptor apiDescriptor, String componentName, String providingBeanName) {
