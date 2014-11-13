@@ -39,10 +39,9 @@ public class AsterixLibraryFactory<T> implements AsterixFactoryBeanPlugin<T>, As
 	@Override
 	public T create(String qualifier) {
 		Object[] args = new Object[factoryMethod.getParameterTypes().length];
-		// TODO: analyze each factory for what dependencies they have?
 		for (int argumentIndex = 0; argumentIndex < factoryMethod.getParameterTypes().length; argumentIndex++) {
 			Class<?> argumentType = factoryMethod.getParameterTypes()[argumentIndex];
-			args[argumentIndex] = beans.getBean(argumentType); // TODO: discover circular library creation
+			args[argumentIndex] = beans.getBean(argumentType);
 		}
 		Object result;
 		try {
