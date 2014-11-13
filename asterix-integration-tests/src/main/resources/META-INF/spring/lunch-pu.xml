@@ -24,6 +24,7 @@
 	
 	<!-- The actual service implementation(s) -->
     <bean id="lunchService" class="com.avanza.asterix.integration.tests.domain.pu.LunchServiceImpl"/>
-	
+	<bean id="lunchRestaurantRepoFactory" class="com.avanza.asterix.integration.tests.domain.pu.LunchRestaurantRepoFactory"/>
+	<bean id="lunchRestaurantRepo" factory-bean="lunchRestaurantRepoFactory" factory-method="create"/>
 	    
 </beans>

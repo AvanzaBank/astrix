@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -39,6 +41,7 @@ import com.avanza.asterix.provider.core.AsterixServiceExport;
  */
 public class AsterixServerRuntimeBuilder {
 	
+	private static final Logger log = LoggerFactory.getLogger(AsterixServerRuntimeBuilder.class);
 	private final AsterixContext asterixContext;
 	private final List<Class<?>> consumedAsterixBeans = new ArrayList<>(1);
 	private final Map<Class<?>, AsterixApiDescriptor> apiDescriptorByProvideService;
@@ -111,6 +114,10 @@ public class AsterixServerRuntimeBuilder {
 		Set<AsterixExportedServiceInfo> result = new HashSet<>();
 		for (String beanName : registry.getBeanDefinitionNames()) {
 			BeanDefinition beanDefinition = registry.getBeanDefinition(beanName);
+			if (beanDefinition.getBeanClassName() == null) {
+				log.debug("Can't find className on bean-definition. Won't use bean as a candiate for AsterixServiceExport. beanName={}", beanName);
+				continue;
+			}
 			Class<?> possibleBeanType = Class.forName(beanDefinition.getBeanClassName());
 			if (!possibleBeanType.isAnnotationPresent(AsterixServiceExport.class)){
 				continue;

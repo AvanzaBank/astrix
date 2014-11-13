@@ -15,6 +15,8 @@
  */
 package com.avanza.asterix.integration.tests.domain.pu;
 
+import java.util.List;
+
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,24 +32,22 @@ import com.avanza.asterix.provider.core.AsterixServiceExport;
 @AsterixServiceExport({LunchService.class, InternalLunchFeeder.class})
 public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 
-	private final GigaSpace gigaSpace;
+	private LunchRestaurantRepo repo;
 	
 	@Autowired
-	public LunchServiceImpl(GigaSpace gigaSpace) {
-		this.gigaSpace = gigaSpace;
+	public LunchServiceImpl(LunchRestaurantRepo repo) {
+		this.repo = repo;
 	}
 
 	@Override
 	public LunchRestaurant suggestRandomLunchRestaurant(String foodType) {
-		LunchRestaurant template = new LunchRestaurant();
-		template.setFoodType(foodType);
-		LunchRestaurant[] candiates = gigaSpace.readMultiple(template);
-		return candiates.length > 0 ? candiates[0] : null;
+		List<LunchRestaurant> candidates = this.repo.findByFoodType(foodType);
+		return candidates.isEmpty() ? null : candidates.get(0);
 	}
 
 	@Override
 	public void addLunchRestaurant(LunchRestaurant restaurant) {
-		this.gigaSpace.write(restaurant);
+		this.repo.writeLunchRestaurant(restaurant);
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 		if ("throwException".equals(r.getName())) {
 			throw new IllegalArgumentException("Illegal restaurant: " + r.getName());
 		}
-		return this.gigaSpace.readById(LunchRestaurant.class, r.getName());
+		return this.repo.getByName(r.getName());
 	}
 
 }
