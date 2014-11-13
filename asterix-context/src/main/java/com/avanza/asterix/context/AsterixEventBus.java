@@ -90,6 +90,7 @@ public class AsterixEventBus {
 		
 		public EventDispatcher() {
 			super("Asterix-EventBus.Dispatcher");
+			setDaemon(true);
 		}
 		
 		@Override

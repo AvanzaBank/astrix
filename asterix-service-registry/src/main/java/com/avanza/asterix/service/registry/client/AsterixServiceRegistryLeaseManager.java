@@ -44,6 +44,7 @@ public class AsterixServiceRegistryLeaseManager extends Thread implements Asteri
 	
 	public AsterixServiceRegistryLeaseManager() {
 		super("Asterix-ServiceRegistryLeaseManager");
+		setDaemon(true);
 	}
 	
 	@Override
