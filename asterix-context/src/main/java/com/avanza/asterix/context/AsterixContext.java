@@ -62,7 +62,7 @@ public class AsterixContext implements Asterix {
 		this.settingsReader = AsterixSettingsReader.create(plugins, settings);
 		this.settingsWriter = AsterixSettingsWriter.create(settings);
 		this.enforeSubsystemBoundaries = this.settingsReader.getBoolean(AsterixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
-		this.beanStateWorker = new AsterixBeanStateWorker(this.settingsReader, eventBus); // TODO: manage life cycle
+		this.beanStateWorker = new AsterixBeanStateWorker(this.settingsReader, eventBus);
 		this.beanStateWorker.start(); // TODO: avoid starting bean-state-worker if no stateful beans are created. + manage lifecycle
 	}
 	
