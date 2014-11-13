@@ -27,7 +27,11 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 final class InstanceCache {
 	
 	private final Logger logger = LoggerFactory.getLogger(InstanceCache.class);
@@ -48,7 +52,6 @@ final class InstanceCache {
 	}
 	
 	public void destroy() {
-		// TODO: ensure that no beans can be created before destroying instances.
 		for (Object object : this.instanceByType.values()) {
 			List<Method> methods = getMethodsAnnotatedWith(object.getClass(), PreDestroy.class);
 			for (Method m : methods) {

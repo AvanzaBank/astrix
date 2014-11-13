@@ -32,14 +32,6 @@ public class AsterixServiceExporterBeans {
 		}
 	}
 
-	public AsterixServiceExporterBean getServiceExporter(AsterixExportedService service) {
-		AsterixServiceExporterBean asterixServiceExporterBean = serviceExporterByComponentName.get(service.getComponentName());
-		if (asterixServiceExporterBean == null) {
-			throw new IllegalStateException("No AsterixServiceExporterBean found for component=" + service.getComponentName());
-		}
-		return asterixServiceExporterBean;
-	}
-	
 	public AsterixServiceExporterBean getServiceExporter(String componentName) {
 		AsterixServiceExporterBean asterixServiceExporterBean = serviceExporterByComponentName.get(componentName);
 		if (asterixServiceExporterBean == null) {
