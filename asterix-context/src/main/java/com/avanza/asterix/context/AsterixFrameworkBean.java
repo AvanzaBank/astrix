@@ -89,7 +89,6 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 		 * 
 		 */
 		
-		// TODO: avoid creating two AsterixContext's  (here and as spring bean). Creating two AsterixContext causes two scannings for providers
 		try {
 			createServiceFrameworkRuntime(registry);
 		} catch (ClassNotFoundException e) {

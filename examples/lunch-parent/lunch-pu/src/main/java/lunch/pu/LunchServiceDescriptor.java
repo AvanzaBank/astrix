@@ -31,8 +31,6 @@ import com.avanza.asterix.provider.core.AsterixService;
 	component = AsterixServiceComponentNames.GS_REMOTING
 )
 public class LunchServiceDescriptor {
-	
-	// TODO: move
 }
 
 
