@@ -16,7 +16,7 @@
     
     <!-- Asterix service framework (provider and consumer) -->
 	<bean id="asterixFrameworkBean" class="com.avanza.asterix.context.AsterixFrameworkBean">
-		<property name="serviceDescriptor" value="lunch.api.provider.LunchServiceDescriptor"/>
+		<property name="serviceDescriptor" value="lunch.pu.LunchServiceDescriptor"/>
 	</bean>
 	<bean id="asterixSettings" class="com.avanza.asterix.context.AsterixSettings">
 		<property name="serviceRegistryUri" value="gs-remoting:jini://*/*/service-registry-space?groups=elilin"/>

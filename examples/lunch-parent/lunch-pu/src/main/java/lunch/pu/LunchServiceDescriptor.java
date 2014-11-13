@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package lunch.api.provider;
+package lunch.pu;
 
+import lunch.api.provider.LunchApiDescriptor;
 import lunch.api.provider.feeder.LunchFeederApiDescriptor;
 
 import com.avanza.asterix.provider.component.AsterixServiceComponentNames;
@@ -30,6 +31,8 @@ import com.avanza.asterix.provider.core.AsterixService;
 	component = AsterixServiceComponentNames.GS_REMOTING
 )
 public class LunchServiceDescriptor {
+	
+	// TODO: move
 }
 
 
