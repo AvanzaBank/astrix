@@ -38,6 +38,10 @@ public class AsterixServiceRegistryLeaseManager extends Thread implements Asteri
 	private AsterixBeans beans;
 	private AsterixSettingsReader settings;
 	
+	public AsterixServiceRegistryLeaseManager() {
+		super("Asterix-ServiceRegistryLeaseManager");
+	}
+	
 	@Override
 	public void run() {
 		while (!interrupted()) {

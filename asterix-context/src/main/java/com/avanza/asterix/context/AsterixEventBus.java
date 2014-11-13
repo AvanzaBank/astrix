@@ -21,10 +21,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AsterixEventBus {
-	
-	// TODO: use guava event-bus?
 	
 	private final BlockingQueue<Object> pendingEvents = new LinkedBlockingQueue<>();
 	private final List<SubscribedListener<?>> subscribedListeners = new CopyOnWriteArrayList<>();
