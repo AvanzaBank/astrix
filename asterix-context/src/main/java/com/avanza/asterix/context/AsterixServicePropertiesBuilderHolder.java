@@ -56,10 +56,8 @@ public class AsterixServicePropertiesBuilderHolder {
 	}
 	
 	public AsterixServiceProperties exportAsyncServiceProperties() {
-		AsterixServiceProperties serviceProperties = servicePropertiesBuilder.buildServiceProperties(exportedService);
+		AsterixServiceProperties serviceProperties = exportServiceProperties();
 		serviceProperties.setApi(asyncService);
-		serviceProperties.setComponent(componentName);
-		// TODO: move responsibility to set qualifier to this class
 		return serviceProperties;
 	}
 
