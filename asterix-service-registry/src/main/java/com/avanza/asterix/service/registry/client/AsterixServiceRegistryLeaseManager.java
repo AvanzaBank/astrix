@@ -41,7 +41,6 @@ public class AsterixServiceRegistryLeaseManager extends Thread implements Asteri
 	@Override
 	public void run() {
 		while (!interrupted()) {
-			// TODO: Effectiveness: check multiple services in each request
 			for (LeasedService<?> leasedService : leasedServices) {
 				renewLease(leasedService);
 			}
