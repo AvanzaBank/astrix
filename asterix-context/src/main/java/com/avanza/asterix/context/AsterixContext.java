@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
+import javax.annotation.PreDestroy;
 /**
  * An AstrixContext is the runtime-environment for the astrix-framework. It is used
  * both by consuming applications as well as server applications. AsterixContext providers access
@@ -33,7 +35,7 @@ public class AsterixContext implements Asterix {
 	
 	private final AsterixPlugins plugins;
 	private final AsterixBeanFactoryRegistry beanFactoryRegistry = new AsterixBeanFactoryRegistry();
-	private final AsterixEventBus eventBus = new AsterixEventBus();
+	private final AsterixEventBus eventBus = AsterixEventBus.create();
 	private final AsterixBeanStates beanStates = new AsterixBeanStates();
 	private final AsterixSettingsReader settingsReader;
 	private final AsterixSettingsWriter settingsWriter;
@@ -82,6 +84,13 @@ public class AsterixContext implements Asterix {
 	<T> void registerBeanFactory(AsterixFactoryBean<T> beanFactory) {
 		injectDependencies(beanFactory);
 		this.beanFactoryRegistry.registerFactory(beanFactory);
+	}
+	
+	@PreDestroy
+	public void destroy() {
+		this.beanStateWorker.interrupt();
+		this.eventBus.destroy();
+		this.instanceCache.destroy();
 	}
 	
 	private void injectDependencies(Object object) {

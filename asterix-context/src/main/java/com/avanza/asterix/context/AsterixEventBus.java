@@ -28,9 +28,23 @@ public class AsterixEventBus {
 	
 	private final BlockingQueue<Object> pendingEvents = new LinkedBlockingQueue<>();
 	private final List<SubscribedListener<?>> subscribedListeners = new CopyOnWriteArrayList<>();
+	private final EventDispatcher eventDispatcher = new EventDispatcher();
 	
-	public AsterixEventBus() {
-		new EventDispatcher().start(); // TODO: manage lifecycle of EventDispatcher-thread 
+	private AsterixEventBus() {
+	}
+	
+	public static AsterixEventBus create() {
+		AsterixEventBus result = new AsterixEventBus();
+		result.start();
+		return result;
+	}
+	
+	private void start() {
+		this.eventDispatcher.start();
+	}
+	
+	public void destroy() {
+		this.eventDispatcher.interrupt();
 	}
 	
 	public void fireEvent(Object event) {
@@ -71,6 +85,10 @@ public class AsterixEventBus {
 	}
 	
 	private class EventDispatcher extends Thread {
+		
+		public EventDispatcher() {
+			super("Asterix-EventBus.Dispatcher");
+		}
 		
 		@Override
 		public void run() {

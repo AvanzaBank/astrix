@@ -15,12 +15,22 @@
  */
 package com.avanza.asterix.context;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.annotation.PreDestroy;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 final class InstanceCache {
 	
+	private final Logger logger = LoggerFactory.getLogger(InstanceCache.class);
 	private final ConcurrentMap<Class<?>, Object> instanceByType = new ConcurrentHashMap<>();
 	private final ObjectInitializer initializer;
 	
@@ -35,6 +45,20 @@ final class InstanceCache {
 			return object;
 		}
 		return init(type);
+	}
+	
+	public void destroy() {
+		// TODO: ensure that no beans can be created before destroying instances.
+		for (Object object : this.instanceByType.values()) {
+			List<Method> methods = getMethodsAnnotatedWith(object.getClass(), PreDestroy.class);
+			for (Method m : methods) {
+				try {
+					m.invoke(object);
+				} catch (Exception e) {
+					logger.error(String.format("Failed to invoke destroy method. methodName=%s objectType=%s", m.getName(), object.getClass().getName()), e);
+				}
+			}
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -56,6 +80,16 @@ final class InstanceCache {
 	
 	interface ObjectInitializer {
 		void init(Object object);
+	}
+	
+	private static List<Method> getMethodsAnnotatedWith(final Class<?> type, final Class<? extends Annotation> annotation) {
+	    final List<Method> methods = new ArrayList<Method>();
+	    for (Method method : type.getMethods()) { 
+            if (method.isAnnotationPresent(annotation)) {
+                methods.add(method);
+            }
+	    }
+	    return methods;
 	}
 	
 }

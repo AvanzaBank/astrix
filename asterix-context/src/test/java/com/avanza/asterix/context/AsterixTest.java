@@ -16,8 +16,11 @@
 package com.avanza.asterix.context;
 
 import static junit.framework.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
@@ -142,6 +145,18 @@ public class AsterixTest {
 		asterixContext.getInstance(IllegalDependendclass.class);
 	}
 	
+	@Test
+	public void preDestroyAnnotatedMethodsOnInstancesCreatedByAsterixAreInvokedWhenAsterixContextIsDestroyed() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		AsterixContext asterixContext = asterixConfigurer.configure();
+		SimpleClass simpleClass = asterixContext.getInstance(SimpleClass.class);
+		assertFalse(simpleClass.destroyed);
+		
+		asterixContext.destroy();
+		assertTrue(simpleClass.destroyed);
+	}
+	
+	
 	static class IllegalDependendclass {
 		@AsterixInject
 		public void setVersioningPlugin() {
@@ -178,10 +193,16 @@ public class AsterixTest {
 	
 	static class SimpleClass implements AsterixSettingsAware {
 		private AsterixSettingsReader settings;
-
+		private volatile boolean destroyed = false;
+		
 		@Override
 		public void setSettings(AsterixSettingsReader settings) {
 			this.settings = settings;
+		}
+		
+		@PreDestroy
+		public void destroy() {
+			this.destroyed = true;
 		}
 	}
 	
