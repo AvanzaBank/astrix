@@ -29,7 +29,11 @@ import com.avanza.asterix.context.AsterixServiceProperties;
 import com.avanza.asterix.context.AsterixSettings;
 import com.avanza.asterix.context.AsterixSettingsAware;
 import com.avanza.asterix.context.AsterixSettingsReader;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AsterixServiceRegistryLeaseManager extends Thread implements AsterixBeanAware, AsterixSettingsAware {
 	
 	private final Logger log = LoggerFactory.getLogger(AsterixServiceRegistryLeaseManager.class);

@@ -20,7 +20,6 @@ public class AsterixCircularDependency extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	public AsterixCircularDependency(Class<?> beanA, Class<?> beanB) {
-		// TODO: Identify api-descriptor for beanFactoryA and beanFactoryB
 		super("Circular dependency detected. beanA=" + beanA.getName() + ", beanB=" + beanB.getName());
 	}
 

@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +33,17 @@ public class AsterixBeanStateWorker extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(AsterixBeanStateWorker.class);
 	private final Collection<StatefulAsterixBean<?>> managedBeans = new CopyOnWriteArrayList<>();
 	private final long beanRebindAttemptIntervalMillis;
-	private final ExecutorService beanStateWorkerThreadPool = Executors.newSingleThreadExecutor();
+	private final ExecutorService beanStateWorkerThreadPool = Executors.newSingleThreadExecutor(new ThreadFactory() {
+		@Override
+		public Thread newThread(Runnable r) {
+			Thread t = new Thread(r, "Asterix-BeanStateWorkerExecutor");
+			t.setDaemon(true);
+			return t;
+		}
+	});
 
 	public AsterixBeanStateWorker(AsterixSettingsReader settings, AsterixEventBus eventBus) {
-		super("Asterix-BeanStateWorker");
+		super("Asterix-BeanStateWorkerDispatcher");
 		setDaemon(true);
 		this.beanRebindAttemptIntervalMillis = settings.getLong(AsterixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 10_000L);
 	}
