@@ -23,6 +23,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.PreDestroy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +65,7 @@ public class MetricsPoller implements AsterixPluginsAware, AsterixSettingsAware 
 	/**
 	 * Stops the scheduled poller. Does not wait for anything to terminate.
 	 */
+	@PreDestroy
 	public void stop() {
 		log.info("Stopping metrics poller");
 		if (executor != null) {

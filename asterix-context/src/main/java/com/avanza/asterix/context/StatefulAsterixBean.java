@@ -37,7 +37,7 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 	private final String optionalQualifier;
 	private volatile InvocationHandler state;
 	private static final AtomicInteger nextId = new AtomicInteger(0);
-	private final String id = nextId.incrementAndGet() + ""; // TODO remove beanId? its used for debugging
+	private final String id = nextId.incrementAndGet() + ""; // Used for debugging to distinguish between many context's started within same jvm.
 	private final AsterixEventBus eventBus;
 	
 	StatefulAsterixBean(AsterixFactoryBeanPlugin<T> beanFactory, String optionalQualifier, AsterixEventBus eventBus) {
@@ -48,7 +48,7 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 	}
 	
 	
-	public String getId() {
+	String getId() {
 		return id;
 	}
 	
