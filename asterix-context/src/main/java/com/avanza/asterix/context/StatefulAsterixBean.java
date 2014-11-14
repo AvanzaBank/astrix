@@ -89,7 +89,6 @@ public class StatefulAsterixBean<T> implements InvocationHandler {
 
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			// TODO: how to know when its time to go to unbound state.
 			try {
 				return method.invoke(bean, args);
 			} catch (InvocationTargetException e) {
