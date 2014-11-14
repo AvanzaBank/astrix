@@ -79,6 +79,15 @@ public class TestAsterixConfigurer {
 		configurer.set(name, value);
 	}
 	
+	/*
+	 * Sets the current subsystem name and enables enforcing of
+	 * subsystem boundaries
+	 */
+	public void setSubsystem(String subsystem) {
+		this.configurer.setSubsystem(subsystem);
+		this.configurer.set(AsterixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
+	}
+	
 	private static class StandaloneFactoryBean<T> implements AsterixFactoryBeanPlugin<T> {
 		private Class<T> type;
 		private T instance;

@@ -36,11 +36,12 @@ public class AsterixConfigurer {
 	private boolean enableFaultTolerance = true;
 	private boolean enableVersioning = true;
 	private boolean enableMonitoring = true; 
-	private final AsterixSettings settings = new AsterixSettings();
-	private String subsystem = "default";
+	private final AsterixSettings settings = new AsterixSettings() {{
+		set(SUBSYSTEM_NAME, "default");
+	}};
 	
 	public AsterixContext configure() {
-		AsterixContext context = new AsterixContext(settings, subsystem);
+		AsterixContext context = new AsterixContext(settings);
 		for (PluginHolder<?> plugin : plugins) {
 			registerPlugin(context, plugin);
 		}
@@ -193,7 +194,7 @@ public class AsterixConfigurer {
 	 * @param string
 	 */
 	public void setSubsystem(String subsystem) {
-		this.subsystem = subsystem;
+		this.settings.set(AsterixSettings.SUBSYSTEM_NAME, subsystem);
 	}
 
 	public void addFactoryBean(AsterixFactoryBean<?> factoryBean) {

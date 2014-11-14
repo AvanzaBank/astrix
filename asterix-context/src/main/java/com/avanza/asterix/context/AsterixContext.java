@@ -50,8 +50,8 @@ public class AsterixContext implements Asterix {
 		}
 	});
 	
-	public AsterixContext(AsterixSettings settings, String currentSubsystem) {
-		this.currentSubsystem = currentSubsystem;
+	public AsterixContext(AsterixSettings settings) {
+		this.currentSubsystem = settings.get(AsterixSettings.SUBSYSTEM_NAME); // TODO: remove field
 		this.eventBus.addEventListener(AsterixBeanStateChangedEvent.class, beanStates);
 		this.plugins = new AsterixPlugins(new AsterixPluginInitializer() {
 			@Override

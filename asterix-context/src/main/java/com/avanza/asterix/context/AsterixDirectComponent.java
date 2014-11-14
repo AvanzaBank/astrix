@@ -67,6 +67,11 @@ public class AsterixDirectComponent implements AsterixServiceComponent {
 		return id;
 	}
 	
+	public static <T> AsterixServiceProperties registerAndGetProperties(Class<T> type, T provider) {
+		String id = register(type, provider);
+		return getServiceProperties(id);
+	}
+	
 	public static AsterixServiceProperties getServiceProperties(String id) {
 		ServiceProvider<?> provider = providerById.get(id);
 		if (provider == null) {

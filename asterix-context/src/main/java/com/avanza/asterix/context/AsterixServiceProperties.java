@@ -32,6 +32,7 @@ public final class AsterixServiceProperties implements Serializable {
 	public static final String QUALIFIER = "_qualifier";
 	public static final String API = "_api";
 	public static final String COMPONENT = "_component";
+	public static final String SUBSYSTEM = "_subsystem";
 	
 	private final Map<String, String> properties = new HashMap<>();
 	
