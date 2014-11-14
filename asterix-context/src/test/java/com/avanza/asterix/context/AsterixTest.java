@@ -16,14 +16,11 @@
 package com.avanza.asterix.context;
 
 import static junit.framework.Assert.assertSame;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
-
-import java.util.Iterator;
-import java.util.ServiceLoader;
 
 import javax.annotation.PreDestroy;
 
@@ -197,7 +194,6 @@ public class AsterixTest {
 		
 		assertNotSame(helloBean1, helloBean2);
 	}
-	
 	
 	static class IllegalDependendclass {
 		@AsterixInject

@@ -36,7 +36,4 @@ public @interface AsterixServiceRegistryApi {
 
 	Class<?>[] exportedApis();
 	
-	// TODO: remove this property from this annotation and identify component on AsterixService/AsterixServiceExport
-//	String[] components();
-	
 }

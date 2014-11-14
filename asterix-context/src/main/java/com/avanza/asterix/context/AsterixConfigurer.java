@@ -37,7 +37,7 @@ public class AsterixConfigurer {
 	private boolean enableVersioning = true;
 	private boolean enableMonitoring = true; 
 	private final AsterixSettings settings = new AsterixSettings();
-	private String subsystem = "unknown";
+	private String subsystem = "default";
 	
 	public AsterixContext configure() {
 		AsterixContext context = new AsterixContext(settings, subsystem);
