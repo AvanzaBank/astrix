@@ -32,7 +32,7 @@ public class AsterixLibraryProviderPlugin implements AsterixApiProviderPlugin {
 	
 	@Override
 	public List<AsterixFactoryBeanPlugin<?>> createFactoryBeans(AsterixApiDescriptor descriptorHolder) {
-		Object libraryProviderInstance = initInstanceProvider(descriptorHolder); // TODO: who manages lifecycle for the libraryProviderInstance?
+		Object libraryProviderInstance = initInstanceProvider(descriptorHolder);
 		List<AsterixFactoryBeanPlugin<?>> result = new ArrayList<>();
 		for (Method m : descriptorHolder.getDescriptorClass().getMethods()) {
 			if (m.isAnnotationPresent(AsterixExport.class)) {

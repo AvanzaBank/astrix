@@ -16,10 +16,14 @@
 package com.avanza.asterix.context;
 
 import static junit.framework.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 import javax.annotation.PreDestroy;
 
@@ -159,6 +163,39 @@ public class AsterixTest {
 		assertFalse(helloBean.destroyed);
 		context.destroy();
 		assertTrue(helloBean.destroyed);
+	}
+	
+	@Test
+	public void manyAsterixContextShouldBeAbleToRunInSameProcessWithoutInterferenceInShutdown() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		asterixConfigurer.registerApiDescriptor(MyLibraryDescriptor.class);
+		AsterixContext context = asterixConfigurer.configure();
+		
+		TestAsterixConfigurer asterixConfigurer2 = new TestAsterixConfigurer();
+		asterixConfigurer2.registerApiDescriptor(MyLibraryDescriptor.class);
+		AsterixContext context2 = asterixConfigurer2.configure();
+		context.destroy();
+		
+		HelloBeanImpl helloBean2 = (HelloBeanImpl) context2.getBean(HelloBean.class);
+		assertFalse(helloBean2.destroyed);
+		context2.destroy();
+		assertTrue(helloBean2.destroyed);
+	}
+	
+	@Test
+	public void librariesCreatedUsingDifferentContextsShouldReturnDifferentInstances() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		asterixConfigurer.registerApiDescriptor(MyLibraryDescriptor.class);
+		AsterixContext context = asterixConfigurer.configure();
+		
+		TestAsterixConfigurer asterixConfigurer2 = new TestAsterixConfigurer();
+		asterixConfigurer2.registerApiDescriptor(MyLibraryDescriptor.class);
+		AsterixContext context2 = asterixConfigurer2.configure();
+		
+		HelloBeanImpl helloBean1 = (HelloBeanImpl) context.getBean(HelloBean.class);
+		HelloBeanImpl helloBean2 = (HelloBeanImpl) context2.getBean(HelloBean.class);
+		
+		assertNotSame(helloBean1, helloBean2);
 	}
 	
 	
