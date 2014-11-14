@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.annotation.PreDestroy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +88,11 @@ public class AsterixServiceRegistryLeaseManager extends Thread implements Asteri
 	@Override
 	public List<Class<?>> getBeanDependencies() {
 		return Arrays.<Class<?>>asList(AsterixServiceRegistryClient.class);
+	}
+	
+	@PreDestroy
+	public void destroy() {
+		interrupt();
 	}
 
 	@Override

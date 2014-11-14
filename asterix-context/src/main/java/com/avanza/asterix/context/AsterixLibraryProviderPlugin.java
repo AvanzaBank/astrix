@@ -28,6 +28,8 @@ import com.avanza.asterix.provider.library.AsterixLibraryProvider;
 @MetaInfServices(AsterixApiProviderPlugin.class)
 public class AsterixLibraryProviderPlugin implements AsterixApiProviderPlugin {
 	
+	private InstanceCache instanceCache;
+	
 	@Override
 	public List<AsterixFactoryBeanPlugin<?>> createFactoryBeans(AsterixApiDescriptor descriptorHolder) {
 		Object libraryProviderInstance = initInstanceProvider(descriptorHolder); // TODO: who manages lifecycle for the libraryProviderInstance?
@@ -41,11 +43,7 @@ public class AsterixLibraryProviderPlugin implements AsterixApiProviderPlugin {
 	}
 
 	private Object initInstanceProvider(AsterixApiDescriptor descriptor) {
-		try {
-			return descriptor.getDescriptorClass().newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to init library provider: " + descriptor.getClass().getName(), e);
-		}
+		return instanceCache.getInstance(descriptor.getDescriptorClass());
 	}
 
 	@Override
@@ -56,6 +54,11 @@ public class AsterixLibraryProviderPlugin implements AsterixApiProviderPlugin {
 	@Override
 	public boolean isLibraryProvider() {
 		return true;
+	}
+	
+	@AsterixInject
+	public void setInstanceCache(InstanceCache instanceCache) {
+		this.instanceCache = instanceCache;
 	}
 	
 	@Override

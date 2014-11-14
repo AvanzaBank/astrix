@@ -16,22 +16,15 @@
 package com.avanza.asterix.context;
 
 import static junit.framework.Assert.assertSame;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
-import com.avanza.asterix.context.AsterixCircularDependency;
-import com.avanza.asterix.context.AsterixContext;
-import com.avanza.asterix.context.AsterixInject;
-import com.avanza.asterix.context.AsterixSettingsAware;
-import com.avanza.asterix.context.AsterixSettingsReader;
-import com.avanza.asterix.context.MissingBeanDependencyException;
-import com.avanza.asterix.context.MissingBeanProviderException;
-import com.avanza.asterix.context.TestAsterixConfigurer;
 import com.avanza.asterix.provider.library.AsterixExport;
 import com.avanza.asterix.provider.library.AsterixLibraryProvider;
 
@@ -156,6 +149,18 @@ public class AsterixTest {
 		assertTrue(simpleClass.destroyed);
 	}
 	
+	@Test
+	public void preDestroyAnnotatedMethodsOnLibraryFactoryInstancesAreInvokedWhenAsterixContextIsDestroyed() throws Exception {
+		TestAsterixConfigurer asterixConfigurer = new TestAsterixConfigurer();
+		asterixConfigurer.registerApiDescriptor(MyLibraryDescriptor.class);
+		AsterixContext context = asterixConfigurer.configure();
+		
+		HelloBeanImpl helloBean = (HelloBeanImpl) context.getBean(HelloBean.class);
+		assertFalse(helloBean.destroyed);
+		context.destroy();
+		assertTrue(helloBean.destroyed);
+	}
+	
 	
 	static class IllegalDependendclass {
 		@AsterixInject
@@ -209,10 +214,16 @@ public class AsterixTest {
 	
 	@AsterixLibraryProvider
 	static class MyLibraryDescriptor {
+		private HelloBeanImpl instance = new HelloBeanImpl();
 		
 		@AsterixExport
 		public HelloBean create() {
-			return new HelloBeanImpl();
+			return instance;
+		}
+		
+		@PreDestroy
+		public void destroy() {
+			instance.destroyed  = true;
 		}
 	}
 	
@@ -276,6 +287,8 @@ public class AsterixTest {
 	}
 	
 	static class HelloBeanImpl implements HelloBean {
+		public boolean destroyed = false;
+
 		public String hello(String msg) {
 			return "hello: " + msg;
 		}

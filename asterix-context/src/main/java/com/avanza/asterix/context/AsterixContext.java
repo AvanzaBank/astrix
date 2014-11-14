@@ -332,17 +332,12 @@ public class AsterixContext implements Asterix {
 		return getPlugins().getPlugin(pluginType);
 	}
 	
-	public <T> T newInstance(Class<T> type) {
-		try {
-			T instance = type.newInstance();
-			injectDependencies(instance);
-			return instance;
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to init instance of: " + type, e);
-		}
-	}
-
 	public <T> T getInstance(Class<T> classType) {
+		// We allow injecting an instance of InstanceCache, hence this
+		// check.
+		if (classType.equals(InstanceCache.class)) {
+			return classType.cast(instanceCache);
+		}
 		return this.instanceCache.getInstance(classType);
 	}
 	
