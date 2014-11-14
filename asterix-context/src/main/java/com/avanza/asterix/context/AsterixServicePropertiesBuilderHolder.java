@@ -51,7 +51,6 @@ public class AsterixServicePropertiesBuilderHolder {
 		AsterixServiceProperties serviceProperties = servicePropertiesBuilder.buildServiceProperties(exportedService);
 		serviceProperties.setApi(exportedService);
 		serviceProperties.setComponent(componentName);
-		// TODO: move responsibility to set qualifier to this class
 		return serviceProperties;
 	}
 	

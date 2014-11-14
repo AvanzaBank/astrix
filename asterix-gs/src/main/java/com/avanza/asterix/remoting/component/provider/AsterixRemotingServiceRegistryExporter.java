@@ -41,7 +41,7 @@ public class AsterixRemotingServiceRegistryExporter implements AsterixServicePro
 	@Override
 	public AsterixServiceProperties buildServiceProperties(Class<?> providedApi) {
 		AsterixServiceProperties serviceProperties = GsBinder.createProperties(this.gigaSpace);
-		serviceProperties.setQualifier(null); // TODO: this is a hack. Qualifier should not be managed internally in service-proprties-exporters
+		serviceProperties.setQualifier(null);
 		return serviceProperties;
 	}
 	

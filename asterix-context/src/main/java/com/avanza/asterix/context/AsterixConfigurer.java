@@ -101,14 +101,13 @@ public class AsterixConfigurer {
 	}
 
 	private void discoverApiProviderPlugins(AsterixContext context) {
-		discoverAllPlugins(context, AsterixApiProviderPlugin.class, new AsterixLibraryProviderPlugin()); // TODO: no need to pass default instance
+		discoverAllPlugins(context, AsterixApiProviderPlugin.class);
 	}
 	
-	private static <T> void discoverAllPlugins(AsterixContext context, Class<T> type, T defaultProvider) {
+	private static <T> void discoverAllPlugins(AsterixContext context, Class<T> type) {
 		List<T> plugins = AsterixPluginDiscovery.discoverAllPlugins(type);
 		if (plugins.isEmpty()) {
-			log.debug("No plugin discovered for {}, using default {}", type.getName(), defaultProvider.getClass().getName());
-			plugins.add(defaultProvider);
+			log.debug("No plugin discovered for {}", type.getName());
 		}
 		for (T plugin : plugins) {
 			log.debug("Found plugin for {}, provider={}", type.getName(), plugin.getClass().getName());
