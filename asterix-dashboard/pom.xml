@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.avanza.asterix</groupId>
 		<artifactId>asterix-parent</artifactId>
-		<version>0.5.4</version>
+		<version>0.5.5-SNAPSHOT</version>
 	</parent>
 	<artifactId>asterix-dashboard</artifactId>
 
