@@ -93,7 +93,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	@Override
 	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
 		/*
-		 * TODO: inspect method an use correct isolation strategy:
+		 * IMPROVE: inspect method an use correct isolation strategy:
 		 * 
 		 *   1. Use HystrixObservableCommand with semaphore isolation for non-blocking operations (methods returning Observable's/Futures)
 		 *   2. Use HystrixCommand with thread isolation for all blocking operations (any method NOT returning an Observable/Future)

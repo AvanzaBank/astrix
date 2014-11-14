@@ -20,8 +20,6 @@ import org.openspaces.core.GigaSpace;
 
 public interface RunningPu extends TestRule, AutoCloseable  {
 
-	// TODO: Rename to ManagedPu?
-	
 	String getLookupGroupName();
 
 	GigaSpace getClusteredGigaSpace();

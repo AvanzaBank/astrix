@@ -42,7 +42,7 @@ public class HystrixFaultTolerancePlugin implements AsterixFaultTolerancePlugin 
 	}
 
 	private synchronized void registerEventLogger() {
-		// TODO better activation when we have activation framework :)
+		// IMPROVE: better activation when we have activation framework :)
 		if (!eventPublisherRegistered) {
 			HystrixEventPublisher publisher = new HystrixEventPublisher(eventLogger);
 			HystrixAdapter.getEventNotifier().addEventNotifier(publisher);

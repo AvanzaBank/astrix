@@ -106,7 +106,7 @@ public class AsterixServiceActivator {
 	 */
 	public AsterixServiceInvocationResponse invokeService(AsterixServiceInvocationRequest request) {
 		try {
-			int version = Integer.parseInt(request.getHeader("apiVersion")); // TODO: allow version to be null?
+			int version = Integer.parseInt(request.getHeader("apiVersion"));
 			String serviceApi = request.getHeader("serviceApi");
 			PublishedService<?> publishedService = this.serviceByType.get(serviceApi);
 			if (publishedService == null) {
@@ -117,7 +117,7 @@ public class AsterixServiceActivator {
 			Throwable exceptionThrownByService = resolveException(e);
 			AsterixServiceInvocationResponse invocationResponse = new AsterixServiceInvocationResponse();
 			invocationResponse.setExceptionMsg(exceptionThrownByService.getMessage());
-			invocationResponse.setCorrelationId(UUID.randomUUID().toString()); // TODO: use header instead?
+			invocationResponse.setCorrelationId(UUID.randomUUID().toString());
 			invocationResponse.setThrownExceptionType(exceptionThrownByService.getClass().getName());
 			logger.info(String.format("Service invocation ended with exception. request=%s correlationId=%s", request, invocationResponse.getCorrelationId()), exceptionThrownByService);
 			return invocationResponse;

@@ -106,8 +106,6 @@ public class FaultToleranceIntegrationTest {
 			
 			@Override
 			public void describeFailureTo(Description description) {
-				// TODO Auto-generated method stub
-				
 			}
 		};
 	}
