@@ -16,7 +16,11 @@
 package com.avanza.asterix.context;
 
 
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public interface Asterix {
 
 	<T> T getBean(Class<T> beanType);

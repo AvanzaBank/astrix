@@ -18,7 +18,11 @@ package com.avanza.asterix.context;
 import java.util.EnumMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AsterixBeanStates implements AsterixEventListener<AsterixBeanStateChangedEvent> {
 	
 	private final ConcurrentMap<AsterixBeanKey, ListenableEnumReference<AsterixBeanState>> beanStateByBeanKey = new ConcurrentHashMap<>();

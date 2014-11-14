@@ -119,7 +119,7 @@ public class AsterixIntegrationTest {
 		proxy.clear(null);
 		
 		AsterixConfigurer configurer = new AsterixConfigurer();
-		configurer.enableFaultTolerance(false); // TODO: enable fault tolerance
+		configurer.enableFaultTolerance(true);
 		configurer.enableVersioning(true);
 		configurer.set(AsterixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 100);
 		configurer.set(AsterixSettings.ASTERIX_CONFIG_URI, config.getExternalConfigUrl());

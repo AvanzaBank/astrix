@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import org.junit.Test;
 
+import com.avanza.asterix.context.AsterixEventLogger;
 import com.avanza.asterix.context.AsterixEventLoggerPlugin;
 import com.avanza.asterix.ft.metrics.HystrixEventPublisher;
 import com.netflix.hystrix.HystrixCommandKey;
@@ -32,10 +33,10 @@ public class HystrixEventPublisherTest {
 
 	@Test
 	public void test() {
-		FakeEventLogger eventLogger = new FakeEventLogger();
-		HystrixEventPublisher publisher = new HystrixEventPublisher(eventLogger);
+		FakeEventLogger logger = new FakeEventLogger();
+		HystrixEventPublisher publisher = new HystrixEventPublisher(new AsterixEventLogger(logger));
 		publisher.markEvent(HystrixEventType.SUCCESS, HystrixCommandKey.Factory.asKey("space_foo"));
-		assertThat(eventLogger.incrementedEvents, contains("hystrix.space.foo.SUCCESS"));
+		assertThat(logger.incrementedEvents, contains("hystrix.space.foo.SUCCESS"));
 	}
 	
 

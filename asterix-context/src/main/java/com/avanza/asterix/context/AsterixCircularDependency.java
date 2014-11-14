@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 package com.avanza.asterix.context;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AsterixCircularDependency extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;

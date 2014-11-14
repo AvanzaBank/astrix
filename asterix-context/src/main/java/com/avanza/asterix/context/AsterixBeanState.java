@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 package com.avanza.asterix.context;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public enum AsterixBeanState {
 	UNKNOWN, 
 	BOUND,

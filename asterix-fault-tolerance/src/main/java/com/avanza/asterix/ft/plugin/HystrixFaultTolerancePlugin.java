@@ -19,18 +19,18 @@ import java.util.Objects;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.asterix.context.AsterixEventLoggerPlugin;
+import com.avanza.asterix.context.AsterixEventLogger;
 import com.avanza.asterix.context.AsterixFaultTolerancePlugin;
-import com.avanza.asterix.context.AsterixPlugins;
-import com.avanza.asterix.context.AsterixPluginsAware;
+import com.avanza.asterix.context.AsterixInject;
 import com.avanza.asterix.ft.HystrixAdapter;
 import com.avanza.asterix.ft.metrics.HystrixEventPublisher;
 
 
 @MetaInfServices(value = AsterixFaultTolerancePlugin.class)
-public class HystrixFaultTolerancePlugin implements AsterixFaultTolerancePlugin, AsterixPluginsAware {
-	private AsterixPlugins plugins;
+public class HystrixFaultTolerancePlugin implements AsterixFaultTolerancePlugin {
+	
 	private boolean eventPublisherRegistered = false;
+	private AsterixEventLogger eventLogger;
 
 	@Override
 	public <T> T addFaultTolerance(Class<T> api, T provider, String group) {
@@ -44,16 +44,14 @@ public class HystrixFaultTolerancePlugin implements AsterixFaultTolerancePlugin,
 	private synchronized void registerEventLogger() {
 		// TODO better activation when we have activation framework :)
 		if (!eventPublisherRegistered) {
-			AsterixEventLoggerPlugin eventLogger = plugins.getPlugin(AsterixEventLoggerPlugin.class);
 			HystrixEventPublisher publisher = new HystrixEventPublisher(eventLogger);
 			HystrixAdapter.getEventNotifier().addEventNotifier(publisher);
 			eventPublisherRegistered = true;
 		}
 	}
 
-	@Override
-	public void setPlugins(AsterixPlugins plugins) {
-		this.plugins = plugins;
+	@AsterixInject
+	public void setEventLogger(AsterixEventLogger eventLogger) {
+		this.eventLogger = eventLogger;
 	}
-
 }

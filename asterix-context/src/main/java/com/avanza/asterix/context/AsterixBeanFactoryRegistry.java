@@ -20,7 +20,11 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AsterixBeanFactoryRegistry {
 	
 	private final ConcurrentMap<Class<?>, AsterixFactoryBean<?>> factoryByBeanType = new ConcurrentHashMap<>();
