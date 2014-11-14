@@ -76,7 +76,6 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 		interrupt();
 	}
 
-	// TODO: For pu's: only run on one primary instance (typically the one with id "1")
 	@Override
 	public void run() {
 		while (!interrupted()) {
