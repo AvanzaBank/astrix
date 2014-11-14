@@ -33,7 +33,20 @@ public class AsterixSettings implements AsterixExternalConfig {
 	@Deprecated
 	public static final String ASTERIX_CONFIG_URL = ASTERIX_CONFIG_URI;
 	public static final String ASTERIX_SERVICE_REGISTRY_URI = "AsterixServiceRegistry.serviceUri";
+	/**
+	 * All services provided will be registered in the service-registry on a regular interval. This Setting defines
+	 * the interval (in millis) on which provided services will be registered in the service-registry
+	 * 
+	 * Defaults to 30 seconds (30 000 ms)
+	 */
 	public static final String SERVICE_REGISTRY_EXPORT_INTERVAL = "AsterixServiceRegistryExporterWorker.exportIntervalMillis";
+	
+	/**
+	 * When registration in the service registry fails, there is an option to wait a shorter time then the regular time 
+	 * defined by {@link #SERVICE_REGISTRY_EXPORT_INTERVAL} 
+	 * 
+	 * Defaults to 5 seconds (5 000 ms)
+	 */
 	public static final String SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL = "AsterixServiceRegistryExporterWorker.retryIntervallMillis";
 	public static final String SERVICE_REGISTRY_LEASE = "AsterixServiceRegistryExporterWorker.serviceLeaseTimeMillis";
 	public static final String API_DESCRIPTOR_SCANNER_BASE_PACKAGE = "AsterixApiDescriptorScanner.basePackage";

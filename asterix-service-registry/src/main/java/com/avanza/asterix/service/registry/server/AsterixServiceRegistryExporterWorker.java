@@ -52,8 +52,8 @@ public class AsterixServiceRegistryExporterWorker extends Thread {
 	public AsterixServiceRegistryExporterWorker(AsterixServiceRegistryClient serviceRegistry, AsterixContext context) {
 		this.serviceRegistryClient = serviceRegistry;
 		AsterixSettingsReader settings = context.getSettings();
-		this.exportIntervallMillis = settings.getLong(AsterixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 60_000L);
-		this.retryIntervallMillis = settings.getLong(AsterixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 10_000L);
+		this.exportIntervallMillis = settings.getLong(AsterixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 30_000L);
+		this.retryIntervallMillis = settings.getLong(AsterixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 5_000L);
 		this.serviceLeaseTimeMillis = settings.getLong(AsterixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
 	}
 	

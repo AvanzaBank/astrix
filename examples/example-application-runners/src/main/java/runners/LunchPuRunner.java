@@ -15,6 +15,9 @@
  */
 package runners;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import com.avanza.asterix.gs.test.util.PuApp;
 
 public class LunchPuRunner {
@@ -22,6 +25,7 @@ public class LunchPuRunner {
 	public static void main(String[] args) {
 		System.setProperty("com.gs.jini_lus.groups", Config.LOOKUP_GROUP_NAME);
 		PuApp.run("classpath:/META-INF/spring/lunch-pu.xml");
+		Logger.getLogger("com.avanza").setLevel(Level.DEBUG);
 	}
 
 }
