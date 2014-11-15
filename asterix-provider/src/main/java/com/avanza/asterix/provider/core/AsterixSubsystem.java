@@ -24,10 +24,13 @@ import java.lang.annotation.Target;
 
 /**
  * @author Elias Lindholm (elilin)
+ * @deprecated Subsystem is defined by setting AsterixFrameworkBean.setSubsystem (or AsterixConfigurer.setSubsystem)
+ * 
  */
 @Target(value = { ElementType.TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
+@Deprecated
 public @interface AsterixSubsystem {
 
 	String value();
