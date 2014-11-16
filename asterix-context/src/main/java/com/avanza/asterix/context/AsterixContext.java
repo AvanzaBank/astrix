@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.PreDestroy;
@@ -40,9 +39,7 @@ public class AsterixContext implements Asterix {
 	private final AsterixSettingsReader settingsReader;
 	private final AsterixSettingsWriter settingsWriter;
 	private final AsterixBeanStateWorker beanStateWorker;
-	private final String currentSubsystem;
 	private AsterixApiProviderPlugins apiProviderPlugins;
-	private boolean enforeSubsystemBoundaries;
 	private final InstanceCache instanceCache = new InstanceCache(new InstanceCache.ObjectInitializer() {
 		@Override
 		public void init(Object object) {
@@ -51,7 +48,6 @@ public class AsterixContext implements Asterix {
 	});
 	
 	public AsterixContext(AsterixSettings settings) {
-		this.currentSubsystem = settings.get(AsterixSettings.SUBSYSTEM_NAME); // TODO: remove field
 		this.eventBus.addEventListener(AsterixBeanStateChangedEvent.class, beanStates);
 		this.plugins = new AsterixPlugins(new AsterixPluginInitializer() {
 			@Override
@@ -61,7 +57,6 @@ public class AsterixContext implements Asterix {
 		});
 		this.settingsReader = AsterixSettingsReader.create(plugins, settings);
 		this.settingsWriter = AsterixSettingsWriter.create(settings);
-		this.enforeSubsystemBoundaries = this.settingsReader.getBoolean(AsterixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
 		this.beanStateWorker = new AsterixBeanStateWorker(this.settingsReader, eventBus);
 		this.beanStateWorker.start();
 	}
@@ -189,33 +184,9 @@ public class AsterixContext implements Asterix {
 		if (!hasBeanFactoryFor(beanType)) {
 			throw new MissingBeanProviderException(beanType);
 		}
-		AsterixFactoryBean<T> factoryBean = this.beanFactoryRegistry.getFactoryBean(beanType);
-		if (isAllowedToInvokeBean(factoryBean)) {
-			return factoryBean;
-		}
-		throw new IllegalSubsystemException(this.currentSubsystem, factoryBean);
+		return this.beanFactoryRegistry.getFactoryBean(beanType);
 	}
 	
-	private <T> boolean isAllowedToInvokeBean(AsterixFactoryBean<T> factoryBean) {
-		if (factoryBean.isLibrary()) {
-			return true; 
-		}
-		if (factoryBean.isVersioned()) {
-			return true;
-		}
-		if (Objects.equals(this.currentSubsystem, factoryBean.getSubsystem())) {
-			return true;
-		}
-		if (!enforeceSubsystemBoundaries()) {
-			return true;
-		}
-		return false;
-	}
-	
-	private boolean enforeceSubsystemBoundaries() {
-		return this.enforeSubsystemBoundaries;
-	}
-
 	public AsterixPlugins getPlugins() {
 		return this.plugins;
 	}
@@ -324,10 +295,6 @@ public class AsterixContext implements Asterix {
 		this.apiProviderPlugins = apiProviderPlugins;
 	}
 
-	public String getCurrentSubsystem() {
-		return this.currentSubsystem;
-	}
-
 	public <T> T getPlugin(Class<T> pluginType) {
 		return getPlugins().getPlugin(pluginType);
 	}
@@ -347,6 +314,10 @@ public class AsterixContext implements Asterix {
 
 	void set(String settingName, String settingValue) {
 		this.settingsWriter.set(settingName, settingValue);
+	}
+
+	String getCurrentSubsystem() {
+		return this.settingsReader.getString(AsterixSettings.SUBSYSTEM_NAME);
 	}
 	
 }

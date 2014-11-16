@@ -16,7 +16,6 @@
 package com.avanza.asterix.integration.tests.domain.apiruntime.feeder;
 
 import com.avanza.asterix.provider.core.AsterixServiceRegistryApi;
-import com.avanza.asterix.provider.core.AsterixSubsystem;
 
 
 @AsterixServiceRegistryApi(
@@ -24,7 +23,6 @@ import com.avanza.asterix.provider.core.AsterixSubsystem;
 		InternalLunchFeeder.class
 	}
 )
-@AsterixSubsystem("lunch-service")
 public class LunchFeederApiDescriptor {
 }
 

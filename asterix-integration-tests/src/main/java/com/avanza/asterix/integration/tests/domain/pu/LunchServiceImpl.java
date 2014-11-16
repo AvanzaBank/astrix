@@ -17,7 +17,6 @@ package com.avanza.asterix.integration.tests.domain.pu;
 
 import java.util.List;
 
-import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.avanza.asterix.integration.tests.domain.api.GetLunchRestaurantRequest;

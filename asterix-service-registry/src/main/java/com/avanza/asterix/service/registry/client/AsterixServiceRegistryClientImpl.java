@@ -20,7 +20,6 @@ import java.util.Objects;
 import org.openspaces.remoting.Routing;
 
 import com.avanza.asterix.context.AsterixServiceProperties;
-import com.avanza.asterix.context.IllegalSubsystemException;
 import com.avanza.asterix.service.registry.server.AsterixServiceRegistryEntry;
 /**
  * 

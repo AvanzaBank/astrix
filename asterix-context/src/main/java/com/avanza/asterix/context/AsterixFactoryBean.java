@@ -82,10 +82,6 @@ public final class AsterixFactoryBean<T> implements AsterixDecorator {
 		return apiDescriptor.isVersioned();
 	}
 
-	public String getSubsystem() {
-		return apiDescriptor.getSubsystem();
-	}
-	
 	public AsterixApiDescriptor getApiDescriptor() {
 		return apiDescriptor;
 	}

@@ -189,7 +189,7 @@ public class AsterixConfigurer {
 	/**
 	 * Optional property that identifies what subsystem the current context belongs to. Its only
 	 * allowed to invoke non-versioned services within the same subsystem. Attempting
-	 * to create an bean in another subsystem will throw an exception. <p>
+	 * to invoke a non-versioned service in another subsystem will throw an IllegalSubsystemException. <p>
 	 * 
 	 * @param string
 	 */

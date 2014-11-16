@@ -21,6 +21,7 @@ import com.gigaspaces.annotation.pojo.SpaceRouting;
 
 public class GetLunchRestaurantRequest implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private String name;
 
 	@SpaceRouting

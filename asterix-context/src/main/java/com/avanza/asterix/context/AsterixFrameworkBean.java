@@ -99,10 +99,7 @@ public class AsterixFrameworkBean implements BeanDefinitionRegistryPostProcessor
 	private void createServiceFrameworkRuntime(BeanDefinitionRegistry registry) throws ClassNotFoundException {
 		AsterixConfigurer configurer = new AsterixConfigurer();
 		configurer.setSettings(this.settings);
-		if (this.serviceDescriptor != null) {
-			configurer.setSubsystem(this.serviceDescriptor.getSubsystem());
-		} else if (this.subsystem != null) {
-			// TODO: use same mechanism to set subsystem for applications that only consume apis for apps providing services
+		if (this.subsystem != null) {
 			configurer.setSubsystem(this.subsystem);
 		}
 		AsterixContext asterixContext = configurer.configure();

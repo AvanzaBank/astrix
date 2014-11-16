@@ -17,25 +17,9 @@ package com.avanza.asterix.context;
 
 public class IllegalSubsystemException extends RuntimeException {
 
-	private String currentSubsystem;
-	private String beanProviderSubsystem;
+	private static final long serialVersionUID = 1L;
 
-	public IllegalSubsystemException(String currentSubsystem, AsterixFactoryBean<?> factoryBean) {
-		super(String.format("Its not allowed to inoke beanType=%s in subsystem=%s, currentSubsystem=%s", factoryBean.getBeanType().getName(), factoryBean.getSubsystem(), currentSubsystem));
-		this.currentSubsystem = currentSubsystem;
-	}
-	
 	public IllegalSubsystemException(String currentSubsystem, String beanProviderSubsystem, Class<?> beanType) {
 		super(String.format("Its not allowed to inoke beanType=%s in providerSubsystem=%s, currentSubsystem=%s", beanType.getName(), beanProviderSubsystem, currentSubsystem));
-		this.currentSubsystem = currentSubsystem;
-		this.beanProviderSubsystem = beanProviderSubsystem;
-	}
-	
-	public String getCurrentSubsystem() {
-		return currentSubsystem;
-	}
-	
-	public String getBeanProviderSubsystem() {
-		return beanProviderSubsystem;
 	}
 }
