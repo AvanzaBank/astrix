@@ -22,6 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixEventType;
+import com.netflix.hystrix.strategy.HystrixPlugins;
 import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;
 
 /**
@@ -33,6 +34,19 @@ import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;
 public final class DelegatingHystrixEventNotifier extends HystrixEventNotifier {
 
 	Collection<HystrixEventNotifier> notifiers = new CopyOnWriteArrayList<HystrixEventNotifier>();
+	
+	private static DelegatingHystrixEventNotifier registeredInstance;
+	
+	public synchronized static DelegatingHystrixEventNotifier getRegisteredNotifierOrRegisterNew() {
+		if (registeredInstance == null) {
+			registeredInstance = new DelegatingHystrixEventNotifier();
+			HystrixPlugins.getInstance().registerEventNotifier(registeredInstance);
+		}
+		return registeredInstance;
+	}
+	
+	private DelegatingHystrixEventNotifier() {
+	}
 
 	@Override
 	public void markEvent(HystrixEventType eventType, HystrixCommandKey key) {

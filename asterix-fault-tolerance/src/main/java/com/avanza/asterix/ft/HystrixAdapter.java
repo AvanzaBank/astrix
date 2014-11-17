@@ -29,7 +29,6 @@ import com.avanza.asterix.core.ServiceUnavailableException;
 import com.avanza.asterix.ft.metrics.DelegatingHystrixEventNotifier;
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommand.Setter;
-import com.netflix.hystrix.strategy.HystrixPlugins;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
@@ -42,11 +41,11 @@ import com.netflix.hystrix.HystrixThreadPoolProperties;
 public class HystrixAdapter<T> implements InvocationHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(HystrixAdapter.class);
-	private static final DelegatingHystrixEventNotifier delegatingEventNotifier = new DelegatingHystrixEventNotifier();
+	private static DelegatingHystrixEventNotifier delegatingEventNotifier;
 
 	static {
 		try {
-			HystrixPlugins.getInstance().registerEventNotifier(delegatingEventNotifier);
+			delegatingEventNotifier = DelegatingHystrixEventNotifier.getRegisteredNotifierOrRegisterNew();
 		} catch (IllegalStateException e) {
 			log.warn("Failed to register delegating event notifier", e);
 		}
