@@ -54,7 +54,7 @@ public class TestAsterixConfigurer {
 
 	public <T> void registerApi(Class<T> beanType, T provider) {
 		StandaloneFactoryBean<T> factoryPlugin = new StandaloneFactoryBean<>(beanType, provider);
-		AsterixApiDescriptor apiDescriptor = AsterixApiDescriptor.simple(provider.getClass().getName(), "not important - is library");
+		AsterixApiDescriptor apiDescriptor = AsterixApiDescriptor.simple(provider.getClass().getName());
 		AsterixFactoryBean<T> factoryBean = new AsterixFactoryBean<>(factoryPlugin, apiDescriptor, true);
 		standaloneFactories.add(factoryBean);
 	}
@@ -77,6 +77,15 @@ public class TestAsterixConfigurer {
 	
 	public void set(String name, String value) {
 		configurer.set(name, value);
+	}
+	
+	/*
+	 * Sets the current subsystem name and enables enforcing of
+	 * subsystem boundaries
+	 */
+	public void setSubsystem(String subsystem) {
+		this.configurer.setSubsystem(subsystem);
+		this.configurer.set(AsterixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
 	}
 	
 	private static class StandaloneFactoryBean<T> implements AsterixFactoryBeanPlugin<T> {

@@ -228,7 +228,7 @@ public class AsterixIntegrationTest {
 	
 	@Test(expected = IllegalSubsystemException.class)
 	public void itsNotAllowedToCreateServicesBeansThatBindsToServicesInOtherSubSystems() throws Exception {
-		asterix.getBean(InternalLunchFeeder.class);
+		asterix.getBean(InternalLunchFeeder.class).addLunchRestaurant(lunchRestaurant().build());;
 	}
 	
 	private void assertEventually(Probe probe) throws InterruptedException {

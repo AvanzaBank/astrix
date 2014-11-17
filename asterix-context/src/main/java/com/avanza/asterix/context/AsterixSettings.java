@@ -53,6 +53,8 @@ public class AsterixSettings implements AsterixExternalConfig {
 	public static final String SERVICE_REGISTRY_LEASE = "AsterixServiceRegistryExporterWorker.serviceLeaseTimeMillis";
 	public static final String API_DESCRIPTOR_SCANNER_BASE_PACKAGE = "AsterixApiDescriptorScanner.basePackage";
 	
+	public static final String SUBSYSTEM_NAME = "AsterixContext.subsystem";
+	
 	private final Map<String, String> settings = new ConcurrentHashMap<>();
 	private String serviceId;
 	

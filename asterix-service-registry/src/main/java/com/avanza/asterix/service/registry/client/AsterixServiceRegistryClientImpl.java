@@ -15,17 +15,25 @@
  */
 package com.avanza.asterix.service.registry.client;
 
+import java.util.Objects;
+
 import org.openspaces.remoting.Routing;
 
 import com.avanza.asterix.context.AsterixServiceProperties;
 import com.avanza.asterix.service.registry.server.AsterixServiceRegistryEntry;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AsterixServiceRegistryClientImpl implements AsterixServiceRegistryClient {
 	
-	private AsterixServiceRegistry serviceRegistry;
+	private final AsterixServiceRegistry serviceRegistry;
+	private final String subsystem;
 
-	public AsterixServiceRegistryClientImpl(AsterixServiceRegistry serviceRegistry) {
-		this.serviceRegistry = serviceRegistry;
+	public AsterixServiceRegistryClientImpl(AsterixServiceRegistry serviceRegistry, String subsystem) {
+		this.serviceRegistry = Objects.requireNonNull(serviceRegistry);
+		this.subsystem = Objects.requireNonNull(subsystem);
 	}
 
 	@Override
@@ -44,6 +52,7 @@ public class AsterixServiceRegistryClientImpl implements AsterixServiceRegistryC
 
 	@Override
 	public <T> void register(@Routing Class<T> type, AsterixServiceProperties properties, long lease) {
+		properties.setProperty(AsterixServiceProperties.SUBSYSTEM, this.subsystem);
 		AsterixServiceRegistryEntry entry = new AsterixServiceRegistryEntry();
 		entry.setServiceProperties(properties.getProperties());
 		entry.setServiceBeanType(type.getName());

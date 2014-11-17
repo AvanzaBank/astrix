@@ -18,7 +18,6 @@ package com.avanza.asterix.context;
 import java.lang.annotation.Annotation;
 
 import com.avanza.asterix.provider.core.AsterixServiceRegistryApi;
-import com.avanza.asterix.provider.core.AsterixSubsystem;
 import com.avanza.asterix.provider.versioning.AsterixVersioned;
 /**
  * 
@@ -31,8 +30,8 @@ public abstract class AsterixApiDescriptor {
 		return new AnnotationApiDescriptor(descriptorHolder);
 	}
 	
-	public static AsterixApiDescriptor simple(String name, String subsystem) {
-		return new SimpleApiDescriptor(name, subsystem);
+	public static AsterixApiDescriptor simple(String name) {
+		return new SimpleApiDescriptor(name);
 	}
 
 	public abstract boolean isAnnotationPresent(Class<? extends Annotation> annotationClass);
@@ -56,17 +55,13 @@ public abstract class AsterixApiDescriptor {
 	
 	public abstract boolean isVersioned();
 	
-	public abstract String getSubsystem();
-	
 	private static class SimpleApiDescriptor extends AsterixApiDescriptor {
 
 		private String name;
-		private String subsystem;
 		private AsterixFactoryBeanPlugin<?> factory;
 		
-		public SimpleApiDescriptor(String name, String subsystem) {
+		public SimpleApiDescriptor(String name) {
 			this.name = name;
-			this.subsystem = subsystem;
 		}
 
 		@Override
@@ -99,11 +94,6 @@ public abstract class AsterixApiDescriptor {
 			return false;
 		}
 
-		@Override
-		public String getSubsystem() {
-			return subsystem;
-		}
-		
 		public AsterixFactoryBeanPlugin<?> getFactory() {
 			return factory;
 		}
@@ -145,13 +135,6 @@ public abstract class AsterixApiDescriptor {
 			return descriptorHolder.isAnnotationPresent(AsterixVersioned.class);
 		}
 		
-		public String getSubsystem() {
-			if (!descriptorHolder.isAnnotationPresent(AsterixSubsystem.class)) {
-				return null;
-			}
-			AsterixSubsystem subsystem = descriptorHolder.getAnnotation(AsterixSubsystem.class);
-			return subsystem.value();
-		}
 	}
 
 }

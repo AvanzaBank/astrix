@@ -36,11 +36,12 @@ public class AsterixConfigurer {
 	private boolean enableFaultTolerance = false;
 	private boolean enableVersioning = true;
 	private boolean enableMonitoring = true; 
-	private final AsterixSettings settings = new AsterixSettings();
-	private String subsystem = "default";
+	private final AsterixSettings settings = new AsterixSettings() {{
+		set(SUBSYSTEM_NAME, "default");
+	}};
 	
 	public AsterixContext configure() {
-		AsterixContext context = new AsterixContext(settings, subsystem);
+		AsterixContext context = new AsterixContext(settings);
 		for (PluginHolder<?> plugin : plugins) {
 			registerPlugin(context, plugin);
 		}
@@ -188,12 +189,12 @@ public class AsterixConfigurer {
 	/**
 	 * Optional property that identifies what subsystem the current context belongs to. Its only
 	 * allowed to invoke non-versioned services within the same subsystem. Attempting
-	 * to create an bean in another subsystem will throw an exception. <p>
+	 * to invoke a non-versioned service in another subsystem will throw an IllegalSubsystemException. <p>
 	 * 
 	 * @param string
 	 */
 	public void setSubsystem(String subsystem) {
-		this.subsystem = subsystem;
+		this.settings.set(AsterixSettings.SUBSYSTEM_NAME, subsystem);
 	}
 
 	public void addFactoryBean(AsterixFactoryBean<?> factoryBean) {

@@ -29,6 +29,10 @@ public @interface AsterixService {
 	
 	Class<?>[] apiDescriptors();
 	
+	/**
+	 * @@deprecated Subsystem is defined by setting AsterixFrameworkBean.setSubsystem (or AsterixConfigurer.setSubsystem)
+	 */
+	@Deprecated
 	String subsystem() default "-";
 
 	/**

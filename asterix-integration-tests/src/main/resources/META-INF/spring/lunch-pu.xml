@@ -17,6 +17,7 @@
     <!-- Asterix service framework (provider and consumer) -->
 	<bean id="asterixFrameworkBean" class="com.avanza.asterix.context.AsterixFrameworkBean">
 		<property name="serviceDescriptor" value="com.avanza.asterix.integration.tests.domain.apiruntime.LunchServiceDescriptor"/>
+		<property name="subsystem" value="lunch-system"/>
 	</bean>
 	<bean id="asterixSettings" class="com.avanza.asterix.context.AsterixSettings">
 		<property name="externalConfigUrl" value="${configUrl}" />

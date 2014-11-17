@@ -70,8 +70,4 @@ public class AsterixServiceDescriptor {
 		return this.apiDescriptors;
 	}
 
-	public String getSubsystem() {
-		return this.asterixService.subsystem();
-	}
-	
 }

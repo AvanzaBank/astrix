@@ -15,20 +15,30 @@
  */
 package com.avanza.asterix.service.registry.client;
 
+import com.avanza.asterix.context.AsterixSettings;
+import com.avanza.asterix.context.AsterixSettingsAware;
+import com.avanza.asterix.context.AsterixSettingsReader;
 import com.avanza.asterix.provider.library.AsterixExport;
 import com.avanza.asterix.provider.library.AsterixLibraryProvider;
 
 @AsterixLibraryProvider
-public class AsterixServiceRegistryLibrary {
+public class AsterixServiceRegistryLibrary implements AsterixSettingsAware {
 	
+	private AsterixSettingsReader settings;
+
 	@AsterixExport
 	public AsterixServiceRegistryClient createClient(AsterixServiceRegistry serviceRegistry) {
-		return new AsterixServiceRegistryClientImpl(serviceRegistry);
+		return new AsterixServiceRegistryClientImpl(serviceRegistry, settings.getString(AsterixSettings.SUBSYSTEM_NAME));
 	}
 	
 	@AsterixExport
 	public AsterixServiceRegistryAdministrator createAdministrator(AsterixServiceRegistry serviceRegistry) {
 		return new AsterixServiceRegistryAdministratorImpl(serviceRegistry);
+	}
+	
+	@Override
+	public void setSettings(AsterixSettingsReader settings) {
+		this.settings = settings;
 	}
 
 }

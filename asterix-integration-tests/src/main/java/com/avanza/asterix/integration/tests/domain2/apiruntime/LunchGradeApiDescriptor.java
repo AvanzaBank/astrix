@@ -16,7 +16,6 @@
 package com.avanza.asterix.integration.tests.domain2.apiruntime;
 
 import com.avanza.asterix.integration.tests.domain2.api.LunchRestaurantGrader;
-import com.avanza.asterix.provider.component.AsterixServiceComponentNames;
 import com.avanza.asterix.provider.core.AsterixServiceRegistryApi;
 import com.avanza.asterix.provider.versioning.AsterixVersioned;
 

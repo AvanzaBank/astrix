@@ -15,6 +15,9 @@
  */
 package com.avanza.asterix.service.registry.client;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,14 +29,20 @@ import com.avanza.asterix.context.AsterixInject;
 import com.avanza.asterix.context.AsterixServiceComponent;
 import com.avanza.asterix.context.AsterixServiceComponents;
 import com.avanza.asterix.context.AsterixServiceProperties;
+import com.avanza.asterix.context.AsterixSettings;
+import com.avanza.asterix.context.AsterixSettingsAware;
+import com.avanza.asterix.context.AsterixSettingsReader;
+import com.avanza.asterix.context.IllegalSubsystemException;
 
-public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin<T>, AsterixBeanAware {
+public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin<T>, AsterixBeanAware, AsterixSettingsAware {
 
 	private Class<T> api;
 	private AsterixApiDescriptor descriptor;
 	private AsterixBeans beans;
 	private AsterixServiceRegistryLeaseManager leaseManager;
 	private AsterixServiceComponents serviceComponents;
+	private String subsystem;
+	private boolean enforceSubsystemBoundaries;
 
 	public ServiceRegistryLookupFactory(AsterixApiDescriptor descriptor,
 										Class<T> api) {
@@ -44,11 +53,30 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 	@Override
 	public T create(String qualifier) {
 		AsterixServiceRegistryClient serviceRegistry = beans.getBean(AsterixServiceRegistryClient.class);
-		AsterixServiceProperties serviceProperties = serviceRegistry.lookup(api, qualifier);
+		AsterixServiceProperties serviceProperties;
+		serviceProperties = serviceRegistry.lookup(api, qualifier);
+		String providerSubsystem = serviceProperties.getProperty(AsterixServiceProperties.SUBSYSTEM);
+		if (!isAllowedToInvokeService(providerSubsystem)) {
+			return createIllegalSubsystemProxy(providerSubsystem);
+		}
 		T service = create(qualifier, serviceProperties);
 		return leaseManager.startManageLease(service, serviceProperties, qualifier, this);
 	}
+
+	private boolean isAllowedToInvokeService(String providerSubsystem) {
+		if (descriptor.isVersioned()) {
+			return true;
+		}
+		if (!enforceSubsystemBoundaries) {
+			return true;
+		}
+		return providerSubsystem.equals(this.subsystem);
+	}
 	
+	private T createIllegalSubsystemProxy(String providerSubsystem) {
+		return api.cast(Proxy.newProxyInstance(api.getClassLoader(), new Class[]{api}, new IllegalSubsystemProxy(subsystem, providerSubsystem, api)));
+	}
+
 	public T create(String qualifier, AsterixServiceProperties serviceProperties) {
 		if (serviceProperties == null) {
 			throw new RuntimeException(String.format("Misssing entry in service-registry api=%s qualifier=%s: ", api.getName(), qualifier));
@@ -89,5 +117,31 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 	public void setServiceComponents(AsterixServiceRegistryLeaseManager leaseManager) {
 		this.leaseManager = leaseManager;
 	}
+	
+	private class IllegalSubsystemProxy<T> implements InvocationHandler {
+		
+		private String currentSubsystem;
+		private String providerSubsystem;
+		private Class<T> beanType;
+		
+
+		public IllegalSubsystemProxy(String currentSubsystem, String providerSubsystem, Class<T> beanType) {
+			this.currentSubsystem = currentSubsystem;
+			this.providerSubsystem = providerSubsystem;
+			this.beanType = beanType;
+		}
+
+		@Override
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			throw new IllegalSubsystemException(currentSubsystem, providerSubsystem, beanType);
+		}
+	}
+
+	@Override
+	public void setSettings(AsterixSettingsReader settings) {
+		this.subsystem = settings.getString(AsterixSettings.SUBSYSTEM_NAME);
+		this.enforceSubsystemBoundaries = settings.getBoolean(AsterixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
+	}
+	
 
 }
