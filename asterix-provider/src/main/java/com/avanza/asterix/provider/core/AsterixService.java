@@ -28,12 +28,6 @@ import java.lang.annotation.Target;
 public @interface AsterixService {
 	
 	Class<?>[] apiDescriptors();
-	
-	/**
-	 * @@deprecated Subsystem is defined by setting AsterixFrameworkBean.setSubsystem (or AsterixConfigurer.setSubsystem)
-	 */
-	@Deprecated
-	String subsystem() default "-";
 
 	/**
 	 * Default component used when exporting services.
