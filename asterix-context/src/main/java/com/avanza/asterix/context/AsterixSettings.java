@@ -55,8 +55,12 @@ public class AsterixSettings implements AsterixExternalConfig {
 	
 	public static final String SUBSYSTEM_NAME = "AsterixContext.subsystem";
 	
+	public static final String ENABLE_FAULT_TOLERANCE = "AsterixContext.enableFaultTolerance";
+	public static final String ENABLE_VERSIONING = "AsterixContext.enableVersioning";
+	public static final String ENABLE_MONITORING = "AsterixContext.enableMonitoring";
+	
 	private final Map<String, String> settings = new ConcurrentHashMap<>();
-	private String serviceId;
+	private final String serviceId;
 	
 	public AsterixSettings() {
 		this.serviceId = AsterixDirectComponent.register(AsterixExternalConfig.class, this);

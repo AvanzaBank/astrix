@@ -33,9 +33,6 @@ public class AsterixConfigurer {
 	private AsterixApiDescriptors asterixApiDescriptors;
 	private final Collection<AsterixFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	private final List<PluginHolder<?>> plugins = new ArrayList<>();
-	private boolean enableFaultTolerance = false;
-	private boolean enableVersioning = true;
-	private boolean enableMonitoring = true; 
 	private final AsterixSettings settings = new AsterixSettings() {{
 		set(SUBSYSTEM_NAME, "default");
 	}};
@@ -90,15 +87,15 @@ public class AsterixConfigurer {
 	}
 	
 	public void enableFaultTolerance(boolean enableFaultTolerance) {
-		this.enableFaultTolerance  = enableFaultTolerance;
+		this.settings.set(AsterixSettings.ENABLE_FAULT_TOLERANCE, enableFaultTolerance);
 	}
 	
 	public void enableVersioning(boolean enableVersioning) {
-		this.enableVersioning = enableVersioning;
+		this.settings.set(AsterixSettings.ENABLE_VERSIONING, enableVersioning);
 	}
 	
 	public void enableMonitoring(boolean enableMonitoring) {
-		this.enableMonitoring = enableMonitoring;
+		this.settings.set(AsterixSettings.ENABLE_MONITORING, enableMonitoring);
 	}
 
 	private void discoverApiProviderPlugins(AsterixContext context) {
@@ -117,7 +114,7 @@ public class AsterixConfigurer {
 	}
 
 	private void configureVersioning(AsterixContext context) {
-		if (enableVersioning) {
+		if (context.getSettings().getBoolean(AsterixSettings.ENABLE_VERSIONING, true)) {
 			discoverOnePlugin(context, AsterixVersioningPlugin.class);
 		} else {
 			context.registerPlugin(AsterixVersioningPlugin.class, AsterixVersioningPlugin.Default.create());
@@ -125,14 +122,14 @@ public class AsterixConfigurer {
 	}
 	
 	private void configureMonitoring(AsterixContext context) {
-		if (enableMonitoring) {
+		if (context.getSettings().getBoolean(AsterixSettings.ENABLE_MONITORING, true)) {
 			MetricsPoller metricsPoller = context.getInstance(MetricsPoller.class);
 			metricsPoller.start();
 		}
 	}
 
 	private void configureFaultTolerance(AsterixContext context) {
-		if (enableFaultTolerance) {
+		if (context.getSettings().getBoolean(AsterixSettings.ENABLE_FAULT_TOLERANCE, false)) {
 			discoverOnePlugin(context, AsterixFaultTolerancePlugin.class);
 		} else {
 			context.registerPlugin(AsterixFaultTolerancePlugin.class, AsterixFaultTolerancePlugin.Default.create());
