@@ -138,9 +138,7 @@ public class AsterixServiceRegistryLeaseManagerTest {
 	}
 	
 	@AsterixServiceRegistryApi(
-		exportedApis = {
-			TestService.class
-		}
+		TestService.class
 	)
 	public static class TestDescriptor {
 	}

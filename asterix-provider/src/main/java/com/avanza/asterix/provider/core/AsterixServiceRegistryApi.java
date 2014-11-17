@@ -34,6 +34,18 @@ import java.lang.annotation.Target;
 @Documented
 public @interface AsterixServiceRegistryApi {
 
-	Class<?>[] exportedApis();
+	/**
+	 * Replaced by value
+	 * @return
+	 */
+	@Deprecated
+	Class<?>[] exportedApis() default {};
+
+	/**
+	 * All exported apis.
+	 * 
+	 * @return
+	 */
+	Class<?>[] value() default {};
 	
 }

@@ -33,7 +33,7 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 	@Override
 	public List<AsterixFactoryBeanPlugin<?>> createFactoryBeans(AsterixApiDescriptor descriptor) {
 		List<AsterixFactoryBeanPlugin<?>> result = new ArrayList<>();
-		for (Class<?> exportedApi : descriptor.getAnnotation(AsterixServiceRegistryApi.class).exportedApis()) {
+		for (Class<?> exportedApi : getExportedApis(descriptor)) {
 			result.add(new ServiceRegistryLookupFactory<>(descriptor, exportedApi));
 			Class<?> asyncInterface = loadInterfaceIfExists(exportedApi.getName() + "Async");
 			if (asyncInterface != null) {
@@ -45,10 +45,24 @@ public class AsterixServiceRegistryProviderPlugin implements AsterixApiProviderP
 	
 	@Override
 	public List<Class<?>> getProvidedBeans(AsterixApiDescriptor descriptor) {
-		AsterixServiceRegistryApi remoteApiDescriptor = descriptor.getAnnotation(AsterixServiceRegistryApi.class);
 		List<Class<?>> result = new ArrayList<>();
-		result.addAll(Arrays.asList(remoteApiDescriptor.exportedApis()));
+		result.addAll(Arrays.asList(getExportedApis(descriptor)));
 		return result;
+	}
+
+	private Class<?>[] getExportedApis(AsterixApiDescriptor descriptor) {
+		Class<?> [] exportedApisDeprecatedWay = descriptor.getAnnotation(AsterixServiceRegistryApi.class).exportedApis();
+		Class<?> [] exportedApisNewWay = descriptor.getAnnotation(AsterixServiceRegistryApi.class).value();
+		if (exportedApisDeprecatedWay.length > 0 && exportedApisNewWay.length > 0) {
+			throw new IllegalArgumentException("Don't combine exportedApis and value. The exportedApis property is replcaed by the value property. Only defina a value property. Descriptor: " + descriptor.getName());
+		}
+		if (exportedApisDeprecatedWay.length > 0) {
+			return exportedApisDeprecatedWay;
+		}
+		if (exportedApisNewWay.length > 0) {
+			return exportedApisNewWay;
+		}
+		throw new IllegalArgumentException("No exported apis found on AsterixServiceRegistryApi: " + descriptor.getName());	
 	}
 	
 	private Class<?> loadInterfaceIfExists(String interfaceName) {

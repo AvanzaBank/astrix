@@ -141,9 +141,7 @@ public class AsterixServiceRegistryClientTest {
 	}
 	
 	@AsterixServiceRegistryApi(
-		exportedApis = { 
-			GreetingService.class
-		}
+		GreetingService.class
 	)
 	public static class GreetingApiDescriptor {
 		

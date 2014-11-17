@@ -95,7 +95,7 @@ public class AsterixSubsystemTest {
 		greetingServiceA.hello("bar");
 	}
 	
-	@AsterixServiceRegistryApi(exportedApis = GreetingService.class)
+	@AsterixServiceRegistryApi(GreetingService.class)
 	public static class GreetingApiDescriptor {
 	}
 	
@@ -104,7 +104,7 @@ public class AsterixSubsystemTest {
 			objectMapperConfigurer = DummyConfigurer.class,
 			version = 1
 	)
-	@AsterixServiceRegistryApi(exportedApis = GreetingService.class)
+	@AsterixServiceRegistryApi(GreetingService.class)
 	public static class VersionedGreetingApiDescriptor {
 	}
 	

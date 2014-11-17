@@ -30,9 +30,7 @@ import com.avanza.asterix.provider.versioning.AsterixVersioned;
 )
 // The service is exported to the service-registry. Consumers queries the service-registry to bind to servers.
 @AsterixServiceRegistryApi(
-	exportedApis = {
-		LunchService.class
-	}
+	LunchService.class
 )
 public class LunchApiDescriptor {
 }

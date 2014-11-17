@@ -19,9 +19,7 @@ import com.avanza.asterix.provider.core.AsterixServiceRegistryApi;
 
 
 @AsterixServiceRegistryApi(
-	exportedApis = {
-		InternalLunchFeeder.class
-	}
+	InternalLunchFeeder.class
 )
 public class LunchFeederApiDescriptor {
 }

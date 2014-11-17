@@ -20,9 +20,7 @@ import org.openspaces.core.GigaSpace;
 import com.avanza.asterix.provider.core.AsterixServiceRegistryApi;
 
 @AsterixServiceRegistryApi(
-	exportedApis = {
-		GigaSpace.class
-	}
+	GigaSpace.class
 )
 public class GsDescriptor {
 	
