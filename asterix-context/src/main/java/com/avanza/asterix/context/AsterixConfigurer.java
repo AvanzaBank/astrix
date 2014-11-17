@@ -33,7 +33,7 @@ public class AsterixConfigurer {
 	private AsterixApiDescriptors asterixApiDescriptors;
 	private final Collection<AsterixFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	private final List<PluginHolder<?>> plugins = new ArrayList<>();
-	private boolean enableFaultTolerance = true;
+	private boolean enableFaultTolerance = false;
 	private boolean enableVersioning = true;
 	private boolean enableMonitoring = true; 
 	private final AsterixSettings settings = new AsterixSettings() {{
