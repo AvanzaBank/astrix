@@ -76,25 +76,19 @@ public class AsterixSettingsReader {
 	}
 
 	public long getLong(String settingsName, long deafualtValue) {
-		Object value = get(settingsName);
+		String value = get(settingsName);
 		if (value == null) {
 			return deafualtValue;
 		}
-		if (value instanceof String) {
-			return Long.parseLong((String)value);
-		}
-		return Long.class.cast(value).longValue();
+		return Long.parseLong(value);
 	}
 
 	public boolean getBoolean(String settingsName, boolean deafualtValue) {
-		Object value = get(settingsName);
+		String value = get(settingsName);
 		if (value == null) {
 			return deafualtValue;
 		}
-		if (value instanceof String) {
-			return Boolean.parseBoolean((String)value);
-		}
-		return Boolean.class.cast(value);
+		return Boolean.parseBoolean(value);
 	}
 	
 	public String getString(String name) {
@@ -102,14 +96,14 @@ public class AsterixSettingsReader {
 	}
 	
 	public String getString(String name, String defaultValue) {
-		Object result = get(name);
+		String result = get(name);
 		if (result == null) {
 			return defaultValue;
 		}
-		return result.toString();
+		return result;
 	}
 
-	private Object get(String settingName) {
+	private String get(String settingName) {
 		String setting = externalConfig.lookup(settingName);
 		if (setting != null) {
 			log.trace("Resolved setting using external config: name={} value={}", settingName, setting);
