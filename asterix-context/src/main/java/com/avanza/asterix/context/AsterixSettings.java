@@ -30,8 +30,6 @@ public class AsterixSettings implements AsterixExternalConfig {
 	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AsterixServiceRegistryLeaseManager.leaseRenewInterval";
 	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AsterixContext.enforceSubsystemBoundaries";
 	public static final String ASTERIX_CONFIG_URI = "AsterixConfig.uri";
-	@Deprecated
-	public static final String ASTERIX_CONFIG_URL = ASTERIX_CONFIG_URI;
 	public static final String ASTERIX_SERVICE_REGISTRY_URI = "AsterixServiceRegistry.serviceUri";
 	
 	/**
