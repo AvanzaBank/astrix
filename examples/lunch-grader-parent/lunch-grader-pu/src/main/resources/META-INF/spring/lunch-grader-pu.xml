@@ -21,6 +21,7 @@
 			</list>
 		</property>
 		<property name="serviceDescriptor" value="lunch.grader.pu.LunchGradeServiceDescriptor" />
+		<property name="subsystem" value="lunch-service"/>
 	</bean>
 	
 	<bean id="asterixSettings" class="com.avanza.asterix.context.AsterixSettings" factory-method="from">

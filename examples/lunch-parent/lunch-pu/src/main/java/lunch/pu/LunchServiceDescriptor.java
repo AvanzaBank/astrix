@@ -27,7 +27,6 @@ import com.avanza.asterix.provider.core.AsterixService;
 		LunchApiDescriptor.class,
 		LunchFeederApiDescriptor.class
 	},
-	subsystem = "lunch-service",
 	component = AsterixServiceComponentNames.GS_REMOTING
 )
 public class LunchServiceDescriptor {
