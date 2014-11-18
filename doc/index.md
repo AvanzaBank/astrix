@@ -1,2 +1,2 @@
-# Asterix Documentation
+# Astrix Documentation
 [Test](testing.md)

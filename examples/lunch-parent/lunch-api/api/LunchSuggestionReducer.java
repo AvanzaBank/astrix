@@ -17,14 +17,14 @@ package lunch.api;
 
 import java.util.List;
 
-import com.avanza.asterix.core.AsterixRemoteResult;
-import com.avanza.asterix.core.AsterixRemoteResultReducer;
+import com.avanza.astrix.core.AstrixRemoteResult;
+import com.avanza.astrix.core.AstrixRemoteResultReducer;
 
-public class LunchSuggestionReducer implements AsterixRemoteResultReducer<LunchRestaurant, LunchRestaurant> {
+public class LunchSuggestionReducer implements AstrixRemoteResultReducer<LunchRestaurant, LunchRestaurant> {
 
 	@Override
-	public LunchRestaurant reduce(List<AsterixRemoteResult<LunchRestaurant>> result) {
-		for (AsterixRemoteResult<LunchRestaurant> l : result) {
+	public LunchRestaurant reduce(List<AstrixRemoteResult<LunchRestaurant>> result) {
+		for (AstrixRemoteResult<LunchRestaurant> l : result) {
 			if (l.getResult() != null) {
 				return l.getResult();
 			}

@@ -19,13 +19,13 @@ import java.util.List;
 
 import org.openspaces.remoting.Routing;
 
-import com.avanza.asterix.core.AsterixBroadcast;
+import com.avanza.astrix.core.AstrixBroadcast;
 
 
 
 public interface LunchService {
 	
-	@AsterixBroadcast
+	@AstrixBroadcast
 	List<LunchRestaurant> getAllLunchRestaurants();
 	
 	void addLunchRestaurant(LunchRestaurant restaurant);

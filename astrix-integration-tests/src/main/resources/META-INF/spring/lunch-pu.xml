@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:os-core="http://www.openspaces.org/schema/core"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.openspaces.org/schema/core http://www.openspaces.org/schema/core/openspaces-core.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:property-placeholder/>
+    <context:annotation-config/>
+    <os-core:space id="space" url="/./lunch-space" mirror="false"/>
+    <os-core:giga-space id="gigaSpace" space="space"/>
+    
+    <!-- Astrix service framework (provider and consumer) -->
+	<bean id="AstrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
+		<property name="serviceDescriptor" value="com.avanza.astrix.integration.tests.domain.apiruntime.LunchServiceDescriptor"/>
+		<property name="subsystem" value="lunch-system"/>
+	</bean>
+	<bean id="AstrixSettings" class="com.avanza.astrix.context.AstrixSettings">
+		<property name="externalConfigUrl" value="${configUrl}" />
+	</bean>
+	
+	<!-- The actual service implementation(s) -->
+    <bean id="lunchService" class="com.avanza.astrix.integration.tests.domain.pu.LunchServiceImpl"/>
+	<bean id="lunchRestaurantRepoFactory" class="com.avanza.astrix.integration.tests.domain.pu.LunchRestaurantRepoFactory"/>
+	<bean id="lunchRestaurantRepo" factory-bean="lunchRestaurantRepoFactory" factory-method="create"/>
+	    
+</beans>

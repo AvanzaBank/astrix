@@ -1,22 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.avanza.asterix</groupId>
-	<artifactId>asterix-examples-parent</artifactId>
+	<groupId>com.avanza.astrix</groupId>
+	<artifactId>astrix-examples-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>lunch-parent</module>
 		<module>lunch-grader-parent</module>
-		<module>lunch-asterix-extensions</module>
+		<module>lunch-astrix-extensions</module>
 		<module>example-application-runners</module>
-		<module>asterix-dashboard-runner</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.7</java.version>
-		<asterix.version>0.7.0-SNAPSHOT</asterix.version>
-		<asterix.groupId>com.avanza.asterix</asterix.groupId>
+		<astrix.version>0.7.0-SNAPSHOT</astrix.version>
+		<astrix.groupId>com.avanza.astrix</astrix.groupId>
 		<log4j.version>1.2.16</log4j.version>
 		<spring.version>3.2.4.RELEASE</spring.version>
 		<spring.groupId>org.springframework</spring.groupId>
@@ -33,54 +32,54 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>${asterix.groupId}</groupId>
-				<artifactId>asterix-context</artifactId>
-				<version>${asterix.version}</version>
+				<groupId>${astrix.groupId}</groupId>
+				<artifactId>astrix-context</artifactId>
+				<version>${astrix.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>${asterix.groupId}</groupId>
-				<artifactId>asterix-core</artifactId>
-				<version>${asterix.version}</version>
+				<groupId>${astrix.groupId}</groupId>
+				<artifactId>astrix-core</artifactId>
+				<version>${astrix.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>${asterix.groupId}</groupId>
-				<artifactId>asterix-fault-tolerance</artifactId>
-				<version>${asterix.version}</version>
+				<groupId>${astrix.groupId}</groupId>
+				<artifactId>astrix-fault-tolerance</artifactId>
+				<version>${astrix.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>${asterix.groupId}</groupId>
-				<artifactId>asterix-gs</artifactId>
-				<version>${asterix.version}</version>
+				<groupId>${astrix.groupId}</groupId>
+				<artifactId>astrix-gs</artifactId>
+				<version>${astrix.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>${asterix.groupId}</groupId>
-				<artifactId>asterix-provider</artifactId>
-				<version>${asterix.version}</version>
+				<groupId>${astrix.groupId}</groupId>
+				<artifactId>astrix-provider</artifactId>
+				<version>${astrix.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>${asterix.groupId}</groupId>
-				<artifactId>asterix-service-registry</artifactId>
-				<version>${asterix.version}</version>
+				<groupId>${astrix.groupId}</groupId>
+				<artifactId>astrix-service-registry</artifactId>
+				<version>${astrix.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>${asterix.groupId}</groupId>
-				<artifactId>asterix-versioning</artifactId>
-				<version>${asterix.version}</version>
+				<groupId>${astrix.groupId}</groupId>
+				<artifactId>astrix-versioning</artifactId>
+				<version>${astrix.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>${asterix.groupId}</groupId>
-				<artifactId>asterix-gs-test-util</artifactId>
-				<version>${asterix.version}</version>
+				<groupId>${astrix.groupId}</groupId>
+				<artifactId>astrix-gs-test-util</artifactId>
+				<version>${astrix.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>${asterix.groupId}</groupId>
-				<artifactId>asterix-service-registry-pu</artifactId>
-				<version>${asterix.version}</version>
+				<groupId>${astrix.groupId}</groupId>
+				<artifactId>astrix-service-registry-pu</artifactId>
+				<version>${astrix.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>${asterix.groupId}</groupId>
-				<artifactId>asterix-dashboard</artifactId>
-				<version>${asterix.version}</version>
+				<groupId>${astrix.groupId}</groupId>
+				<artifactId>astrix-dashboard</artifactId>
+				<version>${astrix.version}</version>
 			</dependency>
 			
 			<!-- GigaSpaces -->

@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.avanza.asterix</groupId>
+		<groupId>com.avanza.astrix</groupId>
 		<artifactId>lunch-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
@@ -20,33 +20,33 @@
 		</dependency>
 	
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
-			<artifactId>asterix-context</artifactId>
+			<groupId>${astrix.groupId}</groupId>
+			<artifactId>astrix-context</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
-			<artifactId>asterix-versioning</artifactId>
+			<groupId>${astrix.groupId}</groupId>
+			<artifactId>astrix-versioning</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
-			<artifactId>asterix-fault-tolerance</artifactId>
+			<groupId>${astrix.groupId}</groupId>
+			<artifactId>astrix-fault-tolerance</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
-			<artifactId>asterix-gs</artifactId>
+			<groupId>${astrix.groupId}</groupId>
+			<artifactId>astrix-gs</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
-			<artifactId>asterix-service-registry</artifactId>
+			<groupId>${astrix.groupId}</groupId>
+			<artifactId>astrix-service-registry</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>lunch-asterix-extensions</artifactId>
+			<artifactId>lunch-astrix-extensions</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
-			<artifactId>asterix-gs-test-util</artifactId>
+			<groupId>${astrix.groupId}</groupId>
+			<artifactId>astrix-gs-test-util</artifactId>
 			<scope>test</scope>
 		</dependency>
 		

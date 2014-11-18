@@ -18,16 +18,16 @@ package lunch.pu;
 import lunch.api.provider.LunchApiDescriptor;
 import lunch.api.provider.feeder.LunchFeederApiDescriptor;
 
-import com.avanza.asterix.provider.component.AsterixServiceComponentNames;
-import com.avanza.asterix.provider.core.AsterixService;
+import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.provider.core.AstrixService;
 
 
-@AsterixService(
+@AstrixService(
 	apiDescriptors = {
 		LunchApiDescriptor.class,
 		LunchFeederApiDescriptor.class
 	},
-	component = AsterixServiceComponentNames.GS_REMOTING
+	component = AstrixServiceComponentNames.GS_REMOTING
 )
 public class LunchServiceDescriptor {
 }

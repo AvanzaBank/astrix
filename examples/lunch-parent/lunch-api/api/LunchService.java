@@ -15,13 +15,13 @@
  */
 package lunch.api;
 
-import com.avanza.asterix.core.AsterixBroadcast;
+import com.avanza.astrix.core.AstrixBroadcast;
 
 
 
 public interface LunchService {
 	
-	@AsterixBroadcast(reducer = LunchSuggestionReducer.class)
+	@AstrixBroadcast(reducer = LunchSuggestionReducer.class)
 	LunchRestaurant suggestRandomLunchRestaurant(String foodType);
 	
 	void addLunchRestaurant(LunchRestaurant restaurant);

@@ -25,12 +25,12 @@ import lunch.api.provider.feeder.InternalLunchFeeder;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.avanza.asterix.provider.component.AsterixServiceComponentNames;
-import com.avanza.asterix.provider.core.AsterixServiceComponentName;
-import com.avanza.asterix.provider.core.AsterixServiceExport;
+import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.provider.core.AstrixServiceComponentName;
+import com.avanza.astrix.provider.core.AstrixServiceExport;
 
-@AsterixServiceComponentName(AsterixServiceComponentNames.GS_REMOTING)
-@AsterixServiceExport({LunchService.class, InternalLunchFeeder.class})
+@AstrixServiceComponentName(AstrixServiceComponentNames.GS_REMOTING)
+@AstrixServiceExport({LunchService.class, InternalLunchFeeder.class})
 public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 
 	private final GigaSpace gigaSpace;

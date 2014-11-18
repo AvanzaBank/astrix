@@ -15,10 +15,10 @@
  */
 package lunch.grader.api.provider;
 
-import com.avanza.asterix.provider.versioning.AsterixObjectMapperConfigurer;
-import com.avanza.asterix.provider.versioning.JacksonObjectMapperBuilder;
+import com.avanza.astrix.provider.versioning.AstrixObjectMapperConfigurer;
+import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
 
-public class LunchGradeApiObjectMapperConfigurer implements AsterixObjectMapperConfigurer {
+public class LunchGradeApiObjectMapperConfigurer implements AstrixObjectMapperConfigurer {
 
 	@Override
 	public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {

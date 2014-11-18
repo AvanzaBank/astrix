@@ -21,9 +21,9 @@ import lunch.grader.api.provider.PublicLunchFeeder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.avanza.asterix.provider.core.AsterixServiceExport;
+import com.avanza.astrix.provider.core.AstrixServiceExport;
 
-@AsterixServiceExport(PublicLunchFeeder.class)
+@AstrixServiceExport(PublicLunchFeeder.class)
 public class PublicLunchFeederImpl implements PublicLunchFeeder {
 
 	// Since this is part of the same subsystem, this app is allowed to invoke it
