@@ -17,8 +17,8 @@ package lunch.grader.api.provider;
 
 import lunch.grader.api.LunchRestaurantGrader;
 
-import com.avanza.asterix.provider.core.AsterixServiceRegistryApi;
-import com.avanza.asterix.provider.versioning.AsterixVersioned;
+import com.avanza.astrix.provider.core.AsterixServiceRegistryApi;
+import com.avanza.astrix.provider.versioning.AsterixVersioned;
 
 @AsterixVersioned(
 	apiMigrations = {},

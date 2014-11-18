@@ -13,18 +13,18 @@
 		mirror="false" />
 	<os-core:giga-space id="gigaSpace" space="space" />
 
-	<bean id="asterixFrameworkBean" class="com.avanza.asterix.context.AsterixFrameworkBean">
+	<bean id="astrixFrameworkBean" class="com.avanza.astrix.context.AsterixFrameworkBean">
 		<property name="consumedAsterixBeans">
 			<list>
-				<value>com.avanza.asterix.integration.tests.domain.api.LunchService</value>
-				<value>com.avanza.asterix.integration.tests.domain.apiruntime.feeder.InternalLunchFeeder</value>
+				<value>com.avanza.astrix.integration.tests.domain.api.LunchService</value>
+				<value>com.avanza.astrix.integration.tests.domain.apiruntime.feeder.InternalLunchFeeder</value>
 			</list>
 		</property>
-		<property name="serviceDescriptor" value="com.avanza.asterix.integration.tests.domain2.pu.LunchGradeServiceDescriptor" />
+		<property name="serviceDescriptor" value="com.avanza.astrix.integration.tests.domain2.pu.LunchGradeServiceDescriptor" />
 		<property name="subsystem" value="lunch-system"/>
 	</bean>
 	
-	<bean id="asterixSettings" class="com.avanza.asterix.context.AsterixSettings" factory-method="from">
+	<bean id="astrixSettings" class="com.avanza.astrix.context.AsterixSettings" factory-method="from">
 		<property name="externalConfigUrl" value="${configUrl}"/>
 		<constructor-arg>
 			<util:map>
@@ -33,8 +33,8 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="lunchRestaurantGrader" class="com.avanza.asterix.integration.tests.domain2.pu.LunchRestaurantGraderImpl" />
-	<bean id="lunchFeeder" class="com.avanza.asterix.integration.tests.domain2.pu.PublicLunchFeederImpl"/>
+	<bean id="lunchRestaurantGrader" class="com.avanza.astrix.integration.tests.domain2.pu.LunchRestaurantGraderImpl" />
+	<bean id="lunchFeeder" class="com.avanza.astrix.integration.tests.domain2.pu.PublicLunchFeederImpl"/>
 
 
 </beans>

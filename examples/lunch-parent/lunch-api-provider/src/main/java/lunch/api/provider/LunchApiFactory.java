@@ -18,8 +18,8 @@ package lunch.api.provider;
 import lunch.api.LunchService;
 import lunch.api.LunchUtil;
 
-import com.avanza.asterix.provider.library.AsterixExport;
-import com.avanza.asterix.provider.library.AsterixLibraryProvider;
+import com.avanza.astrix.provider.library.AsterixExport;
+import com.avanza.astrix.provider.library.AsterixLibraryProvider;
 
 @AsterixLibraryProvider
 public class LunchApiFactory {

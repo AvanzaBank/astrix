@@ -25,9 +25,9 @@ import lunch.api.provider.feeder.InternalLunchFeeder;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.avanza.asterix.provider.component.AsterixServiceComponentNames;
-import com.avanza.asterix.provider.core.AsterixServiceComponentName;
-import com.avanza.asterix.provider.core.AsterixServiceExport;
+import com.avanza.astrix.provider.component.AsterixServiceComponentNames;
+import com.avanza.astrix.provider.core.AsterixServiceComponentName;
+import com.avanza.astrix.provider.core.AsterixServiceExport;
 
 @AsterixServiceComponentName(AsterixServiceComponentNames.GS_REMOTING)
 @AsterixServiceExport({LunchService.class, InternalLunchFeeder.class})

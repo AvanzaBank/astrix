@@ -17,7 +17,7 @@ package lunch.grader.api;
 
 import org.openspaces.remoting.Routing;
 
-import com.avanza.asterix.core.AsterixBroadcast;
+import com.avanza.astrix.core.AsterixBroadcast;
 
 public interface LunchRestaurantGrader {
 	

@@ -15,11 +15,11 @@
     <os-core:giga-space id="gigaSpace" space="space"/>
     
     <!-- Asterix service framework (provider and consumer) -->
-	<bean id="asterixFrameworkBean" class="com.avanza.asterix.context.AsterixFrameworkBean">
+	<bean id="asterixFrameworkBean" class="com.avanza.astrix.context.AsterixFrameworkBean">
 		<property name="serviceDescriptor" value="lunch.pu.LunchServiceDescriptor"/>
 		<property name="subsystem" value="lunch-service"/>
 	</bean>
-	<bean id="asterixSettings" class="com.avanza.asterix.context.AsterixSettings">
+	<bean id="asterixSettings" class="com.avanza.astrix.context.AsterixSettings">
 		<property name="serviceRegistryUri" value="gs-remoting:jini://*/*/service-registry-space?groups=elilin"/>
 	</bean>	
 	    

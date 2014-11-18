@@ -15,7 +15,7 @@
  */
 package lunch.pu;
 
-import com.avanza.asterix.gs.test.util.PuApp;
+import com.avanza.astrix.gs.test.util.PuApp;
 
 public class LunchPuRunner {
 	

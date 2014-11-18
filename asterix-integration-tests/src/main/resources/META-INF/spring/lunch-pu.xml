@@ -14,18 +14,18 @@
     <os-core:space id="space" url="/./lunch-space" mirror="false"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
     
-    <!-- Asterix service framework (provider and consumer) -->
-	<bean id="asterixFrameworkBean" class="com.avanza.asterix.context.AsterixFrameworkBean">
-		<property name="serviceDescriptor" value="com.avanza.asterix.integration.tests.domain.apiruntime.LunchServiceDescriptor"/>
+    <!-- Astrix service framework (provider and consumer) -->
+	<bean id="asterixFrameworkBean" class="com.avanza.astrix.context.AsterixFrameworkBean">
+		<property name="serviceDescriptor" value="com.avanza.astrix.integration.tests.domain.apiruntime.LunchServiceDescriptor"/>
 		<property name="subsystem" value="lunch-system"/>
 	</bean>
-	<bean id="asterixSettings" class="com.avanza.asterix.context.AsterixSettings">
+	<bean id="asterixSettings" class="com.avanza.astrix.context.AsterixSettings">
 		<property name="externalConfigUrl" value="${configUrl}" />
 	</bean>
 	
 	<!-- The actual service implementation(s) -->
-    <bean id="lunchService" class="com.avanza.asterix.integration.tests.domain.pu.LunchServiceImpl"/>
-	<bean id="lunchRestaurantRepoFactory" class="com.avanza.asterix.integration.tests.domain.pu.LunchRestaurantRepoFactory"/>
+    <bean id="lunchService" class="com.avanza.astrix.integration.tests.domain.pu.LunchServiceImpl"/>
+	<bean id="lunchRestaurantRepoFactory" class="com.avanza.astrix.integration.tests.domain.pu.LunchRestaurantRepoFactory"/>
 	<bean id="lunchRestaurantRepo" factory-bean="lunchRestaurantRepoFactory" factory-method="create"/>
 	    
 </beans>

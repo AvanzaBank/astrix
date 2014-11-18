@@ -21,7 +21,7 @@ import lunch.grader.api.provider.PublicLunchFeeder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.avanza.asterix.provider.core.AsterixServiceExport;
+import com.avanza.astrix.provider.core.AsterixServiceExport;
 
 @AsterixServiceExport(PublicLunchFeeder.class)
 public class PublicLunchFeederImpl implements PublicLunchFeeder {

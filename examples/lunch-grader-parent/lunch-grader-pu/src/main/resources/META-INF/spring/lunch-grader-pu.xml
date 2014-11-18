@@ -13,7 +13,7 @@
 		mirror="false" />
 	<os-core:giga-space id="gigaSpace" space="space" />
 
-	<bean id="asterixFrameworkBean" class="com.avanza.asterix.context.AsterixFrameworkBean">
+	<bean id="asterixFrameworkBean" class="com.avanza.astrix.context.AsterixFrameworkBean">
 		<property name="consumedAsterixBeans">
 			<list>
 				<value>lunch.api.LunchService</value>
@@ -24,7 +24,7 @@
 		<property name="subsystem" value="lunch-service"/>
 	</bean>
 	
-	<bean id="asterixSettings" class="com.avanza.asterix.context.AsterixSettings" factory-method="from">
+	<bean id="asterixSettings" class="com.avanza.astrix.context.AsterixSettings" factory-method="from">
 		<property name="serviceRegistryUri" value="gs-remoting:jini://*/*/service-registry-space?groups=elilin"/>
 		<constructor-arg>
 			<util:map>

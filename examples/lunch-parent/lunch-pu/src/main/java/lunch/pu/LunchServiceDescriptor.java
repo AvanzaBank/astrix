@@ -18,8 +18,8 @@ package lunch.pu;
 import lunch.api.provider.LunchApiDescriptor;
 import lunch.api.provider.feeder.LunchFeederApiDescriptor;
 
-import com.avanza.asterix.provider.component.AsterixServiceComponentNames;
-import com.avanza.asterix.provider.core.AsterixService;
+import com.avanza.astrix.provider.component.AsterixServiceComponentNames;
+import com.avanza.astrix.provider.core.AsterixService;
 
 
 @AsterixService(

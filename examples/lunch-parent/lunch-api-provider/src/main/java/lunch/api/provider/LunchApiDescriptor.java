@@ -17,8 +17,8 @@ package lunch.api.provider;
 
 import lunch.api.LunchService;
 
-import com.avanza.asterix.provider.core.AsterixServiceRegistryApi;
-import com.avanza.asterix.provider.versioning.AsterixVersioned;
+import com.avanza.astrix.provider.core.AsterixServiceRegistryApi;
+import com.avanza.astrix.provider.versioning.AsterixVersioned;
 
 
 // The API is versioned.

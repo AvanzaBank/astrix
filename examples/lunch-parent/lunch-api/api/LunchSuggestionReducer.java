@@ -17,8 +17,8 @@ package lunch.api;
 
 import java.util.List;
 
-import com.avanza.asterix.core.AsterixRemoteResult;
-import com.avanza.asterix.core.AsterixRemoteResultReducer;
+import com.avanza.astrix.core.AsterixRemoteResult;
+import com.avanza.astrix.core.AsterixRemoteResultReducer;
 
 public class LunchSuggestionReducer implements AsterixRemoteResultReducer<LunchRestaurant, LunchRestaurant> {
 

@@ -15,7 +15,7 @@
  */
 package lunch.api.provider.feeder;
 
-import com.avanza.asterix.provider.core.AsterixServiceRegistryApi;
+import com.avanza.astrix.provider.core.AsterixServiceRegistryApi;
 
 
 @AsterixServiceRegistryApi(

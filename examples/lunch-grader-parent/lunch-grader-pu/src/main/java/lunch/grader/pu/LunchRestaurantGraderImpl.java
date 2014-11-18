@@ -23,7 +23,7 @@ import lunch.grader.api.LunchRestaurantGrader;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.avanza.asterix.provider.core.AsterixServiceExport;
+import com.avanza.astrix.provider.core.AsterixServiceExport;
 
 @AsterixServiceExport(LunchRestaurantGrader.class)
 public class LunchRestaurantGraderImpl implements LunchRestaurantGrader {

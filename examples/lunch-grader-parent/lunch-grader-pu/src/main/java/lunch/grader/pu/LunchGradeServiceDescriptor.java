@@ -17,8 +17,8 @@ package lunch.grader.pu;
 
 import lunch.grader.api.provider.LunchGradeApiDescriptor;
 
-import com.avanza.asterix.provider.component.AsterixServiceComponentNames;
-import com.avanza.asterix.provider.core.AsterixService;
+import com.avanza.astrix.provider.component.AsterixServiceComponentNames;
+import com.avanza.astrix.provider.core.AsterixService;
 
 
 @AsterixService(

@@ -18,7 +18,7 @@ package runners;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.avanza.asterix.gs.test.util.PuApp;
+import com.avanza.astrix.gs.test.util.PuApp;
 
 public class LunchPuRunner {
 	

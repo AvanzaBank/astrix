@@ -15,7 +15,7 @@
  */
 package lunch.api;
 
-import com.avanza.asterix.core.AsterixBroadcast;
+import com.avanza.astrix.core.AsterixBroadcast;
 
 
 
