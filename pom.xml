@@ -5,18 +5,18 @@
 	<version>0.7.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
-		<module>asterix-core</module>
-		<module>asterix-provider</module>
-		<module>asterix-gs</module>
-		<module>asterix-context</module>
-		<module>asterix-versioning</module>
-		<module>asterix-fault-tolerance</module>
-		<module>asterix-service-registry</module>
-		<module>asterix-integration-tests</module>
-		<module>asterix-service-registry-pu</module>
-		<module>asterix-test-util</module>
-		<module>asterix-gs-test-util</module>
-		<module>asterix-dashboard</module>
+		<module>astrix-core</module>
+		<module>astrix-provider</module>
+		<module>astrix-gs</module>
+		<module>astrix-context</module>
+		<module>astrix-versioning</module>
+		<module>astrix-fault-tolerance</module>
+		<module>astrix-service-registry</module>
+		<module>astrix-integration-tests</module>
+		<module>astrix-service-registry-pu</module>
+		<module>astrix-test-util</module>
+		<module>astrix-gs-test-util</module>
+		<module>astrix-dashboard</module>
 	</modules>
 
 	<scm>
