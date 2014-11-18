@@ -35,7 +35,7 @@ public class AstrixSettingsReader {
 	private Properties classpathOverride = new Properties();
 	
 	private AstrixSettingsReader(AstrixSettings settings, AstrixExternalConfig externalConfig) {
-		this(settings, externalConfig, "META-INF/Astrix/settings.properties");
+		this(settings, externalConfig, "META-INF/astrix/settings.properties");
 	}
 	
 	AstrixSettingsReader(AstrixSettings settings, AstrixExternalConfig externalConfig, String defaultSettingsOverrideFile) {
