@@ -22,9 +22,9 @@ import com.avanza.astrix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain2.api.LunchRestaurantGrader;
-import com.avanza.astrix.provider.core.AsterixServiceExport;
+import com.avanza.astrix.provider.core.AstrixServiceExport;
 
-@AsterixServiceExport(LunchRestaurantGrader.class)
+@AstrixServiceExport(LunchRestaurantGrader.class)
 public class LunchRestaurantGraderImpl implements LunchRestaurantGrader {
 	
 	private final LunchService lunchService;

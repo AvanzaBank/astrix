@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class LunchRestaurantRepoFactory {
 
 	/*
-	 * This factory is used to make sure that Asterix supports application-context-xml files
+	 * This factory is used to make sure that Astrix supports application-context-xml files
 	 * containing factory beans which does not provide a className for the target bean.
 	 */
 	

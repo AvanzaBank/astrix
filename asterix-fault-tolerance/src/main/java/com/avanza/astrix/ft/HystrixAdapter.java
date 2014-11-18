@@ -24,7 +24,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.core.AsterixCallStackTrace;
+import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.ft.metrics.DelegatingHystrixEventNotifier;
 import com.netflix.hystrix.HystrixCommand;
@@ -98,20 +98,20 @@ public class HystrixAdapter<T> implements InvocationHandler {
 		 *   2. Use HystrixCommand with thread isolation for all blocking operations (any method NOT returning an Observable/Future)
 		 */
 		HystrixCommand<HystrixResult> command = createHystrixCommand(method, args);
-		AsterixCallStackTrace trace = new AsterixCallStackTrace();
+		AstrixCallStackTrace trace = new AstrixCallStackTrace();
 		HystrixResult result = command.execute();
 		throwExceptionIfExecutionFailed(trace, result);
 		return result.getResult();
 	}
 
-	private void throwExceptionIfExecutionFailed(AsterixCallStackTrace trace, HystrixResult result) throws Throwable {
+	private void throwExceptionIfExecutionFailed(AstrixCallStackTrace trace, HystrixResult result) throws Throwable {
 		if (result.getException() != null) {
 			appendStackTrace(result.getException(), trace);
 			throw result.getException();
 		}
 	}
 
-	private void appendStackTrace(Throwable exception, AsterixCallStackTrace trace) {
+	private void appendStackTrace(Throwable exception, AstrixCallStackTrace trace) {
 		Throwable lastThowableInChain = exception;
 		while (lastThowableInChain.getCause() != null) {
 			lastThowableInChain = lastThowableInChain.getCause();
@@ -152,10 +152,10 @@ public class HystrixAdapter<T> implements InvocationHandler {
 			protected HystrixResult getFallback() {
 				// getFallback is only invoked when the underlying api threw an ServiceUnavailableException, or the
 				// when the invocation reached timeout. In any case, treat this as service unavailable.
-				ServiceUnavailableCause cause = AsterixUtil.resolveUnavailableCause(this);
+				ServiceUnavailableCause cause = AstrixUtil.resolveUnavailableCause(this);
 				if (isFailedExecution()) {
 					// Underlying service threw ServiceUnavailableException
-					return HystrixResult.exception(AsterixUtil.wrapFailedExecutionException(this));
+					return HystrixResult.exception(AstrixUtil.wrapFailedExecutionException(this));
 				}
 				// Timeout or rejected in queue
 				return HystrixResult.exception(new ServiceUnavailableException(Objects.toString(cause)));

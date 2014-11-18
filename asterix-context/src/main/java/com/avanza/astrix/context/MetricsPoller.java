@@ -29,21 +29,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Periodically polls all AsterixMetricsCollectorPlugins and sends the data they provide to an
- * AsterixMetricLoggerPlugin.
+ * Periodically polls all AstrixMetricsCollectorPlugins and sends the data they provide to an
+ * AstrixMetricLoggerPlugin.
  * 
  * @author Kristoffer Erlandsson (krierl)
  */
-public class MetricsPoller implements AsterixPluginsAware, AsterixSettingsAware {
+public class MetricsPoller implements AstrixPluginsAware, AstrixSettingsAware {
 
 	private static final Integer DEFAULT_DELAY = 5000;
-	private AsterixPlugins plugins;
-	private Collection<AsterixMetricsLoggerPlugin> loggers;
-	private Collection<AsterixMetricsCollectorPlugin> collectors;
+	private AstrixPlugins plugins;
+	private Collection<AstrixMetricsLoggerPlugin> loggers;
+	private Collection<AstrixMetricsCollectorPlugin> collectors;
 	ScheduledExecutorService executor;
 
 	private static final Logger log = LoggerFactory.getLogger(MetricsPoller.class);
-	private AsterixSettingsReader settings;
+	private AstrixSettingsReader settings;
 
 	public void start() {
 		initializeFromPlugins();
@@ -54,8 +54,8 @@ public class MetricsPoller implements AsterixPluginsAware, AsterixSettingsAware 
 	}
 
 	private void initializeFromPlugins() {
-		loggers = plugins.getPlugins(AsterixMetricsLoggerPlugin.class);
-		collectors = plugins.getPlugins(AsterixMetricsCollectorPlugin.class);
+		loggers = plugins.getPlugins(AstrixMetricsLoggerPlugin.class);
+		collectors = plugins.getPlugins(AstrixMetricsCollectorPlugin.class);
 	}
 
 	private long getDelayTimeFromJndiOrFallback() {
@@ -74,24 +74,24 @@ public class MetricsPoller implements AsterixPluginsAware, AsterixSettingsAware 
 	}
 
 	@Override
-	public void setPlugins(AsterixPlugins plugins) {
+	public void setPlugins(AstrixPlugins plugins) {
 		this.plugins = plugins;
 	}
 
 	private static class MetricPollerTask implements Runnable {
 
-		private Collection<AsterixMetricsLoggerPlugin> loggers;
-		private Collection<AsterixMetricsCollectorPlugin> collectors;
+		private Collection<AstrixMetricsLoggerPlugin> loggers;
+		private Collection<AstrixMetricsCollectorPlugin> collectors;
 
-		public MetricPollerTask(Collection<AsterixMetricsLoggerPlugin> loggers, Collection<AsterixMetricsCollectorPlugin> collectors) {
+		public MetricPollerTask(Collection<AstrixMetricsLoggerPlugin> loggers, Collection<AstrixMetricsCollectorPlugin> collectors) {
 			this.loggers = loggers;
 			this.collectors = collectors;
 		}
 
 		@Override
 		public void run() {
-			for (AsterixMetricsCollectorPlugin collector : collectors) {
-				for (AsterixMetricsLoggerPlugin logger : loggers) {
+			for (AstrixMetricsCollectorPlugin collector : collectors) {
+				for (AstrixMetricsLoggerPlugin logger : loggers) {
 					logger.logMetrics(collector.getMetrics());
 				}
 			}
@@ -100,7 +100,7 @@ public class MetricsPoller implements AsterixPluginsAware, AsterixSettingsAware 
 	}
 
 	@Override
-	public void setSettings(AsterixSettingsReader settings) {
+	public void setSettings(AstrixSettingsReader settings) {
 		this.settings = settings;
 	}
 	

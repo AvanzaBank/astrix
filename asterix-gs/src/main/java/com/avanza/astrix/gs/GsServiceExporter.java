@@ -17,14 +17,14 @@ package com.avanza.astrix.gs;
 
 import org.openspaces.core.GigaSpace;
 
-import com.avanza.astrix.context.AsterixApiDescriptor;
-import com.avanza.astrix.context.AsterixServiceExporterBean;
-import com.avanza.astrix.provider.component.AsterixServiceComponentNames;
+import com.avanza.astrix.context.AstrixApiDescriptor;
+import com.avanza.astrix.context.AstrixServiceExporterBean;
+import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 
-public class GsServiceExporter implements AsterixServiceExporterBean {
+public class GsServiceExporter implements AstrixServiceExporterBean {
 
 	@Override
-	public void register(Object provider, AsterixApiDescriptor apiDescriptor, Class<?> providedApi) {
+	public void register(Object provider, AstrixApiDescriptor apiDescriptor, Class<?> providedApi) {
 		if (!providedApi.equals(GigaSpace.class)) {
 			throw new IllegalArgumentException("Cannot export: " + providedApi);
 		}
@@ -33,7 +33,7 @@ public class GsServiceExporter implements AsterixServiceExporterBean {
 	
 	@Override
 	public String getComponent() {
-		return AsterixServiceComponentNames.GS;
+		return AstrixServiceComponentNames.GS;
 	}
 
 }

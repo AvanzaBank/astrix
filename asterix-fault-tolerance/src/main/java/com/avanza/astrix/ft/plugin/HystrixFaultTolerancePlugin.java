@@ -19,18 +19,18 @@ import java.util.Objects;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.context.AsterixEventLogger;
-import com.avanza.astrix.context.AsterixFaultTolerancePlugin;
-import com.avanza.astrix.context.AsterixInject;
+import com.avanza.astrix.context.AstrixEventLogger;
+import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
+import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.ft.HystrixAdapter;
 import com.avanza.astrix.ft.metrics.HystrixEventPublisher;
 
 
-@MetaInfServices(value = AsterixFaultTolerancePlugin.class)
-public class HystrixFaultTolerancePlugin implements AsterixFaultTolerancePlugin {
+@MetaInfServices(value = AstrixFaultTolerancePlugin.class)
+public class HystrixFaultTolerancePlugin implements AstrixFaultTolerancePlugin {
 	
 	private boolean eventPublisherRegistered = false;
-	private AsterixEventLogger eventLogger;
+	private AstrixEventLogger eventLogger;
 
 	@Override
 	public <T> T addFaultTolerance(Class<T> api, T provider, String group) {
@@ -50,8 +50,8 @@ public class HystrixFaultTolerancePlugin implements AsterixFaultTolerancePlugin 
 		}
 	}
 
-	@AsterixInject
-	public void setEventLogger(AsterixEventLogger eventLogger) {
+	@AstrixInject
+	public void setEventLogger(AstrixEventLogger eventLogger) {
 		this.eventLogger = eventLogger;
 	}
 }

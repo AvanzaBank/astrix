@@ -21,19 +21,19 @@ import lunch.api.LunchService;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.avanza.astrix.context.AsterixConfigurer;
-import com.avanza.astrix.context.AsterixContext;
-import com.avanza.astrix.context.AsterixSettings;
+import com.avanza.astrix.context.AstrixConfigurer;
+import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixSettings;
 
 public class LunchClient {
 	
 	public static void main(String[] args) throws InterruptedException {
 		System.setProperty("com.gs.home", "C:\\Developer\\tools\\gigaspaces\\gigaspaces-xap-premium-9.7.0-ga");
 		Logger.getLogger("com.avanza.astrix").setLevel(Level.DEBUG);
-		AsterixConfigurer configurer = new AsterixConfigurer();
-		configurer.set(AsterixSettings.ASTERIX_SERVICE_REGISTRY_URI, "gs-remoting:jini://*/*/service-registry-space?groups=elilin");
-		AsterixContext asterixContext = configurer.configure();
-		LunchService lunchService = asterixContext.waitForBean(LunchService.class, 5000);
+		AstrixConfigurer configurer = new AstrixConfigurer();
+		configurer.set(AstrixSettings.Astrix_SERVICE_REGISTRY_URI, "gs-remoting:jini://*/*/service-registry-space?groups=elilin");
+		AstrixContext AstrixContext = configurer.configure();
+		LunchService lunchService = AstrixContext.waitForBean(LunchService.class, 5000);
 		
 		LunchRestaurant r = new LunchRestaurant();
 		r.setFoodType("vegetarian");

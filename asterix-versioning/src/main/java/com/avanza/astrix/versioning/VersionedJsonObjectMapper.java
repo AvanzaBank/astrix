@@ -38,8 +38,8 @@ import org.codehaus.jackson.map.type.TypeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jackson.type.JavaType;
 
-import com.avanza.astrix.provider.versioning.AsterixJsonApiMigration;
-import com.avanza.astrix.provider.versioning.AsterixJsonMessageMigration;
+import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
+import com.avanza.astrix.provider.versioning.AstrixJsonMessageMigration;
 import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
 import com.avanza.astrix.versioning.JsonMessageMigrator.Builder;
 
@@ -176,17 +176,17 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 		
 		Map<Class<?>, JsonMessageMigrator.Builder<?>> buildersByType = new HashMap<Class<?>, JsonMessageMigrator.Builder<?>>();
 		
-		MessageMigratorsBuilder registerAll(List<AsterixJsonApiMigration> migrations) {
-			for (AsterixJsonApiMigration apiMigration : migrations) {
+		MessageMigratorsBuilder registerAll(List<AstrixJsonApiMigration> migrations) {
+			for (AstrixJsonApiMigration apiMigration : migrations) {
 				int version = apiMigration.fromVersion();
-				for (AsterixJsonMessageMigration<?> messageMigration : apiMigration.getMigrations()) {
+				for (AstrixJsonMessageMigration<?> messageMigration : apiMigration.getMigrations()) {
 					register(version, messageMigration);
 				}
 			}
 			return this;
 		}
 
-		<T> void register(int version, AsterixJsonMessageMigration<T> messageMigration) {
+		<T> void register(int version, AstrixJsonMessageMigration<T> messageMigration) {
 			Builder<T> builder = (Builder<T>) buildersByType.get(messageMigration.getJavaType());
 			if (builder == null) {
 				builder = new Builder<>(messageMigration.getJavaType());
@@ -211,7 +211,7 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 		private List<JsonDeserializerHolder<?>> deserializers = new ArrayList<>();
 		private ConcurrentMap<Class<?>, JsonMessageMigrator<?>> migratorsByType;
 		
-		public VersionedObjectMapperBuilder(List<AsterixJsonApiMigration> migrations) {
+		public VersionedObjectMapperBuilder(List<AstrixJsonApiMigration> migrations) {
 			this.migratorsByType = new MessageMigratorsBuilder().registerAll(migrations).build();
 		}
 
@@ -233,7 +233,7 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 		}
 		
 		private ObjectMapper buildMigratingMapper(ObjectMapper rawMapper, ThreadLocal<Integer> versionHolder) {
-			SimpleModule module = new SimpleModule("asterix-migratingModule", new Version(1,0,0, ""));
+			SimpleModule module = new SimpleModule("Astrix-migratingModule", new Version(1,0,0, ""));
 			for (JsonMessageMigrator<?> migrator : this.migratorsByType.values()) {
 				registerSerializerAndDeserializer(rawMapper, versionHolder, module, migrator);
 			}
@@ -263,7 +263,7 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 		}
 
 		private ObjectMapper buildRaw() {
-			SimpleModule rawModule = new SimpleModule("asterix-rawModule", new Version(1,0,0, ""));
+			SimpleModule rawModule = new SimpleModule("Astrix-rawModule", new Version(1,0,0, ""));
 			for (JsonDeserializerHolder<?> deserializer : this.deserializers) {
 				deserializer.register(rawModule);
 			}
@@ -277,7 +277,7 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 		
 	}
 
-//	public static JsonObjectMapper create(AsterixRemotingServerApi jsonObjectMapperFactory) {
+//	public static JsonObjectMapper create(AstrixRemotingServerApi jsonObjectMapperFactory) {
 //		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(jsonObjectMapperFactory.getMigrations());
 //		jsonObjectMapperFactory.configure(objectMapperBuilder);
 //		return JsonObjectMapper.create(objectMapperBuilder.build());

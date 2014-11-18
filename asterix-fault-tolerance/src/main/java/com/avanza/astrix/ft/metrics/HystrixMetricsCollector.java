@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.context.AsterixMetricsCollectorPlugin;
+import com.avanza.astrix.context.AstrixMetricsCollectorPlugin;
 import com.netflix.hystrix.HystrixCircuitBreaker;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
@@ -31,8 +31,8 @@ import com.netflix.hystrix.HystrixThreadPoolMetrics;
  * @author Andreas Skoog (andsko)
  * @author Kristoffer Erlandsson (krierl)
  */
-@MetaInfServices(AsterixMetricsCollectorPlugin.class)
-public final class HystrixMetricsCollector implements AsterixMetricsCollectorPlugin {
+@MetaInfServices(AstrixMetricsCollectorPlugin.class)
+public final class HystrixMetricsCollector implements AstrixMetricsCollectorPlugin {
 	
 	@Override
 	public Map<String, Number> getMetrics() {

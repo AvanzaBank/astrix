@@ -16,12 +16,12 @@
 package com.avanza.astrix.integration.tests.domain.apiruntime;
 
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
-import com.avanza.astrix.provider.core.AsterixServiceRegistryApi;
-import com.avanza.astrix.provider.versioning.AsterixVersioned;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
+import com.avanza.astrix.provider.versioning.AstrixVersioned;
 
 
 // The API is versioned.
-@AsterixVersioned(
+@AstrixVersioned(
 	apiMigrations = {
 		LunchApiV1Migration.class
 	},	
@@ -29,7 +29,7 @@ import com.avanza.astrix.provider.versioning.AsterixVersioned;
 	objectMapperConfigurer = LunchApiObjectMapperConfigurer.class
 )
 // The service is exported to the service-registry. Consumers queries the service-registry to bind to servers.
-@AsterixServiceRegistryApi(
+@AstrixServiceRegistryApi(
 	LunchService.class
 )
 public class LunchApiDescriptor {

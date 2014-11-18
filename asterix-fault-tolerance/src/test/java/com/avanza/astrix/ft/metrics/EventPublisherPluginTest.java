@@ -23,10 +23,10 @@ import java.util.Collection;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
-import com.avanza.astrix.context.AsterixContext;
-import com.avanza.astrix.context.AsterixEventLoggerPlugin;
-import com.avanza.astrix.context.AsterixFaultTolerancePlugin;
-import com.avanza.astrix.context.TestAsterixConfigurer;
+import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixEventLoggerPlugin;
+import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
+import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.ft.service.SimpleService;
 import com.avanza.astrix.ft.service.SimpleServiceImpl;
 
@@ -34,19 +34,19 @@ public class EventPublisherPluginTest {
 
 	@Test
 	public void eventNotified() throws Exception {
-		TestAsterixConfigurer configurer = new TestAsterixConfigurer();
+		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.enableFaultTolerance(true);
-		FakeAsterixEventLoggerPlugin fakeEventLogger = new FakeAsterixEventLoggerPlugin();
-		configurer.registerPlugin(AsterixEventLoggerPlugin.class, fakeEventLogger);
-		AsterixContext context = configurer.configure();
-		AsterixFaultTolerancePlugin faultTolerancePlugin = context.getPlugins().getPlugin(
-				AsterixFaultTolerancePlugin.class);
+		FakeAstrixEventLoggerPlugin fakeEventLogger = new FakeAstrixEventLoggerPlugin();
+		configurer.registerPlugin(AstrixEventLoggerPlugin.class, fakeEventLogger);
+		AstrixContext context = configurer.configure();
+		AstrixFaultTolerancePlugin faultTolerancePlugin = context.getPlugins().getPlugin(
+				AstrixFaultTolerancePlugin.class);
 		SimpleService ftService = faultTolerancePlugin.addFaultTolerance(SimpleService.class, new SimpleServiceImpl(), "foo");
 		ftService.echo("");
 		assertThat(fakeEventLogger.incrementedEvents, Matchers.contains("hystrix.foo.SimpleService.SUCCESS"));
 	}
 
-	static class FakeAsterixEventLoggerPlugin implements AsterixEventLoggerPlugin {
+	static class FakeAstrixEventLoggerPlugin implements AstrixEventLoggerPlugin {
 
 		private Collection<String> incrementedEvents = new ArrayList<>();
 

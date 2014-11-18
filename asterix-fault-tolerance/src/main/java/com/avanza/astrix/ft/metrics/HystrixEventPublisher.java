@@ -20,7 +20,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.context.AsterixEventLogger;
+import com.avanza.astrix.context.AstrixEventLogger;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixEventType;
 import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;
@@ -28,9 +28,9 @@ import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;
 public final class HystrixEventPublisher extends HystrixEventNotifier {
 
 	private static final Logger log = LoggerFactory.getLogger(HystrixEventPublisher.class);
-	private AsterixEventLogger eventLogger;
+	private AstrixEventLogger eventLogger;
 
-	public HystrixEventPublisher(AsterixEventLogger eventLogger) {
+	public HystrixEventPublisher(AstrixEventLogger eventLogger) {
 		this.eventLogger = Objects.requireNonNull(eventLogger);
 	}
 

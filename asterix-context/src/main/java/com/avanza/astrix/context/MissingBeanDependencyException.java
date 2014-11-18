@@ -19,14 +19,14 @@ public class MissingBeanDependencyException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 
-	public MissingBeanDependencyException(AsterixBeanAware beanDependenciesAware, Class<?> beanType) {
+	public MissingBeanDependencyException(AstrixBeanAware beanDependenciesAware, Class<?> beanType) {
 		super(createErrorMessage(beanDependenciesAware, beanType));
 	}
 
-	private static String createErrorMessage(AsterixBeanAware beanDependenciesAware, Class<?> beanType) {
+	private static String createErrorMessage(AstrixBeanAware beanDependenciesAware, Class<?> beanType) {
 		String requiredBy = beanDependenciesAware.getClass().getName();
-		if (beanDependenciesAware instanceof AsterixFactoryBeanPlugin<?>) {
-			AsterixFactoryBeanPlugin<?> factory = (AsterixFactoryBeanPlugin<?>) beanDependenciesAware;
+		if (beanDependenciesAware instanceof AstrixFactoryBeanPlugin<?>) {
+			AstrixFactoryBeanPlugin<?> factory = (AstrixFactoryBeanPlugin<?>) beanDependenciesAware;
 			requiredBy = requiredBy + "["+ factory.getBeanType().getName() + "]";
 		}
 		return "Missing bean provider. requiredBeanType=" + beanType.getName() + " requiredBy=" + requiredBy;

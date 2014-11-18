@@ -15,15 +15,15 @@
  */
 package com.avanza.astrix.service.registry.client;
 
-import com.avanza.astrix.provider.library.AsterixExport;
-import com.avanza.astrix.provider.library.AsterixLibraryProvider;
-import com.avanza.astrix.service.registry.client.AsterixServiceRegistry;
+import com.avanza.astrix.provider.library.AstrixExport;
+import com.avanza.astrix.provider.library.AstrixLibraryProvider;
+import com.avanza.astrix.service.registry.client.AstrixServiceRegistry;
 import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
 
-@AsterixLibraryProvider
+@AstrixLibraryProvider
 public class InMemoryServiceRegistryDescriptor {
-	@AsterixExport
-	public AsterixServiceRegistry create() {
+	@AstrixExport
+	public AstrixServiceRegistry create() {
 		return new InMemoryServiceRegistry();
 	}
 }

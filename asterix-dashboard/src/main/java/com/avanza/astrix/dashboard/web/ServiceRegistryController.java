@@ -25,26 +25,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.avanza.astrix.context.AsterixServiceProperties;
-import com.avanza.astrix.service.registry.client.AsterixServiceRegistryAdministrator;
-import com.avanza.astrix.service.registry.server.AsterixServiceRegistryEntry;
+import com.avanza.astrix.context.AstrixServiceProperties;
+import com.avanza.astrix.service.registry.client.AstrixServiceRegistryAdministrator;
+import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
 
 @RestController
 @RequestMapping("/services")
 public class ServiceRegistryController {
 	
-	private AsterixServiceRegistryAdministrator serviceRegistryAdmin;
+	private AstrixServiceRegistryAdministrator serviceRegistryAdmin;
 	
 	@Autowired
-	public ServiceRegistryController(AsterixServiceRegistryAdministrator serviceRegistryAdmin) {
+	public ServiceRegistryController(AstrixServiceRegistryAdministrator serviceRegistryAdmin) {
 		this.serviceRegistryAdmin = Objects.requireNonNull(serviceRegistryAdmin);
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public List<Service> services() {
-		List<AsterixServiceRegistryEntry> services = serviceRegistryAdmin.listServices();
+		List<AstrixServiceRegistryEntry> services = serviceRegistryAdmin.listServices();
 		List<Service> result = new ArrayList<>();
-		for (AsterixServiceRegistryEntry entry : services) {
+		for (AstrixServiceRegistryEntry entry : services) {
 			Service s = new Service();
 			s.setProvidedApi(entry.getServiceBeanType());
 			s.setServiceMetadata(entry.getServiceMetadata());

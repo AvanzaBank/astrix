@@ -21,36 +21,36 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.avanza.astrix.context.AsterixDirectComponent;
-import com.avanza.astrix.context.AsterixServiceProperties;
-import com.avanza.astrix.core.AsterixBroadcast;
-import com.avanza.astrix.provider.component.AsterixServiceComponentNames;
-import com.avanza.astrix.provider.core.AsterixConfigApi;
+import com.avanza.astrix.context.AstrixDirectComponent;
+import com.avanza.astrix.context.AstrixServiceProperties;
+import com.avanza.astrix.core.AstrixBroadcast;
+import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.provider.core.AstrixConfigApi;
 import com.avanza.astrix.service.registry.app.ServiceKey;
-import com.avanza.astrix.service.registry.client.AsterixServiceRegistry;
-import com.avanza.astrix.service.registry.client.AsterixServiceRegistryApiDescriptor;
-import com.avanza.astrix.service.registry.server.AsterixServiceRegistryEntry;
+import com.avanza.astrix.service.registry.client.AstrixServiceRegistry;
+import com.avanza.astrix.service.registry.client.AstrixServiceRegistryApiDescriptor;
+import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class InMemoryServiceRegistry implements AsterixServiceRegistry {
+public class InMemoryServiceRegistry implements AstrixServiceRegistry {
 	
-	private Map<ServiceKey, AsterixServiceRegistryEntry> servicePropertiesByKey = new ConcurrentHashMap<>();
+	private Map<ServiceKey, AstrixServiceRegistryEntry> servicePropertiesByKey = new ConcurrentHashMap<>();
 	private String id;
 	
 	public InMemoryServiceRegistry() {
-		this.id = AsterixDirectComponent.register(AsterixServiceRegistry.class, this);
+		this.id = AstrixDirectComponent.register(AstrixServiceRegistry.class, this);
 	}
 	
 	@Override
-	public <T> AsterixServiceRegistryEntry lookup(String type, String qualifier) {
+	public <T> AstrixServiceRegistryEntry lookup(String type, String qualifier) {
 		return this.servicePropertiesByKey.get(new ServiceKey(type, qualifier));
 	}
 	@Override
-	public <T> void register(AsterixServiceRegistryEntry properties, long lease) {
-		ServiceKey key = new ServiceKey(properties.getServiceBeanType(), properties.getServiceProperties().get(AsterixServiceProperties.QUALIFIER));
+	public <T> void register(AstrixServiceRegistryEntry properties, long lease) {
+		ServiceKey key = new ServiceKey(properties.getServiceBeanType(), properties.getServiceProperties().get(AstrixServiceProperties.QUALIFIER));
 		this.servicePropertiesByKey.put(key, properties);
 	}
 	
@@ -58,15 +58,15 @@ public class InMemoryServiceRegistry implements AsterixServiceRegistry {
 		this.servicePropertiesByKey.clear();
 	}
 	public String getConfigEntryName() {
-		return AsterixServiceRegistryApiDescriptor.class.getAnnotation(AsterixConfigApi.class).entryName();
+		return AstrixServiceRegistryApiDescriptor.class.getAnnotation(AstrixConfigApi.class).entryName();
 	}
 	
 	public String getServiceUri() {
-		return AsterixServiceComponentNames.DIRECT + ":" + this.id;
+		return AstrixServiceComponentNames.DIRECT + ":" + this.id;
 	}
 
 	@Override
-	public List<AsterixServiceRegistryEntry> listServices() {
+	public List<AstrixServiceRegistryEntry> listServices() {
 		return new ArrayList<>(servicePropertiesByKey.values());
 	}
 }

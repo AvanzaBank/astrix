@@ -17,20 +17,20 @@ package com.avanza.astrix.versioning.plugin;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.context.AsterixApiDescriptor;
-import com.avanza.astrix.context.AsterixVersioningPlugin;
-import com.avanza.astrix.core.AsterixObjectSerializer;
-import com.avanza.astrix.provider.versioning.AsterixVersioned;
+import com.avanza.astrix.context.AstrixApiDescriptor;
+import com.avanza.astrix.context.AstrixVersioningPlugin;
+import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.provider.versioning.AstrixVersioned;
 
-@MetaInfServices(AsterixVersioningPlugin.class)
-public class JacksonVersioningPlugin implements AsterixVersioningPlugin {
+@MetaInfServices(AstrixVersioningPlugin.class)
+public class JacksonVersioningPlugin implements AstrixVersioningPlugin {
 	@Override
-	public AsterixObjectSerializer create(AsterixApiDescriptor descriptor) {
-		if (descriptor.isAnnotationPresent(AsterixVersioned.class)) {
-			AsterixVersioned versioningInfo = descriptor.getAnnotation(AsterixVersioned.class);
-			return new VersionJacksonAsterixObjectSerializer(versioningInfo);
+	public AstrixObjectSerializer create(AstrixApiDescriptor descriptor) {
+		if (descriptor.isAnnotationPresent(AstrixVersioned.class)) {
+			AstrixVersioned versioningInfo = descriptor.getAnnotation(AstrixVersioned.class);
+			return new VersionJacksonAstrixObjectSerializer(versioningInfo);
 		}
-		return new AsterixObjectSerializer.NoVersioningSupport();
+		return new AstrixObjectSerializer.NoVersioningSupport();
 	}
 
 }

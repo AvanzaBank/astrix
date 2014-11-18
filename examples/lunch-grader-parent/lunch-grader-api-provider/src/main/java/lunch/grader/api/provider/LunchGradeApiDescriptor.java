@@ -17,15 +17,15 @@ package lunch.grader.api.provider;
 
 import lunch.grader.api.LunchRestaurantGrader;
 
-import com.avanza.astrix.provider.core.AsterixServiceRegistryApi;
-import com.avanza.astrix.provider.versioning.AsterixVersioned;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
+import com.avanza.astrix.provider.versioning.AstrixVersioned;
 
-@AsterixVersioned(
+@AstrixVersioned(
 	apiMigrations = {},
 	objectMapperConfigurer = LunchGradeApiObjectMapperConfigurer.class,
 	version = 1
 )
-@AsterixServiceRegistryApi(
+@AstrixServiceRegistryApi(
 	exportedApis = {
 		LunchRestaurantGrader.class,
 		PublicLunchFeeder.class

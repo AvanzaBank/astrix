@@ -15,10 +15,10 @@
  */
 package com.avanza.astrix.integration.tests.domain.apiruntime.feeder;
 
-import com.avanza.astrix.provider.core.AsterixServiceRegistryApi;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
 
 
-@AsterixServiceRegistryApi(
+@AstrixServiceRegistryApi(
 	InternalLunchFeeder.class
 )
 public class LunchFeederApiDescriptor {

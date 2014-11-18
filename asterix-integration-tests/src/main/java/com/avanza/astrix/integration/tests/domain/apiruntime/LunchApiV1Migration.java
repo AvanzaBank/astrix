@@ -18,10 +18,10 @@ package com.avanza.astrix.integration.tests.domain.apiruntime;
 import org.codehaus.jackson.node.ObjectNode;
 
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
-import com.avanza.astrix.provider.versioning.AsterixJsonApiMigration;
-import com.avanza.astrix.provider.versioning.AsterixJsonMessageMigration;
+import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
+import com.avanza.astrix.provider.versioning.AstrixJsonMessageMigration;
 
-public class LunchApiV1Migration implements AsterixJsonApiMigration {
+public class LunchApiV1Migration implements AstrixJsonApiMigration {
 
 	@Override
 	public int fromVersion() {
@@ -29,13 +29,13 @@ public class LunchApiV1Migration implements AsterixJsonApiMigration {
 	}
 	
 	@Override
-	public AsterixJsonMessageMigration<?>[] getMigrations() {
-		return new AsterixJsonMessageMigration[] {
+	public AstrixJsonMessageMigration<?>[] getMigrations() {
+		return new AstrixJsonMessageMigration[] {
 			new LunchRestaurantV1Migration()
 		};
 	}
 	
-	private static class LunchRestaurantV1Migration implements AsterixJsonMessageMigration<LunchRestaurant> {
+	private static class LunchRestaurantV1Migration implements AstrixJsonMessageMigration<LunchRestaurant> {
 
 		@Override
 		public void upgrade(ObjectNode json) {

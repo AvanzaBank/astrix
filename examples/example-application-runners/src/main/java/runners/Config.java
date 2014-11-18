@@ -17,6 +17,6 @@ package runners;
 
 public class Config {
 	
-	static final String LOOKUP_GROUP_NAME = "asterix-demo-apps";
+	static final String LOOKUP_GROUP_NAME = "Astrix-demo-apps";
 
 }

@@ -17,7 +17,7 @@ package com.avanza.astrix.gs;
 
 import org.openspaces.core.GigaSpace;
 
-import com.avanza.astrix.context.AsterixServiceProperties;
+import com.avanza.astrix.context.AstrixServiceProperties;
 import com.j_spaces.core.client.SpaceURL;
 
 
@@ -26,22 +26,22 @@ public class GsBinder {
 	public static final String SPACE_NAME_PROPERTY = "spaceName";
 	public static final String SPACE_URL_PROPERTY = "spaceUrl";
 	
-	public static GsFactory createGsFactory(AsterixServiceProperties properties) {
+	public static GsFactory createGsFactory(AstrixServiceProperties properties) {
 		String spaceUrl = properties.getProperty(SPACE_URL_PROPERTY);
 		return new GsFactory(spaceUrl);
 	}
 	
-	public static AsterixServiceProperties createProperties(GigaSpace space) {
-		AsterixServiceProperties result = new AsterixServiceProperties();
+	public static AstrixServiceProperties createProperties(GigaSpace space) {
+		AstrixServiceProperties result = new AstrixServiceProperties();
 		result.setApi(GigaSpace.class);
 		result.setProperty(SPACE_NAME_PROPERTY, space.getSpace().getName());
 		result.setProperty(SPACE_URL_PROPERTY, new SpaceUrlBuilder(space).buildSpaceUrl());
 		return result;
 	}
 
-	public static AsterixServiceProperties createServiceProperties(String spaceUrl) {
+	public static AstrixServiceProperties createServiceProperties(String spaceUrl) {
 		String spaceName = spaceUrl.split("/")[4]; // format: jini://*/*/space-name/... 
-		AsterixServiceProperties result = new AsterixServiceProperties();
+		AstrixServiceProperties result = new AstrixServiceProperties();
 		result.setApi(GigaSpace.class);
 		result.setProperty(SPACE_NAME_PROPERTY, spaceName);
 		result.setProperty(SPACE_URL_PROPERTY, spaceUrl);

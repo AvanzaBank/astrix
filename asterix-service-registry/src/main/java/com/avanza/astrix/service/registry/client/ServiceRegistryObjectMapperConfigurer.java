@@ -15,10 +15,10 @@
  */
 package com.avanza.astrix.service.registry.client;
 
-import com.avanza.astrix.provider.versioning.AsterixObjectMapperConfigurer;
+import com.avanza.astrix.provider.versioning.AstrixObjectMapperConfigurer;
 import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
 
-public class ServiceRegistryObjectMapperConfigurer implements AsterixObjectMapperConfigurer {
+public class ServiceRegistryObjectMapperConfigurer implements AstrixObjectMapperConfigurer {
 
 	@Override
 	public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {

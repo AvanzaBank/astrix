@@ -23,8 +23,8 @@ import java.util.Collection;
 
 import org.junit.Test;
 
-import com.avanza.astrix.context.AsterixEventLogger;
-import com.avanza.astrix.context.AsterixEventLoggerPlugin;
+import com.avanza.astrix.context.AstrixEventLogger;
+import com.avanza.astrix.context.AstrixEventLoggerPlugin;
 import com.avanza.astrix.ft.metrics.HystrixEventPublisher;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixEventType;
@@ -34,13 +34,13 @@ public class HystrixEventPublisherTest {
 	@Test
 	public void test() {
 		FakeEventLogger logger = new FakeEventLogger();
-		HystrixEventPublisher publisher = new HystrixEventPublisher(new AsterixEventLogger(logger));
+		HystrixEventPublisher publisher = new HystrixEventPublisher(new AstrixEventLogger(logger));
 		publisher.markEvent(HystrixEventType.SUCCESS, HystrixCommandKey.Factory.asKey("space_foo"));
 		assertThat(logger.incrementedEvents, contains("hystrix.space.foo.SUCCESS"));
 	}
 	
 
-	static class FakeEventLogger implements AsterixEventLoggerPlugin {
+	static class FakeEventLogger implements AstrixEventLoggerPlugin {
 
 		Collection<String> incrementedEvents = new ArrayList<String>();
 		

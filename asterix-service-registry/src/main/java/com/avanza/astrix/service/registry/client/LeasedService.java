@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
 
-import com.avanza.astrix.context.AsterixServiceProperties;
+import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.core.ServiceUnavailableException;
 /**
  * 
@@ -32,12 +32,12 @@ import com.avanza.astrix.core.ServiceUnavailableException;
 public final class LeasedService<T> implements InvocationHandler {
 	
 	private volatile T currentInstance;
-	private volatile AsterixServiceProperties currentProperties;
+	private volatile AstrixServiceProperties currentProperties;
 	private final ServiceRegistryLookupFactory<T> factoryBean;
 	private final String qualifier;
 	
 	public LeasedService(T currentInstance,
-			AsterixServiceProperties currentProperties,
+			AstrixServiceProperties currentProperties,
 			String qualifier,
 			ServiceRegistryLookupFactory<T> factoryBean) {
 		this.currentInstance = currentInstance;
@@ -55,7 +55,7 @@ public final class LeasedService<T> implements InvocationHandler {
 		}
 	}
 	
-	public void refreshServiceProperties(AsterixServiceProperties serviceProperties) {
+	public void refreshServiceProperties(AstrixServiceProperties serviceProperties) {
 		// TODO: if this fails, make sure new attempts are performed later
 		if (serviceHasChanged(serviceProperties)) {
 			if (serviceProperties != null) {
@@ -67,7 +67,7 @@ public final class LeasedService<T> implements InvocationHandler {
 		}
 	}
 
-	private boolean serviceHasChanged(AsterixServiceProperties serviceProperties) {
+	private boolean serviceHasChanged(AstrixServiceProperties serviceProperties) {
 		return !Objects.equals(currentProperties, serviceProperties);
 	}
 

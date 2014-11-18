@@ -17,9 +17,9 @@ package com.avanza.astrix.gs;
 
 import org.openspaces.core.GigaSpace;
 
-import com.avanza.astrix.provider.core.AsterixServiceRegistryApi;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
 
-@AsterixServiceRegistryApi(
+@AstrixServiceRegistryApi(
 	GigaSpace.class
 )
 public class GsDescriptor {

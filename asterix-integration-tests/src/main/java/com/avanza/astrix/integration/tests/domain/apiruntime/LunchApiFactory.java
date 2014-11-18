@@ -17,13 +17,13 @@ package com.avanza.astrix.integration.tests.domain.apiruntime;
 
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.api.LunchUtil;
-import com.avanza.astrix.provider.library.AsterixExport;
-import com.avanza.astrix.provider.library.AsterixLibraryProvider;
+import com.avanza.astrix.provider.library.AstrixExport;
+import com.avanza.astrix.provider.library.AstrixLibraryProvider;
 
-@AsterixLibraryProvider
+@AstrixLibraryProvider
 public class LunchApiFactory {
 
-	@AsterixExport
+	@AstrixExport
 	public LunchUtil createLunchUtil(LunchService lunchService) {
 		return new LunchUtilImpl(lunchService);
 	}

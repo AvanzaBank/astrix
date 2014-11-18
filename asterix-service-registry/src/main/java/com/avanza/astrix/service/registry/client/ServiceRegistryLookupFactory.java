@@ -21,30 +21,30 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
 
-import com.avanza.astrix.context.AsterixApiDescriptor;
-import com.avanza.astrix.context.AsterixBeanAware;
-import com.avanza.astrix.context.AsterixBeans;
-import com.avanza.astrix.context.AsterixFactoryBeanPlugin;
-import com.avanza.astrix.context.AsterixInject;
-import com.avanza.astrix.context.AsterixServiceComponent;
-import com.avanza.astrix.context.AsterixServiceComponents;
-import com.avanza.astrix.context.AsterixServiceProperties;
-import com.avanza.astrix.context.AsterixSettings;
-import com.avanza.astrix.context.AsterixSettingsAware;
-import com.avanza.astrix.context.AsterixSettingsReader;
+import com.avanza.astrix.context.AstrixApiDescriptor;
+import com.avanza.astrix.context.AstrixBeanAware;
+import com.avanza.astrix.context.AstrixBeans;
+import com.avanza.astrix.context.AstrixFactoryBeanPlugin;
+import com.avanza.astrix.context.AstrixInject;
+import com.avanza.astrix.context.AstrixServiceComponent;
+import com.avanza.astrix.context.AstrixServiceComponents;
+import com.avanza.astrix.context.AstrixServiceProperties;
+import com.avanza.astrix.context.AstrixSettings;
+import com.avanza.astrix.context.AstrixSettingsAware;
+import com.avanza.astrix.context.AstrixSettingsReader;
 import com.avanza.astrix.context.IllegalSubsystemException;
 
-public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin<T>, AsterixBeanAware, AsterixSettingsAware {
+public class ServiceRegistryLookupFactory<T> implements AstrixFactoryBeanPlugin<T>, AstrixBeanAware, AstrixSettingsAware {
 
 	private Class<T> api;
-	private AsterixApiDescriptor descriptor;
-	private AsterixBeans beans;
-	private AsterixServiceRegistryLeaseManager leaseManager;
-	private AsterixServiceComponents serviceComponents;
+	private AstrixApiDescriptor descriptor;
+	private AstrixBeans beans;
+	private AstrixServiceRegistryLeaseManager leaseManager;
+	private AstrixServiceComponents serviceComponents;
 	private String subsystem;
 	private boolean enforceSubsystemBoundaries;
 
-	public ServiceRegistryLookupFactory(AsterixApiDescriptor descriptor,
+	public ServiceRegistryLookupFactory(AstrixApiDescriptor descriptor,
 										Class<T> api) {
 		this.descriptor = descriptor;
 		this.api = api;
@@ -52,10 +52,10 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 
 	@Override
 	public T create(String qualifier) {
-		AsterixServiceRegistryClient serviceRegistry = beans.getBean(AsterixServiceRegistryClient.class);
-		AsterixServiceProperties serviceProperties;
+		AstrixServiceRegistryClient serviceRegistry = beans.getBean(AstrixServiceRegistryClient.class);
+		AstrixServiceProperties serviceProperties;
 		serviceProperties = serviceRegistry.lookup(api, qualifier);
-		String providerSubsystem = serviceProperties.getProperty(AsterixServiceProperties.SUBSYSTEM);
+		String providerSubsystem = serviceProperties.getProperty(AstrixServiceProperties.SUBSYSTEM);
 		if (!isAllowedToInvokeService(providerSubsystem)) {
 			return createIllegalSubsystemProxy(providerSubsystem);
 		}
@@ -77,15 +77,15 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 		return api.cast(Proxy.newProxyInstance(api.getClassLoader(), new Class[]{api}, new IllegalSubsystemProxy(subsystem, providerSubsystem, api)));
 	}
 
-	public T create(String qualifier, AsterixServiceProperties serviceProperties) {
+	public T create(String qualifier, AstrixServiceProperties serviceProperties) {
 		if (serviceProperties == null) {
 			throw new RuntimeException(String.format("Misssing entry in service-registry api=%s qualifier=%s: ", api.getName(), qualifier));
 		}
-		AsterixServiceComponent serviceComponent = getServiceComponent(serviceProperties);
+		AstrixServiceComponent serviceComponent = getServiceComponent(serviceProperties);
 		return serviceComponent.createService(descriptor, api, serviceProperties);
 	}
 	
-	private AsterixServiceComponent getServiceComponent(AsterixServiceProperties serviceProperties) {
+	private AstrixServiceComponent getServiceComponent(AstrixServiceProperties serviceProperties) {
 		String componentName = serviceProperties.getComponent();
 		if (componentName == null) {
 			throw new IllegalArgumentException("Expected a componentName to be set on serviceProperties: " + serviceProperties);
@@ -95,7 +95,7 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 	
 	@Override
 	public List<Class<?>> getBeanDependencies() {
-		return Arrays.<Class<?>>asList(AsterixServiceRegistryClient.class);
+		return Arrays.<Class<?>>asList(AstrixServiceRegistryClient.class);
 	}
 
 	@Override
@@ -104,17 +104,17 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 	}
 
 	@Override
-	public void setAsterixBeans(AsterixBeans beans) {
+	public void setAstrixBeans(AstrixBeans beans) {
 		this.beans = beans;
 	}
 	
-	@AsterixInject
-	public void setServiceComponents(AsterixServiceComponents serviceComponents) {
+	@AstrixInject
+	public void setServiceComponents(AstrixServiceComponents serviceComponents) {
 		this.serviceComponents = serviceComponents;
 	}
 	
-	@AsterixInject
-	public void setServiceComponents(AsterixServiceRegistryLeaseManager leaseManager) {
+	@AstrixInject
+	public void setServiceComponents(AstrixServiceRegistryLeaseManager leaseManager) {
 		this.leaseManager = leaseManager;
 	}
 	
@@ -138,9 +138,9 @@ public class ServiceRegistryLookupFactory<T> implements AsterixFactoryBeanPlugin
 	}
 
 	@Override
-	public void setSettings(AsterixSettingsReader settings) {
-		this.subsystem = settings.getString(AsterixSettings.SUBSYSTEM_NAME);
-		this.enforceSubsystemBoundaries = settings.getBoolean(AsterixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
+	public void setSettings(AstrixSettingsReader settings) {
+		this.subsystem = settings.getString(AstrixSettings.SUBSYSTEM_NAME);
+		this.enforceSubsystemBoundaries = settings.getBoolean(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
 	}
 	
 

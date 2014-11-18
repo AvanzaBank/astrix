@@ -25,8 +25,8 @@ import java.util.List;
 import org.codehaus.jackson.node.ObjectNode;
 import org.junit.Test;
 
-import com.avanza.astrix.provider.versioning.AsterixJsonApiMigration;
-import com.avanza.astrix.provider.versioning.AsterixJsonMessageMigration;
+import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
+import com.avanza.astrix.provider.versioning.AstrixJsonMessageMigration;
 import com.avanza.astrix.versioning.VersionedJsonObjectMapper;
 import com.avanza.astrix.versioning.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
 import com.google.common.reflect.TypeToken;
@@ -35,7 +35,7 @@ import com.google.common.reflect.TypeToken;
 
 public class VersionedJsonObjectMapperTest {
 	
-	List<AsterixJsonApiMigration> apiMigrations = new ArrayList<>();
+	List<AstrixJsonApiMigration> apiMigrations = new ArrayList<>();
 	
 	@Test
 	public void canSerializerAndDeserializeObjectsUsingObjectMapper() throws Exception {
@@ -119,11 +119,11 @@ public class VersionedJsonObjectMapperTest {
 		assertEquals("defaultBar", deserializedPojos.get(0).getBar());
 	}
 	
-	private final class TestPojoV1ToV2Migration implements AsterixJsonApiMigration {
+	private final class TestPojoV1ToV2Migration implements AstrixJsonApiMigration {
 		@Override
-		public AsterixJsonMessageMigration<?>[] getMigrations() {
-			return new AsterixJsonMessageMigration<?>[] {
-				new AsterixJsonMessageMigration<TestPojoV2>() {
+		public AstrixJsonMessageMigration<?>[] getMigrations() {
+			return new AstrixJsonMessageMigration<?>[] {
+				new AstrixJsonMessageMigration<TestPojoV2>() {
 					@Override
 					public Class<TestPojoV2> getJavaType() {
 						return TestPojoV2.class;

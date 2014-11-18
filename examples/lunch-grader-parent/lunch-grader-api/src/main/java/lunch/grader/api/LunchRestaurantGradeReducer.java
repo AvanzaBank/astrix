@@ -17,16 +17,16 @@ package lunch.grader.api;
 
 import java.util.List;
 
-import com.avanza.astrix.core.AsterixRemoteResult;
-import com.avanza.astrix.core.AsterixRemoteResultReducer;
+import com.avanza.astrix.core.AstrixRemoteResult;
+import com.avanza.astrix.core.AstrixRemoteResultReducer;
 
-public class LunchRestaurantGradeReducer implements AsterixRemoteResultReducer<LunchRestaurantGrade, LunchRestaurantGrade> {
+public class LunchRestaurantGradeReducer implements AstrixRemoteResultReducer<LunchRestaurantGrade, LunchRestaurantGrade> {
 
 	@Override
-	public LunchRestaurantGrade reduce(List<AsterixRemoteResult<LunchRestaurantGrade>> grades) {
+	public LunchRestaurantGrade reduce(List<AstrixRemoteResult<LunchRestaurantGrade>> grades) {
 		LunchRestaurantGrade result = null;
 		
-		for (AsterixRemoteResult<LunchRestaurantGrade> grade : grades) {
+		for (AstrixRemoteResult<LunchRestaurantGrade> grade : grades) {
 			if (grade.getResult() == null) {
 				continue;
 			}

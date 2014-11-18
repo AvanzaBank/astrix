@@ -24,9 +24,9 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import com.avanza.astrix.context.AsterixMetricsCollectorPlugin;
-import com.avanza.astrix.context.AsterixMetricsLoggerPlugin;
-import com.avanza.astrix.context.TestAsterixConfigurer;
+import com.avanza.astrix.context.AstrixMetricsCollectorPlugin;
+import com.avanza.astrix.context.AstrixMetricsLoggerPlugin;
+import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 
@@ -34,16 +34,16 @@ public class MetricsPollerTest {
 
 	@Test
 	public void test() throws Exception {
-		TestAsterixConfigurer configurer = new TestAsterixConfigurer();
+		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.enableMonitoring(true);
-		configurer.registerPlugin(AsterixMetricsCollectorPlugin.class, new FakeCollector());
+		configurer.registerPlugin(AstrixMetricsCollectorPlugin.class, new FakeCollector());
 		FakeLogger logger = new FakeLogger();
-		configurer.registerPlugin(AsterixMetricsLoggerPlugin.class, logger);
+		configurer.registerPlugin(AstrixMetricsLoggerPlugin.class, logger);
 		configurer.configure();
 		assertEventually(loggedMetrics(logger, hasEntry("foo", (Number) 1)));
 	}
 
-	static class FakeCollector implements AsterixMetricsCollectorPlugin {
+	static class FakeCollector implements AstrixMetricsCollectorPlugin {
 
 		@Override
 		public Map<String, Number> getMetrics() {
@@ -53,7 +53,7 @@ public class MetricsPollerTest {
 		}
 	}
 
-	static class FakeLogger implements AsterixMetricsLoggerPlugin {
+	static class FakeLogger implements AstrixMetricsLoggerPlugin {
 
 		private Map<String, Number> lastLogged = new HashMap<>();
 		

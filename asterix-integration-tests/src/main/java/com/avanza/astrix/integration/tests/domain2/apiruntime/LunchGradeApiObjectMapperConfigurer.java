@@ -15,10 +15,10 @@
  */
 package com.avanza.astrix.integration.tests.domain2.apiruntime;
 
-import com.avanza.astrix.provider.versioning.AsterixObjectMapperConfigurer;
+import com.avanza.astrix.provider.versioning.AstrixObjectMapperConfigurer;
 import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
 
-public class LunchGradeApiObjectMapperConfigurer implements AsterixObjectMapperConfigurer {
+public class LunchGradeApiObjectMapperConfigurer implements AstrixObjectMapperConfigurer {
 
 	@Override
 	public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {

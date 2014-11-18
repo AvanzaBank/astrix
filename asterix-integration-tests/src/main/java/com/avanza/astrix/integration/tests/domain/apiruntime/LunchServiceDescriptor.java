@@ -16,16 +16,16 @@
 package com.avanza.astrix.integration.tests.domain.apiruntime;
 
 import com.avanza.astrix.integration.tests.domain.apiruntime.feeder.LunchFeederApiDescriptor;
-import com.avanza.astrix.provider.component.AsterixServiceComponentNames;
-import com.avanza.astrix.provider.core.AsterixService;
+import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.provider.core.AstrixService;
 
 
-@AsterixService(
+@AstrixService(
 	apiDescriptors = {
 		LunchApiDescriptor.class,
 		LunchFeederApiDescriptor.class
 	},
-	component = AsterixServiceComponentNames.GS_REMOTING
+	component = AstrixServiceComponentNames.GS_REMOTING
 )
 public class LunchServiceDescriptor {
 }
