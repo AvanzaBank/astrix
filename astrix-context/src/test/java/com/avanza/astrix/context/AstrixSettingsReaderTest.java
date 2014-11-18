@@ -28,7 +28,7 @@ public class AstrixSettingsReaderTest {
 
 	AstrixSettings settings = new AstrixSettings();
 	AstrixSettings externalConfig = new AstrixSettings();
-	AstrixSettingsReader AstrixSettingsReader = new AstrixSettingsReader(settings, externalConfig, "META-INF/Astrix/settings_test.properties");
+	AstrixSettingsReader AstrixSettingsReader = new AstrixSettingsReader(settings, externalConfig, "META-INF/astrix/settings_test.properties");
 	
 	@Test
 	public void externalConfigTakesHighestPrecedence() throws Exception {
