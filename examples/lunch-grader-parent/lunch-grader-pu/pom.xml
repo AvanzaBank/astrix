@@ -25,32 +25,32 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>lunch-asterix-extensions</artifactId>
+			<artifactId>lunch-astrix-extensions</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
+			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-context</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
+			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-versioning</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
+			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-fault-tolerance</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
+			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-gs</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
+			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-service-registry</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
+			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-gs-test-util</artifactId>
 			<scope>test</scope>
 		</dependency>

@@ -5,5 +5,5 @@
     <artifactId>astrix-examples-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>lunch-asterix-extensions</artifactId>
+  <artifactId>lunch-astrix-extensions</artifactId>
 </project>

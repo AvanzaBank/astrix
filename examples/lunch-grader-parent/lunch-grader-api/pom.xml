@@ -8,7 +8,7 @@
   <artifactId>lunch-grader-api</artifactId>
   <dependencies>
   	<dependency>
-		<groupId>${asterix.groupId}</groupId>
+		<groupId>${astrix.groupId}</groupId>
 		<artifactId>astrix-core</artifactId>  	
   	</dependency>
   	<dependency>

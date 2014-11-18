@@ -19,11 +19,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
+			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-gs-test-util</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
+			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-service-registry-pu</artifactId>
 		</dependency>
 	</dependencies>

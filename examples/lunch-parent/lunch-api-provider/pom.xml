@@ -14,7 +14,7 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>${asterix.groupId}</groupId>
+			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-provider</artifactId>
 		</dependency>
 	</dependencies>
