@@ -40,7 +40,7 @@ public class AstrixDashboardConfig {
 	@Bean
 	public AstrixSettings AstrixSettings() {
 		return new AstrixSettings() {{
-			set(Astrix_SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=elilin");
+			set(ASTRIX_SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=elilin");
 		}};
 	}
 	

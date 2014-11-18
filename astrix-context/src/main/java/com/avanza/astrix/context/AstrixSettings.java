@@ -29,8 +29,8 @@ public class AstrixSettings implements AstrixExternalConfig {
 	public static final String BEAN_REBIND_ATTEMPT_INTERVAL = "StatefulAstrixBean.beanRebindAttemptInterval";
 	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AstrixServiceRegistryLeaseManager.leaseRenewInterval";
 	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AstrixContext.enforceSubsystemBoundaries";
-	public static final String Astrix_CONFIG_URI = "AstrixConfig.uri";
-	public static final String Astrix_SERVICE_REGISTRY_URI = "AstrixServiceRegistry.serviceUri";
+	public static final String ASTRIX_CONFIG_URI = "AstrixConfig.uri";
+	public static final String ASTRIX_SERVICE_REGISTRY_URI = "AstrixServiceRegistry.serviceUri";
 	
 	/**
 	 * All services provided will be registered in the service-registry on a regular interval. This Setting defines
@@ -69,19 +69,19 @@ public class AstrixSettings implements AstrixExternalConfig {
 	}
 	
 	public final void setExternalConfigUrl(String AstrixConfigUrl) {
-		set(Astrix_CONFIG_URI, AstrixConfigUrl);
+		set(ASTRIX_CONFIG_URI, AstrixConfigUrl);
 	}
 	
 	public final String getAstrixConfigUrl() {
-		return getString(Astrix_CONFIG_URI);
+		return getString(ASTRIX_CONFIG_URI);
 	}
 	
 	public final void setServiceRegistryUri(String serviceRegistryUri) {
-		set(Astrix_SERVICE_REGISTRY_URI, serviceRegistryUri);
+		set(ASTRIX_SERVICE_REGISTRY_URI, serviceRegistryUri);
 	}
 	
 	public final String getServiceRegistryUri() {
-		return getString(Astrix_SERVICE_REGISTRY_URI);
+		return getString(ASTRIX_SERVICE_REGISTRY_URI);
 	}
 
 	public final void set(String settingName, long value) {

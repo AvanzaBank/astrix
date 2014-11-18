@@ -36,7 +36,7 @@ import com.avanza.astrix.provider.versioning.AstrixVersioned;
 	exportedApis = {
 			AstrixServiceRegistry.class
 	},
-	entryName = AstrixSettings.Astrix_SERVICE_REGISTRY_URI
+	entryName = AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI
 )
 public class AstrixServiceRegistryApiDescriptor {
 }

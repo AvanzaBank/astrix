@@ -56,11 +56,11 @@ public class AstrixSettingsReader {
 	static AstrixSettingsReader create(AstrixPlugins plugins, AstrixSettings settings) {
 		/*
 		 *  NOTE: 
-		 *  This behavior might look weird. We must create a AstrixSettingsReader too lookup the Astrix_CONFIG_URI setting
+		 *  This behavior might look weird. We must create a AstrixSettingsReader too lookup the ASTRIX_CONFIG_URI setting
 		 *  in order to create the AstrixExternalConfig. The reason is that we want the same chain of lookup
 		 *  to take place event when reading the external_config_url.
 		 */
-		String configUrl = new AstrixSettingsReader(settings, settings).getString(AstrixSettings.Astrix_CONFIG_URI);
+		String configUrl = new AstrixSettingsReader(settings, settings).getString(AstrixSettings.ASTRIX_CONFIG_URI);
 		if (configUrl == null) {
 			return new AstrixSettingsReader(settings, new AstrixSettings());
 		}

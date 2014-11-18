@@ -79,7 +79,7 @@ public class AstrixIntegrationTest {
 															.configure();
 	
 	private static AstrixSettings config = new AstrixSettings() {{
-		set(Astrix_SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
+		set(ASTRIX_SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
 		set(SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
 	}};
 	
@@ -122,7 +122,7 @@ public class AstrixIntegrationTest {
 		configurer.enableFaultTolerance(true);
 		configurer.enableVersioning(true);
 		configurer.set(AstrixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 100);
-		configurer.set(AstrixSettings.Astrix_CONFIG_URI, config.getExternalConfigUrl());
+		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, config.getExternalConfigUrl());
 		configurer.setSubsystem("test-sub-system");
 		Astrix = configurer.configure();
 		this.lunchService = Astrix.getBean(LunchService.class);
