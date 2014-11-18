@@ -54,7 +54,7 @@ public class AstrixServiceRegistryClientTest {
 //		// TODO: remove debugging information
 //		BasicConfigurator.configure();
 //		Logger.getRootLogger().setLevel(Level.WARN);
-//		Logger.getLogger("se.avanzabank.Astrix").setLevel(Level.DEBUG);
+//		Logger.getLogger("se.avanzabank.astrix").setLevel(Level.DEBUG);
 //	}
 
 	@Before
