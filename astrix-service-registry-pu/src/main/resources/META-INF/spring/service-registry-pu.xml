@@ -13,6 +13,11 @@
 	<bean class="com.avanza.astrix.context.AstrixFrameworkBean">
 		<property name="serviceDescriptor"
 			value="com.avanza.astrix.service.registry.pu.AstrixServiceRegistryServiceDescriptor" />
+		<property name="settings">
+			<map>
+				<entry key="AstrixGsComponent.exportGigaSpace" value="false"/>
+			</map>
+		</property>
 	</bean>
 	<bean name="serviceRegistryImpl"
 		class="com.avanza.astrix.service.registry.pu.AstrixServiceRegistryImpl" />

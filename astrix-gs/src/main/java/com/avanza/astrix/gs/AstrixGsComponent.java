@@ -16,6 +16,7 @@
 package com.avanza.astrix.gs;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
@@ -30,6 +31,7 @@ import com.avanza.astrix.context.AstrixPlugins;
 import com.avanza.astrix.context.AstrixPluginsAware;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceProperties;
+import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.AstrixSpringContext;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 
@@ -68,6 +70,9 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 	
 	@Override
 	public List<AstrixExportedServiceInfo> getImplicitExportedServices() {
+		if (!astrixContext.getSettings().getBoolean(AstrixSettings.EXPORT_GIGASPACE, true)) {
+			return Collections.emptyList();
+		}
 		return Arrays.asList(new AstrixExportedServiceInfo(GigaSpace.class, AstrixApiDescriptor.create(GsDescriptor.class), getName(), null));
 	}
 	
