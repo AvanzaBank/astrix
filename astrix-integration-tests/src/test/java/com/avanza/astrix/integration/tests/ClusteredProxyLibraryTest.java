@@ -28,17 +28,16 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
 
-import com.avanza.astrix.context.Astrix;
 import com.avanza.astrix.context.AstrixConfigurer;
+import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
-import com.avanza.astrix.integration.tests.domain.api.GetLunchRestaurantRequest;
-import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
+import com.avanza.astrix.integration.tests.domain.api.LunchStatistics;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 
-public class SmallIntegrationTest {
+public class ClusteredProxyLibraryTest {
 	
 	@ClassRule
 	public static RunningPu serviceRegistrypu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
@@ -65,6 +64,8 @@ public class SmallIntegrationTest {
 											  .configure();
 	
 	private LunchService lunchService;
+
+	private AstrixContext astrix;
 	
 	static {
 		BasicConfigurator.configure();
@@ -82,20 +83,17 @@ public class SmallIntegrationTest {
 		configurer.enableVersioning(true);
 		configurer.set(AstrixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 1000);
 		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, config.getExternalConfigUrl());
-		configurer.setSubsystem("test-sub-system");
-		Astrix astrix = configurer.configure();
+		configurer.setSubsystem("lunch-system");
+		astrix = configurer.configure();
 		this.lunchService = astrix.waitForBean(LunchService.class, 5000);
 	}
 	
+	
 	@Test
-	public void routedRemotingRequest() throws Exception {
+	public void aClusteredProxyIsConsumableUsingTheServiceRegistryFromTheSameSubsystem() throws Exception {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		
-		GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
-		request.setName("Martins Green Room");
-		
-		LunchRestaurant r = lunchService.getLunchRestaurant(request);
-		assertEquals("Martins Green Room", r.getName());
+		assertEquals(1, astrix.getBean(LunchStatistics.class).getRestaurantCount());
 	}
 
 }

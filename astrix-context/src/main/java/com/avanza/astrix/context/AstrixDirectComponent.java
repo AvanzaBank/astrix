@@ -16,6 +16,8 @@
 package com.avanza.astrix.context;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -129,7 +131,12 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	public <T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor) {
 		throw new UnsupportedOperationException();
 	}
-
+	
+	@Override
+	public List<AstrixExportedServiceInfo> getImplicitExportedServices() {
+		return Collections.emptyList();
+	}
+	
 	@Override
 	public boolean supportsAsyncApis() {
 		return false;

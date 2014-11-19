@@ -46,6 +46,7 @@ import com.avanza.astrix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.api.LunchServiceAsync;
+import com.avanza.astrix.integration.tests.domain.api.LunchStatistics;
 import com.avanza.astrix.integration.tests.domain.api.LunchUtil;
 import com.avanza.astrix.integration.tests.domain.apiruntime.feeder.InternalLunchFeeder;
 import com.avanza.astrix.integration.tests.domain2.api.LunchRestaurantGrader;
@@ -106,6 +107,8 @@ public class AstrixIntegrationTest {
 	private PublicLunchFeeder publicLunchFeeder;
 	private AstrixContext astrix;
 	private AstrixServiceRegistryClient serviceRegistryClient;
+
+	private LunchStatistics lunchGraderUtil;
 	
 	static {
 		BasicConfigurator.configure();
@@ -131,12 +134,14 @@ public class AstrixIntegrationTest {
 		this.asyncLunchService = astrix.getBean(LunchServiceAsync.class);
 		this.publicLunchFeeder = astrix.getBean(PublicLunchFeeder.class);
 		this.serviceRegistryClient = astrix.getBean(AstrixServiceRegistryClient.class);
+		this.lunchGraderUtil = astrix.getBean(LunchStatistics.class);
 		astrix.waitForBean(LunchService.class, 5000);
 		astrix.waitForBean(LunchUtil.class, 5000); // TODO: it does not make sense to wait for a library. How to cluelessly design waiting for libraries?
 		astrix.waitForBean(LunchRestaurantGrader.class, 5000);
 		astrix.waitForBean(LunchServiceAsync.class, 5000);
 		astrix.waitForBean(PublicLunchFeeder.class, 5000);
 		astrix.waitForBean(AstrixServiceRegistry.class, 5000);
+		astrix.waitForBean(LunchStatistics.class, 5000);
 	}
 	
 	@Test

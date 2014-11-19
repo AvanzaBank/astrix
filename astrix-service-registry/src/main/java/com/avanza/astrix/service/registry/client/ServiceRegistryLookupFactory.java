@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.avanza.astrix.context.AstrixApiDescriptor;
 import com.avanza.astrix.context.AstrixBeanAware;
+import com.avanza.astrix.context.AstrixBeanKey;
 import com.avanza.astrix.context.AstrixBeans;
 import com.avanza.astrix.context.AstrixFactoryBeanPlugin;
 import com.avanza.astrix.context.AstrixInject;
@@ -97,8 +98,8 @@ public class ServiceRegistryLookupFactory<T> implements AstrixFactoryBeanPlugin<
 	}
 	
 	@Override
-	public List<Class<?>> getBeanDependencies() {
-		return Arrays.<Class<?>>asList(AstrixServiceRegistryClient.class);
+	public List<AstrixBeanKey> getBeanDependencies() {
+		return Arrays.asList(AstrixBeanKey.create(AstrixServiceRegistryClient.class, null));
 	}
 
 	@Override

@@ -42,7 +42,6 @@ public class AstrixServiceExporter {
 	private AstrixContext astrixContext;
 	private final List<Object> serviceProviders = new CopyOnWriteArrayList<>();
 	
-	@PostConstruct
 	public void exportProvidedServices() {
 		Collection<AstrixExportedServiceInfo> exportedServices = getExportedServices();
 		validateAllPublishedServicesAreProvided(exportedServices);
@@ -53,15 +52,15 @@ public class AstrixServiceExporter {
 	
 	private void exportService(AstrixExportedServiceInfo exportedService) {
 		AstrixServiceComponent serviceComponent = serviceComponents.getComponent(exportedService.getComponentName());
-		exportService(exportedService.getProvider(), serviceComponent, exportedService.getProvidedService());
+		exportService(exportedService, serviceComponent, exportedService.getProvidedService());
 		if (exportedService.getApiDescriptor().usesServiceRegistry()) {
 			AstrixServiceRegistryPlugin serviceRegistryPlugin = astrixContext.getPlugin(AstrixServiceRegistryPlugin.class);
 			serviceRegistryPlugin.addProvider(exportedService.getProvidedService(), serviceComponent);
 		}
 	}
 	
-	private <T> void exportService(Object bean, AstrixServiceComponent serviceComponent, Class<T> providedApi) {
-		serviceComponent.exportService(providedApi, providedApi.cast(bean), getApiDescriptor(providedApi));
+	private <T> void exportService(AstrixExportedServiceInfo exportedService, AstrixServiceComponent serviceComponent, Class<T> providedApi) {
+		serviceComponent.exportService(providedApi, providedApi.cast(exportedService.getProvider()), exportedService.getApiDescriptor());
 	}
 
 	@AstrixInject
@@ -113,6 +112,9 @@ public class AstrixServiceExporter {
 
 	private Collection<AstrixExportedServiceInfo> getExportedServices() {
 		Set<AstrixExportedServiceInfo> result = new HashSet<>();
+		for (AstrixServiceComponent serviceComponent : this.serviceComponents.getAll()) {
+			result.addAll(serviceComponent.getImplicitExportedServices());
+		}
 		for (Object provider : this.serviceProviders) {
 			AstrixServiceExport serviceExport = provider.getClass().getAnnotation(AstrixServiceExport.class);
 			for (Class<?> providedServiceType : serviceExport.value()) {

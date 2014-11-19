@@ -18,7 +18,6 @@ package com.avanza.astrix.service.registry.server;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
@@ -49,15 +48,6 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 	private long retryIntervallMillis;
 	private AstrixContext astrixContext;
 
-	@Autowired
-	public AstrixServiceRegistryExporterWorker(AstrixServiceRegistryClient serviceRegistry, AstrixContext context) {
-		this.serviceRegistryClient = serviceRegistry;
-		AstrixSettingsReader settings = context.getSettings();
-		this.exportIntervallMillis = settings.getLong(AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 30_000L);
-		this.retryIntervallMillis = settings.getLong(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 5_000L);
-		this.serviceLeaseTimeMillis = settings.getLong(AstrixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
-	}
-	
 	public AstrixServiceRegistryExporterWorker() {
 	}
 	
@@ -67,9 +57,7 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 	}
 	
 
-	@PostConstruct
 	public void startServiceExporter() {
-		// TODO: How to start service exporter ??? It should be started after application is fully initialized
 		if (serviceBuilders.isEmpty()) {
 			log.info("No ServiceExporters configured. No services will be published to service registry");
 		}

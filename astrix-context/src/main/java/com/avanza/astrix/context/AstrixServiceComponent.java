@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.context;
 
+import java.util.List;
+
 
 /**
  * Used on the client side to bind to service exported over the service-registry. <p>
@@ -56,6 +58,8 @@ public interface AstrixServiceComponent {
 	 * @return
 	 */
 	boolean supportsAsyncApis();
+
+	List<AstrixExportedServiceInfo> getImplicitExportedServices();
 
 	
 }

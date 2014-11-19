@@ -15,20 +15,28 @@
  */
 package com.avanza.astrix.gs;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.context.AstrixApiDescriptor;
 import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixExportedServiceInfo;
+import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
 import com.avanza.astrix.context.AstrixInject;
+import com.avanza.astrix.context.AstrixPlugins;
+import com.avanza.astrix.context.AstrixPluginsAware;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixSpringContext;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 
 @MetaInfServices(AstrixServiceComponent.class)
-public class AstrixGsComponent implements AstrixServiceComponent {
-	
+public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsAware {
+
+	private AstrixPlugins plugins;
 	private AstrixContext astrixContext;
 	
 	@Override
@@ -36,7 +44,9 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 		if (!GigaSpace.class.isAssignableFrom(type)) {
 			throw new IllegalStateException("Programming error, attempted to create: " + type);
 		}
-		return type.cast(GsBinder.createGsFactory(serviceProperties).create()); // TODO: fault tolerance
+		T gigaSpace = type.cast(GsBinder.createGsFactory(serviceProperties).create());
+		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
+		return plugins.getPlugin(AstrixFaultTolerancePlugin.class).addFaultTolerance(type, gigaSpace, spaceName);
 	}
 	
 	@Override
@@ -55,7 +65,12 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 	public <T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor) {
 		// Intentionally empty
 	}
-
+	
+	@Override
+	public List<AstrixExportedServiceInfo> getImplicitExportedServices() {
+		return Arrays.asList(new AstrixExportedServiceInfo(GigaSpace.class, AstrixApiDescriptor.create(GsDescriptor.class), getName(), null));
+	}
+	
 	@Override
 	public boolean supportsAsyncApis() {
 		return false;
@@ -73,6 +88,11 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 	@AstrixInject
 	public void setAstrixContext(AstrixContext astrixContext) {
 		this.astrixContext = astrixContext;
+	}
+
+	@Override
+	public void setPlugins(AstrixPlugins plugins) {
+		this.plugins = plugins;
 	}
 	
 }

@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.context;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,6 +36,10 @@ public class AstrixServiceComponents implements AstrixPluginsAware {
 		for (AstrixServiceComponent serviceComponent : plugins.getPlugins(AstrixServiceComponent.class)) {
 			componentsByName.put(serviceComponent.getName(), serviceComponent);
 		}
+	}
+
+	public Collection<AstrixServiceComponent> getAll() {
+		return this.componentsByName.values();
 	}
 
 

@@ -23,14 +23,4 @@ import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
 	GigaSpace.class
 )
 public class GsDescriptor {
-	
-	/*
-	 * TODO:
-	 * GigaSpace should not be exported generically from this class. It should
-	 * rather be exported as any other service by a service provider that
-	 * exports GigaSpace and a corresponding space-name as a service. 
-	 * 
-	 * 
-	 */
-	
 }

@@ -19,4 +19,5 @@ package com.avanza.astrix.integration.tests.domain.api;
 public interface LunchUtil {
 
 	LunchRestaurant suggestVegetarianRestaurant();
+
 }

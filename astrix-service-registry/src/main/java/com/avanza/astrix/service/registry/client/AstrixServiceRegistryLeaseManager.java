@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.context.AstrixBeanAware;
+import com.avanza.astrix.context.AstrixBeanKey;
 import com.avanza.astrix.context.AstrixBeans;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixSettings;
@@ -86,8 +87,8 @@ public class AstrixServiceRegistryLeaseManager extends Thread implements AstrixB
 	}
 
 	@Override
-	public List<Class<?>> getBeanDependencies() {
-		return Arrays.<Class<?>>asList(AstrixServiceRegistryClient.class);
+	public List<AstrixBeanKey> getBeanDependencies() {
+		return Arrays.asList(AstrixBeanKey.create(AstrixServiceRegistryClient.class, null));
 	}
 	
 	@PreDestroy
