@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.context;
 
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 /**
  * Used on the client side to bind to service exported over the service-registry. <p>
@@ -37,13 +36,6 @@ public interface AstrixServiceComponent {
 	 * @return
 	 */
 	String getName();
-	
-	/**
-	 * Server side component used to make a given provider using this component invokable
-	 * from other processes.
-	 * @return
-	 */
-	Class<? extends AstrixServiceExporterBean> getExporterBean();
 	
 	/**
 	 * Server side component used by service-registry to extract service

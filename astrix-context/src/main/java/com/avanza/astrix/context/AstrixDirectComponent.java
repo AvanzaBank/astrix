@@ -126,12 +126,6 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	}
 
 	@Override
-	public Class<? extends AstrixServiceExporterBean> getExporterBean() {
-		// NOT USED. This is a client side component only
-		return null;
-	}
-
-	@Override
 	public Class<? extends AstrixServicePropertiesBuilder> getServiceBuilder() {
 		// NOT USED. This is a client side component only
 		return null;
