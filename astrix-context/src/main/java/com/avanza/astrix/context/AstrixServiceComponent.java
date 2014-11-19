@@ -30,6 +30,8 @@ public interface AstrixServiceComponent {
 	
 	<T> T createService(AstrixApiDescriptor apiDescriptor, Class<T> type, String serviceProperties);
 	
+	<T> AstrixServiceProperties createServiceProperties(Class<T> exportedService);
+	
 	/**
 	 * The name of this component.
 	 * 
@@ -55,6 +57,5 @@ public interface AstrixServiceComponent {
 	 */
 	boolean supportsAsyncApis();
 
-	<T> AstrixServiceProperties createServiceProperties(Class<T> exportedService);
 	
 }

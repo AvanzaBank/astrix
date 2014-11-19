@@ -24,9 +24,6 @@
 			</map>
 		</property>
 	</bean>
-<!-- 	<bean id="AstrixSettings" class="com.avanza.astrix.context.AstrixSettings"> -->
-<!-- 		<property name="externalConfigUrl" value="${configUrl}" /> -->
-<!-- 	</bean> -->
 	
 	<!-- The actual service implementation(s) -->
     <bean id="lunchService" class="com.avanza.astrix.integration.tests.domain.pu.LunchServiceImpl"/>

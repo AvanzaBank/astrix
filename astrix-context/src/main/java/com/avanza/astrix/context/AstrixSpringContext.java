@@ -16,7 +16,15 @@
 package com.avanza.astrix.context;
 
 import org.springframework.context.ApplicationContext;
-
+/**
+ * Acts as a bride between Astrix and Spring.
+ * 
+ * - Astrix managed classes can read spring-beans by accessing the ApplicationContext
+ * - Spring managed classes might access Astrix by autowiring in this class
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AstrixSpringContext {
 	
 	private AstrixContext astrixContext;
