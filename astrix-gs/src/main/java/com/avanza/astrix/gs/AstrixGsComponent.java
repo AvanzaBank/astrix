@@ -17,17 +17,19 @@ package com.avanza.astrix.gs;
 
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import com.avanza.astrix.context.AstrixApiDescriptor;
+import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixServiceComponent;
-import com.avanza.astrix.context.AstrixServiceExporterBean;
 import com.avanza.astrix.context.AstrixServiceProperties;
-import com.avanza.astrix.context.AstrixServicePropertiesBuilder;
+import com.avanza.astrix.context.AstrixSpringContext;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 
 @MetaInfServices(AstrixServiceComponent.class)
 public class AstrixGsComponent implements AstrixServiceComponent {
+	
+	private AstrixContext astrixContext;
 	
 	@Override
 	public <T> T createService(AstrixApiDescriptor apiDescriptor, Class<T> type, AstrixServiceProperties serviceProperties) {
@@ -48,19 +50,29 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 		return AstrixServiceComponentNames.GS;
 	}
 	
+
 	@Override
-	public void registerBeans(BeanDefinitionRegistry registry) {
-		// Does not require any spring-beans
+	public <T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor) {
+		// Intentionally empty
 	}
 
 	@Override
-	public Class<? extends AstrixServiceExporterBean> getExporterBean() {
-		return null;
+	public boolean supportsAsyncApis() {
+		return false;
 	}
 
 	@Override
-	public Class<? extends AstrixServicePropertiesBuilder> getServiceBuilder() {
-		return GigaSpaceServiceRegistryExporter.class;
+	public <T> AstrixServiceProperties createServiceProperties(Class<T> type) {
+		if (!type.equals(GigaSpace.class)) {
+			throw new IllegalArgumentException("Can't export: " + type);
+		}
+		GigaSpace space = astrixContext.getInstance(AstrixSpringContext.class).getApplicationContext().getBean(GigaSpace.class);
+		return GsBinder.createProperties(space);
+	}
+	
+	@AstrixInject
+	public void setAstrixContext(AstrixContext astrixContext) {
+		this.astrixContext = astrixContext;
 	}
 	
 }

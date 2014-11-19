@@ -73,6 +73,11 @@ public class StatefulAstrixBean<T> implements InvocationHandler {
 		log.info("Successfully rebound to " + beanFactory.getBeanType() + ", AstrixBeanId=" + id);
 	}
 	
+	@Override
+	public String toString() {
+		return "StatefulAsterixBean[" + this.beanFactory.getBeanType().getName() + "]";
+	}
+	
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -102,6 +107,9 @@ public class StatefulAstrixBean<T> implements InvocationHandler {
 
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			if (method.getDeclaringClass().equals(Object.class)) {
+				return method.invoke(StatefulAstrixBean.this, args);
+			}
 			throw new ServiceUnavailableException("AstrixBeanId=" + id + " beanType="+ beanFactory.getBeanType().getName() + " qualifier=" + optionalQualifier);
 		}
 	}

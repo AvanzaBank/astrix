@@ -15,8 +15,8 @@
  */
 package com.avanza.astrix.service.registry.server;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixServiceProperties;
-import com.avanza.astrix.context.AstrixServicePropertiesBuilderHolder;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.AstrixSettingsReader;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -41,12 +41,13 @@ import com.avanza.astrix.service.registry.client.AstrixServiceRegistryClient;
  */
 public class AstrixServiceRegistryExporterWorker extends Thread {
 	
-	private List<AstrixServicePropertiesBuilderHolder> serviceBuilders = Collections.emptyList();
-	private final AstrixServiceRegistryClient serviceRegistryClient;
-	private final Logger log = LoggerFactory.getLogger(AstrixServiceRegistryExporterWorker.class);
-	private final long exportIntervallMillis;		  
-	private final long serviceLeaseTimeMillis;
-	private final long retryIntervallMillis;
+	private List<AstrixServicePropertiesBuilderHolder> serviceBuilders = new CopyOnWriteArrayList<>();
+	private AstrixServiceRegistryClient serviceRegistryClient;
+	private Logger log = LoggerFactory.getLogger(AstrixServiceRegistryExporterWorker.class);
+	private long exportIntervallMillis;		  
+	private long serviceLeaseTimeMillis;
+	private long retryIntervallMillis;
+	private AstrixContext astrixContext;
 
 	@Autowired
 	public AstrixServiceRegistryExporterWorker(AstrixServiceRegistryClient serviceRegistry, AstrixContext context) {
@@ -57,6 +58,9 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 		this.serviceLeaseTimeMillis = settings.getLong(AstrixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
 	}
 	
+	public AstrixServiceRegistryExporterWorker() {
+	}
+	
 	@Autowired(required = false)
 	public void setServiceBuilders(List<AstrixServicePropertiesBuilderHolder> serviceBuilders) {
 		this.serviceBuilders = serviceBuilders;
@@ -65,9 +69,15 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 
 	@PostConstruct
 	public void startServiceExporter() {
+		// TODO: How to start service exporter ??? It should be started after application is fully initialized
 		if (serviceBuilders.isEmpty()) {
 			log.info("No ServiceExporters configured. No services will be published to service registry");
 		}
+		this.serviceRegistryClient = astrixContext.getBean(AstrixServiceRegistryClient.class);
+		AstrixSettingsReader settings = astrixContext.getSettings();
+		this.exportIntervallMillis = settings.getLong(AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 30_000L);
+		this.retryIntervallMillis = settings.getLong(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 5_000L);
+		this.serviceLeaseTimeMillis = settings.getLong(AstrixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
 		start();
 	}
 	
@@ -108,6 +118,16 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 				log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			}
 		}
+	}
+	
+	@AstrixInject
+	public void setAstrixContext(AstrixContext astrixContext) {
+		this.astrixContext = astrixContext;
+	}
+
+	public void addServiceBuilder(
+			AstrixServicePropertiesBuilderHolder astrixServicePropertiesBuilderHolder) {
+		this.serviceBuilders.add(astrixServicePropertiesBuilderHolder);
 	}
 	
 

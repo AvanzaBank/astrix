@@ -71,25 +71,25 @@ public class AstrixBeanStateWorker extends Thread {
 	
 	private static class BindCommand implements Runnable {
 		
-		private final StatefulAstrixBean<?> AstrixBean;
+		private final StatefulAstrixBean<?> astrixBean;
 		
-		public BindCommand(StatefulAstrixBean<?> AstrixBean) {
-			this.AstrixBean = AstrixBean;
+		public BindCommand(StatefulAstrixBean<?> astrixBean) {
+			this.astrixBean = astrixBean;
 		}
 
 		@Override
 		public void run() {
-			if (AstrixBean.isBound()) {
+			if (astrixBean.isBound()) {
 				return;
 			}
-			log.debug("Binding bean. AstrixBeanId=" + AstrixBean.getId());
+			log.debug("Binding bean. astrixBeanId=" + astrixBean.getId());
 			try {
-				AstrixBean.bind();
+				astrixBean.bind();
 			} catch (MissingExternalDependencyException e) {
-				log.error("Runtime configuration error. Failed to create " + AstrixBean.getBeanFactory().getBeanType(), e);
+				log.error("Runtime configuration error. Failed to create " + astrixBean.getBeanFactory().getBeanType(), e);
 				return;
 			} catch (Exception e) {
-				log.info("Failed to bind to " + AstrixBean.getBeanFactory().getBeanType().getName(), e);
+				log.info("Failed to bind to " + astrixBean.getBeanFactory().getBeanType().getName() + " astrixBeanId=" + astrixBean.getId(), e);
 			}
 		}
 	}

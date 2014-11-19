@@ -23,6 +23,7 @@ import javax.annotation.Resource;
 import org.openspaces.core.executor.AutowireTask;
 import org.openspaces.core.executor.DistributedTask;
 
+import com.avanza.astrix.context.AstrixSpringContext;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 import com.gigaspaces.async.AsyncResult;
 
@@ -31,7 +32,7 @@ public class AstrixDistributedServiceInvocationTask implements DistributedTask<A
 
 	private static final long serialVersionUID = 1L;
 	@Resource
-	private transient AstrixServiceActivator AstrixServiceActivator;
+	private transient AstrixSpringContext astrixSpringContext;
 	private final AstrixServiceInvocationRequest request;
 	
 	public AstrixDistributedServiceInvocationTask(AstrixServiceInvocationRequest request) {
@@ -40,7 +41,8 @@ public class AstrixDistributedServiceInvocationTask implements DistributedTask<A
 
 	@Override
 	public AstrixServiceInvocationResponse execute() throws Exception {
-		return AstrixServiceActivator.invokeService(request);
+		AstrixServiceActivator serviceActivator = astrixSpringContext.getAstrixContext().getInstance(AstrixServiceActivator.class);
+		return serviceActivator.invokeService(request);
 	}
 	
 	@Override

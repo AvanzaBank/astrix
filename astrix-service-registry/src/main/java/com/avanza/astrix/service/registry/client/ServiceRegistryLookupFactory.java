@@ -55,6 +55,9 @@ public class ServiceRegistryLookupFactory<T> implements AstrixFactoryBeanPlugin<
 		AstrixServiceRegistryClient serviceRegistry = beans.getBean(AstrixServiceRegistryClient.class);
 		AstrixServiceProperties serviceProperties;
 		serviceProperties = serviceRegistry.lookup(api, qualifier);
+		if (serviceProperties == null) {
+			throw new RuntimeException(String.format("No service-provider found in service-registry: api=%s qualifier=%s", api.getName(), qualifier));
+		}
 		String providerSubsystem = serviceProperties.getProperty(AstrixServiceProperties.SUBSYSTEM);
 		if (!isAllowedToInvokeService(providerSubsystem)) {
 			return createIllegalSubsystemProxy(providerSubsystem);

@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.context;
 
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 /**
  * Used on the client side to bind to service exported over the service-registry. <p>
@@ -31,33 +30,32 @@ public interface AstrixServiceComponent {
 	
 	<T> T createService(AstrixApiDescriptor apiDescriptor, Class<T> type, String serviceProperties);
 	
+	<T> AstrixServiceProperties createServiceProperties(Class<T> exportedService);
+	
 	/**
 	 * The name of this component.
 	 * 
 	 * @return
 	 */
 	String getName();
+
+	<T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor);
 	
 	/**
-	 * Used on server side to register all required spring-beans to use this component.
+	 * Whether the api supports an async version based on the following naming
+	 * convention:
+	 *  
+	 * <pre>
+	 * MyService
+	 * 	MyResult mySyncMethod(Argument)
 	 * 
-	 * @param registry
-	 * @param serviceDescriptor 
-	 */
-	void registerBeans(BeanDefinitionRegistry registry);
-	
-	/**
-	 * Server side component used to make a given provider using this component invokable
-	 * from other processes.
+	 * MyServiceAsync
+	 * 	Future<MyResult> mySyncMethod(Argument)
+	 * </pre>
+	 * 
 	 * @return
 	 */
-	Class<? extends AstrixServiceExporterBean> getExporterBean();
-	
-	/**
-	 * Server side component used by service-registry to extract service
-	 * properties for services published to service-registry.
-	 * @return
-	 */
-	Class<? extends AstrixServicePropertiesBuilder> getServiceBuilder();
+	boolean supportsAsyncApis();
+
 	
 }

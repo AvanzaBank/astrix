@@ -305,6 +305,9 @@ public class AstrixContext implements Astrix {
 		if (classType.equals(InstanceCache.class)) {
 			return classType.cast(instanceCache);
 		}
+		if (classType.equals(AstrixContext.class)) {
+			return classType.cast(this);
+		}
 		return this.instanceCache.getInstance(classType);
 	}
 	

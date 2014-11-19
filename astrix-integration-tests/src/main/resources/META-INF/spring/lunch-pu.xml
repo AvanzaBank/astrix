@@ -18,9 +18,11 @@
 	<bean id="AstrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
 		<property name="serviceDescriptor" value="com.avanza.astrix.integration.tests.domain.apiruntime.LunchServiceDescriptor"/>
 		<property name="subsystem" value="lunch-system"/>
-	</bean>
-	<bean id="AstrixSettings" class="com.avanza.astrix.context.AstrixSettings">
-		<property name="externalConfigUrl" value="${configUrl}" />
+		<property name="settings">
+			<map>
+				<entry key="AstrixConfig.uri" value="${configUrl}"/>
+			</map>
+		</property>
 	</bean>
 	
 	<!-- The actual service implementation(s) -->

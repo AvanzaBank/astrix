@@ -16,13 +16,16 @@
 package com.avanza.astrix.context;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import com.avanza.astrix.provider.core.AstrixServiceExport;
 
 /**
  * Server side component used to export all services provided by a given server as defined by
@@ -31,38 +34,100 @@ import org.springframework.context.ApplicationContextAware;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceExporter implements ApplicationContextAware {
+public class AstrixServiceExporter {
 	
-	private ApplicationContext applicationContext;
-	private AstrixServiceExporterBeans AstrixServiceExporterBeans;
-	private Collection<AstrixExportedServiceInfo> exportedServices;
-
-	@Autowired
-	public AstrixServiceExporter(AstrixServiceExporterBeans AstrixServiceExporters) {
-		this.AstrixServiceExporterBeans = AstrixServiceExporters;
-	}
-	
-	public Collection<AstrixExportedServiceInfo> getExportedServices() {
-		return exportedServices;
-	}
-	
-	public void setExportedServices(Collection<AstrixExportedServiceInfo> exportedServices) {
-		this.exportedServices = exportedServices;
-	}
-
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
-		this.applicationContext = applicationContext;
-	}
+	private AstrixServiceComponents serviceComponents;
+	private AstrixServiceDescriptor serviceDescriptor;
+	private final Map<Class<?>, AstrixApiDescriptor> apiDescriptorByProvideService = new ConcurrentHashMap<Class<?>, AstrixApiDescriptor>();
+	private AstrixContext astrixContext;
+	private final List<Object> serviceProviders = new CopyOnWriteArrayList<>();
 	
 	@PostConstruct
-	public void register() {
+	public void exportProvidedServices() {
+		Collection<AstrixExportedServiceInfo> exportedServices = getExportedServices();
+		validateAllPublishedServicesAreProvided(exportedServices);
 		for (AstrixExportedServiceInfo exportedService : exportedServices) {
-			Object provider = applicationContext.getBean(exportedService.getProvidingBeanName());
-			AstrixServiceExporterBean serviceExporterBean = AstrixServiceExporterBeans.getServiceExporter(exportedService.getComponentName());
-			serviceExporterBean.register(provider, exportedService.getApiDescriptor(), exportedService.getProvidedService());
+			exportService(exportedService);
 		}
+	}
+	
+	private void exportService(AstrixExportedServiceInfo exportedService) {
+		AstrixServiceComponent serviceComponent = serviceComponents.getComponent(exportedService.getComponentName());
+		exportService(exportedService.getProvider(), serviceComponent, exportedService.getProvidedService());
+		if (exportedService.getApiDescriptor().usesServiceRegistry()) {
+			AstrixServiceRegistryPlugin serviceRegistryPlugin = astrixContext.getPlugin(AstrixServiceRegistryPlugin.class);
+			serviceRegistryPlugin.addProvider(exportedService.getProvidedService(), serviceComponent);
+		}
+	}
+	
+	private <T> void exportService(Object bean, AstrixServiceComponent serviceComponent, Class<T> providedApi) {
+		serviceComponent.exportService(providedApi, providedApi.cast(bean), getApiDescriptor(providedApi));
+	}
+
+	@AstrixInject
+	public void setServiceComponents(AstrixServiceComponents serviceComponents) {
+		this.serviceComponents = serviceComponents;
+	}
+	
+	@AstrixInject
+	public void setAstrixContext(AstrixContext astrixContext) {
+		this.astrixContext = astrixContext;
+	}
+
+	public void addServiceProvider(Object bean) {
+		this.serviceProviders.add(bean);
+	}
+	
+	private AstrixApiDescriptor getApiDescriptor(Class<?> serviceType) {
+		AstrixApiDescriptor result = this.apiDescriptorByProvideService.get(serviceType);
+		if (result == null) {
+			throw new IllegalArgumentException("Service descriptor does not export service. descriptor: " + serviceDescriptor.getClass().getName() + ", service: " + serviceType.getName());
+		}
+		return result;
+	}
+
+	public void setSericeDescriptor(AstrixServiceDescriptor serviceDescriptor) {
+		this.serviceDescriptor = serviceDescriptor;		// TODO: How to inject service descriptor??? 
+		for (AstrixApiDescriptor apiDescriptor : serviceDescriptor.getApiDescriptors()) {
+			for (Class<?> beanType : astrixContext.getExportedBeans(apiDescriptor)) {
+				apiDescriptorByProvideService.put(beanType, apiDescriptor);
+			}
+		}
+	}
+	
+	private void validateAllPublishedServicesAreProvided(Collection<AstrixExportedServiceInfo> exportedServices) {
+		Set<Class<?>> providedServices = new HashSet<>();
+		for (AstrixExportedServiceInfo exportedServiceInfo : exportedServices) {
+			providedServices.add(exportedServiceInfo.getProvidedService());
+		}
+		Set<Class<?>> publishedServices = new HashSet<>(this.apiDescriptorByProvideService.keySet());
+		publishedServices.removeAll(providedServices);
+		if (!publishedServices.isEmpty()) {
+			throw new IllegalStateException(String.format(
+					"Couldn't find service provider(s) (@AstrixServiceExport annotated bean) for all " +
+					"services exported by service descriptor. Missing provider(s) for: %s. Verify that " +
+					"current application-context defines a bean providing the given service(s) that are annotated with @AstrixServiceExport",
+					publishedServices));
+		}
+	}
+
+	private Collection<AstrixExportedServiceInfo> getExportedServices() {
+		Set<AstrixExportedServiceInfo> result = new HashSet<>();
+		for (Object provider : this.serviceProviders) {
+			AstrixServiceExport serviceExport = provider.getClass().getAnnotation(AstrixServiceExport.class);
+			for (Class<?> providedServiceType : serviceExport.value()) {
+				if (!publishesService(providedServiceType)) {
+					continue;
+				}
+				AstrixApiDescriptor apiDescriptor = getApiDescriptor(providedServiceType);
+				result.add(new AstrixExportedServiceInfo(providedServiceType, apiDescriptor, serviceDescriptor.getComponent(), provider));
+			}
+		}
+		return result;
+	}
+	
+	private boolean publishesService(Class<?> providedServiceType) {
+		return this.apiDescriptorByProvideService.containsKey(providedServiceType);
 	}
 
 }

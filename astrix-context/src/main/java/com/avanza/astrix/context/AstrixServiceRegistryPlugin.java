@@ -15,16 +15,11 @@
  */
 package com.avanza.astrix.context;
 
-import java.util.Collection;
-
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 public interface AstrixServiceRegistryPlugin {
 
-	void registerBeanDefinitions(BeanDefinitionRegistry registry,
-			Collection<AstrixExportedServiceInfo> publishedServices) throws BeansException;
-
-	Collection<? extends Class<?>> getConsumedBeanTypes();
+	<T> void addProvider(Class<T> beanType, AstrixServiceComponent serviceComponent);
+	
+	void startPublishServices();
 
 }

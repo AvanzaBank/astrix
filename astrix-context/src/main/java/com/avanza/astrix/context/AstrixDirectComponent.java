@@ -21,7 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.kohsuke.MetaInfServices;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 
@@ -54,11 +53,6 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	@Override
 	public String getName() {
 		return AstrixServiceComponentNames.DIRECT;
-	}
-
-	@Override
-	public void registerBeans(BeanDefinitionRegistry registry) {
-		 // NOT USED. Client side component only 
 	}
 
 	public static <T> String register(Class<T> type, T provider) {
@@ -132,15 +126,18 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	}
 
 	@Override
-	public Class<? extends AstrixServiceExporterBean> getExporterBean() {
-		// NOT USED. This is a client side component only
-		return null;
+	public <T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Class<? extends AstrixServicePropertiesBuilder> getServiceBuilder() {
-		// NOT USED. This is a client side component only
-		return null;
+	public boolean supportsAsyncApis() {
+		return false;
+	}
+
+	@Override
+	public <T> AstrixServiceProperties createServiceProperties(Class<T> exportedService) {
+		throw new UnsupportedOperationException();
 	}
 	
 }
