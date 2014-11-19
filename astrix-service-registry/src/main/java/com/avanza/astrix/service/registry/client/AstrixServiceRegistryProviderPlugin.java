@@ -51,16 +51,9 @@ public class AstrixServiceRegistryProviderPlugin implements AstrixApiProviderPlu
 	}
 
 	private Class<?>[] getExportedApis(AstrixApiDescriptor descriptor) {
-		Class<?> [] exportedApisDeprecatedWay = descriptor.getAnnotation(AstrixServiceRegistryApi.class).exportedApis();
-		Class<?> [] exportedApisNewWay = descriptor.getAnnotation(AstrixServiceRegistryApi.class).value();
-		if (exportedApisDeprecatedWay.length > 0 && exportedApisNewWay.length > 0) {
-			throw new IllegalArgumentException("Don't combine exportedApis and value. The exportedApis property is replcaed by the value property. Only defina a value property. Descriptor: " + descriptor.getName());
-		}
-		if (exportedApisDeprecatedWay.length > 0) {
-			return exportedApisDeprecatedWay;
-		}
-		if (exportedApisNewWay.length > 0) {
-			return exportedApisNewWay;
+		Class<?> [] exportedApis = descriptor.getAnnotation(AstrixServiceRegistryApi.class).value();
+		if (exportedApis.length > 0) {
+			return exportedApis;
 		}
 		throw new IllegalArgumentException("No exported apis found on AstrixServiceRegistryApi: " + descriptor.getName());	
 	}

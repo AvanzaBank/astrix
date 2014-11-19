@@ -35,13 +35,6 @@ import java.lang.annotation.Target;
 public @interface AstrixServiceRegistryApi {
 
 	/**
-	 * Replaced by value
-	 * @return
-	 */
-	@Deprecated
-	Class<?>[] exportedApis() default {};
-
-	/**
 	 * All exported apis.
 	 * 
 	 * @return
