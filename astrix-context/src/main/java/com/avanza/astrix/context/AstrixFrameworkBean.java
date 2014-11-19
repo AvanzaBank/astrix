@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PreDestroy;
-import javax.management.RuntimeErrorException;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -56,6 +55,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 			beanFactory.registerSingleton(consumedAstrixBean.getName(), astrixContext.getBean(consumedAstrixBean));
 		}
 		beanFactory.registerSingleton("_astrixSpringContext", astrixContext.getInstance(AstrixSpringContext.class));
+		beanFactory.registerSingleton("_astrixContext", astrixContext);
 		beanFactory.addBeanPostProcessor(astrixContext.getInstance(AstrixBeanPostProcessor.class));
 	}
 
@@ -138,6 +138,9 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	}
 
 	private void exportAllProvidedServices() {
+		if (serviceDescriptor == null) {
+			return; // current application exports no services
+		}
 		AstrixServiceExporter serviceExporter = astrixContext.getInstance(AstrixServiceExporter.class);
 		serviceExporter.setSericeDescriptor(serviceDescriptor); // TODO This is a hack. Avoid setting serviceDescriptor explicitly here
 		serviceExporter.exportProvidedServices();
