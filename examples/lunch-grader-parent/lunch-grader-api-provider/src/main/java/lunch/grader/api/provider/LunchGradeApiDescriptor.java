@@ -25,12 +25,10 @@ import com.avanza.astrix.provider.versioning.AstrixVersioned;
 	objectMapperConfigurer = LunchGradeApiObjectMapperConfigurer.class,
 	version = 1
 )
-@AstrixServiceRegistryApi(
-	exportedApis = {
-		LunchRestaurantGrader.class,
-		PublicLunchFeeder.class
-	}
-)
+@AstrixServiceRegistryApi({
+	LunchRestaurantGrader.class,
+	PublicLunchFeeder.class
+})
 public class LunchGradeApiDescriptor {
 }
 
