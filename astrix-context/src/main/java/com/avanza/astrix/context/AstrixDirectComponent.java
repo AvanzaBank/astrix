@@ -126,12 +126,6 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	}
 
 	@Override
-	public Class<? extends AstrixServicePropertiesBuilder> getServiceBuilder() {
-		// NOT USED. This is a client side component only
-		return null;
-	}
-
-	@Override
 	public <T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor) {
 		throw new UnsupportedOperationException();
 	}

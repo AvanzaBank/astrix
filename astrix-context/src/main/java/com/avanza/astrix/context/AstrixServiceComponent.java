@@ -36,13 +36,6 @@ public interface AstrixServiceComponent {
 	 * @return
 	 */
 	String getName();
-	
-	/**
-	 * Server side component used by service-registry to extract service
-	 * properties for services published to service-registry.
-	 * @return
-	 */
-	Class<? extends AstrixServicePropertiesBuilder> getServiceBuilder();
 
 	<T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor);
 	

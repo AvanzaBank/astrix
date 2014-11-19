@@ -13,24 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.service.registry.server;
 
-public class AstrixServicePropertiesBuilderHolder {
+import com.avanza.astrix.context.AstrixServiceComponent;
+import com.avanza.astrix.context.AstrixServiceProperties;
+
+class AstrixServicePropertiesBuilderHolder {
 	
-	private AstrixServicePropertiesBuilder servicePropertiesBuilder;
-	private String componentName;
 	private Class<?> exportedService;
 	private Class<?> asyncService;
 	private AstrixServiceComponent serviceComponent;
-	
-	public AstrixServicePropertiesBuilderHolder(AstrixServicePropertiesBuilder serviceBuilder, String componentName, Class<?> exportedService) {
-		this.servicePropertiesBuilder = serviceBuilder;
-		this.componentName = componentName;
-		this.exportedService = exportedService;
-		if (this.servicePropertiesBuilder.supportsAsyncApis()) {
-			this.asyncService = loadInterfaceIfExists(exportedService.getName() + "Async");
-		}
-	}
 	
 	public AstrixServicePropertiesBuilderHolder(AstrixServiceComponent serviceComponent, Class<?> exportedService) {
 		this.serviceComponent = serviceComponent;
@@ -62,13 +54,6 @@ public class AstrixServicePropertiesBuilderHolder {
 		serviceProperties.setComponent(serviceComponent.getName());
 		return serviceProperties;
 	}
-	
-//	public AstrixServiceProperties exportServiceProperties() {
-//		AstrixServiceProperties serviceProperties = servicePropertiesBuilder.buildServiceProperties(exportedService);
-//		serviceProperties.setApi(exportedService);
-//		serviceProperties.setComponent(componentName);
-//		return serviceProperties;
-//	}
 	
 	public AstrixServiceProperties exportAsyncServiceProperties() {
 		AstrixServiceProperties serviceProperties = exportServiceProperties();

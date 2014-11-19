@@ -23,7 +23,6 @@ import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceProperties;
-import com.avanza.astrix.context.AstrixServicePropertiesBuilder;
 import com.avanza.astrix.context.AstrixSpringContext;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 
@@ -51,10 +50,6 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 		return AstrixServiceComponentNames.GS;
 	}
 	
-	@Override
-	public Class<? extends AstrixServicePropertiesBuilder> getServiceBuilder() {
-		return GigaSpaceServiceRegistryExporter.class;
-	}
 
 	@Override
 	public <T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor) {

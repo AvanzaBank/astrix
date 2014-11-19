@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixServiceProperties;
-import com.avanza.astrix.context.AstrixServicePropertiesBuilderHolder;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.AstrixSettingsReader;
 import com.avanza.astrix.core.ServiceUnavailableException;
