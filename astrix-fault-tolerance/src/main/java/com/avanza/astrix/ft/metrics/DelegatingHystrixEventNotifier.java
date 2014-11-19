@@ -19,6 +19,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixEventType;
@@ -34,17 +37,27 @@ import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;
 public final class DelegatingHystrixEventNotifier extends HystrixEventNotifier {
 
 	Collection<HystrixEventNotifier> notifiers = new CopyOnWriteArrayList<HystrixEventNotifier>();
-	
+
 	private static DelegatingHystrixEventNotifier registeredInstance;
-	
+
+	private static final Logger log = LoggerFactory.getLogger(DelegatingHystrixEventNotifier.class);
+
 	public synchronized static DelegatingHystrixEventNotifier getRegisteredNotifierOrRegisterNew() {
 		if (registeredInstance == null) {
 			registeredInstance = new DelegatingHystrixEventNotifier();
-			HystrixPlugins.getInstance().registerEventNotifier(registeredInstance);
+			try {
+				HystrixPlugins.getInstance().registerEventNotifier(registeredInstance);
+			} catch (IllegalStateException e) {
+				HystrixEventNotifier alreadyRegisteredNotifier = HystrixPlugins.getInstance().getEventNotifier();
+				log.warn(
+						"Could not register DelegatingHystrixEventNotifier. Command execution events will not be tracked. Already registered notifier: "
+								+ alreadyRegisteredNotifier, e);
+				// Return the delegating event notifier anyways so that clients not need to adapt. It will never be called though.
+			}
 		}
 		return registeredInstance;
 	}
-	
+
 	private DelegatingHystrixEventNotifier() {
 	}
 

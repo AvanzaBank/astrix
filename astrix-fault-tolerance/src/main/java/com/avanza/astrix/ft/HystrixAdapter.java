@@ -44,11 +44,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	private static DelegatingHystrixEventNotifier delegatingEventNotifier;
 
 	static {
-		try {
-			delegatingEventNotifier = DelegatingHystrixEventNotifier.getRegisteredNotifierOrRegisterNew();
-		} catch (IllegalStateException e) {
-			log.warn("Failed to register delegating event notifier", e);
-		}
+		delegatingEventNotifier = DelegatingHystrixEventNotifier.getRegisteredNotifierOrRegisterNew();
 	}
 
 	private final T provider;
