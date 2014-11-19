@@ -15,11 +15,28 @@
  */
 package com.avanza.astrix.context;
 
+import org.springframework.context.ApplicationContext;
 
-public interface AstrixServiceRegistryPlugin {
-
-	<T> void addProvider(Class<T> beanType, AstrixServiceComponent serviceComponent);
+public class AstrixSpringContext {
 	
-	void startPublishServices();
+	private AstrixContext astrixContext;
+	private ApplicationContext applicationContext;
+
+	@AstrixInject
+	public void setAstrixContext(AstrixContext astrixContext) {
+		this.astrixContext = astrixContext;
+	}
+	
+	public void setApplicationContext(ApplicationContext applicationContext) {
+		this.applicationContext = applicationContext;
+	}
+	
+	public ApplicationContext getApplicationContext() {
+		return applicationContext;
+	}
+	
+	public AstrixContext getAstrixContext() {
+		return astrixContext;
+	}
 
 }

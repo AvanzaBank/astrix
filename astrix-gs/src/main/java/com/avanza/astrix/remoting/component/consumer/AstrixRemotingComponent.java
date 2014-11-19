@@ -17,17 +17,18 @@ package com.avanza.astrix.remoting.component.consumer;
 
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
-import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import com.avanza.astrix.context.AstrixApiDescriptor;
+import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
+import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixPlugins;
 import com.avanza.astrix.context.AstrixPluginsAware;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceExporterBean;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixServicePropertiesBuilder;
+import com.avanza.astrix.context.AstrixSpringContext;
 import com.avanza.astrix.context.AstrixVersioningPlugin;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.gs.GsBinder;
@@ -35,7 +36,6 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.remoting.client.AstrixRemotingProxy;
 import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
 import com.avanza.astrix.remoting.component.provider.AstrixRemotingServiceRegistryExporter;
-import com.avanza.astrix.remoting.server.AstrixRemotingArgumentSerializerFactory;
 import com.avanza.astrix.remoting.server.AstrixRemotingServiceExporterBean;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 
@@ -43,6 +43,7 @@ import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 public class AstrixRemotingComponent implements AstrixPluginsAware, AstrixServiceComponent {
 	
 	private AstrixPlugins plugins;
+	private AstrixContext astrixContext;
 	
 	@Override
 	public <T> T createService(AstrixApiDescriptor descriptor, Class<T> api, AstrixServiceProperties serviceProperties) {
@@ -74,15 +75,6 @@ public class AstrixRemotingComponent implements AstrixPluginsAware, AstrixServic
 	}
 	
 	@Override
-	public void registerBeans(BeanDefinitionRegistry registry) {
-		AnnotatedGenericBeanDefinition beanDefinition = new AnnotatedGenericBeanDefinition(AstrixServiceActivator.class);
-		registry.registerBeanDefinition("_serviceActivator", beanDefinition);
-		
-		beanDefinition = new AnnotatedGenericBeanDefinition(AstrixRemotingArgumentSerializerFactory.class);
-		registry.registerBeanDefinition("_AstrixRemotingArgumentSerializerFactory", beanDefinition);
-	}
-	
-	@Override
 	public Class<? extends AstrixServiceExporterBean> getExporterBean() {
 		return AstrixRemotingServiceExporterBean.class;
 	}
@@ -90,6 +82,30 @@ public class AstrixRemotingComponent implements AstrixPluginsAware, AstrixServic
 	@Override
 	public Class<? extends AstrixServicePropertiesBuilder> getServiceBuilder() {
 		return AstrixRemotingServiceRegistryExporter.class;
+	}
+
+	@Override
+	public <T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor) {
+		AstrixObjectSerializer objectSerializer = plugins.getPlugin(AstrixVersioningPlugin.class).create(apiDescriptor); 
+		this.astrixContext.getInstance(AstrixServiceActivator.class).register(provider, objectSerializer, providedApi);
+	}
+	
+	@AstrixInject
+	public void setAstrixContext(AstrixContext astrixContext) {
+		this.astrixContext = astrixContext;
+	}
+
+	@Override
+	public boolean supportsAsyncApis() {
+		return true;
+	}
+
+	@Override
+	public <T> AstrixServiceProperties createServiceProperties(Class<T> exportedService) {
+		GigaSpace gigaSpace = astrixContext.getInstance(AstrixSpringContext.class).getApplicationContext().getBean(GigaSpace.class);
+		AstrixServiceProperties serviceProperties = GsBinder.createProperties(gigaSpace);
+		serviceProperties.setQualifier(null);
+		return serviceProperties;
 	}
 	
 }

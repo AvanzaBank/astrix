@@ -39,14 +39,6 @@ public interface AstrixServiceComponent {
 	String getName();
 	
 	/**
-	 * Used on server side to register all required spring-beans to use this component.
-	 * 
-	 * @param registry
-	 * @param serviceDescriptor 
-	 */
-	void registerBeans(BeanDefinitionRegistry registry);
-	
-	/**
 	 * Server side component used to make a given provider using this component invokable
 	 * from other processes.
 	 * @return
@@ -59,5 +51,25 @@ public interface AstrixServiceComponent {
 	 * @return
 	 */
 	Class<? extends AstrixServicePropertiesBuilder> getServiceBuilder();
+
+	<T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor);
+	
+	/**
+	 * Whether the api supports an async version based on the following naming
+	 * convention:
+	 *  
+	 * <pre>
+	 * MyService
+	 * 	MyResult mySyncMethod(Argument)
+	 * 
+	 * MyServiceAsync
+	 * 	Future<MyResult> mySyncMethod(Argument)
+	 * </pre>
+	 * 
+	 * @return
+	 */
+	boolean supportsAsyncApis();
+
+	<T> AstrixServiceProperties createServiceProperties(Class<T> exportedService);
 	
 }

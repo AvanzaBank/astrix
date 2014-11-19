@@ -104,7 +104,7 @@ public class AstrixIntegrationTest {
 	private LunchRestaurantGrader lunchRestaurantGrader;
 	private LunchServiceAsync asyncLunchService;
 	private PublicLunchFeeder publicLunchFeeder;
-	private AstrixContext Astrix;
+	private AstrixContext astrix;
 	private AstrixServiceRegistryClient serviceRegistryClient;
 	
 	static {
@@ -124,19 +124,19 @@ public class AstrixIntegrationTest {
 		configurer.set(AstrixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 100);
 		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, config.getExternalConfigUrl());
 		configurer.setSubsystem("test-sub-system");
-		Astrix = configurer.configure();
-		this.lunchService = Astrix.getBean(LunchService.class);
-		this.lunchUtil = Astrix.getBean(LunchUtil.class);
-		this.lunchRestaurantGrader = Astrix.getBean(LunchRestaurantGrader.class);
-		this.asyncLunchService = Astrix.getBean(LunchServiceAsync.class);
-		this.publicLunchFeeder = Astrix.getBean(PublicLunchFeeder.class);
-		this.serviceRegistryClient = Astrix.getBean(AstrixServiceRegistryClient.class);
-		Astrix.waitForBean(LunchService.class, 5000);
-		Astrix.waitForBean(LunchUtil.class, 5000); // TODO: it does not make sense to wait for a library. How to cluelessly design waiting for libraries?
-		Astrix.waitForBean(LunchRestaurantGrader.class, 5000);
-		Astrix.waitForBean(LunchServiceAsync.class, 5000);
-		Astrix.waitForBean(PublicLunchFeeder.class, 5000);
-		Astrix.waitForBean(AstrixServiceRegistry.class, 5000);
+		astrix = configurer.configure();
+		this.lunchService = astrix.getBean(LunchService.class);
+		this.lunchUtil = astrix.getBean(LunchUtil.class);
+		this.lunchRestaurantGrader = astrix.getBean(LunchRestaurantGrader.class);
+		this.asyncLunchService = astrix.getBean(LunchServiceAsync.class);
+		this.publicLunchFeeder = astrix.getBean(PublicLunchFeeder.class);
+		this.serviceRegistryClient = astrix.getBean(AstrixServiceRegistryClient.class);
+		astrix.waitForBean(LunchService.class, 5000);
+		astrix.waitForBean(LunchUtil.class, 5000); // TODO: it does not make sense to wait for a library. How to cluelessly design waiting for libraries?
+		astrix.waitForBean(LunchRestaurantGrader.class, 5000);
+		astrix.waitForBean(LunchServiceAsync.class, 5000);
+		astrix.waitForBean(PublicLunchFeeder.class, 5000);
+		astrix.waitForBean(AstrixServiceRegistry.class, 5000);
 	}
 	
 	@Test
@@ -228,7 +228,7 @@ public class AstrixIntegrationTest {
 	
 	@Test(expected = IllegalSubsystemException.class)
 	public void itsNotAllowedToCreateServicesBeansThatBindsToServicesInOtherSubSystems() throws Exception {
-		Astrix.getBean(InternalLunchFeeder.class).addLunchRestaurant(lunchRestaurant().build());;
+		astrix.getBean(InternalLunchFeeder.class).addLunchRestaurant(lunchRestaurant().build());;
 	}
 	
 	private void assertEventually(Probe probe) throws InterruptedException {

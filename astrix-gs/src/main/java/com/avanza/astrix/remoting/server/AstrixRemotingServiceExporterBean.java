@@ -40,7 +40,7 @@ public class AstrixRemotingServiceExporterBean implements AstrixServiceExporterB
 		this.serviceActivator = serviceActivator;
 		this.objectSerializerFactory = objectSerializerFactory;
 	}
-
+	
 	@Override
 	public void register(Object provider, AstrixApiDescriptor apiDescriptor, Class<?> providedApi) {
 		AstrixObjectSerializer objectSerializer = objectSerializerFactory.create(apiDescriptor); 

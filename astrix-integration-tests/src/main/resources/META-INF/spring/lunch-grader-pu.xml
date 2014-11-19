@@ -22,16 +22,22 @@
 		</property>
 		<property name="serviceDescriptor" value="com.avanza.astrix.integration.tests.domain2.pu.LunchGradeServiceDescriptor" />
 		<property name="subsystem" value="lunch-system"/>
+		<property name="settings">
+			<map>
+				<entry key="AstrixConfig.uri" value="${configUrl}"/>
+				<entry key="StatefulAstrixBean.beanRebindAttemptInterval" value="100" />
+			</map>
+		</property>
 	</bean>
 	
-	<bean id="astrixSettings" class="com.avanza.astrix.context.AstrixSettings" factory-method="from">
-		<property name="externalConfigUrl" value="${configUrl}"/>
-		<constructor-arg>
-			<util:map>
-				<entry key="StatefulAstrixBean.beanRebindAttemptInterval" value="100" />
-			</util:map>
-		</constructor-arg>
-	</bean>
+<!-- 	<bean id="astrixSettings" class="com.avanza.astrix.context.AstrixSettings" factory-method="from"> -->
+<!-- 		<property name="externalConfigUrl" value="${configUrl}"/> -->
+<!-- 		<constructor-arg> -->
+<!-- 			<util:map> -->
+<!-- 				<entry key="StatefulAstrixBean.beanRebindAttemptInterval" value="100" /> -->
+<!-- 			</util:map> -->
+<!-- 		</constructor-arg> -->
+<!-- 	</bean> -->
 
 	<bean id="lunchRestaurantGrader" class="com.avanza.astrix.integration.tests.domain2.pu.LunchRestaurantGraderImpl" />
 	<bean id="lunchFeeder" class="com.avanza.astrix.integration.tests.domain2.pu.PublicLunchFeederImpl"/>

@@ -32,14 +32,13 @@ public class AstrixExportedServiceInfo {
 	private Class<?> providedService;
 	private AstrixApiDescriptor apiDescriptor;
 	private String componentName;
-	private String providingBeanName;
+	private Object provider;
 
-	public AstrixExportedServiceInfo(Class<?> providedService,
-			AstrixApiDescriptor apiDescriptor, String componentName, String providingBeanName) {
+	public AstrixExportedServiceInfo(Class<?> providedService, AstrixApiDescriptor apiDescriptor, String componentName, Object provider) {
 		this.providedService = providedService;
 		this.apiDescriptor = apiDescriptor;
 		this.componentName = componentName;
-		this.providingBeanName = providingBeanName;
+		this.provider = provider;
 	}
 	
 	public Class<?> getProvidedService() {
@@ -54,8 +53,8 @@ public class AstrixExportedServiceInfo {
 		return componentName;
 	}
 	
-	public String getProvidingBeanName() {
-		return providingBeanName;
+	public Object getProvider() {
+		return provider;
 	}
 	
 }

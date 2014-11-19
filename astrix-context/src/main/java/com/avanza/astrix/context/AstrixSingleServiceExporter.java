@@ -23,6 +23,8 @@ import javax.annotation.PostConstruct;
  */
 public class AstrixSingleServiceExporter {
 	
+	// TODO: DELETE ME?
+	
 	private AstrixExportedServiceInfo exportedService;
 	private AstrixServiceExporterBean serviceExporterBean;
 	private Object provider;

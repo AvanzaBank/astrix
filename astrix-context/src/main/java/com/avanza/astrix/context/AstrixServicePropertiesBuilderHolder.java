@@ -21,12 +21,21 @@ public class AstrixServicePropertiesBuilderHolder {
 	private String componentName;
 	private Class<?> exportedService;
 	private Class<?> asyncService;
+	private AstrixServiceComponent serviceComponent;
 	
 	public AstrixServicePropertiesBuilderHolder(AstrixServicePropertiesBuilder serviceBuilder, String componentName, Class<?> exportedService) {
 		this.servicePropertiesBuilder = serviceBuilder;
 		this.componentName = componentName;
 		this.exportedService = exportedService;
 		if (this.servicePropertiesBuilder.supportsAsyncApis()) {
+			this.asyncService = loadInterfaceIfExists(exportedService.getName() + "Async");
+		}
+	}
+	
+	public AstrixServicePropertiesBuilderHolder(AstrixServiceComponent serviceComponent, Class<?> exportedService) {
+		this.serviceComponent = serviceComponent;
+		this.exportedService = exportedService;
+		if (serviceComponent.supportsAsyncApis()) {
 			this.asyncService = loadInterfaceIfExists(exportedService.getName() + "Async");
 		}
 	}
@@ -48,11 +57,18 @@ public class AstrixServicePropertiesBuilderHolder {
 	}
 
 	public AstrixServiceProperties exportServiceProperties() {
-		AstrixServiceProperties serviceProperties = servicePropertiesBuilder.buildServiceProperties(exportedService);
+		AstrixServiceProperties serviceProperties = serviceComponent.createServiceProperties(exportedService);
 		serviceProperties.setApi(exportedService);
-		serviceProperties.setComponent(componentName);
+		serviceProperties.setComponent(serviceComponent.getName());
 		return serviceProperties;
 	}
+	
+//	public AstrixServiceProperties exportServiceProperties() {
+//		AstrixServiceProperties serviceProperties = servicePropertiesBuilder.buildServiceProperties(exportedService);
+//		serviceProperties.setApi(exportedService);
+//		serviceProperties.setComponent(componentName);
+//		return serviceProperties;
+//	}
 	
 	public AstrixServiceProperties exportAsyncServiceProperties() {
 		AstrixServiceProperties serviceProperties = exportServiceProperties();
