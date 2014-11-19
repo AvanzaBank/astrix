@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain2.apiruntime;
+package com.avanza.astrix.provider.core;
 
-import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface PublicLunchFeeder {
 
-	void addLunchRestaurant(LunchRestaurant restaurant);
-	
+/**
+ * @author Elias Lindholm (elilin)
+ */
+@Target(value = { ElementType.PARAMETER})
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface AstrixQualifier {
+	String value();
 }

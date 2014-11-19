@@ -63,8 +63,9 @@ public class StatefulAstrixBean<T> implements InvocationHandler {
 	public void bind() {
 		T bean = this.beanFactory.create(optionalQualifier);
 		this.state = new Bound(bean);
-		this.eventBus.fireEvent(new AstrixBeanStateChangedEvent(AstrixBeanKey.create(beanFactory.getBeanType(), optionalQualifier), AstrixBeanState.BOUND));
-		log.info("Successfully bound to " + beanFactory.getBeanType() + ", AstrixBeanId=" + id);
+		AstrixBeanKey beanKey = AstrixBeanKey.create(beanFactory.getBeanType(), optionalQualifier);
+		this.eventBus.fireEvent(new AstrixBeanStateChangedEvent(beanKey, AstrixBeanState.BOUND));
+		log.info("Successfully bound to " + beanKey + ", AstrixBeanId=" + id);
 	}
 	
 	public void rebind() {

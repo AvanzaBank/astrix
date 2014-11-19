@@ -40,6 +40,29 @@ import org.springframework.context.event.ContextStoppedEvent;
  */
 public class AstrixFrameworkBean implements BeanFactoryPostProcessor, ApplicationContextAware, ApplicationListener<ApplicationContextEvent> {
 	
+	/*
+	 * IMPLEMENTATION NOTE - Astrix startup
+	 * 
+	 * The startup procedure goes as follows:
+	 * 
+	 * 1. BeanFactoryPostProcessor (BFPP)
+	 *  - The BFPP will register an instance for each consumedAstrixBean in the BeanFactory
+	 *  - The BFPP will also register an instance of AstrixSpingContext to act as bridge
+	 *    between spring and astrix.
+	 *    
+	 * 2. BeanPostProcessor (BPP)
+	 *  - The BPP will investigate each spring-bean in the current application and search
+	 *    for @AstrixServiceExport annotated classes and register those with the AstrixServiceExporter
+	 *    
+	 * 3. ApplicationListener<ContexRefreshedEvent>
+	 *  - After each spring-bean have bean created and fully initialized this class will receive a call-back
+	 *    and start exporting services using the AstrixServiceExporter.
+	 *    
+	 * 
+	 * Note that this class (AstrixFrameworkBean) is the only class in the framework that will recieve spring-lifecylce events.
+	 * 
+	 */
+	
 	private List<Class<?>> consumedAstrixBeans = new ArrayList<>();
 	private String subsystem;
 	private Map<String, String> settings = new HashMap<>();

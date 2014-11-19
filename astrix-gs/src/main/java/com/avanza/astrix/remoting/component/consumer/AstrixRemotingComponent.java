@@ -15,11 +15,15 @@
  */
 package com.avanza.astrix.remoting.component.consumer;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.context.AstrixApiDescriptor;
 import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixExportedServiceInfo;
 import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
 import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixPlugins;
@@ -74,6 +78,11 @@ public class AstrixRemotingComponent implements AstrixPluginsAware, AstrixServic
 	public <T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor) {
 		AstrixObjectSerializer objectSerializer = plugins.getPlugin(AstrixVersioningPlugin.class).create(apiDescriptor); 
 		this.astrixContext.getInstance(AstrixServiceActivator.class).register(provider, objectSerializer, providedApi);
+	}
+	
+	@Override
+	public List<AstrixExportedServiceInfo> getImplicitExportedServices() {
+		return Collections.emptyList();
 	}
 	
 	@AstrixInject

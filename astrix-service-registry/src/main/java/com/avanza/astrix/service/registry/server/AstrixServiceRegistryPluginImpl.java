@@ -17,7 +17,6 @@ package com.avanza.astrix.service.registry.server;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceRegistryPlugin;
@@ -25,22 +24,21 @@ import com.avanza.astrix.context.AstrixServiceRegistryPlugin;
 @MetaInfServices(AstrixServiceRegistryPlugin.class)
 public class AstrixServiceRegistryPluginImpl implements AstrixServiceRegistryPlugin {
 	
-	private AstrixContext astrixContext;
+	private AstrixServiceRegistryExporterWorker serviceRegistryExporterWorker;
 	
 	@Override
 	public <T> void addProvider(Class<T> beanType, AstrixServiceComponent serviceComponent) {
-		AstrixServiceRegistryExporterWorker exporterWorker = astrixContext.getInstance(AstrixServiceRegistryExporterWorker.class);
-		exporterWorker.addServiceBuilder(new AstrixServicePropertiesBuilderHolder(serviceComponent, beanType));
+		serviceRegistryExporterWorker.addServiceBuilder(new AstrixServicePropertiesBuilderHolder(serviceComponent, beanType));
 	}
 	
 	@AstrixInject
-	public void setAstrixContext(AstrixContext astrixContext) {
-		this.astrixContext = astrixContext;
+	public void setServiceRegistryExporterWorker(AstrixServiceRegistryExporterWorker serviceRegistryExporterWorker) {
+		this.serviceRegistryExporterWorker = serviceRegistryExporterWorker;
 	}
 
 	@Override
 	public void startPublishServices() {
-		astrixContext.getInstance(AstrixServiceRegistryExporterWorker.class).startServiceExporter();
+		serviceRegistryExporterWorker.startServiceExporter();
 	}
 	
 }

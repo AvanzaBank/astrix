@@ -51,5 +51,9 @@ public class LunchRestaurant implements Serializable {
 	public void setFoodType(String foodType) {
 		this.foodType = foodType;
 	}
+
+	public static LunchRestaurant template() {
+		return new LunchRestaurant();
+	}
 	
 }

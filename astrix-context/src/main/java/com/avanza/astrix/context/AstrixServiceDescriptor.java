@@ -39,7 +39,7 @@ public class AstrixServiceDescriptor {
 		}
 	}
 	
-	// To simplify creating using srping bean definitions
+	// To simplify creating using spring bean definitions
 	public static AstrixServiceDescriptor create(AstrixServiceDescriptor AstrixServiceDescriptor) {
 		return AstrixServiceDescriptor;
 	}

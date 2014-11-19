@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain2.apiruntime;
+package com.avanza.astrix.integration.tests.domain.api;
 
-import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
+public interface LunchStatistics {
 
-public interface PublicLunchFeeder {
-
-	void addLunchRestaurant(LunchRestaurant restaurant);
-	
+	int getRestaurantCount();
+		
 }

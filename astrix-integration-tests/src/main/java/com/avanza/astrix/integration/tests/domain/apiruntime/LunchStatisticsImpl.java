@@ -13,12 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain2.apiruntime;
+package com.avanza.astrix.integration.tests.domain.apiruntime;
+
+import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
+import com.avanza.astrix.integration.tests.domain.api.LunchStatistics;
 
-public interface PublicLunchFeeder {
+public class LunchStatisticsImpl implements LunchStatistics {
 
-	void addLunchRestaurant(LunchRestaurant restaurant);
+	private final GigaSpace lunchSpaceProxy;
 	
+	public LunchStatisticsImpl(GigaSpace lunchSpaceProxy) {
+		this.lunchSpaceProxy = lunchSpaceProxy;
+	}
+
+	@Override
+	public int getRestaurantCount() {
+		return lunchSpaceProxy.count(LunchRestaurant.template());
+	}
+
 }
