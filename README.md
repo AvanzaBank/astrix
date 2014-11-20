@@ -92,13 +92,11 @@ interface LunchRestaurantGrader {
 	objectMapperConfigurer = LunchApiObjectMapperConfigurer.class
 )
 // The service is exported to the service-registry. Service is bound by Astrix at runtime using service-registry
-@AstrixServiceRegistryApi(
-	exportedApis = {
-		LunchService.class,
-		LunchAdministrator.class,
-		LunchRestaurantGrader.class
-	}
-)
+@AstrixServiceRegistryApi({
+	LunchService.class,
+	LunchAdministrator.class,
+	LunchRestaurantGrader.class
+})
 public class LunchApiDescriptor {
 }
 ```
@@ -179,7 +177,7 @@ public class LunchServiceDescriptor {
 
 ```xml
 <!-- Astrix service framework (provider and consumer) -->
-<bean id="AstrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
+<bean id="astrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
 	<property name="serviceDescriptor" value="com.avanza.astrix.integration.tests.domain.apiruntime.LunchServiceDescriptor"/>
 </bean>
 
@@ -194,7 +192,7 @@ public class LunchServiceDescriptor {
 ### pu.xml (or an ordinary spring.xml)
 
 ```xml
-<bean id="AstrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
+<bean id="astrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
 	<property name="consumedAstrixBeans">
 		<list>
 			<value>com.avanza.astrix.integration.tests.domain.api.LunchService</value>
