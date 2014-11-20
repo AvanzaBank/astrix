@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html ng-app="lunchApp">
+
+<head>
+<link rel="stylesheet" href="css/bootstrap.min.css" />
+<link href="app.css" rel="stylesheet" />
+<script type="text/javascript" src="script/angular.min.js"></script>
+<script type="text/javascript" src="app.js"></script>
+</head>
+
+	<body>
+		<div class="container-fluid" ng-controller="LunchAppController">
+			<h1>Lunch Web</h1>
+			<div class="row">
+		    	<div class="col-md-3">
+					<form role="form" novalidate class="simple-form">
+					  <div class="form-group">
+					    <label for="restaurantName">Name</label>
+					    <input type="text" class="form-control" id="restaurantName" ng-model="restaurant.name" placeholder="Enter Restaurant">
+					  </div>
+					  <div class="form-group">
+					    <label for="foodType">Food type</label>
+					    <input type="text" class="form-control" id="foodType" ng-model="restaurant.foodType" placeholder="Food type">
+					  </div>
+     				  <pre>restaurant = {{restaurant | json}}</pre>	    	
+					  <button type="submit" class="btn btn-default" ng-click="add(restaurant)">Add</button>
+					</form>	
+		    	</div>
+			</div>
+			
+			<div class="row">
+		    	<div class="col-md-4">
+					<table class="table table-condensed">
+						<thead>
+							<tr>
+								<th>Restaurant</th>
+								<th>Food Type</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="restaurant in restaurants">
+								<td>{{restaurant.name}}</td>
+								<td>{{restaurant.foodType}}</td>
+							</tr>
+						</tbody>
+					</table> 	
+		    	</div>
+			</div>
+
+		</div>
+	</body>
+</html>

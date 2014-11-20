@@ -10,6 +10,7 @@
 		<module>lunch-grader-parent</module>
 		<module>lunch-astrix-extensions</module>
 		<module>example-application-runners</module>
+		<module>lunch-web</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

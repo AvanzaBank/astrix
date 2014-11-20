@@ -13,10 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package runners;
+package lunch.web;
 
-public class Config {
-	
-	static final String LOOKUP_GROUP_NAME = "astrix-demo-apps";
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
+
+@EnableAutoConfiguration
+@ComponentScan("lunch.web")
+public class LunchWebServer {
+
+	public static void main(String[] args) {
+		System.setProperty("server.port", "9111");
+		SpringApplication.run(LunchWebServer.class, args);
+	}
 
 }
