@@ -60,6 +60,7 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 	public void startServiceExporter() {
 		if (serviceBuilders.isEmpty()) {
 			log.info("No ServiceExporters configured. No services will be published to service registry");
+			return;
 		}
 		this.serviceRegistryClient = astrixContext.getBean(AstrixServiceRegistryClient.class);
 		AstrixSettingsReader settings = astrixContext.getSettings();

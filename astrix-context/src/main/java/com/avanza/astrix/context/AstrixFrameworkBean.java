@@ -16,6 +16,7 @@
 package com.avanza.astrix.context;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,7 +83,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		beanFactory.addBeanPostProcessor(astrixContext.getInstance(AstrixBeanPostProcessor.class));
 	}
 
-	public void setConsumedAstrixBeans(List<Class<?>> consumedAstrixBeans) {
+	public void setConsumedAstrixBeans(List<Class<? extends Object>> consumedAstrixBeans) {
 		this.consumedAstrixBeans = consumedAstrixBeans;
 	}
 
@@ -168,6 +169,10 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		serviceExporter.setSericeDescriptor(serviceDescriptor); // TODO This is a hack. Avoid setting serviceDescriptor explicitly here
 		serviceExporter.exportProvidedServices();
 		astrixContext.getPlugin(AstrixServiceRegistryPlugin.class).startPublishServices();
+	}
+
+	public void setConsumedAstrixBeans(Class<?>... consumedAstrixBeans) {
+		setConsumedAstrixBeans(Arrays.asList(consumedAstrixBeans));
 	}
 	
 }
