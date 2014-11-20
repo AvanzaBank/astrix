@@ -16,6 +16,7 @@
 package lunch.web;
 
 import lunch.api.LunchService;
+import lunch.api.LunchUtil;
 import lunch.grader.api.LunchRestaurantGrader;
 
 import org.apache.log4j.BasicConfigurator;
@@ -33,7 +34,7 @@ public class WebAppConfig {
 		org.apache.log4j.Logger.getLogger("com.avanza.astrix").setLevel(org.apache.log4j.Level.DEBUG);
 		AstrixFrameworkBean result = new AstrixFrameworkBean();
 		result.setSubsystem("lunch-web");
-		result.setConsumedAstrixBeans(LunchService.class, LunchRestaurantGrader.class);
+		result.setConsumedAstrixBeans(LunchService.class, LunchRestaurantGrader.class, LunchUtil.class);
 		return result;
 	}
 

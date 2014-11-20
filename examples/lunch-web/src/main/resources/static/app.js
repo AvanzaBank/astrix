@@ -11,8 +11,14 @@ lunchApp.factory("LunchService", function($http) {
 	service.list = function() {
 		return $http.get("/lunchrestaurants/");
 	}
-	service.add = function(restaurant) {
-		return $http.post("/lunchrestaurants/", {name: restaurant.name, foodType: restaurant.foodType});
+	service.add = function(restaurant, onSuccess) {
+		$http.post("/lunchrestaurants/", restaurant).
+			success(function(data, status, headers, config) {
+				onSuccess(data);
+			});
+	}
+	service.random = function(restaurant) {
+		return $http.get("/randomrestaurant/");
 	}
 	return service;
 });
@@ -20,7 +26,11 @@ lunchApp.factory("LunchService", function($http) {
 
 lunchApp.controller("LunchAppController", function ($scope, LunchService) {
 	$scope.restaurants = [];
-	$scope.add = LunchService.add
+	$scope.add = function (restaurant) {
+		newRestaurant = LunchService.add(restaurant, function(newRestaurant) {
+			$scope.restaurants.push(newRestaurant);
+		});
+	}
 	var getRestaurants = function () {
 		var restaurantPromise = LunchService.list();
 		restaurantPromise.success(function (data, status) {
@@ -28,6 +38,16 @@ lunchApp.controller("LunchAppController", function ($scope, LunchService) {
 		})
 	}
 	getRestaurants();
+});
+
+lunchApp.controller("LunchSuggestionController", function ($scope, LunchService) {
+	var randomRestaurant = function () {
+		var restaurantPromise = LunchService.random();
+		restaurantPromise.success(function (data, status) {
+			$scope.restaurant = data;
+		})
+	}
+	randomRestaurant();
 });
 
 lunchApp.filter("StringReplace", function () {

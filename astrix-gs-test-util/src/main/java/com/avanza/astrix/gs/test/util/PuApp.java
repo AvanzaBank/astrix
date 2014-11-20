@@ -21,7 +21,7 @@ public class PuApp {
 
 	private PartitionedPu partitionedPu;
 
-	public PuApp(String puXmlPath) {
+	private PuApp(String puXmlPath) {
 		partitionedPu = new PartitionedPu(PuConfigurers
 				.partitionedPu(puXmlPath).numberOfPrimaries(1)
 				.numberOfBackups(0));
@@ -37,8 +37,12 @@ public class PuApp {
 		}
 	}
 
-	public void start() throws IOException {
+	private void start() throws IOException {
 		this.partitionedPu.run();
+	}
+	
+	public void stop() throws IOException {
+		this.partitionedPu.shutdown();
 	}
 
 }

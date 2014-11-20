@@ -19,4 +19,6 @@ package lunch.api;
 public interface LunchUtil {
 
 	LunchRestaurant suggestVegetarianRestaurant();
+	
+	LunchRestaurant suggestRandomRestaurant();
 }

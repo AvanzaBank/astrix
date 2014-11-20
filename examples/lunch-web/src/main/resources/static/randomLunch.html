@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html ng-app="lunchApp">
+
+<head>
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<link href="app.css" rel="stylesheet" />
+	<script type="text/javascript" src="script/angular.min.js"></script>
+	<script type="text/javascript" src="app.js"></script>
+</head>
+
+	<body>
+		<div class="container-fluid" ng-controller="LunchSuggestionController">
+			<h1>Lunch Web</h1>
+     		<pre>{{restaurant | json}}</pre>	  
+		</div>
+	</body>
+</html>

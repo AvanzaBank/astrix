@@ -38,4 +38,13 @@ public class LunchUtilImpl implements LunchUtil {
 		}
 		return allRestaurants.get(random.nextInt(allRestaurants.size()));
 	}
+
+	@Override
+	public LunchRestaurant suggestRandomRestaurant() {
+		List<LunchRestaurant> allRestaurants = lunchService.getAllLunchRestaurants();
+		if (allRestaurants.isEmpty()) {
+			return null;
+		}
+		return allRestaurants.get(random.nextInt(allRestaurants.size()));
+	}
 }

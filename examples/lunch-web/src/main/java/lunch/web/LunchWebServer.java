@@ -17,6 +17,7 @@ package lunch.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 @EnableAutoConfiguration
@@ -25,7 +26,8 @@ public class LunchWebServer {
 
 	public static void main(String[] args) {
 		System.setProperty("server.port", "9111");
-		SpringApplication.run(LunchWebServer.class, args);
+		ConfigurableApplicationContext appContext = SpringApplication.run(LunchWebServer.class, args);
+		appContext.close();
 	}
 
 }

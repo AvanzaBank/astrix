@@ -19,33 +19,46 @@ import java.util.List;
 
 import lunch.api.LunchRestaurant;
 import lunch.api.LunchService;
+import lunch.api.LunchUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/lunchrestaurants")
+@RequestMapping("/")
 public class LunchRestaurantController {
 	
 	private LunchService lunchService;
+	private LunchUtil lunchUtil;
 	
 	@Autowired
-	public LunchRestaurantController(LunchService lunchService) {
+	public LunchRestaurantController(LunchService lunchService, LunchUtil lunchUtil) {
 		this.lunchService = lunchService;
+		this.lunchUtil = lunchUtil;
 	}
-
-	@RequestMapping(method = RequestMethod.POST)
-	public void addLunchRestaurant(@RequestParam("name") String name, @RequestParam("foodType") String foodType) {
-		this.lunchService.addLunchRestaurant(new LunchRestaurant(name, foodType));
+	@RequestMapping(value= "/lunchrestaurants", method = RequestMethod.POST)
+	public LunchRestaurant addLunchRestaurant(@RequestBody LunchRestaurant restaurant) {
+		if (restaurant.getName() == null) {
+			throw new IllegalArgumentException("Restaurant name is mandatory");
+		}
+		this.lunchService.addLunchRestaurant(restaurant);
+		return restaurant;
 	}
 	
-	@RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(value= "/lunchrestaurants", method = RequestMethod.GET)
 	public List<LunchRestaurant> addLunchRestaurant() {
 		List<LunchRestaurant> lunchRestaurants = this.lunchService.getAllLunchRestaurants();
 		return lunchRestaurants;
+	}
+	
+
+	@RequestMapping(value= "/randomrestaurant", method = RequestMethod.GET)
+	public LunchRestaurant getRandomLunchRestaurant() {
+		return lunchUtil.suggestRandomRestaurant();
 	}
 
 }

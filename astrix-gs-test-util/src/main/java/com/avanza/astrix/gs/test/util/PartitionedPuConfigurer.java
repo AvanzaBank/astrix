@@ -25,11 +25,10 @@ public final class PartitionedPuConfigurer {
 	String puXmlPath;
 	int numberOfPrimaries = 1;
 	int numberOfBackups = 0;
-	boolean startAsync = false;
+	boolean startAsync = true;
 	Properties contextProperties = new Properties();
 	Map<String, Properties> beanProperies = new HashMap<>();
 	String lookupGroupName = UUID.randomUUID().toString();
-	
 
 	public PartitionedPuConfigurer(String puXmlPath) {
 		this.puXmlPath = puXmlPath;
@@ -74,6 +73,10 @@ public final class PartitionedPuConfigurer {
 	
 	public PartitionedPuConfigurer contextProperty(String name, String value) {
 		this.contextProperties.setProperty(name, value);
+		return this;
+	}
+
+	public PartitionedPuConfigurer serviceRegistryUri(String serviceUri) {
 		return this;
 	}
 
