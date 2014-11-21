@@ -8,7 +8,7 @@ Libraries are used to execute domain logic on the consumer side. Libraries are a
 public interface LunchUtil {
 	LunchRestaurant suggestRandomRestaurant();
 }
-``` 
+```
 
 ### Example API Provider
 ```java
@@ -45,9 +45,9 @@ public class LunchApiFactory {
 ### Consumer - Alt 1 Standalone
 ```java
 public void consumerMethod() {
-		AstrixConfigurer configurer = new AstrixConfigurer();
-		AstrixContext astrix = configurer.configure();
-		LunchUtil lunchUtil = astrix.getBean(LunchUtil.class);
+	AstrixConfigurer configurer = new AstrixConfigurer();
+	AstrixContext astrix = configurer.configure();
+	LunchUtil lunchUtil = astrix.getBean(LunchUtil.class);
 }
 ``` 
 

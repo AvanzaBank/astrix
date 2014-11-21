@@ -17,6 +17,7 @@
 		<module>astrix-test-util</module>
 		<module>astrix-gs-test-util</module>
 		<module>astrix-dashboard</module>
+		<module>tutorial</module>
 	</modules>
 
 	<scm>
