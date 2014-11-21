@@ -1,6 +1,8 @@
 # Creating a Library
 Libraries are used to execute domain logic on the consumer side. Libraries are allowed to depend on other astrix-managed beans (remote-services, other libraries, etc)
 
+## Providing a Library
+
 ### Example API
 ```java
 public interface LunchUtil {
@@ -38,7 +40,7 @@ public class LunchApiFactory {
 }
 ``` 
 
-
+## Consuming a Library
 
 ### Consumer - Alt 1 Standalone
 ```java
@@ -49,7 +51,7 @@ public void consumerMethod() {
 }
 ``` 
 
-### Consumer - Alt 2 Spring-application (java config)
+### Consumer - Alt 2 Spring-application (xml config)
 ```xml
 <bean id="astrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
 	<property name="consumedAstrixBeans">
@@ -60,6 +62,26 @@ public void consumerMethod() {
 </bean>
 
 <!-- Other beans: LunchUtil will be available as an autowire candiate -->
+``` 
+
+### Consumer - Alt 3 Spring-application (java config)
+```xml
+@Configuration
+public class AppConfig {
+	
+	@Bean
+	public AstrixFrameworkBean astrix() {
+		AstrixFrameworkBean result = new AstrixFrameworkBean();
+		result.setSubsystem("lunch-service");
+		result.setConsumedAstrixBeans(LunchUtil.class);
+		return result;
+	}
+	
+	@Bean
+	public MyAppClass createAppClass(LunchUtil lunchUtil) {
+		return new MyAppClass(lunchUtil);
+	}
+}
 ``` 
 
 
