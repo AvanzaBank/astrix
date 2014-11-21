@@ -27,7 +27,6 @@ public class LunchWebServer {
 	public static void main(String[] args) {
 		System.setProperty("server.port", "9111");
 		ConfigurableApplicationContext appContext = SpringApplication.run(LunchWebServer.class, args);
-		appContext.close();
 	}
 
 }

@@ -15,15 +15,17 @@
  */
 package lunch.tests;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 import lunch.api.LunchRestaurant;
 import lunch.api.LunchService;
+import lunch.grader.api.LunchRestaurantGrader;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
@@ -32,36 +34,33 @@ import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
 
-public class LunchIntegrationTest {
+public class LunchGraderIntegrationTest {
 	
-	public static InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
+	public static InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
+		addConfig(AstrixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 200);
+	}};
 	
 	@ClassRule
-	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
-												   .contextProperty("configUri", serviceRegistry.getExternalConfigUri())
-												   .configure();
-	
-//	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
-//			   											 .serviceRegistryUri(serviceRegistry.getServiceUri())
-//														 .configure();
-	
-	static {
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.INFO);
-		Logger.getLogger("com.avanza").setLevel(Level.DEBUG);
-	}
+	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
+			   											 .contextProperty("externalConfigUri", serviceRegistry.getExternalConfigUri())
+			   											 .startAsync(false)
+														 .configure();
 	
 	@Test
 	public void testName() throws Exception {
+		LunchService lunchMock = Mockito.mock(LunchService.class);
+		Mockito.stub(lunchMock.getLunchRestaurant("mcdonalds")).toReturn(new LunchRestaurant("mcdonalds", "fastfood"));
+		serviceRegistry.registerProvider(LunchService.class, lunchMock, "lunch-system");
+		
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.set(AstrixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 500);
 		configurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixContext astrix = configurer.configure();
-		LunchService lunchService = astrix.waitForBean(LunchService.class, 15_000);
+		LunchRestaurantGrader grader = astrix.waitForBean(LunchRestaurantGrader.class, 5_000);
 		
-		lunchService.addLunchRestaurant(new LunchRestaurant("McDonalds", "Fast Food"));
+		grader.grade("mcdonalds", 5);
+		grader.grade("mcdonalds", 3);
 		
-		assertNotNull(lunchService.getLunchRestaurant("McDonalds"));
+		assertEquals(4D, grader.getAvarageGrade("mcdonalds"), 0.01D);
 	}
 
 }

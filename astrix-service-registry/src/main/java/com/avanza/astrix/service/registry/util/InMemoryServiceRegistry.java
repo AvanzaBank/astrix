@@ -22,26 +22,35 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.avanza.astrix.context.AstrixDirectComponent;
+import com.avanza.astrix.context.AstrixExternalConfig;
 import com.avanza.astrix.context.AstrixServiceProperties;
-import com.avanza.astrix.core.AstrixBroadcast;
+import com.avanza.astrix.context.AstrixSettings;
+import com.avanza.astrix.context.AstrixSettingsExternalConfigPlugin;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixConfigApi;
+import com.avanza.astrix.provider.core.AstrixPluginQualifier;
 import com.avanza.astrix.service.registry.app.ServiceKey;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistry;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistryApiDescriptor;
+import com.avanza.astrix.service.registry.client.AstrixServiceRegistryClientImpl;
 import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class InMemoryServiceRegistry implements AstrixServiceRegistry {
+public class InMemoryServiceRegistry implements AstrixServiceRegistry, AstrixExternalConfig {
 	
 	private Map<ServiceKey, AstrixServiceRegistryEntry> servicePropertiesByKey = new ConcurrentHashMap<>();
 	private String id;
+	private Properties externalConfig = new Properties();
+	private String externalConfigId;
 	
 	public InMemoryServiceRegistry() {
 		this.id = AstrixDirectComponent.register(AstrixServiceRegistry.class, this);
+		// TODO: allow registering multiple provided interfaces under same id in direct-component
+		this.externalConfigId = AstrixDirectComponent.register(AstrixExternalConfig.class, this);
+		this.externalConfig.put(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, getServiceUri());
 	}
 	
 	@Override
@@ -68,5 +77,27 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry {
 	@Override
 	public List<AstrixServiceRegistryEntry> listServices() {
 		return new ArrayList<>(servicePropertiesByKey.values());
+	}
+	
+	public void set(String settingName, String value) {
+		this.externalConfig.setProperty(settingName, value);
+	}
+	
+	public void addConfig(String settingName, long value) {
+		this.externalConfig.setProperty(settingName, Long.toString(value));
+	}
+
+	@Override
+	public String lookup(String name) {
+		return this.externalConfig.getProperty(name);
+	}
+
+	public String getExternalConfigUri() {
+		return AstrixSettingsExternalConfigPlugin.class.getAnnotation(AstrixPluginQualifier.class).value() + ":" + this.externalConfigId;
+	}
+
+	public <T> void registerProvider(Class<T> api, T provider, String subsystem) {
+		AstrixServiceRegistryClientImpl serviceRegistryClient = new AstrixServiceRegistryClientImpl(this, subsystem);
+		serviceRegistryClient.register(api, AstrixDirectComponent.registerAndGetProperties(api, provider), 60_000);
 	}
 }

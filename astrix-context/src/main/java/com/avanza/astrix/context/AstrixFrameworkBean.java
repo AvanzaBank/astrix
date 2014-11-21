@@ -175,4 +175,8 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		setConsumedAstrixBeans(Arrays.asList(consumedAstrixBeans));
 	}
 	
+	public void setExternalConfigUri(String externalConfigUri) {
+		this.settings.put(AstrixSettings.ASTRIX_CONFIG_URI, externalConfigUri);
+	}
+	
 }

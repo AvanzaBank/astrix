@@ -22,6 +22,7 @@
 		</property>
 		<property name="serviceDescriptor" value="lunch.grader.pu.LunchGradeServiceDescriptor" />
 		<property name="subsystem" value="lunch-service"/>
+		<property name="externalConfigUri" value="${externalConfigUri}"/>
 	</bean>
 	
 	<bean id="AstrixSettings" class="com.avanza.astrix.context.AstrixSettings" factory-method="from">

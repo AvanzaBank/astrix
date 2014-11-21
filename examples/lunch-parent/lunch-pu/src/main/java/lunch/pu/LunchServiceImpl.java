@@ -40,13 +40,6 @@ public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 		this.gigaSpace = gigaSpace;
 	}
 
-//	@Override
-//	public List<LunchRestaurant> getAllLunchRestaurants(String foodType) {
-//		LunchRestaurant template = new LunchRestaurant();
-//		template.setFoodType(foodType);
-//		return Arrays.asList(gigaSpace.readMultiple(template));
-//	}
-	
 	@Override
 	public List<LunchRestaurant> getAllLunchRestaurants() {
 		LunchRestaurant template = new LunchRestaurant();
@@ -62,7 +55,7 @@ public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 	public LunchRestaurant getLunchRestaurant(String name) {
 		return this.gigaSpace.readById(LunchRestaurant.class, name);
 	}
-
+	
 }
 
 
