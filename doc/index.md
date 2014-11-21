@@ -1,2 +1,3 @@
 # Astrix Documentation
-[Test](testing.md)
+[Libraries](library.md) 
+[Testing](testing.md)
