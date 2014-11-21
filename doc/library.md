@@ -37,3 +37,29 @@ public class LunchApiFactory {
 	
 }
 ``` 
+
+
+
+### Consumer - Alt 1 Standalone
+```java
+public void consumerMethod() {
+		AstrixConfigurer configurer = new AstrixConfigurer();
+		AstrixContext astrix = configurer.configure();
+		LunchUtil lunchUtil = astrix.getBean(LunchUtil.class);
+}
+``` 
+
+### Consumer - Alt 2 Spring-application (java config)
+```xml
+<bean id="astrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
+	<property name="consumedAstrixBeans">
+		<list>
+			<value>lunch.api.LunchUtil</value>
+		</list>
+	</property>
+</bean>
+
+<!-- Other beans: LunchUtil will be available as an autowire candiate -->
+``` 
+
+
