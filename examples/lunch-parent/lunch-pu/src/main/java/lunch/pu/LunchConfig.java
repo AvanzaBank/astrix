@@ -18,6 +18,7 @@ package lunch.pu;
 import lunch.api.LunchService;
 
 import org.openspaces.core.GigaSpace;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,10 +28,11 @@ import com.avanza.astrix.context.AstrixFrameworkBean;
 public class LunchConfig {
 	
 	@Bean
-	public AstrixFrameworkBean astrix() {
+	public AstrixFrameworkBean astrix(@Value("${externalConfigUri}") String externalConfigUri) {
 		AstrixFrameworkBean result = new AstrixFrameworkBean();
 		result.setSubsystem("lunch-service");
 		result.setServiceDescriptor(LunchServiceDescriptor.class);
+		result.setExternalConfigUri(externalConfigUri);
 		return result;
 	}
 	

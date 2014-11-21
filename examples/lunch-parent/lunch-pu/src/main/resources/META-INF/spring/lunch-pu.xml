@@ -18,7 +18,7 @@
 	<bean id="astrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
 		<property name="serviceDescriptor" value="lunch.pu.LunchServiceDescriptor"/>
 		<property name="subsystem" value="lunch-service"/>
-		<property name="externalConfigUri" value="${configUri}"/>
+		<property name="externalConfigUri" value="${externalConfigUri}"/>
 	</bean>
 	    
 	<!-- The actual service implementation(s) -->

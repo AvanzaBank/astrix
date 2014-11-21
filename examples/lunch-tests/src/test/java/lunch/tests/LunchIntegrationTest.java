@@ -38,13 +38,8 @@ public class LunchIntegrationTest {
 	
 	@ClassRule
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
-												   .contextProperty("configUri", serviceRegistry.getExternalConfigUri())
+												   .contextProperty("externalConfigUri", serviceRegistry.getExternalConfigUri())
 												   .configure();
-	
-//	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
-//			   											 .serviceRegistryUri(serviceRegistry.getServiceUri())
-//														 .configure();
-	
 	static {
 		BasicConfigurator.configure();
 		Logger.getRootLogger().setLevel(Level.INFO);
