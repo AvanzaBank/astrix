@@ -15,6 +15,7 @@
  */
 package tutorial.t1.provider;
 
+import tutorial.t1.api.LunchRestaurantFinder;
 import tutorial.t1.api.LunchUtil;
 
 import com.avanza.astrix.provider.library.AstrixExport;
@@ -24,8 +25,13 @@ import com.avanza.astrix.provider.library.AstrixLibraryProvider;
 public class LunchLibraryProvider {
 	
 	@AstrixExport
-	public LunchUtil lunchUtil() {
-		return new LunchUtilImpl();
+	public LunchUtil lunchUtil(LunchRestaurantFinder restaurantFinder) {
+		return new LunchUtilImpl(restaurantFinder);
+	}
+	
+	@AstrixExport
+	public LunchRestaurantFinder lunchRestaurantFinder() {
+		return new LunchRestaurantsFinderImpl();
 	}
 
 }

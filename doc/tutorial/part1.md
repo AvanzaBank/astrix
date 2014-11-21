@@ -94,3 +94,64 @@ public class LunchLibraryTest {
 ```
 
 An AstrixContext is created using an AstrixConfigurer. By default, astrix won't scan the classpath for api-providers. The `AstrixConfigurer.setBasePackage` tells Astrix to scan the "tutorial.t1" package, and all its subpackages for api-providers. In this case Astrix will find that the `LunchLibraryProvider` provides the `LunchUtil` api-element, and use it as a factory to create instances of `LunchUtil`.
+
+### Injecting depencencies into a library
+Astrix can inject other astrix-beans into an AstrixLibraryProvider. This is a powerfull feature that allows building libraries that aggregate services from many sources without burding the consumer of the api to know exactly what services are required by the given library. Lets extend the lunch-library to illustrate injecting astrix-beans into libraries:
+
+First we add another interface to the lunch-api:
+```java
+public interface LunchRestaurantFinder {
+	List<String> getAllRestaurants();
+}
+```
+
+Second we add an implementation of the new interface, and update the `LunchUtilImpl` to use the new `LunchRestaurantFinder`: 
+
+```java
+public class LunchRestaurantsFinderImpl implements LunchRestaurantFinder {
+	@Override
+	public List<String> getAllRestaurants() {
+		return AllLunchRestaurants.ALL_RESTAURANTS;
+	}
+}
+
+public class LunchUtilImpl implements LunchUtil {
+	
+	private LunchRestaurantFinder lunchRestaurantFinder;
+	
+	public LunchUtilImpl(LunchRestaurantFinder lunchRestaurantFinder) {
+		this.lunchRestaurantFinder = lunchRestaurantFinder;
+	}
+
+	private List<String> getAllRestaurants() {
+		return lunchRestaurantFinder.getAllRestaurants();
+	}
+
+}
+```
+
+And finally we have to update the `LunchLibraryProvider`. For the point of illustration we are depending on Astrix to inject the LunchRestaurantFinder into the factory-method for `LunchUtil`:
+
+```java
+@AstrixLibraryProvider
+public class LunchLibraryProvider {
+
+	@AstrixExport
+	public LunchUtil lunchUtil(LunchRestaurantFinder restaurantFinder) {
+		return new LunchUtilImpl(restaurantFinder);
+	}
+
+	@AstrixExport
+	public LunchRestaurantFinder lunchRestaurantFinder() {
+		return new LunchRestaurantsFinderImpl();
+	}
+}
+```
+
+The unittest for the new example looks the same as the first one testing the simple library. When the client (the unit test) creates the LunchUtil bean the instantiation process goes as follows:
+
+1. Astrix finds the factory-method for `LunchUtil` and sees that it depends on another astrix-bean, `LunchRestaurantFinder` 
+2. Astrix creates the `LunchRestaurantFinder`
+3. Astrix injects the `LunchRestaurnatFinder` into the factory-method for `LunchUtil`
+
+This also illustrates another powerful feature of Astrix. Namely that library providers are free to change the implemenentation of libraries without the need of any source-code changes by any consumers. 

@@ -18,12 +18,18 @@ package tutorial.t1.provider;
 import java.util.List;
 import java.util.Random;
 
+import tutorial.t1.api.LunchRestaurantFinder;
 import tutorial.t1.api.LunchUtil;
 
 public class LunchUtilImpl implements LunchUtil {
 	
 	private Random rnd = new Random();
+	private LunchRestaurantFinder lunchRestaurantFinder;
 	
+	public LunchUtilImpl(LunchRestaurantFinder lunchRestaurantFinder) {
+		this.lunchRestaurantFinder = lunchRestaurantFinder;
+	}
+
 	@Override
 	public String randomLunchRestaurant() {
 		List<String> restaurants = getAllRestaurants();
@@ -31,7 +37,7 @@ public class LunchUtilImpl implements LunchUtil {
 	}
 
 	private List<String> getAllRestaurants() {
-		return AllLunchRestaurants.ALL_RESTAURANTS;
+		return lunchRestaurantFinder.getAllRestaurants();
 	}
 
 }
