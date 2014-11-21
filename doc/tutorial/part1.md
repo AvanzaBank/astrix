@@ -1,13 +1,24 @@
 # Part 1 - The IOC container
-One of the core features of Astrix is to work as a factory for mircoservices. In that regard, Astrix is similar to other IOC frameworks like Spring and Guice, although Astrix is not intended as the main application IOC-contiainer. Rather Astrix complements another IOC-container, for instance spring which Astrix is well integrated with, to create services, whereas the other IOC-framwork is responsible for wiring-together all application-beans and managing their lifecycle.
+One of the core features of Astrix is to work as a factory for mircoservices. In that regard, Astrix is similar to other IOC frameworks like Spring or Guice. However, Astrix is not intended to be used as a standalone IOC-contiainer. Rather Astrix complements another IOC-container acting as a factory for binding to (micro)services, whereas the other IOC-framwork is responsible for wiring-together all application-beans and managing their lifecycle.
 
-At runtime, every object that Astrix creates is called an astrix-bean, which is similar to a bean in spring.
+#### Why two IOC-containers?
+A typicall IOC container like spring is well suited to provide loose coupling between the objects that builds up the application. A good practice when developing spring applications is to "program against interface's" wich means that the different application objects only know each other by interface. This works well for fairly large applications. 
 
-On type of api in astrix is called `Library`. A Library consists of a number of public interfaces/classes and associated implementations. Astrix shields a library provider from the consumers of the libraries by allowing the consumer to "program against interfaces" without ever needing to now what implements the given interfaces, or how the classes that implement the interfaces are assembled.
+However, a problem arise when building a system that consists of hundereds of microservices, typcially developed by different teams/individualls, and where all microservices are consumed by many other microservcies. In such a case its not only important that the different application objects know each other through an interface, but also that different applications (microservices) don't know how other objects are assembled.
 
-### Example Library 
+Wheras a normal IOC-container inverses the responsibility for application assembly, Astrix inverses the responsibility for api assembly.
 
-The first step in creating a library is to define the public api. This example only contians a simple LunchUtil interface:
+### AstrixContext 
+![AstrixContext](AstrixIOC.png)
+
+
+At runtime, every object that Astrix creates is called an astrix-bean, which is similar to a bean in spring. In order for Astrix to be able to create an astrix-bean of a given type, an `ApiProvider` for the given api must exist. Astrix has an extendable ApiProvider mechanism, which allows new api "types" to be plugged into Astrix. Two common api types that are supported out of the box are `Library`and `ServiceRegistryApi`.
+
+A Library consist of a number of public interfaces/classes and associated implementations. Astrix shields a library provider from the consumers of the library by allowing the consumer to "program against interfaces" without ever needing to now what implements the given interfaces, or how the classes that implement the interfaces are assembled.
+
+### A Simple Library 
+
+The first step in creating a library is to define the public api. This example only contains a LunchUtil interface:
 
 ```java
 public interface LunchUtil {
@@ -50,8 +61,7 @@ public class LunchLibraryProvider {
 }
 ```
  
-The `@AstrixLibraryProvider` tells Astrix that this class can build library apis. Each method annotated with `@AstrixExport` will act as a factory method to create the given api element, which is defined by the return type of thte factory method, which is `LunchUtil` in this example.
-
+The `@AstrixLibraryProvider` annotation tells Astrix that this class if a factory for a library api. Each method annotated with `@AstrixExport` will act as a factory method to create a given api element, which is defined by the return type of the factory method, which is `LunchUtil` in this example.
 
 
 Consumption of LunchApi is done by first creating an `AstrixContext` and then use it as a factory. This unit-test exemplifies:
