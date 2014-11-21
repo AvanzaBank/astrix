@@ -1,5 +1,5 @@
 # Part 1 - The IOC container
-One of the core features of Astrix is to work as a factory for mircoservices. In that regard, Astrix is similar to other IOC frameworks like Spring or Guice. However, Astrix is not intended to be used as a standalone IOC-container. Rather Astrix complements another IOC-container acting as a factory for binding to (micro)services, whereas the other IOC-framwork is responsible for wiring together all application-beans and managing their lifecycle.
+One of the core features of Astrix is to work as a factory for microservices. In that regard, Astrix is similar to other IOC frameworks like Spring or Guice. However, Astrix is not intended to be used as a standalone IOC-container. Rather Astrix complements another IOC-container acting as a factory for binding to (micro)services, whereas the other IOC-framwork is responsible for wiring together all application-beans and managing their lifecycle.
 
 #### Why two IOC-containers?
 A typicall IOC container like spring is well suited to provide loose coupling between the objects that builds up the application. A good practice when developing spring applications is to "program against interface's" wich means that the different application objects only know each other by interface. This works well for fairly large applications. 
