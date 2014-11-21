@@ -1,10 +1,10 @@
 # Part 1 - The IOC container
-One of the core features of Astrix is to work as a factory for mircoservices. In that regard, Astrix is similar to other IOC frameworks like Spring or Guice. However, Astrix is not intended to be used as a standalone IOC-contiainer. Rather Astrix complements another IOC-container acting as a factory for binding to (micro)services, whereas the other IOC-framwork is responsible for wiring-together all application-beans and managing their lifecycle.
+One of the core features of Astrix is to work as a factory for mircoservices. In that regard, Astrix is similar to other IOC frameworks like Spring or Guice. However, Astrix is not intended to be used as a standalone IOC-container. Rather Astrix complements another IOC-container acting as a factory for binding to (micro)services, whereas the other IOC-framwork is responsible for wiring-together all application-beans and managing their lifecycle.
 
 #### Why two IOC-containers?
 A typicall IOC container like spring is well suited to provide loose coupling between the objects that builds up the application. A good practice when developing spring applications is to "program against interface's" wich means that the different application objects only know each other by interface. This works well for fairly large applications. 
 
-However, a problem arise when building a system that consists of hundereds of microservices, typcially developed by different teams/individualls, and where all microservices are consumed by many other microservcies. In such a case its not only important that the different application objects know each other through an interface, but also that different applications (microservices) don't know how other objects are assembled.
+However, a problem arise when building a system that consists of hundereds of microservices, typcially developed by different teams/individualls. Sharing libraries/clients in such an organization can lead to hard maintainance if one does not take care to clearly define what is part of the public-api, and what should constitue an internal implementation detail. In such a case its not only important that the different application objects know each other through an interface, but also that different applications don't know how the libraries/clients provided by other teams are assembled.
 
 Wheras a normal IOC-container inverses the responsibility for application assembly, Astrix inverses the responsibility for api assembly.
 
