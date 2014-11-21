@@ -95,7 +95,7 @@ public class LunchLibraryTest {
 
 An AstrixContext is created using an AstrixConfigurer. By default, astrix won't scan the classpath for api-providers. The `AstrixConfigurer.setBasePackage` tells Astrix to scan the "tutorial.t1" package, and all its subpackages for api-providers. In this case Astrix will find that the `LunchLibraryProvider` provides the `LunchUtil` api-element, and use it as a factory to create instances of `LunchUtil`.
 
-### Injecting depencencies into a library
+### Injecting Depencencies into a Library
 Astrix can inject other astrix-beans into an AstrixLibraryProvider. This is a powerfull feature that allows building libraries that aggregate services from many sources without burding the consumer of the api to know exactly what services are required by the given library. Lets extend the lunch-library to illustrate injecting astrix-beans into libraries:
 
 First we add another interface to the lunch-api:
@@ -154,4 +154,9 @@ The unittest for the new example looks the same as the first one testing the sim
 2. Astrix creates the `LunchRestaurantFinder`
 3. Astrix injects the `LunchRestaurnatFinder` into the factory-method for `LunchUtil`
 
-This also illustrates another powerful feature of Astrix. Namely that library providers are free to change the implemenentation of libraries without the need of any source-code changes by any consumers. 
+This also illustrates another powerful feature of Astrix. Namely that library providers are free to change the implemenentation of libraries without the need of any source-code changes by any consumers.
+
+
+
+### Life Cycle Management of Libraries
+TODO
