@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.After;
 import org.junit.Test;
 
-import tutorial.t1.api.LunchUtil;
+import tutorial.t1.api.LunchSuggester;
 import tutorial.t1.provider.AllLunchRestaurants;
 
 import com.avanza.astrix.context.AstrixConfigurer;
@@ -36,14 +36,14 @@ public class LunchLibraryTest {
 	}
 
 	@Test
-	public void lunchUtilCanBeConsumedUsingAstrix() throws Exception {
+	public void lunchSuggesterCanBeConsumedUsingAstrix() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setBasePackage("tutorial.t1");
 		astrix = configurer.configure();
 		
-		LunchUtil bean = astrix.getBean(LunchUtil.class);
-		
-		String restaurant = bean.randomLunchRestaurant();
+		LunchSuggester lunchSuggester = astrix.getBean(LunchSuggester.class);
+		String restaurant = lunchSuggester.randomLunchRestaurant();
+
 		assertTrue(AllLunchRestaurants.ALL_RESTAURANTS.contains(restaurant));
 	}
 	

@@ -15,23 +15,15 @@
  */
 package tutorial.t1.provider;
 
+import java.util.List;
+
 import tutorial.t1.api.LunchRestaurantFinder;
-import tutorial.t1.api.LunchSuggester;
 
-import com.avanza.astrix.provider.library.AstrixExport;
-import com.avanza.astrix.provider.library.AstrixLibraryProvider;
+public class LunchRestaurantsFinderImpl implements LunchRestaurantFinder {
 
-@AstrixLibraryProvider
-public class LunchLibraryProvider {
-	
-	@AstrixExport
-	public LunchSuggester lunchUtil(LunchRestaurantFinder restaurantFinder) {
-		return new LunchSuggesterImpl(restaurantFinder);
-	}
-	
-	@AstrixExport
-	public LunchRestaurantFinder lunchRestaurantFinder() {
-		return new LunchRestaurantsFinderImpl();
+	@Override
+	public List<String> getAllRestaurants() {
+		return AllLunchRestaurants.ALL_RESTAURANTS;
 	}
 
 }

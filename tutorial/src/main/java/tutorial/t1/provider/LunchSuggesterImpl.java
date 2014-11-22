@@ -19,14 +19,14 @@ import java.util.List;
 import java.util.Random;
 
 import tutorial.t1.api.LunchRestaurantFinder;
-import tutorial.t1.api.LunchUtil;
+import tutorial.t1.api.LunchSuggester;
 
-public class LunchUtilImpl implements LunchUtil {
+public class LunchSuggesterImpl implements LunchSuggester {
 	
 	private Random rnd = new Random();
 	private LunchRestaurantFinder lunchRestaurantFinder;
 	
-	public LunchUtilImpl(LunchRestaurantFinder lunchRestaurantFinder) {
+	public LunchSuggesterImpl(LunchRestaurantFinder lunchRestaurantFinder) {
 		this.lunchRestaurantFinder = lunchRestaurantFinder;
 	}
 

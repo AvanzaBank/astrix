@@ -15,8 +15,10 @@
  */
 package tutorial.t1.api;
 
-public interface LunchUtil {
-	
-	String randomLunchRestaurant();
-	
+import java.util.List;
+
+public interface LunchRestaurantFinder {
+
+	List<String> getAllRestaurants();
+
 }
