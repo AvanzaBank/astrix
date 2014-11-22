@@ -152,11 +152,128 @@ The unittest for the new example looks the same as the first one testing the sim
 
 1. Astrix finds the factory-method for `LunchSuggester` and sees that it depends on another astrix-bean, `LunchRestaurantFinder` 
 2. Astrix creates the `LunchRestaurantFinder`
-3. Astrix injects the `LunchRestaurnatFinder` into the factory-method for `LunchSuggester`
+3. Astrix injects the `LunchRestaurantFinder` into the factory-method for `LunchSuggester`
 
 This also illustrates another powerful feature of Astrix. Namely that library providers are free to change the implemenentation of libraries without the need of any source-code changes by any consumers.
 
 
 
 ### Life Cycle Management of Libraries
-TODO
+Astrix allows created libraries to receive two types of lifecycle events. When a library bean is created Astrix will invoke all `@PostConstruct` annotated method right after invoking the factory method. When the `AstrixContext` is destroyed (by invoking `AstrixContext.destroy()`) all `@PreDestroy` annotated methods will be invoked on each library bean that has bean created by the AstrixContext.
+
+
+```java
+public interface LunchRestaurantFinder {
+	List<String> getAllRestaurants();
+	boolean isInitialized();
+	boolean isDestroyed();
+}
+
+public class LunchRestaurantFinderImpl implements LunchRestaurantFinder {
+
+	private boolean initialized = false;
+	private boolean destroyed = false;
+
+	@Override
+	public List<String> getAllRestaurants() {
+		return AllLunchRestaurants.ALL_RESTAURANTS;
+	}
+	
+	@PostConstruct
+	public void init() {
+		this.initialized = true;
+	}
+	
+	@PreDestroy
+	public void preDestroy() {
+		this.destroyed  = true;
+	}
+
+	@Override
+	public boolean isInitialized() {
+		return initialized;
+	}
+
+	@Override
+	public boolean isDestroyed() {
+		return this.destroyed;
+	}
+
+}
+
+public class LibraryLifecycleManagementTest {
+	
+	private AstrixContext astrix;
+	
+	@Test
+	public void postConstructAnnotatedMethodsAreInvokedAfterTheBeanHasBeanCreated() throws Exception {
+		AstrixConfigurer configurer = new AstrixConfigurer();
+		configurer.setBasePackage("tutorial.t2");
+		astrix = configurer.configure();
+		
+		LunchRestaurantFinder restaurantFinder = astrix.getBean(LunchRestaurantFinder.class);
+		assertTrue(restaurantFinder.isInitialized());
+	}
+	
+	@Test
+	public void preDestroyAnnotatedMethodsAreInvokedWhenTheContextIsDestroyed() throws Exception {
+		AstrixConfigurer configurer = new AstrixConfigurer();
+		configurer.setBasePackage("tutorial.t2");
+		astrix = configurer.configure();
+		
+		LunchRestaurantFinder restaurantFinder = astrix.getBean(LunchRestaurantFinder.class);
+		assertFalse(restaurantFinder.isDestroyed());
+		
+		astrix.destroy();
+		assertTrue(restaurantFinder.isDestroyed());
+	}
+	
+
+}
+
+```
+
+
+
+### Testing Libraries
+TODO - Illustrate mocking dependencies to other libraries
+
+LibA
+
+LibB depende on LibA
+
+Testing LibB without LibA
+
+AstrixConfigurer configurer = new AstrixConfigurer();
+configurer.registerApiDescriptor(LibBDescriptor.class); // No scanning
+configurer.registerBean(LibAMock.class, libAMock); // Register Mock
+AstrixContext = configurer.configure();
+
+LibBType type = configurer.get(LibBType.class); // Astrix will inject mock to LibB.
+
+
+
+### Service Binding
+- AstrixServiceComponent
+- DirectComponent
+- GsComponent
+
+* Introduce AstrixConfigApi
+* Illustrate service-binding with AstrixConfigApi
+
+
+### Service Registry (Service discovery)
+- Dynamic service discovery
+- Relies on serivce-binding through AstrixServiceComponent
+
+
+
+
+
+
+
+
+
+
+
+
