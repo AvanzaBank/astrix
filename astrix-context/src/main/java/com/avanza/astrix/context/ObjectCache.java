@@ -31,7 +31,15 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
- * Manages the life-cycle of each object created by Astrix. Three types object exists:
+ * Manages the life-cycle of each object created by Astrix. Each object created will be cached.
+ * 
+ * When the object is created (upon cache-miss) the object will be created using the ObjectFactory
+ * and then the object will be initialized by invoking all @PostConstruct annotated methods.
+ * 
+ * When the ObjectCache is destroyed all objects in the cache will be destroyed by invoking
+ * all @PreDestroy annotated methods on every instance in the cache.
+ * 
+ * Three types object exists:
  * 1. AstrixBeans
  * 2. Internal Classes
  * 3. Plugins (currently not managed)
