@@ -29,7 +29,7 @@ public class LibraryLifecycleManagementTest {
 	
 	private AstrixContext astrix;
 	
-//	@Test
+	@Test
 	public void postConstructAnnotatedMethodsAreInvokedAfterTheBeanHasBeanCreated() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setBasePackage("tutorial.t2");
@@ -37,6 +37,15 @@ public class LibraryLifecycleManagementTest {
 		
 		LunchRestaurantFinder restaurantFinder = astrix.getBean(LunchRestaurantFinder.class);
 		assertTrue(restaurantFinder.isInitialized());
+	}
+	
+	@Test
+	public void preDestroyAnnotatedMethodsAreInvokedWhenTheContextIsDestroyed() throws Exception {
+		AstrixConfigurer configurer = new AstrixConfigurer();
+		configurer.setBasePackage("tutorial.t2");
+		astrix = configurer.configure();
+		
+		LunchRestaurantFinder restaurantFinder = astrix.getBean(LunchRestaurantFinder.class);
 		assertFalse(restaurantFinder.isDestroyed());
 		
 		astrix.destroy();
