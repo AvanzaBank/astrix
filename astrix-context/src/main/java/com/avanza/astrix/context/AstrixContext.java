@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PreDestroy;
+
+import com.avanza.astrix.context.ObjectId.AstrixBeanId;
 /**
  * An AstrixContext is the runtime-environment for the astrix-framework. It is used
  * both by consuming applications as well as server applications. AstrixContext providers access
@@ -40,12 +42,23 @@ public class AstrixContext implements Astrix {
 	private final AstrixSettingsWriter settingsWriter;
 	private final AstrixBeanStateWorker beanStateWorker;
 	private AstrixApiProviderPlugins apiProviderPlugins;
-	private final InstanceCache instanceCache = new InstanceCache(new InstanceCache.ObjectInitializer() {
+	private final ObjectCache objectCache = new ObjectCache(new ObjectCache.ObjectFactory() {
 		@Override
-		public void init(Object object) {
-			injectDependencies(object);
+		@SuppressWarnings("unchecked")
+		public <T> T create(ObjectId objectId) throws Exception {
+			if (objectId.isAstrixBean()) {
+				AstrixBeanId beanId = (AstrixBeanId) objectId;
+				// Detect circular dependencies by retrieving transitive bean dependencies
+				// "just in time" when an astrix-bean is created.
+				getTransitiveBeanDependenciesForBean(beanId.getKey().getBeanType());
+				return (T) getFactoryBean(beanId.getKey().getBeanType()).create(beanId.getKey().getQualifier());
+			}
+			T result =  (T) objectId.getType().newInstance();
+			injectDependencies(result);
+			return result;
 		}
 	});
+	
 	
 	public AstrixContext(AstrixSettings settings) {
 		this.eventBus.addEventListener(AstrixBeanStateChangedEvent.class, beanStates);
@@ -85,7 +98,7 @@ public class AstrixContext implements Astrix {
 	public void destroy() {
 		this.beanStateWorker.interrupt();
 		this.eventBus.destroy();
-		this.instanceCache.destroy();
+		this.objectCache.destroy();
 	}
 	
 	private void injectDependencies(Object object) {
@@ -174,10 +187,7 @@ public class AstrixContext implements Astrix {
 	}
 	
 	public <T> T getBean(Class<T> beanType, String qualifier) {
-		// Detect circular dependencies by retrieving transitive bean dependencies
-		// "just in time" when an Astrix-bean is created.
-		getTransitiveBeanDependenciesForBean(beanType); 
-		return getFactoryBean(beanType).create(qualifier);
+		return objectCache.getInstance(ObjectId.astrixBean(AstrixBeanKey.create(beanType, qualifier)));
 	}
 
 	private <T> AstrixFactoryBean<T> getFactoryBean(Class<T> beanType) {
@@ -299,16 +309,21 @@ public class AstrixContext implements Astrix {
 		return getPlugins().getPlugin(pluginType);
 	}
 	
+	/**
+	 * Returns an instance of an internal framework class.
+	 * @param classType
+	 * @return
+	 */
 	public <T> T getInstance(Class<T> classType) {
-		// We allow injecting an instance of InstanceCache, hence this
+		// We allow injecting an instance of ObjectCache, hence this
 		// check.
-		if (classType.equals(InstanceCache.class)) {
-			return classType.cast(instanceCache);
+		if (classType.equals(ObjectCache.class)) {
+			return classType.cast(objectCache);
 		}
 		if (classType.equals(AstrixContext.class)) {
 			return classType.cast(this);
 		}
-		return this.instanceCache.getInstance(classType);
+		return this.objectCache.getInstance(ObjectId.internalClass(classType));
 	}
 	
 	public AstrixSettingsReader getSettings() {

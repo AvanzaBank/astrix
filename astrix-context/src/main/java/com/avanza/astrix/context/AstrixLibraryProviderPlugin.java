@@ -28,7 +28,7 @@ import com.avanza.astrix.provider.library.AstrixLibraryProvider;
 @MetaInfServices(AstrixApiProviderPlugin.class)
 public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
 	
-	private InstanceCache instanceCache;
+	private ObjectCache instanceCache;
 	
 	@Override
 	public List<AstrixFactoryBeanPlugin<?>> createFactoryBeans(AstrixApiDescriptor descriptorHolder) {
@@ -43,7 +43,7 @@ public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
 	}
 
 	private Object initInstanceProvider(AstrixApiDescriptor descriptor) {
-		return instanceCache.getInstance(descriptor.getDescriptorClass());
+		return instanceCache.getInstance(ObjectId.internalClass(descriptor.getDescriptorClass()));
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
 	}
 	
 	@AstrixInject
-	public void setInstanceCache(InstanceCache instanceCache) {
+	public void setInstanceCache(ObjectCache instanceCache) {
 		this.instanceCache = instanceCache;
 	}
 	

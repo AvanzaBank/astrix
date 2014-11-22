@@ -34,7 +34,6 @@ public final class AstrixFactoryBean<T> implements AstrixDecorator {
 	private final AstrixFactoryBeanPlugin <T> plugin;
 	private final Class<T> beanType;
 	private final AstrixApiDescriptor apiDescriptor;
-	private volatile AstrixBean<T> AstrixBean;
 	private final boolean isLibrary;
 	
 	public AstrixFactoryBean(AstrixFactoryBeanPlugin<T> factoryPlugin, AstrixApiDescriptor apiDescriptor, boolean isLibrary) {
@@ -45,24 +44,7 @@ public final class AstrixFactoryBean<T> implements AstrixDecorator {
 	}
 
 	public T create(String optionalQualifier) {
-		AstrixBean<T> bean = getAstrixBean(optionalQualifier);
-		return bean.getInstance(); 
-	}
-	
-	private AstrixBean<T> getAstrixBean(String optionalQualifier) {
-		AstrixBean<T> bean = AstrixBean;
-		if (bean != null) {
-			return bean;
-		}
-		synchronized (this) {
-			bean = AstrixBean;
-			if (bean != null) {
-				return bean;
-			}
-			bean = new AstrixBean<>(this.plugin.create(optionalQualifier));
-			this.AstrixBean = bean;
-			return bean;
-		}
+		return this.plugin.create(optionalQualifier);
 	}
 	
 	public Class<T> getBeanType() {
@@ -85,17 +67,4 @@ public final class AstrixFactoryBean<T> implements AstrixDecorator {
 	public AstrixApiDescriptor getApiDescriptor() {
 		return apiDescriptor;
 	}
-	
-	private static class AstrixBean<T> {
-		private final T instance;
-		
-		public AstrixBean(T instance) {
-			this.instance = instance;
-		}
-
-		public T getInstance() {
-			return instance;
-		}
-	}
-	
 }
