@@ -96,23 +96,25 @@ class RemoteServiceMethod {
 					if (routingStrategy != null) {
 						throw new AmbiguousRoutingException(String.format("Ambiguous routing, multiple @Routing annotated methods on %s", m.toString()));
 					}
-					Routing routing = (Routing) a;
-					if (routing.value().trim().isEmpty()) {
-						routingStrategy = new AnnotatedArgumentRoutingStrategy(argumentIndex);
-					} else {
-						String methodName = routing.value();
-						try {
-							Class<?> type = m.getParameterTypes()[argumentIndex];
-							Method method = type.getMethod(methodName);
-							routingStrategy = new PropertyOnAnnotatedArgumentRoutingStrategy(argumentIndex, method);
-						} catch (NoSuchMethodException | SecurityException e) {
-							throw new IllegalArgumentException("Cant route using: " + methodName , e);
-						}
-					}
+					routingStrategy = createRoutingStrategy(m, argumentIndex, (Routing) a);
 				}
 			}
 		}
 		return routingStrategy;
+	}
+
+	private static RoutingStrategy createRoutingStrategy(Method serviceMethod, int routingArgumentIndex, Routing routingAnnotation) {
+		if (routingAnnotation.value().trim().isEmpty()) {
+			return new AnnotatedArgumentRoutingStrategy(routingArgumentIndex);
+		} 
+		String targetRoutingMethod = routingAnnotation.value();
+		try {
+			Class<?> type = serviceMethod.getParameterTypes()[routingArgumentIndex];
+			Method method = type.getMethod(targetRoutingMethod);
+			return new PropertyOnAnnotatedArgumentRoutingStrategy(routingArgumentIndex, method);
+		} catch (NoSuchMethodException | SecurityException e) {
+			throw new IllegalArgumentException("Cant route using: " + targetRoutingMethod , e);
+		}
 	}
 	
 	private interface RoutingStrategy {
