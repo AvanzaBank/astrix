@@ -16,6 +16,7 @@
 package com.avanza.astrix.remoting.client;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.openspaces.remoting.Routing;
@@ -95,7 +96,19 @@ class RemoteServiceMethod {
 					if (routingStrategy != null) {
 						throw new AmbiguousRoutingException(String.format("Ambiguous routing, multiple @Routing annotated methods on %s", m.toString()));
 					}
-					routingStrategy = new AnnotatedArgumentRoutingStrategy(argumentIndex);
+					Routing routing = (Routing) a;
+					if (routing.value().trim().isEmpty()) {
+						routingStrategy = new AnnotatedArgumentRoutingStrategy(argumentIndex);
+					} else {
+						String methodName = routing.value();
+						try {
+							Class<?> type = m.getParameterTypes()[argumentIndex];
+							Method method = type.getMethod(methodName);
+							routingStrategy = new PropertyOnAnnotatedArgumentRoutingStrategy(argumentIndex, method);
+						} catch (NoSuchMethodException | SecurityException e) {
+							throw new IllegalArgumentException("Cant route using: " + methodName , e);
+						}
+					}
 				}
 			}
 		}
@@ -117,6 +130,29 @@ class RemoteServiceMethod {
 		@Override
 		public GsRoutingKey getRoutingKey(Object[] args) {
 			return GsRoutingKey.create(args[argumentIndex]);
+		}
+	}
+	
+	private static class PropertyOnAnnotatedArgumentRoutingStrategy implements RoutingStrategy {
+		
+		private final int argumentIndex;
+		private final Method propertyMethod;
+
+
+		public PropertyOnAnnotatedArgumentRoutingStrategy(int argumentIndex, Method propertyMethod) {
+			this.argumentIndex = argumentIndex;
+			this.propertyMethod = propertyMethod;
+		}
+
+		@Override
+		public GsRoutingKey getRoutingKey(Object[] args) {
+			Object routingKey;
+			try {
+				routingKey = propertyMethod.invoke(args[argumentIndex]);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new IllegalArgumentException("Failed to rout using method:" + propertyMethod, e);
+			}
+			return GsRoutingKey.create(routingKey);
 		}
 	}
 	

@@ -264,7 +264,7 @@ LibBType type = configurer.get(LibBType.class); // Astrix will inject mock to Li
 
 ### Service Registry (Service discovery)
 - Dynamic service discovery
-- Relies on serivce-binding through AstrixServiceComponent
+- Relies on service-binding using AstrixServiceComponent
 
 
 

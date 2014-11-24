@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 /**
+ * Scans a given class for a @SpaceRouting annotated method. 
  * 
  * @author Elias Lindholm (elilin)
  *
