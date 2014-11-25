@@ -27,7 +27,7 @@ public class AstrixRemoteServiceException extends RuntimeException {
 	private final String serviceExceptionMessage;
 
 	public AstrixRemoteServiceException(String serviceExceptionMessage, String serviceExceptionType, String correlationId) {
-		super("[" + serviceExceptionType + ": " + serviceExceptionMessage + "] correlationId=" + correlationId);
+		super("Remote service threw exception, see server log for details. [" + serviceExceptionType + ": " + serviceExceptionMessage + "] correlationId=" + correlationId);
 		this.serviceExceptionMessage = serviceExceptionMessage;
 		this.exceptionType = serviceExceptionType;
 	}

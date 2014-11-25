@@ -178,7 +178,7 @@ public class AstrixIntegrationTest {
 			lunchService.getLunchRestaurant(request);
 		} catch (AstrixRemoteServiceException e) {
 			assertEquals(IllegalArgumentException.class.getName(), e.getExceptionType());
-			assertThat(e.getMessage(), startsWith("[java.lang.IllegalArgumentException: Illegal restaurant: throwException]"));
+			assertThat(e.getMessage(), startsWith("Remote service threw exception, see server log for details. [java.lang.IllegalArgumentException: Illegal restaurant: throwException]"));
 		}
 	}
 	

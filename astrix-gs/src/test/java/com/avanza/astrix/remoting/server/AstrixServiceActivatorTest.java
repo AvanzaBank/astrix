@@ -165,7 +165,7 @@ public class AstrixServiceActivatorTest {
 			fail("Expected remote service exception to be thrown");
 		} catch (AstrixRemoteServiceException e) {
 			assertEquals(IllegalArgumentException.class.getName(), e.getExceptionType());
-			assertThat(e.getMessage(), startsWith("[java.lang.IllegalArgumentException: Remote service error message]"));
+			assertThat(e.getMessage(), startsWith("Remote service threw exception, see server log for details. [java.lang.IllegalArgumentException: Remote service error message]"));
 		}
 	}
 	
@@ -185,7 +185,7 @@ public class AstrixServiceActivatorTest {
 			fail("Expected remote service exception to be thrown");
 		} catch (AstrixRemoteServiceException e) {
 			assertEquals(IllegalArgumentException.class.getName(), e.getExceptionType());
-			assertThat(e.getMessage(), startsWith("[java.lang.IllegalArgumentException: Broadcast error message]"));
+			assertThat(e.getMessage(), startsWith("Remote service threw exception, see server log for details. [java.lang.IllegalArgumentException: Broadcast error message]"));
 		}
 	}
 	
