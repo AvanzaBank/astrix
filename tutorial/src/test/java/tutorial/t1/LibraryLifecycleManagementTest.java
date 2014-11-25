@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tutorial.t2;
+package tutorial.t1;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import tutorial.t2.api.LunchRestaurantFinder;
+import tutorial.t1.api.LunchRestaurantFinder;
 
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
@@ -32,7 +32,7 @@ public class LibraryLifecycleManagementTest {
 	@Test
 	public void postConstructAnnotatedMethodsAreInvokedAfterTheBeanHasBeanCreated() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.setBasePackage("tutorial.t2");
+		configurer.setBasePackage("tutorial.t1");
 		astrix = configurer.configure();
 		
 		LunchRestaurantFinder restaurantFinder = astrix.getBean(LunchRestaurantFinder.class);
@@ -42,7 +42,7 @@ public class LibraryLifecycleManagementTest {
 	@Test
 	public void preDestroyAnnotatedMethodsAreInvokedWhenTheContextIsDestroyed() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.setBasePackage("tutorial.t2");
+		configurer.setBasePackage("tutorial.t1");
 		astrix = configurer.configure();
 		
 		LunchRestaurantFinder restaurantFinder = astrix.getBean(LunchRestaurantFinder.class);

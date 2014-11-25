@@ -20,5 +20,9 @@ import java.util.List;
 public interface LunchRestaurantFinder {
 
 	List<String> getAllRestaurants();
+	
+	boolean isInitialized();
+	
+	boolean isDestroyed();
 
 }

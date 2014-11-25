@@ -236,21 +236,49 @@ public class LibraryLifecycleManagementTest {
 
 
 ### Testing Libraries
-TODO - Illustrate mocking dependencies to other libraries
+Its a good practice to test your libraries. If your library doesn't depend on any services you can just create an instance of your library using an AstrixConfigurer. But most libraries have dependencies on services. After all, thats the whole purpose of using Astrix, to support a service based architecture. In such cases its convenient to test the library isolated from the services it consumes, especially if the consumed service(s) are provided by another team. Astrix makes it really easy to provide test-specific implementations for any service consumed as the following example illustrates.
 
-LibA
+```java
+public class MockingAstrixBeansTest {
+	
+	@Test
+	public void testAstrixConfigurerAllowsRegistrationOfMockInstances() throws Exception {
+		LunchRestaurantFinder restaurantFinder = Mockito.mock(LunchRestaurantFinder.class);
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		
+		// Register the api(s) we intend to test
+		astrixConfigurer.registerApiDescriptor(LunchLibraryProvider.class);
+		
+		// Stub out its dependency 
+		astrixConfigurer.registerApi(LunchRestaurantFinder.class, restaurantFinder);
+		AstrixContext astrixContext = astrixConfigurer.configure();
+		
+		// Get the api we intend to test
+		LunchSuggester lunchSuggester = astrixContext.getBean(LunchSuggester.class);
+		
+		// Stub out getAllRestaurants to allways return one restaurant
+		Mockito.stub(restaurantFinder.getAllRestaurants()).toReturn(Arrays.asList("Max"));
 
-LibB depende on LibA
+		assertEquals("Max", lunchSuggester.randomLunchRestaurant());
+	}
 
-Testing LibB without LibA
+	@AstrixLibraryProvider
+	public static class LunchLibraryProvider {
+		
+		// Note that this library don't provide the LunchRestaurantFinder, lets
+		// pretend that its a remote-service provided by another team.
+		
+		@AstrixExport
+		public LunchSuggester lunchUtil(LunchRestaurantFinder restaurantFinder) {
+			return new LunchSuggesterImpl(restaurantFinder);
+		}
+		
+	}
 
-AstrixConfigurer configurer = new AstrixConfigurer();
-configurer.registerApiDescriptor(LibBDescriptor.class); // No scanning
-configurer.registerBean(LibAMock.class, libAMock); // Register Mock
-AstrixContext = configurer.configure();
+}
+```
 
-LibBType type = configurer.get(LibBType.class); // Astrix will inject mock to LibB.
-
+In the example we are using the `TestAstrixConfigurer` instead of the normal `AstrixConfigurer`. The `TestAstrixConfigurer` uses `AstrixConfigurer` behind the scenes, but it creates a configuration suitable for unittesting. It also exposes some functionality not available using the regular AstrixConfigurer api, and disables api-descriptor scanning. Therefore we programmatically register api-descriptors for the api's we are intended to test. In the example the api under test depends on another api, `LunchRestaurantFinder`. The `TestAstrixConfigurer.addApi` allows us to register a mock for that api in the test. Since the creation of a AstrixContext is very fast and we stubbed out the single service dependency, this test will run at "unit test" speed. 
 
 
 ### Service Binding

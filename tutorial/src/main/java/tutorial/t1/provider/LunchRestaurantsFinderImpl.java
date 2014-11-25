@@ -17,13 +17,39 @@ package tutorial.t1.provider;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import tutorial.t1.api.LunchRestaurantFinder;
 
 public class LunchRestaurantsFinderImpl implements LunchRestaurantFinder {
 
+	private boolean initialized = false;
+	private boolean destroyed = false;
+
 	@Override
 	public List<String> getAllRestaurants() {
 		return AllLunchRestaurants.ALL_RESTAURANTS;
+	}
+	
+	@PostConstruct
+	public void init() {
+		this.initialized = true;
+	}
+	
+	@PreDestroy
+	public void preDestroy() {
+		this.destroyed  = true;
+	}
+
+	@Override
+	public boolean isInitialized() {
+		return initialized;
+	}
+
+	@Override
+	public boolean isDestroyed() {
+		return this.destroyed;
 	}
 
 }
