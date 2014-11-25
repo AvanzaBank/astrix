@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tutorial.t1;
+package tutorial.p2;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Test;
+import org.mockito.Mockito;
 
-import tutorial.t1.api.LunchRestaurantFinder;
+import tutorial.p2.api.LunchRestaurantFinder;
+import tutorial.p2.api.LunchSuggester;
 
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixDirectComponent;
 
-public class LibraryLifecycleManagementTest {
-
+public class LunchLibraryTest {
+	
 	private AstrixContext astrix;
 	
 	@After
@@ -36,27 +40,19 @@ public class LibraryLifecycleManagementTest {
 	}
 	
 	@Test
-	public void postConstructAnnotatedMethodsAreInvokedAfterTheBeanHasBeanCreated() throws Exception {
+	public void astrixDirectComponentAllowsBindingToObjectsInSameProcess() throws Exception {
+		LunchRestaurantFinder restaurantFinder = Mockito.mock(LunchRestaurantFinder.class);
+		String serviceUri = AstrixDirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinder);
+
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.setBasePackage("tutorial.t1");
+		configurer.set("restaurantFinderUri", serviceUri);
+		configurer.setBasePackage("tutorial.p2");
 		astrix = configurer.configure();
 		
-		LunchRestaurantFinder restaurantFinder = astrix.getBean(LunchRestaurantFinder.class);
-		assertTrue(restaurantFinder.isInitialized());
+		LunchSuggester lunchSuggester = astrix.getBean(LunchSuggester.class);
+
+		Mockito.stub(restaurantFinder.getAllRestaurants()).toReturn(Arrays.asList("Pontus!"));
+		assertEquals("Pontus!", lunchSuggester.randomLunchRestaurant());
 	}
-	
-	@Test
-	public void preDestroyAnnotatedMethodsAreInvokedWhenTheContextIsDestroyed() throws Exception {
-		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.setBasePackage("tutorial.t1");
-		astrix = configurer.configure();
-		
-		LunchRestaurantFinder restaurantFinder = astrix.getBean(LunchRestaurantFinder.class);
-		assertFalse(restaurantFinder.isDestroyed());
-		
-		astrix.destroy();
-		assertTrue(restaurantFinder.isDestroyed());
-	}
-	
 
 }

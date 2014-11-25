@@ -146,5 +146,10 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	public <T> AstrixServiceProperties createServiceProperties(Class<T> exportedService) {
 		throw new UnsupportedOperationException();
 	}
+
+	public static <T> String registerAndGetUri(Class<T> api, T provider) {
+		String id = register(api, provider);
+		return getServiceUri(id);
+	}
 	
 }

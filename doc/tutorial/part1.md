@@ -233,8 +233,6 @@ public class LibraryLifecycleManagementTest {
 
 ```
 
-
-
 ### Testing Libraries
 Its a good practice to test your libraries. If your library doesn't depend on any services you can just create an instance of your library using an AstrixConfigurer. But most libraries have dependencies on services. After all, thats the whole purpose of using Astrix, to support a service based architecture. In such cases its convenient to test the library isolated from the services it consumes, especially if the consumed service(s) are provided by another team. Astrix makes it really easy to provide test-specific implementations for any service consumed as the following example illustrates.
 
@@ -281,13 +279,16 @@ public class MockingAstrixBeansTest {
 In the example we are using the `TestAstrixConfigurer` instead of the normal `AstrixConfigurer`. The `TestAstrixConfigurer` uses `AstrixConfigurer` behind the scenes, but it creates a configuration suitable for unittesting. It also exposes some functionality not available using the regular AstrixConfigurer api, and disables api-descriptor scanning. Therefore we programmatically register api-descriptors for the api's we are intended to test. In the example the api under test depends on another api, `LunchRestaurantFinder`. The `TestAstrixConfigurer.addApi` allows us to register a mock for that api in the test. Since the creation of a AstrixContext is very fast and we stubbed out the single service dependency, this test will run at "unit test" speed. 
 
 
+
 ### Service Binding
 - AstrixServiceComponent
 - DirectComponent
 - GsComponent
 
 * Introduce AstrixConfigApi
-* Illustrate service-binding with AstrixConfigApi
+* Illustrate service-binding with AstrixConfigApi and DirectComponent
+* Illustrate that a service must not be available when bean is created
+* Illustrate waiting for library bean to be bound
 
 
 ### Service Registry (Service discovery)
