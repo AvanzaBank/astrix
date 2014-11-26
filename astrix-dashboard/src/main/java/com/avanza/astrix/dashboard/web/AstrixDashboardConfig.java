@@ -16,6 +16,7 @@
 package com.avanza.astrix.dashboard.web;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,19 +30,15 @@ import com.avanza.astrix.service.registry.client.AstrixServiceRegistryAdministra
 public class AstrixDashboardConfig {
 	
 	@Bean
-	public AstrixFrameworkBean Astrix() {
+	public AstrixFrameworkBean astrix() {
 		AstrixFrameworkBean result = new AstrixFrameworkBean();
 		result.setConsumedAstrixBeans(Arrays.<Class<?>>asList(
 			AstrixServiceRegistryAdministrator.class
 		));
+		result.setSettings(new HashMap<String, String>() {{
+			put(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?locators=testgssystem01.test.aza.se");
+		}});
 		return result;
-	}
-	
-	@Bean
-	public AstrixSettings AstrixSettings() {
-		return new AstrixSettings() {{
-			set(ASTRIX_SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=elilin");
-		}};
 	}
 	
 }
