@@ -13,49 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tutorial.t1;
+package tutorial.p1;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Test;
 
-import tutorial.t1.api.LunchRestaurantFinder;
+import tutorial.p1.api.LunchSuggester;
+import tutorial.p1.provider.AllLunchRestaurants;
 
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 
-public class LibraryLifecycleManagementTest {
-
+public class LunchLibraryTest {
+	
 	private AstrixContext astrix;
 	
 	@After
 	public void after() {
 		astrix.destroy();
 	}
-	
+
 	@Test
-	public void postConstructAnnotatedMethodsAreInvokedAfterTheBeanHasBeanCreated() throws Exception {
+	public void lunchSuggesterCanBeConsumedUsingAstrix() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.setBasePackage("tutorial.t1");
+		configurer.setBasePackage("tutorial.p1");
 		astrix = configurer.configure();
 		
-		LunchRestaurantFinder restaurantFinder = astrix.getBean(LunchRestaurantFinder.class);
-		assertTrue(restaurantFinder.isInitialized());
-	}
-	
-	@Test
-	public void preDestroyAnnotatedMethodsAreInvokedWhenTheContextIsDestroyed() throws Exception {
-		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.setBasePackage("tutorial.t1");
-		astrix = configurer.configure();
-		
-		LunchRestaurantFinder restaurantFinder = astrix.getBean(LunchRestaurantFinder.class);
-		assertFalse(restaurantFinder.isDestroyed());
-		
-		astrix.destroy();
-		assertTrue(restaurantFinder.isDestroyed());
+		LunchSuggester lunchSuggester = astrix.getBean(LunchSuggester.class);
+		String restaurant = lunchSuggester.randomLunchRestaurant();
+
+		assertTrue(AllLunchRestaurants.ALL_RESTAURANTS.contains(restaurant));
 	}
 	
 

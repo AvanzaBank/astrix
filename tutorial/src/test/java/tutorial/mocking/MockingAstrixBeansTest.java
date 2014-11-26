@@ -22,9 +22,9 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import tutorial.t1.api.LunchRestaurantFinder;
-import tutorial.t1.api.LunchSuggester;
-import tutorial.t1.provider.LunchSuggesterImpl;
+import tutorial.p1.api.LunchRestaurantFinder;
+import tutorial.p1.api.LunchSuggester;
+import tutorial.p1.provider.LunchSuggesterImpl;
 
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;

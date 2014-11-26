@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tutorial.t1.provider;
+package tutorial.p1.provider;
 
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import tutorial.t1.api.LunchRestaurantFinder;
+import tutorial.p1.api.LunchRestaurantFinder;
 
 public class LunchRestaurantsFinderImpl implements LunchRestaurantFinder {
 

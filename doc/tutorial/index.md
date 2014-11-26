@@ -3,3 +3,4 @@ The tutorial is an step-by-step guide to getting started with Astrix. Fully work
 
 ### Index
 [Part 1 - The IOC Container](part1.md)  
+[Part 2 - Service Binding](part2.md)  

@@ -13,16 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tutorial.t1.api;
+package tutorial.p1.provider;
 
-import java.util.List;
+import tutorial.p1.api.LunchRestaurantFinder;
+import tutorial.p1.api.LunchSuggester;
 
-public interface LunchRestaurantFinder {
+import com.avanza.astrix.provider.library.AstrixExport;
+import com.avanza.astrix.provider.library.AstrixLibraryProvider;
 
-	List<String> getAllRestaurants();
+@AstrixLibraryProvider
+public class LunchLibraryProvider {
 	
-	boolean isInitialized();
+	@AstrixExport
+	public LunchSuggester lunchUtil(LunchRestaurantFinder restaurantFinder) {
+		return new LunchSuggesterImpl(restaurantFinder);
+	}
 	
-	boolean isDestroyed();
+	@AstrixExport
+	public LunchRestaurantFinder lunchRestaurantFinder() {
+		return new LunchRestaurantsFinderImpl();
+	}
 
 }

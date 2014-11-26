@@ -20,7 +20,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import tutorial.t1.api.LunchRestaurantFinder;
+import tutorial.p1.api.LunchRestaurantFinder;
 
 public class LunchRestaurantsFinderImpl implements LunchRestaurantFinder {
 

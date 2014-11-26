@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tutorial.t1.provider;
+package tutorial.p1.api;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-public class AllLunchRestaurants {
+public interface LunchRestaurantFinder {
 
-	public static List<String> ALL_RESTAURANTS = Collections.unmodifiableList(
-			Arrays.asList("Martins Gröna", "Tradition", "Serwito"));
+	List<String> getAllRestaurants();
+	
+	boolean isInitialized();
+	
+	boolean isDestroyed();
+
 }

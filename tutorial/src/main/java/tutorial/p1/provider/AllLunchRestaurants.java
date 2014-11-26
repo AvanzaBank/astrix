@@ -13,25 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tutorial.t1.provider;
+package tutorial.p1.provider;
 
-import tutorial.t1.api.LunchRestaurantFinder;
-import tutorial.t1.api.LunchSuggester;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-import com.avanza.astrix.provider.library.AstrixExport;
-import com.avanza.astrix.provider.library.AstrixLibraryProvider;
+public class AllLunchRestaurants {
 
-@AstrixLibraryProvider
-public class LunchLibraryProvider {
-	
-	@AstrixExport
-	public LunchSuggester lunchUtil(LunchRestaurantFinder restaurantFinder) {
-		return new LunchSuggesterImpl(restaurantFinder);
-	}
-	
-	@AstrixExport
-	public LunchRestaurantFinder lunchRestaurantFinder() {
-		return new LunchRestaurantsFinderImpl();
-	}
-
+	public static List<String> ALL_RESTAURANTS = Collections.unmodifiableList(
+			Arrays.asList("Martins Gröna", "Tradition", "Serwito"));
 }

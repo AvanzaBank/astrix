@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tutorial.t1.provider;
+package tutorial.p1.provider;
 
 import java.util.List;
 import java.util.Random;
 
-import tutorial.t1.api.LunchRestaurantFinder;
-import tutorial.t1.api.LunchSuggester;
+import tutorial.p1.api.LunchRestaurantFinder;
+import tutorial.p1.api.LunchSuggester;
 
 public class LunchSuggesterImpl implements LunchSuggester {
 	

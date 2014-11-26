@@ -49,6 +49,12 @@ Astrix uses a fault-tolerance layer built using Hystrix. Depending on the type o
 ## Spring Integration
 Astrix is well integrated with spring. It can be viewed as an extension to spring where Astrix is responsible for binding and creating spring-beans for microservices.
 
+
+## Documentation
+[Tutorial](doc/tutorial/index.md)
+[Documentation](doc/index.md)  
+
+
 ## Generic module layout
 Typical module-layout when creating a service using Astrix: 
 * API
