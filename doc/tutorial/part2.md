@@ -157,19 +157,20 @@ public class AstrixBeanStateManagementTest {
 
 
 
+TODO:
+
 ### Service Binding
-- GsComponent
 
 * Illustrate service-binding with AstrixConfigApi and DirectComponent (DONE)
-* Illustrate that a service must not be available when bean is created
-* Illustrate waiting for library bean to be bound
+* Illustrate that a service must not be available when bean is created (DONE)
+* Illustrate waiting for library bean to be bound (DONE)
+* GsComponent
 
 
 ### Service Registry (Service discovery)
 * Dynamic service discovery
 * Relies on service-binding using AstrixServiceComponent
 
-
 ### Astrix configuration
-* Extension points
-* Default hierarchy
+* Extension points (DONE)
+* Default hierarchy (DONE)
