@@ -1,4 +1,4 @@
-# Part 2 - Service Binding
+'# Part 2 - Service Binding
 The first part of the tutorial introduced how libraries can be created and consumed with Astrix. In this part we will introduce another type of api, the heart in all service based architectures, namely the service.
 
 In this context, a service is something that is typically provided by a different process. Therefore, in order to consume a service, Astrix must first bind to the service, which is done in two steps:
@@ -6,9 +6,9 @@ In this context, a service is something that is typically provided by a differen
 1. Locate a provider of the given service. This involves identifying what `AstrixServiceComponent` to use to bind to the service and find all properties required by the `AstrixServiceComponent` to bind to the service.
 2. Use the `AstrixServiceComponent` to bind to the given service.
 
-There are two deegres of freedom involved here for a service provider. The first one is how a service is located. Out of the box Astrix supports two mechanisms for locating a service. One using configuration, `@AstrixConfigApi`, and another using the service-registry, `@AstrixServiceRegistryApi`, which will be introduced later. The second degree of freedom is how Astrix binds to a service, which done by the `AstrixServiceComponent`. Astrix comes with a number of service-component implementations out of the box which will be introduced throughout the tutorial. 
+There are two degrees of freedom involved here for a service provider. The first one is how a service is located. Out of the box Astrix supports two mechanisms for locating a service. One using configuration, `@AstrixConfigApi`, and another using the service-registry, `@AstrixServiceRegistryApi`, which will be introduced later. The second degree of freedom is how Astrix binds to a service, which done by the `AstrixServiceComponent`. Astrix comes with a number of service-component implementations out of the box which will be introduced throughout the tutorial. 
 
-Astrix has an extendable service-binding mechanism through the `AstrixServiceComponent` interface. As an api-developer or consumer, you never use the `AstrixServiceComponent` directly. Rather its used behind the sceenes by Astrix to bind to a provider of a given service. However, even if you don't intend to implement you own service-component it's good to have knowledge about the inner workings of service binding.
+Astrix has an extendible service-binding mechanism through the `AstrixServiceComponent` interface. As an api-developer or consumer, you never use the `AstrixServiceComponent` directly. Rather its used behind the scenes by Astrix to bind to a provider of a given service. However, even if you don't intend to implement you own service-component it's good to have knowledge about the inner workings of service binding.
 
 ### Service binding using AstrixDirectComponent and @AstrixConfigApi
 The first service-component we will cover is the `AstrixDirectComponent` which is a useful tool to support testing. It allows binding to a service provider within the same process, i.e. an ordinary object within the same jvm. The next example introduces the `AstrixDirectComponent` and `@AstrixConfigApi`.
@@ -89,7 +89,7 @@ When we configure Astrix we provide a setting, "restaurantFinderUri" with a valu
 In the example above we use the configuration mechanism to locate the provider of `LunchRestaurantFinder`. The configuration mechanism in Astrix is hierarchical and an entry is resolved in the following order.
 
 1. External configuration
-2. Programatic configuration set on AstrixConfigurer
+2. Programmatic configuration set on AstrixConfigurer
 3. META-INF/astrix/settings.properties
 4. Default values
 
@@ -148,10 +148,10 @@ public class AstrixBeanStateManagementTest {
 
 1. The BEAN_REBIND_ATTEMPT_INTERVAL determines how often Astrix will attempt to bind a given bean (millis).
 2. The ASTRIX_CONFIG_URI provides a service-like uri to the external configuration source, in this case an instance of AstrixSettings.
-3. Since the LunchSuggester uses LunchRestaurantFinder in background but currently configuration doesn not contain a 'restarurantFinderUri'it will be in state UNBOUND
+3. Since the LunchSuggester uses LunchRestaurantFinder in background but currently configuration doesn't not contain a 'restarurantFinderUri'it will be in state UNBOUND
 4. Register a mock instance for LunchRestaurantFinder in the direct-component
 5. Add restaurantFinderUri entry to configuration pointing to the mock
-6. strix allows us to wait for a bean to be bound. Note that we are waiting for a Library. Astrix is clever and detects that the library uses the LunchRestaurantFinder and therefore waits until the LunchRestaurantFinder is bound
+6. Astrix allows us to wait for a bean to be bound. Note that we are waiting for a Library. Astrix is clever and detects that the library uses the LunchRestaurantFinder and therefore waits until the LunchRestaurantFinder is bound
 7. Invoke the `LunchSuggester` library, which in turn `LunchRestaurantFinder` service which will be BOUND at this time.
 
 
