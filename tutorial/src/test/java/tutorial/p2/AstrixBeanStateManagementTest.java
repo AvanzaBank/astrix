@@ -43,28 +43,44 @@ public class AstrixBeanStateManagementTest {
 	}
 	
 	@Test
-	public void astrixManagesStateForEachServiceBean() throws Exception {
+	public void astrixManagesStateForEachServiceBean2() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
+		// The BEAN_REBIND_ATTEMPT_INTERVAL determines how often 
+		// Astrix will attempt to bind a given bean (millis).
 		configurer.set(AstrixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 10);
-		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, settings.getExternalConfigUrl());
+		// Set the uri to the external config.
+		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, settings.getExternalConfigUri());
 		configurer.setBasePackage("tutorial.p2");
 		astrix = configurer.configure();
 		
 		LunchSuggester lunchSuggester = astrix.getBean(LunchSuggester.class);
-		
+
 		try {
+			// Since the LunchSuggester uses LunchRestaurantFinder in background
+			// but currently configuration doesn not contain a 'restarurantFinderUri'
+			// so it will be in state UNBOUND
 			lunchSuggester.randomLunchRestaurant();
 		} catch (ServiceUnavailableException e) {
 			// No service available
 		}
 		
+		
 		LunchRestaurantFinder restaurantFinder = Mockito.mock(LunchRestaurantFinder.class);
 
+		// Register mock instance in direct-component
 		String serviceUri = AstrixDirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinder);
+		// Add restaurantFinderUri entry to configuration pointing to the mock
 		settings.set("restaurantFinderUri", serviceUri);
+		
+		// Astrix allows us to wait for a bean to be bound
+		// Note that we are waiting for a Library. Astrix is clever and
+		// Detects that the library uses the LunchRestaurantFinder and therefore
+		// waits until the LunchRestaurantFinder is bound
 		astrix.waitForBean(LunchSuggester.class, 2000);
 		
 		Mockito.stub(restaurantFinder.getAllRestaurants()).toReturn(Arrays.asList("Pontus!"));
+		
+		// Invoke library which will in turn invoke the mock.
 		assertEquals("Pontus!", lunchSuggester.randomLunchRestaurant());
 	}
 }
