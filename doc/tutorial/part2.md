@@ -1,4 +1,4 @@
-'# Part 2 - Service Binding
+# Part 2 - Service Binding
 The first part of the tutorial introduced how libraries can be created and consumed with Astrix. In this part we will introduce another type of api, the heart in all service based architectures, namely the service.
 
 In this context, a service is something that is typically provided by a different process. Therefore, in order to consume a service, Astrix must first bind to the service, which is done in two steps:
