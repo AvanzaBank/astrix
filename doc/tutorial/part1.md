@@ -18,7 +18,7 @@ At runtime, every object that is part of an api that Astrix creates is called an
 A `Library` consist of a number of public interfaces/classes and associated implementations. Astrix shields a library provider from the consumers of the library by allowing the consumer to "program against interfaces" without ever needing to now what implements the given interfaces, or how the classes that implement the interfaces are assembled.
 
 ### A Simple Library 
-The code for this part can be found [here](../../tree/master/tutorial/src/main/java/tutorial/t1). 
+The code for this part can be found [here](../../tree/master/tutorial/src/main/java/tutorial/p1). 
 
 The first step in creating a library is to define the public api. This example only contains a LunchSuggester interface:
 
@@ -49,7 +49,8 @@ public class LunchSuggesterImpl implements LunchSuggester {
 }
 ```
 
-Finally, in order to use Astrix as a factory to create instances of the given library one must create a library-descriptor, which is typically located in the same module as the implementing classes:
+Finally, in order to use Astrix as a factory to create instances of the given library one must create an api-descriptor. An api-descriptor exports the public elements of an api. There are different kinds of api-descriptors, and the one associated with libraries is called library-descriptor. A library-descriptor is typically located in the same module as the implementing classes.
+
 
 ```java
 @AstrixLibraryProvider

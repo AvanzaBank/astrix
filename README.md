@@ -51,8 +51,8 @@ Astrix is well integrated with spring. It can be viewed as an extension to sprin
 
 
 ## Documentation
-[Tutorial](doc/tutorial/index.md)
-[Documentation](doc/index.md)  
+[Tutorial](doc/tutorial/index.md)  
+[Documentation](doc/index.md) 
 
 
 ## Generic module layout
