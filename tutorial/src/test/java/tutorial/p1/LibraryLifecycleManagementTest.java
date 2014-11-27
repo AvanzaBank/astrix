@@ -36,7 +36,7 @@ public class LibraryLifecycleManagementTest {
 	}
 	
 	@Test
-	public void postConstructAnnotatedMethodsAreInvokedAfterTheBeanHasBeanCreated() throws Exception {
+	public void postConstructAnnotatedMethodsAreInvokedWhenTheBeanIsCreated() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setBasePackage("tutorial.p1");
 		astrix = configurer.configure();

@@ -1,4 +1,5 @@
 # Part 1 - The IOC container
+
 One of the core features of Astrix is to work as a factory for microservices. In that regard, Astrix is similar to other IOC frameworks like Spring or Guice. However, Astrix is not intended to be used as a standalone IOC-container. Rather Astrix complements another IOC-container acting as a factory for binding to (micro)services, whereas the other IOC-framwork is responsible for wiring together all application-beans and managing their lifecycle.
 
 #### Why two IOC-containers?
@@ -67,7 +68,7 @@ public class LunchLibraryProvider {
 The `@AstrixLibraryProvider` annotation tells Astrix that this class is a factory for a library api. Each method annotated with `@AstrixExport` will act as a factory method to create a given api element, which is defined by the return type of the factory method, which is `LunchSuggester` in this example.
 
 ### Consuming the Library
-Consumption of the LunchApi is done by first creating an `AstrixContext` and then use it as a factory. This unit-test exemplifies:
+Consumption of the LunchApi is done by first creating an `AstrixContext` and then use it as a factory, as in the following unit test.
 
 
 ```java
@@ -94,10 +95,10 @@ public class LunchLibraryTest {
 }
 ```
 
-An AstrixContext is created using an AstrixConfigurer. By default, Astrix won't scan the classpath for api-providers. The `AstrixConfigurer.setBasePackage` tells Astrix to scan the "tutorial.t1" package, and all its subpackages for api-providers. In this case Astrix will find that the `LunchLibraryProvider` provides the `LunchUtil` api, and use it as a factory to create instances of `LunchUtil`.
+An AstrixContext is created using an AstrixConfigurer. By default, Astrix won't scan the classpath for api-providers. The `AstrixConfigurer.setBasePackage` tells Astrix to scan the "tutorial.t1" package, and all its subpackages for api-providers. In this case Astrix will find that the `LunchLibraryProvider` provides the `LunchSuggester` api, and use it as a factory to create instances of `LunchSuggester`.
 
 ### Injecting Dependencies into a Library
-Astrix can inject other astrix-beans into an AstrixLibraryProvider. This is a powerful feature that allows building libraries that aggregate services from many sources without burden the consumer of the api to know exactly what services are required by the given library. Lets extend the lunch-library to illustrate injecting astrix-beans into libraries:
+Astrix can inject other astrix-beans into a library. This is a powerful feature that allows libraries that aggregate services from many sources without burden the consumer of the api to know exactly what services are required by the given library. Lets extend the lunch-library to illustrate injecting astrix-beans into libraries:
 
 First we add another interface to the lunch-api:
 ```java
@@ -160,7 +161,7 @@ This also illustrates another powerful feature of Astrix. Namely that library pr
 
 
 ### Life Cycle Management of Libraries
-Astrix allows created libraries to receive two types of lifecycle events. When a library bean is created Astrix will invoke all `@PostConstruct` annotated method right after invoking the factory method. When the `AstrixContext` is destroyed (by invoking `AstrixContext.destroy()`) all `@PreDestroy` annotated methods will be invoked on each library bean that has bean created by the AstrixContext.
+Astrix allows created libraries to receive two types of lifecycle events. When a library bean is created Astrix will invoke all `@PostConstruct` annotated methods right after invoking the factory method. When the `AstrixContext` is destroyed (by invoking `AstrixContext.destroy()`) all `@PreDestroy` annotated methods will be invoked on each library bean created by the `AstrixContext`.
 
 
 ```java
@@ -207,7 +208,7 @@ public class LibraryLifecycleManagementTest {
 	private AstrixContext astrix;
 	
 	@Test
-	public void postConstructAnnotatedMethodsAreInvokedAfterTheBeanHasBeanCreated() throws Exception {
+	public void postConstructAnnotatedMethodsAreInvokedWhenTheBeanIsCreated() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setBasePackage("tutorial.t2");
 		astrix = configurer.configure();
@@ -229,7 +230,6 @@ public class LibraryLifecycleManagementTest {
 		assertTrue(restaurantFinder.isDestroyed());
 	}
 	
-
 }
 
 ```
@@ -268,7 +268,7 @@ public class MockingAstrixBeansTest {
 		// pretend that its a remote-service provided by another team.
 		
 		@AstrixExport
-		public LunchSuggester lunchUtil(LunchRestaurantFinder restaurantFinder) {
+		public LunchSuggester lunchSuggester(LunchRestaurantFinder restaurantFinder) {
 			return new LunchSuggesterImpl(restaurantFinder);
 		}
 		
@@ -276,8 +276,7 @@ public class MockingAstrixBeansTest {
 
 }
 ```
-
-In the example we are using the `TestAstrixConfigurer` instead of the normal `AstrixConfigurer`. The `TestAstrixConfigurer` uses `AstrixConfigurer` behind the scenes, but it creates a configuration suitable for unittesting. It also exposes some functionality not available using the regular `AstrixConfigurer` api, and disables api-descriptor scanning. Therefore we programmatically register api-descriptors for the api's intended to test. In the example the api under test depends on another api, `LunchRestaurantFinder`. The `TestAstrixConfigurer.addApi` allows us to register a mock for that api in the test. Since the creation of a AstrixContext is very fast and we stubbed out the single service dependency, this test will run at "unit test" speed.
+In the example we are using the `TestAstrixConfigurer` instead of the normal `AstrixConfigurer`. The `TestAstrixConfigurer` uses `AstrixConfigurer` behind the scenes, but it creates a configuration suitable for unit testing. It also exposes some functionality not available using the regular `AstrixConfigurer` api, and disables api-descriptor scanning. Therefore we programmatically register api-descriptors for the api's we intend to test. In the example the api under test depends on another api, `LunchRestaurantFinder`. The `TestAstrixConfigurer.addApi` allows us to register a mock for that api in the test. Since the creation of a AstrixContext is very fast and we stubbed out the single service dependency, this test will run at "unit test" speed.
 
 [Next: Part 2 - Service Binding](part2.md)  
 
