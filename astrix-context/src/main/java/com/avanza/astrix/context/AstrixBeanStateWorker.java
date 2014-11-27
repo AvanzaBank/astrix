@@ -45,7 +45,7 @@ public class AstrixBeanStateWorker extends Thread {
 	public AstrixBeanStateWorker(AstrixSettingsReader settings, AstrixEventBus eventBus) {
 		super("Astrix-BeanStateWorkerDispatcher");
 		setDaemon(true);
-		this.beanRebindAttemptIntervalMillis = settings.getLong(AstrixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 10_000L);
+		this.beanRebindAttemptIntervalMillis = settings.getLong(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10_000L);
 	}
 	
 	public void add(StatefulAstrixBean<?> bean) {

@@ -29,7 +29,7 @@
 		<property name="serviceRegistryUri" value="gs-remoting:jini://*/*/service-registry-space?groups=elilin"/>
 		<constructor-arg>
 			<util:map>
-				<entry key="StatefulAstrixBean.beanRebindAttemptInterval" value="100" />
+				<entry key="StatefulAstrixBean.beanBindAttemptInterval" value="100" />
 			</util:map>
 		</constructor-arg>
 	</bean>

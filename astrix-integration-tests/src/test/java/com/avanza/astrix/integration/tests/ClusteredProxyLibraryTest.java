@@ -81,7 +81,7 @@ public class ClusteredProxyLibraryTest {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.enableFaultTolerance(true);
 		configurer.enableVersioning(true);
-		configurer.set(AstrixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 1000);
+		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1000);
 		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, config.getExternalConfigUrl());
 		configurer.setSubsystem("lunch-system");
 		astrix = configurer.configure();

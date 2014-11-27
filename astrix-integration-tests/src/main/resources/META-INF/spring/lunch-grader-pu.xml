@@ -25,7 +25,7 @@
 		<property name="settings">
 			<map>
 				<entry key="AstrixConfig.uri" value="${configUrl}"/>
-				<entry key="StatefulAstrixBean.beanRebindAttemptInterval" value="100" />
+				<entry key="StatefulAstrixBean.beanBindAttemptInterval" value="100" />
 			</map>
 		</property>
 	</bean>

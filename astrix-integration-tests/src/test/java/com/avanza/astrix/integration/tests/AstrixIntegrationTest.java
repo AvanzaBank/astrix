@@ -122,7 +122,7 @@ public class AstrixIntegrationTest {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.enableFaultTolerance(true);
 		configurer.enableVersioning(true);
-		configurer.set(AstrixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 100);
+		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
 		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, config.getExternalConfigUrl());
 		configurer.setSubsystem("test-sub-system");
 		astrix = configurer.configure();

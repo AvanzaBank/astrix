@@ -54,7 +54,7 @@ public class AstrixServiceRegistryLeaseManagerTest {
 		serviceRegistry = new CorruptableServiceRegistry();
 		TestAstrixConfigurer AstrixConfig = new TestAstrixConfigurer();
 		AstrixConfig.set(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 1); // No Sleep between attempts
-		AstrixConfig.set(AstrixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 1);
+		AstrixConfig.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
 		AstrixConfig.registerApiDescriptor(TestDescriptor.class);
 		AstrixConfig.registerApiDescriptor(AstrixServiceRegistryLibrary.class);
 		AstrixConfig.registerApi(AstrixServiceRegistry.class, serviceRegistry);

@@ -60,7 +60,7 @@ public class AstrixServiceRegistryClientTest {
 	@Before
 	public void setup() {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
-		configurer.set(AstrixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 10);
+		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		configurer.set(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 10);
 		configurer.registerApiDescriptor(GreetingApiDescriptor.class);
 		configurer.registerApiDescriptor(InMemoryServiceRegistryDescriptor.class);

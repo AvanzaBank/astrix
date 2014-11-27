@@ -43,11 +43,11 @@ public class AstrixBeanStateManagementTest {
 	}
 	
 	@Test
-	public void astrixManagesStateForEachServiceBean2() throws Exception {
+	public void astrixManagesStateForEachServiceBean() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		// The BEAN_REBIND_ATTEMPT_INTERVAL determines how often 
+		// The BEAN_BIND_ATTEMPT_INTERVAL determines how often 
 		// Astrix will attempt to bind a given bean (millis).
-		configurer.set(AstrixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 10);
+		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		// Set the uri to the external config.
 		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, settings.getExternalConfigUri());
 		configurer.setBasePackage("tutorial.p2");
