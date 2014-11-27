@@ -76,8 +76,4 @@ public final class PartitionedPuConfigurer {
 		return this;
 	}
 
-	public PartitionedPuConfigurer serviceRegistryUri(String serviceUri) {
-		return this;
-	}
-
 }

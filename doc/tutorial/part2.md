@@ -158,22 +158,4 @@ public class AstrixBeanStateManagementTest {
 7. The `LunchSuggester` library is invoked, which in turn invokes the `LunchRestaurantFinder` service which will be `BOUND` at this time.
 
 
-
-
-TODO:
-
-### Service Binding
-
-* Illustrate service-binding with AstrixConfigApi and DirectComponent (DONE)
-* Illustrate that a service must not be available when bean is created (DONE)
-* Illustrate waiting for library bean to be bound (DONE)
-* GsComponent
-
-
-### Service Registry (Service discovery)
-* Dynamic service discovery
-* Relies on service-binding using AstrixServiceComponent
-
-### Astrix configuration
-* Extension points (DONE)
-* Default hierarchy (DONE)
+[Next: Part 3 - The Service Registry](part3.md)  

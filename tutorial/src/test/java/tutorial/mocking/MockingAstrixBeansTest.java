@@ -57,7 +57,7 @@ public class MockingAstrixBeansTest {
 	@AstrixLibraryProvider
 	public static class LunchLibraryProvider {
 		
-		// Note that this library don't provide the LunchRestaurantFinder, lets
+		// Note that this library don't provide the LunchService, lets
 		// pretend that its a remote-service provided by another team.
 		
 		@AstrixExport

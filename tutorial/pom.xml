@@ -20,6 +20,17 @@
   	</dependency>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
+  		<artifactId>astrix-gs</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
+  		<artifactId>astrix-gs-test-util</artifactId>
+  		<version>${project.version}</version>
+  		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
   		<artifactId>astrix-test-util</artifactId>
   		<version>${project.version}</version>
   		<scope>test</scope>
