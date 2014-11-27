@@ -2,7 +2,7 @@
 One of the core features of Astrix is to work as a factory for microservices. In that regard, Astrix is similar to other IOC frameworks like Spring or Guice. However, Astrix is not intended to be used as a standalone IOC-container. Rather Astrix complements another IOC-container acting as a factory for binding to (micro)services, whereas the other IOC-framwork is responsible for wiring together all application-beans and managing their lifecycle.
 
 #### Why two IOC-containers?
-A typical IOC container like spring is well suited to provide loose coupling between the application objects. A good practice when developing spring applications is to "program against interface's" wich means that the different application objects only know each other by interface. This works well for fairly large applications. 
+A typical IOC container like spring is well suited to provide loose coupling between the application objects. A good practice when developing spring applications is to "program against interface's" which means that the different application objects only know each other by interface. This works well for fairly large applications. 
 
 However, a problem arise when building a system that consists of hundreds of microservices, typcialy developed by different teams/individual's. Sharing libraries and clients in such an organization can lead to difficulties in maintainance if care is not taken to clearly define what is part of the public-api, and what should constitute an internal implementation detail. In such a case its not only important that the different application objects know each other through an interface, but also that different applications don't know how the libraries and clients provided by other teams are assembled.
 
@@ -13,7 +13,7 @@ Astrix provides great integration with spring through the `AstrixFrameworkBean`,
 ### ApplicationContext and AstrixContext  
 ![AstrixContext](AstrixIOC.png)
 
-At runtime, every object that is part of an api that Astrix creates is called an Astrix-bean, which is similar to a bean in spring. In order for Astrix to be able to create an astrix-bean of a given type, an `ApiProvider` for the given api must exist. Astrix has an extendible `ApiProvider` mechanism, which allows new api "types" to be plugged into Astrix. Two common api types that are supported out of the box are `Library` and `ServiceRegistryApi`.
+At runtime, every object that is part of an api that Astrix creates is called an Astrix-bean, which is similar to a bean in spring. In order for Astrix to be able to create an astrix-bean of a given type, an `ApiProvider` for the given api must exist. Astrix has an extensible `ApiProvider` mechanism, which allows new api "types" to be plugged into Astrix. Two common api types that are supported out of the box are `Library` and `ServiceRegistryApi`.
 
 A `Library` consist of a number of public interfaces/classes and associated implementations. Astrix shields a library provider from the consumers of the library by allowing the consumer to "program against interfaces" without ever needing to now what implements the given interfaces, or how the classes that implement the interfaces are assembled.
 
@@ -96,7 +96,7 @@ public class LunchLibraryTest {
 
 An AstrixContext is created using an AstrixConfigurer. By default, Astrix won't scan the classpath for api-providers. The `AstrixConfigurer.setBasePackage` tells Astrix to scan the "tutorial.t1" package, and all its subpackages for api-providers. In this case Astrix will find that the `LunchLibraryProvider` provides the `LunchUtil` api, and use it as a factory to create instances of `LunchUtil`.
 
-### Injecting Dependencies into a Library
+### Injecting Depencencies into a Library
 Astrix can inject other astrix-beans into an AstrixLibraryProvider. This is a powerful feature that allows building libraries that aggregate services from many sources without burden the consumer of the api to know exactly what services are required by the given library. Lets extend the lunch-library to illustrate injecting astrix-beans into libraries:
 
 First we add another interface to the lunch-api:
