@@ -22,8 +22,8 @@ import javax.annotation.Resource;
 import org.openspaces.core.executor.AutowireTask;
 import org.openspaces.core.executor.Task;
 
-import com.avanza.astrix.context.AstrixSpringContext;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
+import com.avanza.astrix.spring.AstrixSpringContext;
 /**
  * 
  * @author Elias Lindholm (elilin)

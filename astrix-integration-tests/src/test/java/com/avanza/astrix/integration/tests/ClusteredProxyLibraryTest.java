@@ -85,7 +85,7 @@ public class ClusteredProxyLibraryTest {
 		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, config.getExternalConfigUrl());
 		configurer.setSubsystem("lunch-system");
 		astrix = configurer.configure();
-		this.lunchService = astrix.waitForBean(LunchService.class, 5000);
+		this.lunchService = astrix.waitForBean(LunchService.class, 10000);
 	}
 	
 	

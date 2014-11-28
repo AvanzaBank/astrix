@@ -21,10 +21,10 @@ import java.util.HashMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.avanza.astrix.context.AstrixFrameworkBean;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistryAdministrator;
+import com.avanza.astrix.spring.AstrixFrameworkBean;
 
 @Configuration
 public class AstrixDashboardConfig {
