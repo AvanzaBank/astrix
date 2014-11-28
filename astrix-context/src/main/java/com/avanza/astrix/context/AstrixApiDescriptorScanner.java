@@ -21,13 +21,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import org.reflections.Reflections;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
 /**
  * Uses classpath scanning to locate api-descriptors. <p>
  * 
@@ -64,19 +63,12 @@ public class AstrixApiDescriptorScanner implements AstrixApiDescriptors {
 		List<Class<? extends Annotation>> allProviderAnnotationTypes = getAllProviderAnnotationTypes();
 		log.debug("Running scan for api-descriptors of types={}", allProviderAnnotationTypes);
 		List<AstrixApiDescriptor> discoveredApiDescriptors = new ArrayList<>();
-		ClassPathScanningCandidateComponentProvider providerScanner = new ClassPathScanningCandidateComponentProvider(false);
-		for (Class<? extends Annotation> providerFactory : allProviderAnnotationTypes) {
-			providerScanner.addIncludeFilter(new AnnotationTypeFilter(providerFactory));
-		}
-		Set<BeanDefinition> foundCandidateComponents = providerScanner.findCandidateComponents(basePackage);
-		for (BeanDefinition beanDefinition : foundCandidateComponents) {
-			try {
-				Class<?> providerClass = Class.forName(beanDefinition.getBeanClassName());
+		Reflections reflections = new Reflections(basePackage);
+		for (Class<? extends Annotation> apiAnnotation : allProviderAnnotationTypes) { 
+			for (Class<?> providerClass : reflections.getTypesAnnotatedWith(apiAnnotation)) {
 				AstrixApiDescriptor descriptor = AstrixApiDescriptor.create(providerClass);
 				log.debug("Found api descriptor {}", descriptor);
 				discoveredApiDescriptors.add(descriptor);
-			} catch (ClassNotFoundException e) {
-				throw new IllegalStateException("Unable to load api descriptor class " + beanDefinition.getBeanClassName(), e);
 			}
 		}
 		apiDescriptorsByBasePackage.put(basePackage, discoveredApiDescriptors);
@@ -94,4 +86,5 @@ public class AstrixApiDescriptorScanner implements AstrixApiDescriptors {
 		}
 		return result;
 	}
+
 }

@@ -136,6 +136,14 @@
 				<artifactId>guava</artifactId>
 				<version>${guava.version}</version>
 			</dependency>
+			
+			<!-- Reflections for annotation scanning-->
+			<dependency>
+				<groupId>org.reflections</groupId>
+				<artifactId>reflections</artifactId>
+				<version>0.9.9</version>
+			</dependency>
+			
 
 			<!-- Jackson 1.x -->
 			<dependency>
