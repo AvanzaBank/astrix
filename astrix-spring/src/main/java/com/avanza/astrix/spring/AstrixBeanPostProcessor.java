@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.spring;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
+import com.avanza.astrix.context.AstrixInject;
+import com.avanza.astrix.context.AstrixServiceExporter;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 /**
  * 

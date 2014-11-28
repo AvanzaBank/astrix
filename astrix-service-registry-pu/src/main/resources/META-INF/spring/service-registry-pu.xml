@@ -10,7 +10,7 @@
 	<os-core:space id="space" url="/./service-registry-space" mirror="false"/>
 	<os-core:giga-space id="gigaSpace" space="space" />
 
-	<bean class="com.avanza.astrix.context.AstrixFrameworkBean">
+	<bean class="com.avanza.astrix.spring.AstrixFrameworkBean">
 		<property name="serviceDescriptor"
 			value="com.avanza.astrix.service.registry.pu.AstrixServiceRegistryServiceDescriptor" />
 		<property name="settings">

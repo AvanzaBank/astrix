@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.spring;
 
 import org.springframework.context.ApplicationContext;
+
+import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixInject;
 /**
  * Acts as a bride between Astrix and Spring.
  * 

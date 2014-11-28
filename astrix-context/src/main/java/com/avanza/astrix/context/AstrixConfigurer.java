@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class AstrixConfigurer {
 
@@ -169,7 +168,6 @@ public class AstrixConfigurer {
 		this.settings.setAll(settings);
 	}
 	
-	@Autowired(required = false)
 	public void setAstrixSettings(AstrixSettings settings) {
 		this.settings.setAll(settings);
 	}

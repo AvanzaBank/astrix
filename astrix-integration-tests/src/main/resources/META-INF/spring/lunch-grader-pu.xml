@@ -13,7 +13,7 @@
 		mirror="false" />
 	<os-core:giga-space id="gigaSpace" space="space" />
 
-	<bean id="astrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
+	<bean id="astrixFrameworkBean" class="com.avanza.astrix.spring.AstrixFrameworkBean">
 		<property name="consumedAstrixBeans">
 			<list>
 				<value>com.avanza.astrix.integration.tests.domain.api.LunchService</value>

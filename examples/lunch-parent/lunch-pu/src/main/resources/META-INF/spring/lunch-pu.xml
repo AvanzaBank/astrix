@@ -15,7 +15,7 @@
     <os-core:giga-space id="gigaSpace" space="space"/>
     
     <!-- Astrix service framework (provider and consumer) -->
-	<bean id="astrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
+	<bean id="astrixFrameworkBean" class="com.avanza.astrix.spring.AstrixFrameworkBean">
 		<property name="serviceDescriptor" value="lunch.pu.LunchServiceDescriptor"/>
 		<property name="subsystem" value="lunch-service"/>
 		<property name="externalConfigUri" value="${externalConfigUri}"/>

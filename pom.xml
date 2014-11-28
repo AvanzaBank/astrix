@@ -18,6 +18,7 @@
 		<module>astrix-gs-test-util</module>
 		<module>astrix-dashboard</module>
 		<module>tutorial</module>
+		<module>astrix-spring</module>
 	</modules>
 
 	<scm>

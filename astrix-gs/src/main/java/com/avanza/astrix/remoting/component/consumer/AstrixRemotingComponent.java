@@ -30,7 +30,6 @@ import com.avanza.astrix.context.AstrixPlugins;
 import com.avanza.astrix.context.AstrixPluginsAware;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceProperties;
-import com.avanza.astrix.context.AstrixSpringContext;
 import com.avanza.astrix.context.AstrixVersioningPlugin;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.gs.GsBinder;
@@ -38,6 +37,7 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.remoting.client.AstrixRemotingProxy;
 import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
+import com.avanza.astrix.spring.AstrixSpringContext;
 
 @MetaInfServices(AstrixServiceComponent.class)
 public class AstrixRemotingComponent implements AstrixPluginsAware, AstrixServiceComponent {

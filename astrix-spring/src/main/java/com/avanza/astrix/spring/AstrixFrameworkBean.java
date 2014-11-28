@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.spring;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,10 +34,16 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 
+import com.avanza.astrix.context.AstrixConfigurer;
+import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixServiceDescriptor;
+import com.avanza.astrix.context.AstrixServiceExporter;
+import com.avanza.astrix.context.AstrixServiceRegistryPlugin;
+import com.avanza.astrix.context.AstrixSettings;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
- *
  */
 public class AstrixFrameworkBean implements BeanFactoryPostProcessor, ApplicationContextAware, ApplicationListener<ApplicationContextEvent> {
 	

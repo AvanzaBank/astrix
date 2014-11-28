@@ -32,8 +32,8 @@ import com.avanza.astrix.context.AstrixPluginsAware;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixSettings;
-import com.avanza.astrix.context.AstrixSpringContext;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.spring.AstrixSpringContext;
 
 @MetaInfServices(AstrixServiceComponent.class)
 public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsAware {

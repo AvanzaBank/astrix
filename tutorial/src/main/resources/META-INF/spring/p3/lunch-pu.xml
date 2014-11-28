@@ -13,7 +13,7 @@
     <os-core:space id="space" url="/./lunch-space" mirror="false"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
     
-	<bean id="astrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
+	<bean id="astrixFrameworkBean" class="com.avanza.astrix.spring.AstrixFrameworkBean">
 		<property name="serviceDescriptor" value="tutorial.p3.server.LunchServiceDescriptor"/>
 		<property name="externalConfigUri" value="${externalConfigUri}"/>
 	</bean>

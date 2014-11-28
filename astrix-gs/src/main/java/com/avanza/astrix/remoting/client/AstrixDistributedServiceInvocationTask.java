@@ -23,8 +23,8 @@ import javax.annotation.Resource;
 import org.openspaces.core.executor.AutowireTask;
 import org.openspaces.core.executor.DistributedTask;
 
-import com.avanza.astrix.context.AstrixSpringContext;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
+import com.avanza.astrix.spring.AstrixSpringContext;
 import com.gigaspaces.async.AsyncResult;
 
 @AutowireTask
