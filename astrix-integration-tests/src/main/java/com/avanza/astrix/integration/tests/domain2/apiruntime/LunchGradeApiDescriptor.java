@@ -20,9 +20,8 @@ import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
 
 @AstrixVersioned(
-	apiMigrations = {},
-	objectMapperConfigurer = LunchGradeApiObjectMapperConfigurer.class,
-	version = 1
+	version = 1,
+	objectSerializerConfigurer = LunchGradeApiObjectMapperConfigurer.class
 )
 @AstrixServiceRegistryApi({
 	LunchRestaurantGrader.class,
