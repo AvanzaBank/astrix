@@ -32,8 +32,20 @@ public @interface AstrixVersioned {
 	
 	int version();
 	
+	/**
+	 * @deprecated Replaced by Jackson1ObjectSerializerConfigurer and objectSerializerConfigurer() property.
+	 * @return
+	 */
+	@Deprecated
 	Class<? extends AstrixJsonApiMigration>[] apiMigrations() default {};
 
-	Class<? extends AstrixObjectMapperConfigurer> objectMapperConfigurer();
+	/**
+	 * @deprecated Replaced by Jackson1ObjectSerializerConfigurer and objectSerializerConfigurer() property.
+	 * @return
+	 */
+	@Deprecated
+	Class<? extends AstrixObjectMapperConfigurer> objectMapperConfigurer() default AstrixObjectMapperConfigurer.class;
+	
+	Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfigurer() default AstrixObjectSerializerConfigurer.class;
 	
 }

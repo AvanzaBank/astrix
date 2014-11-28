@@ -13,17 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.client;
+package com.avanza.astrix.integration.tests.domain.apiruntime;
 
-import com.avanza.astrix.provider.versioning.AstrixObjectMapperConfigurer;
+import java.util.Arrays;
+import java.util.List;
+
+import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
 import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
+import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
 
-public class ServiceRegistryObjectMapperConfigurer implements AstrixObjectMapperConfigurer {
+
+public class LunchApiObjectSerializerConfigurer implements Jackson1ObjectSerializerConfigurer {
+	
+	@Override
+	public List<? extends AstrixJsonApiMigration> apiMigrations() {
+		return Arrays.asList(new LunchApiV1Migration());
+	}
 
 	@Override
 	public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

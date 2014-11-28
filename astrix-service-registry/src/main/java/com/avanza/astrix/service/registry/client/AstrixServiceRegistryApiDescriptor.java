@@ -28,9 +28,8 @@ import com.avanza.astrix.provider.versioning.AstrixVersioned;
  *
  */
 @AstrixVersioned (
-	apiMigrations = {},
-	objectMapperConfigurer = ServiceRegistryObjectMapperConfigurer.class,
-	version = 1
+	version = 1,
+	objectSerializerConfigurer = ServiceRegistryObjectSerializerConfigurer.class
 )
 @AstrixConfigApi(
 	exportedApis = {

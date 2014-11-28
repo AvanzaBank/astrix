@@ -24,12 +24,8 @@ import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.IllegalSubsystemException;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
-import com.avanza.astrix.provider.versioning.AstrixObjectMapperConfigurer;
+import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
-import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistry;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryClient;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryLibrary;
 import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
 
 public class AstrixSubsystemTest {
@@ -103,18 +99,14 @@ public class AstrixSubsystemTest {
 	}
 	
 	@AstrixVersioned(
-			apiMigrations = {},
-			objectMapperConfigurer = DummyConfigurer.class,
-			version = 1
+		objectSerializerConfigurer = DummyConfigurer.class,
+		version = 1
 	)
 	@AstrixServiceRegistryApi(GreetingService.class)
 	public static class VersionedGreetingApiDescriptor {
 	}
 	
-	public static class DummyConfigurer implements AstrixObjectMapperConfigurer {
-		@Override
-		public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
-		}
+	public static class DummyConfigurer implements AstrixObjectSerializerConfigurer {
 	}
 
 	public interface GreetingService {

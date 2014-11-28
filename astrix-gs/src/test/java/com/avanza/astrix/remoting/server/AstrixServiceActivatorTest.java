@@ -16,7 +16,6 @@
 package com.avanza.astrix.remoting.server;
 
 import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -24,6 +23,7 @@ import static org.junit.Assert.fail;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
@@ -40,14 +40,16 @@ import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
 import com.avanza.astrix.provider.versioning.AstrixObjectMapperConfigurer;
+import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
 import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
 import com.avanza.astrix.remoting.client.AstrixMissingServiceException;
 import com.avanza.astrix.remoting.client.AstrixRemoteServiceException;
 import com.avanza.astrix.remoting.client.AstrixRemotingProxy;
 import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
-import com.avanza.astrix.remoting.server.AstrixServiceActivator;
+import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
 import com.avanza.astrix.versioning.plugin.JacksonVersioningPlugin;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 
@@ -58,16 +60,20 @@ import com.gigaspaces.annotation.pojo.SpaceRouting;
  */
 public class AstrixServiceActivatorTest {
 
-	public static class DummyConfigurer implements AstrixObjectMapperConfigurer {
+	public static class DummyConfigurer implements Jackson1ObjectSerializerConfigurer {
+		@Override
+		public List<? extends AstrixJsonApiMigration> apiMigrations() {
+			return Collections.emptyList();
+		}
+
 		@Override
 		public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
 		}
 	}
 	
 	@AstrixVersioned(
-			apiMigrations = {},
-			objectMapperConfigurer = DummyConfigurer.class,
-			version = 1
+		version = 1,
+		objectSerializerConfigurer = DummyConfigurer.class
 	)
 	public static class DummyDescriptor {
 		

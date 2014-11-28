@@ -22,7 +22,9 @@ import java.util.List;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
 import com.avanza.astrix.provider.versioning.AstrixObjectMapperConfigurer;
+import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
+import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
 import com.avanza.astrix.versioning.JsonObjectMapper;
 import com.avanza.astrix.versioning.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
 
@@ -34,26 +36,46 @@ public class VersionJacksonAstrixObjectSerializer implements AstrixObjectSeriali
 	public VersionJacksonAstrixObjectSerializer(AstrixVersioned versioningInfo) {
 		Class<? extends AstrixJsonApiMigration>[] apiMigrationFactories = versioningInfo.apiMigrations();
 		Class<? extends AstrixObjectMapperConfigurer> objectMapperConfigurerFactory = versioningInfo.objectMapperConfigurer();
+		Class<? extends AstrixObjectSerializerConfigurer> serializerBuilder = versioningInfo.objectSerializerConfigurer();
 		this.version = versioningInfo.version();
-		this.objectMapper = buildObjectMapper(apiMigrationFactories, objectMapperConfigurerFactory);
-	}
-
-	private JsonObjectMapper buildObjectMapper(
-			Class<? extends AstrixJsonApiMigration>[] apiMigrationFactories,
-			Class<? extends AstrixObjectMapperConfigurer> objectMapperConfigurerFactory) {
 		try {
-			AstrixObjectMapperConfigurer AstrixObjectMapperConfigurer = objectMapperConfigurerFactory.newInstance();
-			List<AstrixJsonApiMigration> apiMigrations = new ArrayList<>();
+			if (serializerBuilder.equals(AstrixObjectSerializerConfigurer.class)) {
+				this.objectMapper = buildObjectMapper(new LegacyClientAdapter(apiMigrationFactories, objectMapperConfigurerFactory));
+			} else {
+				this.objectMapper = buildObjectMapper(Jackson1ObjectSerializerConfigurer.class.cast(serializerBuilder.newInstance()));
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to init JsonObjectMapper", e);
+		}
+	}
+	
+	static class LegacyClientAdapter implements Jackson1ObjectSerializerConfigurer {
+		
+		private List<AstrixJsonApiMigration> apiMigrations = new ArrayList<>();
+		private AstrixObjectMapperConfigurer astrixObjectMapperConfigurer;
+		
+		public LegacyClientAdapter(Class<? extends AstrixJsonApiMigration>[] apiMigrationFactories,
+								   Class<? extends AstrixObjectMapperConfigurer> objectMapperConfigurerFactory) throws Exception {
+			astrixObjectMapperConfigurer = objectMapperConfigurerFactory.newInstance();
 			for (Class<? extends AstrixJsonApiMigration> apiMigrationFactory : apiMigrationFactories) {
 				apiMigrations.add(apiMigrationFactory.newInstance());
 			}
-			VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
-			AstrixObjectMapperConfigurer.configure(objectMapperBuilder);
-			return JsonObjectMapper.create(objectMapperBuilder.build());
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw new RuntimeException("Failed to init JsonObjectMapper", e);
-		} finally {
 		}
+		
+		@Override
+		public List<? extends AstrixJsonApiMigration> apiMigrations() {
+			return apiMigrations;
+		}
+		@Override
+		public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
+			astrixObjectMapperConfigurer.configure(objectMapperBuilder);
+		}
+	}
+
+	private JsonObjectMapper buildObjectMapper(Jackson1ObjectSerializerConfigurer serializerBuilder) {
+		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(serializerBuilder.apiMigrations());
+		serializerBuilder.configure(objectMapperBuilder);
+		return JsonObjectMapper.create(objectMapperBuilder.build());
 	}
 
 	@Override
