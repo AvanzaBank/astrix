@@ -15,15 +15,23 @@
  */
 package com.avanza.astrix.service.registry.client;
 
-import com.avanza.astrix.provider.versioning.AstrixObjectMapperConfigurer;
-import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
+import java.util.Collections;
+import java.util.List;
 
-public class ServiceRegistryObjectMapperConfigurer implements AstrixObjectMapperConfigurer {
+import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
+import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
+import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
+
+public class ServiceRegistryObjectSerializerConfigurer implements Jackson1ObjectSerializerConfigurer {
 
 	@Override
-	public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
-		// TODO Auto-generated method stub
-		
+	public List<? extends AstrixJsonApiMigration> apiMigrations() {
+		return Collections.emptyList();
 	}
+	
+	@Override
+	public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
+	}
+
 
 }
