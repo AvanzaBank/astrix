@@ -176,7 +176,7 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 		
 		Map<Class<?>, JsonMessageMigrator.Builder<?>> buildersByType = new HashMap<Class<?>, JsonMessageMigrator.Builder<?>>();
 		
-		MessageMigratorsBuilder registerAll(List<AstrixJsonApiMigration> migrations) {
+		MessageMigratorsBuilder registerAll(List<? extends AstrixJsonApiMigration> migrations) {
 			for (AstrixJsonApiMigration apiMigration : migrations) {
 				int version = apiMigration.fromVersion();
 				for (AstrixJsonMessageMigration<?> messageMigration : apiMigration.getMigrations()) {
@@ -211,7 +211,7 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 		private List<JsonDeserializerHolder<?>> deserializers = new ArrayList<>();
 		private ConcurrentMap<Class<?>, JsonMessageMigrator<?>> migratorsByType;
 		
-		public VersionedObjectMapperBuilder(List<AstrixJsonApiMigration> migrations) {
+		public VersionedObjectMapperBuilder(List<? extends AstrixJsonApiMigration> migrations) {
 			this.migratorsByType = new MessageMigratorsBuilder().registerAll(migrations).build();
 		}
 

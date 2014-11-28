@@ -97,7 +97,6 @@ public class VersionedJsonObjectMapperTest {
 		assertEquals(1, deserializedPojos.size());
 		assertEquals("p1", deserializedPojos.get(0).getFoo());
 	}
-	
 
 	@Test
 	@SuppressWarnings("serial")
@@ -139,7 +138,6 @@ public class VersionedJsonObjectMapperTest {
 				}
 			};
 		}
-
 		@Override
 		public int fromVersion() {
 			return 1;
