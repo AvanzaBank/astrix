@@ -19,15 +19,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.openspaces.core.GigaSpace;
-
 import rx.Observable;
 import rx.Subscriber;
 
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
-import com.gigaspaces.async.AsyncFuture;
-import com.gigaspaces.async.AsyncFutureListener;
-import com.gigaspaces.async.AsyncResult;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -41,10 +36,6 @@ public class AstrixRemotingTransport {
 		this.impl = impl;
 	}
 
-	public static AstrixRemotingTransport remoteSpace(GigaSpace gigaSpace) {
-		return new AstrixRemotingTransport(new GsImpl(gigaSpace));
-	}
-	
 	public static AstrixRemotingTransport direct(AstrixServiceActivator activator) {
 		return new AstrixRemotingTransport(new Direct(activator));
 	}
@@ -107,62 +98,6 @@ public class AstrixRemotingTransport {
 				public void call(Subscriber<? super List<AstrixServiceInvocationResponse>> t1) {
 					t1.onNext(Arrays.asList(response));
 					t1.onCompleted();
-				}
-			});
-		}
-		
-	}
-	
-	private static class GsImpl implements Spi {
-
-		private final GigaSpace gigaSpace;
-		
-		public GsImpl(GigaSpace gigaSpace) {
-			this.gigaSpace = gigaSpace;
-		}
-
-		@Override
-		public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, GsRoutingKey routingKey) {
-			final AsyncFuture<AstrixServiceInvocationResponse> response = this.gigaSpace.execute(new AstrixServiceInvocationTask(request), routingKey);
-			return Observable.create(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {
-				@Override
-				public void call(final Subscriber<? super AstrixServiceInvocationResponse> t1) {
-					response.setListener(new AsyncFutureListener<AstrixServiceInvocationResponse>() {
-						@Override
-						public void onResult(AsyncResult<AstrixServiceInvocationResponse> result) {
-							if (result.getException() == null) {
-								t1.onNext(result.getResult());
-								t1.onCompleted();
-							} else {
-								t1.onError(result.getException());
-							}
-						}
-					});
-				}
-			});
-		}
-		
-		@Override
-		public Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request) {
-			final AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>> responses = gigaSpace.execute(new AstrixDistributedServiceInvocationTask(request));
-			return Observable.create(new Observable.OnSubscribe<List<AstrixServiceInvocationResponse>>() {
-				@Override
-				public void call(final Subscriber<? super List<AstrixServiceInvocationResponse>> subscriber) {
-					responses.setListener(new AsyncFutureListener<List<AsyncResult<AstrixServiceInvocationResponse>>>() {
-						@Override
-						public void onResult(AsyncResult<List<AsyncResult<AstrixServiceInvocationResponse>>> asyncRresult) {
-							if (asyncRresult.getException() == null) {
-								List<AstrixServiceInvocationResponse> result = new ArrayList<>();
-								for (AsyncResult<AstrixServiceInvocationResponse> asyncInvocationResponse : asyncRresult.getResult()) {
-									result.add(asyncInvocationResponse.getResult());
-								}
-								subscriber.onNext(result);
-								subscriber.onCompleted();
-							} else {
-								subscriber.onError(asyncRresult.getException());
-							}
-						}
-					});
 				}
 			});
 		}
