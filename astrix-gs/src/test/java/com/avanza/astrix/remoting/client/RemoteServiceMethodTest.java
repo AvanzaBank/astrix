@@ -30,8 +30,8 @@ public class RemoteServiceMethodTest {
 			}
 		}
 		Router router = new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
-		GsRoutingKey routingKey = router.getRoutingKey("routing-arg");
-		assertEquals(GsRoutingKey.create("routing-arg"), routingKey);
+		RoutingKey routingKey = router.getRoutingKey("routing-arg");
+		assertEquals(RoutingKey.create("routing-arg"), routingKey);
 	}
 	
 	@Test
@@ -47,8 +47,8 @@ public class RemoteServiceMethodTest {
 		}
 		
 		Router router = new GsRoutingStrategy().create(Service.class.getMethod("hello", RoutingType.class));
-		GsRoutingKey routingKey = router.getRoutingKey(new RoutingType());
-		assertEquals(GsRoutingKey.create("routing-arg"), routingKey);
+		RoutingKey routingKey = router.getRoutingKey(new RoutingType());
+		assertEquals(RoutingKey.create("routing-arg"), routingKey);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)

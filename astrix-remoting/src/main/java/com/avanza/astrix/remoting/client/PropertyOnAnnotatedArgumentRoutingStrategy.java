@@ -30,13 +30,13 @@ public class PropertyOnAnnotatedArgumentRoutingStrategy implements Router {
 	}
 
 	@Override
-	public GsRoutingKey getRoutingKey(Object[] args) {
+	public RoutingKey getRoutingKey(Object[] args) {
 		Object routingKey;
 		try {
 			routingKey = propertyMethod.invoke(args[argumentIndex]);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new IllegalArgumentException("Failed to rout using method:" + propertyMethod, e);
 		}
-		return GsRoutingKey.create(routingKey);
+		return RoutingKey.create(routingKey);
 	}
 }

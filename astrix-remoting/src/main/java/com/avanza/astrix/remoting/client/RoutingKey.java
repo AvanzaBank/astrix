@@ -22,21 +22,21 @@ import java.io.Serializable;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class GsRoutingKey implements Serializable {
+public final class RoutingKey implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	private final int hash;
 
-	private GsRoutingKey(int hash) {
+	private RoutingKey(int hash) {
 		this.hash = hash;
 	}
 	
-	public static GsRoutingKey create(Object object) {
-		return new GsRoutingKey(object.hashCode());
+	public static RoutingKey create(Object object) {
+		return new RoutingKey(object.hashCode());
 	}
 	
-	public static GsRoutingKey create(int hash) {
-		return new GsRoutingKey(hash);
+	public static RoutingKey create(int hash) {
+		return new RoutingKey(hash);
 	}
 	
 	@Override
@@ -52,7 +52,7 @@ public final class GsRoutingKey implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		GsRoutingKey other = (GsRoutingKey) obj;
+		RoutingKey other = (RoutingKey) obj;
 		if (hash != other.hash)
 			return false;
 		return true;

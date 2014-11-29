@@ -44,7 +44,7 @@ public class AstrixRemotingTransport {
 		return new AstrixRemotingTransport(impl);
 	}
 
-	public AstrixServiceInvocationResponse processRoutedRequest(AstrixServiceInvocationRequest request, GsRoutingKey routingKey) {
+	public AstrixServiceInvocationResponse processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
 		return impl.processRoutedRequest(request, routingKey).toBlocking().first();
 	}
 	
@@ -57,7 +57,7 @@ public class AstrixRemotingTransport {
 		return responses;
 	}
 	
-	public Observable<AstrixServiceInvocationResponse> observeProcessRoutedRequest(AstrixServiceInvocationRequest request, GsRoutingKey routingKey) {
+	public Observable<AstrixServiceInvocationResponse> observeProcessRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
 		return impl.processRoutedRequest(request, routingKey);
 	}
 	
@@ -66,7 +66,7 @@ public class AstrixRemotingTransport {
 	}
 	
 	public interface Spi {
-		public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, GsRoutingKey routingKey);
+		public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey);
 		public Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request);
 	}
 	
@@ -79,7 +79,7 @@ public class AstrixRemotingTransport {
 		}
 
 		@Override
-		public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, GsRoutingKey routingKey){
+		public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey){
 			final AstrixServiceInvocationResponse response = activator.invokeService(request);
 			return Observable.create(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {
 				@Override

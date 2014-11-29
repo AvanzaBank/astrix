@@ -34,7 +34,7 @@ public class RemoteServiceMethod {
 		return signature;
 	}
 	
-	public GsRoutingKey getRoutingKey(Object... args) throws Exception {
+	public RoutingKey getRoutingKey(Object... args) throws Exception {
 		return this.router.getRoutingKey(args);
 	}
 	

@@ -28,7 +28,7 @@ public class AnnotatedArgumentInstanceRoutingStrategy implements Router {
 	}
 
 	@Override
-	public GsRoutingKey getRoutingKey(Object[] args) throws Exception {
-		return GsRoutingKey.create(routingKeyMethod.invoke(args[argumentIndex]));
+	public RoutingKey getRoutingKey(Object[] args) throws Exception {
+		return RoutingKey.create(routingKeyMethod.invoke(args[argumentIndex]));
 	}
 }

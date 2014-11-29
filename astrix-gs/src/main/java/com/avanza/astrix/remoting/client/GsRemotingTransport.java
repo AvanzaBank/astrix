@@ -37,7 +37,7 @@ public class GsRemotingTransport implements Spi {
 	}
 
 	@Override
-	public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, GsRoutingKey routingKey) {
+	public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
 		final AsyncFuture<AstrixServiceInvocationResponse> response = this.gigaSpace.execute(new AstrixServiceInvocationTask(request), routingKey);
 		return Observable.create(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {
 			@Override

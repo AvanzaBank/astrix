@@ -17,7 +17,7 @@ package com.avanza.astrix.remoting.client;
 
 public class BroadcastRoutingStrategy implements Router {
 	@Override
-	public GsRoutingKey getRoutingKey(Object[] args) {
+	public RoutingKey getRoutingKey(Object[] args) {
 		return null;
 	}
 }

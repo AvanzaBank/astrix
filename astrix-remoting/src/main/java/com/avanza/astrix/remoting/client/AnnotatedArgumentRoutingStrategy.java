@@ -24,7 +24,7 @@ public class AnnotatedArgumentRoutingStrategy implements Router {
 	}
 
 	@Override
-	public GsRoutingKey getRoutingKey(Object[] args) {
-		return GsRoutingKey.create(args[argumentIndex]);
+	public RoutingKey getRoutingKey(Object[] args) {
+		return RoutingKey.create(args[argumentIndex]);
 	}
 }

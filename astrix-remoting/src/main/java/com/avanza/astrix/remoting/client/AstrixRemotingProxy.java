@@ -93,7 +93,7 @@ public class AstrixRemotingProxy implements InvocationHandler {
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		RemoteServiceMethod serviceMethod = this.remoteServiceMethodByMethod.get(method);
 		
-		GsRoutingKey routingKey = serviceMethod.getRoutingKey(args);
+		RoutingKey routingKey = serviceMethod.getRoutingKey(args);
 		Type returnType = getReturnType(method);
 		AstrixServiceInvocationRequest invocationRequest = new AstrixServiceInvocationRequest();
 		
@@ -225,7 +225,7 @@ public class AstrixRemotingProxy implements InvocationHandler {
 
 	private Observable<Object> observeProcessRoutedRequest(
 			final Type returnType, AstrixServiceInvocationRequest request,
-			GsRoutingKey routingKey) {
+			RoutingKey routingKey) {
 		Observable<AstrixServiceInvocationResponse> response = this.serviceTransport.observeProcessRoutedRequest(request, routingKey);
 		return response.map(new Func1<AstrixServiceInvocationResponse, Object>() {
 			@Override

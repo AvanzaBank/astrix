@@ -16,5 +16,5 @@
 package com.avanza.astrix.remoting.client;
 
 public interface Router {
-	GsRoutingKey getRoutingKey(Object... args) throws Exception;
+	RoutingKey getRoutingKey(Object... args) throws Exception;
 }
