@@ -30,9 +30,9 @@ import com.avanza.astrix.remoting.server.AstrixServiceActivator;
  */
 public class AstrixRemotingTransport {
 	
-	private final Spi impl;
+	private final RemotingTransportSpi impl;
 	
-	AstrixRemotingTransport(Spi impl) {
+	AstrixRemotingTransport(RemotingTransportSpi impl) {
 		this.impl = impl;
 	}
 
@@ -40,7 +40,7 @@ public class AstrixRemotingTransport {
 		return new AstrixRemotingTransport(new Direct(activator));
 	}
 	
-	public static AstrixRemotingTransport create(Spi impl) {
+	public static AstrixRemotingTransport create(RemotingTransportSpi impl) {
 		return new AstrixRemotingTransport(impl);
 	}
 
@@ -65,12 +65,7 @@ public class AstrixRemotingTransport {
 		return impl.processBroadcastRequest(request);
 	}
 	
-	public interface Spi {
-		public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey);
-		public Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request);
-	}
-	
-	private static class Direct implements Spi {
+	private static class Direct implements RemotingTransportSpi {
 
 		private AstrixServiceActivator activator;
 

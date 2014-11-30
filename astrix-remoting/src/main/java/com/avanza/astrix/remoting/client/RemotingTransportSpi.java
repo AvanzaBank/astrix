@@ -15,20 +15,11 @@
  */
 package com.avanza.astrix.remoting.client;
 
-import java.lang.reflect.Method;
+import java.util.List;
 
-public class AnnotatedArgumentInstanceRoutingStrategy implements Router {
-	
-	private int argumentIndex;
-	private Method routingKeyMethod;
-	
-	public AnnotatedArgumentInstanceRoutingStrategy(int argumentIndex, Method routingKeyMethod) {
-		this.argumentIndex = argumentIndex;
-		this.routingKeyMethod = routingKeyMethod;
-	}
+import rx.Observable;
 
-	@Override
-	public RoutingKey getRoutingKey(Object... args) throws Exception {
-		return RoutingKey.create(routingKeyMethod.invoke(args[argumentIndex]));
-	}
+public interface RemotingTransportSpi {
+	public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey);
+	public Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request);
 }

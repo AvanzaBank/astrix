@@ -23,12 +23,11 @@ import org.openspaces.core.GigaSpace;
 import rx.Observable;
 import rx.Subscriber;
 
-import com.avanza.astrix.remoting.client.AstrixRemotingTransport.Spi;
 import com.gigaspaces.async.AsyncFuture;
 import com.gigaspaces.async.AsyncFutureListener;
 import com.gigaspaces.async.AsyncResult;
 
-public class GsRemotingTransport implements Spi {
+public class GsRemotingTransport implements RemotingTransportSpi {
 
 	private final GigaSpace gigaSpace;
 	
