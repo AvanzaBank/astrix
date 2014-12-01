@@ -34,44 +34,15 @@ public class VersionJacksonAstrixObjectSerializer implements AstrixObjectSeriali
 	private int version;
 
 	public VersionJacksonAstrixObjectSerializer(AstrixVersioned versioningInfo) {
-		Class<? extends AstrixJsonApiMigration>[] apiMigrationFactories = versioningInfo.apiMigrations();
-		Class<? extends AstrixObjectMapperConfigurer> objectMapperConfigurerFactory = versioningInfo.objectMapperConfigurer();
 		Class<? extends AstrixObjectSerializerConfigurer> serializerBuilder = versioningInfo.objectSerializerConfigurer();
 		this.version = versioningInfo.version();
 		try {
-			if (serializerBuilder.equals(AstrixObjectSerializerConfigurer.class)) {
-				this.objectMapper = buildObjectMapper(new LegacyClientAdapter(apiMigrationFactories, objectMapperConfigurerFactory));
-			} else {
-				this.objectMapper = buildObjectMapper(Jackson1ObjectSerializerConfigurer.class.cast(serializerBuilder.newInstance()));
-			}
+			this.objectMapper = buildObjectMapper(Jackson1ObjectSerializerConfigurer.class.cast(serializerBuilder.newInstance()));
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to init JsonObjectMapper", e);
 		}
 	}
 	
-	static class LegacyClientAdapter implements Jackson1ObjectSerializerConfigurer {
-		
-		private List<AstrixJsonApiMigration> apiMigrations = new ArrayList<>();
-		private AstrixObjectMapperConfigurer astrixObjectMapperConfigurer;
-		
-		public LegacyClientAdapter(Class<? extends AstrixJsonApiMigration>[] apiMigrationFactories,
-								   Class<? extends AstrixObjectMapperConfigurer> objectMapperConfigurerFactory) throws Exception {
-			astrixObjectMapperConfigurer = objectMapperConfigurerFactory.newInstance();
-			for (Class<? extends AstrixJsonApiMigration> apiMigrationFactory : apiMigrationFactories) {
-				apiMigrations.add(apiMigrationFactory.newInstance());
-			}
-		}
-		
-		@Override
-		public List<? extends AstrixJsonApiMigration> apiMigrations() {
-			return apiMigrations;
-		}
-		@Override
-		public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
-			astrixObjectMapperConfigurer.configure(objectMapperBuilder);
-		}
-	}
-
 	private JsonObjectMapper buildObjectMapper(Jackson1ObjectSerializerConfigurer serializerBuilder) {
 		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(serializerBuilder.apiMigrations());
 		serializerBuilder.configure(objectMapperBuilder);

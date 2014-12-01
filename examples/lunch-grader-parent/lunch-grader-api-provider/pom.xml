@@ -21,5 +21,9 @@
 			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-provider</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>${astrix.groupId}</groupId>
+			<artifactId>astrix-versioning</artifactId>
+		</dependency>
 	</dependencies>
 </project>

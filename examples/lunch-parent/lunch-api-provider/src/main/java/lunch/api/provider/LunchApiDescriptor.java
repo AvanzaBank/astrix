@@ -23,11 +23,8 @@ import com.avanza.astrix.provider.versioning.AstrixVersioned;
 
 // The API is versioned.
 @AstrixVersioned(
-	apiMigrations = {
-		LunchApiV1Migration.class
-	},	
 	version = 2,
-	objectMapperConfigurer = LunchApiObjectMapperConfigurer.class
+	objectSerializerConfigurer = LunchApiObjectSerializerConfigurer.class
 )
 // The service is exported to the service-registry. Consumers queries the service-registry to bind to servers.
 @AstrixServiceRegistryApi(

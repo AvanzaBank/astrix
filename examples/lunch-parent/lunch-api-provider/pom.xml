@@ -17,5 +17,13 @@
 			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-provider</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>${astrix.groupId}</groupId>
+			<artifactId>astrix-versioning</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+		</dependency>
 	</dependencies>
 </project>

@@ -15,14 +15,23 @@
  */
 package lunch.api.provider;
 
-import com.avanza.astrix.provider.versioning.AstrixObjectMapperConfigurer;
+import java.util.Arrays;
+import java.util.List;
+
+import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
 import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
+import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
 
 
-public class LunchApiObjectMapperConfigurer implements AstrixObjectMapperConfigurer {
+public class LunchApiObjectSerializerConfigurer implements Jackson1ObjectSerializerConfigurer {
 
 	@Override
 	public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
+	}
+
+	@Override
+	public List<? extends AstrixJsonApiMigration> apiMigrations() {
+		return Arrays.asList(new LunchApiV1Migration());
 	}
 
 }
