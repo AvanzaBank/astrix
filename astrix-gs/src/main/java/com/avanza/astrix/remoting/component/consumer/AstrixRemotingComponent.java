@@ -36,6 +36,8 @@ import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.remoting.client.AstrixRemotingProxy;
 import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
+import com.avanza.astrix.remoting.client.GsRemotingTransport;
+import com.avanza.astrix.remoting.client.GsRoutingStrategy;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 import com.avanza.astrix.spring.AstrixSpringContext;
 
@@ -52,9 +54,9 @@ public class AstrixRemotingComponent implements AstrixPluginsAware, AstrixServic
 		
 		String targetSpace = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
 		GigaSpace space = GsBinder.createGsFactory(serviceProperties).create();
-		AstrixRemotingTransport remotingTransport = AstrixRemotingTransport.remoteSpace(space);
+		AstrixRemotingTransport remotingTransport = GsRemotingTransport.remoteSpace(space);
 		
-		T proxy = AstrixRemotingProxy.create(api, remotingTransport, objectSerializer);
+		T proxy = AstrixRemotingProxy.create(api, remotingTransport, objectSerializer, new GsRoutingStrategy());
 		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(api, proxy, targetSpace);
 		return proxyWithFaultTolerance;
 	}

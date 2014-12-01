@@ -5,14 +5,14 @@ In this context, a service is something that is typically provided by a differen
 
 Service binding is done in two steps:
 
-1. Lookup the service properties associated with the given service. This involves identifying what `AstrixServiceComponent` to use and find all properties required by the `AstrixServiceComponent` to the service.
+1. Lookup the service properties associated with the given service. This involves identifying what `AstrixServiceComponent` to use and find all properties required by the `AstrixServiceComponent` to bind to the service.
 2. Use the `AstrixServiceComponent` to bind to the given service.
 
 Those two steps offers two levels of indirection. The first one is how to lookup the service-properties associated with a service. Out of the box Astrix supports two mechanisms for service-properties lookup. One using configuration, `@AstrixConfigApi`, and another using the service-registry, `@AstrixServiceRegistryApi`, which will be introduced later. The other level of indirection is how Astrix binds to a service, which done by the `AstrixServiceComponent`. Astrix comes with a number of service-component implementations out of the box which will be introduced throughout the tutorial. 
 
 
 ### Service binding using AstrixDirectComponent and @AstrixConfigApi
-The first service-component covered is the `AstrixDirectComponent` which is a useful to support testing. It allows binding to a service provider within the same process, i.e. an ordinary object within the same jvm. The true power of the `AstrixDirectComponent` comes when using it in combination with the service-registry, which we will se later in the tutorial when introducing the service-registry. This example introduces the `AstrixDirectComponent` in combination with a `@AstrixConfigApi`.
+The first service-component covered is the `AstrixDirectComponent` which is a useful tool to support testing. It allows binding to a service provider within the same process, i.e. an ordinary object within the same jvm. The true power of the `AstrixDirectComponent` comes when using it in combination with the service-registry, which we will se later in the tutorial when introducing the service-registry. This example introduces the `AstrixDirectComponent` in combination with a `@AstrixConfigApi`.
 
 In this example the api i split into one library, `LunchSuggester`, and one service, `LunchRestaruantFinder`. The api-descriptor exporting the `LunchRestaurantFinder` is annotated with `@AstrixConfigApi` which tells Astrix to lookup the service-properties for the `LunchRestaurantFinder` in configuration under the entry name `"restaurantFinderUri"`.
 
@@ -57,9 +57,9 @@ public class LunchLibraryTest {
 	}
 	
 	@Test
-	public void astrixDirectComponentAllowsBindingToObjectsInTheSameProcess() throws Exception {
-		LunchRestaurantFinder restaurantFinder = Mockito.mock(LunchRestaurantFinder.class);
-		String serviceUri = AstrixDirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinder);
+	public void astrixDirectComponentAllowsBindingToObjectsInSameProcess() throws Exception {
+		LunchRestaurantFinder restaurantFinderStub = Mockito.mock(LunchRestaurantFinder.class);
+		String serviceUri = AstrixDirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinderStub);
 
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.set("restaurantFinderUri", serviceUri);
@@ -68,14 +68,14 @@ public class LunchLibraryTest {
 		
 		LunchSuggester lunchSuggester = astrix.getBean(LunchSuggester.class);
 
-		Mockito.stub(restaurantFinder.getAllRestaurants()).toReturn(Arrays.asList("Pontus!"));
+		Mockito.stub(restaurantFinderStub.getAllRestaurants()).toReturn(Arrays.asList("Pontus!"));
 		assertEquals("Pontus!", lunchSuggester.randomLunchRestaurant());
 	}
 
 }
 ```
 
-In the test we want to stub out the `LunchRestaurantFinder` using Mockito. This could easily be done using the `TestAstrixConfigurer` introduced in part 1, but for the sake of illustration we will use the `AstrixDirectComponent`. We register the mock with the `AstrixDirectComponent` which returns a serviceUri. A serviceUri contains all the service-properties required to bind to a given service. The first part identifies the name of the service component, in this case `"direct"`. The second part is service-component specific and contains all properties required by the service-component to bind to the given service. `AstrixDirectComponent` requires an identifier for the target instance which is generated when we register the instance with the `AstrixDirectComponent`. Therefore a serviceUri identifying a service provided using the `AstrixDirectComponent` might look like this: `"direct:21"`.
+In the test we want to stub out the `LunchRestaurantFinder` using Mockito. This can easily be done using the `TestAstrixConfigurer` introduced in part 1, but for the sake of illustration we will use the `AstrixDirectComponent`. We register the mock with the `AstrixDirectComponent` which returns a serviceUri. A serviceUri contains all the service-properties required to bind to a given service. The first part identifies the name of the service component, in this case `"direct"`. The second part is service-component specific and contains all properties required by the service-component to bind to the given service. `AstrixDirectComponent` requires an identifier for the target instance which is generated when we register the instance with the `AstrixDirectComponent`. Therefore a serviceUri identifying a service provided using the `AstrixDirectComponent` might look like this: `"direct:21"`.
 
 When we configure Astrix we provide a setting, `"restaurantFinderUri"` with a value that contains the serviceUri to the `LunchRestaurantFinder` mock instance. When Astrix creates an instance of `LunchRestaurantFinder` (which is done indirectly when we create the `LunchSuggester` bean in the test) the process goes like this:
 
@@ -94,7 +94,7 @@ The previous example uses the configuration mechanism to lookup service-properti
 3. `META-INF/astrix/settings.properties`
 4. Default values
 
-Astrix will use the first value found for a given setting. Hence the External Configuration takes precedence over the Programatic configuration and so on. The external configuration is pluggable by implementing `AstrixExternalConfig`. By default Astrix will not use any external configuration. The `settings.properties` provides a convenient way to override the default values provided by Astrix. It could be used to set corporate wide default-values by sharing a single `settings.properties` file. For instance it could be used to say that `"com.mycorp"` should be scanned for api-providers, avoiding the need to dupplicate such configurations on every instance of AstrixConfigurer throughout an enterprise.
+Astrix will use the first value found for a given setting. Hence the External Configuration takes precedence over the Programatic configuration and so on. The external configuration is pluggable by implementing the `AstrixExternalConfig` spi. By default Astrix will not use any external configuration. The `settings.properties` provides a convenient way to override the default values provided by Astrix. It could be used to set corporate wide default-values by sharing a single `settings.properties` file. For instance it could be used to say that `"com.mycorp"` should be scanned for api-providers, avoiding the need to dupplicate such configurations on every instance of AstrixConfigurer throughout an enterprise.
 
 ```java
 TODO: configuration example?
@@ -150,7 +150,7 @@ public class AstrixBeanStateManagementTest {
 ```
 
 1. The `BEAN_BIND_ATTEMPT_INTERVAL` determines how often Astrix will attempt to bind a given bean (millis).
-2. The `ASTRIX_CONFIG_URI` is a service-like uri to the external configuration source, in this case an instance of `AstrixSettings`.
+2. The `ASTRIX_CONFIG_URI` is a service-like uri to the external configuration source, in this case an instance of `AstrixSettings` within the same process.
 3. The `LunchSuggester` uses `LunchRestaurantFinder` in background. Since the configuration contains no entry for  `"restarurantFinderUri"` the `LunchRestaurantFinder` will be in state `UNBOUND`
 4. This registers a mock instance for `LunchRestaurantFinder` in the direct-component, which returns a serviceUri that can be used to bind to the mock instance.
 5. A `"restaurantFinderUri"` pointing to the mock is added to the configuration.

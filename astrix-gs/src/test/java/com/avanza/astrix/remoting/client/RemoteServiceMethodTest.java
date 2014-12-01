@@ -29,10 +29,9 @@ public class RemoteServiceMethodTest {
 			public void hello(@Routing String routingArg, String anotherArg) {
 			}
 		}
-		
-		RemoteServiceMethod serviceMethod = RemoteServiceMethod.create(Service.class.getMethod("hello", String.class, String.class));
-		GsRoutingKey routingKey = serviceMethod.getRoutingKey("routing-arg");
-		assertEquals(GsRoutingKey.create("routing-arg"), routingKey);
+		Router router = new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
+		RoutingKey routingKey = router.getRoutingKey("routing-arg");
+		assertEquals(RoutingKey.create("routing-arg"), routingKey);
 	}
 	
 	@Test
@@ -47,9 +46,9 @@ public class RemoteServiceMethodTest {
 			}
 		}
 		
-		RemoteServiceMethod serviceMethod = RemoteServiceMethod.create(Service.class.getMethod("hello", RoutingType.class));
-		GsRoutingKey routingKey = serviceMethod.getRoutingKey(new RoutingType());
-		assertEquals(GsRoutingKey.create("routing-arg"), routingKey);
+		Router router = new GsRoutingStrategy().create(Service.class.getMethod("hello", RoutingType.class));
+		RoutingKey routingKey = router.getRoutingKey(new RoutingType());
+		assertEquals(RoutingKey.create("routing-arg"), routingKey);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
@@ -61,7 +60,7 @@ public class RemoteServiceMethodTest {
 			}
 		}
 		
-		RemoteServiceMethod.create(Service.class.getMethod("hello", RoutingType.class));
+		new GsRoutingStrategy().create(Service.class.getMethod("hello", RoutingType.class));
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
@@ -76,7 +75,7 @@ public class RemoteServiceMethodTest {
 			}
 		}
 		
-		RemoteServiceMethod.create(Service.class.getMethod("hello", RoutingType.class));
+		new GsRoutingStrategy().create(Service.class.getMethod("hello", RoutingType.class));
 	}
 	
 	@Test(expected = AmbiguousRoutingException.class)
@@ -85,7 +84,7 @@ public class RemoteServiceMethodTest {
 			public void hello(@Routing String routingArg, @Routing String routingArg2) {
 			}
 		}
-		RemoteServiceMethod.create(Service.class.getMethod("hello", String.class, String.class));
+		new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
 	}
 	
 	@Test(expected = AmbiguousRoutingException.class)
@@ -94,7 +93,7 @@ public class RemoteServiceMethodTest {
 			public void hello(String routingArg, String routingArg2) {
 			}
 		}
-		RemoteServiceMethod.create(Service.class.getMethod("hello", String.class, String.class));
+		new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
 	}
 
 }

@@ -15,10 +15,27 @@
  */
 package com.avanza.astrix.remoting.client;
 
-public class IllegalServiceInvocationException extends RuntimeException {
-
-	public IllegalServiceInvocationException(String string) {
-		super(string);
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public class RemoteServiceMethod {
+	
+	private String signature;
+	private Router router;
+	
+	public RemoteServiceMethod(String signature, Router router) {
+		this.signature = signature;
+		this.router = router;
 	}
 
+	public String getSignature() {
+		return signature;
+	}
+	
+	public RoutingKey getRoutingKey(Object... args) throws Exception {
+		return this.router.getRoutingKey(args);
+	}
+	
 }

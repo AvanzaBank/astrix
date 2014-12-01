@@ -35,21 +35,21 @@ public class MockingAstrixBeansTest {
 	
 	@Test
 	public void testAstrixConfigurerAllowsRegistrationOfMockInstances() throws Exception {
-		LunchRestaurantFinder restaurantFinder = Mockito.mock(LunchRestaurantFinder.class);
+		LunchRestaurantFinder restaurantFinderStub = Mockito.mock(LunchRestaurantFinder.class);
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		
 		// Register the api(s) we intend to test
 		astrixConfigurer.registerApiDescriptor(LunchLibraryProvider.class);
 		
 		// Stub out its dependency 
-		astrixConfigurer.registerApi(LunchRestaurantFinder.class, restaurantFinder);
+		astrixConfigurer.registerApi(LunchRestaurantFinder.class, restaurantFinderStub);
 		AstrixContext astrixContext = astrixConfigurer.configure();
 		
 		// Get the api we intend to test
 		LunchSuggester lunchSuggester = astrixContext.getBean(LunchSuggester.class);
 		
 		// Stub out getAllRestaurants to allways return one restaurant
-		Mockito.stub(restaurantFinder.getAllRestaurants()).toReturn(Arrays.asList("Max"));
+		Mockito.stub(restaurantFinderStub.getAllRestaurants()).toReturn(Arrays.asList("Max"));
 
 		assertEquals("Max", lunchSuggester.randomLunchRestaurant());
 	}

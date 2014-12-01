@@ -95,6 +95,14 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 		return provider.getProvider();
 	}
 	
+	public static <T> T getServiceProvider(String id) {
+		ServiceProvider<T> provider = (ServiceProvider<T>) providerById.get(id);
+		if (provider == null) {
+			throw new IllegalArgumentException("No provider registered with id: " + id);
+		}
+		return provider.getProvider();
+	}
+	
 	static class ServiceProvider<T> {
 		private String id;
 		private Class<T> type;

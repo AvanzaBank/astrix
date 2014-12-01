@@ -38,6 +38,7 @@ import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.remoting.util.MethodSignatureBuilder;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -55,12 +56,13 @@ public class AstrixRemotingProxy implements InvocationHandler {
 	
 	private AstrixRemotingProxy(Class<?> serviceApi,
 							  AstrixObjectSerializer objectSerializer,
-							  AstrixRemotingTransport AstrixServiceTransport) {
+							  AstrixRemotingTransport AstrixServiceTransport,
+							  RoutingStrategy routingStrategy) {
 		this.apiVersion = objectSerializer.version();
 		this.objectSerializer = objectSerializer;
 		this.serviceTransport = AstrixServiceTransport;
 		for (Method m : serviceApi.getMethods()) {
-			remoteServiceMethodByMethod.put(m, RemoteServiceMethod.create(m));
+			remoteServiceMethodByMethod.put(m, new RemoteServiceMethod(MethodSignatureBuilder.build(m), routingStrategy.create(m)));
 		}
 		if (serviceApi.getSimpleName().startsWith("Observable")) {
 			String packageAndEventualOuterClassName = serviceApi.getName().substring(0, serviceApi.getName().length() - serviceApi.getSimpleName().length());
@@ -80,9 +82,9 @@ public class AstrixRemotingProxy implements InvocationHandler {
 			this.isAsyncApi = false;
 		}
 	}
-
-	public static <T> T create(Class<T> service, AstrixRemotingTransport transport, AstrixObjectSerializer objectSerializer) {
-		AstrixRemotingProxy handler = new AstrixRemotingProxy(service, objectSerializer, transport);
+	
+	public static <T> T create(Class<T> service, AstrixRemotingTransport transport, AstrixObjectSerializer objectSerializer, RoutingStrategy routingStrategy) {
+		AstrixRemotingProxy handler = new AstrixRemotingProxy(service, objectSerializer, transport, routingStrategy);
 		T serviceProxy = (T) Proxy.newProxyInstance(AstrixRemotingProxy.class.getClassLoader(), new Class[]{service}, handler);
 		return serviceProxy;
 	}
@@ -91,7 +93,7 @@ public class AstrixRemotingProxy implements InvocationHandler {
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		RemoteServiceMethod serviceMethod = this.remoteServiceMethodByMethod.get(method);
 		
-		GsRoutingKey routingKey = serviceMethod.getRoutingKey(args);
+		RoutingKey routingKey = serviceMethod.getRoutingKey(args);
 		Type returnType = getReturnType(method);
 		AstrixServiceInvocationRequest invocationRequest = new AstrixServiceInvocationRequest();
 		
@@ -223,7 +225,7 @@ public class AstrixRemotingProxy implements InvocationHandler {
 
 	private Observable<Object> observeProcessRoutedRequest(
 			final Type returnType, AstrixServiceInvocationRequest request,
-			GsRoutingKey routingKey) {
+			RoutingKey routingKey) {
 		Observable<AstrixServiceInvocationResponse> response = this.serviceTransport.observeProcessRoutedRequest(request, routingKey);
 		return response.map(new Func1<AstrixServiceInvocationResponse, Object>() {
 			@Override

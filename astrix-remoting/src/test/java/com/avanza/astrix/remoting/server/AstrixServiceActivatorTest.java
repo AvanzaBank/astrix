@@ -20,10 +20,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
@@ -31,25 +31,21 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.openspaces.remoting.Routing;
 
 import rx.Observable;
 
-import com.avanza.astrix.context.AstrixApiDescriptor;
+import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.AstrixRemoteResultReducer;
-import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
-import com.avanza.astrix.provider.versioning.AstrixVersioned;
-import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
 import com.avanza.astrix.remoting.client.AstrixMissingServiceException;
 import com.avanza.astrix.remoting.client.AstrixRemoteServiceException;
 import com.avanza.astrix.remoting.client.AstrixRemotingProxy;
 import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
-import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
-import com.avanza.astrix.versioning.plugin.JacksonVersioningPlugin;
-import com.gigaspaces.annotation.pojo.SpaceRouting;
+import com.avanza.astrix.remoting.client.Router;
+import com.avanza.astrix.remoting.client.RoutingKey;
+import com.avanza.astrix.remoting.client.RoutingStrategy;
 
 /**
  * 
@@ -58,27 +54,51 @@ import com.gigaspaces.annotation.pojo.SpaceRouting;
  */
 public class AstrixServiceActivatorTest {
 
-	public static class DummyConfigurer implements Jackson1ObjectSerializerConfigurer {
+	
+	AstrixObjectSerializer objectSerializer = new AstrixObjectSerializer() {
 		@Override
-		public List<? extends AstrixJsonApiMigration> apiMigrations() {
-			return Collections.emptyList();
+		public <T> T deserialize(Object element, Type type, int version) {
+			return AstrixDirectComponent.getServiceProvider(element.toString());
 		}
 
 		@Override
-		public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
+		public Object serialize(Object element, int version) {
+			return register(element, element.getClass());
 		}
-	}
+
+		private <T> Object register(Object element, Class<T> type) {
+			return AstrixDirectComponent.register(type, type.cast(element));
+		}
+
+		@Override
+		public int version() {
+			return 1;
+		}
+	};
+	AstrixServiceActivator activator = new AstrixServiceActivator();
 	
-	@AstrixVersioned(
-		version = 1,
-		objectSerializerConfigurer = DummyConfigurer.class
-	)
-	public static class DummyDescriptor {
+	private static class NoRoutingStrategy implements RoutingStrategy {
+		@Override
+		public Router create(Method serviceMethod) {
+			if (serviceMethod.isAnnotationPresent(AstrixBroadcast.class)) {
+				return new Router() {
+					@Override
+					public RoutingKey getRoutingKey(Object... args) throws Exception {
+						return null; // Broadcast
+					}
+					
+				};
+			}
+			return new Router() {
+				@Override
+				public RoutingKey getRoutingKey(Object... args) throws Exception {
+					return RoutingKey.create(1); // Constant routing
+				}
+				
+			};
+		}
 		
 	}
-	
-	AstrixObjectSerializer objectSerializer = new JacksonVersioningPlugin().create(AstrixApiDescriptor.create(DummyDescriptor.class));
-	AstrixServiceActivator activator = new AstrixServiceActivator();
 	
 	@Test
 	public void invokesAServiceThroughTransportAndServiceActivator() throws Exception {
@@ -97,7 +117,7 @@ public class AstrixServiceActivatorTest {
 		};
 		activator.register(impl, objectSerializer, TestService.class);
 		
-		TestService testService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+		TestService testService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 
 		HelloRequest request = new HelloRequest("kalle");
 		HelloResponse reply = testService.hello(request);
@@ -122,7 +142,7 @@ public class AstrixServiceActivatorTest {
 		
 		activator.register(impl, objectSerializer, TestService.class);
 		
-		TestService testService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+		TestService testService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 
 		HelloRequest request = new HelloRequest("kalle");
 		String reply = testService.hello(request, "replyTo-");
@@ -142,7 +162,7 @@ public class AstrixServiceActivatorTest {
 		};
 		activator.register(serviceProvider, objectSerializer, AnnotatedArgumentTestService.class);
 		
-		AnnotatedArgumentTestService serviceProxy = AstrixRemotingProxy.create(AnnotatedArgumentTestService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+		AnnotatedArgumentTestService serviceProxy = AstrixRemotingProxy.create(AnnotatedArgumentTestService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 
 		String reply = serviceProxy.hello("kalle", "hello-");
 		assertEquals("hello-kalle", reply);
@@ -164,7 +184,7 @@ public class AstrixServiceActivatorTest {
 			};
 			activator.register(impl, objectSerializer, TestService.class);
 
-			TestService testService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+			TestService testService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 			testService.hello(new HelloRequest("foo"));
 			fail("Expected remote service exception to be thrown");
 		} catch (AstrixRemoteServiceException e) {
@@ -184,7 +204,7 @@ public class AstrixServiceActivatorTest {
 			};
 			activator.register(impl, objectSerializer, BroadcastService.class);
 
-			BroadcastService broadcastService = AstrixRemotingProxy.create(BroadcastService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+			BroadcastService broadcastService = AstrixRemotingProxy.create(BroadcastService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 			broadcastService.broadcast(new BroadcastRequest("foo"));
 			fail("Expected remote service exception to be thrown");
 		} catch (AstrixRemoteServiceException e) {
@@ -218,8 +238,8 @@ public class AstrixServiceActivatorTest {
 		activator.register(provider, objectSerializer, BroadcastService.class);
 		activator.register(provider, objectSerializer, TestService.class);
 
-		BroadcastService broadcastService = AstrixRemotingProxy.create(BroadcastService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
-		TestService testService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+		BroadcastService broadcastService = AstrixRemotingProxy.create(BroadcastService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
+		TestService testService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 		
 		assertEquals(provider.hello(new HelloRequest("kalle")), testService.hello(new HelloRequest("kalle")));
 		assertEquals(provider.broadcast(new BroadcastRequest("kalle")), broadcastService.broadcast(new BroadcastRequest("kalle")));
@@ -228,7 +248,7 @@ public class AstrixServiceActivatorTest {
 	@Test
 	public void request_NoCorrespondingService_throwsException() throws Exception {
 		try {
-			TestService missingRemoteService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+			TestService missingRemoteService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 			missingRemoteService.hello(new HelloRequest("foo"));
 		} catch (AstrixRemoteServiceException e) {
 			assertEquals(AstrixMissingServiceException.class.getName(), e.getExceptionType());
@@ -249,7 +269,7 @@ public class AstrixServiceActivatorTest {
 		};
 		activator.register(impl, objectSerializer, TestService.class);
 		
-		ObservableTestService service = AstrixRemotingProxy.create(ObservableTestService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+		ObservableTestService service = AstrixRemotingProxy.create(ObservableTestService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 		Observable<HelloResponse> message = service.hello(new HelloRequest("kalle"));
 		assertEquals("reply-kalle", message.toBlocking().first().getGreeting());
 	}
@@ -268,7 +288,7 @@ public class AstrixServiceActivatorTest {
 		};
 		activator.register(impl, objectSerializer, TestService.class);
 		
-		TestServiceAsync service = AstrixRemotingProxy.create(TestServiceAsync.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+		TestServiceAsync service = AstrixRemotingProxy.create(TestServiceAsync.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 		Future<HelloResponse> response = service.hello(new HelloRequest("kalle"));
 		assertEquals("reply-kalle", response.get().getGreeting());
 	}
@@ -301,7 +321,7 @@ public class AstrixServiceActivatorTest {
 		activator.register(impl, objectSerializer, TestService.class);
 		
 		
-		ObservableTestService service = AstrixRemotingProxy.create(ObservableTestService.class, AstrixRemotingTransport.direct(activator), corruptDeserializer);
+		ObservableTestService service = AstrixRemotingProxy.create(ObservableTestService.class, AstrixRemotingTransport.direct(activator), corruptDeserializer, new NoRoutingStrategy());
 		Observable<HelloResponse> message = service.hello(new HelloRequest("kalle"));
 		message.toBlocking().first();
 	}
@@ -320,7 +340,7 @@ public class AstrixServiceActivatorTest {
 		};
 		activator.register(impl, objectSerializer, GenericReturnTypeService.class);
 		
-		GenericReturnTypeService testService = AstrixRemotingProxy.create(GenericReturnTypeService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+		GenericReturnTypeService testService = AstrixRemotingProxy.create(GenericReturnTypeService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 
 		HelloRequest request = new HelloRequest("kalle");
 		List<HelloResponse> reply = testService.hello("foo-routing", Arrays.<HelloRequest>asList(request));
@@ -342,7 +362,7 @@ public class AstrixServiceActivatorTest {
 		};
 		activator.register(impl, objectSerializer, BroadcastingGenericReturnTypeService.class);
 		
-		BroadcastingGenericReturnTypeService testService = AstrixRemotingProxy.create(BroadcastingGenericReturnTypeService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+		BroadcastingGenericReturnTypeService testService = AstrixRemotingProxy.create(BroadcastingGenericReturnTypeService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 
 		HelloRequest request = new HelloRequest("kalle");
 		List<HelloResponse> reply = testService.hello(Arrays.<HelloRequest>asList(request));
@@ -360,7 +380,7 @@ public class AstrixServiceActivatorTest {
 		};
 		activator.register(impl, objectSerializer, NoArgumentService.class);
 		
-		NoArgumentService testService = AstrixRemotingProxy.create(NoArgumentService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+		NoArgumentService testService = AstrixRemotingProxy.create(NoArgumentService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 
 		List<String> reply = testService.hello();
 		assertEquals(1, reply.size());
@@ -378,7 +398,7 @@ public class AstrixServiceActivatorTest {
 		};
 		activator.register(impl, objectSerializer, VoidService.class);
 		
-		VoidService testService = AstrixRemotingProxy.create(VoidService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+		VoidService testService = AstrixRemotingProxy.create(VoidService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 
 		testService.hello("kalle");
 		String lastReceivedRequest = receivedRequest.poll(1, TimeUnit.SECONDS);
@@ -396,7 +416,7 @@ public class AstrixServiceActivatorTest {
 		};
 		activator.register(impl, objectSerializer, BroadcastVoidService.class);
 		
-		BroadcastVoidService testService = AstrixRemotingProxy.create(BroadcastVoidService.class, AstrixRemotingTransport.direct(activator), objectSerializer);
+		BroadcastVoidService testService = AstrixRemotingProxy.create(BroadcastVoidService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 
 		testService.hello("kalle");
 		String lastReceivedRequest = receivedRequest.poll(0, TimeUnit.SECONDS);
@@ -418,7 +438,7 @@ public class AstrixServiceActivatorTest {
 		public HelloRequest() {
 		}
 		
-		@SpaceRouting
+//		@SpaceRouting
 		public String getMesssage() {
 			return messsage;
 		}
@@ -493,7 +513,7 @@ public class AstrixServiceActivatorTest {
 	}
 	
 	interface GenericReturnTypeService {
-		List<HelloResponse> hello(@Routing String routingKey, List<HelloRequest> greeting);
+		List<HelloResponse> hello(String routingKey, List<HelloRequest> greeting);
 	}
 	
 	interface BroadcastingGenericReturnTypeService {
@@ -507,7 +527,7 @@ public class AstrixServiceActivatorTest {
 	}
 	
 	interface VoidService {
-		void hello(@Routing String message);
+		void hello(String message);
 	}
 	
 	interface BroadcastVoidService {
@@ -516,7 +536,7 @@ public class AstrixServiceActivatorTest {
 	}
 	
 	interface AnnotatedArgumentTestService {
-		String hello(@Routing String message, String greeting);
+		String hello(String message, String greeting);
 	}
 	
 	interface ObservableTestService {

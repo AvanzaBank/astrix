@@ -19,6 +19,8 @@
 		<module>astrix-dashboard</module>
 		<module>tutorial</module>
 		<module>astrix-spring</module>
+		<module>astrix-http</module>
+		<module>astrix-remoting</module>
 	</modules>
 
 	<scm>
