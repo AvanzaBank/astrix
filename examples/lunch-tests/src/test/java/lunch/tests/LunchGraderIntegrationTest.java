@@ -20,9 +20,6 @@ import lunch.api.LunchRestaurant;
 import lunch.api.LunchService;
 import lunch.grader.api.LunchRestaurantGrader;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -37,7 +34,7 @@ import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
 public class LunchGraderIntegrationTest {
 	
 	public static InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
-		addConfig(AstrixSettings.BEAN_REBIND_ATTEMPT_INTERVAL, 200);
+		addConfig(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 200);
 	}};
 	
 	@ClassRule

@@ -17,10 +17,11 @@
 		<module>astrix-test-util</module>
 		<module>astrix-gs-test-util</module>
 		<module>astrix-dashboard</module>
-		<module>tutorial</module>
 		<module>astrix-spring</module>
 		<module>astrix-http</module>
 		<module>astrix-remoting</module>
+		<module>examples</module>
+		<module>tutorial</module>
 	</modules>
 
 	<scm>

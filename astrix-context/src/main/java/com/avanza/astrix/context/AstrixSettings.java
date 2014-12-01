@@ -26,12 +26,12 @@ import com.avanza.astrix.provider.core.AstrixPluginQualifier;
  */
 public class AstrixSettings implements AstrixExternalConfig {
 	
+	public static final String BEAN_BIND_ATTEMPT_INTERVAL = "StatefulAstrixBean.beanBindAttemptInterval";
 	/**
 	 * @deprecated - replaced by BEAN_BIND_ATTEMPT_INTERVAL
 	 */
 	@Deprecated
-	public static final String BEAN_REBIND_ATTEMPT_INTERVAL = "StatefulAstrixBean.beanRebindAttemptInterval";
-	public static final String BEAN_BIND_ATTEMPT_INTERVAL = "StatefulAstrixBean.beanBindAttemptInterval";
+	public static final String BEAN_REBIND_ATTEMPT_INTERVAL = BEAN_BIND_ATTEMPT_INTERVAL;
 	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AstrixServiceRegistryLeaseManager.leaseRenewInterval";
 	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AstrixContext.enforceSubsystemBoundaries";
 	public static final String ASTRIX_CONFIG_URI = "AstrixConfig.uri";
