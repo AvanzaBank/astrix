@@ -36,7 +36,7 @@ public class MethodSignatureBuilder {
 			}
 			methodSignatureBuilder.append(param.getName());
 		}
-		methodSignatureBuilder.append("(");
+		methodSignatureBuilder.append(")");
 		return methodSignatureBuilder.toString();
 	}
 

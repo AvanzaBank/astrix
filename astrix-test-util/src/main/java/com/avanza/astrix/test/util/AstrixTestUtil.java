@@ -90,12 +90,13 @@ public class AstrixTestUtil {
 	public static <T extends Exception> Probe isSuccessfulServiceInvocation(final Runnable serviceInvocation) {
 		return new Probe() {
 			
-			private Exception lastException;
+			private volatile Exception lastException;
 
 			@Override
 			public void sample() {
 				try {
 					serviceInvocation.run();
+					this.lastException = null;
 				} catch (Exception e) {
 					this.lastException = e;
 				}
