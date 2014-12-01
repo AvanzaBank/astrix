@@ -15,6 +15,7 @@
  */
 package lunch.tests;
 
+import static com.avanza.astrix.test.util.AstrixTestUtil.isSuccessfulServiceInvocation;
 import static org.junit.Assert.assertEquals;
 import lunch.api.LunchRestaurant;
 import lunch.api.LunchService;
@@ -30,6 +31,8 @@ import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
+import com.avanza.astrix.test.util.Poller;
+import com.avanza.astrix.test.util.Probe;
 
 public class LunchGraderIntegrationTest {
 	
@@ -44,7 +47,7 @@ public class LunchGraderIntegrationTest {
 														 .configure();
 	
 	@Test
-	public void testName() throws Exception {
+	public void itsPossibleToStubOutServiceDependenciesUsingInMemoryServiceRegistry() throws Exception {
 		LunchService lunchMock = Mockito.mock(LunchService.class);
 		Mockito.stub(lunchMock.getLunchRestaurant("mcdonalds")).toReturn(new LunchRestaurant("mcdonalds", "fastfood"));
 		serviceRegistry.registerProvider(LunchService.class, lunchMock, "lunch-system");
@@ -52,12 +55,25 @@ public class LunchGraderIntegrationTest {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixContext astrix = configurer.configure();
-		LunchRestaurantGrader grader = astrix.waitForBean(LunchRestaurantGrader.class, 5_000);
+		final LunchRestaurantGrader grader = astrix.waitForBean(LunchRestaurantGrader.class, 5_000);
 		
-		grader.grade("mcdonalds", 5);
+		// Not that the lunch-grader-pu grader.grade uses another service internally, hence we must wait
+		// For that as well to bind its service-bean
+		assertEventually(isSuccessfulServiceInvocation(new Runnable() {
+			@Override
+			public void run() {
+				grader.grade("mcdonalds", 5);
+			}
+		}));
 		grader.grade("mcdonalds", 3);
 		
 		assertEquals(4D, grader.getAvarageGrade("mcdonalds"), 0.01D);
 	}
+
+	private void assertEventually(Probe successfulServiceInvocation)
+			throws InterruptedException {
+		new Poller(10_000L, 50).check(successfulServiceInvocation);
+	}
+	
 
 }

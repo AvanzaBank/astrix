@@ -87,6 +87,32 @@ public class AstrixTestUtil {
 		};
 	}
 	
+	public static <T extends Exception> Probe isSuccessfulServiceInvocation(final Runnable serviceInvocation) {
+		return new Probe() {
+			
+			private Exception lastException;
+
+			@Override
+			public void sample() {
+				try {
+					serviceInvocation.run();
+				} catch (Exception e) {
+					this.lastException = e;
+				}
+			}
+			
+			@Override
+			public boolean isSatisfied() {
+				return this.lastException == null;
+			}
+			
+			@Override
+			public void describeFailureTo(Description description) {
+				description.appendText("Expected successful serviceInovcation, but last invocation threw exception: " + lastException.toString());
+			}
+		};
+	}
+	
 	public static <T extends Exception> Matcher<T> isExceptionOfType(final Class<T> type) {
 		return new TypeSafeMatcher<T>() {
 			@Override
