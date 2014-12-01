@@ -41,8 +41,8 @@ public class LunchLibraryTest {
 	
 	@Test
 	public void astrixDirectComponentAllowsBindingToObjectsInSameProcess() throws Exception {
-		LunchRestaurantFinder restaurantFinder = Mockito.mock(LunchRestaurantFinder.class);
-		String serviceUri = AstrixDirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinder);
+		LunchRestaurantFinder restaurantFinderStub = Mockito.mock(LunchRestaurantFinder.class);
+		String serviceUri = AstrixDirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinderStub);
 
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.set("restaurantFinderUri", serviceUri);
@@ -51,7 +51,7 @@ public class LunchLibraryTest {
 		
 		LunchSuggester lunchSuggester = astrix.getBean(LunchSuggester.class);
 
-		Mockito.stub(restaurantFinder.getAllRestaurants()).toReturn(Arrays.asList("Pontus!"));
+		Mockito.stub(restaurantFinderStub.getAllRestaurants()).toReturn(Arrays.asList("Pontus!"));
 		assertEquals("Pontus!", lunchSuggester.randomLunchRestaurant());
 	}
 

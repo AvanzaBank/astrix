@@ -50,7 +50,7 @@ public class LunchSuggesterImpl implements LunchSuggester {
 }
 ```
 
-Finally, in order to use Astrix as a factory to create instances of the given library one must create an api-descriptor. An api-descriptor exports the public elements of an api. There are different kinds of api-descriptors, and the one associated with libraries is called library-descriptor. A library-descriptor is typically located in the same module as the implementing classes.
+Finally, in order to use Astrix as a factory to create instances of the given library an api-descriptor must exist. An api-descriptor exports the public elements of an api. There are different kinds of api-descriptors, and the one associated with libraries is called library-descriptor. A library-descriptor is typically located in the same module as the implementing classes.
 
 
 ```java
@@ -98,7 +98,7 @@ public class LunchLibraryTest {
 An AstrixContext is created using an AstrixConfigurer. By default, Astrix won't scan the classpath for api-providers. The `AstrixConfigurer.setBasePackage` tells Astrix to scan the "tutorial.t1" package, and all its subpackages for api-providers. In this case Astrix will find that the `LunchLibraryProvider` provides the `LunchSuggester` api, and use it as a factory to create instances of `LunchSuggester`.
 
 ### Injecting Dependencies into a Library
-Astrix can inject other astrix-beans into a library. This is a powerful feature that allows libraries that aggregate services from many sources without burden the consumer of the api to know exactly what services are required by the given library. Lets extend the lunch-library to illustrate injecting astrix-beans into libraries:
+Astrix can inject other astrix-beans into a library. This allows libraries to aggregate services from many sources without burden the consumer of the api to know exactly what services are required by the given library. Lets extend the lunch-library to illustrate injecting astrix-beans into libraries:
 
 First we add another interface to the lunch-api:
 ```java
@@ -163,6 +163,7 @@ This also illustrates another powerful feature of Astrix. Namely that library pr
 ### Life Cycle Management of Libraries
 Astrix allows created libraries to receive two types of lifecycle events. When a library bean is created Astrix will invoke all `@PostConstruct` annotated methods right after invoking the factory method. When the `AstrixContext` is destroyed (by invoking `AstrixContext.destroy()`) all `@PreDestroy` annotated methods will be invoked on each library bean created by the `AstrixContext`.
 
+This is illustrated by the next example.
 
 ```java
 public interface LunchRestaurantFinder {
@@ -242,21 +243,21 @@ public class MockingAstrixBeansTest {
 	
 	@Test
 	public void testAstrixConfigurerAllowsRegistrationOfMockInstances() throws Exception {
-		LunchRestaurantFinder restaurantFinder = Mockito.mock(LunchRestaurantFinder.class);
+		LunchRestaurantFinder restaurantFinderStub = Mockito.mock(LunchRestaurantFinder.class);
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		
 		// Register the api(s) we intend to test
 		astrixConfigurer.registerApiDescriptor(LunchLibraryProvider.class);
 		
 		// Stub out its dependency 
-		astrixConfigurer.registerApi(LunchRestaurantFinder.class, restaurantFinder);
+		astrixConfigurer.registerApi(LunchRestaurantFinder.class, restaurantFinderStub);
 		AstrixContext astrixContext = astrixConfigurer.configure();
 		
 		// Get the api we intend to test
 		LunchSuggester lunchSuggester = astrixContext.getBean(LunchSuggester.class);
 		
 		// Stub out getAllRestaurants to allways return one restaurant
-		Mockito.stub(restaurantFinder.getAllRestaurants()).toReturn(Arrays.asList("Max"));
+		Mockito.stub(restaurantFinderStub.getAllRestaurants()).toReturn(Arrays.asList("Max"));
 
 		assertEquals("Max", lunchSuggester.randomLunchRestaurant());
 	}
