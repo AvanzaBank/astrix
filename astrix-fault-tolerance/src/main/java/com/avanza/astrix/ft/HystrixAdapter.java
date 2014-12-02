@@ -195,7 +195,10 @@ public class HystrixAdapter<T> implements InvocationHandler {
 						.withExecutionIsolationThreadTimeoutInMilliseconds(
 								settings.getExecutionIsolationThreadTimeoutInMilliseconds())
 						.withMetricsRollingStatisticalWindowInMilliseconds(
-								settings.getMetricsRollingStatisticalWindowInMilliseconds());
+								settings.getMetricsRollingStatisticalWindowInMilliseconds())
+						.withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests());
+		// TODO configure exeution isolation strategy (.withExecutionIsolationStrategy(ExecutionIsolationStrategy.SEMAPHORE))
+						
 		// MaxQueueSize must be set to a non negative value in order for QueueSizeRejectionThreshold to have any effect.
 		// We use a high value for MaxQueueSize in order to allow QueueSizeRejectionThreshold to change dynamically using archaius.
 		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =
