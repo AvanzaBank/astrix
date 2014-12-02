@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.ft.metrics.DelegatingHystrixEventNotifier;
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommand.Setter;
 import com.netflix.hystrix.HystrixCommandGroupKey;
@@ -41,20 +40,12 @@ import com.netflix.hystrix.HystrixThreadPoolProperties;
 public class HystrixAdapter<T> implements InvocationHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(HystrixAdapter.class);
-	private static DelegatingHystrixEventNotifier delegatingEventNotifier;
-
-	static {
-		delegatingEventNotifier = DelegatingHystrixEventNotifier.getRegisteredNotifierOrRegisterNew();
-	}
 
 	private final T provider;
 	private final Class<T> api;
 	private final String group;
 	private final Setter hystrixConfiguration;
 
-	public static DelegatingHystrixEventNotifier getEventNotifier() {
-		return delegatingEventNotifier;
-	}
 
 	public HystrixAdapter(Class<T> api, T provider, String group) {
 		this(api, provider, group, new HystrixCommandSettings());
