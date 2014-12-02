@@ -25,6 +25,7 @@ class HystrixCommandSettings {
 
 	private int queueSizeRejectionThreshold = 10;
 	private int coreSize = 10;
+	private int semaphoreMaxConcurrentRequests = 10;
 	private String commandKey = null; // null means use api name as command key
 	private int executionIsolationThreadTimeoutInMilliseconds = 1000;
 	private int metricsRollingStatisticalWindowInMilliseconds = 10000;
@@ -51,6 +52,14 @@ class HystrixCommandSettings {
 
 	public void setCoreSize(int coreSize) {
 		this.coreSize = coreSize;
+	}
+	
+	public int getSemaphoreMaxConcurrentRequests() {
+		return semaphoreMaxConcurrentRequests;
+	}
+
+	public void setSemaphoreMaxConcurrentRequests(int semaphoreMaxConcurrentRequests) {
+		this.semaphoreMaxConcurrentRequests = semaphoreMaxConcurrentRequests;
 	}
 
 	public String getCommandKey() {
