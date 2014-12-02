@@ -15,6 +15,9 @@
  */
 package com.avanza.astrix.gs;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.context.AstrixServiceProperties;
@@ -25,6 +28,8 @@ public class GsBinder {
 	
 	public static final String SPACE_NAME_PROPERTY = "spaceName";
 	public static final String SPACE_URL_PROPERTY = "spaceUrl";
+	
+	private static final Pattern SPACE_URL_PATTERN = Pattern.compile("jini://.*?/.*?/(.*)?[?](.*)");
 	
 	public static GsFactory createGsFactory(AstrixServiceProperties properties) {
 		String spaceUrl = properties.getProperty(SPACE_URL_PROPERTY);
@@ -41,7 +46,11 @@ public class GsBinder {
 	}
 
 	public static AstrixServiceProperties createServiceProperties(String spaceUrl) {
-		String spaceName = spaceUrl.split("/")[4]; // format: jini://*/*/space-name/... 
+		Matcher spaceUrlMatcher = SPACE_URL_PATTERN.matcher(spaceUrl);
+		if (!spaceUrlMatcher.find()) {
+			throw new IllegalArgumentException("Invalid spaceUrl: " + spaceUrl);
+		}
+		String spaceName = spaceUrlMatcher.group(1);
 		AstrixServiceProperties result = new AstrixServiceProperties();
 		result.setApi(GigaSpace.class);
 		result.setProperty(SPACE_NAME_PROPERTY, spaceName);
