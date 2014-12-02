@@ -43,7 +43,6 @@ public class AstrixConfigurer {
 		}
 		configureFaultTolerance(context);
 		configureVersioning(context);
-		configureMonitoring(context);
 		discoverApiProviderPlugins(context);
 		AstrixApiProviderPlugins apiProviderPlugins = new AstrixApiProviderPlugins(context.getPlugins(AstrixApiProviderPlugin.class));
 		context.setApiProviderPlugins(apiProviderPlugins);
@@ -93,10 +92,6 @@ public class AstrixConfigurer {
 		this.settings.set(AstrixSettings.ENABLE_VERSIONING, enableVersioning);
 	}
 	
-	public void enableMonitoring(boolean enableMonitoring) {
-		this.settings.set(AstrixSettings.ENABLE_MONITORING, enableMonitoring);
-	}
-
 	private void discoverApiProviderPlugins(AstrixContext context) {
 		discoverAllPlugins(context, AstrixApiProviderPlugin.class);
 	}
@@ -120,13 +115,6 @@ public class AstrixConfigurer {
 		}
 	}
 	
-	private void configureMonitoring(AstrixContext context) {
-		if (context.getSettings().getBoolean(AstrixSettings.ENABLE_MONITORING, true)) {
-			MetricsPoller metricsPoller = context.getInstance(MetricsPoller.class);
-			metricsPoller.start();
-		}
-	}
-
 	private void configureFaultTolerance(AstrixContext context) {
 		if (context.getSettings().getBoolean(AstrixSettings.ENABLE_FAULT_TOLERANCE, false)) {
 			discoverOnePlugin(context, AstrixFaultTolerancePlugin.class);
