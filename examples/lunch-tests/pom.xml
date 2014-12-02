@@ -23,13 +23,11 @@
 		<dependency>
 			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-gs-test-util</artifactId>
-			<version>${astrix.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-test-util</artifactId>
-			<version>${astrix.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
