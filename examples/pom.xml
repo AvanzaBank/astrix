@@ -19,9 +19,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.7</java.version>
-		
-		<astrix.version>${project.version}</astrix.version>
-		
 		<astrix.groupId>com.avanza.astrix</astrix.groupId>
 		<log4j.version>1.2.16</log4j.version>
 		<spring.version>3.2.4.RELEASE</spring.version>
@@ -42,52 +39,57 @@
 			<dependency>
 				<groupId>${astrix.groupId}</groupId>
 				<artifactId>astrix-context</artifactId>
-				<version>${astrix.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${astrix.groupId}</groupId>
 				<artifactId>astrix-core</artifactId>
-				<version>${astrix.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${astrix.groupId}</groupId>
 				<artifactId>astrix-fault-tolerance</artifactId>
-				<version>${astrix.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${astrix.groupId}</groupId>
 				<artifactId>astrix-gs</artifactId>
-				<version>${astrix.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${astrix.groupId}</groupId>
 				<artifactId>astrix-provider</artifactId>
-				<version>${astrix.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${astrix.groupId}</groupId>
 				<artifactId>astrix-service-registry</artifactId>
-				<version>${astrix.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${astrix.groupId}</groupId>
 				<artifactId>astrix-versioning</artifactId>
-				<version>${astrix.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${astrix.groupId}</groupId>
 				<artifactId>astrix-gs-test-util</artifactId>
-				<version>${astrix.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${astrix.groupId}</groupId>
 				<artifactId>astrix-service-registry-pu</artifactId>
-				<version>${astrix.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${astrix.groupId}</groupId>
 				<artifactId>astrix-dashboard</artifactId>
-				<version>${astrix.version}</version>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${astrix.groupId}</groupId>
+				<artifactId>astrix-test-util</artifactId>
+				<version>${project.version}</version>
 			</dependency>
 			
 			<!-- GigaSpaces -->
