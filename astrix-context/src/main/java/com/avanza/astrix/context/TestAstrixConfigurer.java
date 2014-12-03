@@ -36,7 +36,6 @@ public class TestAstrixConfigurer {
 		});
 		configurer.enableVersioning(false);
 		configurer.enableFaultTolerance(false);
-		configurer.enableMonitoring(false);
 		configurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, false);
 	}
 
@@ -61,10 +60,6 @@ public class TestAstrixConfigurer {
 
 	public <T> void registerPlugin(Class<T> c, T provider) {
 		configurer.registerPlugin(c, provider);
-	}
-	
-	public void enableMonitoring(boolean enabled) {
-		configurer.enableMonitoring(enabled);
 	}
 	
 	public void enableFaultTolerance(boolean enabled) {

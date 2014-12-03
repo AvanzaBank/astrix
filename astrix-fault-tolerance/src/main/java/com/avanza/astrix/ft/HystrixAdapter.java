@@ -140,6 +140,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 				// getFallback is only invoked when the underlying api threw an ServiceUnavailableException, or the
 				// when the invocation reached timeout. In any case, treat this as service unavailable.
 				ServiceUnavailableCause cause = AstrixUtil.resolveUnavailableCause(this);
+				log.info(String.format("Aborted command execution: cause=%s circuit=%s", cause, this.getCommandKey().name()));
 				if (isFailedExecution()) {
 					// Underlying service threw ServiceUnavailableException
 					return HystrixResult.exception(AstrixUtil.wrapFailedExecutionException(this));
