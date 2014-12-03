@@ -23,9 +23,24 @@
 					    <label for="foodType">Food type</label>
 					    <input type="text" class="form-control" id="foodType" ng-model="restaurant.foodType" placeholder="Food type">
 					  </div>
-     				  <pre>restaurant = {{restaurant | json}}</pre>	    	
 					  <button type="submit" class="btn btn-default" ng-click="add(restaurant)">Add</button>
 					</form>	
+					<br>	
+					<h4>Grade Restaurant</h4>
+					
+					<form role="form" novalidate class="simple-form">
+					  <div class="form-group">
+					    <label for="restaurantName">Name</label>
+					    <input type="text" class="form-control" id="restaurantName" ng-model="restaurant.name" placeholder="Enter Restaurant">
+					  </div>
+					  <div class="form-group">
+					    <label for="foodType">Grade</label>
+					    <input type="text" class="form-control" id="foodType" ng-model="restaurant.grade" placeholder="Grade">
+					  </div>
+					  <button type="submit" class="btn btn-default" ng-click="grade(restaurant)">Grade</button>
+					</form>
+					<br>	
+  				   <pre>restaurant = {{restaurant | json}}</pre>
 		    	</div>
 		    	<div class="col-md-4">
 					<h4>Restaurants</h4>
@@ -34,12 +49,14 @@
 							<tr>
 								<th>Name</th>
 								<th>Food Type</th>
+								<th>Grade</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr ng-repeat="restaurant in restaurants | orderBy:'name'">
 								<td>{{restaurant.name}}</td>
 								<td>{{restaurant.foodType}}</td>
+								<td>{{restaurant.grade}}</td>
 							</tr>
 						</tbody>
 					</table> 	

@@ -20,6 +20,12 @@ lunchApp.factory("LunchService", function($http) {
 	service.random = function(restaurant) {
 		return $http.get("/randomrestaurant/");
 	}
+	service.grade = function(restaurant, onSuccess) {
+		$http.post("/grade/" + restaurant.name, restaurant.grade).
+			success(function(data, status, headers, config) {
+				onSuccess(data);
+			});
+	}
 	return service;
 });
 
@@ -29,6 +35,15 @@ lunchApp.controller("LunchAppController", function ($scope, LunchService) {
 	$scope.add = function (restaurant) {
 		newRestaurant = LunchService.add(restaurant, function(newRestaurant) {
 			$scope.restaurants.push(newRestaurant);
+		});
+	}
+	$scope.grade = function (restaurant) {
+		LunchService.grade(restaurant, function(restaurant) {
+			for (var i = 0; i < $scope.restaurants.length; i++) {
+				if ($scope.restaurants[i].name == restaurant.name) {
+					$scope.restaurants[i] = restaurant;
+				}
+			}
 		});
 	}
 	var getRestaurants = function () {

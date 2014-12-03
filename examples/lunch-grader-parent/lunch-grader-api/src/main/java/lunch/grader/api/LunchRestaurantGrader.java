@@ -23,7 +23,7 @@ public interface LunchRestaurantGrader {
 	
 	void grade(@Routing String restaurantName, int grade);
 	
-	double getAvarageGrade(@Routing String restaurantName);
+	Double getAvarageGrade(@Routing String restaurantName);
 	
 	@AstrixBroadcast
 	LunchRestaurantGrade getHighestGrade();

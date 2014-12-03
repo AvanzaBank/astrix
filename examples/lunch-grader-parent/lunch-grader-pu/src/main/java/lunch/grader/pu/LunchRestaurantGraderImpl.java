@@ -53,10 +53,10 @@ public class LunchRestaurantGraderImpl implements LunchRestaurantGrader {
 	}
 
 	@Override
-	public double getAvarageGrade(String restaurantName) {
+	public Double getAvarageGrade(String restaurantName) {
 		LunchRestaurantGrade currentGrade = gigaSpace.readById(LunchRestaurantGrade.class, restaurantName);
 		if (currentGrade == null) {
-			return -1D;
+			return null;
 		}
 		return currentGrade.avarageGrade();
 	}

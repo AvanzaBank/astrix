@@ -15,12 +15,15 @@
  */
 package runners;
 
+import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.gs.test.util.PuApp;
 
 public class LunchGraderPuRunner {
 	
 	public static void main(String[] args) {
+		AstrixSettings externalConfig = new AstrixSettings();
 		System.setProperty("com.gs.jini_lus.groups", Config.LOOKUP_GROUP_NAME);
+		System.setProperty("externalConfigUri", externalConfig.getExternalConfigUri());
 		PuApp.run("classpath:/META-INF/spring/lunch-grader-pu.xml");
 	}
 

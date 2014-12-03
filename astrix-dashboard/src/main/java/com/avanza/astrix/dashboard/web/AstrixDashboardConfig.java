@@ -36,7 +36,9 @@ public class AstrixDashboardConfig {
 			AstrixServiceRegistryAdministrator.class
 		));
 		result.setSettings(new HashMap<String, String>() {{
-			put(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?locators=testgssystem01.test.aza.se");
+			put(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + 
+//					":jini://*/*/service-registry-space?locators=testgssystem01.test.aza.se"); 
+					":jini://*/*/service-registry-space?groups=astrix-demo-apps");
 		}});
 		return result;
 	}

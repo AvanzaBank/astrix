@@ -23,6 +23,7 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.avanza.astrix.context.AstrixServiceProperties;
@@ -41,11 +42,11 @@ public class ServiceRegistryController {
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public List<Service> services() {
+	public List<ServiceData> services() {
 		List<AstrixServiceRegistryEntry> services = serviceRegistryAdmin.listServices();
-		List<Service> result = new ArrayList<>();
+		List<ServiceData> result = new ArrayList<>();
 		for (AstrixServiceRegistryEntry entry : services) {
-			Service s = new Service();
+			ServiceData s = new ServiceData();
 			s.setProvidedApi(entry.getServiceBeanType());
 			s.setServiceMetadata(entry.getServiceMetadata());
 			s.setServiceProperties(entry.getServiceProperties());
@@ -53,8 +54,41 @@ public class ServiceRegistryController {
 		}
 		return result;
 	}
+	
+	@RequestMapping(value = "/summary", method = RequestMethod.GET)
+	public List<ServiceDataSummary> servicesSummary() {
+		List<AstrixServiceRegistryEntry> services = serviceRegistryAdmin.listServices();
+		List<ServiceDataSummary> result = new ArrayList<>();
+		for (AstrixServiceRegistryEntry entry : services) {
+			AstrixServiceProperties serviceProperties = new AstrixServiceProperties(entry.getServiceProperties());
+			ServiceDataSummary s = new ServiceDataSummary();
+			if (serviceProperties.getQualifier() != null) {
+				s.setApiKey(serviceProperties.getProperty(AstrixServiceProperties.API) + ":" + serviceProperties.getQualifier());
+			} else {
+				s.setApiKey(serviceProperties.getProperty(AstrixServiceProperties.API) + ":-");
+			}
+			s.setSubsystem(serviceProperties.getProperty(AstrixServiceProperties.SUBSYSTEM));
+			StringBuilder serviceUriBuilder = new StringBuilder();
+			serviceUriBuilder.append(serviceProperties.getComponent()).append(":");
+			boolean prependAmpersand = false;
+			for (Map.Entry<String, String> property : serviceProperties.getProperties().entrySet()) {
+				if (property.getKey().startsWith("_")) {
+					continue;
+				}
+				if (prependAmpersand) {
+					serviceUriBuilder.append("&");
+				} else {
+					prependAmpersand = true;
+				}
+				serviceUriBuilder.append(property.getKey()).append("=").append(property.getValue());
+			}
+			s.setServiceUri(serviceUriBuilder.toString());
+			result.add(s);
+		}
+		return result;
+	}
 
-	public static class Service {
+	public static class ServiceData {
 		private String providedApi;
 		private Map<String, String> serviceProperties;
 		private Map<String, String> serviceMetadata;
@@ -81,7 +115,37 @@ public class ServiceRegistryController {
 		public Map<String, String> getServiceProperties() {
 			return serviceProperties;
 		}
+	}
+	
+	public static class ServiceDataSummary {
+		
+		private String apiKey;
+		private String subsystem;
+		private String serviceUri;
+		
+		public String getApiKey() {
+			return apiKey;
+		}
+		
+		public void setApiKey(String apiKey) {
+			this.apiKey = apiKey;
+		}
+		
+		public String getSubsystem() {
+			return subsystem;
+		}
+		
+		public void setSubsystem(String subsystem) {
+			this.subsystem = subsystem;
+		}
+		
+		public String getServiceUri() {
+			return serviceUri;
+		}
 
+		public void setServiceUri(String serviceUri) {
+			this.serviceUri = serviceUri;
+		}
 	}
 
 }

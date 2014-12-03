@@ -4,22 +4,14 @@ angular.isUndefinedOrNull = function(value) {
 	return angular.isUndefined(value) || value === null || value.length === 0;
 };
 
-var AsterixDashboard = angular.module("AsterixDashboard", []);
+var AstrixDashboard = angular.module("AstrixDashboard", []);
 
-AsterixDashboard.factory("ServiceRegistry", [ "$http", function($http) {
+AstrixDashboard.factory("ServiceRegistry", [ "$http", function($http) {
 	var service = {};
 
 	service.list = function() {
 		return $http.get("/services/");
 	}
-
-//	service.loadFiltered = function(appsToShow) {
-//		return $http.get("/livelyness", {
-//			'params' : {
-//				'appsToShow' : appsToShow
-//			}
-//		});
-//	}
 
 	return service;
 
@@ -27,7 +19,7 @@ AsterixDashboard.factory("ServiceRegistry", [ "$http", function($http) {
 
 
 
-AsterixDashboard.controller("ServiceRegistryController", ["$scope", "ServiceRegistry", "$interval", function ($scope, ServiceRegistry, $interval) {
+AstrixDashboard.controller("ServiceRegistryController", ["$scope", "ServiceRegistry", "$interval", function ($scope, ServiceRegistry, $interval) {
 	$scope.services = [];
 	var getServices = function () {
 		var servicesPromise = ServiceRegistry.list();
@@ -43,7 +35,7 @@ AsterixDashboard.controller("ServiceRegistryController", ["$scope", "ServiceRegi
 	init();
 }]);
 
-AsterixDashboard.filter("StringReplace", function () {
+AstrixDashboard.filter("StringReplace", function () {
 	return function (input, what, whith) {
 		return input.replace(what, whith);
 	};
