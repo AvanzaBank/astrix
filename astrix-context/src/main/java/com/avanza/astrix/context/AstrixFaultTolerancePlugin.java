@@ -17,17 +17,17 @@ package com.avanza.astrix.context;
 
 public interface AstrixFaultTolerancePlugin {
 	
-	<T> T addFaultTolerance(Class<T> api, T provider, String group);
-	
 	public static class Default {
 		public static AstrixFaultTolerancePlugin create() {
 			return new AstrixFaultTolerancePlugin() {
 				@Override
-				public <T> T addFaultTolerance(Class<T> api, T provider, String group) {
-					return provider;
+				public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec) {
+					return spec.getProvider();
 				}
 			};
 		}
 	}
+
+	<T> T addFaultTolerance(FaultToleranceSpecification<T> spec);
 
 }
