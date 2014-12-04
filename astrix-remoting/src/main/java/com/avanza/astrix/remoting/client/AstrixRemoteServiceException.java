@@ -14,33 +14,23 @@
  * limitations under the License.
  */
 package com.avanza.astrix.remoting.client;
+
+import com.avanza.astrix.core.ServiceException;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixRemoteServiceException extends RuntimeException {
+public class AstrixRemoteServiceException extends ServiceException {
 
 	private static final long serialVersionUID = 1L;
-	
-	private final String exceptionType;
-	private final String serviceExceptionMessage;
 
 	public AstrixRemoteServiceException(String serviceExceptionMessage, String serviceExceptionType, String correlationId) {
-		super("Remote service threw exception, see server log for details. [" + serviceExceptionType + ": " + serviceExceptionMessage + "] correlationId=" + correlationId);
-		this.serviceExceptionMessage = serviceExceptionMessage;
-		this.exceptionType = serviceExceptionType;
+		super("Remote service threw exception, see server log for details. [" + serviceExceptionType + ": " + serviceExceptionMessage + "] correlationId=" + correlationId,
+			  serviceExceptionMessage,
+			  serviceExceptionType, 
+			  correlationId);
 	}
-	
-	public String getExceptionType() {
-		return exceptionType;
-	}
-	
-	public String getServiceExceptionMessage() {
-		return serviceExceptionMessage;
-	}
-	
-	
-	
 	
 }
