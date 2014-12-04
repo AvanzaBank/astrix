@@ -15,14 +15,14 @@
  */
 package com.avanza.astrix.remoting.client;
 
-import com.avanza.astrix.core.ServiceException;
+import com.avanza.astrix.core.ServiceInvocationException;
 
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixRemoteServiceException extends ServiceException {
+public class AstrixRemoteServiceException extends ServiceInvocationException {
 
 	private static final long serialVersionUID = 1L;
 

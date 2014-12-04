@@ -15,11 +15,15 @@
  */
 package com.avanza.astrix.core;
 /**
+ * Thrown on the client side when the server side service invocation ended with an exception.
+ * 
+ * This is different from a {@link ServiceUnavailableException} when we failed to invoke the server side
+ * service at all.
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class ServiceException extends RuntimeException {
+public class ServiceInvocationException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -34,7 +38,7 @@ public class ServiceException extends RuntimeException {
 	 * @param serviceExceptionType - the type of the thrown exception
 	 * @param correlationId - a correlation id to identify the exception in server side logs.
 	 */
-	public ServiceException(String msg, String serviceExceptionMessage, String serviceExceptionType, String correlationId) {
+	public ServiceInvocationException(String msg, String serviceExceptionMessage, String serviceExceptionType, String correlationId) {
 		super(msg);
 		this.serviceExceptionMessage = serviceExceptionMessage;
 		this.exceptionType = serviceExceptionType;
