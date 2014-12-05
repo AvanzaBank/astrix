@@ -17,8 +17,9 @@ package com.avanza.astrix.core;
 /**
  * Thrown on the client side when the server side service invocation ended with an exception.
  * 
- * This is different from a {@link ServiceUnavailableException} when we failed to invoke the server side
- * service at all.
+ * This is different from a {@link ServiceUnavailableException} which is thrown when the service
+ * invocation never returned a response at all, either because timeout was reached or becuase
+ * the fault-tolerance layer rejected the operation.
  * 
  * @author Elias Lindholm (elilin)
  *
