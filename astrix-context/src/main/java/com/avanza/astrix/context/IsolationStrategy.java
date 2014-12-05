@@ -13,24 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft.plugin;
+package com.avanza.astrix.context;
 
-import java.util.Objects;
-
-import org.kohsuke.MetaInfServices;
-
-import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
-import com.avanza.astrix.context.FaultToleranceSpecification;
-import com.avanza.astrix.ft.HystrixAdapter;
-
-
-@MetaInfServices(value = AstrixFaultTolerancePlugin.class)
-public class HystrixFaultTolerancePlugin implements AstrixFaultTolerancePlugin {
-	
-	@Override
-	public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec) {
-		Objects.requireNonNull(spec);
-		return HystrixAdapter.create(spec);
-	}
-
+public enum IsolationStrategy {
+	THREAD, SEMAPHORE;
 }

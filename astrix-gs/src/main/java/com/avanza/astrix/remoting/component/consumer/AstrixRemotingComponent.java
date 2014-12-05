@@ -31,6 +31,8 @@ import com.avanza.astrix.context.AstrixPluginsAware;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixVersioningPlugin;
+import com.avanza.astrix.context.FaultToleranceSpecification;
+import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -57,7 +59,9 @@ public class AstrixRemotingComponent implements AstrixPluginsAware, AstrixServic
 		AstrixRemotingTransport remotingTransport = GsRemotingTransport.remoteSpace(space);
 		
 		T proxy = AstrixRemotingProxy.create(api, remotingTransport, objectSerializer, new GsRoutingStrategy());
-		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(api, proxy, targetSpace);
+		FaultToleranceSpecification<T> ftSpec = FaultToleranceSpecification.builder(api).provider(proxy)
+				.group(targetSpace).isolationStrategy(IsolationStrategy.THREAD).build();
+		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(ftSpec);
 		return proxyWithFaultTolerance;
 	}
 	

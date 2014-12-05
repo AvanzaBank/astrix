@@ -32,6 +32,8 @@ import com.avanza.astrix.context.AstrixPluginsAware;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixSettings;
+import com.avanza.astrix.context.FaultToleranceSpecification;
+import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.spring.AstrixSpringContext;
 
@@ -48,7 +50,9 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 		}
 		T gigaSpace = type.cast(GsBinder.createGsFactory(serviceProperties).create());
 		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
-		return plugins.getPlugin(AstrixFaultTolerancePlugin.class).addFaultTolerance(type, gigaSpace, spaceName);
+		FaultToleranceSpecification<T> ftSpec = FaultToleranceSpecification.builder(type).provider(gigaSpace)
+				.isolationStrategy(IsolationStrategy.THREAD).group(spaceName).build();
+		return plugins.getPlugin(AstrixFaultTolerancePlugin.class).addFaultTolerance(ftSpec);
 	}
 	
 	@Override

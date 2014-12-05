@@ -24,6 +24,8 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.context.FaultToleranceSpecification;
+import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.netflix.hystrix.HystrixCommand;
@@ -45,35 +47,36 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	private final Class<T> api;
 	private final String group;
 	private final Setter hystrixConfiguration;
+	private final IsolationStrategy isolationStrategy;
 
 
-	public HystrixAdapter(Class<T> api, T provider, String group) {
-		this(api, provider, group, new HystrixCommandSettings());
+	public HystrixAdapter(FaultToleranceSpecification<T> spec) {
+		this(spec, new HystrixCommandSettings());
 	}
 
-	private HystrixAdapter(Class<T> api, T provider, String group, HystrixCommandSettings settings) {
-		this.api = api;
-		this.provider = provider;
-		this.group = group;
+	private HystrixAdapter(FaultToleranceSpecification<T> spec, HystrixCommandSettings settings) {
+		this.api = spec.getApi();
+		this.provider = spec.getProvider();
+		this.group = spec.getGroup();
+		this.isolationStrategy = spec.getIsolationStrategy();
 		this.hystrixConfiguration = getHystrixConfiguration(settings);
 	}
 
-	public static <T> T create(Class<T> api, T provider, String group, HystrixCommandSettings settings) {
-		Objects.requireNonNull(api);
-		Objects.requireNonNull(provider);
-		Objects.requireNonNull(group);
+	public static <T> T create(FaultToleranceSpecification<T> spec,  HystrixCommandSettings settings) {
+		Objects.requireNonNull(spec);
 		Objects.requireNonNull(settings);
-		log.debug("Adding fault tolerance: api={}, group={}", api, group);
+		Class<T> api = spec.getApi();
+		log.debug("Adding fault tolerance: api={}, group={}", api, spec.getGroup());
 		if (!api.isInterface()) {
 			throw new IllegalArgumentException(
 					"Can only add fault tolerance to an api exposed using an interface. Exposed api=" + api);
 		}
 		return api.cast(Proxy.newProxyInstance(HystrixAdapter.class.getClassLoader(), new Class[] { api },
-				new HystrixAdapter<T>(api, provider, group, settings)));
+				new HystrixAdapter<T>(spec, settings)));
 	}
 
-	public static <T> T create(Class<T> api, T provider, String group) {
-		return create(api, provider, group, new HystrixCommandSettings());
+	public static <T> T create(FaultToleranceSpecification<T> spec) {
+		return create(spec, new HystrixCommandSettings());
 	}
 
 	@Override
