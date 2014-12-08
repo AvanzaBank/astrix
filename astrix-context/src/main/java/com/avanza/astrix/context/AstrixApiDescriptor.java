@@ -18,6 +18,7 @@ package com.avanza.astrix.context;
 import java.lang.annotation.Annotation;
 
 import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
 /**
  * 
@@ -128,7 +129,8 @@ public abstract class AstrixApiDescriptor {
 		 * @return
 		 */
 		public boolean usesServiceRegistry() {
-			return descriptorHolder.isAnnotationPresent(AstrixServiceRegistryApi.class);
+			return descriptorHolder.isAnnotationPresent(AstrixServiceRegistryApi.class)
+					|| descriptorHolder.isAnnotationPresent(AstrixServiceRegistryLookup.class);
 		}
 		
 		public boolean isVersioned() {

@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package com.avanza.astrix.context;
+
+import java.util.Objects;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -31,12 +34,15 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 		this.descriptor = descriptor;
 		this.beanType = beanType;
 		this.serviceLookup = serviceLookup;
-		this.serviceComponents = serviceComponents;
+		this.serviceComponents = Objects.requireNonNull(serviceComponents);
 	}
 
 	@Override
 	public T create(String optionalQualifier) {
 		AstrixServiceProperties serviceProperties = serviceLookup.lookup(beanType, optionalQualifier);
+		if (serviceProperties == null) {
+			throw new RuntimeException(String.format("No service-provider found in service-registry: api=%s qualifier=%s", beanType.getName(), optionalQualifier));
+		}
 		AstrixServiceComponent serviceComponent = serviceComponents.getComponent(serviceProperties.getComponent());
 		return serviceComponent.createService(descriptor, beanType, serviceProperties);
 	}
