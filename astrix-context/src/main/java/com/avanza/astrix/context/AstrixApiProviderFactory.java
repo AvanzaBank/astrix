@@ -25,7 +25,7 @@ import java.util.List;
  * different types of apis. This class is responsible for interpreting such annotations and create an
  * AstrixApiProvider for the given api. <p>
  * 
- * The factory is extendable by adding more {@link AstrixApiProviderPlugin}'s. <p>
+ * The factory is extendible by adding more {@link AstrixApiProviderPlugin}'s. <p>
  *  
  * @author Elias Lindholm (elilin)
  *

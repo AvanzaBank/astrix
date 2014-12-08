@@ -30,10 +30,8 @@ import java.util.concurrent.ConcurrentMap;
 public class AstrixApiProvider {
 	
 	private final ConcurrentMap<Class<?>, AstrixFactoryBean<?>> factoryByProvidedType = new ConcurrentHashMap<>();
-	private final AstrixApiDescriptor apiDescriptor;
 	
 	public AstrixApiProvider(List<AstrixFactoryBean<?>> factories, AstrixApiDescriptor descriptorHolder) {
-		this.apiDescriptor = descriptorHolder;
 		for (AstrixFactoryBean<?> factory : factories) {
 			AstrixFactoryBean<?> previous = this.factoryByProvidedType.putIfAbsent(factory.getBeanType(), factory);
 			if (previous != null) {
@@ -44,10 +42,6 @@ public class AstrixApiProvider {
 		}
 	}
 	
-	public AstrixApiDescriptor getDescriptor() {
-		return apiDescriptor;
-	}
-
 	/**
 	 * Returns the set of all provided bean-types by this api. <p>
 	 *  
