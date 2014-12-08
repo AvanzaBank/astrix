@@ -24,18 +24,34 @@ import java.lang.annotation.Annotation;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceLookup<T extends Annotation> {
+public class AstrixServiceLookup {
 	
-	private AstrixServiceLookupPlugin<T> serviceLookupPlugin;
-	private T lookupInfo;
-	
-	public AstrixServiceLookup(AstrixServiceLookupPlugin<T> serviceLookupPlugin, T lookupInfo) {
-		this.serviceLookupPlugin = serviceLookupPlugin;
-		this.lookupInfo = lookupInfo;
+	private Impl<?> impl;
+
+	public AstrixServiceLookup(Impl<?> impl) {
+		this.impl = impl;
+	}
+
+	public static <T extends Annotation> AstrixServiceLookup create(AstrixServiceLookupPlugin<T> serviceLookupPlugin, T lookupInfo) {
+		return new AstrixServiceLookup(new Impl<T>(serviceLookupPlugin, lookupInfo));
 	}
 
 	public AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier) {
-		return serviceLookupPlugin.lookup(beanType, optionalQualifier, lookupInfo);
+		return impl.lookup(beanType, optionalQualifier);
+	}
+	
+	private static class Impl<T extends Annotation> {
+		private AstrixServiceLookupPlugin<T> serviceLookupPlugin;
+		private T lookupInfo;
+		
+		Impl(AstrixServiceLookupPlugin<T> serviceLookupPlugin, T lookupInfo) {
+			this.serviceLookupPlugin = serviceLookupPlugin;
+			this.lookupInfo = lookupInfo;
+		}
+
+		AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier) {
+			return serviceLookupPlugin.lookup(beanType, optionalQualifier, lookupInfo);
+		}
 	}
 	
 }
