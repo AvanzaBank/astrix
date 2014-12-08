@@ -27,7 +27,7 @@ import java.util.List;
  * 
  * For instance, one type of api is "library", which is handled by the AstrixLibraryProviderPlugin. It
  * allows api-providers to export api's that require "a lot" of wiring on the client side by annotating
- * a class with @AstrixLibraryProvider an export different api-elements by annotating factory methods
+ * a class with @AstrixServiceProvider an export different api-elements by annotating factory methods
  * for different api elements with @AstrixExport. 
  * 
  * Another type of api is a "service-registry" api, which binds to services using the service-registry

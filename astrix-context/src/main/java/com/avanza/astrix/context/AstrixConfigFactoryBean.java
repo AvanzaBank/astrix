@@ -40,15 +40,15 @@ public class AstrixConfigFactoryBean<T> implements AstrixFactoryBeanPlugin<T> {
 	public T create(String optionalQualifier) {
 		String serviceUri = lookup();
 		String component = serviceUri.substring(0, serviceUri.indexOf(":"));
-		String serviceProperties = serviceUri.substring(serviceUri.indexOf(":") + 1);
+		String servicePropertiesUri = serviceUri.substring(serviceUri.indexOf(":") + 1);
 		AstrixServiceComponent serviceComponent = getServiceComponent(component);
+		AstrixServiceProperties serviceProperties = serviceComponent.createServiceProperties(servicePropertiesUri);
 		return serviceComponent.createService(descriptor, api, serviceProperties);
 	}
 
 	private AstrixServiceComponent getServiceComponent(String componentName) {
 		return serviceComponents.getComponent(componentName);
 	}
-	
 
 	private String lookup() {
 		String result = this.settings.getString(entryName);

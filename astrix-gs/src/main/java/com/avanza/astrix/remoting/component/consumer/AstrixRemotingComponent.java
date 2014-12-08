@@ -66,8 +66,8 @@ public class AstrixRemotingComponent implements AstrixPluginsAware, AstrixServic
 	}
 	
 	@Override
-	public <T> T createService(AstrixApiDescriptor apiDescriptor, Class<T> type, String serviceUrl) {
-		return createService(apiDescriptor, type, GsBinder.createServiceProperties(serviceUrl));
+	public <T> AstrixServiceProperties createServiceProperties(String serviceUri) {
+		return GsBinder.createServiceProperties(serviceUri);
 	}
 	
 	@Override

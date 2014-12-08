@@ -30,7 +30,7 @@ public interface AstrixServiceComponent {
 	
 	<T> T createService(AstrixApiDescriptor apiDescriptor, Class<T> type, AstrixServiceProperties serviceProperties);
 	
-	<T> T createService(AstrixApiDescriptor apiDescriptor, Class<T> type, String serviceProperties);
+	<T> AstrixServiceProperties createServiceProperties(String serviceUri);
 	
 	<T> AstrixServiceProperties createServiceProperties(Class<T> exportedService);
 	

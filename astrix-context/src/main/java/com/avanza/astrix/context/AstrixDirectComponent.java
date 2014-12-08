@@ -43,13 +43,9 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	}
 	
 	@Override
-	public <T> T createService(AstrixApiDescriptor apiDescriptor, Class<T> type, String componentSpecificUri) {
-		String providerName = componentSpecificUri;
-		ServiceProvider<?> result = providerById.get(providerName);
-		if (result == null) {
-			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + type);
-		}
-		return type.cast(result.getProvider());
+	public <T> AstrixServiceProperties createServiceProperties(String componentSpecificUri) {
+		String providerId = componentSpecificUri;
+		return getServiceProperties(providerId);
 	}
 
 	@Override
