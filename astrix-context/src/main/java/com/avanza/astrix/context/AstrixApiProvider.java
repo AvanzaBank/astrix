@@ -31,11 +31,9 @@ public class AstrixApiProvider {
 	
 	private final ConcurrentMap<Class<?>, AstrixFactoryBean<?>> factoryByProvidedType = new ConcurrentHashMap<>();
 	private final AstrixApiDescriptor apiDescriptor;
-	private final AstrixApiProviderPlugin providerFactoryPlugin;
 	
-	public AstrixApiProvider(List<AstrixFactoryBean<?>> factories, AstrixApiDescriptor descriptorHolder, AstrixApiProviderPlugin providerFactoryPlugin) {
+	public AstrixApiProvider(List<AstrixFactoryBean<?>> factories, AstrixApiDescriptor descriptorHolder) {
 		this.apiDescriptor = descriptorHolder;
-		this.providerFactoryPlugin = providerFactoryPlugin;
 		for (AstrixFactoryBean<?> factory : factories) {
 			AstrixFactoryBean<?> previous = this.factoryByProvidedType.putIfAbsent(factory.getBeanType(), factory);
 			if (previous != null) {
@@ -63,10 +61,6 @@ public class AstrixApiProvider {
 	@SuppressWarnings("unchecked")
 	public <T> AstrixFactoryBean<T> getFactory(Class<T> type) {
 		return (AstrixFactoryBean<T>) this.factoryByProvidedType.get(type);
-	}
-
-	public boolean hasStatefulBeans() {
-		return !this.providerFactoryPlugin.isLibraryProvider();
 	}
 
 }

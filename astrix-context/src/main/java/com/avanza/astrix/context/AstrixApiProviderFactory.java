@@ -48,7 +48,7 @@ public class AstrixApiProviderFactory {
 			}
 			factoryBeans.add(new AstrixFactoryBean<>(decoratatedFactory, descriptor, providerFactoryPlugin.isLibraryProvider()));
 		}
-		return new AstrixApiProvider(factoryBeans, descriptor, providerFactoryPlugin); 
+		return new AstrixApiProvider(factoryBeans, descriptor); 
 	}
 	
 	private AstrixApiProviderPlugin getProviderPlugin(AstrixApiDescriptor descriptor) {
