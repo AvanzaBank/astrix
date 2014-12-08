@@ -30,10 +30,21 @@ public class AstrixConfigServiceLookupPlugin implements AstrixServiceLookupPlugi
 	private AstrixSettingsReader settings;
 
 	@Override
-	public AstrixServiceLookup create(AstrixConfigLookup lookup) {
-		return new AstrixConfigServiceLookup(settings, serviceComponents, lookup.value());
+	public AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier, AstrixConfigLookup lookupAnnotation) {
+		String serviceUri = settings.getString(lookupAnnotation.value());
+		return buildServiceProperties(serviceUri);
 	}
-
+	
+	private AstrixServiceProperties buildServiceProperties(String serviceUriIncludingComponent) {
+		String component = serviceUriIncludingComponent.substring(0, serviceUriIncludingComponent.indexOf(":"));
+		String serviceUri = serviceUriIncludingComponent.substring(serviceUriIncludingComponent.indexOf(":") + 1);
+		AstrixServiceComponent serviceComponent = getServiceComponent(component);
+		return serviceComponent.createServiceProperties(serviceUri);
+	}
+	
+	private AstrixServiceComponent getServiceComponent(String componentName) {
+		return serviceComponents.getComponent(componentName);
+	}
 	@Override
 	public Class<AstrixConfigLookup> getLookupAnnotationType() {
 		return AstrixConfigLookup.class;
@@ -48,5 +59,6 @@ public class AstrixConfigServiceLookupPlugin implements AstrixServiceLookupPlugi
 	public void setServiceComponents(AstrixServiceComponents serviceComponents) {
 		this.serviceComponents = serviceComponents;
 	}
+
 
 }

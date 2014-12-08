@@ -28,7 +28,7 @@ public class AstrixServiceLookupFactory implements AstrixPluginsAware {
 	
 	private List<AstrixServiceLookupPlugin<? extends Annotation>> serviceLookupPlugins = new CopyOnWriteArrayList<>();
 
-	public AstrixServiceLookup createServiceLookup(AstrixApiDescriptor descriptor) {
+	public AstrixServiceLookup<?> createServiceLookup(AstrixApiDescriptor descriptor) {
 		for (AstrixServiceLookupPlugin<?> lookupPlugin : serviceLookupPlugins) {
 			if (descriptor.isAnnotationPresent(lookupPlugin.getLookupAnnotationType())) {
 				return create(descriptor, lookupPlugin);
@@ -37,8 +37,8 @@ public class AstrixServiceLookupFactory implements AstrixPluginsAware {
 		throw new IllegalArgumentException("Can't identify what lookup-strategy to use to locate services exported using descriptor: " + descriptor);
 	}
 
-	private <T extends Annotation> AstrixServiceLookup  create(AstrixApiDescriptor descriptor, AstrixServiceLookupPlugin<T> lookupPlugin) {
-		return lookupPlugin.create(descriptor.getAnnotation(lookupPlugin.getLookupAnnotationType()));
+	private <T extends Annotation> AstrixServiceLookup<?>  create(AstrixApiDescriptor descriptor, AstrixServiceLookupPlugin<T> lookupPlugin) {
+		return new AstrixServiceLookup<>(lookupPlugin, descriptor.getAnnotation(lookupPlugin.getLookupAnnotationType()));
 	}
 	
 	@Override

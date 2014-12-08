@@ -13,29 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.provider.core;
 
-import java.lang.annotation.Annotation;
-
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 
 /**
+ * Used to indicate that services should be located using
+ * the service registry
  * 
  * @author Elias Lindholm (elilin)
- *
  */
-public class AstrixServiceLookup<T extends Annotation> {
-	
-	private AstrixServiceLookupPlugin<T> serviceLookupPlugin;
-	private T lookupInfo;
-	
-	public AstrixServiceLookup(AstrixServiceLookupPlugin<T> serviceLookupPlugin, T lookupInfo) {
-		this.serviceLookupPlugin = serviceLookupPlugin;
-		this.lookupInfo = lookupInfo;
-	}
-
-	public AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier) {
-		return serviceLookupPlugin.lookup(beanType, optionalQualifier, lookupInfo);
-	}
-	
+@Target(value = { ElementType.TYPE })
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface AstrixServiceRegistryLookup {
 }

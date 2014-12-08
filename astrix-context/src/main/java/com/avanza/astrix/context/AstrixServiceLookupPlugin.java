@@ -19,7 +19,7 @@ import java.lang.annotation.Annotation;
 
 public interface AstrixServiceLookupPlugin<T extends Annotation> {
 	
-	AstrixServiceLookup create(T lookupAnnotation);
+	AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier, T lookupAnnotation);
 	
 	Class<T> getLookupAnnotationType();
 
