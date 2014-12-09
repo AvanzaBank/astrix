@@ -32,7 +32,7 @@ public class AstrixSettings implements AstrixExternalConfig {
 	 */
 	@Deprecated
 	public static final String BEAN_REBIND_ATTEMPT_INTERVAL = BEAN_BIND_ATTEMPT_INTERVAL;
-	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AstrixServiceRegistryLeaseManager.leaseRenewInterval";
+	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AstrixServiceLeaseManager.leaseRenewInterval";
 	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AstrixContext.enforceSubsystemBoundaries";
 	public static final String ASTRIX_CONFIG_URI = "AstrixConfig.uri";
 	public static final String ASTRIX_SERVICE_REGISTRY_URI = "AstrixServiceRegistry.serviceUri";
@@ -107,6 +107,10 @@ public class AstrixSettings implements AstrixExternalConfig {
 	
 	public final void set(String settingName, String value) {
 		this.settings.put(settingName, value);
+	}
+	
+	public final void remove(String settingName) {
+		this.settings.remove(settingName);
 	}
 
 	public static AstrixSettings from(Map<String, String> settings) {

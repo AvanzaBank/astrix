@@ -170,5 +170,17 @@ public class AstrixPlugins {
 		Plugin<T> plugin = getPluginHolder(pluginType);
 		return plugin.getOne(qualifier);
 	}
+
+	public <T> T getPluginInstance(
+			Class<T> providerType) {
+		for (Class<?> pluginTypeCandidate : providerType.getInterfaces()) {
+			for (Object pluginProvider : getPlugins(pluginTypeCandidate)) {
+				if (pluginProvider.getClass().equals(providerType)) {
+					return providerType.cast(pluginProvider);
+				}
+			}
+		}
+		throw new IllegalArgumentException("Plugin provider not found: " + providerType.getName());
+	}
 	
 }

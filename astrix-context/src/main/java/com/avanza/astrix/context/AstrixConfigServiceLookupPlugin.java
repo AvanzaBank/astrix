@@ -32,6 +32,9 @@ public class AstrixConfigServiceLookupPlugin implements AstrixServiceLookupPlugi
 	@Override
 	public AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier, AstrixConfigLookup lookupAnnotation) {
 		String serviceUri = settings.getString(lookupAnnotation.value());
+		if (serviceUri == null) {
+			return null;
+		}
 		return buildServiceProperties(serviceUri);
 	}
 	

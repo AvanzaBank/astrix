@@ -29,20 +29,22 @@ import com.avanza.astrix.provider.core.AstrixServiceProvider;
  *
  */
 @MetaInfServices(AstrixApiProviderPlugin.class)
-public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
+public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin, AstrixSettingsAware {
 	
 	private AstrixServiceComponents serviceComponents;
 	private AstrixServiceLookupFactory serviceLookupFactory;
+	private AstrixServiceLeaseManager leaseManager;
+	private AstrixSettingsReader settings;
 
 	@Override
 	public List<AstrixFactoryBeanPlugin<?>> createFactoryBeans(AstrixApiDescriptor descriptor) {
 		List<AstrixFactoryBeanPlugin<?>> result = new ArrayList<>();
 		for (Class<?> exportedApi : getProvidedBeans(descriptor)) {
 			AstrixServiceLookup serviceLookup = getLookupStrategy(descriptor);
-			result.add(new AstrixServiceFactory<>(descriptor, exportedApi, serviceLookup, serviceComponents));
+			result.add(new AstrixServiceFactory<>(descriptor, exportedApi, serviceLookup, serviceComponents, leaseManager, settings));
 			Class<?> asyncInterface = loadInterfaceIfExists(exportedApi.getName() + "Async");
 			if (asyncInterface != null) {
-				result.add(new AstrixServiceFactory<>(descriptor, asyncInterface, serviceLookup, serviceComponents));
+				result.add(new AstrixServiceFactory<>(descriptor, asyncInterface, serviceLookup, serviceComponents, leaseManager, settings));
 			}
 		}
 		return result;
@@ -88,6 +90,16 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 	@AstrixInject
 	public void setServiceLookupFactory(AstrixServiceLookupFactory serviceLookupFactory) {
 		this.serviceLookupFactory = serviceLookupFactory;
+	}
+	
+	@AstrixInject
+	public void setLeaseManager(AstrixServiceLeaseManager leaseManager) {
+		this.leaseManager = leaseManager;
+	}
+
+	@Override
+	public void setSettings(AstrixSettingsReader settings) {
+		this.settings = settings;
 	}
 
 }

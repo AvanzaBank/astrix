@@ -22,9 +22,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,30 +30,19 @@ import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.provider.core.AstrixServiceProvider;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryApiTest.GreetingService;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryApiTest.GreetingServiceImpl;
 import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 import com.avanza.astrix.test.util.Supplier;
 
 
-public class AstrixServiceRegistryLookupTest {
+public class AstrixServiceRegistryApiTest {
 	
 	private static final long UNUSED_LEASE = 10_000L;
 	private AstrixServiceRegistryClient serviceRegistryClient;
 	private AstrixContext context;
 	private InMemoryServiceRegistry fakeServiceRegistry;
-	
-	static {
-	// 	TODO: remove debugging information
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.WARN);
-		Logger.getLogger("com.avanza.astrix").setLevel(Level.DEBUG);
-	}
 	
 	@Before
 	public void setup() {
@@ -80,7 +66,6 @@ public class AstrixServiceRegistryLookupTest {
 		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), greetingService.hello("kalle"));
 	}
 	
-	
 	@Test
 	public void lookupService_ServiceAvailableInRegistryButItsNotPossibleToBindToIt_ServiceIsBoundWhenServiceBecamesAvailable() throws Exception {
 		final String objectId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
@@ -101,13 +86,52 @@ public class AstrixServiceRegistryLookupTest {
 		}, equalTo("hello: kalle")));
 	}
 	
+	@Test
+	public void serviceIsReboundIfServiceIsMovedInRegistry() throws Exception {
+		final String providerId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		serviceRegistryClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(providerId), UNUSED_LEASE);
+		
+		final GreetingService dummyService = context.getBean(GreetingService.class);
+		assertEquals("hello: kalle", dummyService.hello("kalle"));
+		
+		final String newProviderId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hej: "));
+		serviceRegistryClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(newProviderId), UNUSED_LEASE);
+		
+		assertEventually(serviceInvocationResult(new Supplier<String>() {
+			@Override
+			public String get() {
+				return dummyService.hello("kalle");
+			}
+		}, equalTo("hej: kalle")));
+	}
+	
+	@Test
+	public void whenServiceIsRemovedFromRegistryItShouldStartThrowingServiceUnavailable() throws Exception {
+		final String providerId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		serviceRegistryClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(providerId), UNUSED_LEASE);
+		
+		final GreetingService dummyService = context.getBean(GreetingService.class);
+		assertEquals("hello: kalle", dummyService.hello("kalle"));
+		
+		fakeServiceRegistry.clear(); // Simulate lease expiry
+		
+		assertEventually(serviceInvocationException(new Supplier<String>() {
+			@Override
+			public String get() {
+				return dummyService.hello("kalle");
+			}
+		}, isExceptionOfType(ServiceUnavailableException.class)));
+	}
+	
 	private void assertEventually(Probe probe) throws InterruptedException {
 		new Poller(1000, 1).check(probe);
 	}
 	
-	@AstrixServiceRegistryLookup
-	@AstrixServiceProvider(GreetingService.class)
+	@AstrixServiceRegistryApi(
+		GreetingService.class
+	)
 	public static class GreetingApiDescriptor {
+		
 	}
 	
 	public interface GreetingService {

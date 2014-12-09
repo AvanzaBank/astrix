@@ -25,19 +25,34 @@ import org.kohsuke.MetaInfServices;
 import com.avanza.astrix.context.AstrixApiDescriptor;
 import com.avanza.astrix.context.AstrixApiProviderPlugin;
 import com.avanza.astrix.context.AstrixFactoryBeanPlugin;
+import com.avanza.astrix.context.AstrixInject;
+import com.avanza.astrix.context.AstrixPlugins;
+import com.avanza.astrix.context.AstrixPluginsAware;
+import com.avanza.astrix.context.AstrixServiceComponents;
+import com.avanza.astrix.context.AstrixServiceFactory;
+import com.avanza.astrix.context.AstrixServiceLeaseManager;
+import com.avanza.astrix.context.AstrixServiceLookup;
+import com.avanza.astrix.context.AstrixSettingsAware;
+import com.avanza.astrix.context.AstrixSettingsReader;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
 
 @MetaInfServices(AstrixApiProviderPlugin.class)
-public class AstrixServiceRegistryProviderPlugin implements AstrixApiProviderPlugin {
+public class AstrixServiceRegistryProviderPlugin implements AstrixApiProviderPlugin, AstrixPluginsAware, AstrixSettingsAware {
 	
+	private AstrixServiceComponents serviceComponents;
+	private AstrixServiceLeaseManager leaseManager;
+	private AstrixSettingsReader settings;
+	private AstrixPlugins plugins;
+
 	@Override
 	public List<AstrixFactoryBeanPlugin<?>> createFactoryBeans(AstrixApiDescriptor descriptor) {
 		List<AstrixFactoryBeanPlugin<?>> result = new ArrayList<>();
-		for (Class<?> exportedApi : getExportedApis(descriptor)) {
-			result.add(new ServiceRegistryLookupFactory<>(descriptor, exportedApi));
+		for (Class<?> exportedApi : getProvidedBeans(descriptor)) {
+			AstrixServiceLookup serviceLookup = AstrixServiceLookup.create(plugins.getPluginInstance(AstrixServiceRegistryLookupPlugin.class), null);
+			result.add(new AstrixServiceFactory<>(descriptor, exportedApi, serviceLookup, serviceComponents, leaseManager, settings));
 			Class<?> asyncInterface = loadInterfaceIfExists(exportedApi.getName() + "Async");
 			if (asyncInterface != null) {
-				result.add(new ServiceRegistryLookupFactory<>(descriptor, asyncInterface));
+				result.add(new AstrixServiceFactory<>(descriptor, asyncInterface, serviceLookup, serviceComponents, leaseManager, settings));
 			}
 		}
 		return result;
@@ -48,14 +63,6 @@ public class AstrixServiceRegistryProviderPlugin implements AstrixApiProviderPlu
 		List<Class<?>> result = new ArrayList<>();
 		result.addAll(Arrays.asList(getExportedApis(descriptor)));
 		return result;
-	}
-
-	private Class<?>[] getExportedApis(AstrixApiDescriptor descriptor) {
-		Class<?> [] exportedApis = descriptor.getAnnotation(AstrixServiceRegistryApi.class).value();
-		if (exportedApis.length > 0) {
-			return exportedApis;
-		}
-		throw new IllegalArgumentException("No exported apis found on AstrixServiceRegistryApi: " + descriptor.getName());	
 	}
 	
 	private Class<?> loadInterfaceIfExists(String interfaceName) {
@@ -70,6 +77,14 @@ public class AstrixServiceRegistryProviderPlugin implements AstrixApiProviderPlu
 		return null;
 	}
 
+	private Class<?>[] getExportedApis(AstrixApiDescriptor descriptor) {
+		Class<?> [] exportedApis = descriptor.getAnnotation(AstrixServiceRegistryApi.class).value();
+		if (exportedApis.length > 0) {
+			return exportedApis;
+		}
+		throw new IllegalArgumentException("No exported apis found on AstrixServiceRegistryApi: " + descriptor.getName());	
+	}
+	
 	@Override
 	public Class<? extends Annotation> getProviderAnnotationType() {
 		return AstrixServiceRegistryApi.class;
@@ -79,4 +94,25 @@ public class AstrixServiceRegistryProviderPlugin implements AstrixApiProviderPlu
 	public boolean isLibraryProvider() {
 		return false;
 	}
+
+	@Override
+	public void setPlugins(AstrixPlugins plugins) {
+		this.plugins = plugins;
+	}
+	
+	@AstrixInject
+	public void setServiceComponents(AstrixServiceComponents serviceComponents) {
+		this.serviceComponents = serviceComponents;
+	}
+	
+	@AstrixInject
+	public void setLeaseManager(AstrixServiceLeaseManager leaseManager) {
+		this.leaseManager = leaseManager;
+	}
+
+	@Override
+	public void setSettings(AstrixSettingsReader settings) {
+		this.settings = settings;
+	}
+
 }

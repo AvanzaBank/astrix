@@ -15,7 +15,9 @@
  */
 package com.avanza.astrix.context;
 
-import java.util.Objects;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 /**
  * 
@@ -25,31 +27,95 @@ import java.util.Objects;
  */
 public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 	
-	private final Class<T> beanType;
+	private final Class<T> api;
 	private final AstrixApiDescriptor descriptor;
 	private final AstrixServiceComponents serviceComponents;
 	private final AstrixServiceLookup serviceLookup;
+	private final String subsystem;
+	private final boolean enforceSubsystemBoundaries;
+	private final AstrixServiceLeaseManager leaseManager;
 
-	public AstrixServiceFactory(AstrixApiDescriptor descriptor, Class<T> beanType, AstrixServiceLookup serviceLookup, AstrixServiceComponents serviceComponents) {
+	public AstrixServiceFactory(AstrixApiDescriptor descriptor, 
+								Class<T> beanType, 
+								AstrixServiceLookup serviceLookup, 
+								AstrixServiceComponents serviceComponents, 
+								AstrixServiceLeaseManager leaseManager,
+								AstrixSettingsReader settings) {
 		this.descriptor = descriptor;
-		this.beanType = beanType;
+		this.api = beanType;
 		this.serviceLookup = serviceLookup;
-		this.serviceComponents = Objects.requireNonNull(serviceComponents);
+		this.serviceComponents = serviceComponents;
+		this.leaseManager = leaseManager;
+		this.subsystem = settings.getString(AstrixSettings.SUBSYSTEM_NAME);
+		this.enforceSubsystemBoundaries = settings.getBoolean(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
 	}
 
 	@Override
-	public T create(String optionalQualifier) {
-		AstrixServiceProperties serviceProperties = serviceLookup.lookup(beanType, optionalQualifier);
+	public T create(String qualifier) {
+		AstrixServiceProperties serviceProperties = serviceLookup.lookup(api, qualifier);
 		if (serviceProperties == null) {
-			throw new RuntimeException(String.format("No service-provider found in service-registry: api=%s qualifier=%s", beanType.getName(), optionalQualifier));
+			throw new RuntimeException(String.format("No service-provider found in service-registry: api=%s qualifier=%s", api.getName(), qualifier));
 		}
-		AstrixServiceComponent serviceComponent = serviceComponents.getComponent(serviceProperties.getComponent());
-		return serviceComponent.createService(descriptor, beanType, serviceProperties);
+		String providerSubsystem = serviceProperties.getProperty(AstrixServiceProperties.SUBSYSTEM);
+		if (!isAllowedToInvokeService(providerSubsystem)) {
+			return createIllegalSubsystemProxy(providerSubsystem);
+		}
+		T service = create(qualifier, serviceProperties);
+		return leaseManager.startManageLease(service, serviceProperties, qualifier, this, serviceLookup);
 	}
 
 	@Override
 	public Class<T> getBeanType() {
-		return beanType;
+		return api;
+	}
+
+	private boolean isAllowedToInvokeService(String providerSubsystem) {
+		if (descriptor.isVersioned()) {
+			return true;
+		}
+		if (!enforceSubsystemBoundaries) {
+			return true;
+		}
+		return providerSubsystem.equals(this.subsystem);
+	}
+	
+	private T createIllegalSubsystemProxy(String providerSubsystem) {
+		return api.cast(Proxy.newProxyInstance(api.getClassLoader(), new Class[]{api}, new IllegalSubsystemProxy(subsystem, providerSubsystem, api)));
+	}
+
+	public T create(String qualifier, AstrixServiceProperties serviceProperties) {
+		if (serviceProperties == null) {
+			throw new RuntimeException(String.format("Misssing entry in service-registry api=%s qualifier=%s: ", api.getName(), qualifier));
+		}
+		AstrixServiceComponent serviceComponent = getServiceComponent(serviceProperties);
+		return serviceComponent.createService(descriptor, api, serviceProperties);
+	}
+	
+	private AstrixServiceComponent getServiceComponent(AstrixServiceProperties serviceProperties) {
+		String componentName = serviceProperties.getComponent();
+		if (componentName == null) {
+			throw new IllegalArgumentException("Expected a componentName to be set on serviceProperties: " + serviceProperties);
+		}
+		return serviceComponents.getComponent(componentName);
+	}
+	
+	private class IllegalSubsystemProxy<T> implements InvocationHandler {
+		
+		private String currentSubsystem;
+		private String providerSubsystem;
+		private Class<T> beanType;
+		
+
+		public IllegalSubsystemProxy(String currentSubsystem, String providerSubsystem, Class<T> beanType) {
+			this.currentSubsystem = currentSubsystem;
+			this.providerSubsystem = providerSubsystem;
+			this.beanType = beanType;
+		}
+
+		@Override
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			throw new IllegalSubsystemException(currentSubsystem, providerSubsystem, beanType);
+		}
 	}
 	
 }
