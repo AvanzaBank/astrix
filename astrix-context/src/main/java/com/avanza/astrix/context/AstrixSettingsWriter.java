@@ -34,5 +34,9 @@ class AstrixSettingsWriter {
 	public void set(String settingName, String settingValue) {
 		this.settings.set(settingName, settingValue);
 	}
+	
+	public void remove(String settingName) {
+		this.settings.remove(settingName);
+	}
 
 }

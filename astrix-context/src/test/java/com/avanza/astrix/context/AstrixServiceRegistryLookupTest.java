@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.client;
+package com.avanza.astrix.context;
 
 import static com.avanza.astrix.test.util.AstrixTestUtil.isExceptionOfType;
 import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationException;
@@ -22,75 +22,57 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.AstrixDirectComponent;
-import com.avanza.astrix.context.AstrixSettings;
-import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistry;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryClient;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryLibrary;
-import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
-import com.avanza.astrix.test.util.AstrixTestUtil;
+import com.avanza.astrix.provider.core.AstrixConfigLookup;
+import com.avanza.astrix.provider.core.AstrixServiceProvider;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 import com.avanza.astrix.test.util.Supplier;
 
 
-public class AstrixServiceRegistryClientTest {
+public class AstrixServiceRegistryLookupTest {
 	
-	private static final long UNUSED_LEASE = 10_000L;
-	private AstrixServiceRegistryClient serviceRegistryClient;
+	private static final String GREETING_SERVICE_URI = "greetingServiceUri";
 	private AstrixContext context;
-	private InMemoryServiceRegistry fakeServiceRegistry;
 	
-//	static {
-//		// TODO: remove debugging information
-//		BasicConfigurator.configure();
-//		Logger.getRootLogger().setLevel(Level.WARN);
-//		Logger.getLogger("se.avanzabank.astrix").setLevel(Level.DEBUG);
-//	}
-
 	@Before
 	public void setup() {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		configurer.set(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 10);
 		configurer.registerApiDescriptor(GreetingApiDescriptor.class);
-		configurer.registerApiDescriptor(InMemoryServiceRegistryDescriptor.class);
-		configurer.registerApiDescriptor(AstrixServiceRegistryLibrary.class);
 		context = configurer.configure();
-		fakeServiceRegistry = (InMemoryServiceRegistry) context.getBean(AstrixServiceRegistry.class);
-		serviceRegistryClient = context.getBean(AstrixServiceRegistryClient.class);
+	}
+	
+	@After
+	public void destroy() {
+		context.destroy();
 	}
 	
 	@Test
 	public void lookupService_serviceAvailableInRegistry_ServiceIsImmediatlyBound() throws Exception {
-		final String objectId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
-		serviceRegistryClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
+		context.set(GREETING_SERVICE_URI, AstrixDirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hello: ")));
 		
 		GreetingService greetingService = context.getBean(GreetingService.class);
 		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), greetingService.hello("kalle"));
 	}
 	
+	
 	@Test
-	public void lookupService_ServiceAvailableInRegistryButItsNotPossibleToBindToIt_ServiceIsBoundWhenServiceBecamesAvailable() throws Exception {
-		final String objectId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+	public void lookupService_ServiceLookupFails_ServiceIsBoundWhenServiceBecamesAvailable() throws Exception {
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		
 		try {
 			dummyService.hello("kalle");
-			fail("Excpected service not to be registered in registry");
+			fail("Excpected service lookup to fail");
 		} catch (ServiceUnavailableException e) {
 		}
 
-		serviceRegistryClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
+		context.set(GREETING_SERVICE_URI, AstrixDirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hello: ")));
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
 			public String get() {
@@ -100,15 +82,13 @@ public class AstrixServiceRegistryClientTest {
 	}
 	
 	@Test
-	public void serviceIsReboundIfServiceIsMovedInRegistry() throws Exception {
-		final String providerId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
-		serviceRegistryClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(providerId), UNUSED_LEASE);
+	public void serviceIsBoundToNewProviderWhenServiceIsMoved() throws Exception {
+		context.set(GREETING_SERVICE_URI, AstrixDirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hello: ")));
 		
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		assertEquals("hello: kalle", dummyService.hello("kalle"));
 		
-		final String newProviderId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hej: "));
-		serviceRegistryClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(newProviderId), UNUSED_LEASE);
+		context.set(GREETING_SERVICE_URI, AstrixDirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hej: ")));
 		
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
@@ -119,14 +99,13 @@ public class AstrixServiceRegistryClientTest {
 	}
 	
 	@Test
-	public void whenServiceIsRemovedFromRegistryItShouldStartThrowingServiceUnavailable() throws Exception {
-		final String providerId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
-		serviceRegistryClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(providerId), UNUSED_LEASE);
+	public void whenServiceIsRemovedFromSourceOfLookupItShouldStartThrowingServiceUnavailable() throws Exception {
+		context.set(GREETING_SERVICE_URI, AstrixDirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hello: ")));
 		
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		assertEquals("hello: kalle", dummyService.hello("kalle"));
 		
-		fakeServiceRegistry.clear(); // Simulate lease expiry
+		context.removeSetting(GREETING_SERVICE_URI);
 		
 		assertEventually(serviceInvocationException(new Supplier<String>() {
 			@Override
@@ -140,11 +119,9 @@ public class AstrixServiceRegistryClientTest {
 		new Poller(1000, 1).check(probe);
 	}
 	
-	@AstrixServiceRegistryApi(
-		GreetingService.class
-	)
+	@AstrixConfigLookup(GREETING_SERVICE_URI)
+	@AstrixServiceProvider(GreetingService.class)
 	public static class GreetingApiDescriptor {
-		
 	}
 	
 	public interface GreetingService {

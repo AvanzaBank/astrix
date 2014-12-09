@@ -13,49 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.client;
+package com.avanza.astrix.context;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
-import java.util.List;
 
-import com.avanza.astrix.context.AstrixApiDescriptor;
-import com.avanza.astrix.context.AstrixBeanAware;
-import com.avanza.astrix.context.AstrixBeanKey;
-import com.avanza.astrix.context.AstrixBeans;
-import com.avanza.astrix.context.AstrixFactoryBeanPlugin;
-import com.avanza.astrix.context.AstrixInject;
-import com.avanza.astrix.context.AstrixServiceComponent;
-import com.avanza.astrix.context.AstrixServiceComponents;
-import com.avanza.astrix.context.AstrixServiceProperties;
-import com.avanza.astrix.context.AstrixSettings;
-import com.avanza.astrix.context.AstrixSettingsAware;
-import com.avanza.astrix.context.AstrixSettingsReader;
-import com.avanza.astrix.context.IllegalSubsystemException;
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ * @param <T>
+ */
+public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
+	
+	private final Class<T> api;
+	private final AstrixApiDescriptor descriptor;
+	private final AstrixServiceComponents serviceComponents;
+	private final AstrixServiceLookup serviceLookup;
+	private final String subsystem;
+	private final boolean enforceSubsystemBoundaries;
+	private final AstrixServiceLeaseManager leaseManager;
 
-public class ServiceRegistryLookupFactory<T> implements AstrixFactoryBeanPlugin<T>, AstrixBeanAware, AstrixSettingsAware {
-
-	private Class<T> api;
-	private AstrixApiDescriptor descriptor;
-	private AstrixBeans beans;
-	private AstrixServiceRegistryLeaseManager leaseManager;
-	private AstrixServiceComponents serviceComponents;
-	private String subsystem;
-	private boolean enforceSubsystemBoundaries;
-
-	public ServiceRegistryLookupFactory(AstrixApiDescriptor descriptor,
-										Class<T> api) {
+	public AstrixServiceFactory(AstrixApiDescriptor descriptor, 
+								Class<T> beanType, 
+								AstrixServiceLookup serviceLookup, 
+								AstrixServiceComponents serviceComponents, 
+								AstrixServiceLeaseManager leaseManager,
+								AstrixSettingsReader settings) {
 		this.descriptor = descriptor;
-		this.api = api;
+		this.api = beanType;
+		this.serviceLookup = serviceLookup;
+		this.serviceComponents = serviceComponents;
+		this.leaseManager = leaseManager;
+		this.subsystem = settings.getString(AstrixSettings.SUBSYSTEM_NAME);
+		this.enforceSubsystemBoundaries = settings.getBoolean(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
 	}
 
 	@Override
 	public T create(String qualifier) {
-		AstrixServiceRegistryClient serviceRegistry = beans.getBean(AstrixServiceRegistryClient.class);
-		AstrixServiceProperties serviceProperties;
-		serviceProperties = serviceRegistry.lookup(api, qualifier);
+		AstrixServiceProperties serviceProperties = serviceLookup.lookup(api, qualifier);
 		if (serviceProperties == null) {
 			throw new RuntimeException(String.format("No service-provider found in service-registry: api=%s qualifier=%s", api.getName(), qualifier));
 		}
@@ -64,7 +61,12 @@ public class ServiceRegistryLookupFactory<T> implements AstrixFactoryBeanPlugin<
 			return createIllegalSubsystemProxy(providerSubsystem);
 		}
 		T service = create(qualifier, serviceProperties);
-		return leaseManager.startManageLease(service, serviceProperties, qualifier, this);
+		return leaseManager.startManageLease(service, serviceProperties, qualifier, this, serviceLookup);
+	}
+
+	@Override
+	public Class<T> getBeanType() {
+		return api;
 	}
 
 	private boolean isAllowedToInvokeService(String providerSubsystem) {
@@ -97,31 +99,6 @@ public class ServiceRegistryLookupFactory<T> implements AstrixFactoryBeanPlugin<
 		return serviceComponents.getComponent(componentName);
 	}
 	
-	@Override
-	public List<AstrixBeanKey> getBeanDependencies() {
-		return Arrays.asList(AstrixBeanKey.create(AstrixServiceRegistryClient.class, null));
-	}
-
-	@Override
-	public Class<T> getBeanType() {
-		return this.api;
-	}
-
-	@Override
-	public void setAstrixBeans(AstrixBeans beans) {
-		this.beans = beans;
-	}
-	
-	@AstrixInject
-	public void setServiceComponents(AstrixServiceComponents serviceComponents) {
-		this.serviceComponents = serviceComponents;
-	}
-	
-	@AstrixInject
-	public void setServiceComponents(AstrixServiceRegistryLeaseManager leaseManager) {
-		this.leaseManager = leaseManager;
-	}
-	
 	private class IllegalSubsystemProxy<T> implements InvocationHandler {
 		
 		private String currentSubsystem;
@@ -140,12 +117,5 @@ public class ServiceRegistryLookupFactory<T> implements AstrixFactoryBeanPlugin<
 			throw new IllegalSubsystemException(currentSubsystem, providerSubsystem, beanType);
 		}
 	}
-
-	@Override
-	public void setSettings(AstrixSettingsReader settings) {
-		this.subsystem = settings.getString(AstrixSettings.SUBSYSTEM_NAME);
-		this.enforceSubsystemBoundaries = settings.getBoolean(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
-	}
 	
-
 }

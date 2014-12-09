@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain.apiruntime.feeder;
+package com.avanza.astrix.provider.core;
 
-import com.avanza.astrix.provider.core.AstrixServiceProvider;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 
-@AstrixServiceRegistryLookup
-@AstrixServiceProvider(InternalLunchFeeder.class)
-public class LunchFeederApiDescriptor {
+/**
+ * @author Elias Lindholm (elilin)
+ */
+@Target(value = { ElementType.TYPE })
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface AstrixConfigLookup {
+	String value();
 }
-
-

@@ -16,7 +16,8 @@
 package com.avanza.astrix.integration.tests.domain.apiruntime;
 
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
+import com.avanza.astrix.provider.core.AstrixServiceProvider;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
 
 
@@ -26,9 +27,8 @@ import com.avanza.astrix.provider.versioning.AstrixVersioned;
 	objectSerializerConfigurer = LunchApiObjectSerializerConfigurer.class
 )
 // The service is exported to the service-registry. Consumers queries the service-registry to bind to servers.
-@AstrixServiceRegistryApi(
-	LunchService.class
-)
+@AstrixServiceRegistryLookup
+@AstrixServiceProvider(LunchService.class)
 public class LunchApiDescriptor {
 }
 

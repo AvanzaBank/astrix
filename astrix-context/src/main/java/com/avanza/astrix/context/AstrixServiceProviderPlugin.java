@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.client;
+package com.avanza.astrix.context;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -22,33 +22,25 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.context.AstrixApiDescriptor;
-import com.avanza.astrix.context.AstrixApiProviderPlugin;
-import com.avanza.astrix.context.AstrixFactoryBeanPlugin;
-import com.avanza.astrix.context.AstrixInject;
-import com.avanza.astrix.context.AstrixPlugins;
-import com.avanza.astrix.context.AstrixPluginsAware;
-import com.avanza.astrix.context.AstrixServiceComponents;
-import com.avanza.astrix.context.AstrixServiceFactory;
-import com.avanza.astrix.context.AstrixServiceLeaseManager;
-import com.avanza.astrix.context.AstrixServiceLookup;
-import com.avanza.astrix.context.AstrixSettingsAware;
-import com.avanza.astrix.context.AstrixSettingsReader;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
-
+import com.avanza.astrix.provider.core.AstrixServiceProvider;
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 @MetaInfServices(AstrixApiProviderPlugin.class)
-public class AstrixServiceRegistryProviderPlugin implements AstrixApiProviderPlugin, AstrixPluginsAware, AstrixSettingsAware {
+public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin, AstrixSettingsAware {
 	
 	private AstrixServiceComponents serviceComponents;
+	private AstrixServiceLookupFactory serviceLookupFactory;
 	private AstrixServiceLeaseManager leaseManager;
 	private AstrixSettingsReader settings;
-	private AstrixPlugins plugins;
 
 	@Override
 	public List<AstrixFactoryBeanPlugin<?>> createFactoryBeans(AstrixApiDescriptor descriptor) {
 		List<AstrixFactoryBeanPlugin<?>> result = new ArrayList<>();
 		for (Class<?> exportedApi : getProvidedBeans(descriptor)) {
-			AstrixServiceLookup serviceLookup = AstrixServiceLookup.create(plugins.getPluginInstance(AstrixServiceRegistryLookupPlugin.class), null);
+			AstrixServiceLookup serviceLookup = getLookupStrategy(descriptor);
 			result.add(new AstrixServiceFactory<>(descriptor, exportedApi, serviceLookup, serviceComponents, leaseManager, settings));
 			Class<?> asyncInterface = loadInterfaceIfExists(exportedApi.getName() + "Async");
 			if (asyncInterface != null) {
@@ -57,14 +49,27 @@ public class AstrixServiceRegistryProviderPlugin implements AstrixApiProviderPlu
 		}
 		return result;
 	}
-	
+
+	private AstrixServiceLookup getLookupStrategy(AstrixApiDescriptor descriptor) {
+		return serviceLookupFactory.createServiceLookup(descriptor);
+	}
+
 	@Override
 	public List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor) {
-		List<Class<?>> result = new ArrayList<>();
-		result.addAll(Arrays.asList(getExportedApis(descriptor)));
-		return result;
+		Class<?>[] providedServices = descriptor.getAnnotation(AstrixServiceProvider.class).value();
+		return Arrays.asList(providedServices);
 	}
-	
+
+	@Override
+	public Class<? extends Annotation> getProviderAnnotationType() {
+		return AstrixServiceProvider.class;
+	}
+
+	@Override
+	public boolean isLibraryProvider() {
+		return false;
+	}
+
 	private Class<?> loadInterfaceIfExists(String interfaceName) {
 		try {
 			Class<?> c = Class.forName(interfaceName);
@@ -76,33 +81,15 @@ public class AstrixServiceRegistryProviderPlugin implements AstrixApiProviderPlu
 		}
 		return null;
 	}
-
-	private Class<?>[] getExportedApis(AstrixApiDescriptor descriptor) {
-		Class<?> [] exportedApis = descriptor.getAnnotation(AstrixServiceRegistryApi.class).value();
-		if (exportedApis.length > 0) {
-			return exportedApis;
-		}
-		throw new IllegalArgumentException("No exported apis found on AstrixServiceRegistryApi: " + descriptor.getName());	
-	}
-	
-	@Override
-	public Class<? extends Annotation> getProviderAnnotationType() {
-		return AstrixServiceRegistryApi.class;
-	}
-	
-	@Override
-	public boolean isLibraryProvider() {
-		return false;
-	}
-
-	@Override
-	public void setPlugins(AstrixPlugins plugins) {
-		this.plugins = plugins;
-	}
 	
 	@AstrixInject
 	public void setServiceComponents(AstrixServiceComponents serviceComponents) {
 		this.serviceComponents = serviceComponents;
+	}
+	
+	@AstrixInject
+	public void setServiceLookupFactory(AstrixServiceLookupFactory serviceLookupFactory) {
+		this.serviceLookupFactory = serviceLookupFactory;
 	}
 	
 	@AstrixInject

@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain.apiruntime.feeder;
+package com.avanza.astrix.context;
 
-import com.avanza.astrix.provider.core.AstrixServiceProvider;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
+import java.lang.annotation.Annotation;
 
+public interface AstrixServiceLookupPlugin<T extends Annotation> {
+	
+	AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier, T lookupAnnotation);
+	
+	Class<T> getLookupAnnotationType();
 
-@AstrixServiceRegistryLookup
-@AstrixServiceProvider(InternalLunchFeeder.class)
-public class LunchFeederApiDescriptor {
 }
-
-

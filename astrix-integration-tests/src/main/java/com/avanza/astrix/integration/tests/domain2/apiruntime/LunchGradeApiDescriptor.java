@@ -16,14 +16,16 @@
 package com.avanza.astrix.integration.tests.domain2.apiruntime;
 
 import com.avanza.astrix.integration.tests.domain2.api.LunchRestaurantGrader;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
+import com.avanza.astrix.provider.core.AstrixServiceProvider;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
 
 @AstrixVersioned(
 	version = 1,
 	objectSerializerConfigurer = LunchGradeApiObjectMapperConfigurer.class
 )
-@AstrixServiceRegistryApi({
+@AstrixServiceRegistryLookup
+@AstrixServiceProvider({
 	LunchRestaurantGrader.class,
 	PublicLunchFeeder.class
 })
