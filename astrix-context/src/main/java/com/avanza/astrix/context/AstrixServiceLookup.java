@@ -28,7 +28,7 @@ public class AstrixServiceLookup {
 	
 	private Impl<?> impl;
 
-	public AstrixServiceLookup(Impl<?> impl) {
+	private AstrixServiceLookup(Impl<?> impl) {
 		this.impl = impl;
 	}
 
@@ -41,16 +41,16 @@ public class AstrixServiceLookup {
 	}
 	
 	private static class Impl<T extends Annotation> {
-		private AstrixServiceLookupPlugin<T> serviceLookupPlugin;
+		private AstrixServiceLookupPlugin<T> serviceLookup;
 		private T lookupInfo;
 		
 		Impl(AstrixServiceLookupPlugin<T> serviceLookupPlugin, T lookupInfo) {
-			this.serviceLookupPlugin = serviceLookupPlugin;
+			this.serviceLookup = serviceLookupPlugin;
 			this.lookupInfo = lookupInfo;
 		}
 
 		AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier) {
-			return serviceLookupPlugin.lookup(beanType, optionalQualifier, lookupInfo);
+			return serviceLookup.lookup(beanType, optionalQualifier, lookupInfo);
 		}
 	}
 	
