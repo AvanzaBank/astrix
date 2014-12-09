@@ -20,12 +20,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.AstrixDirectComponent;
-import com.avanza.astrix.context.AstrixSettings;
-import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.provider.core.AstrixConfigApi;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
 import com.avanza.astrix.provider.core.AstrixServiceProvider;
 import com.avanza.astrix.provider.library.AstrixExport;
