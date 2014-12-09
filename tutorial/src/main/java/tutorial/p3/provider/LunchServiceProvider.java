@@ -18,10 +18,10 @@ package tutorial.p3.provider;
 
 import tutorial.p3.api.LunchService;
 
-import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
+import com.avanza.astrix.provider.core.AstrixServiceProvider;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 
-@AstrixServiceRegistryApi(
-	LunchService.class
-)
-public class LunchServiceApi {
+@AstrixServiceRegistryLookup
+@AstrixServiceProvider(LunchService.class)
+public class LunchServiceProvider {
 }

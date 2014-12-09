@@ -12,9 +12,9 @@ Those two steps offers two levels of indirection. The first one is how to lookup
 
 
 ### Service binding using AstrixDirectComponent and @AstrixConfigLookup
-The first service-component covered is the `AstrixDirectComponent` which is a useful tool to support testing. It allows binding to a service provider within the same process, i.e. an ordinary object within the same jvm. The true power of the `AstrixDirectComponent` comes when using it in combination with the service-registry, which we will se later in the tutorial when introducing the service-registry. This example introduces the `AstrixDirectComponent` in combination with a `@AstrixConfigApi`.
+The first service-component covered is the `AstrixDirectComponent` which is a useful tool to support testing. It allows binding to a service within the same process, i.e. an ordinary object within the same jvm. The true power of the `AstrixDirectComponent` comes when using it in combination with the service-registry, which we will se later in the tutorial when introducing the service-registry. This example introduces the `AstrixDirectComponent` in combination with a `@AstrixConfigLookup`.
 
-In this example the api i split into one library, `LunchSuggester`, and one service, `LunchRestaruantFinder`. The api-descriptor exporting the `LunchRestaurantFinder` is annotated with `@AstrixConfigApi` which tells Astrix to lookup the service-properties for the `LunchRestaurantFinder` in configuration under the entry name `"restaurantFinderUri"`.
+In this example the api i split into one library, `LunchSuggester`, and one service, `LunchRestaruantFinder`. A service is created using a `@AstrixServiceProvider` annotation which has a property indicating what api-elements to export as a service. A service-provider must also define what lookup-mechanism to use to locate the provided services. The `LunchServiceProvider` is annotated with `@AstrixConfigLookup` indicating that the properties required to bind to the provided service should be looked up in the configuration. 
 
 ```java
 public interface LunchSuggester {
@@ -77,8 +77,8 @@ In the test we want to stub out the `LunchRestaurantFinder` using Mockito. This 
 
 When we configure Astrix we provide a setting, `"restaurantFinderUri"` with a value that contains the serviceUri to the `LunchRestaurantFinder` mock instance. When Astrix creates an instance of `LunchRestaurantFinder` (which is done indirectly when we create the `LunchSuggester` bean in the test) the process goes like this:
 
-1. Astrix sees that its a configuration-api (`@AstrixConfigApi`)
-2. Astrix queries the configuration for the entry name defined by the annotation ("restaurantFinderUri") to get the serviceUri, lets say that its value is `"direct:21"`
+1. Astrix sees that it is a service (the api-provider is annotated with `@AstrixServiceProvider`) and that service properties should be looked up in configuration (`@AstrixConfigApi`)
+3. Astrix queries the configuration for the entry name defined by the `@AstrixConfigApi` annotation ("restaurantFinderUri") to get the serviceUri, lets say that its value is `"direct:21"`
 3. Astrix parses the serviceUri to find what `AstrixServiceComponent` to use for binding, in this case `"direct"`
 4. Astrix delegates service binding to `AstrixDirectComponent`, passing in all component-specific properties, in this case `"21"`
 5. The `AstrixDirectComponent` queries its internal registry of objects and finds our mock instance and returns it
@@ -100,7 +100,7 @@ TODO: configuration example?
 
 
 ### Stateful Astrix Beans
-Every bean that is bound using an `AstrixServiceComponent` will be a "stateful" bean. `Astrix.getBean(BeanType.class)` always returns a proxy for a stateful bean (provided that there exists an api-descriptor exporting the given api). However, if the bean can't be bound the proxy will be in `UNBOUND` state in which it will throw a `ServiceUnavailableException` on each invocation. Astrix will periodically attempt to bind an `UNBOUND` bean until successful.
+Every service-bean in astrix (any bean bound using an `AstrixServiceComponent`) will be a "stateful" bean. `Astrix.getBean(BeanType.class)` always returns a proxy for a stateful bean (provided that there exists an `AstrixServiceProvider` exporting the given api). However, if the bean can't be bound the proxy will be in `UNBOUND` state in which it will throw a `ServiceUnavailableException` on each invocation. Astrix will periodically attempt to bind an `UNBOUND` bean until successful.
 
 The following example illustrates how a service-bean proxy goes from `UNBOUND` state to `BOUND` when the target service becomes available. It also illustrates usage of AstrixSettings as an external configuration provider which can be useful in testing.
 

@@ -15,14 +15,14 @@
  */
 package tutorial.p3.server;
 
-import tutorial.p3.provider.LunchServiceApi;
+import tutorial.p3.provider.LunchServiceProvider;
 
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixService;
 
 @AstrixService(
 	apiDescriptors = {
-		LunchServiceApi.class
+		LunchServiceProvider.class
 	},
 	component = AstrixServiceComponentNames.GS_REMOTING
 )
