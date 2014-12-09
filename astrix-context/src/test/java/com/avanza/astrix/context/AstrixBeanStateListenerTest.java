@@ -26,6 +26,8 @@ import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixConfigApi;
+import com.avanza.astrix.provider.core.AstrixConfigLookup;
+import com.avanza.astrix.provider.core.AstrixServiceProvider;
 import com.avanza.astrix.provider.library.AstrixExport;
 import com.avanza.astrix.provider.library.AstrixLibraryProvider;
 
@@ -92,10 +94,8 @@ public class AstrixBeanStateListenerTest {
 		}
 	}
 	
-	@AstrixConfigApi(
-		entryName = "myService",
-		exportedApis = MyService.class
-	)
+	@AstrixConfigLookup("myService")
+	@AstrixServiceProvider(MyService.class)
 	public static class MyServiceDescriptor {
 	}
 	

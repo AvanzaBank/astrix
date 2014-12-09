@@ -16,7 +16,8 @@
 package com.avanza.astrix.service.registry.client;
 
 import com.avanza.astrix.context.AstrixSettings;
-import com.avanza.astrix.provider.core.AstrixConfigApi;
+import com.avanza.astrix.provider.core.AstrixConfigLookup;
+import com.avanza.astrix.provider.core.AstrixServiceProvider;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
 
 /**
@@ -31,12 +32,8 @@ import com.avanza.astrix.provider.versioning.AstrixVersioned;
 	version = 1,
 	objectSerializerConfigurer = ServiceRegistryObjectSerializerConfigurer.class
 )
-@AstrixConfigApi(
-	exportedApis = {
-			AstrixServiceRegistry.class
-	},
-	entryName = AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI
-)
+@AstrixConfigLookup(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI)
+@AstrixServiceProvider(AstrixServiceRegistry.class)
 public class AstrixServiceRegistryApiDescriptor {
 }
 

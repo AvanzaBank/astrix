@@ -42,7 +42,9 @@ public class AstrixConfigServiceLookupPlugin implements AstrixServiceLookupPlugi
 		String component = serviceUriIncludingComponent.substring(0, serviceUriIncludingComponent.indexOf(":"));
 		String serviceUri = serviceUriIncludingComponent.substring(serviceUriIncludingComponent.indexOf(":") + 1);
 		AstrixServiceComponent serviceComponent = getServiceComponent(component);
-		return serviceComponent.createServiceProperties(serviceUri);
+		AstrixServiceProperties serviceProperties = serviceComponent.createServiceProperties(serviceUri);
+		serviceProperties.setComponent(serviceComponent.getName());
+		return serviceProperties;
 	}
 	
 	private AstrixServiceComponent getServiceComponent(String componentName) {
