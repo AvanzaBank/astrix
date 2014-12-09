@@ -46,8 +46,13 @@ public class TestAstrixConfigurer {
 		return configurer.configure();
 	}
 
+	/**
+	 * @deprecated renamed to registerApiProvider
+	 * @param descriptor
+	 */
+	@Deprecated
 	public void registerApiDescriptor(Class<?> descriptor) {
-		descriptors.add(AstrixApiDescriptor.create(descriptor));
+		registerApiProvider(descriptor);
 	}
 	
 	/**

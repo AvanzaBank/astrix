@@ -43,7 +43,7 @@ public class AstrixServiceTest {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		configurer.set(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 10);
-		configurer.registerApiDescriptor(GreetingApiDescriptor.class);
+		configurer.registerApiProvider(GreetingApiProvider.class);
 		context = configurer.configure();
 	}
 	
@@ -120,7 +120,7 @@ public class AstrixServiceTest {
 	
 	@AstrixConfigLookup(GREETING_SERVICE_URI)
 	@AstrixServiceProvider(GreetingService.class)
-	public static class GreetingApiDescriptor {
+	public static class GreetingApiProvider {
 	}
 	
 	public interface GreetingService {

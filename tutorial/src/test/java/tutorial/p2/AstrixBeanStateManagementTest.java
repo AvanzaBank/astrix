@@ -52,8 +52,8 @@ public class AstrixBeanStateManagementTest {
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		// Set the uri to the external config.
 		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, settings.getExternalConfigUri());
-		configurer.registerApiDescriptor(LunchServiceProvider.class);
-		configurer.registerApiDescriptor(LunchLibraryProvider.class);
+		configurer.registerApiProvider(LunchServiceProvider.class);
+		configurer.registerApiProvider(LunchLibraryProvider.class);
 		astrix = configurer.configure();
 		
 		LunchSuggester lunchSuggester = astrix.getBean(LunchSuggester.class);

@@ -15,8 +15,6 @@
  */
 package com.avanza.astrix.service.registry.client;
 
-import static com.avanza.astrix.test.util.AstrixTestUtil.isExceptionOfType;
-import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationException;
 import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationResult;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
@@ -34,10 +32,7 @@ import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixServiceProvider;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryApiTest.GreetingService;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryApiTest.GreetingServiceImpl;
 import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
@@ -63,9 +58,9 @@ public class AstrixServiceRegistryLookupTest {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		configurer.set(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 10);
-		configurer.registerApiDescriptor(GreetingApiDescriptor.class);
-		configurer.registerApiDescriptor(InMemoryServiceRegistryLibraryProvider.class);
-		configurer.registerApiDescriptor(AstrixServiceRegistryLibraryProvider.class);
+		configurer.registerApiProvider(GreetingApiProvider.class);
+		configurer.registerApiProvider(InMemoryServiceRegistryLibraryProvider.class);
+		configurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		context = configurer.configure();
 		fakeServiceRegistry = (InMemoryServiceRegistry) context.getBean(AstrixServiceRegistry.class);
 		serviceRegistryClient = context.getBean(AstrixServiceRegistryClient.class);
@@ -107,7 +102,7 @@ public class AstrixServiceRegistryLookupTest {
 	
 	@AstrixServiceRegistryLookup
 	@AstrixServiceProvider(GreetingService.class)
-	public static class GreetingApiDescriptor {
+	public static class GreetingApiProvider {
 	}
 	
 	public interface GreetingService {

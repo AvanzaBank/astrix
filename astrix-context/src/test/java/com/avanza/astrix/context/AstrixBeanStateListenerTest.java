@@ -33,8 +33,8 @@ public class AstrixBeanStateListenerTest {
 		String myServiceId = AstrixDirectComponent.register(MyService.class, new MyServiceImpl());
 		TestAstrixConfigurer testAstrixConfigurer = new TestAstrixConfigurer();
 		testAstrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
-		testAstrixConfigurer.registerApiDescriptor(MyLibraryDescriptor.class);
-		testAstrixConfigurer.registerApiDescriptor(MyServiceDescriptor.class);
+		testAstrixConfigurer.registerApiProvider(MyLibraryProvider.class);
+		testAstrixConfigurer.registerApiProvider(MyServiceProvider.class);
 		AstrixContext Astrix = testAstrixConfigurer.configure();
 		
 		final MyClient myClient = Astrix.getBean(MyClient.class);
@@ -81,7 +81,7 @@ public class AstrixBeanStateListenerTest {
 	}
 	
 	@AstrixLibraryProvider
-	public static class MyLibraryDescriptor {
+	public static class MyLibraryProvider {
 		
 		@AstrixExport
 		public MyClient myClient(MyService service) {
@@ -91,7 +91,7 @@ public class AstrixBeanStateListenerTest {
 	
 	@AstrixConfigLookup("myService")
 	@AstrixServiceProvider(MyService.class)
-	public static class MyServiceDescriptor {
+	public static class MyServiceProvider {
 	}
 	
 	

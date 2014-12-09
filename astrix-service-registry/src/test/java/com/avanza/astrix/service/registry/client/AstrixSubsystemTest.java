@@ -37,16 +37,16 @@ public class AstrixSubsystemTest {
 		// Simulate two different subsystems using to AstrixContext's
 		TestAstrixConfigurer configurerA = new TestAstrixConfigurer();
 		configurerA.setSubsystem("A");
-		configurerA.registerApiDescriptor(GreetingApiDescriptor.class);
+		configurerA.registerApiProvider(GreetingServiceProvider.class);
 		configurerA.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
-		configurerA.registerApiDescriptor(AstrixServiceRegistryLibraryProvider.class);
+		configurerA.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		AstrixContext contextA = configurerA.configure();
 		
 		TestAstrixConfigurer configurerB = new TestAstrixConfigurer();
 		configurerB.setSubsystem("B");
-		configurerB.registerApiDescriptor(GreetingApiDescriptor.class);
+		configurerB.registerApiProvider(GreetingServiceProvider.class);
 		configurerB.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
-		configurerB.registerApiDescriptor(AstrixServiceRegistryLibraryProvider.class);
+		configurerB.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		AstrixContext contextB = configurerB.configure();
 
 		// Publish non versioned service in contextB
@@ -69,16 +69,16 @@ public class AstrixSubsystemTest {
 		// Simulate two different subsystems using to AstrixContext's
 		TestAstrixConfigurer configurerA = new TestAstrixConfigurer();
 		configurerA.setSubsystem("A");
-		configurerA.registerApiDescriptor(VersionedGreetingApiDescriptor.class);
+		configurerA.registerApiProvider(VersionedGreetingServiceProvider.class);
 		configurerA.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
-		configurerA.registerApiDescriptor(AstrixServiceRegistryLibraryProvider.class);
+		configurerA.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		AstrixContext contextA = configurerA.configure();
 		
 		TestAstrixConfigurer configurerB = new TestAstrixConfigurer();
 		configurerB.setSubsystem("B");
-		configurerB.registerApiDescriptor(VersionedGreetingApiDescriptor.class);
+		configurerB.registerApiProvider(VersionedGreetingServiceProvider.class);
 		configurerB.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
-		configurerB.registerApiDescriptor(AstrixServiceRegistryLibraryProvider.class);
+		configurerB.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		AstrixContext contextB = configurerB.configure();
 
 		// Publish non versioned service in contextB
@@ -97,7 +97,7 @@ public class AstrixSubsystemTest {
 	
 	@AstrixServiceRegistryLookup
 	@AstrixServiceProvider(GreetingService.class)
-	public static class GreetingApiDescriptor {
+	public static class GreetingServiceProvider {
 	}
 	
 	@AstrixVersioned(
@@ -106,7 +106,7 @@ public class AstrixSubsystemTest {
 	)
 	@AstrixServiceRegistryLookup
 	@AstrixServiceProvider(GreetingService.class)
-	public static class VersionedGreetingApiDescriptor {
+	public static class VersionedGreetingServiceProvider {
 	}
 	
 	public static class DummyConfigurer implements AstrixObjectSerializerConfigurer {

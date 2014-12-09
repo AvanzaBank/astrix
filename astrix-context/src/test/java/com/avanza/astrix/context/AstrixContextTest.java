@@ -52,7 +52,7 @@ public class AstrixContextTest {
 	@Test(expected = MissingBeanDependencyException.class)
 	public void detectsMissingBeanDependencies() throws Exception {
 		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiDescriptor(DependentApi.class);
+		AstrixConfigurer.registerApiProvider(DependentApi.class);
 		AstrixContext AstrixContext = AstrixConfigurer.configure();
 
 		AstrixContext.getBean(DependentBean.class);
@@ -61,7 +61,7 @@ public class AstrixContextTest {
 	@Test
 	public void asterixBeansAreDestroyedUponContextDestroy() throws Exception {
 		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiDescriptor(HelloBeanLibrary.class);
+		AstrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
 		AstrixContext astrixContext = AstrixConfigurer.configure();
 
 		HelloBean helloBean = astrixContext.getBean(HelloBean.class);
@@ -75,7 +75,7 @@ public class AstrixContextTest {
 	@Test
 	public void asterixBeansAreInitializedWhenFirstCreated() throws Exception {
 		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiDescriptor(HelloBeanLibrary.class);
+		AstrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
 		AstrixContext astrixContext = AstrixConfigurer.configure();
 
 		HelloBean helloBean = astrixContext.getBean(HelloBean.class);
@@ -85,7 +85,7 @@ public class AstrixContextTest {
 	@Test
 	public void cachesCreatedApis() throws Exception {
 		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiDescriptor(HelloBeanLibrary.class);
+		AstrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
 		AstrixContext AstrixContext = AstrixConfigurer.configure();
 
 		HelloBean beanA = AstrixContext.getBean(HelloBean.class);
@@ -126,11 +126,11 @@ public class AstrixContextTest {
 	@Test
 	public void manyAstrixContextShouldBeAbleToRunInSameProcessWithoutInterferenceInShutdown() throws Exception {
 		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiDescriptor(HelloBeanLibrary.class);
+		AstrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
 		AstrixContext context = AstrixConfigurer.configure();
 		
 		TestAstrixConfigurer AstrixConfigurer2 = new TestAstrixConfigurer();
-		AstrixConfigurer2.registerApiDescriptor(HelloBeanLibrary.class);
+		AstrixConfigurer2.registerApiProvider(HelloBeanLibrary.class);
 		AstrixContext context2 = AstrixConfigurer2.configure();
 		context.destroy();
 		

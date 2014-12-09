@@ -48,8 +48,8 @@ public class LunchLibraryTest {
 
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.set("restaurantFinderUri", serviceUri);
-		configurer.registerApiDescriptor(LunchServiceProvider.class);
-		configurer.registerApiDescriptor(LunchLibraryProvider.class);
+		configurer.registerApiProvider(LunchServiceProvider.class);
+		configurer.registerApiProvider(LunchLibraryProvider.class);
 		astrix = configurer.configure();
 		
 		LunchSuggester lunchSuggester = astrix.getBean(LunchSuggester.class);
