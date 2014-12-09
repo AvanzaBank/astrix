@@ -25,11 +25,13 @@ import org.mockito.Mockito;
 
 import tutorial.p2.api.LunchRestaurantFinder;
 import tutorial.p2.api.LunchSuggester;
+import tutorial.p2.provider.LunchLibraryProvider;
+import tutorial.p2.provider.LunchServiceProvider;
 
-import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.AstrixSettings;
+import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
 
 public class AstrixBeanStateManagementTest {
@@ -44,13 +46,14 @@ public class AstrixBeanStateManagementTest {
 	
 	@Test
 	public void astrixManagesStateForEachServiceBean() throws Exception {
-		AstrixConfigurer configurer = new AstrixConfigurer();
+		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		// The BEAN_BIND_ATTEMPT_INTERVAL determines how often 
 		// Astrix will attempt to bind a given bean (millis).
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		// Set the uri to the external config.
 		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, settings.getExternalConfigUri());
-		configurer.setBasePackage("tutorial.p2");
+		configurer.registerApiDescriptor(LunchServiceProvider.class);
+		configurer.registerApiDescriptor(LunchLibraryProvider.class);
 		astrix = configurer.configure();
 		
 		LunchSuggester lunchSuggester = astrix.getBean(LunchSuggester.class);

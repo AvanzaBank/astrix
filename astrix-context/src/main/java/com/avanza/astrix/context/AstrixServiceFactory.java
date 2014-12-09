@@ -76,7 +76,7 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 		if (!enforceSubsystemBoundaries) {
 			return true;
 		}
-		return providerSubsystem.equals(this.subsystem);
+		return this.subsystem.equals(providerSubsystem);
 	}
 	
 	private T createIllegalSubsystemProxy(String providerSubsystem) {

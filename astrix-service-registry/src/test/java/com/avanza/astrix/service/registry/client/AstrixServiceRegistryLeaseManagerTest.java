@@ -57,7 +57,7 @@ public class AstrixServiceRegistryLeaseManagerTest {
 		AstrixConfig.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
 		AstrixConfig.registerApiDescriptor(TestDescriptor.class);
 		AstrixConfig.registerApiDescriptor(AstrixServiceRegistryLibrary.class);
-		AstrixConfig.registerApi(AstrixServiceRegistry.class, serviceRegistry);
+		AstrixConfig.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		context = AstrixConfig.configure();
 		serviceRegistryClient = context.getBean(AstrixServiceRegistryClient.class);
 		

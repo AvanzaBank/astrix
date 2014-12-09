@@ -39,10 +39,10 @@ public class MockingAstrixBeansTest {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		
 		// Register the api(s) we intend to test
-		astrixConfigurer.registerApiDescriptor(LunchLibraryProvider.class);
+		astrixConfigurer.registerApiProvider(LunchLibraryProvider.class);
 		
 		// Stub out its dependency 
-		astrixConfigurer.registerApi(LunchRestaurantFinder.class, restaurantFinderStub);
+		astrixConfigurer.registerAstrixBean(LunchRestaurantFinder.class, restaurantFinderStub);
 		AstrixContext astrixContext = astrixConfigurer.configure();
 		
 		// Get the api we intend to test

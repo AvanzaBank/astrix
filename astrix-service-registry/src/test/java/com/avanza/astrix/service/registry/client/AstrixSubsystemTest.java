@@ -37,14 +37,14 @@ public class AstrixSubsystemTest {
 		TestAstrixConfigurer configurerA = new TestAstrixConfigurer();
 		configurerA.setSubsystem("A");
 		configurerA.registerApiDescriptor(GreetingApiDescriptor.class);
-		configurerA.registerApi(AstrixServiceRegistry.class, serviceRegistry);
+		configurerA.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		configurerA.registerApiDescriptor(AstrixServiceRegistryLibrary.class);
 		AstrixContext contextA = configurerA.configure();
 		
 		TestAstrixConfigurer configurerB = new TestAstrixConfigurer();
 		configurerB.setSubsystem("B");
 		configurerB.registerApiDescriptor(GreetingApiDescriptor.class);
-		configurerB.registerApi(AstrixServiceRegistry.class, serviceRegistry);
+		configurerB.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		configurerB.registerApiDescriptor(AstrixServiceRegistryLibrary.class);
 		AstrixContext contextB = configurerB.configure();
 
@@ -69,14 +69,14 @@ public class AstrixSubsystemTest {
 		TestAstrixConfigurer configurerA = new TestAstrixConfigurer();
 		configurerA.setSubsystem("A");
 		configurerA.registerApiDescriptor(VersionedGreetingApiDescriptor.class);
-		configurerA.registerApi(AstrixServiceRegistry.class, serviceRegistry);
+		configurerA.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		configurerA.registerApiDescriptor(AstrixServiceRegistryLibrary.class);
 		AstrixContext contextA = configurerA.configure();
 		
 		TestAstrixConfigurer configurerB = new TestAstrixConfigurer();
 		configurerB.setSubsystem("B");
 		configurerB.registerApiDescriptor(VersionedGreetingApiDescriptor.class);
-		configurerB.registerApi(AstrixServiceRegistry.class, serviceRegistry);
+		configurerB.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		configurerB.registerApiDescriptor(AstrixServiceRegistryLibrary.class);
 		AstrixContext contextB = configurerB.configure();
 

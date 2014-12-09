@@ -8,10 +8,10 @@ Service binding is done in two steps:
 1. Lookup the service properties associated with the given service. This involves identifying what `AstrixServiceComponent` to use and find all properties required by the `AstrixServiceComponent` to bind to the service.
 2. Use the `AstrixServiceComponent` to bind to the given service.
 
-Those two steps offers two levels of indirection. The first one is how to lookup the service-properties associated with a service. Out of the box Astrix supports two mechanisms for service-properties lookup. One using configuration, `@AstrixConfigApi`, and another using the service-registry, `@AstrixServiceRegistryApi`, which will be introduced later. The other level of indirection is how Astrix binds to a service, which done by the `AstrixServiceComponent`. Astrix comes with a number of service-component implementations out of the box which will be introduced throughout the tutorial. 
+Those two steps offers two levels of indirection. The first one is how to lookup the service-properties associated with a service. Out of the box Astrix supports two mechanisms for service lookup. One using configuration, `@AstrixConfigLookup`, and another using the service-registry, `@AstrixServiceRegistryLookup`, which will be introduced later. The other level of indirection is how Astrix binds to a service, which done by the `AstrixServiceComponent`. Astrix comes with a number of service-component implementations out of the box which will be introduced throughout the tutorial. 
 
 
-### Service binding using AstrixDirectComponent and @AstrixConfigApi
+### Service binding using AstrixDirectComponent and @AstrixConfigLookup
 The first service-component covered is the `AstrixDirectComponent` which is a useful tool to support testing. It allows binding to a service provider within the same process, i.e. an ordinary object within the same jvm. The true power of the `AstrixDirectComponent` comes when using it in combination with the service-registry, which we will se later in the tutorial when introducing the service-registry. This example introduces the `AstrixDirectComponent` in combination with a `@AstrixConfigApi`.
 
 In this example the api i split into one library, `LunchSuggester`, and one service, `LunchRestaruantFinder`. The api-descriptor exporting the `LunchRestaurantFinder` is annotated with `@AstrixConfigApi` which tells Astrix to lookup the service-properties for the `LunchRestaurantFinder` in configuration under the entry name `"restaurantFinderUri"`.
@@ -36,10 +36,8 @@ public interface LunchRestaurantFinder {
 	List<String> getAllRestaurants();
 }
 
-@AstrixConfigApi(
-	exportedApis = LunchRestaurantFinder.class,
-	entryName = "restaurantFinderUri"
-)
+@AstrixConfigLookup("restaurantFinderUri")
+@AstrixServiceProvider(LunchRestaurantFinder.class)
 public class LunchServiceProvider {
 }
 ```
@@ -154,7 +152,8 @@ public class AstrixBeanStateManagementTest {
 3. The `LunchSuggester` uses `LunchRestaurantFinder` in background. Since the configuration contains no entry for  `"restarurantFinderUri"` the `LunchRestaurantFinder` will be in state `UNBOUND`
 4. This registers a mock instance for `LunchRestaurantFinder` in the direct-component, which returns a serviceUri that can be used to bind to the mock instance.
 5. A `"restaurantFinderUri"` pointing to the mock is added to the configuration.
-6. Astrix allows us to wait for a bean to be bound. Note that we are waiting for a Library. Astrix is clever and detects that the library uses the `LunchRestaurantFinder` and therefore waits until the `LunchRestaurantFinder` is bound.
+6. Astrix allows us to wait for a bean to be bound. Note that we are waiting for a Library. Astrix is clever and detects that the library uses the `LunchRest
+7. aurantFinder` and therefore waits until the `LunchRestaurantFinder` is bound.
 7. The `LunchSuggester` library is invoked, which in turn invokes the `LunchRestaurantFinder` service which will be `BOUND` at this time.
 
 

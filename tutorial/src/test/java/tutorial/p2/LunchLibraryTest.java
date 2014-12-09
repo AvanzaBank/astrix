@@ -25,10 +25,12 @@ import org.mockito.Mockito;
 
 import tutorial.p2.api.LunchRestaurantFinder;
 import tutorial.p2.api.LunchSuggester;
+import tutorial.p2.provider.LunchLibraryProvider;
+import tutorial.p2.provider.LunchServiceProvider;
 
-import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
+import com.avanza.astrix.context.TestAstrixConfigurer;
 
 public class LunchLibraryTest {
 	
@@ -44,9 +46,10 @@ public class LunchLibraryTest {
 		LunchRestaurantFinder restaurantFinderStub = Mockito.mock(LunchRestaurantFinder.class);
 		String serviceUri = AstrixDirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinderStub);
 
-		AstrixConfigurer configurer = new AstrixConfigurer();
+		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.set("restaurantFinderUri", serviceUri);
-		configurer.setBasePackage("tutorial.p2");
+		configurer.registerApiDescriptor(LunchServiceProvider.class);
+		configurer.registerApiDescriptor(LunchLibraryProvider.class);
 		astrix = configurer.configure();
 		
 		LunchSuggester lunchSuggester = astrix.getBean(LunchSuggester.class);

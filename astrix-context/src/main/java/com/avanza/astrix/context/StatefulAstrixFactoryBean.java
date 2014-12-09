@@ -17,6 +17,9 @@ package com.avanza.astrix.context;
 
 import java.lang.reflect.Proxy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -25,6 +28,7 @@ import java.lang.reflect.Proxy;
  */
 final class StatefulAstrixFactoryBean<T> implements AstrixFactoryBeanPlugin<T>, AstrixDecorator, AstrixEventBusAware, AstrixBeanStateWorkerAware {
 
+	private static final Logger log = LoggerFactory.getLogger(StatefulAstrixFactoryBean.class);
 	private final AstrixFactoryBeanPlugin<T> targetFactory;
 	private AstrixEventBus eventBus;
 	private AstrixBeanStateWorker beanStateWorker;
@@ -44,6 +48,7 @@ final class StatefulAstrixFactoryBean<T> implements AstrixFactoryBeanPlugin<T>, 
 		try {
 			handler.bind();
 		} catch (Exception e) {
+			log.info("Failed to bind to " + handler.getBeanFactory().getBeanType().getName() + " astrixBeanId=" + handler.getId(), e);
 		}
 		beanStateWorker.add(handler);
 		return targetFactory.getBeanType().cast(Proxy.newProxyInstance(targetFactory.getBeanType().getClassLoader(), new Class<?>[]{targetFactory.getBeanType()}, handler));

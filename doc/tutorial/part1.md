@@ -1,5 +1,5 @@
 # Part 1 - The IOC container
-One of the cornerstones in the design philosophy of Astrix is that Astrix manages the creation and lifecycle of every element that is part of a published api. In this context, a published api is something that is intended to be reused by many different applications within an organization, and often backed by one or many microservices. The api is typically maintained by a single team, and consumed by applications maintained by many other teams. Astrix has similarities with other IOC frameworks like Spring or Guice. However, Astrix is not intended to be used as a standalone IOC-container. Rather Astrix complements another IOC-container acting as a factory to create types that is part of a published api, whereas the other IOC-framework is responsible for wiring all application-beans, some of which are api-beans created by astrix, and managing their lifecycle.
+One of the cornerstones in the design philosophy of Astrix is that Astrix manages the creation and lifecycle of every element that is part of a published api. In this context, a published api is something that is intended to be reused by many different applications within an organization, and often backed by one or more microservices. The api is typically maintained by a single team, and consumed by applications maintained by many other teams. Astrix has similarities with other IOC frameworks like Spring or Guice. However, Astrix is not intended to be used as a standalone IOC-container. Rather Astrix complements another IOC-container acting as a factory to create types that is part of a published api, whereas the other IOC-framework is responsible for wiring all application-beans, some of which are api-beans created by astrix, and managing their lifecycle.
 
 #### Why two IOC-containers?
 A typical IOC container like spring is well suited to provide loose coupling between the application objects. A good practice when developing spring applications is to "program against interface's" which means that the different application objects only know each other by interface. This works well for fairly large applications. 
@@ -13,7 +13,7 @@ Astrix provides great integration with spring through the `AstrixFrameworkBean`,
 ### ApplicationContext and AstrixContext  
 ![AstrixContext](AstrixIOC.png)
 
-At runtime, every object that is part of an api managed by Astrix is called an astrix-bean, which is similar to a bean in spring. In order for Astrix to be able to create an astrix-bean of a given type, an `ApiProvider` for the given api must exist. Astrix has an extendible `ApiProvider` mechanism, which allows new api "types" to be plugged into Astrix. Two common api types that are supported out of the box are `Library` and `ServiceRegistryApi`.
+At runtime, every object that is part of an api managed by Astrix is called an astrix-bean, which is similar to a bean in spring. In order for Astrix to be able to create an astrix-bean of a given type, an `ApiProvider` for the given api must exist. Astrix has an extendible `ApiProvider` mechanism, which allows new api "types" to be plugged into Astrix. Two common api types that are supported out of the box are `Library` and `Service`.
 
 A `Library` consist of a number of public interfaces/classes and associated implementations. Astrix shields a library provider from the consumers of the library by allowing the consumer to "program against interfaces" without ever needing to now what implements the given interfaces, or how the classes that implement the interfaces are assembled.
 
@@ -48,8 +48,7 @@ public class LunchSuggesterImpl implements LunchSuggester {
 
 }
 ```
-
-Finally, in order to use Astrix as a factory to create instances of the given library an api-descriptor must exist. An api-descriptor exports the public elements of an api. There are different kinds of api-descriptors, and the one associated with libraries is called library-descriptor. A library-descriptor is typically located in the same module as the implementing classes.
+Finally, an `ApiProvider` is created to export the library. An `ApiProvider` is what makes the api available as an astrix-api. Two kinds of `ApiProvider` exists and the one associated with libraries is called `AstrixLibraryProvider`. The `ApiProvider` is typically located in the same module as the implementing classes.
 
 
 ```java
@@ -64,7 +63,7 @@ public class LunchLibraryProvider {
 }
 ```
  
-The `@AstrixLibraryProvider` annotation tells Astrix that this class is a factory for a library api. Each method annotated with `@AstrixExport` will act as a factory method to create a given api element, which is defined by the return type of the factory method, which is `LunchSuggester` in this example.
+The `@AstrixLibraryProvider` annotation tells Astrix that this class is a library api. Each method annotated with `@AstrixExport` will act as a factory method to create a given api element, which is defined by the return type of the factory method, which is `LunchSuggester` in this example.
 
 ### Consuming the Library
 Consumption of the LunchApi is done by first creating an `AstrixContext` and then use it as a factory, as in the following unit test.
@@ -246,10 +245,10 @@ public class MockingAstrixBeansTest {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		
 		// Register the api(s) we intend to test
-		astrixConfigurer.registerApiDescriptor(LunchLibraryProvider.class);
+		astrixConfigurer.registerApiProvider(LunchLibraryProvider.class);
 		
 		// Stub out its dependency 
-		astrixConfigurer.registerApi(LunchRestaurantFinder.class, restaurantFinderStub);
+		astrixConfigurer.registerAstrixBean(LunchRestaurantFinder.class, restaurantFinderStub);
 		AstrixContext astrixContext = astrixConfigurer.configure();
 		
 		// Get the api we intend to test
@@ -276,6 +275,6 @@ public class MockingAstrixBeansTest {
 
 }
 ```
-In the example we are using the `TestAstrixConfigurer` instead of the normal `AstrixConfigurer`. The `TestAstrixConfigurer` uses `AstrixConfigurer` behind the scenes, but it creates a configuration suitable for unit testing. It also exposes some functionality not available using the regular `AstrixConfigurer` api, and disables api-descriptor scanning. Therefore we programmatically register api-descriptors for the api's we intend to test. In the example the api under test depends on another api, `LunchRestaurantFinder`. The `TestAstrixConfigurer.addApi` allows us to register a mock for that api in the test. Since the creation of a AstrixContext is very fast and we stubbed out the single service dependency, this test will run at "unit test" speed.
+In the example we are using a `TestAstrixConfigurer` instead of the normal `AstrixConfigurer`. A `TestAstrixConfigurer` uses `AstrixConfigurer` behind the scenes, but it creates a configuration suitable for unit testing. It also exposes some functionality not available using the regular `AstrixConfigurer` api, and disables `ApiProvider` scanning. Therefore we programmatically register an `ApiProvider` for the api we intend to test. In the example the api under test depends on another astrix-bean in another api, the `LunchRestaurantFinder`. The `TestAstrixConfigurer.registerAstrixBean` allows us to register a mock for that astrix-bean in the test. Since the creation of a AstrixContext is very fast and we stubbed out the single service dependency, this test will run at "unit test" speed.
 
 [Next: Part 2 - Service Binding](part2.md)  
