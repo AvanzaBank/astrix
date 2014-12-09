@@ -17,10 +17,10 @@ package com.avanza.astrix.gs;
 
 import org.openspaces.core.GigaSpace;
 
-import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
+import com.avanza.astrix.provider.core.AstrixServiceProvider;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 
-@AstrixServiceRegistryApi(
-	GigaSpace.class
-)
+@AstrixServiceRegistryLookup
+@AstrixServiceProvider(GigaSpace.class)
 public class GsDescriptor {
 }
