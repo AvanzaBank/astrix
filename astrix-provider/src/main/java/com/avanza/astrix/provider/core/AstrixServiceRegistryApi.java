@@ -26,12 +26,14 @@ import java.lang.annotation.Target;
  * Used to indicate that this api should be exported(published) to the
  * service registry as well as looked up on the service registry by
  * consumers.
+ * @deprecated - replaced by {@link AstrixServiceRegistryLookup} and {@link AstrixServiceProvider} (both required)
  * 
  * @author Elias Lindholm (elilin)
  */
 @Target(value = { ElementType.TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
+@Deprecated
 public @interface AstrixServiceRegistryApi {
 
 	/**
