@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 
 
 /**
- * Similar to {@link AstrixServiceRegistryApi} but uses configuration mechanism to lookup service-properties
+ * Similar to {@link AstrixServiceRegistryApi} but uses {@link AstrixConfigLookup} mechanism to lookup service-properties
  * for a given api. 
  * 
  * @author Elias Lindholm (elilin)

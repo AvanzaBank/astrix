@@ -33,7 +33,7 @@ import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistry;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistryClient;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryLibrary;
+import com.avanza.astrix.service.registry.client.AstrixServiceRegistryLibraryProvider;
 import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
 import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
 import com.avanza.astrix.test.util.Poller;
@@ -56,7 +56,7 @@ public class AstrixServiceRegistryLeaseManagerTest {
 		AstrixConfig.set(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 1); // No Sleep between attempts
 		AstrixConfig.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
 		AstrixConfig.registerApiDescriptor(TestDescriptor.class);
-		AstrixConfig.registerApiDescriptor(AstrixServiceRegistryLibrary.class);
+		AstrixConfig.registerApiDescriptor(AstrixServiceRegistryLibraryProvider.class);
 		AstrixConfig.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		context = AstrixConfig.configure();
 		serviceRegistryClient = context.getBean(AstrixServiceRegistryClient.class);

@@ -64,8 +64,8 @@ public class AstrixServiceRegistryLookupTest {
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		configurer.set(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 10);
 		configurer.registerApiDescriptor(GreetingApiDescriptor.class);
-		configurer.registerApiDescriptor(InMemoryServiceRegistryDescriptor.class);
-		configurer.registerApiDescriptor(AstrixServiceRegistryLibrary.class);
+		configurer.registerApiDescriptor(InMemoryServiceRegistryLibraryProvider.class);
+		configurer.registerApiDescriptor(AstrixServiceRegistryLibraryProvider.class);
 		context = configurer.configure();
 		fakeServiceRegistry = (InMemoryServiceRegistry) context.getBean(AstrixServiceRegistry.class);
 		serviceRegistryClient = context.getBean(AstrixServiceRegistryClient.class);
