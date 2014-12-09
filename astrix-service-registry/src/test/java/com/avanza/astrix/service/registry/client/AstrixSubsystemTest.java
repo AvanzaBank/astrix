@@ -23,7 +23,8 @@ import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.IllegalSubsystemException;
 import com.avanza.astrix.context.TestAstrixConfigurer;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
+import com.avanza.astrix.provider.core.AstrixServiceProvider;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
 import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
@@ -94,7 +95,8 @@ public class AstrixSubsystemTest {
 		greetingServiceA.hello("bar");
 	}
 	
-	@AstrixServiceRegistryApi(GreetingService.class)
+	@AstrixServiceRegistryLookup
+	@AstrixServiceProvider(GreetingService.class)
 	public static class GreetingApiDescriptor {
 	}
 	
@@ -102,7 +104,8 @@ public class AstrixSubsystemTest {
 		objectSerializerConfigurer = DummyConfigurer.class,
 		version = 1
 	)
-	@AstrixServiceRegistryApi(GreetingService.class)
+	@AstrixServiceRegistryLookup
+	@AstrixServiceProvider(GreetingService.class)
 	public static class VersionedGreetingApiDescriptor {
 	}
 	
