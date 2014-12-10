@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixSettings;
@@ -46,7 +46,7 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 	private long exportIntervallMillis;		  
 	private long serviceLeaseTimeMillis;
 	private long retryIntervallMillis;
-	private AstrixContext astrixContext;
+	private AstrixContextImpl astrixContext;
 
 	public AstrixServiceRegistryExporterWorker() {
 	}
@@ -110,7 +110,7 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 	}
 	
 	@AstrixInject
-	public void setAstrixContext(AstrixContext astrixContext) {
+	public void setAstrixContext(AstrixContextImpl astrixContext) {
 		this.astrixContext = astrixContext;
 	}
 

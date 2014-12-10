@@ -36,7 +36,7 @@ import org.junit.Test;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.context.AstrixConfigurer;
-import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.IllegalSubsystemException;
@@ -105,7 +105,7 @@ public class AstrixIntegrationTest {
 	private LunchRestaurantGrader lunchRestaurantGrader;
 	private LunchServiceAsync asyncLunchService;
 	private PublicLunchFeeder publicLunchFeeder;
-	private AstrixContext astrix;
+	private AstrixContextImpl astrix;
 	private AstrixServiceRegistryClient serviceRegistryClient;
 
 	static {

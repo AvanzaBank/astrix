@@ -16,7 +16,7 @@
 package com.avanza.astrix.context;
 
 /**
- * Used internally by Astrix 'decorator' classes to allow AstrixContext
+ * Used internally by Astrix 'decorator' classes to allow AstrixContextImpl
  * to inject dependencies to decorated Astrix classes.
  * 
  * @author Elias Lindholm (elilin)

@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.context.AstrixConfigurer;
-import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
@@ -65,7 +65,7 @@ public class ClusteredProxyLibraryTest {
 	
 	private LunchService lunchService;
 
-	private AstrixContext astrix;
+	private AstrixContextImpl astrix;
 	
 	static {
 		BasicConfigurator.configure();

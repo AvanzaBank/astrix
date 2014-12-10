@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.IllegalSubsystemException;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -34,20 +34,20 @@ public class AstrixSubsystemTest {
 	@Test(expected = IllegalSubsystemException.class)
 	public void itsNotAllowedToInvokeNonVersionedServicesInOtherSubsystems() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
-		// Simulate two different subsystems using to AstrixContext's
+		// Simulate two different subsystems using to AstrixContextImpl's
 		TestAstrixConfigurer configurerA = new TestAstrixConfigurer();
 		configurerA.setSubsystem("A");
 		configurerA.registerApiProvider(GreetingServiceProvider.class);
 		configurerA.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		configurerA.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		AstrixContext contextA = configurerA.configure();
+		AstrixContextImpl contextA = configurerA.configure();
 		
 		TestAstrixConfigurer configurerB = new TestAstrixConfigurer();
 		configurerB.setSubsystem("B");
 		configurerB.registerApiProvider(GreetingServiceProvider.class);
 		configurerB.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		configurerB.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		AstrixContext contextB = configurerB.configure();
+		AstrixContextImpl contextB = configurerB.configure();
 
 		// Publish non versioned service in contextB
 		AstrixServiceRegistryClient serviceRegistryClientB = contextB.getBean(AstrixServiceRegistryClient.class);
@@ -66,20 +66,20 @@ public class AstrixSubsystemTest {
 	@Test
 	public void itsAllowedToInvokeVersionedServicesInOtherSubsystems() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
-		// Simulate two different subsystems using to AstrixContext's
+		// Simulate two different subsystems using to AstrixContextImpl's
 		TestAstrixConfigurer configurerA = new TestAstrixConfigurer();
 		configurerA.setSubsystem("A");
 		configurerA.registerApiProvider(VersionedGreetingServiceProvider.class);
 		configurerA.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		configurerA.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		AstrixContext contextA = configurerA.configure();
+		AstrixContextImpl contextA = configurerA.configure();
 		
 		TestAstrixConfigurer configurerB = new TestAstrixConfigurer();
 		configurerB.setSubsystem("B");
 		configurerB.registerApiProvider(VersionedGreetingServiceProvider.class);
 		configurerB.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		configurerB.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		AstrixContext contextB = configurerB.configure();
+		AstrixContextImpl contextB = configurerB.configure();
 
 		// Publish non versioned service in contextB
 		AstrixServiceRegistryClient serviceRegistryClientB = contextB.getBean(AstrixServiceRegistryClient.class);

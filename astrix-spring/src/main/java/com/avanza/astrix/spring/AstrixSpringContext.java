@@ -17,7 +17,7 @@ package com.avanza.astrix.spring;
 
 import org.springframework.context.ApplicationContext;
 
-import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixInject;
 /**
  * Acts as a bride between Astrix and Spring.
@@ -30,11 +30,11 @@ import com.avanza.astrix.context.AstrixInject;
  */
 public class AstrixSpringContext {
 	
-	private AstrixContext astrixContext;
+	private AstrixContextImpl astrixContext;
 	private ApplicationContext applicationContext;
 
 	@AstrixInject
-	public void setAstrixContext(AstrixContext astrixContext) {
+	public void setAstrixContext(AstrixContextImpl astrixContext) {
 		this.astrixContext = astrixContext;
 	}
 	
@@ -46,7 +46,7 @@ public class AstrixSpringContext {
 		return applicationContext;
 	}
 	
-	public AstrixContext getAstrixContext() {
+	public AstrixContextImpl getAstrixContext() {
 		return astrixContext;
 	}
 

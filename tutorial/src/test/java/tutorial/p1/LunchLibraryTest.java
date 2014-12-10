@@ -24,11 +24,11 @@ import tutorial.p1.api.LunchSuggester;
 import tutorial.p1.provider.AllLunchRestaurants;
 
 import com.avanza.astrix.context.AstrixConfigurer;
-import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixContextImpl;
 
 public class LunchLibraryTest {
 	
-	private AstrixContext astrix;
+	private AstrixContextImpl astrix;
 	
 	@After
 	public void after() {

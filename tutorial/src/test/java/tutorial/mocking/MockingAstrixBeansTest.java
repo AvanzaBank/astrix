@@ -26,7 +26,7 @@ import tutorial.p1.api.LunchRestaurantFinder;
 import tutorial.p1.api.LunchSuggester;
 import tutorial.p1.provider.LunchSuggesterImpl;
 
-import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.library.AstrixExport;
 import com.avanza.astrix.provider.library.AstrixLibraryProvider;
@@ -43,7 +43,7 @@ public class MockingAstrixBeansTest {
 		
 		// Stub out its dependency 
 		astrixConfigurer.registerAstrixBean(LunchRestaurantFinder.class, restaurantFinderStub);
-		AstrixContext astrixContext = astrixConfigurer.configure();
+		AstrixContextImpl astrixContext = astrixConfigurer.configure();
 		
 		// Get the api we intend to test
 		LunchSuggester lunchSuggester = astrixContext.getBean(LunchSuggester.class);

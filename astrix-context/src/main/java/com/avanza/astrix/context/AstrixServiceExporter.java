@@ -39,7 +39,7 @@ public class AstrixServiceExporter {
 	private AstrixServiceComponents serviceComponents;
 	private AstrixServiceDescriptor serviceDescriptor;
 	private final Map<Class<?>, AstrixApiDescriptor> apiDescriptorByProvideService = new ConcurrentHashMap<Class<?>, AstrixApiDescriptor>();
-	private AstrixContext astrixContext;
+	private AstrixContextImpl astrixContext;
 	private final List<Object> serviceProviders = new CopyOnWriteArrayList<>();
 	
 	public void exportProvidedServices() {
@@ -69,7 +69,7 @@ public class AstrixServiceExporter {
 	}
 	
 	@AstrixInject
-	public void setAstrixContext(AstrixContext astrixContext) {
+	public void setAstrixContext(AstrixContextImpl astrixContext) {
 		this.astrixContext = astrixContext;
 	}
 
