@@ -11,5 +11,9 @@
 			<groupId>junit</groupId>
 			<artifactId>junit-dep</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+		</dependency>
 	</dependencies>
 </project>
