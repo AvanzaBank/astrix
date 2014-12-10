@@ -25,12 +25,14 @@ import com.avanza.astrix.context.AstrixBeanKey;
 import com.avanza.astrix.context.AstrixBeans;
 import com.avanza.astrix.context.AstrixServiceLookupPlugin;
 import com.avanza.astrix.context.AstrixServiceProperties;
+import com.avanza.astrix.context.DefaultServiceLookup;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
+@DefaultServiceLookup
 @MetaInfServices(AstrixServiceLookupPlugin.class)
 public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupPlugin<AstrixServiceRegistryLookup>, AstrixBeanAware {
 

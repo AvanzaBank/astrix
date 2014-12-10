@@ -15,26 +15,18 @@
  */
 package com.avanza.astrix.context;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 
 /**
- * 
  * @author Elias Lindholm (elilin)
- *
  */
-public interface Astrix {
-
-	/**
-	 * Looks up a bean in the bean registry. <p>
-	 * 
-	 * @param beanType
-	 * @return
-	 */
-	<T> T getBean(Class<T> beanType);
-
-	<T> T getBean(Class<T> beanType, String qualifier);
-
-	<T> T waitForBean(Class<T> beanType, long timeoutMillis) throws InterruptedException;
-
-	<T> T waitForBean(Class<T> beanType, String qualifier,long timeoutMillis) throws InterruptedException;
-
+@Target(value = { ElementType.TYPE})
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface DefaultServiceLookup {
 }

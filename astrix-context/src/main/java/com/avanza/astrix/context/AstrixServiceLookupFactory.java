@@ -27,12 +27,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class AstrixServiceLookupFactory implements AstrixPluginsAware {
 	
 	private List<AstrixServiceLookupPlugin<? extends Annotation>> serviceLookupPlugins = new CopyOnWriteArrayList<>();
+	private AstrixServiceLookup defaultLookup;
 
 	public AstrixServiceLookup createServiceLookup(AstrixApiDescriptor descriptor) {
 		for (AstrixServiceLookupPlugin<?> lookupPlugin : serviceLookupPlugins) {
 			if (descriptor.isAnnotationPresent(lookupPlugin.getLookupAnnotationType())) {
 				return create(descriptor, lookupPlugin);
 			}
+		}
+		if (defaultLookup != null) {
+			return defaultLookup;
 		}
 		throw new IllegalArgumentException("Can't identify what lookup-strategy to use to locate services exported using descriptor: " + descriptor);
 	}
@@ -44,6 +48,9 @@ public class AstrixServiceLookupFactory implements AstrixPluginsAware {
 	@Override
 	public void setPlugins(AstrixPlugins plugins) {
 		for (AstrixServiceLookupPlugin<?> lookupPlugin : plugins.getPlugins(AstrixServiceLookupPlugin.class)) {
+			if (lookupPlugin.getClass().isAnnotationPresent(DefaultServiceLookup.class)) {
+				this.defaultLookup = AstrixServiceLookup.create(lookupPlugin, null);
+			}
 			this.serviceLookupPlugins.add(lookupPlugin);
 		}
 	}
