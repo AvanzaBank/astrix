@@ -113,15 +113,6 @@ public abstract class AstrixApiDescriptor {
 			return descriptorHolder;
 		}
 		
-		/**
-		 * Whether this api uses the service registry or not.
-		 * @return
-		 */
-		public boolean usesServiceRegistry() {
-			return descriptorHolder.isAnnotationPresent(AstrixServiceRegistryApi.class)
-					|| descriptorHolder.isAnnotationPresent(AstrixServiceRegistryLookup.class);
-		}
-		
 		public boolean isVersioned() {
 			return descriptorHolder.isAnnotationPresent(AstrixVersioned.class);
 		}
