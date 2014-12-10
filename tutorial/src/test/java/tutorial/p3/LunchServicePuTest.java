@@ -15,7 +15,7 @@
  */
 package tutorial.p3;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import javax.annotation.PostConstruct;
 

@@ -37,7 +37,7 @@ public class AstrixConfigurer {
 	}};
 	
 	public AstrixContext configure() {
-		AstrixContext context = new AstrixContext(settings);
+		AstrixContextImpl context = new AstrixContextImpl(settings);
 		for (PluginHolder<?> plugin : plugins) {
 			registerPlugin(context, plugin);
 		}
@@ -57,11 +57,11 @@ public class AstrixConfigurer {
 		return context;
 	}
 	
-	private <T> void registerPlugin(AstrixContext context, PluginHolder<T> pluginHolder) {
+	private <T> void registerPlugin(AstrixContextImpl context, PluginHolder<T> pluginHolder) {
 		context.registerPlugin(pluginHolder.pluginType, pluginHolder.pluginProvider);
 	}
 
-	private List<AstrixApiProvider> createApiProviders(AstrixApiProviderFactory apiProviderFactory, AstrixContext context) {
+	private List<AstrixApiProvider> createApiProviders(AstrixApiProviderFactory apiProviderFactory, AstrixContextImpl context) {
 		List<AstrixApiProvider> result = new ArrayList<>();
 		for (AstrixApiDescriptor descriptor : getApiDescriptors(context).getAll()) {
 			result.add(apiProviderFactory.create(descriptor));
@@ -69,7 +69,7 @@ public class AstrixConfigurer {
 		return result;
 	}
 
-	private AstrixApiDescriptors getApiDescriptors(AstrixContext context) {
+	private AstrixApiDescriptors getApiDescriptors(AstrixContextImpl context) {
 		if (this.AstrixApiDescriptors != null) {
 			return AstrixApiDescriptors;
 		}
@@ -92,11 +92,11 @@ public class AstrixConfigurer {
 		this.settings.set(AstrixSettings.ENABLE_VERSIONING, enableVersioning);
 	}
 	
-	private void discoverApiProviderPlugins(AstrixContext context) {
+	private void discoverApiProviderPlugins(AstrixContextImpl context) {
 		discoverAllPlugins(context, AstrixApiProviderPlugin.class);
 	}
 	
-	private static <T> void discoverAllPlugins(AstrixContext context, Class<T> type) {
+	private static <T> void discoverAllPlugins(AstrixContextImpl context, Class<T> type) {
 		List<T> plugins = AstrixPluginDiscovery.discoverAllPlugins(type);
 		if (plugins.isEmpty()) {
 			log.debug("No plugin discovered for {}", type.getName());
@@ -107,7 +107,7 @@ public class AstrixConfigurer {
 		}
 	}
 
-	private void configureVersioning(AstrixContext context) {
+	private void configureVersioning(AstrixContextImpl context) {
 		if (context.getSettings().getBoolean(AstrixSettings.ENABLE_VERSIONING, true)) {
 			discoverOnePlugin(context, AstrixVersioningPlugin.class);
 		} else {
@@ -115,7 +115,7 @@ public class AstrixConfigurer {
 		}
 	}
 	
-	private void configureFaultTolerance(AstrixContext context) {
+	private void configureFaultTolerance(AstrixContextImpl context) {
 		if (context.getSettings().getBoolean(AstrixSettings.ENABLE_FAULT_TOLERANCE, false)) {
 			discoverOnePlugin(context, AstrixFaultTolerancePlugin.class);
 		} else {
@@ -123,7 +123,7 @@ public class AstrixConfigurer {
 		}
 	}
 	
-	private static <T> T discoverOnePlugin(AstrixContext context, Class<T> type) {
+	private static <T> T discoverOnePlugin(AstrixContextImpl context, Class<T> type) {
 		T provider = AstrixPluginDiscovery.discoverOnePlugin(type);
 		log.debug("Found plugin for {}, using {}", type.getName(), provider.getClass().getName());
 		context.registerPlugin(type, provider);

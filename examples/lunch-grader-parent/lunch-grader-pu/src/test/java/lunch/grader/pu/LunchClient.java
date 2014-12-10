@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.AstrixSettings;
 
 public class LunchClient {
 	

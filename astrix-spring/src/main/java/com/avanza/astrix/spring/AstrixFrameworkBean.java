@@ -35,7 +35,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 
 import com.avanza.astrix.context.AstrixConfigurer;
-import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixServiceDescriptor;
 import com.avanza.astrix.context.AstrixServiceExporter;
 import com.avanza.astrix.context.AstrixServiceRegistryPlugin;
@@ -74,7 +74,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	private String subsystem;
 	private Map<String, String> settings = new HashMap<>();
 	private AstrixServiceDescriptor serviceDescriptor;
-	private AstrixContext astrixContext;
+	private AstrixContextImpl astrixContext;
 	
 	public AstrixFrameworkBean() {
 	}
@@ -139,13 +139,13 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		astrixContext.getInstance(AstrixSpringContext.class).setApplicationContext(applicationContext);
 	}
 	
-	private AstrixContext createAsterixContext() {
+	private AstrixContextImpl createAsterixContext() {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setSettings(this.settings);
 		if (this.subsystem != null) {
 			configurer.setSubsystem(this.subsystem);
 		}
-		AstrixContext astrixContext = configurer.configure();
+		AstrixContextImpl astrixContext = (AstrixContextImpl) configurer.configure();
 		return astrixContext;
 	}
 

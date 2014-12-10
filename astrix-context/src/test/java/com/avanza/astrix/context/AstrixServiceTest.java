@@ -36,7 +36,7 @@ import com.avanza.astrix.test.util.Supplier;
 public class AstrixServiceTest {
 	
 	private static final String GREETING_SERVICE_URI = "greetingServiceUri";
-	private AstrixContext context;
+	private AstrixContextImpl context;
 	
 	@Before
 	public void setup() {

@@ -35,7 +35,7 @@ public class AstrixLibraryTest {
 	public void aLibraryCanExportInterfaces() throws Exception {
 		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
 		AstrixConfigurer.registerApiProvider(MyLibraryProvider.class);
-		AstrixContext AstrixContext = AstrixConfigurer.configure();
+		AstrixContextImpl AstrixContext = AstrixConfigurer.configure();
 		
 		HelloBean libraryBean = AstrixContext.getBean(HelloBean.class);
 		assertEquals("hello: kalle", libraryBean.hello("kalle"));
@@ -45,7 +45,7 @@ public class AstrixLibraryTest {
 	public void aLibraryCanExportClasses() throws Exception {
 		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
 		AstrixConfigurer.registerApiProvider(MyLibraryProviderNoInterface.class);
-		AstrixContext AstrixContext = AstrixConfigurer.configure();
+		AstrixContextImpl AstrixContext = AstrixConfigurer.configure();
 
 		HelloBeanImpl libraryBean = AstrixContext.getBean(HelloBeanImpl.class);
 		assertEquals("hello: kalle", libraryBean.hello("kalle"));
@@ -57,7 +57,7 @@ public class AstrixLibraryTest {
 		AstrixConfigurer.registerApiProvider(CircularApiA.class);
 		AstrixConfigurer.registerApiProvider(CircularApiB.class);
 		AstrixConfigurer.registerApiProvider(CircularApiC.class);
-		AstrixContext AstrixContext = AstrixConfigurer.configure();
+		AstrixContextImpl AstrixContext = AstrixConfigurer.configure();
 
 		AstrixContext.getBean(HelloBeanImpl.class);
 	}
@@ -67,7 +67,7 @@ public class AstrixLibraryTest {
 		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
 		AstrixConfigurer.registerApiProvider(DependentApi.class);
 		AstrixConfigurer.registerApiProvider(IndependentApi.class);
-		AstrixContext AstrixContext = AstrixConfigurer.configure();
+		AstrixContextImpl AstrixContext = AstrixConfigurer.configure();
 
 		IndependentApi bean = AstrixContext.getBean(IndependentApi.class);
 		assertNotNull(bean);
@@ -76,7 +76,7 @@ public class AstrixLibraryTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void injectAnnotatedMethodMustAcceptAtLeastOneDependency() throws Exception {
 		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixContext AstrixContext = AstrixConfigurer.configure();
+		AstrixContextImpl AstrixContext = AstrixConfigurer.configure();
 		AstrixContext.getInstance(IllegalDependendClass.class);
 	}
 	
@@ -84,7 +84,7 @@ public class AstrixLibraryTest {
 	public void preDestroyAnnotatedMethodsOnLibraryFactoryInstancesAreInvokedWhenAstrixContextIsDestroyed() throws Exception {
 		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
 		AstrixConfigurer.registerApiProvider(MyLibraryProvider.class);
-		AstrixContext context = AstrixConfigurer.configure();
+		AstrixContextImpl context = AstrixConfigurer.configure();
 		
 		HelloBeanImpl helloBean = (HelloBeanImpl) context.getBean(HelloBean.class);
 		assertFalse(helloBean.destroyed);
@@ -96,11 +96,11 @@ public class AstrixLibraryTest {
 	public void librariesCreatedUsingDifferentContextsShouldReturnDifferentInstances() throws Exception {
 		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
 		AstrixConfigurer.registerApiProvider(MyLibraryProvider.class);
-		AstrixContext context = AstrixConfigurer.configure();
+		AstrixContextImpl context = AstrixConfigurer.configure();
 		
 		TestAstrixConfigurer AstrixConfigurer2 = new TestAstrixConfigurer();
 		AstrixConfigurer2.registerApiProvider(MyLibraryProvider.class);
-		AstrixContext context2 = AstrixConfigurer2.configure();
+		AstrixContextImpl context2 = AstrixConfigurer2.configure();
 		
 		HelloBeanImpl helloBean1 = (HelloBeanImpl) context.getBean(HelloBean.class);
 		HelloBeanImpl helloBean2 = (HelloBeanImpl) context2.getBean(HelloBean.class);

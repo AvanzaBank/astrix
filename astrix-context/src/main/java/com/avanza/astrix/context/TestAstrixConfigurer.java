@@ -39,11 +39,11 @@ public class TestAstrixConfigurer {
 		configurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, false);
 	}
 
-	public AstrixContext configure() {
+	public AstrixContextImpl configure() {
 		for (AstrixFactoryBean<?> factoryBean : standaloneFactories) {
 			configurer.addFactoryBean(factoryBean);
 		}
-		return configurer.configure();
+		return (AstrixContextImpl) configurer.configure();
 	}
 
 	/**

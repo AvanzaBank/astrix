@@ -23,7 +23,7 @@ import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.context.AstrixApiDescriptor;
-import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixExportedServiceInfo;
 import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
 import com.avanza.astrix.context.AstrixInject;
@@ -41,7 +41,7 @@ import com.avanza.astrix.spring.AstrixSpringContext;
 public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsAware {
 
 	private AstrixPlugins plugins;
-	private AstrixContext astrixContext;
+	private AstrixContextImpl astrixContext;
 	
 	@Override
 	public <T> T createService(AstrixApiDescriptor apiDescriptor, Class<T> type, AstrixServiceProperties serviceProperties) {
@@ -95,7 +95,7 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 	}
 	
 	@AstrixInject
-	public void setAstrixContext(AstrixContext astrixContext) {
+	public void setAstrixContext(AstrixContextImpl astrixContext) {
 		this.astrixContext = astrixContext;
 	}
 
