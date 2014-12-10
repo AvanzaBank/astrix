@@ -36,11 +36,9 @@ public class AstrixContext implements Astrix {
 	
 	private final AstrixPlugins plugins;
 	private final AstrixBeanFactoryRegistry beanFactoryRegistry = new AstrixBeanFactoryRegistry();
-	private final AstrixEventBus eventBus = AstrixEventBus.create();
 	private final AstrixBeanStates beanStates = new AstrixBeanStates();
 	private final AstrixSettingsReader settingsReader;
 	private final AstrixSettingsWriter settingsWriter;
-	private final AstrixBeanStateWorker beanStateWorker;
 	private AstrixApiProviderPlugins apiProviderPlugins;
 	private final ObjectCache objectCache = new ObjectCache(new ObjectCache.ObjectFactory() {
 		@Override
@@ -61,7 +59,6 @@ public class AstrixContext implements Astrix {
 	
 	
 	public AstrixContext(AstrixSettings settings) {
-		this.eventBus.addEventListener(AstrixBeanStateChangedEvent.class, beanStates);
 		this.plugins = new AstrixPlugins(new AstrixPluginInitializer() {
 			@Override
 			public void init(Object plugin) {
@@ -70,8 +67,7 @@ public class AstrixContext implements Astrix {
 		});
 		this.settingsReader = AstrixSettingsReader.create(plugins, settings);
 		this.settingsWriter = AstrixSettingsWriter.create(settings);
-		this.beanStateWorker = new AstrixBeanStateWorker(this.settingsReader, eventBus);
-		this.beanStateWorker.start();
+		getInstance(AstrixEventBus.class).addEventListener(AstrixBeanStateChangedEvent.class, beanStates);
 	}
 	
 	public <T> List<T> getPlugins(Class<T> type) {
@@ -96,8 +92,6 @@ public class AstrixContext implements Astrix {
 	
 	@PreDestroy
 	public void destroy() {
-		this.beanStateWorker.interrupt();
-		this.eventBus.destroy();
 		this.objectCache.destroy();
 	}
 	
@@ -139,14 +133,8 @@ public class AstrixContext implements Astrix {
 		if (object instanceof AstrixDecorator) {
 			injectDependencies(AstrixDecorator.class.cast(object).getTarget());
 		}
-		if (object instanceof AstrixEventBusAware) {
-			AstrixEventBusAware.class.cast(object).setEventBus(eventBus);
-		}
 		if (object instanceof AstrixSettingsAware) {
 			AstrixSettingsAware.class.cast(object).setSettings(settingsReader);
-		}
-		if (object instanceof AstrixBeanStateWorkerAware) {
-			AstrixBeanStateWorkerAware.class.cast(object).setBeanStateWorker(beanStateWorker);
 		}
 	}
 	
@@ -303,7 +291,7 @@ public class AstrixContext implements Astrix {
 	 * @param classType
 	 * @return
 	 */
-	public <T> T getInstance(Class<T> classType) {
+	public final <T> T getInstance(Class<T> classType) {
 		// We allow injecting an instance of ObjectCache, hence this
 		// check.
 		if (classType.equals(ObjectCache.class)) {

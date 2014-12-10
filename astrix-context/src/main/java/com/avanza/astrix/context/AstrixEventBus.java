@@ -21,6 +21,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -32,19 +35,15 @@ public class AstrixEventBus {
 	private final List<SubscribedListener<?>> subscribedListeners = new CopyOnWriteArrayList<>();
 	private final EventDispatcher eventDispatcher = new EventDispatcher();
 	
-	private AstrixEventBus() {
+	public AstrixEventBus() {
 	}
 	
-	public static AstrixEventBus create() {
-		AstrixEventBus result = new AstrixEventBus();
-		result.start();
-		return result;
-	}
-	
-	private void start() {
+	@PostConstruct
+	public void start() {
 		this.eventDispatcher.start();
 	}
 	
+	@PreDestroy
 	public void destroy() {
 		this.eventDispatcher.interrupt();
 	}

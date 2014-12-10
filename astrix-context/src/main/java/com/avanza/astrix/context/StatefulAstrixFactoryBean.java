@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T>
  */
-final class StatefulAstrixFactoryBean<T> implements AstrixFactoryBeanPlugin<T>, AstrixDecorator, AstrixEventBusAware, AstrixBeanStateWorkerAware {
+final class StatefulAstrixFactoryBean<T> implements AstrixFactoryBeanPlugin<T>, AstrixDecorator {
 
 	private static final Logger log = LoggerFactory.getLogger(StatefulAstrixFactoryBean.class);
 	private final AstrixFactoryBeanPlugin<T> targetFactory;
@@ -64,12 +64,12 @@ final class StatefulAstrixFactoryBean<T> implements AstrixFactoryBeanPlugin<T>, 
 		return targetFactory;
 	}
 
-	@Override
+	@AstrixInject
 	public void setEventBus(AstrixEventBus eventBus) {
 		this.eventBus = eventBus;
 	}
 
-	@Override
+	@AstrixInject
 	public void setBeanStateWorker(AstrixBeanStateWorker worker) {
 		this.beanStateWorker = worker;
 	}

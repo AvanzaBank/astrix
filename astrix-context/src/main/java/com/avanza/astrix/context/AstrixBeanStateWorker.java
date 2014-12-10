@@ -21,6 +21,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import javax.annotation.PreDestroy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
@@ -28,11 +30,11 @@ import org.slf4j.LoggerFactory;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixBeanStateWorker extends Thread {
+public class AstrixBeanStateWorker extends Thread implements AstrixSettingsAware {
 
 	private static final Logger log = LoggerFactory.getLogger(AstrixBeanStateWorker.class);
 	private final Collection<StatefulAstrixBean<?>> managedBeans = new CopyOnWriteArrayList<>();
-	private final long beanRebindAttemptIntervalMillis;
+	private long beanRebindAttemptIntervalMillis;
 	private final ExecutorService beanStateWorkerThreadPool = Executors.newSingleThreadExecutor(new ThreadFactory() {
 		@Override
 		public Thread newThread(Runnable r) {
@@ -42,13 +44,22 @@ public class AstrixBeanStateWorker extends Thread {
 		}
 	});
 
-	public AstrixBeanStateWorker(AstrixSettingsReader settings, AstrixEventBus eventBus) {
+	public AstrixBeanStateWorker() {
 		super("Astrix-BeanStateWorkerDispatcher");
 		setDaemon(true);
-		this.beanRebindAttemptIntervalMillis = settings.getLong(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10_000L);
+	}
+	
+	@PreDestroy
+	public void destroy() {
+		interrupt();
 	}
 	
 	public void add(StatefulAstrixBean<?> bean) {
+		synchronized (this) {
+			if (!isAlive()) {
+				start();
+			}
+		}
 		this.managedBeans.add(bean);
 	}
 	
@@ -92,6 +103,11 @@ public class AstrixBeanStateWorker extends Thread {
 				log.info("Failed to bind to " + astrixBean.getBeanFactory().getBeanType().getName() + " astrixBeanId=" + astrixBean.getId(), e);
 			}
 		}
+	}
+
+	@Override
+	public void setSettings(AstrixSettingsReader settings) {
+		this.beanRebindAttemptIntervalMillis = settings.getLong(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10_000L);
 	}
 	
 }
