@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.avanza.astrix.context.AstrixContextImpl;
+import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -42,7 +42,7 @@ public class AstrixServiceRegistryApiTest {
 	
 	private static final long UNUSED_LEASE = 10_000L;
 	private AstrixServiceRegistryClient serviceRegistryClient;
-	private AstrixContextImpl context;
+	private AstrixContext context;
 	private InMemoryServiceRegistry fakeServiceRegistry;
 	
 	@Before

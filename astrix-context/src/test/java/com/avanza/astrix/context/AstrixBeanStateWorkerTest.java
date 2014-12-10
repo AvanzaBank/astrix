@@ -27,7 +27,7 @@ public class AstrixBeanStateWorkerTest {
 	
 	@Test
 	public void workerIsInterruptedWhenContextDestroyed() throws Exception {
-		AstrixContextImpl context = new TestAstrixConfigurer().configure();
+		AstrixContextImpl context = (AstrixContextImpl) new TestAstrixConfigurer().configure();
 		final AstrixBeanStateWorker worker = context.getInstance(AstrixBeanStateWorker.class);
 		worker.start();
 		assertTrue(worker.isAlive());

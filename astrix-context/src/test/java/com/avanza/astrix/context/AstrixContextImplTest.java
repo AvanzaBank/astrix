@@ -32,9 +32,9 @@ public class AstrixContextImplTest {
 	
 	@Test
 	public void astrixContextShouldInstantiateAndInjectRequiredClasses() throws Exception {
-		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixContextImpl AstrixContext = AstrixConfigurer.configure();
-		MultipleDependentClass dependentClass = AstrixContext.getInstance(MultipleDependentClass.class);
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
+		MultipleDependentClass dependentClass = astrixContext.getInstance(MultipleDependentClass.class);
 		
 		assertNotNull(dependentClass.dep);
 		assertNotNull(dependentClass.dep2);
@@ -43,26 +43,26 @@ public class AstrixContextImplTest {
 	
 	@Test(expected = MissingBeanProviderException.class)
 	public void detectsMissingBeans() throws Exception {
-		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixContextImpl AstrixContext = AstrixConfigurer.configure();
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		AstrixContextImpl AstrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 
 		AstrixContext.getBean(HelloBean.class);
 	}
 	
 	@Test(expected = MissingBeanDependencyException.class)
 	public void detectsMissingBeanDependencies() throws Exception {
-		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiProvider(DependentApi.class);
-		AstrixContextImpl AstrixContext = AstrixConfigurer.configure();
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(DependentApi.class);
+		AstrixContextImpl AstrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 
 		AstrixContext.getBean(DependentBean.class);
 	}
 	
 	@Test
 	public void asterixBeansAreDestroyedUponContextDestroy() throws Exception {
-		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
-		AstrixContextImpl astrixContext = AstrixConfigurer.configure();
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
+		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 
 		HelloBean helloBean = astrixContext.getBean(HelloBean.class);
 		assertFalse(helloBean.destroyed);
@@ -74,9 +74,9 @@ public class AstrixContextImplTest {
 	
 	@Test
 	public void asterixBeansAreInitializedWhenFirstCreated() throws Exception {
-		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
-		AstrixContextImpl astrixContext = AstrixConfigurer.configure();
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
+		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 
 		HelloBean helloBean = astrixContext.getBean(HelloBean.class);
 		assertTrue(helloBean.initialized);
@@ -84,9 +84,9 @@ public class AstrixContextImplTest {
 	
 	@Test
 	public void cachesCreatedApis() throws Exception {
-		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
-		AstrixContextImpl AstrixContext = AstrixConfigurer.configure();
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
+		AstrixContextImpl AstrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 
 		HelloBean beanA = AstrixContext.getBean(HelloBean.class);
 		HelloBean beanB = AstrixContext.getBean(HelloBean.class);
@@ -95,8 +95,8 @@ public class AstrixContextImplTest {
 	
 	@Test
 	public void canInitRegularClasses() throws Exception {
-		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixContextImpl AstrixContext = AstrixConfigurer.configure();
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		AstrixContextImpl AstrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 		InternalFrameworkClass simple = AstrixContext.getInstance(InternalFrameworkClass.class);
 		
 		assertNotNull(simple.settings);
@@ -105,7 +105,7 @@ public class AstrixContextImplTest {
 	@Test
 	public void cachesCreatedInstancesOfRegularClasses() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		AstrixContextImpl astrixContext = astrixConfigurer.configure();
+		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 		InternalFrameworkClass simple1 = astrixContext.getInstance(InternalFrameworkClass.class);
 		InternalFrameworkClass simple2 = astrixContext.getInstance(InternalFrameworkClass.class);
 		
@@ -115,7 +115,7 @@ public class AstrixContextImplTest {
 	@Test
 	public void preDestroyAnnotatedMethodsOnInstancesCreatedByAstrixAreInvokedWhenAstrixContextIsDestroyed() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		AstrixContextImpl astrixContext = astrixConfigurer.configure();
+		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 		HelloBean simpleClass = astrixContext.getInstance(HelloBean.class); // treat HelloBean as internal class
 		assertFalse(simpleClass.destroyed);
 		
@@ -129,9 +129,9 @@ public class AstrixContextImplTest {
 		AstrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
 		AstrixContext context = AstrixConfigurer.configure();
 		
-		TestAstrixConfigurer AstrixConfigurer2 = new TestAstrixConfigurer();
-		AstrixConfigurer2.registerApiProvider(HelloBeanLibrary.class);
-		AstrixContextImpl context2 = AstrixConfigurer2.configure();
+		TestAstrixConfigurer astrixConfigurer2 = new TestAstrixConfigurer();
+		astrixConfigurer2.registerApiProvider(HelloBeanLibrary.class);
+		AstrixContextImpl context2 = (AstrixContextImpl) astrixConfigurer2.configure();
 		context.destroy();
 		
 		HelloBean helloBean2 = (HelloBean) context2.getBean(HelloBean.class);

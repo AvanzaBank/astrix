@@ -44,7 +44,7 @@ public class AstrixServiceTest {
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		configurer.set(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 10);
 		configurer.registerApiProvider(GreetingApiProvider.class);
-		context = configurer.configure();
+		context = (AstrixContextImpl) configurer.configure();
 	}
 	
 	@After

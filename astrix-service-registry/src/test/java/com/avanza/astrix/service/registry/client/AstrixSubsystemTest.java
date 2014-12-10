@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-import com.avanza.astrix.context.AstrixContextImpl;
+import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.IllegalSubsystemException;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -40,14 +40,14 @@ public class AstrixSubsystemTest {
 		configurerA.registerApiProvider(GreetingServiceProvider.class);
 		configurerA.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		configurerA.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		AstrixContextImpl contextA = configurerA.configure();
+		AstrixContext contextA = configurerA.configure();
 		
 		TestAstrixConfigurer configurerB = new TestAstrixConfigurer();
 		configurerB.setSubsystem("B");
 		configurerB.registerApiProvider(GreetingServiceProvider.class);
 		configurerB.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		configurerB.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		AstrixContextImpl contextB = configurerB.configure();
+		AstrixContext contextB = configurerB.configure();
 
 		// Publish non versioned service in contextB
 		AstrixServiceRegistryClient serviceRegistryClientB = contextB.getBean(AstrixServiceRegistryClient.class);
@@ -72,14 +72,14 @@ public class AstrixSubsystemTest {
 		configurerA.registerApiProvider(VersionedGreetingServiceProvider.class);
 		configurerA.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		configurerA.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		AstrixContextImpl contextA = configurerA.configure();
+		AstrixContext contextA = configurerA.configure();
 		
 		TestAstrixConfigurer configurerB = new TestAstrixConfigurer();
 		configurerB.setSubsystem("B");
 		configurerB.registerApiProvider(VersionedGreetingServiceProvider.class);
 		configurerB.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		configurerB.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		AstrixContextImpl contextB = configurerB.configure();
+		AstrixContext contextB = configurerB.configure();
 
 		// Publish non versioned service in contextB
 		AstrixServiceRegistryClient serviceRegistryClientB = contextB.getBean(AstrixServiceRegistryClient.class);

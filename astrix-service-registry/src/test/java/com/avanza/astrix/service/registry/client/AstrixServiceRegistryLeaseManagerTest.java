@@ -25,7 +25,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.avanza.astrix.context.AstrixContextImpl;
+import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -43,20 +43,20 @@ import com.avanza.astrix.test.util.Supplier;
 public class AstrixServiceRegistryLeaseManagerTest {
 
 	private AstrixServiceRegistryClient serviceRegistryClient;
-	private AstrixContextImpl context;
+	private AstrixContext context;
 	private CorruptableServiceRegistry serviceRegistry;
 	private TestService testService;
 	
 	@Before
 	public void setup() {
 		serviceRegistry = new CorruptableServiceRegistry();
-		TestAstrixConfigurer AstrixConfig = new TestAstrixConfigurer();
-		AstrixConfig.set(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 1); // No Sleep between attempts
-		AstrixConfig.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
-		AstrixConfig.registerApiProvider(TestProvider.class);
-		AstrixConfig.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		AstrixConfig.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
-		context = AstrixConfig.configure();
+		TestAstrixConfigurer astrixConfig = new TestAstrixConfigurer();
+		astrixConfig.set(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 1); // No Sleep between attempts
+		astrixConfig.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
+		astrixConfig.registerApiProvider(TestProvider.class);
+		astrixConfig.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
+		astrixConfig.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
+		context = astrixConfig.configure();
 		serviceRegistryClient = context.getBean(AstrixServiceRegistryClient.class);
 		
 		TestService impl = new TestService() {

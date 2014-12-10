@@ -35,9 +35,9 @@ public class AstrixBeanStateListenerTest {
 		testAstrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
 		testAstrixConfigurer.registerApiProvider(MyLibraryProvider.class);
 		testAstrixConfigurer.registerApiProvider(MyServiceProvider.class);
-		AstrixContextImpl Astrix = testAstrixConfigurer.configure();
+		AstrixContextImpl astrix = (AstrixContextImpl) testAstrixConfigurer.configure();
 		
-		final MyClient myClient = Astrix.getBean(MyClient.class);
+		final MyClient myClient = astrix.getBean(MyClient.class);
 		
 		try {
 			myClient.hello("kalle");
@@ -47,9 +47,9 @@ public class AstrixBeanStateListenerTest {
 		}
 		
 		// Make myService available in configuration => Allows bean to be bound
-		Astrix.set("myService", AstrixDirectComponent.getServiceUri(myServiceId));
+		astrix.set("myService", AstrixDirectComponent.getServiceUri(myServiceId));
 		
-		Astrix.waitForBean(MyClient.class, 1000);
+		astrix.waitForBean(MyClient.class, 1000);
 		assertEquals("hello: kalle", myClient.hello("kalle"));
 		
 	}

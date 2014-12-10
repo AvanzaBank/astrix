@@ -15,7 +15,7 @@
  */
 package tutorial.mocking;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 
@@ -26,7 +26,7 @@ import tutorial.p1.api.LunchRestaurantFinder;
 import tutorial.p1.api.LunchSuggester;
 import tutorial.p1.provider.LunchSuggesterImpl;
 
-import com.avanza.astrix.context.AstrixContextImpl;
+import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.library.AstrixExport;
 import com.avanza.astrix.provider.library.AstrixLibraryProvider;
@@ -43,7 +43,7 @@ public class MockingAstrixBeansTest {
 		
 		// Stub out its dependency 
 		astrixConfigurer.registerAstrixBean(LunchRestaurantFinder.class, restaurantFinderStub);
-		AstrixContextImpl astrixContext = astrixConfigurer.configure();
+		AstrixContext astrixContext = astrixConfigurer.configure();
 		
 		// Get the api we intend to test
 		LunchSuggester lunchSuggester = astrixContext.getBean(LunchSuggester.class);
