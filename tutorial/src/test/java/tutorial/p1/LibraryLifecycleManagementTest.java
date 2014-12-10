@@ -24,11 +24,11 @@ import org.junit.Test;
 import tutorial.p1.api.LunchRestaurantFinder;
 
 import com.avanza.astrix.context.AstrixConfigurer;
-import com.avanza.astrix.context.AstrixContextImpl;
+import com.avanza.astrix.context.AstrixContext;
 
 public class LibraryLifecycleManagementTest {
 
-	private AstrixContextImpl astrix;
+	private AstrixContext astrix;
 	
 	@After
 	public void after() {

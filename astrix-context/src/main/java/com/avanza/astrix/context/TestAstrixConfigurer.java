@@ -43,7 +43,7 @@ public class TestAstrixConfigurer {
 		for (AstrixFactoryBean<?> factoryBean : standaloneFactories) {
 			configurer.addFactoryBean(factoryBean);
 		}
-		return configurer.configure();
+		return (AstrixContextImpl) configurer.configure();
 	}
 
 	/**

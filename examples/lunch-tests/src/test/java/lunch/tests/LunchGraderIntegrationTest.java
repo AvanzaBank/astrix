@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.avanza.astrix.context.AstrixConfigurer;
-import com.avanza.astrix.context.AstrixContextImpl;
+import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
@@ -54,7 +54,7 @@ public class LunchGraderIntegrationTest {
 		
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		AstrixContextImpl astrix = configurer.configure();
+		AstrixContext astrix = configurer.configure();
 		final LunchRestaurantGrader grader = astrix.waitForBean(LunchRestaurantGrader.class, 5_000);
 		
 		// Not that the lunch-grader-pu grader.grade uses another service internally, hence we must wait

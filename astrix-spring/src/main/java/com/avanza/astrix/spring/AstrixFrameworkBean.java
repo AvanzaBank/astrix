@@ -145,7 +145,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		if (this.subsystem != null) {
 			configurer.setSubsystem(this.subsystem);
 		}
-		AstrixContextImpl astrixContext = configurer.configure();
+		AstrixContextImpl astrixContext = (AstrixContextImpl) configurer.configure();
 		return astrixContext;
 	}
 

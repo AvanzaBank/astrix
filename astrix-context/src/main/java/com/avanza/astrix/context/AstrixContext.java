@@ -15,12 +15,14 @@
  */
 package com.avanza.astrix.context;
 
-import javax.annotation.PreDestroy;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public interface AstrixContext {
 
-	@PreDestroy
-	public abstract void destroy();
+	void destroy();
 
 	/**
 	 * Looks up a bean in the bean registry. <p>
@@ -28,14 +30,12 @@ public interface AstrixContext {
 	 * @param beanType
 	 * @return
 	 */
-	public abstract <T> T getBean(Class<T> beanType);
+	<T> T getBean(Class<T> beanType);
 
-	public abstract <T> T getBean(Class<T> beanType, String qualifier);
+	<T> T getBean(Class<T> beanType, String qualifier);
 
-	public abstract <T> T waitForBean(Class<T> beanType, long timeoutMillis)
-			throws InterruptedException;
+	<T> T waitForBean(Class<T> beanType, long timeoutMillis) throws InterruptedException;
 
-	public abstract <T> T waitForBean(Class<T> beanType, String qualifier,
-			long timeoutMillis) throws InterruptedException;
+	<T> T waitForBean(Class<T> beanType, String qualifier,long timeoutMillis) throws InterruptedException;
 
 }

@@ -26,7 +26,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import com.avanza.astrix.context.AstrixConfigurer;
-import com.avanza.astrix.context.AstrixContextImpl;
+import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
@@ -51,7 +51,7 @@ public class LunchIntegrationTest {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 500);
 		configurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		AstrixContextImpl astrix = configurer.configure();
+		AstrixContext astrix = configurer.configure();
 		LunchService lunchService = astrix.waitForBean(LunchService.class, 15_000);
 		
 		lunchService.addLunchRestaurant(new LunchRestaurant("McDonalds", "Fast Food"));

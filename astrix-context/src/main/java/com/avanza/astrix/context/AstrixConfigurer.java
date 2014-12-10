@@ -36,7 +36,7 @@ public class AstrixConfigurer {
 		set(SUBSYSTEM_NAME, "default");
 	}};
 	
-	public AstrixContextImpl configure() {
+	public AstrixContext configure() {
 		AstrixContextImpl context = new AstrixContextImpl(settings);
 		for (PluginHolder<?> plugin : plugins) {
 			registerPlugin(context, plugin);

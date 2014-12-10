@@ -22,15 +22,14 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.avanza.astrix.context.AstrixConfigurer;
-import com.avanza.astrix.context.AstrixContextImpl;
-import com.avanza.astrix.context.AstrixSettings;
+import com.avanza.astrix.context.AstrixContext;
 
 public class LunchClient {
 	
 	public static void main(String[] args) throws InterruptedException {
 		Logger.getLogger("com.avanza.astrix").setLevel(Level.DEBUG);
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		AstrixContextImpl AstrixContext = configurer.configure();
+		AstrixContext AstrixContext = configurer.configure();
 		LunchService lunchService = AstrixContext.waitForBean(LunchService.class, 5000);
 		
 		LunchRestaurant r = new LunchRestaurant();

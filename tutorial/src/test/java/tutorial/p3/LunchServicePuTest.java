@@ -15,7 +15,7 @@
  */
 package tutorial.p3;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import javax.annotation.PostConstruct;
 
@@ -25,7 +25,7 @@ import org.junit.Test;
 import tutorial.p3.api.LunchService;
 
 import com.avanza.astrix.context.AstrixConfigurer;
-import com.avanza.astrix.context.AstrixContextImpl;
+import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
@@ -40,7 +40,7 @@ public class LunchServicePuTest {
 												   .contextProperty("externalConfigUri", serviceRegistry.getExternalConfigUri())
 												   .configure();
 
-	private AstrixContextImpl astrix;
+	private AstrixContext astrix;
 	
 	@PostConstruct
 	public void destroy() {
