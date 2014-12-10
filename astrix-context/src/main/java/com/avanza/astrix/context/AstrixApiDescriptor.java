@@ -48,12 +48,6 @@ public abstract class AstrixApiDescriptor {
 		return getName();
 	}
 	
-	/**
-	 * Whether this api uses the service registry or not.
-	 * @return
-	 */
-	public abstract boolean usesServiceRegistry();
-	
 	public abstract boolean isVersioned();
 	
 	private static class SimpleApiDescriptor extends AstrixApiDescriptor {
@@ -83,11 +77,6 @@ public abstract class AstrixApiDescriptor {
 		@Override
 		public Class<?> getDescriptorClass() {
 			return null;
-		}
-
-		@Override
-		public boolean usesServiceRegistry() {
-			return false;
 		}
 
 		@Override

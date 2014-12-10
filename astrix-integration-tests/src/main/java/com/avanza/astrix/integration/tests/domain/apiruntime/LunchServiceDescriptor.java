@@ -22,7 +22,7 @@ import com.avanza.astrix.provider.core.AstrixService;
 
 @AstrixService(
 	apiDescriptors = {
-		LunchApiDescriptor.class,
+		LunchServiceProvider.class,
 		LunchFeederApiDescriptor.class
 	},
 	component = AstrixServiceComponentNames.GS_REMOTING

@@ -16,8 +16,10 @@
 package com.avanza.astrix.context;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 
 /**
  * 
@@ -26,17 +28,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class AstrixServiceLookupFactory implements AstrixPluginsAware {
 	
-	private List<AstrixServiceLookupPlugin<? extends Annotation>> serviceLookupPlugins = new CopyOnWriteArrayList<>();
-	private AstrixServiceLookup defaultLookup;
+	private final ConcurrentMap<Class<?>, AstrixServiceLookupPlugin<?>> lookupStrategyByAnnotationType = new ConcurrentHashMap<>();
 
 	public AstrixServiceLookup createServiceLookup(AstrixApiDescriptor descriptor) {
-		for (AstrixServiceLookupPlugin<?> lookupPlugin : serviceLookupPlugins) {
-			if (descriptor.isAnnotationPresent(lookupPlugin.getLookupAnnotationType())) {
-				return create(descriptor, lookupPlugin);
-			}
-		}
-		if (defaultLookup != null) {
-			return defaultLookup;
+		AstrixServiceLookupPlugin<?> servcieLookupPlugin = getServiceLookupPlugin(descriptor);
+		if (servcieLookupPlugin != null) {
+			return create(descriptor, servcieLookupPlugin);
 		}
 		throw new IllegalArgumentException("Can't identify what lookup-strategy to use to locate services exported using descriptor: " + descriptor);
 	}
@@ -45,14 +42,29 @@ public class AstrixServiceLookupFactory implements AstrixPluginsAware {
 		return AstrixServiceLookup.create(lookupPlugin, descriptor.getAnnotation(lookupPlugin.getLookupAnnotationType()));
 	}
 	
+	private AstrixServiceLookupPlugin<?> getServiceLookupPlugin(AstrixApiDescriptor descriptor) {
+		Class<?> lookupStrategy = getLookupStrategy(descriptor);
+		return lookupStrategyByAnnotationType.get(lookupStrategy);
+	}
+	
 	@Override
 	public void setPlugins(AstrixPlugins plugins) {
 		for (AstrixServiceLookupPlugin<?> lookupPlugin : plugins.getPlugins(AstrixServiceLookupPlugin.class)) {
-			if (lookupPlugin.getClass().isAnnotationPresent(DefaultServiceLookup.class)) {
-				this.defaultLookup = AstrixServiceLookup.create(lookupPlugin, null);
-			}
-			this.serviceLookupPlugins.add(lookupPlugin);
+			this.lookupStrategyByAnnotationType.put(lookupPlugin.getLookupAnnotationType(), lookupPlugin);
 		}
+	}
+
+	public boolean usesServiceRegistry(AstrixApiDescriptor apiDescriptor) {
+		return getLookupStrategy(apiDescriptor).equals(AstrixServiceRegistryLookup.class);
+	}
+	
+	private Class<?> getLookupStrategy(AstrixApiDescriptor descriptor) {
+		for (AstrixServiceLookupPlugin<?> lookupPlugin : lookupStrategyByAnnotationType.values()) {
+			if (descriptor.isAnnotationPresent(lookupPlugin.getLookupAnnotationType())) {
+				return lookupPlugin.getLookupAnnotationType();
+			}
+		}
+		return AstrixServiceRegistryLookup.class;
 	}
 
 }

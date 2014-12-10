@@ -15,14 +15,14 @@
  */
 package com.avanza.astrix.integration.tests.domain2.pu;
 
-import com.avanza.astrix.integration.tests.domain2.apiruntime.LunchGradeApiDescriptor;
+import com.avanza.astrix.integration.tests.domain2.apiruntime.LunchGradeServiceProvider;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixService;
 
 
 @AstrixService(
 	apiDescriptors = {
-		LunchGradeApiDescriptor.class
+		LunchGradeServiceProvider.class
 	},
 	component = AstrixServiceComponentNames.GS_REMOTING
 )

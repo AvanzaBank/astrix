@@ -13,23 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain2.apiruntime;
+package com.avanza.astrix.integration.tests.domain.apiruntime;
 
-import com.avanza.astrix.integration.tests.domain2.api.LunchRestaurantGrader;
+import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.provider.core.AstrixServiceProvider;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
 
+
+// The API is versioned.
 @AstrixVersioned(
-	version = 1,
-	objectSerializerConfigurer = LunchGradeApiObjectMapperConfigurer.class
+	version = 2,
+	objectSerializerConfigurer = LunchApiObjectSerializerConfigurer.class
 )
-@AstrixServiceRegistryLookup
-@AstrixServiceProvider({
-	LunchRestaurantGrader.class,
-	PublicLunchFeeder.class
-})
-public class LunchGradeApiDescriptor {
+// The service is exported to the service-registry. Consumers queries the service-registry to bind to servers.
+@AstrixServiceProvider(LunchService.class)
+public class LunchServiceProvider {
 }
 
 

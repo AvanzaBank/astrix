@@ -24,18 +24,4 @@ public interface AstrixContext extends Astrix {
 
 	void destroy();
 
-	/**
-	 * Looks up a bean in the bean registry. <p>
-	 * 
-	 * @param beanType
-	 * @return
-	 */
-	<T> T getBean(Class<T> beanType);
-
-	<T> T getBean(Class<T> beanType, String qualifier);
-
-	<T> T waitForBean(Class<T> beanType, long timeoutMillis) throws InterruptedException;
-
-	<T> T waitForBean(Class<T> beanType, String qualifier,long timeoutMillis) throws InterruptedException;
-
 }

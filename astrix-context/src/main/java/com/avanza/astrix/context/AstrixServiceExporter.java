@@ -23,8 +23,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.annotation.PostConstruct;
-
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 
 /**
@@ -53,7 +51,7 @@ public class AstrixServiceExporter {
 	private void exportService(AstrixExportedServiceInfo exportedService) {
 		AstrixServiceComponent serviceComponent = serviceComponents.getComponent(exportedService.getComponentName());
 		exportService(exportedService, serviceComponent, exportedService.getProvidedService());
-		if (exportedService.getApiDescriptor().usesServiceRegistry()) {
+		if (astrixContext.getInstance(AstrixServiceLookupFactory.class).usesServiceRegistry(exportedService.getApiDescriptor())) {
 			AstrixServiceRegistryPlugin serviceRegistryPlugin = astrixContext.getPlugin(AstrixServiceRegistryPlugin.class);
 			serviceRegistryPlugin.addProvider(exportedService.getProvidedService(), serviceComponent);
 		}

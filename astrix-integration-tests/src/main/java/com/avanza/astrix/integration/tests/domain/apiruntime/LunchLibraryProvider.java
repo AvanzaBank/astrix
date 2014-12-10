@@ -25,7 +25,7 @@ import com.avanza.astrix.provider.library.AstrixExport;
 import com.avanza.astrix.provider.library.AstrixLibraryProvider;
 
 @AstrixLibraryProvider
-public class LunchApiFactory {
+public class LunchLibraryProvider {
 
 	@AstrixExport
 	public LunchUtil createLunchUtil(LunchService lunchService) {
