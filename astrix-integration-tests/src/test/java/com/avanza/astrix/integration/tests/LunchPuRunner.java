@@ -37,7 +37,7 @@ public class LunchPuRunner {
 		settings.setServiceRegistryUri(AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=service-registry");
 		PartitionedPu partitionedPu = new PartitionedPu(PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 				.numberOfPrimaries(1)
-				.contextProperty("configUrl", settings.getExternalConfigUrl())
+				.contextProperty("configUrl", settings.getExternalConfigUri())
 				.numberOfBackups(0));
 		partitionedPu.run();
 	}

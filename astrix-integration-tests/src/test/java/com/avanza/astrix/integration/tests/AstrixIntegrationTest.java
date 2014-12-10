@@ -88,7 +88,7 @@ public class AstrixIntegrationTest {
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
-											  .contextProperty("configUrl", config.getExternalConfigUrl())
+											  .contextProperty("configUrl", config.getExternalConfigUri())
 											  .startAsync(true)
 											  .configure();
 	
@@ -96,7 +96,7 @@ public class AstrixIntegrationTest {
 	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
 														.numberOfPrimaries(1)
 														.numberOfBackups(0)
-														.contextProperty("configUrl", config.getExternalConfigUrl())
+														.contextProperty("configUrl", config.getExternalConfigUri())
 														.startAsync(true)
 														.configure();
 
@@ -123,7 +123,7 @@ public class AstrixIntegrationTest {
 		configurer.enableFaultTolerance(true);
 		configurer.enableVersioning(true);
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
-		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, config.getExternalConfigUrl());
+		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, config.getExternalConfigUri());
 		configurer.setSubsystem("test-sub-system");
 		astrix = configurer.configure();
 		this.lunchService = astrix.getBean(LunchService.class);

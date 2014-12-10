@@ -59,7 +59,7 @@ public class ClusteredProxyLibraryTest {
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
-											  .contextProperty("configUrl", config.getExternalConfigUrl())
+											  .contextProperty("configUrl", config.getExternalConfigUri())
 											  .startAsync(true)
 											  .configure();
 	
@@ -82,7 +82,7 @@ public class ClusteredProxyLibraryTest {
 		configurer.enableFaultTolerance(true);
 		configurer.enableVersioning(true);
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1000);
-		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, config.getExternalConfigUrl());
+		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, config.getExternalConfigUri());
 		configurer.setSubsystem("lunch-system");
 		astrix = configurer.configure();
 		this.lunchService = astrix.waitForBean(LunchService.class, 10000);

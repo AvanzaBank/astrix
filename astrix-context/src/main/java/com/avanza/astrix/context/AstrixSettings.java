@@ -68,15 +68,6 @@ public class AstrixSettings implements AstrixExternalConfig {
 	public AstrixSettings() {
 		this.serviceId = AstrixDirectComponent.register(AstrixExternalConfig.class, this);
 	}
-
-	/**
-	 * @deprecated replaces by getExternalConfigUri
-	 * @return
-	 */
-	@Deprecated
-	public final String getExternalConfigUrl() {
-		return getExternalConfigUri();
-	}
 	
 	/**
 	 * Returns a uri that can be used to use this instance of AstrixSettings as an external config provider.
@@ -88,17 +79,8 @@ public class AstrixSettings implements AstrixExternalConfig {
 		return AstrixSettingsExternalConfigPlugin.class.getAnnotation(AstrixPluginQualifier.class).value() + ":" + this.serviceId;
 	}
 	
-	public final String getAstrixConfigUrl() {
-		return getString(ASTRIX_CONFIG_URI);
-	}
-	
 	public final void setServiceRegistryUri(String serviceRegistryUri) {
 		set(ASTRIX_SERVICE_REGISTRY_URI, serviceRegistryUri);
-	}
-	
-	@Deprecated
-	public final String getServiceRegistryUri() {
-		return getString(ASTRIX_SERVICE_REGISTRY_URI);
 	}
 
 	public final void set(String settingName, long value) {
