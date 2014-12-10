@@ -67,7 +67,7 @@ public class AstrixContext implements Astrix {
 		});
 		this.settingsReader = AstrixSettingsReader.create(plugins, settings);
 		this.settingsWriter = AstrixSettingsWriter.create(settings);
-		getInstance(AstrixEventBus.class).addEventListener(AstrixBeanStateChangedEvent.class, beanStates);
+		getInstance(EventBus.class).addEventListener(AstrixBeanStateChangedEvent.class, beanStates);
 	}
 	
 	public <T> List<T> getPlugins(Class<T> type) {

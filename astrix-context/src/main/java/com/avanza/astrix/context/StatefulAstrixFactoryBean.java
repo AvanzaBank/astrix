@@ -30,7 +30,7 @@ final class StatefulAstrixFactoryBean<T> implements AstrixFactoryBeanPlugin<T>, 
 
 	private static final Logger log = LoggerFactory.getLogger(StatefulAstrixFactoryBean.class);
 	private final AstrixFactoryBeanPlugin<T> targetFactory;
-	private AstrixEventBus eventBus;
+	private EventBus eventBus;
 	private AstrixBeanStateWorker beanStateWorker;
 	
 	public StatefulAstrixFactoryBean(AstrixFactoryBeanPlugin<T> targetFactory) {
@@ -65,7 +65,7 @@ final class StatefulAstrixFactoryBean<T> implements AstrixFactoryBeanPlugin<T>, 
 	}
 
 	@AstrixInject
-	public void setEventBus(AstrixEventBus eventBus) {
+	public void setEventBus(EventBus eventBus) {
 		this.eventBus = eventBus;
 	}
 

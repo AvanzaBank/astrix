@@ -38,9 +38,9 @@ public class StatefulAstrixBean<T> implements InvocationHandler {
 	private volatile InvocationHandler state;
 	private static final AtomicInteger nextId = new AtomicInteger(0);
 	private final String id = nextId.incrementAndGet() + ""; // Used for debugging to distinguish between many context's started within same jvm.
-	private final AstrixEventBus eventBus;
+	private final EventBus eventBus;
 	
-	StatefulAstrixBean(AstrixFactoryBeanPlugin<T> beanFactory, String optionalQualifier, AstrixEventBus eventBus) {
+	StatefulAstrixBean(AstrixFactoryBeanPlugin<T> beanFactory, String optionalQualifier, EventBus eventBus) {
 		this.beanFactory = beanFactory;
 		this.optionalQualifier = optionalQualifier;
 		this.eventBus = eventBus;

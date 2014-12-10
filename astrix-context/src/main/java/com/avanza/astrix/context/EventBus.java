@@ -29,13 +29,13 @@ import javax.annotation.PreDestroy;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixEventBus {
+public class EventBus {
 	
 	private final BlockingQueue<Object> pendingEvents = new LinkedBlockingQueue<>();
 	private final List<SubscribedListener<?>> subscribedListeners = new CopyOnWriteArrayList<>();
 	private final EventDispatcher eventDispatcher = new EventDispatcher();
 	
-	public AstrixEventBus() {
+	public EventBus() {
 	}
 	
 	@PostConstruct
