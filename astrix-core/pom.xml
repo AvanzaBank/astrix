@@ -6,4 +6,19 @@
 		<version>0.12.7-SNAPSHOT</version>
 	</parent>
 	<artifactId>astrix-core</artifactId>
+	<dependencies>
+	
+		<!-- Test -->
+		<dependency>
+	  		<groupId>junit</groupId>
+	  		<artifactId>junit-dep</artifactId>
+	  		<scope>test</scope>
+	  	</dependency>
+	  	<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>astrix-test-util</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>

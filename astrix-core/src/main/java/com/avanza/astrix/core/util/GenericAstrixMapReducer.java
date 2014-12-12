@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.remoting.util;
+package com.avanza.astrix.core.util;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +22,10 @@ import java.util.Map;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.AstrixRemoteResultReducer;
 
+/**
+ * Reduce {@link Map}s into one {@link Map} containing the union of all input data
+ * @author joasah
+ */
 public class GenericAstrixMapReducer<K, V> implements AstrixRemoteResultReducer<Map<K, V>, Map<K, V>> {
 
 	@Override

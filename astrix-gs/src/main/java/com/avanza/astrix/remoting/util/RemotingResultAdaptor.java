@@ -23,6 +23,10 @@ import org.openspaces.remoting.SpaceRemotingResult;
 
 import com.avanza.astrix.core.AstrixRemoteResult;
 
+/**
+ * Adaptor that unifies handling of Gigaspaces {@link SpaceRemotingResult} and Astrix {@link AstrixRemoteResult}
+ * @author joasah
+ */
 public interface RemotingResultAdaptor<T> {
 	public T getResult() throws Throwable;
 
