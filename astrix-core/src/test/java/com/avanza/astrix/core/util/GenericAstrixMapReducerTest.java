@@ -31,23 +31,23 @@ public class GenericAstrixMapReducerTest {
 	@Test
 	public void reduce_flattensMaps() throws Exception {
 		GenericAstrixMapReducer<String, Integer> reducer = new GenericAstrixMapReducer<String, Integer>();
-		assertEquals(newMap("a", 1).build(), reducer.reduce(Arrays.asList(new AstrixRemoteResult<>(newMap("a", 1).build(), null))));
+		assertEquals(newMap("a", 1).build(), reducer.reduce(Arrays.asList(AstrixRemoteResult.successful(newMap("a", 1).build()))));
 		
 		assertEquals(newMap("a", 1).with("b", 2).build(), reducer.reduce(Arrays.asList(
-				new AstrixRemoteResult<>(newMap("a", 1).build(), null),
-				new AstrixRemoteResult<>(newMap("b", 2).build(), null))));
+				AstrixRemoteResult.successful(newMap("a", 1).build()),
+				AstrixRemoteResult.successful(newMap("b", 2).build()))));
 		
 		assertEquals(newMap("a", 1).with("b", 2).with("c", 3).build(), reducer.reduce(Arrays.asList(
-				new AstrixRemoteResult<>(newMap("a", 1).with("c", 3).build(), null),
-				new AstrixRemoteResult<>(newMap("b", 2).build(), null))));
+				AstrixRemoteResult.successful(newMap("a", 1).with("c", 3).build()),
+				AstrixRemoteResult.successful(newMap("b", 2).build()))));
 	}
 	
 	@Test(expected = MyRuntimeException.class)
 	public void reduce_rethrowsException() throws Exception {
 		GenericAstrixMapReducer<String, Integer> reducer = new GenericAstrixMapReducer<String, Integer>();
 		reducer.reduce(Arrays.asList(
-				new AstrixRemoteResult<>(newMap("a", 1).build(), null),
-				new AstrixRemoteResult<Map<String, Integer>>(null, new MyRuntimeException())));
+				AstrixRemoteResult.successful(newMap("a", 1).build()),
+				AstrixRemoteResult.<Map<String, Integer>>failure(new MyRuntimeException())));
 	}
 	
 	public static AstrixTestUtil.MapBuilder newMap(String key, Integer value) {

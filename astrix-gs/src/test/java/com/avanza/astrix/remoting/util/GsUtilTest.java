@@ -15,42 +15,30 @@
  */
 package com.avanza.astrix.remoting.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Objects;
 
 import org.junit.Test;
 import org.openspaces.remoting.SpaceRemotingResult;
 
 import com.avanza.astrix.core.AstrixRemoteResult;
 
-public class RemotingResultAdaptorTest {
+public class GsUtilTest {
 
-	@Test
-	public void getResult_astrixRemotingResultWrap() throws Throwable {
-		assertEquals("hej", 
-				RemotingResultAdaptor.AstrixRemotingResultWrap.wrap(Arrays.asList(new AstrixRemoteResult<>("hej", null))).iterator().next().getResult());
-	}
-	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void getResult_gigaSpaceRemotingResultWrap() throws Throwable {
-		@SuppressWarnings("unchecked")
-		Collection<RemotingResultAdaptor<?>> wrap = (Collection<RemotingResultAdaptor<?>>) 
-			RemotingResultAdaptor.GigaSpaceRemotingResultWrap.wrap(new SpaceRemotingResult[] { new MySpaceRemotingResult<String>("hej", null) });
-		assertEquals("hej", wrap.iterator().next().getResult());
-	}
-	
-	@Test(expected = MyException.class)
-	public void getResult_astrixRemotingResultWrap_rethrowsException() throws Throwable {
-		RemotingResultAdaptor.AstrixRemotingResultWrap.wrap(Arrays.asList(new AstrixRemoteResult<>(null, new MyException()))).iterator().next().getResult();
+		assertEquals(Arrays.asList(AstrixRemoteResult.successful("hej")), 
+				GsUtil.<String>convertToAstrixRemoteResults(new SpaceRemotingResult[] { new MySpaceRemotingResult<String>("hej", null) }));
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Test(expected = MyException.class)
-	public void getResult_gigaSpaceRemotingResultWrap_rethrowsException() throws Throwable {
-		((Collection<RemotingResultAdaptor<?>>) RemotingResultAdaptor.GigaSpaceRemotingResultWrap.wrap(new SpaceRemotingResult[] { new MySpaceRemotingResult<String>(null, new MyException()) }))
-			.iterator().next().getResult();
+	@Test
+	public void getResult_gigaSpaceRemotingResultWrap_retainsException() throws Throwable {
+		assertEquals(Arrays.asList(AstrixRemoteResult.failure(new MyException())), 
+				GsUtil.<String>convertToAstrixRemoteResults(new SpaceRemotingResult[] { new MySpaceRemotingResult<String>(null, new MyException()) }));
 	}
 	
 	public static class MySpaceRemotingResult<T> implements SpaceRemotingResult<T> {
@@ -85,6 +73,23 @@ public class RemotingResultAdaptorTest {
 	
 	public static class MyException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			return true;
+		}
+		@Override
+		public int hashCode() {
+			return Objects.hash(1);
+		}
 	}
 	
 }

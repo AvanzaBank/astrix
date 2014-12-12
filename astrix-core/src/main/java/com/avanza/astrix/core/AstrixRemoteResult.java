@@ -15,13 +15,15 @@
  */
 package com.avanza.astrix.core;
 
+import java.util.Objects;
 
-public class AstrixRemoteResult<T> {
+
+public final class AstrixRemoteResult<T> {
 	
 	private final T result;
 	private final RuntimeException exception;
 
-	public AstrixRemoteResult(T result, RuntimeException exception) {
+	private AstrixRemoteResult(T result, RuntimeException exception) {
 		this.result = result;
 		this.exception = exception;
 	}
@@ -62,4 +64,25 @@ public class AstrixRemoteResult<T> {
 		return new AstrixRemoteResult<>(null, null);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		@SuppressWarnings("unchecked")
+		AstrixRemoteResult<T> other = (AstrixRemoteResult<T>) obj;
+		return (result == null ? other.result == null : result.equals(other.result))
+				&& (exception == null ? other.exception == null : exception.equals(other.exception));
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(result, exception);
+	}
 }
