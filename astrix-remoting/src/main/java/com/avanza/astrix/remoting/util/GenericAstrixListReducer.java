@@ -21,12 +21,12 @@ import java.util.List;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.AstrixRemoteResultReducer;
 
-public class GenericAstrixListReducer implements AstrixRemoteResultReducer<List<?>, List<?>> {
+public class GenericAstrixListReducer<T> implements AstrixRemoteResultReducer<List<T>, List<T>> {
 
 	@Override
-	public List<?> reduce(List<AstrixRemoteResult<List<?>>> results) {
-		List<Object> list = new ArrayList<Object>();
-		for (AstrixRemoteResult<List<?>> result : results) {
+	public List<T> reduce(List<AstrixRemoteResult<List<T>>> results) {
+		List<T> list = new ArrayList<>();
+		for (AstrixRemoteResult<List<T>> result : results) {
 			list.addAll(result.getResult());
 		}
 		return list;
