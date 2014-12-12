@@ -29,14 +29,14 @@ public class GsUtilTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void getResult_gigaSpaceRemotingResultWrap() throws Throwable {
+	public void convertToAstrixRemoteResults_gigaSpaceRemotingResultWrap() throws Throwable {
 		assertEquals(Arrays.asList(AstrixRemoteResult.successful("hej")), 
 				GsUtil.<String>convertToAstrixRemoteResults(new SpaceRemotingResult[] { new MySpaceRemotingResult<String>("hej", null) }));
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void getResult_gigaSpaceRemotingResultWrap_retainsException() throws Throwable {
+	public void convertToAstrixRemoteResults_gigaSpaceRemotingResultWrap_retainsException() throws Throwable {
 		assertEquals(Arrays.asList(AstrixRemoteResult.failure(new MyException())), 
 				GsUtil.<String>convertToAstrixRemoteResults(new SpaceRemotingResult[] { new MySpaceRemotingResult<String>(null, new MyException()) }));
 	}
