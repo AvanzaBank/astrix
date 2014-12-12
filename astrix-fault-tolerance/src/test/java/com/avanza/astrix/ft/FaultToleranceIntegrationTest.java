@@ -41,12 +41,17 @@ import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 import com.google.common.base.Throwables;
 
-public class FaultToleranceIntegrationTest {
+public abstract class FaultToleranceIntegrationTest {
 
-	private static final long SLEEP_FOR_TIMEOUT = 1100l;
 	private Class<SimpleService> api = SimpleService.class;
 	private SimpleService provider = new SimpleServiceImpl();
 	private SimpleService testService;
+	
+	protected abstract IsolationStrategy isolationStrategy();
+	
+	protected SimpleService testService() {
+		return testService;
+	}
 
 	@Before
 	public void createService() {
@@ -64,10 +69,6 @@ public class FaultToleranceIntegrationTest {
 		assertThat(testService.echo("foo"), is(equalTo("foo")));
 	}
 	
-	@Test(expected=ServiceUnavailableException.class)
-	public void timeoutThrowsServiceUnavailableException() {
-		testService.sleep(SLEEP_FOR_TIMEOUT);
-	}
 	
 	@Test(expected=SimpleServiceException.class)
 	public void serviceExceptionIsThrown() throws Exception {
@@ -142,12 +143,13 @@ public class FaultToleranceIntegrationTest {
 	public void rejectsWhenPoolIsFull() throws Exception {
 		HystrixCommandSettings settings = settingsRandomCommandKey();
 		settings.setCoreSize(3);
-		settings.setQueueSizeRejectionThreshold(3);
+		settings.setMaxQueueSize(-1); // sync queue
 		settings.setExecutionIsolationThreadTimeoutInMilliseconds(5000);
+		settings.setSemaphoreMaxConcurrentRequests(3);
 		SimpleService serviceWithFt = HystrixAdapter.create(specRandomGroup(), settings);
 		ExecutorService pool = Executors.newCachedThreadPool();
 		Collection<R> runners = new ArrayList<R>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 5; i++) {
 			R runner = new R(serviceWithFt);
 			runners.add(runner);
 			// We need a delay between starting the tasks since Hystrix has its own check to see if stuff fits
@@ -166,7 +168,7 @@ public class FaultToleranceIntegrationTest {
 			}
 			numRejectionErrors++;
 		}
-		assertThat(numRejectionErrors, is(4));
+		assertThat(numRejectionErrors, is(2));
 	}
 	
 	private static class R implements Runnable {
@@ -198,7 +200,7 @@ public class FaultToleranceIntegrationTest {
 			testService.throwException(SimpleServiceException.class);
 			fail("Expected SimpleServiceException");
 		} catch (SimpleServiceException e) {
-			assertThat(Throwables.getStackTraceAsString(e), containsString(getClass().getName() + ".callerStackIsAddedToException"));
+			assertThat(Throwables.getStackTraceAsString(e), containsString(FaultToleranceIntegrationTest.class.getName() + ".callerStackIsAddedToException"));
 		}
 	}
 	
@@ -208,19 +210,10 @@ public class FaultToleranceIntegrationTest {
 			testService.throwException(ServiceUnavailableException.class);
 			fail("Expected SimpleServiceException");
 		} catch (ServiceUnavailableException e) {
-			assertThat(Throwables.getStackTraceAsString(e), containsString(getClass().getName() + ".callerStackIsAddedToException"));
+			assertThat(Throwables.getStackTraceAsString(e), containsString(FaultToleranceIntegrationTest.class.getName() + ".callerStackIsAddedToException"));
 		}
 	}
 	
-	@Test
-	public void callerStackIsAddedToExceptionOnTimeout() throws Exception {
-		try {
-			testService.sleep(SLEEP_FOR_TIMEOUT);
-			fail("Expected ServiceUnavailableException");
-		} catch (ServiceUnavailableException e) {
-			assertThat(Throwables.getStackTraceAsString(e), containsString(getClass().getName() + ".callerStackIsAddedToException"));
-		}
-	}
 	
 	private HystrixCommandSettings settingsRandomCommandKey() {
 		HystrixCommandSettings settings = new HystrixCommandSettings();
@@ -230,7 +223,7 @@ public class FaultToleranceIntegrationTest {
 	}
 	
 	private FaultToleranceSpecification<SimpleService> specRandomGroup() {
-		return FaultToleranceSpecification.builder(api).provider(provider).group(randomString()).isolationStrategy(IsolationStrategy.THREAD).build();
+		return FaultToleranceSpecification.builder(api).provider(provider).group(randomString()).isolationStrategy(isolationStrategy()).build();
 	}
 	
 	private String randomString() {

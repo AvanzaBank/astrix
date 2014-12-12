@@ -30,6 +30,7 @@ import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommand.Setter;
+import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
@@ -191,13 +192,13 @@ public class HystrixAdapter<T> implements InvocationHandler {
 								settings.getExecutionIsolationThreadTimeoutInMilliseconds())
 						.withMetricsRollingStatisticalWindowInMilliseconds(
 								settings.getMetricsRollingStatisticalWindowInMilliseconds())
-						.withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests());
-		// TODO configure exeution isolation strategy (.withExecutionIsolationStrategy(ExecutionIsolationStrategy.SEMAPHORE))
+						.withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests())
+						.withExecutionIsolationStrategy(determineExecutionIsolationStrategy());
 						
 		// MaxQueueSize must be set to a non negative value in order for QueueSizeRejectionThreshold to have any effect.
 		// We use a high value for MaxQueueSize in order to allow QueueSizeRejectionThreshold to change dynamically using archaius.
 		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =
-				HystrixThreadPoolProperties.Setter().withMaxQueueSize(1_000_000)
+				HystrixThreadPoolProperties.Setter().withMaxQueueSize(settings.getMaxQueueSize())
 						.withQueueSizeRejectionThreshold(settings.getQueueSizeRejectionThreshold())
 						.withCoreSize(settings.getCoreSize());
 
@@ -205,6 +206,13 @@ public class HystrixAdapter<T> implements InvocationHandler {
 				.andCommandKey(getCommandKey(settings))
 				.andCommandPropertiesDefaults(commandPropertiesDefault)
 				.andThreadPoolPropertiesDefaults(threadPoolPropertiesDefaults);
+	}
+
+	private ExecutionIsolationStrategy determineExecutionIsolationStrategy() {
+		if (isolationStrategy == IsolationStrategy.THREAD) {
+			return ExecutionIsolationStrategy.THREAD; 
+		}
+		return ExecutionIsolationStrategy.SEMAPHORE;
 	}
 
 	private HystrixCommandKey getCommandKey(HystrixCommandSettings settings) {

@@ -28,7 +28,16 @@ class HystrixCommandSettings {
 	private int semaphoreMaxConcurrentRequests = 10;
 	private String commandKey = null; // null means use api name as command key
 	private int executionIsolationThreadTimeoutInMilliseconds = 1000;
-	private int metricsRollingStatisticalWindowInMilliseconds = 10000;
+	private int metricsRollingStatisticalWindowInMilliseconds = 10_000;
+	private int maxQueueSize = 1_000_000;
+
+	public int getMaxQueueSize() {
+		return maxQueueSize;
+	}
+
+	public void setMaxQueueSize(int maxQueueSize) {
+		this.maxQueueSize = maxQueueSize;
+	}
 
 	public int getMetricsRollingStatisticalWindowInMilliseconds() {
 		return metricsRollingStatisticalWindowInMilliseconds;
