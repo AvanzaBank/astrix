@@ -77,8 +77,7 @@ public final class AstrixRemoteResult<T> {
 		}
 		@SuppressWarnings("unchecked")
 		AstrixRemoteResult<T> other = (AstrixRemoteResult<T>) obj;
-		return (result == null ? other.result == null : result.equals(other.result))
-				&& (exception == null ? other.exception == null : exception.equals(other.exception));
+		return Objects.equals(result, other.result) && Objects.equals(exception, other.exception);
 	}
 	
 	@Override
