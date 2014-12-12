@@ -6,3 +6,4 @@
 *.md.html
 target
 .metadata/
+.recommenders/
