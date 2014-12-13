@@ -71,7 +71,7 @@ public class TestAstrixConfigurer {
 	public <T> void registerAstrixBean(Class<T> beanType, T provider) {
 		StandaloneFactoryBean<T> factoryPlugin = new StandaloneFactoryBean<>(beanType, provider);
 		AstrixApiDescriptor apiDescriptor = AstrixApiDescriptor.simple(provider.getClass().getName());
-		AstrixFactoryBean<T> factoryBean = new AstrixFactoryBean<>(factoryPlugin, apiDescriptor, true);
+		AstrixFactoryBean<T> factoryBean = new AstrixFactoryBean<>(factoryPlugin, apiDescriptor, false);
 		standaloneFactories.add(factoryBean);
 	}
 

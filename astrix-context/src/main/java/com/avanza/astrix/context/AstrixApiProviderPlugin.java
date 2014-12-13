@@ -46,14 +46,24 @@ public interface AstrixApiProviderPlugin {
 	Class<? extends Annotation> getProviderAnnotationType();
 	
 	/**
-	 * Whether this is a "service provider" or a "library provider". Services providers binds its
-	 * bean types to services provided by other processes by contrast to library provider whose beans
-	 * are implemented by in memory objects. 
+	 * Whether the beans provided by this type of api are stateful. 
 	 * 
+	 * A stateful bean may not possible to create at a given time. For instance, for service's 
+	 * provided using the service registry it might not be possible to create the bean for any of these reasons:
+	 * 
+	 * 1. service-registry i not available
+	 * 2. no service provider is registered in the registry (yet)
+	 * 3. the server does not respond on connection attempt
+	 * 
+	 * Astrix will manage the state for stateful beans and make sure it's always possible
+	 * to create an instance of a stateful beans (using Astrix.getBean). The bean will 
+	 * be in UNBOUND state if the underlying AstrixFactoryBeanPlugin can't create the bean. 
+	 * Astrix will periodically attempt to create the bean using the underlying factory
+	 * until successful.
+
 	 * @return
 	 */
-	// TODO: Rename to "hasStatefulBeans"
-	boolean isLibraryProvider();
+	boolean hasStatefulBeans();
 	
 	
 }

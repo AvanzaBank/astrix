@@ -43,10 +43,10 @@ public class AstrixApiProviderFactory {
 		List<AstrixFactoryBean<?>> factoryBeans = new ArrayList<>();
 		for (AstrixFactoryBeanPlugin<?> factoryBean : providerFactoryPlugin.createFactoryBeans(descriptor)) {
 			AstrixFactoryBeanPlugin<?> decoratatedFactory = factoryBean;
-			if (!providerFactoryPlugin.isLibraryProvider()) {
+			if (providerFactoryPlugin.hasStatefulBeans()) {
 				decoratatedFactory = new StatefulAstrixFactoryBean<>(factoryBean);
 			}
-			factoryBeans.add(new AstrixFactoryBean<>(decoratatedFactory, descriptor, providerFactoryPlugin.isLibraryProvider()));
+			factoryBeans.add(new AstrixFactoryBean<>(decoratatedFactory, descriptor, providerFactoryPlugin.hasStatefulBeans()));
 		}
 		return new AstrixApiProvider(factoryBeans, descriptor); 
 	}

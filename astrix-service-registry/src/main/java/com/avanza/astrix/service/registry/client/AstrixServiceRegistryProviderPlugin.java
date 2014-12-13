@@ -91,8 +91,8 @@ public class AstrixServiceRegistryProviderPlugin implements AstrixApiProviderPlu
 	}
 	
 	@Override
-	public boolean isLibraryProvider() {
-		return false;
+	public boolean hasStatefulBeans() {
+		return true;
 	}
 
 	@Override

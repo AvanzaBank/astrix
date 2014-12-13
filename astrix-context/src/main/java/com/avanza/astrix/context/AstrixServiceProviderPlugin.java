@@ -66,8 +66,8 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin, Ast
 	}
 
 	@Override
-	public boolean isLibraryProvider() {
-		return false;
+	public boolean hasStatefulBeans() {
+		return true;
 	}
 
 	private Class<?> loadInterfaceIfExists(String interfaceName) {

@@ -214,7 +214,7 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 	}
 
 	private boolean isStatefulBean(AstrixBeanKey beanKey) {
-		return !this.beanFactoryRegistry.getFactoryBean(beanKey.getBeanType()).isLibrary();
+		return this.beanFactoryRegistry.getFactoryBean(beanKey.getBeanType()).isStateful();
 	}
 
 	/**

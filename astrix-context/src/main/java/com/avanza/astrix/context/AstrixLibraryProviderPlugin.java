@@ -52,8 +52,8 @@ public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
 	}
 	
 	@Override
-	public boolean isLibraryProvider() {
-		return true;
+	public boolean hasStatefulBeans() {
+		return false;
 	}
 	
 	@AstrixInject
