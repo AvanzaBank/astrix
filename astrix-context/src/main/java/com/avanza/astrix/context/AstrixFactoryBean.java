@@ -34,13 +34,19 @@ public final class AstrixFactoryBean<T> implements AstrixDecorator {
 	private final AstrixFactoryBeanPlugin <T> plugin;
 	private final Class<T> beanType;
 	private final AstrixApiDescriptor apiDescriptor;
-	private final boolean isStateful;
 	
-	public AstrixFactoryBean(AstrixFactoryBeanPlugin<T> factoryPlugin, AstrixApiDescriptor apiDescriptor, boolean isStateful) {
+	private AstrixFactoryBean(AstrixFactoryBeanPlugin<T> factoryPlugin, AstrixApiDescriptor apiDescriptor) {
 		this.plugin = factoryPlugin;
 		this.apiDescriptor = apiDescriptor;
-		this.isStateful = isStateful;
 		this.beanType = factoryPlugin.getBeanType();
+	}
+
+	public static <T> AstrixFactoryBean<T> stateful(AstrixFactoryBeanPlugin<T> factoryBean, AstrixApiDescriptor descriptor) {
+		return new AstrixFactoryBean<>(new StatefulAstrixFactoryBean<>(factoryBean), descriptor);
+	}
+
+	public static <T> AstrixFactoryBean<T> nonStateful(AstrixFactoryBeanPlugin<T> factoryBean, AstrixApiDescriptor descriptor) {
+		return new AstrixFactoryBean<>(factoryBean, descriptor);
 	}
 
 	public T create(String optionalQualifier) {
@@ -57,7 +63,7 @@ public final class AstrixFactoryBean<T> implements AstrixDecorator {
 	}
 
 	public boolean isStateful() {
-		return isStateful;
+		return this.plugin.getClass().equals(StatefulAstrixFactoryBean.class);
 	}
 
 	public boolean isVersioned() {
@@ -67,4 +73,5 @@ public final class AstrixFactoryBean<T> implements AstrixDecorator {
 	public AstrixApiDescriptor getApiDescriptor() {
 		return apiDescriptor;
 	}
+
 }
