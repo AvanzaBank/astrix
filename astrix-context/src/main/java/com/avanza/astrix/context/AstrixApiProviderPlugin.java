@@ -23,15 +23,16 @@ import java.util.List;
  * An AstrixApiProviderPlugin is responsible for creating AstrixFactoryBeanPlugin for
  * all parts of a given "type" of api. By "type" in this context, we don't mean the
  * different api's that are hooked into Astrix for consumption, but rather a mechanism
- * for an api-provider to use to make the different part's of the api available for consumption.
+ * for an api-provider to publish the different part's of the api, thereby allowing it
+ * to be consumed using Astrix.
  * 
- * For instance, one type of api is "library", which is handled by the AstrixLibraryProviderPlugin. It
+ * For instance, one type of api is "library", which is handled by the {@link AstrixLibraryProviderPlugin}. It
  * allows api-providers to export api's that require "a lot" of wiring on the client side by annotating
  * a class with @AstrixServiceProvider an export different api-elements by annotating factory methods
  * for different api elements with @AstrixExport. 
  * 
- * Another type of api is a "service-registry" api, which binds to services using the service-registry
- * which typically also requires a server side component to respond to the service-invocation-request.
+ * Another type of api is a "service" api, which binds to services using an {@link AstrixServiceComponent}.
+ * This typically also requires a server side component to respond to the service-invocation-request.
  * 
  * @author Elias Lindholm (elilin)
  *
@@ -51,6 +52,7 @@ public interface AstrixApiProviderPlugin {
 	 * 
 	 * @return
 	 */
+	// TODO: Rename to "hasStatefulBeans"
 	boolean isLibraryProvider();
 	
 	

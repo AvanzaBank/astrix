@@ -54,10 +54,6 @@ public class AstrixServiceDescriptor {
 		return descriptorHolder.getName().toString();
 	}
 
-	private Class<?> getHolder() {
-		return descriptorHolder;
-	}
-
 	/**
 	 * Default component used for services exported to service registry.
 	 * @return

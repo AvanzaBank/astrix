@@ -54,8 +54,8 @@ final class ObjectCache {
 	private final ConcurrentMap<ObjectId, Lock> lockedObjects = new ConcurrentHashMap<>();
 	private final ObjectFactory objectFactory;
 	
-	public ObjectCache(ObjectFactory initializer) {
-		this.objectFactory = Objects.requireNonNull(initializer);
+	public ObjectCache(ObjectFactory objectFactory) {
+		this.objectFactory = Objects.requireNonNull(objectFactory);
 	}
 
 	@SuppressWarnings("unchecked")
