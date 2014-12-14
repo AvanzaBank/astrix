@@ -99,14 +99,14 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 		return serviceComponents.getComponent(componentName);
 	}
 	
-	private class IllegalSubsystemProxy<T> implements InvocationHandler {
+	private class IllegalSubsystemProxy implements InvocationHandler {
 		
 		private String currentSubsystem;
 		private String providerSubsystem;
-		private Class<T> beanType;
+		private Class<?> beanType;
 		
 
-		public IllegalSubsystemProxy(String currentSubsystem, String providerSubsystem, Class<T> beanType) {
+		public IllegalSubsystemProxy(String currentSubsystem, String providerSubsystem, Class<?> beanType) {
 			this.currentSubsystem = currentSubsystem;
 			this.providerSubsystem = providerSubsystem;
 			this.beanType = beanType;

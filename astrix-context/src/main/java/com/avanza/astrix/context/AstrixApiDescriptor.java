@@ -17,8 +17,6 @@ package com.avanza.astrix.context;
 
 import java.lang.annotation.Annotation;
 
-import com.avanza.astrix.provider.core.AstrixServiceRegistryApi;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
 /**
  * 
@@ -53,7 +51,6 @@ public abstract class AstrixApiDescriptor {
 	private static class SimpleApiDescriptor extends AstrixApiDescriptor {
 
 		private String name;
-		private AstrixFactoryBeanPlugin<?> factory;
 		
 		public SimpleApiDescriptor(String name) {
 			this.name = name;
@@ -84,10 +81,6 @@ public abstract class AstrixApiDescriptor {
 			return false;
 		}
 
-		public AstrixFactoryBeanPlugin<?> getFactory() {
-			return factory;
-		}
-		
 	}
 	
 	private static class AnnotationApiDescriptor extends AstrixApiDescriptor {
