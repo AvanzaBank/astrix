@@ -46,14 +46,14 @@ public interface AstrixApiProviderPlugin {
 	Class<? extends Annotation> getProviderAnnotationType();
 	
 	/**
-	 * Whether the beans provided by this type of api are stateful. 
+	 * Defines whether the beans provided by this type of api are stateful. 
 	 * 
 	 * A stateful bean may not possible to create at a given time. For instance, for service's 
 	 * provided using the service registry it might not be possible to create the bean for any of these reasons:
 	 * 
-	 * 1. service-registry i not available
-	 * 2. no service provider is registered in the registry (yet)
-	 * 3. the server does not respond on connection attempt
+	 * 1. The service-registry i not available
+	 * 2. No service provider is registered in the registry (yet)
+	 * 3. The service provider does not respond on connection attempt
 	 * 
 	 * Astrix will manage the state for stateful beans and make sure it's always possible
 	 * to create an instance of a stateful beans (using Astrix.getBean). The bean will 
