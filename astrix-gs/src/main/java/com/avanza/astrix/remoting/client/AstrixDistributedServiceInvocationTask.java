@@ -26,7 +26,14 @@ import org.openspaces.core.executor.DistributedTask;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 import com.avanza.astrix.spring.AstrixSpringContext;
 import com.gigaspaces.async.AsyncResult;
-
+/**
+ * Carries an AstrixServiceInvocationRequest from client to server and performs
+ * the invocation of the {@link AstrixServiceActivator} by using the possibility
+ * to autowire spring-beans on the server side. <p>
+ * 
+ * @author Elias Lindholm
+ *
+ */
 @AutowireTask
 public class AstrixDistributedServiceInvocationTask implements DistributedTask<AstrixServiceInvocationResponse, List<AsyncResult<AstrixServiceInvocationResponse>>> {
 

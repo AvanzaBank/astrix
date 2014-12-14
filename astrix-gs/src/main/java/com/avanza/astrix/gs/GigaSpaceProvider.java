@@ -19,8 +19,13 @@ import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.provider.core.AstrixServiceProvider;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
-
+/**
+ * Provides the GigaSpace interface as a service using the service-registry. <p>
+ * 
+ * @author Elias Lindholm
+ *
+ */
 @AstrixServiceRegistryLookup
 @AstrixServiceProvider(GigaSpace.class)
-public class GsDescriptor {
+public class GigaSpaceProvider {
 }

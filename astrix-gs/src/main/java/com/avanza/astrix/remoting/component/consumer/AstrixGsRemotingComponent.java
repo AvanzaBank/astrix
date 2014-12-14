@@ -42,9 +42,14 @@ import com.avanza.astrix.remoting.client.GsRemotingTransport;
 import com.avanza.astrix.remoting.client.GsRoutingStrategy;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 import com.avanza.astrix.spring.AstrixSpringContext;
-
+/**
+ * Provides remoting using a GigaSpace clustered proxy as transport. <p> 
+ * 
+ * @author Elias Lindholm
+ *
+ */
 @MetaInfServices(AstrixServiceComponent.class)
-public class AstrixRemotingComponent implements AstrixPluginsAware, AstrixServiceComponent {
+public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServiceComponent {
 	
 	private AstrixPlugins plugins;
 	private AstrixContextImpl astrixContext;

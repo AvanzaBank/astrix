@@ -23,7 +23,11 @@ import org.openspaces.core.GigaSpace;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.j_spaces.core.client.SpaceURL;
 
-
+/**
+ * 
+ * @author Elias Lindholm
+ *
+ */
 public class GsBinder {
 	
 	public static final String SPACE_NAME_PROPERTY = "spaceName";

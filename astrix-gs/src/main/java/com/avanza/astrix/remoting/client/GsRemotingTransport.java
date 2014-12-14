@@ -26,7 +26,12 @@ import rx.Subscriber;
 import com.gigaspaces.async.AsyncFuture;
 import com.gigaspaces.async.AsyncFutureListener;
 import com.gigaspaces.async.AsyncResult;
-
+/**
+ * RemotingTransport implementation based on GigaSpaces task execution. <p> 
+ * 
+ * @author Elias Lindholm
+ *
+ */
 public class GsRemotingTransport implements RemotingTransportSpi {
 
 	private final GigaSpace gigaSpace;

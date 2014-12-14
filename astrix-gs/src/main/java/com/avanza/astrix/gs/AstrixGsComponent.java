@@ -36,7 +36,12 @@ import com.avanza.astrix.context.FaultToleranceSpecification;
 import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.spring.AstrixSpringContext;
-
+/**
+ * Service component allowing GigaSpace clustered proxy to be used as a service. 
+ * 
+ * @author Elias Lindholm
+ *
+ */
 @MetaInfServices(AstrixServiceComponent.class)
 public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsAware {
 
@@ -77,7 +82,7 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 		if (!astrixContext.getSettings().getBoolean(AstrixSettings.EXPORT_GIGASPACE, true)) {
 			return Collections.emptyList();
 		}
-		return Arrays.asList(new AstrixExportedServiceInfo(GigaSpace.class, AstrixApiDescriptor.create(GsDescriptor.class), getName(), null));
+		return Arrays.asList(new AstrixExportedServiceInfo(GigaSpace.class, AstrixApiDescriptor.create(GigaSpaceProvider.class), getName(), null));
 	}
 	
 	@Override

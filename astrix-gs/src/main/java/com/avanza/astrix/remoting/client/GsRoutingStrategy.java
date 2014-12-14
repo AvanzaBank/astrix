@@ -21,7 +21,13 @@ import java.lang.reflect.Method;
 import org.openspaces.remoting.Routing;
 
 import com.avanza.astrix.core.AstrixBroadcast;
-
+/**
+ * Provides a routing strategy compatible with the routing used by native 
+ * gigaspaces remoting, (@Routing annotated arguments).
+ * 
+ * @author Elias Lindholm
+ *
+ */
 public class GsRoutingStrategy implements RoutingStrategy {
 	
 	private static final RoutingKeyMethodCache routingKeyMethodCache = new RoutingKeyMethodCache();
