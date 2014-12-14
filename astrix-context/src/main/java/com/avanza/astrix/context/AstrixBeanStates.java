@@ -62,9 +62,9 @@ public class AstrixBeanStates implements AstrixEventListener<AstrixBeanStateChan
 		}
 		
 		public void set(T value) {
-			this.value = value;
 			Object enumValueMonitor = getMonitor(value);
 			synchronized (enumValueMonitor) {
+				this.value = value;
 				enumValueMonitor.notifyAll();
 			}
 		}
@@ -79,6 +79,9 @@ public class AstrixBeanStates implements AstrixEventListener<AstrixBeanStateChan
 			}
 			Object enumValueMonitor = getMonitor(value);
 			synchronized (enumValueMonitor) {
+				if (this.value == value) {
+					return true;
+				}
 				enumValueMonitor.wait(timeoutMillis);
 				return this.value == value;
 			}
