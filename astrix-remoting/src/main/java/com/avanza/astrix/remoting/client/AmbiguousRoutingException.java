@@ -20,7 +20,7 @@ package com.avanza.astrix.remoting.client;
  * @author Elias Lindholm (elilin)
  *
  */
-class AmbiguousRoutingException extends RuntimeException {
+public class AmbiguousRoutingException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 

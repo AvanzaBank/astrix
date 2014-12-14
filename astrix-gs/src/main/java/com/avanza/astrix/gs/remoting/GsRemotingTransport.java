@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.remoting.client;
+package com.avanza.astrix.gs.remoting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +23,11 @@ import org.openspaces.core.GigaSpace;
 import rx.Observable;
 import rx.Subscriber;
 
+import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
+import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
+import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
+import com.avanza.astrix.remoting.client.RemotingTransportSpi;
+import com.avanza.astrix.remoting.client.RoutingKey;
 import com.gigaspaces.async.AsyncFuture;
 import com.gigaspaces.async.AsyncFutureListener;
 import com.gigaspaces.async.AsyncResult;
@@ -87,7 +92,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 	}
 
 	public static AstrixRemotingTransport remoteSpace(GigaSpace gigaSpace) {
-		return new AstrixRemotingTransport(new GsRemotingTransport(gigaSpace));
+		return AstrixRemotingTransport.create(new GsRemotingTransport(gigaSpace));
 	}
 	
 }

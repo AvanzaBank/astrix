@@ -35,7 +35,7 @@ public class PropertyOnAnnotatedArgumentRoutingStrategy implements Router {
 		try {
 			routingKey = propertyMethod.invoke(args[argumentIndex]);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new IllegalArgumentException("Failed to rout using method:" + propertyMethod, e);
+			throw new IllegalArgumentException("Failed to route using method:" + propertyMethod, e);
 		}
 		return RoutingKey.create(routingKey);
 	}

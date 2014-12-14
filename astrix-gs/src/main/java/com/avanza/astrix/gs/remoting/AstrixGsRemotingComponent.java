@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.remoting.component.consumer;
+package com.avanza.astrix.gs.remoting;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,8 +38,6 @@ import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.remoting.client.AstrixRemotingProxy;
 import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
-import com.avanza.astrix.remoting.client.GsRemotingTransport;
-import com.avanza.astrix.remoting.client.GsRoutingStrategy;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 import com.avanza.astrix.spring.AstrixSpringContext;
 /**

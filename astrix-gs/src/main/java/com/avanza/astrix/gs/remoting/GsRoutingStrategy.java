@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.remoting.client;
+package com.avanza.astrix.gs.remoting;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -21,6 +21,13 @@ import java.lang.reflect.Method;
 import org.openspaces.remoting.Routing;
 
 import com.avanza.astrix.core.AstrixBroadcast;
+import com.avanza.astrix.remoting.client.AmbiguousRoutingException;
+import com.avanza.astrix.remoting.client.AnnotatedArgumentInstanceRoutingStrategy;
+import com.avanza.astrix.remoting.client.AnnotatedArgumentRoutingStrategy;
+import com.avanza.astrix.remoting.client.BroadcastRoutingStrategy;
+import com.avanza.astrix.remoting.client.PropertyOnAnnotatedArgumentRoutingStrategy;
+import com.avanza.astrix.remoting.client.Router;
+import com.avanza.astrix.remoting.client.RoutingStrategy;
 /**
  * Provides a routing strategy compatible with the routing used by native 
  * gigaspaces remoting, (@Routing annotated arguments).

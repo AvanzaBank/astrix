@@ -13,49 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.remoting.client;
+package com.avanza.astrix.gs.remoting;
 
-import java.util.List;
 import java.util.Objects;
 
 import javax.annotation.Resource;
 
 import org.openspaces.core.executor.AutowireTask;
-import org.openspaces.core.executor.DistributedTask;
+import org.openspaces.core.executor.Task;
 
+import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
+import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 import com.avanza.astrix.spring.AstrixSpringContext;
-import com.gigaspaces.async.AsyncResult;
 /**
- * Carries an AstrixServiceInvocationRequest from client to server and performs
- * the invocation of the {@link AstrixServiceActivator} by using the possibility
- * to autowire spring-beans on the server side. <p>
  * 
- * @author Elias Lindholm
+ * @author Elias Lindholm (elilin)
  *
  */
 @AutowireTask
-public class AstrixDistributedServiceInvocationTask implements DistributedTask<AstrixServiceInvocationResponse, List<AsyncResult<AstrixServiceInvocationResponse>>> {
+public class AstrixServiceInvocationTask implements Task<AstrixServiceInvocationResponse> {
 
 	private static final long serialVersionUID = 1L;
+
 	@Resource
 	private transient AstrixSpringContext astrixSpringContext;
-	private final AstrixServiceInvocationRequest request;
+	private final AstrixServiceInvocationRequest invocationRequest;
 	
-	public AstrixDistributedServiceInvocationTask(AstrixServiceInvocationRequest request) {
-		this.request = Objects.requireNonNull(request);
+	public AstrixServiceInvocationTask(AstrixServiceInvocationRequest invocationRequest) {
+		this.invocationRequest = Objects.requireNonNull(invocationRequest);
 	}
 
 	@Override
 	public AstrixServiceInvocationResponse execute() throws Exception {
 		AstrixServiceActivator serviceActivator = astrixSpringContext.getAstrixContext().getInstance(AstrixServiceActivator.class);
-		return serviceActivator.invokeService(request);
+		return serviceActivator.invokeService(invocationRequest);
 	}
-	
-	@Override
-	public List<AsyncResult<AstrixServiceInvocationResponse>> reduce(List<AsyncResult<AstrixServiceInvocationResponse>> results) throws Exception {
-		return results;
-	}
-
 
 }

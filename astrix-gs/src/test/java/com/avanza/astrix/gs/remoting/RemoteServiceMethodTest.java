@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.remoting.client;
+package com.avanza.astrix.gs.remoting;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.openspaces.remoting.Routing;
+
+import com.avanza.astrix.remoting.client.AmbiguousRoutingException;
+import com.avanza.astrix.remoting.client.Router;
+import com.avanza.astrix.remoting.client.RoutingKey;
 
 public class RemoteServiceMethodTest {
 	
@@ -36,46 +40,33 @@ public class RemoteServiceMethodTest {
 	
 	@Test
 	public void routesOnRoutingAnnotatedArgumentPropertyIfDefined() throws Exception {
-		class RoutingType {
-			public String getRouting() {
-				return "routing-arg";
-			}
-		}
 		class Service {
-			public void hello(@Routing("getRouting") RoutingType routingArg) {
+			public void hello(@Routing("getRouting") ProperRoutingMethod routingArg) {
 			}
 		}
 		
-		Router router = new GsRoutingStrategy().create(Service.class.getMethod("hello", RoutingType.class));
-		RoutingKey routingKey = router.getRoutingKey(new RoutingType());
+		Router router = new GsRoutingStrategy().create(Service.class.getMethod("hello", ProperRoutingMethod.class));
+		RoutingKey routingKey = router.getRoutingKey(new ProperRoutingMethod());
 		assertEquals(RoutingKey.create("routing-arg"), routingKey);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void missingPropertyMethod_throwsIllegalArgumentException() throws Exception {
-		class RoutingType {
-		}
 		class Service {
-			public void hello(@Routing("getRouting") RoutingType routingArg) {
+			public void hello(@Routing("getRouting") MissingRoutingMethod routingArg) {
 			}
 		}
-		
-		new GsRoutingStrategy().create(Service.class.getMethod("hello", RoutingType.class));
+		new GsRoutingStrategy().create(Service.class.getMethod("hello", MissingRoutingMethod.class));
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void invalidPropertyMethod_throwsIllegalArgumentException() throws Exception {
-		class RoutingType {
-			public String getRouting(String illegalArgument) {
-				return "";
-			}
-		}
 		class Service {
-			public void hello(@Routing("getRouting") RoutingType routingArg) {
+			public void hello(@Routing("getRouting") IllegalRoutingMethod routingArg) {
 			}
 		}
 		
-		new GsRoutingStrategy().create(Service.class.getMethod("hello", RoutingType.class));
+		new GsRoutingStrategy().create(Service.class.getMethod("hello", IllegalRoutingMethod.class));
 	}
 	
 	@Test(expected = AmbiguousRoutingException.class)
@@ -94,6 +85,21 @@ public class RemoteServiceMethodTest {
 			}
 		}
 		new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
+	}
+	
+	public static class ProperRoutingMethod {
+		public String getRouting() {
+			return "routing-arg";
+		}
+	}
+	
+	public static class MissingRoutingMethod {
+	}
+	
+	public static class IllegalRoutingMethod {
+		public String getRouting(String illegalArgument) {
+			return "";
+		}
 	}
 
 }

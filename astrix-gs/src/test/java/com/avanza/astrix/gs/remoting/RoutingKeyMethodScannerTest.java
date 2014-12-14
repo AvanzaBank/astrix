@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.remoting.client;
+package com.avanza.astrix.gs.remoting;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 
-import com.avanza.astrix.remoting.client.RoutingKeyMethodScanner;
+import com.avanza.astrix.gs.remoting.RoutingKeyMethodScanner;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 
 
