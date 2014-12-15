@@ -15,6 +15,9 @@
  */
 package com.avanza.astrix.test.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -125,6 +128,21 @@ public class AstrixTestUtil {
 				return true;
 			}
 		};
+	}
+	
+	public static class MapBuilder {
+		private HashMap<String, Integer> result = new HashMap<>();
+		public MapBuilder() { }
+		public MapBuilder(String key, Integer value) { 
+			with(key, value);
+		}
+		public MapBuilder with(String key, Integer value) {
+			result.put(key, value);
+			return this;
+		}
+		public Map<String, Integer> build() {
+			return result;
+		}
 	}
 
 }

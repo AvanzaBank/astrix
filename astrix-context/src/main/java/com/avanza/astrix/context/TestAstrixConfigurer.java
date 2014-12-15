@@ -56,17 +56,18 @@ public class TestAstrixConfigurer {
 	}
 	
 	/**
-	 * Registers an api provider.
+	 * Registers api provider(s).
 	 * 
 	 * This is an alias for registerApiDescriptor(Class<?> descriptor), which
 	 * should be removed in the future.
 	 * 
 	 * @param provider
 	 */
-	public void registerApiProvider(Class<?> provider) {
-		descriptors.add(AstrixApiDescriptor.create(provider));
+	public void registerApiProvider(Class<?>... providers) {
+		for (Class<?> provider : providers) {
+			descriptors.add(AstrixApiDescriptor.create(provider));
+		}
 	}
-	
 
 	public <T> void registerAstrixBean(Class<T> beanType, T provider) {
 		StandaloneFactoryBean<T> factoryPlugin = new StandaloneFactoryBean<>(beanType, provider);

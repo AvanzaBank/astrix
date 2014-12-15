@@ -5,3 +5,5 @@
 .apt_generated
 *.md.html
 target
+.metadata/
+.recommenders/
