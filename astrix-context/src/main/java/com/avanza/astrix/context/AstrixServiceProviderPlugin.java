@@ -23,6 +23,8 @@ import java.util.List;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.provider.core.AstrixServiceProvider;
+import com.avanza.astrix.provider.versioning.AstrixVersioned;
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -39,12 +41,18 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin, Ast
 	@Override
 	public List<AstrixFactoryBeanPlugin<?>> createFactoryBeans(AstrixApiDescriptor descriptor) {
 		List<AstrixFactoryBeanPlugin<?>> result = new ArrayList<>();
+		ServiceVersioningContext versioningContext;
+		if (descriptor.isVersioned()) {
+			versioningContext = ServiceVersioningContext.versionedService(descriptor.getAnnotation(AstrixVersioned.class));
+		} else {
+			versioningContext = ServiceVersioningContext.nonVersioned();
+		}
 		for (Class<?> exportedApi : getProvidedBeans(descriptor)) {
 			AstrixServiceLookup serviceLookup = getLookupStrategy(descriptor);
-			result.add(new AstrixServiceFactory<>(descriptor, exportedApi, serviceLookup, serviceComponents, leaseManager, settings));
+			result.add(new AstrixServiceFactory<>(versioningContext, exportedApi, serviceLookup, serviceComponents, leaseManager, settings));
 			Class<?> asyncInterface = loadInterfaceIfExists(exportedApi.getName() + "Async");
 			if (asyncInterface != null) {
-				result.add(new AstrixServiceFactory<>(descriptor, asyncInterface, serviceLookup, serviceComponents, leaseManager, settings));
+				result.add(new AstrixServiceFactory<>(versioningContext, asyncInterface, serviceLookup, serviceComponents, leaseManager, settings));
 			}
 		}
 		return result;

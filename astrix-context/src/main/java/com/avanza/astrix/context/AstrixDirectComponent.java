@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 @MetaInfServices(AstrixServiceComponent.class)
 public class AstrixDirectComponent implements AstrixServiceComponent {
@@ -33,7 +34,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	private final static Map<String, ServiceProvider<?>> providerById = new ConcurrentHashMap<>();
 	
 	@Override
-	public <T> T createService(AstrixApiDescriptor apiDescriptor, Class<T> type, AstrixServiceProperties serviceProperties) {
+	public <T> T createService(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
 		String providerName = serviceProperties.getProperty("providerId");
 		ServiceProvider<?> result = providerById.get(providerName);
 		if (result == null) {
@@ -132,7 +133,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	}
 
 	@Override
-	public <T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor) {
+	public <T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext) {
 		throw new UnsupportedOperationException();
 	}
 	

@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package com.avanza.astrix.context;
+
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
+
 /**
  * Holds information about a given exported service. 
  * 
@@ -33,10 +36,12 @@ public class AstrixExportedServiceInfo {
 	private AstrixApiDescriptor apiDescriptor;
 	private String componentName;
 	private Object provider;
+	private ServiceVersioningContext versioningContext;
 
-	public AstrixExportedServiceInfo(Class<?> providedService, AstrixApiDescriptor apiDescriptor, String componentName, Object provider) {
+	public AstrixExportedServiceInfo(Class<?> providedService, AstrixApiDescriptor apiDescriptor, ServiceVersioningContext versioningContext, String componentName, Object provider) {
 		this.providedService = providedService;
 		this.apiDescriptor = apiDescriptor;
+		this.versioningContext = versioningContext;
 		this.componentName = componentName;
 		this.provider = provider;
 	}
@@ -55,6 +60,10 @@ public class AstrixExportedServiceInfo {
 	
 	public Object getProvider() {
 		return provider;
+	}
+
+	public ServiceVersioningContext getVersioningContext() {
+		return versioningContext;
 	}
 	
 }

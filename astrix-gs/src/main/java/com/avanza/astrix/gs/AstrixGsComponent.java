@@ -35,6 +35,7 @@ import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.FaultToleranceSpecification;
 import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
 /**
  * Service component allowing GigaSpace clustered proxy to be used as a service. 
@@ -49,7 +50,7 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 	private AstrixContextImpl astrixContext;
 	
 	@Override
-	public <T> T createService(AstrixApiDescriptor apiDescriptor, Class<T> type, AstrixServiceProperties serviceProperties) {
+	public <T> T createService(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
 		if (!GigaSpace.class.isAssignableFrom(type)) {
 			throw new IllegalStateException("Programming error, attempted to create: " + type);
 		}
@@ -73,7 +74,7 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 	
 
 	@Override
-	public <T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor) {
+	public <T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext) {
 		// Intentionally empty
 	}
 	
@@ -82,7 +83,7 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 		if (!astrixContext.getSettings().getBoolean(AstrixSettings.EXPORT_GIGASPACE, true)) {
 			return Collections.emptyList();
 		}
-		return Arrays.asList(new AstrixExportedServiceInfo(GigaSpace.class, AstrixApiDescriptor.create(GigaSpaceProvider.class), getName(), null));
+		return Arrays.asList(new AstrixExportedServiceInfo(GigaSpace.class, AstrixApiDescriptor.create(GigaSpaceProvider.class), ServiceVersioningContext.nonVersioned(), getName(), null));
 	}
 	
 	@Override

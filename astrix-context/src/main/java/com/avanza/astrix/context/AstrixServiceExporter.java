@@ -24,6 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.avanza.astrix.provider.core.AstrixServiceExport;
+import com.avanza.astrix.provider.versioning.AstrixVersioned;
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 /**
  * Server side component used to export all services provided by a given server as defined by
@@ -58,7 +60,7 @@ public class AstrixServiceExporter {
 	}
 	
 	private <T> void exportService(AstrixExportedServiceInfo exportedService, AstrixServiceComponent serviceComponent, Class<T> providedApi) {
-		serviceComponent.exportService(providedApi, providedApi.cast(exportedService.getProvider()), exportedService.getApiDescriptor());
+		serviceComponent.exportService(providedApi, providedApi.cast(exportedService.getProvider()), exportedService.getVersioningContext());
 	}
 
 	@AstrixInject
@@ -72,6 +74,9 @@ public class AstrixServiceExporter {
 	}
 
 	public void addServiceProvider(Object bean) {
+		if (!bean.getClass().isAnnotationPresent(AstrixServiceExport.class)) {
+			throw new IllegalArgumentException("Service provider beans must be annotated with @AstrixServiceExport. bean: " + bean.getClass().getName());
+		}
 		this.serviceProviders.add(bean);
 	}
 	
@@ -120,12 +125,20 @@ public class AstrixServiceExporter {
 					continue;
 				}
 				AstrixApiDescriptor apiDescriptor = getApiDescriptor(providedServiceType);
-				result.add(new AstrixExportedServiceInfo(providedServiceType, apiDescriptor, serviceDescriptor.getComponent(), provider));
+				ServiceVersioningContext versioningContext = createVersioningContext(apiDescriptor);
+				result.add(new AstrixExportedServiceInfo(providedServiceType, apiDescriptor, versioningContext, serviceDescriptor.getComponent(), provider));
 			}
 		}
 		return result;
 	}
 	
+	private ServiceVersioningContext createVersioningContext(AstrixApiDescriptor apiDescriptor) {
+		if (apiDescriptor.isVersioned()) {
+			return ServiceVersioningContext.versionedService(apiDescriptor.getAnnotation(AstrixVersioned.class));
+		}
+		return ServiceVersioningContext.nonVersioned();
+	}
+
 	private boolean publishesService(Class<?> providedServiceType) {
 		return this.apiDescriptorByProvideService.containsKey(providedServiceType);
 	}

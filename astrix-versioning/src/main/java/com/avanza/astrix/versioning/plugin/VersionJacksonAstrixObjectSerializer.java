@@ -16,15 +16,10 @@
 package com.avanza.astrix.versioning.plugin;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.avanza.astrix.core.AstrixObjectSerializer;
-import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
-import com.avanza.astrix.provider.versioning.AstrixObjectMapperConfigurer;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
-import com.avanza.astrix.provider.versioning.AstrixVersioned;
-import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.versioning.JsonObjectMapper;
 import com.avanza.astrix.versioning.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
 
@@ -33,9 +28,9 @@ public class VersionJacksonAstrixObjectSerializer implements AstrixObjectSeriali
 	private JsonObjectMapper objectMapper;
 	private int version;
 
-	public VersionJacksonAstrixObjectSerializer(AstrixVersioned versioningInfo) {
-		Class<? extends AstrixObjectSerializerConfigurer> serializerBuilder = versioningInfo.objectSerializerConfigurer();
-		this.version = versioningInfo.version();
+	public VersionJacksonAstrixObjectSerializer(ServiceVersioningContext versioningContext) {
+		Class<? extends AstrixObjectSerializerConfigurer> serializerBuilder = versioningContext.getObjectSerializerConfigurerClass();
+		this.version = versioningContext.version();
 		try {
 			this.objectMapper = buildObjectMapper(Jackson1ObjectSerializerConfigurer.class.cast(serializerBuilder.newInstance()));
 		} catch (Exception e) {

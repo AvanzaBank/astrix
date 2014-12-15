@@ -17,6 +17,8 @@ package com.avanza.astrix.context;
 
 import java.util.List;
 
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
+
 
 /**
  * Used on the client side to bind to service exported over the service-registry. <p>
@@ -28,7 +30,7 @@ import java.util.List;
  */
 public interface AstrixServiceComponent {
 	
-	<T> T createService(AstrixApiDescriptor apiDescriptor, Class<T> type, AstrixServiceProperties serviceProperties);
+	<T> T createService(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties);
 	
 	<T> AstrixServiceProperties createServiceProperties(String serviceUri);
 	
@@ -41,7 +43,7 @@ public interface AstrixServiceComponent {
 	 */
 	String getName();
 
-	<T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor);
+	<T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext);
 	
 	/**
 	 * Whether the api supports an async version based on the following naming

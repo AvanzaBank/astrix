@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixApiProvider {
+final class AstrixApiProvider {
 	
 	private final ConcurrentMap<Class<?>, AstrixFactoryBean<?>> factoryByProvidedType = new ConcurrentHashMap<>();
 	

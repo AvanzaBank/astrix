@@ -19,6 +19,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -28,20 +30,20 @@ import java.lang.reflect.Proxy;
 public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 	
 	private final Class<T> api;
-	private final AstrixApiDescriptor descriptor;
 	private final AstrixServiceComponents serviceComponents;
 	private final AstrixServiceLookup serviceLookup;
 	private final String subsystem;
 	private final boolean enforceSubsystemBoundaries;
 	private final AstrixServiceLeaseManager leaseManager;
+	private final ServiceVersioningContext versioningContext;
 
-	public AstrixServiceFactory(AstrixApiDescriptor descriptor, 
+	public AstrixServiceFactory(ServiceVersioningContext serviceVersioningContext, 
 								Class<T> beanType, 
 								AstrixServiceLookup serviceLookup, 
 								AstrixServiceComponents serviceComponents, 
 								AstrixServiceLeaseManager leaseManager,
 								AstrixSettingsReader settings) {
-		this.descriptor = descriptor;
+		this.versioningContext = serviceVersioningContext;
 		this.api = beanType;
 		this.serviceLookup = serviceLookup;
 		this.serviceComponents = serviceComponents;
@@ -70,7 +72,7 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 	}
 
 	private boolean isAllowedToInvokeService(String providerSubsystem) {
-		if (descriptor.isVersioned()) {
+		if (versioningContext.isVersioned()) {
 			return true;
 		}
 		if (!enforceSubsystemBoundaries) {
@@ -88,7 +90,7 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 			throw new RuntimeException(String.format("Misssing entry in service-registry api=%s qualifier=%s: ", api.getName(), qualifier));
 		}
 		AstrixServiceComponent serviceComponent = getServiceComponent(serviceProperties);
-		return serviceComponent.createService(descriptor, api, serviceProperties);
+		return serviceComponent.createService(versioningContext, api, serviceProperties);
 	}
 	
 	private AstrixServiceComponent getServiceComponent(AstrixServiceProperties serviceProperties) {

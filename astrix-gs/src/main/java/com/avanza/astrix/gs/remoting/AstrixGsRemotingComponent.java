@@ -21,7 +21,6 @@ import java.util.List;
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
-import com.avanza.astrix.context.AstrixApiDescriptor;
 import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixExportedServiceInfo;
 import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
@@ -36,6 +35,7 @@ import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.remoting.client.AstrixRemotingProxy;
 import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
@@ -53,8 +53,8 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	private AstrixContextImpl astrixContext;
 	
 	@Override
-	public <T> T createService(AstrixApiDescriptor descriptor, Class<T> api, AstrixServiceProperties serviceProperties) {
-		AstrixObjectSerializer objectSerializer = plugins.getPlugin(AstrixVersioningPlugin.class).create(descriptor);
+	public <T> T createService(ServiceVersioningContext versioningContext, Class<T> api, AstrixServiceProperties serviceProperties) {
+		AstrixObjectSerializer objectSerializer = plugins.getPlugin(AstrixVersioningPlugin.class).create(versioningContext);
 		AstrixFaultTolerancePlugin faultTolerance = plugins.getPlugin(AstrixFaultTolerancePlugin.class);
 		
 		String targetSpace = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
@@ -84,8 +84,8 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	}
 	
 	@Override
-	public <T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor) {
-		AstrixObjectSerializer objectSerializer = plugins.getPlugin(AstrixVersioningPlugin.class).create(apiDescriptor); 
+	public <T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext) {
+		AstrixObjectSerializer objectSerializer = plugins.getPlugin(AstrixVersioningPlugin.class).create(versioningContext); 
 		this.astrixContext.getInstance(AstrixServiceActivator.class).register(provider, objectSerializer, providedApi);
 	}
 	
