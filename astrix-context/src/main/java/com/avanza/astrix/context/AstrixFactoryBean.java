@@ -66,10 +66,6 @@ public final class AstrixFactoryBean<T> implements AstrixDecorator {
 		return this.plugin.getClass().equals(StatefulAstrixFactoryBean.class);
 	}
 
-	public boolean isVersioned() {
-		return apiDescriptor.isVersioned();
-	}
-
 	public AstrixApiDescriptor getApiDescriptor() {
 		return apiDescriptor;
 	}
