@@ -29,6 +29,7 @@ import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.library.AstrixExport;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
+import com.avanza.astrix.provider.versioning.NonVersioned;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 /**
@@ -68,7 +69,7 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 		for (Class<?> providedApi : providedApis) {
 			for (Method m : providedApi.getMethods()) {
 				if (m.isAnnotationPresent(Service.class)) {
-					ServiceVersioningContext versioningContext = createVersioningContext(descriptor);
+					ServiceVersioningContext versioningContext = createVersioningContext(descriptor, providedApi);
 					AstrixServiceLookup serviceLookup = serviceLookupFactory.createServiceLookup(m);
 					result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, m.getReturnType()));
 				}
@@ -77,7 +78,10 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 		return result;
 	}
 	
-	private ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor) {
+	private ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, Class<?> providedApi) {
+		if (providedApi.isAnnotationPresent(NonVersioned.class)) {
+			return ServiceVersioningContext.nonVersioned();
+		}
 		if (descriptor.isAnnotationPresent(AstrixVersioned.class)) {
 			return ServiceVersioningContext.versionedService(descriptor.getAnnotation(AstrixVersioned.class));
 		} 

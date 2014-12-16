@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -30,7 +31,11 @@ import org.kohsuke.MetaInfServices;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 @MetaInfServices(AstrixServiceComponent.class)
 public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPluginsAware {
 	
@@ -41,11 +46,11 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 	@Override
 	public <T> T createService(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
 		String providerName = serviceProperties.getProperty("providerId");
-		ServiceProvider<?> result = providerById.get(providerName);
-		if (result == null) {
+		ServiceProvider<?> serviceProvider = providerById.get(providerName);
+		if (serviceProvider == null) {
 			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + type);
 		}
-		return type.cast(result.getProvider(astrixPlugins.getPlugin(AstrixVersioningPlugin.class), versioningContext));
+		return type.cast(serviceProvider.getProvider(astrixPlugins.getPlugin(AstrixVersioningPlugin.class), versioningContext));
 	}
 	
 	@Override
@@ -60,12 +65,14 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 	}
 
 	public static <T> String register(Class<T> type, T provider) {
-		return register(type, provider, ServiceVersioningContext.nonVersioned());
+		String id = String.valueOf(idGen.incrementAndGet());
+		providerById.put(id, new ServiceProvider<T>(id, type, provider));
+		return id;
 	}
 	
-	public static <T> String register(Class<T> type, T provider, ServiceVersioningContext versiongingContext) {
+	private static <T> String register(Class<T> type, T provider, ServiceVersioningContext serverVersioningContext) {
 		String id = String.valueOf(idGen.incrementAndGet());
-		providerById.put(id, new ServiceProvider<T>(id, type, provider, versiongingContext));
+		providerById.put(id, new VersioningAwareServiceProvider<>(id, type, provider, serverVersioningContext));
 		return id;
 	}
 	
@@ -114,13 +121,11 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 		private String id;
 		private Class<T> type;
 		private T provider;
-		private ServiceVersioningContext serverVersioningContext;
 		
-		public ServiceProvider(String id, Class<T> type, T provider, ServiceVersioningContext serverVersioningContext) {
+		public ServiceProvider(String id, Class<T> type, T provider) {
 			this.id = id;
 			this.type = type;
 			this.provider = provider;
-			this.serverVersioningContext = serverVersioningContext;
 		}
 		
 		public String getId() {
@@ -132,10 +137,29 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 		}
 		
 		public T getProvider(AstrixVersioningPlugin astrixVersioningPlugin, ServiceVersioningContext clientVersioningContext) {
-			if (serverVersioningContext.isVersioned()) {
+			return provider;
+		}
+	}
+	
+	static class VersioningAwareServiceProvider<T> extends ServiceProvider<T> {
+		
+		private Class<T> type;
+		private T provider;
+		private ServiceVersioningContext serverVersioningContext;
+		
+		public VersioningAwareServiceProvider(String id, Class<T> type, T provider, ServiceVersioningContext serverVersioningContext) {
+			super(id, type, provider);
+			this.type = type;
+			this.provider = provider;
+			this.serverVersioningContext = serverVersioningContext;
+		}
+		
+		@Override
+		public T getProvider(AstrixVersioningPlugin astrixVersioningPlugin, ServiceVersioningContext clientVersioningContext) {
+			if (serverVersioningContext.isVersioned() || clientVersioningContext.isVersioned()) {
 				VersionedServiceProviderProxy serializationHandlingProxy = 
 						new VersionedServiceProviderProxy(provider, 
-														  serverVersioningContext.version(), 
+														  clientVersioningContext.version(), 
 														  astrixVersioningPlugin.create(clientVersioningContext), 
 														  astrixVersioningPlugin.create(serverVersioningContext));
 				return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[]{type}, serializationHandlingProxy);
@@ -162,16 +186,20 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			Object[] marshalledAndUnmarshalledArgs = new Object[args.length];
 			for (int i = 0; i < args.length; i++) {
-				// simulate client serialization
+				// simulate client serialization before sending request over network
 				Object serialized = clientSerializer.serialize(args[i], clientVersion);
-				// simulate server deserialization
-				Object deserialed = serverSerializer.deserialize(serialized, method.getParameterTypes()[i], clientVersion); 
-				marshalledAndUnmarshalledArgs[i] = deserialed;
+				// simulate server deserialization after receiving request from network
+				Object deserialized = serverSerializer.deserialize(serialized, method.getParameterTypes()[i], clientVersion);
+				if (args[i] != null && !args[i].getClass().equals(deserialized.getClass())) {
+					throw new IllegalArgumentException("Deserialization of service arguments failed. clientSerializer=" 
+								+ clientSerializer.getClass().getName() + " serverSerializer=" + serverSerializer.getClass().getName());
+				}
+				marshalledAndUnmarshalledArgs[i] = deserialized;
 			}
 			Object result = method.invoke(provider, marshalledAndUnmarshalledArgs);
-			// simulate server serialization
+			// simulate server serialization before sending response over network
 			Object serialized = serverSerializer.serialize(result, clientVersion);
-			// simulate client deserialization
+			// simulate client deserialization after receiving response from server.
 			Object deserialized = clientSerializer.deserialize(serialized, method.getReturnType(), clientVersion);
 			return deserialized;
 		}
@@ -207,11 +235,34 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 	}
 
 	public static <T> String registerAndGetUri(Class<T> api, T provider) {
-		return registerAndGetUri(api, provider, ServiceVersioningContext.nonVersioned());
+		String id = register(api, provider);
+		return getServiceUri(id);
 	}
 	
-	public static <T> String registerAndGetUri(Class<T> api, T provider, ServiceVersioningContext versiongingContext) {
-		String id = register(api, provider, versiongingContext);
+	/**
+	 * Registers a a provider for a given api and associates it with the given ServiceVersioningContext. <p>
+	 * 
+	 * Using this method activates serialization/deserialization of service argument/return types. <p>
+	 * 
+	 * Example:  
+	 * 	pingService.ping("my-arg")
+	 * 
+	 *
+	 * 1. Using the ServiceVersioningContext provided by the api (using @AstrixVersioned) the service arguments will
+	 *    be serialized.
+	 * 2. All arguments will then be deserialized using the serverVersioningContext passed as to this method during registration of the provider
+	 * 3. The service is invoked with the arguments returned from step 2.
+	 * 4. The return type will be serialized using the serverVersioningContext
+	 * 5. The return type will be deserialized using the ServiceVersioningContext provided by the api.
+	 * 6. The value is returned.
+	 * 
+	 * @param api
+	 * @param provider
+	 * @param serverVersioningContext
+	 * @return
+	 */
+	public static <T> String registerAndGetUri(Class<T> api, T provider, ServiceVersioningContext serverVersioningContext) {
+		String id = register(api, provider, serverVersioningContext);
 		return getServiceUri(id);
 	}
 
