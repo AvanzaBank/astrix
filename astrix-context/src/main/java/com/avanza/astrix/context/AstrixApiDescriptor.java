@@ -16,8 +16,6 @@
 package com.avanza.astrix.context;
 
 import java.lang.annotation.Annotation;
-
-import com.avanza.astrix.provider.versioning.AstrixVersioned;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -45,9 +43,6 @@ public abstract class AstrixApiDescriptor {
 	public final String toString() {
 		return getName();
 	}
-	
-	@Deprecated // TODO: delete
-	public abstract boolean isVersioned();
 	
 	private static class SimpleApiDescriptor extends AstrixApiDescriptor {
 
@@ -77,11 +72,6 @@ public abstract class AstrixApiDescriptor {
 			return null;
 		}
 
-		@Override
-		public boolean isVersioned() {
-			return false;
-		}
-
 	}
 	
 	private static class AnnotationApiDescriptor extends AstrixApiDescriptor {
@@ -105,10 +95,6 @@ public abstract class AstrixApiDescriptor {
 
 		public Class<?> getDescriptorClass() {
 			return descriptorHolder;
-		}
-		
-		public boolean isVersioned() {
-			return descriptorHolder.isAnnotationPresent(AstrixVersioned.class);
 		}
 		
 	}

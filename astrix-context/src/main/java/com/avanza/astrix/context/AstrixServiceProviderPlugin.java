@@ -43,7 +43,7 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 		for (Class<?> exportedApi : getProvidedBeans(descriptor)) {
 			AstrixServiceLookup serviceLookup = getLookupStrategy(descriptor);
 			result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, exportedApi));
-			Class<?> asyncInterface = loadInterfaceIfExists(exportedApi.getName() + "Async");
+			Class<?> asyncInterface = serviceMetaFactory.loadInterfaceIfExists(exportedApi.getName() + "Async");
 			if (asyncInterface != null) {
 				result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, asyncInterface));
 			}
@@ -65,6 +65,11 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 
 	@Override
 	public List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor) {
+		return getProvidedServices(descriptor);
+	}
+	
+	@Override
+	public List<Class<?>> getProvidedServices(AstrixApiDescriptor descriptor) {
 		Class<?>[] providedServices = descriptor.getAnnotation(AstrixServiceProvider.class).value();
 		return Arrays.asList(providedServices);
 	}
@@ -77,18 +82,6 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 	@Override
 	public boolean hasStatefulBeans() {
 		return true;
-	}
-
-	private Class<?> loadInterfaceIfExists(String interfaceName) {
-		try {
-			Class<?> c = Class.forName(interfaceName);
-			if (c.isInterface()) {
-				return c;
-			}
-		} catch (ClassNotFoundException e) {
-			// fall through and return null
-		}
-		return null;
 	}
 	
 	@AstrixInject

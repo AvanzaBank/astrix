@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain.apiruntime.feeder;
+package com.avanza.astrix.integration.tests.domain.api;
 
-import com.avanza.astrix.provider.core.AstrixServiceProvider;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
+import com.avanza.astrix.provider.core.Library;
+import com.avanza.astrix.provider.core.Service;
+import com.avanza.astrix.provider.versioning.Versioned;
 
-
-//@AstrixServiceRegistryLookup
-//@AstrixServiceProvider(InternalLunchFeeder.class)
-public class LunchFeederApiDescriptor {
+@Versioned
+public interface LunchApi {
+	@Service
+	LunchService lunchService();
+	
+	@Library
+	LunchUtil lunchUtil();
+	
+	@Library
+	LunchStatistics lunchStatistics();
 }
-
-

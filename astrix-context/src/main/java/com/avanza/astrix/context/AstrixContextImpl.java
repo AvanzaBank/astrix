@@ -271,8 +271,8 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		
 	}
 
-	public List<Class<?>> getExportedBeans(AstrixApiDescriptor apiDescriptor) {
-		return apiProviderPlugins.getExportedBeans(apiDescriptor);
+	public List<Class<?>> getExportedServices(AstrixApiDescriptor apiDescriptor) {
+		return apiProviderPlugins.getExportedServices(apiDescriptor);
 	}
 
 	void setApiProviderPlugins(AstrixApiProviderPlugins apiProviderPlugins) {

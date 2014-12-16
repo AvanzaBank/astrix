@@ -42,10 +42,10 @@ public class AstrixApiProviderPlugins {
 		}
 	}
 	
-	public List<Class<?>> getExportedBeans(AstrixApiDescriptor descriptor) {
+	public List<Class<?>> getExportedServices(AstrixApiDescriptor descriptor) {
 		AstrixApiProviderPlugin providerFactoryPlugin = getProviderPlugin(descriptor);
 		List<Class<?>> result = new ArrayList<>();
-		result.addAll(providerFactoryPlugin.getProvidedBeans(descriptor));
+		result.addAll(providerFactoryPlugin.getProvidedServices(descriptor));
 		return result;
 	}
 	

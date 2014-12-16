@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain.apiruntime;
+package com.avanza.astrix.integration.tests.domain.pu;
 
-import com.avanza.astrix.integration.tests.domain.apiruntime.feeder.LunchFeederApiDescriptor;
+import com.avanza.astrix.integration.tests.domain.apiruntime.LunchApiProvider;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixService;
 
 
 @AstrixService(
 	apiDescriptors = {
-		LunchServiceProvider.class,
-		LunchFeederApiDescriptor.class
+		LunchApiProvider.class
 	},
 	component = AstrixServiceComponentNames.GS_REMOTING
 )

@@ -45,6 +45,8 @@ public interface AstrixApiProviderPlugin {
 	
 	List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor);
 	
+	List<Class<?>> getProvidedServices(AstrixApiDescriptor descriptor);
+	
 	Class<? extends Annotation> getProviderAnnotationType();
 	
 	ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, Class<?> api);

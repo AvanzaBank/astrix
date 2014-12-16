@@ -18,6 +18,7 @@ package com.avanza.astrix.context;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
@@ -76,6 +77,11 @@ public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
 			}
 		}
 		return result;
+	}
+	
+	@Override
+	public List<Class<?>> getProvidedServices(AstrixApiDescriptor descriptor) {
+		return Collections.emptyList();
 	}
 	
 }

@@ -24,7 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.avanza.astrix.provider.core.AstrixServiceExport;
-import com.avanza.astrix.provider.versioning.AstrixVersioned;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 /**
@@ -97,7 +96,7 @@ public class AstrixServiceExporter {
 	public void setSericeDescriptor(AstrixServiceDescriptor serviceDescriptor) {
 		this.serviceDescriptor = serviceDescriptor;		// TODO: How to inject service descriptor??? 
 		for (AstrixApiDescriptor apiDescriptor : serviceDescriptor.getApiDescriptors()) {
-			for (Class<?> beanType : astrixContext.getExportedBeans(apiDescriptor)) {
+			for (Class<?> beanType : astrixContext.getExportedServices(apiDescriptor)) {
 				apiDescriptorByProvideService.put(beanType, apiDescriptor);
 			}
 		}

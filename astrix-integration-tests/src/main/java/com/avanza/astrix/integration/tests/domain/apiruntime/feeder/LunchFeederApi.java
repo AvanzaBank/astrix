@@ -15,13 +15,14 @@
  */
 package com.avanza.astrix.integration.tests.domain.apiruntime.feeder;
 
-import com.avanza.astrix.provider.core.AstrixServiceProvider;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
+import com.avanza.astrix.provider.core.Service;
 
 
-//@AstrixServiceRegistryLookup
-//@AstrixServiceProvider(InternalLunchFeeder.class)
-public class LunchFeederApiDescriptor {
+
+public interface LunchFeederApi {
+	
+	@Service
+	InternalLunchFeeder internalLunchFeeder();
 }
 
 

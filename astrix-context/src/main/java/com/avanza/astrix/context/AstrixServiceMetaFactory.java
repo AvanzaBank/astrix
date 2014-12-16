@@ -21,7 +21,7 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceMetaFactory implements AstrixSettingsAware {
+public final class AstrixServiceMetaFactory implements AstrixSettingsAware {
 
 	private AstrixServiceComponents serviceComponents;
 	private AstrixServiceLeaseManager leaseManager;
@@ -29,6 +29,18 @@ public class AstrixServiceMetaFactory implements AstrixSettingsAware {
 
 	public <T> AstrixServiceFactory<T> createServiceFactory(ServiceVersioningContext versioningContext, AstrixServiceLookup serviceLookup, Class<T> serviceApi) {
 		return new AstrixServiceFactory<>(versioningContext, serviceApi, serviceLookup, serviceComponents, leaseManager, settings);
+	}
+	
+	public Class<?> loadInterfaceIfExists(String interfaceName) {
+		try {
+			Class<?> c = Class.forName(interfaceName);
+			if (c.isInterface()) {
+				return c;
+			}
+		} catch (ClassNotFoundException e) {
+			// fall through and return null
+		}
+		return null;
 	}
 
 	@AstrixInject

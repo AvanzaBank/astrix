@@ -26,7 +26,7 @@ import com.avanza.astrix.provider.versioning.AstrixVersioned;
 	objectSerializerConfigurer = LunchApiObjectSerializerConfigurer.class
 )
 // The service is exported to the service-registry. Consumers queries the service-registry to bind to servers.
-@AstrixServiceProvider(LunchService.class)
+//@AstrixServiceProvider(LunchService.class)
 public class LunchServiceProvider {
 }
 
