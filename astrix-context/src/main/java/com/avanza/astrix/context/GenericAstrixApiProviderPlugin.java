@@ -78,7 +78,8 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 		return result;
 	}
 	
-	private ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, Class<?> providedApi) {
+	@Override
+	public ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, Class<?> providedApi) {
 		if (!providedApi.isAnnotationPresent(Versioned.class)) {
 			return ServiceVersioningContext.nonVersioned();
 		}

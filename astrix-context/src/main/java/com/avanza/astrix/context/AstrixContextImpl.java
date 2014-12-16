@@ -297,6 +297,9 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		if (classType.equals(AstrixContextImpl.class)) {
 			return classType.cast(this);
 		}
+		if (classType.equals(AstrixApiProviderPlugins.class)) {
+			return classType.cast(this.apiProviderPlugins);
+		}
 		return this.objectCache.getInstance(ObjectId.internalClass(classType));
 	}
 	

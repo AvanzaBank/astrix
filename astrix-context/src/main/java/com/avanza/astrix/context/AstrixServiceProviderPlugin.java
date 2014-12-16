@@ -39,7 +39,7 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 	@Override
 	public List<AstrixFactoryBeanPlugin<?>> createFactoryBeans(AstrixApiDescriptor descriptor) {
 		List<AstrixFactoryBeanPlugin<?>> result = new ArrayList<>();
-		ServiceVersioningContext versioningContext = createVersioningContext(descriptor);
+		ServiceVersioningContext versioningContext = createVersioningContext(descriptor, null);
 		for (Class<?> exportedApi : getProvidedBeans(descriptor)) {
 			AstrixServiceLookup serviceLookup = getLookupStrategy(descriptor);
 			result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, exportedApi));
@@ -51,8 +51,9 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 		return result;
 	}
 
-	private ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor) {
-		if (descriptor.isVersioned()) {
+	@Override
+	public ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, Class<?> api) {
+		if (descriptor.isAnnotationPresent(AstrixVersioned.class)) {
 			return ServiceVersioningContext.versionedService(descriptor.getAnnotation(AstrixVersioned.class));
 		}
 		return ServiceVersioningContext.nonVersioned();

@@ -41,6 +41,7 @@ public class AstrixServiceExporter {
 	private final Map<Class<?>, AstrixApiDescriptor> apiDescriptorByProvideService = new ConcurrentHashMap<Class<?>, AstrixApiDescriptor>();
 	private AstrixContextImpl astrixContext;
 	private final List<Object> serviceProviders = new CopyOnWriteArrayList<>();
+	private AstrixApiProviderPlugins apiProviderPlugins;
 	
 	public void exportProvidedServices() {
 		Collection<AstrixExportedServiceInfo> exportedServices = getExportedServices();
@@ -71,6 +72,11 @@ public class AstrixServiceExporter {
 	@AstrixInject
 	public void setAstrixContext(AstrixContextImpl astrixContext) {
 		this.astrixContext = astrixContext;
+	}
+	
+	@AstrixInject
+	public void setApiProviderPlugins(AstrixApiProviderPlugins apiProviderPlugins) {
+		this.apiProviderPlugins = apiProviderPlugins;
 	}
 
 	public void addServiceProvider(Object bean) {
@@ -125,18 +131,15 @@ public class AstrixServiceExporter {
 					continue;
 				}
 				AstrixApiDescriptor apiDescriptor = getApiDescriptor(providedServiceType);
-				ServiceVersioningContext versioningContext = createVersioningContext(apiDescriptor);
+				ServiceVersioningContext versioningContext = createVersioningContext(apiDescriptor, providedServiceType);
 				result.add(new AstrixExportedServiceInfo(providedServiceType, apiDescriptor, versioningContext, serviceDescriptor.getComponent(), provider));
 			}
 		}
 		return result;
 	}
 	
-	private ServiceVersioningContext createVersioningContext(AstrixApiDescriptor apiDescriptor) {
-		if (apiDescriptor.isVersioned()) {
-			return ServiceVersioningContext.versionedService(apiDescriptor.getAnnotation(AstrixVersioned.class));
-		}
-		return ServiceVersioningContext.nonVersioned();
+	private ServiceVersioningContext createVersioningContext(AstrixApiDescriptor apiDescriptor, Class<?> api) {
+		return this.apiProviderPlugins.createVersioningContext(apiDescriptor, api);
 	}
 
 	private boolean publishesService(Class<?> providedServiceType) {

@@ -18,6 +18,8 @@ package com.avanza.astrix.context;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
+
 
 /**
  * An AstrixApiProviderPlugin is responsible for creating AstrixFactoryBeanPlugin for
@@ -44,6 +46,8 @@ public interface AstrixApiProviderPlugin {
 	List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor);
 	
 	Class<? extends Annotation> getProviderAnnotationType();
+	
+	ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, Class<?> api);
 	
 	/**
 	 * Defines whether the beans provided by this type of api are stateful. 

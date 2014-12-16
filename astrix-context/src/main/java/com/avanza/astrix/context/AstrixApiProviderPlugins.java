@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -54,6 +56,11 @@ public class AstrixApiProviderPlugins {
 			}
 		}
 		throw new IllegalArgumentException("No plugin registered that can handle descriptor: " + descriptor);
+	}
+	
+	ServiceVersioningContext createVersioningContext(AstrixApiDescriptor apiDescriptor, Class<?> api) {
+		AstrixApiProviderPlugin apiProvider = getProviderPlugin(apiDescriptor);
+		return apiProvider.createVersioningContext(apiDescriptor, api);
 	}
 
 }

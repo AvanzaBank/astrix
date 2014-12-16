@@ -46,6 +46,7 @@ public abstract class AstrixApiDescriptor {
 		return getName();
 	}
 	
+	@Deprecated // TODO: delete
 	public abstract boolean isVersioned();
 	
 	private static class SimpleApiDescriptor extends AstrixApiDescriptor {
