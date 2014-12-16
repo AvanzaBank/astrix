@@ -25,9 +25,11 @@ import java.lang.annotation.Target;
 /**
  * @author Elias Lindholm (elilin)
  */
-@Target(value = { ElementType.TYPE, ElementType.METHOD })
+@Target(value = { ElementType.TYPE})
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
-public @interface AstrixConfigLookup {
-	String value();
+public @interface AstrixApiProvider {
+
+	Class<?>[] value();
+	
 }

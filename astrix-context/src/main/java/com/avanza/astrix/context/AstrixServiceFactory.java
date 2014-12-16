@@ -18,6 +18,7 @@ package com.avanza.astrix.context;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Objects;
 
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
@@ -37,18 +38,18 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 	private final AstrixServiceLeaseManager leaseManager;
 	private final ServiceVersioningContext versioningContext;
 
-	public AstrixServiceFactory(ServiceVersioningContext serviceVersioningContext, 
+	public AstrixServiceFactory(ServiceVersioningContext versioningContext, 
 								Class<T> beanType, 
 								AstrixServiceLookup serviceLookup, 
 								AstrixServiceComponents serviceComponents, 
 								AstrixServiceLeaseManager leaseManager,
 								AstrixSettingsReader settings) {
-		this.versioningContext = serviceVersioningContext;
-		this.api = beanType;
-		this.serviceLookup = serviceLookup;
-		this.serviceComponents = serviceComponents;
-		this.leaseManager = leaseManager;
-		this.subsystem = settings.getString(AstrixSettings.SUBSYSTEM_NAME);
+		this.versioningContext = Objects.requireNonNull(versioningContext);
+		this.api = Objects.requireNonNull(beanType);
+		this.serviceLookup = Objects.requireNonNull(serviceLookup);
+		this.serviceComponents = Objects.requireNonNull(serviceComponents);
+		this.leaseManager = Objects.requireNonNull(leaseManager);
+		this.subsystem = Objects.requireNonNull(settings.getString(AstrixSettings.SUBSYSTEM_NAME));
 		this.enforceSubsystemBoundaries = settings.getBoolean(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
 	}
 
@@ -56,7 +57,7 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 	public T create(String qualifier) {
 		AstrixServiceProperties serviceProperties = serviceLookup.lookup(api, qualifier);
 		if (serviceProperties == null) {
-			throw new RuntimeException(String.format("No service-provider found in service-registry: api=%s qualifier=%s", api.getName(), qualifier));
+			throw new RuntimeException(String.format("No service-provider found: api=%s qualifier=%s serviceLookup=%s", api.getName(), qualifier, serviceLookup));
 		}
 		String providerSubsystem = serviceProperties.getProperty(AstrixServiceProperties.SUBSYSTEM);
 		if (!isAllowedToInvokeService(providerSubsystem)) {

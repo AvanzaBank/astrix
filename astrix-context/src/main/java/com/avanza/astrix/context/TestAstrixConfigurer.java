@@ -121,5 +121,9 @@ public class TestAstrixConfigurer {
 		}
 		
 	}
+
+	public void enableVersioning(boolean enableVersioning) {
+		this.configurer.enableVersioning(enableVersioning);
+	}
 	
 }

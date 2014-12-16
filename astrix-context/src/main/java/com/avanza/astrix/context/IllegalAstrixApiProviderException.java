@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.provider.core;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
+package com.avanza.astrix.context;
 
 /**
+ * 
  * @author Elias Lindholm (elilin)
+ *
  */
-@Target(value = { ElementType.TYPE, ElementType.METHOD })
-@Retention(value = RetentionPolicy.RUNTIME)
-@Documented
-public @interface AstrixConfigLookup {
-	String value();
+public class IllegalAstrixApiProviderException extends RuntimeException {
+
+	private static final long serialVersionUID = 1L;
+
+	public IllegalAstrixApiProviderException(String msg) {
+		super(msg);
+	}
+
 }

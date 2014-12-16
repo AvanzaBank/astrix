@@ -22,5 +22,5 @@ public interface AstrixServiceLookupPlugin<T extends Annotation> {
 	AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier, T lookupAnnotation);
 	
 	Class<T> getLookupAnnotationType();
-
+	
 }

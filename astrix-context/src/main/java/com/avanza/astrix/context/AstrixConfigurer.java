@@ -123,11 +123,9 @@ public class AstrixConfigurer {
 		}
 	}
 	
-	private static <T> T discoverOnePlugin(AstrixContextImpl context, Class<T> type) {
-		T provider = AstrixPluginDiscovery.discoverOnePlugin(type);
+	private static <T> void discoverOnePlugin(AstrixContextImpl context, Class<T> type) {
+		T provider = context.getPlugin(type);
 		log.debug("Found plugin for {}, using {}", type.getName(), provider.getClass().getName());
-		context.registerPlugin(type, provider);
-		return provider;
 	}
 
 	// package private. Used for internal testing only
@@ -137,7 +135,7 @@ public class AstrixConfigurer {
 	
 	// package private. Used for internal testing only
 	<T> void registerPlugin(Class<T> c, T provider) {
-		plugins .add(new PluginHolder<>(c, provider));
+		plugins.add(new PluginHolder<>(c, provider));
 	}
 
 	public void set(String settingName, long value) {

@@ -139,7 +139,7 @@ public class AstrixPlugins {
 				throw new IllegalArgumentException("No provider registered for type: " + type);
 			}
 			if (providers.size() != 1) {
-				throw new IllegalArgumentException("Expected one provider for: " + type + " fount: + "+ providers);
+				throw new IllegalArgumentException("Expected one provider for: " + type + " found: + "+ providers);
 			}
 			return providers.get(0);
 		}

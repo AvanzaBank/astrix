@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 package com.avanza.astrix.provider.versioning;
+
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
