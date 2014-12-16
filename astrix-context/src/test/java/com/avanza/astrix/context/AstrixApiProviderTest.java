@@ -24,10 +24,10 @@ import com.avanza.astrix.provider.core.AstrixConfigLookup;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.library.AstrixExport;
+import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
-import com.avanza.astrix.provider.versioning.AstrixVersioned;
-import com.avanza.astrix.provider.versioning.NonVersioned;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
+import com.avanza.astrix.provider.versioning.Versioned;
 
 
 public class AstrixApiProviderTest {
@@ -143,19 +143,7 @@ public class AstrixApiProviderTest {
 		PingLib pingLib();
 	}
 
-	public interface PingServiceApi {
-		
-		@AstrixConfigLookup("pingServiceUri")
-		@Service
-		PingService pingService();
-	}
 
-	@NonVersioned
-	public interface InternalPingServiceApi {
-		@AstrixConfigLookup("internalPingServiceUri")
-		@Service
-		InternalPingService internalPingService();
-	}
 	
 
 	public interface PingServiceAndLibraryApi {
@@ -188,15 +176,29 @@ public class AstrixApiProviderTest {
 		// No export of PingLib
 	}
 	
-	@AstrixVersioned(
+	@AstrixObjectSerializerConfig(
 		version = 1,
 		objectSerializerConfigurer = DummyObjectSerializerConfigurer.class
 	)
 	@AstrixApiProvider(PingServiceApi.class)
 	public static class VersionedPingServiceProvider {
 	}
+
+	public interface InternalPingServiceApi {
+		@AstrixConfigLookup("internalPingServiceUri")
+		@Service
+		InternalPingService internalPingService();
+	}
 	
-	@AstrixVersioned(
+	@Versioned
+	public interface PingServiceApi {
+		
+		@AstrixConfigLookup("pingServiceUri")
+		@Service
+		PingService pingService();
+	}
+	
+	@AstrixObjectSerializerConfig(
 		version = 1,
 		objectSerializerConfigurer = DummyObjectSerializerConfigurer.class
 	)

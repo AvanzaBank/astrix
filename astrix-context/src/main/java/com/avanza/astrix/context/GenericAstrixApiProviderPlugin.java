@@ -28,9 +28,9 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.library.AstrixExport;
-import com.avanza.astrix.provider.versioning.AstrixVersioned;
-import com.avanza.astrix.provider.versioning.NonVersioned;
+import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
+import com.avanza.astrix.provider.versioning.Versioned;
 
 /**
  * 
@@ -79,13 +79,15 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 	}
 	
 	private ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, Class<?> providedApi) {
-		if (providedApi.isAnnotationPresent(NonVersioned.class)) {
+		if (!providedApi.isAnnotationPresent(Versioned.class)) {
 			return ServiceVersioningContext.nonVersioned();
 		}
-		if (descriptor.isAnnotationPresent(AstrixVersioned.class)) {
-			return ServiceVersioningContext.versionedService(descriptor.getAnnotation(AstrixVersioned.class));
+		if (!descriptor.isAnnotationPresent(AstrixObjectSerializerConfig.class)) {
+			throw new IllegalArgumentException("Illegal api-provider. Api is versioned but provider does not declare a @AstrixObjectSerializerConfig." +
+					" providedApi=" + providedApi.getName() + ", descriptor=" + descriptor.getName());
 		} 
-		return ServiceVersioningContext.nonVersioned();
+		AstrixObjectSerializerConfig serializerConfig = descriptor.getAnnotation(AstrixObjectSerializerConfig.class);
+		return ServiceVersioningContext.versionedService(serializerConfig.version(), serializerConfig.objectSerializerConfigurer());
 	}
 
 	@Override

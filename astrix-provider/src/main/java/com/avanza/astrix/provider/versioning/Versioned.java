@@ -28,5 +28,5 @@ import java.lang.annotation.Target;
 @Target(value = { ElementType.TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
-public @interface NonVersioned {
+public @interface Versioned {
 }
