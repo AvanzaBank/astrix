@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
+import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.library.AstrixExport;
@@ -50,6 +51,18 @@ public class AstrixApiProviderTest {
 		
 		PingLib ping = context.getBean(PingLib.class);
 		assertEquals("Expected non-stateful astrix bean without a proxy.", PingLibImpl.class, ping.getClass());
+	}
+	
+	@Test
+	public void librariesCanBeQualifiedToDistinguishProviders() throws Exception {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(PingAndReversePingLibraryProvider.class);
+		AstrixContext context = astrixConfigurer.configure();
+		
+		PingLib ping = context.getBean(PingLib.class, "ping");
+		PingLib reversePing = context.getBean(PingLib.class, "reverse-ping");
+		assertEquals("hello", ping.ping("hello"));
+		assertEquals("olleh", reversePing.ping("hello"));
 	}
 	
 	@Test(expected = IllegalAstrixApiProviderException.class)
@@ -134,6 +147,13 @@ public class AstrixApiProviderTest {
 		}
 	}
 	
+	public static class ReversePingLibImpl implements PingLib {
+		@Override
+		public String ping(String msg) {
+			return new StringBuilder(msg).reverse().toString();
+		}
+	}
+	
 	public static class PingServiceImpl implements PingService {
 		@Override
 		public String ping(String msg) {
@@ -152,9 +172,18 @@ public class AstrixApiProviderTest {
 		@Library
 		PingLib pingLib();
 	}
-
-
 	
+	public interface PingAndReversePingLibraryApi {
+
+		@AstrixQualifier("ping")
+		@Library
+		PingLib pingLib();
+		
+		@AstrixQualifier("reverse-ping")
+		@Library
+		PingLib reversePingLib();
+	}
+
 
 	public interface PingServiceAndLibraryApi {
 		@Library
@@ -170,6 +199,22 @@ public class AstrixApiProviderTest {
 		@AstrixExport
 		public PingLib myLib() {
 			return new PingLibImpl();
+		}
+	}
+	
+	@AstrixApiProvider(PingAndReversePingLibraryApi.class)
+	public static class PingAndReversePingLibraryProvider {
+
+		@AstrixQualifier("ping")
+		@AstrixExport
+		public PingLib ping() {
+			return new PingLibImpl();
+		}
+
+		@AstrixQualifier("reverse-ping")
+		@AstrixExport
+		public PingLib reversePing() {
+			return new ReversePingLibImpl();
 		}
 	}
 	

@@ -69,8 +69,8 @@ public class AstrixServiceLeaseManager extends Thread implements AstrixSettingsA
 		}
 		LeasedService<T> leasedService = new LeasedService<>(service, qualifier, currentProperties, serviceFactory, serviceLookup);
 		leasedServices.add(leasedService);
-		Object leasedServiceProxy = Proxy.newProxyInstance(serviceFactory.getBeanType().getClassLoader(), new Class[]{serviceFactory.getBeanType()}, leasedService);
-		return serviceFactory.getBeanType().cast(leasedServiceProxy);
+		Object leasedServiceProxy = Proxy.newProxyInstance(serviceFactory.getBeanKey().getBeanType().getClassLoader(), new Class[]{serviceFactory.getBeanKey().getBeanType()}, leasedService);
+		return serviceFactory.getBeanKey().getBeanType().cast(leasedServiceProxy);
 	}
 	
 	@PreDestroy

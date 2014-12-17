@@ -26,7 +26,7 @@ import java.util.List;
  */
 public interface AstrixBeanAware {
 	
-	List<AstrixBeanKey> getBeanDependencies();
+	List<AstrixBeanKey<? extends Object>> getBeanDependencies();
 	
 	void setAstrixBeans(AstrixBeans beans);
 

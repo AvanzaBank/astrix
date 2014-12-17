@@ -34,9 +34,9 @@ final class StatefulAstrixFactoryBean<T> implements AstrixFactoryBeanPlugin<T>, 
 	private AstrixBeanStateWorker beanStateWorker;
 	
 	public StatefulAstrixFactoryBean(AstrixFactoryBeanPlugin<T> targetFactory) {
-		if (!targetFactory.getBeanType().isInterface()) {
+		if (!targetFactory.getBeanKey().getBeanType().isInterface()) {
 			throw new IllegalArgumentException("Can only create stateful Astrix beans if bean is exported using an interface." +
-											   " targetBeanType=" + targetFactory.getBeanType().getName() + 
+											   " targetBean=" + targetFactory.getBeanKey() + 
 											   " beanFactoryType=" + targetFactory.getClass().getName());
 		}
 		this.targetFactory = targetFactory;
@@ -48,15 +48,16 @@ final class StatefulAstrixFactoryBean<T> implements AstrixFactoryBeanPlugin<T>, 
 		try {
 			handler.bind();
 		} catch (Exception e) {
-			log.info("Failed to bind to " + handler.getBeanFactory().getBeanType().getName() + " astrixBeanId=" + handler.getId(), e);
+			log.info("Failed to bind to " + handler.getBeanFactory().getBeanKey() + " astrixBeanId=" + handler.getId(), e);
 		}
 		beanStateWorker.add(handler);
-		return targetFactory.getBeanType().cast(Proxy.newProxyInstance(targetFactory.getBeanType().getClassLoader(), new Class<?>[]{targetFactory.getBeanType()}, handler));
+		return targetFactory.getBeanKey().getBeanType().cast(
+				Proxy.newProxyInstance(targetFactory.getBeanKey().getBeanType().getClassLoader(), new Class<?>[]{targetFactory.getBeanKey().getBeanType()}, handler));
 	}
 
 	@Override
-	public Class<T> getBeanType() {
-		return targetFactory.getBeanType();
+	public AstrixBeanKey<T> getBeanKey() {
+		return targetFactory.getBeanKey();
 	}
 
 	@Override

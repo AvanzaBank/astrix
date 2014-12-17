@@ -27,8 +27,8 @@ public final class AstrixServiceMetaFactory implements AstrixSettingsAware {
 	private AstrixServiceLeaseManager leaseManager;
 	private AstrixSettingsReader settings;
 
-	public <T> AstrixServiceFactory<T> createServiceFactory(ServiceVersioningContext versioningContext, AstrixServiceLookup serviceLookup, Class<T> serviceApi) {
-		return new AstrixServiceFactory<>(versioningContext, serviceApi, serviceLookup, serviceComponents, leaseManager, settings);
+	public <T> AstrixServiceFactory<T> createServiceFactory(ServiceVersioningContext versioningContext, AstrixServiceLookup serviceLookup, AstrixBeanKey<T> serviceBean) {
+		return new AstrixServiceFactory<>(versioningContext, serviceBean, serviceLookup, serviceComponents, leaseManager, settings);
 	}
 	
 	public Class<?> loadInterfaceIfExists(String interfaceName) {

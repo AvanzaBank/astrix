@@ -63,7 +63,7 @@ public class StatefulAstrixBean<T> implements InvocationHandler {
 	public void bind() {
 		T bean = this.beanFactory.create(optionalQualifier);
 		this.state = new Bound(bean);
-		AstrixBeanKey beanKey = AstrixBeanKey.create(beanFactory.getBeanType(), optionalQualifier);
+		AstrixBeanKey<T> beanKey = beanFactory.getBeanKey();
 		this.eventBus.fireEvent(new AstrixBeanStateChangedEvent(beanKey, AstrixBeanState.BOUND));
 		log.info("Successfully bound to " + beanKey + ", AstrixBeanId=" + id);
 	}
@@ -71,12 +71,12 @@ public class StatefulAstrixBean<T> implements InvocationHandler {
 	public void rebind() {
 		T bean = this.beanFactory.create(optionalQualifier);
 		this.state = new Bound(bean);
-		log.info("Successfully rebound to " + beanFactory.getBeanType() + ", AstrixBeanId=" + id);
+		log.info("Successfully rebound to " + beanFactory.getBeanKey() + ", AstrixBeanId=" + id);
 	}
 	
 	@Override
 	public String toString() {
-		return "StatefulAsterixBean[" + this.beanFactory.getBeanType().getName() + "]";
+		return "StatefulAsterixBean[" + this.beanFactory.getBeanKey() + "]";
 	}
 	
 
@@ -111,7 +111,7 @@ public class StatefulAstrixBean<T> implements InvocationHandler {
 			if (method.getDeclaringClass().equals(Object.class)) {
 				return method.invoke(StatefulAstrixBean.this, args);
 			}
-			throw new ServiceUnavailableException("AstrixBeanId=" + id + " beanType="+ beanFactory.getBeanType().getName() + " qualifier=" + optionalQualifier);
+			throw new ServiceUnavailableException("AstrixBeanId=" + id + " bean="+ beanFactory.getBeanKey());
 		}
 	}
 

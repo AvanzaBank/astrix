@@ -18,7 +18,7 @@ package com.avanza.astrix.context;
 import java.util.Objects;
 
 public abstract class ObjectId {
-	public static ObjectId astrixBean(AstrixBeanKey key) {
+	public static ObjectId astrixBean(AstrixBeanKey<?> key) {
 		return new AstrixBeanId(key);
 	}
 	public static ObjectId internalClass(Class<?> type) {
@@ -47,13 +47,13 @@ public abstract class ObjectId {
 	
 	public static class AstrixBeanId extends ObjectId {
 
-		private AstrixBeanKey key;
+		private AstrixBeanKey<?> key;
 
-		public AstrixBeanId(AstrixBeanKey key) {
+		public AstrixBeanId(AstrixBeanKey<?> key) {
 			this.key = key;
 		}
 		
-		public AstrixBeanKey getKey() {
+		public AstrixBeanKey<?> getKey() {
 			return key;
 		}
 		

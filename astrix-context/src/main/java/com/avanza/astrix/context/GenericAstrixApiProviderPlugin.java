@@ -49,9 +49,9 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 	@Override
 	public List<AstrixFactoryBeanPlugin<?>> createFactoryBeans(AstrixApiDescriptor descriptorHolder) {
 		List<AstrixFactoryBeanPlugin<?>> result = getFactoryBeans(descriptorHolder);
-		Set<Class<?>> providedBeans = new HashSet<>(getProvidedBeans(descriptorHolder));
+		Set<AstrixBeanKey<?>> providedBeans = new HashSet<>(getProvidedBeans(descriptorHolder));
 		for (AstrixFactoryBeanPlugin<?> factory : result) {
-			providedBeans.remove(factory.getBeanType());
+			providedBeans.remove(factory.getBeanKey());
 		}
 		if (!providedBeans.isEmpty()) {
 			throw new IllegalAstrixApiProviderException("Not all elements defined in api provided by " + descriptorHolder + ". Missing provider for " + providedBeans);
@@ -63,23 +63,31 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 		Object libraryProviderInstance = initInstanceProvider(descriptor);
 		List<AstrixFactoryBeanPlugin<?>> result = new ArrayList<>();
 		// Create library factories
-		for (Method m : descriptor.getDescriptorClass().getMethods()) {
-			if (m.isAnnotationPresent(AstrixExport.class)) {
-				result.add(new AstrixLibraryFactory<>(libraryProviderInstance, m));
+		for (Method possibleLibraryFactory : descriptor.getDescriptorClass().getMethods()) {
+			if (possibleLibraryFactory.isAnnotationPresent(AstrixExport.class)) {
+				String qualifier = null;
+				if (possibleLibraryFactory.isAnnotationPresent(AstrixQualifier.class)) {
+					qualifier = possibleLibraryFactory.getAnnotation(AstrixQualifier.class).value();
+				}
+				result.add(new AstrixLibraryFactory<>(libraryProviderInstance, possibleLibraryFactory, qualifier));
 			}
 		}
 		// Create service factories
 		Class<?>[] providedApis = descriptor.getAnnotation(AstrixApiProvider.class).value();
 		for (Class<?> providedApi : providedApis) {
-			for (Method m : providedApi.getMethods()) {
-				if (m.isAnnotationPresent(Service.class)) {
-					Class<?> providedService = m.getReturnType();
+			for (Method beanDefinition : providedApi.getMethods()) {
+				if (beanDefinition.isAnnotationPresent(Service.class)) {
+					Class<?> providedService = beanDefinition.getReturnType();
 					ServiceVersioningContext versioningContext = createVersioningContext(descriptor, providedService);
-					AstrixServiceLookup serviceLookup = serviceLookupFactory.createServiceLookup(m);
-					result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, providedService));
+					AstrixServiceLookup serviceLookup = serviceLookupFactory.createServiceLookup(beanDefinition);
+					String qualifier = null;
+					if (beanDefinition.isAnnotationPresent(AstrixQualifier.class)) {
+						qualifier = beanDefinition.getAnnotation(AstrixQualifier.class).value();
+					}
+					result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, AstrixBeanKey.create(providedService, qualifier)));
 					Class<?> asyncInterface = serviceMetaFactory.loadInterfaceIfExists(providedService.getName() + "Async");
 					if (asyncInterface != null) {
-						result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, asyncInterface));
+						result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, AstrixBeanKey.create(asyncInterface, qualifier)));
 					}
 				}
 			}
@@ -111,13 +119,17 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 		throw new IllegalArgumentException(String.format("Descriptor does not provide service. descriptor=%s service=%s", descriptor, providedService.getName()));
 	}
 
-	private List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor) {
+	private List<AstrixBeanKey<?>> getProvidedBeans(AstrixApiDescriptor descriptor) {
 		Class<?>[] providedApis = descriptor.getAnnotation(AstrixApiProvider.class).value();
-		List<Class<?>> result = new ArrayList<>();
+		List<AstrixBeanKey<?>> result = new ArrayList<>();
 		for (Class<?> providedApi : providedApis) {
-			for (Method m : providedApi.getMethods()) {
-				if (m.isAnnotationPresent(Library.class) || m.isAnnotationPresent(Service.class)) {
-					result.add(m.getReturnType());
+			for (Method beanDefinition : providedApi.getMethods()) {
+				if (beanDefinition.isAnnotationPresent(Library.class) || beanDefinition.isAnnotationPresent(Service.class)) {
+					String qualifier = null;
+					if (beanDefinition.isAnnotationPresent(AstrixQualifier.class)) {
+						qualifier = beanDefinition.getAnnotation(AstrixQualifier.class).value();
+					}
+					result.add(AstrixBeanKey.create(beanDefinition.getReturnType(), qualifier));
 				}
 			}
 		}
@@ -140,7 +152,7 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 					if (!declaredBean.getAnnotation(Service.class).value().isEmpty()) {
 						serviceComponentName = declaredBean.getAnnotation(Service.class).value();
 					}
-					AstrixBeanKey serviceBeanKey = AstrixBeanKey.create(declaredBean.getReturnType(), qualifier);
+					AstrixBeanKey<?> serviceBeanKey = AstrixBeanKey.create(declaredBean.getReturnType(), qualifier);
 					boolean usesServiceRegistry = this.serviceLookupFactory.getLookupStrategy(declaredBean).equals(AstrixServiceRegistryLookup.class);
 					result.add(new AstrixServiceBeanDefinition(serviceBeanKey, descriptor, this, usesServiceRegistry, serviceComponentName));
 				}

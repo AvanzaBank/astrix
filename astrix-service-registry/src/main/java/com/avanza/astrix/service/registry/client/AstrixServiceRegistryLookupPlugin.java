@@ -48,8 +48,8 @@ public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupPlu
 	}
 
 	@Override
-	public List<AstrixBeanKey> getBeanDependencies() {
-		return Arrays.asList(AstrixBeanKey.create(AstrixServiceRegistryClient.class, null));
+	public List<AstrixBeanKey<? extends Object>> getBeanDependencies() {
+		return Arrays.<AstrixBeanKey<?>>asList(AstrixBeanKey.create(AstrixServiceRegistryClient.class, null));
 	}
 
 	@Override

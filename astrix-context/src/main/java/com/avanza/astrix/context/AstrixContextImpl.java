@@ -48,8 +48,8 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 				AstrixBeanId beanId = (AstrixBeanId) objectId;
 				// Detect circular dependencies by retrieving transitive bean dependencies
 				// "just in time" when an astrix-bean is created.
-				getTransitiveBeanDependenciesForBean(beanId.getKey().getBeanType());
-				return (T) getFactoryBean(beanId.getKey().getBeanType()).create(beanId.getKey().getQualifier());
+				getTransitiveBeanDependenciesForBean(beanId.getKey());
+				return (T) getFactoryBean(beanId.getKey()).create(beanId.getKey().getQualifier());
 			}
 			T result =  (T) objectId.getType().newInstance();
 			injectDependencies(result);
@@ -79,7 +79,7 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 	}
 	
 	void registerApiProvider(AstrixApiProvider apiProvider) {
-		for (Class<?> beanType : apiProvider.providedApis()) {
+		for (AstrixBeanKey<?> beanType : apiProvider.providedApis()) {
 			AstrixFactoryBean<?> beanFactory = apiProvider.getFactory(beanType);
 			registerBeanFactory(beanFactory);
 		}
@@ -154,15 +154,15 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 				try {
 					return AstrixContextImpl.this.getBean(beanType, qualifier);
 				} catch (MissingBeanProviderException e) {
-					throw new MissingBeanDependencyException(beanDependenciesAware, beanType);
+					throw new MissingBeanDependencyException(beanDependenciesAware, AstrixBeanKey.create(beanType, qualifier));
 				}
 			}
 			
 		});
 	}
 
-	private boolean hasBeanFactoryFor(Class<?> beanType) {
-		return this.beanFactoryRegistry.hasBeanFactoryFor(beanType);
+	private boolean hasBeanFactoryFor(AstrixBeanKey<? extends Object> beanKey) {
+		return this.beanFactoryRegistry.hasBeanFactoryFor(beanKey);
 	}
 
 	@Override
@@ -175,7 +175,7 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		return objectCache.getInstance(ObjectId.astrixBean(AstrixBeanKey.create(beanType, qualifier)));
 	}
 
-	private <T> AstrixFactoryBean<T> getFactoryBean(Class<T> beanType) {
+	private <T> AstrixFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanType) {
 		if (!hasBeanFactoryFor(beanType)) {
 			throw new MissingBeanProviderException(beanType);
 		}
@@ -198,14 +198,14 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		return result;
 	}
 	
-	private void waitForBeanAndTransitiveDependenciesToBeBound(AstrixBeanKey beanKey, long timeoutMillis) throws InterruptedException {
-		for (AstrixBeanKey dependencyKey: getTransitiveBeanDependenciesForBean(beanKey.getBeanType())) {
+	private void waitForBeanAndTransitiveDependenciesToBeBound(AstrixBeanKey<?> beanKey, long timeoutMillis) throws InterruptedException {
+		for (AstrixBeanKey<?> dependencyKey: getTransitiveBeanDependenciesForBean(beanKey)) {
 			waitForBeanToBeBound(dependencyKey, timeoutMillis);
 		}
 		waitForBeanToBeBound(beanKey, timeoutMillis);
 	}
 
-	private void waitForBeanToBeBound(AstrixBeanKey beanKey, long timeoutMillis)
+	private void waitForBeanToBeBound(AstrixBeanKey<?> beanKey, long timeoutMillis)
 			throws InterruptedException {
 		if (!isStatefulBean(beanKey)) {
 			return;
@@ -213,8 +213,8 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		this.beanStates.waitForBeanToBeBound(beanKey, timeoutMillis);
 	}
 
-	private boolean isStatefulBean(AstrixBeanKey beanKey) {
-		return this.beanFactoryRegistry.getFactoryBean(beanKey.getBeanType()).isStateful();
+	private boolean isStatefulBean(AstrixBeanKey<?> beanKey) {
+		return this.beanFactoryRegistry.getFactoryBean(beanKey).isStateful();
 	}
 
 	/**
@@ -224,7 +224,7 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 	 * @param beanType
 	 * @return
 	 */
-	public Collection<AstrixBeanKey> getTransitiveBeanDependenciesForBean(Class<?> beanType) {
+	public Collection<AstrixBeanKey<?>> getTransitiveBeanDependenciesForBean(AstrixBeanKey<? extends Object> beanType) {
 		return new TransitiveBeanDependencyResolver(getFactoryBean(beanType)).resolve();
 	}
 	
@@ -232,14 +232,14 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 
 		private AstrixFactoryBeanPlugin<?> rootFactory;
 		private AstrixFactoryBean<?> root;
-		private Set<AstrixBeanKey> transitiveDependencies = new HashSet<>();
+		private Set<AstrixBeanKey<?>> transitiveDependencies = new HashSet<>();
 		
 		public TransitiveBeanDependencyResolver(AstrixFactoryBean<?> rootFactory) {
 			this.root = rootFactory;			
 			this.rootFactory = (AstrixFactoryBeanPlugin<?>) rootFactory.getTarget();
 		}
 
-		public Set<AstrixBeanKey> resolve() {
+		public Set<AstrixBeanKey<?>> resolve() {
 			resolveTransitiveDependencies(rootFactory);
 			return transitiveDependencies;
 		}
@@ -247,15 +247,15 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		private void resolveTransitiveDependencies(AstrixFactoryBeanPlugin<?> beanFactory) {
 			if (beanFactory instanceof AstrixBeanAware) {
 				AstrixBeanAware beanAwareFactory = AstrixBeanAware.class.cast(beanFactory);
-				for (AstrixBeanKey transitiveDependency : beanAwareFactory.getBeanDependencies()) {
-					if (this.rootFactory.getBeanType().equals(transitiveDependency.getBeanType())) {
-						throw new AstrixCircularDependency(root.getBeanType(), beanFactory.getBeanType());
+				for (AstrixBeanKey<?> transitiveDependency : beanAwareFactory.getBeanDependencies()) {
+					if (this.rootFactory.getBeanKey().equals(transitiveDependency)) {
+						throw new AstrixCircularDependency(root.getBeanType(), beanFactory.getBeanKey().getBeanType());
 					}
 					transitiveDependencies.add(transitiveDependency);
 					try {
-						resolveTransitiveDependencies(getFactoryBean(transitiveDependency.getBeanType()));
+						resolveTransitiveDependencies(getFactoryBean(transitiveDependency));
 					} catch (MissingBeanProviderException e) {
-						throw new MissingBeanDependencyException(beanAwareFactory, transitiveDependency.getBeanType());
+						throw new MissingBeanDependencyException(beanAwareFactory, transitiveDependency);
 					}
 				}
 			}

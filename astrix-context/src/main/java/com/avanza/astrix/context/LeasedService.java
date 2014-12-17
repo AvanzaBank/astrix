@@ -48,8 +48,14 @@ class LeasedService<T> implements InvocationHandler {
 		this.serviceLookup = serviceLookup;
 	}
 
-	public Class<T> getBeanType() {
-		return serviceFactory.getBeanType();
+	// TODO: rename to getBeanKey
+	public AstrixBeanKey<T> getBeanType() {
+		return serviceFactory.getBeanKey();
+	}
+	
+	// TODO: rename to getBeanType
+	public Class<T> getType() {
+		return serviceFactory.getBeanKey().getBeanType();
 	}
 	
 	public String getQualifier() {
@@ -57,7 +63,7 @@ class LeasedService<T> implements InvocationHandler {
 	}
 
 	public void renew() {
-		AstrixServiceProperties serviceProperties = serviceLookup.lookup(getBeanType(), getQualifier());
+		AstrixServiceProperties serviceProperties = serviceLookup.lookup(getType(), getQualifier());
 		refreshServiceProperties(serviceProperties);
 	}
 
@@ -66,7 +72,7 @@ class LeasedService<T> implements InvocationHandler {
 			if (serviceProperties != null) {
 				currentInstance = serviceFactory.create(qualifier, serviceProperties);
 			} else {
-				currentInstance = (T) Proxy.newProxyInstance(getBeanType().getClassLoader(), new Class[]{getBeanType()}, new NotRegistered());
+				currentInstance = (T) Proxy.newProxyInstance(getType().getClassLoader(), new Class[]{getType()}, new NotRegistered());
 			}
 			currentProperties = serviceProperties;
 		}
@@ -88,7 +94,7 @@ class LeasedService<T> implements InvocationHandler {
 	private class NotRegistered implements InvocationHandler {
 
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			throw new ServiceUnavailableException("Service not available in registry. type=" + getBeanType().getName() + ", qualifier=" + getQualifier());
+			throw new ServiceUnavailableException("Service not available in registry. type=" + getType().getName() + ", qualifier=" + getQualifier());
 		}
 	}
 

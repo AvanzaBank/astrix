@@ -38,7 +38,7 @@ public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
 		List<AstrixFactoryBeanPlugin<?>> result = new ArrayList<>();
 		for (Method m : descriptorHolder.getDescriptorClass().getMethods()) {
 			if (m.isAnnotationPresent(AstrixExport.class)) {
-				result.add(new AstrixLibraryFactory<>(libraryProviderInstance, m));
+				result.add(new AstrixLibraryFactory<>(libraryProviderInstance, m, null));
 			}
 		}
 		return result;

@@ -21,24 +21,24 @@ import java.util.Objects;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class AstrixBeanKey {
+public final class AstrixBeanKey<T> {
 	
-	private Class<?> beanType;
+	private Class<T> beanType;
 	private String qualifier;
 
-	private AstrixBeanKey(Class<?> beanType, String qualifier) {
+	private AstrixBeanKey(Class<T> beanType, String qualifier) {
 		this.beanType = beanType;
 		this.qualifier = qualifier;
 	}
 	
-	public static AstrixBeanKey create(Class<?> beanType, String qualifier) {
+	public static <T> AstrixBeanKey<T> create(Class<T> beanType, String qualifier) {
 		if (qualifier == null) {
-			return new AstrixBeanKey(beanType, "-");
+			return new AstrixBeanKey<>(beanType, "-");
 		} 
-		return new AstrixBeanKey(beanType, qualifier);
+		return new AstrixBeanKey<>(beanType, qualifier);
 	}
 	
-	public Class<?> getBeanType() {
+	public Class<T> getBeanType() {
 		return beanType;
 	}
 	
@@ -66,12 +66,15 @@ public final class AstrixBeanKey {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AstrixBeanKey other = (AstrixBeanKey) obj;
+		AstrixBeanKey<?> other = (AstrixBeanKey<?>) obj;
 		return this.getBeanTypeName().equals(other.getBeanTypeName()) && this.qualifier.equals(other.qualifier);
 	}
 	
 	@Override
 	public String toString() {
+		if (getQualifier() == null) {
+			return getBeanTypeName();
+		}
 		return getBeanTypeName() + "-" + qualifier;
 	}
 	

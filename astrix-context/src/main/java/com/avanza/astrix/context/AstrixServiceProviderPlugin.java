@@ -43,10 +43,10 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 		for (AstrixServiceBeanDefinition serviceBeanDefinition : getProvidedBeans(descriptor)) {
 			AstrixServiceLookup serviceLookup = getLookupStrategy(descriptor);
 			Class<?> beanType = serviceBeanDefinition.getBeanKey().getBeanType();
-			result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, beanType));
+			result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, AstrixBeanKey.create(beanType, null)));
 			Class<?> asyncInterface = serviceMetaFactory.loadInterfaceIfExists(beanType.getName() + "Async");
 			if (asyncInterface != null) {
-				result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, asyncInterface));
+				result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, AstrixBeanKey.create(asyncInterface, null)));
 			}
 		}
 		return result;

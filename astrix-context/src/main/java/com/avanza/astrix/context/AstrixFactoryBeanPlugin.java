@@ -28,7 +28,7 @@ public interface AstrixFactoryBeanPlugin<T> {
 	
 	T create(String optionalQualifier);
 	
-	Class<T> getBeanType();
+	AstrixBeanKey<T> getBeanKey();
 	
 	/**
 	 * Defines whether the bean created by this factory is stateful.  

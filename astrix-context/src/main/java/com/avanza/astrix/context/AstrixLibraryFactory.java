@@ -26,15 +26,15 @@ public class AstrixLibraryFactory<T> implements AstrixFactoryBeanPlugin<T>, Astr
 
 	private Object factoryInstance;
 	private Method factoryMethod;
-	private Class<T> type;
-	private List<AstrixBeanKey> astrixBeanDependencies;
+	private AstrixBeanKey<T> beanKey;
+	private List<AstrixBeanKey<?>> astrixBeanDependencies;
 	private AstrixBeans beans;
 	
 	@SuppressWarnings("unchecked")
-	public AstrixLibraryFactory(Object factoryInstance, Method factoryMethod) {
+	public AstrixLibraryFactory(Object factoryInstance, Method factoryMethod, String qualifier) {
 		this.factoryInstance = factoryInstance;
 		this.factoryMethod = factoryMethod;
-		this.type = (Class<T>) factoryMethod.getReturnType();
+		this.beanKey = AstrixBeanKey.create((Class<T>) factoryMethod.getReturnType(), qualifier);
 		this.astrixBeanDependencies = new ArrayList<>(factoryMethod.getParameterTypes().length);
 		for (int argumentIndex = 0; argumentIndex < factoryMethod.getParameterTypes().length; argumentIndex++) {
 			Class<?> parameterType = factoryMethod.getParameterTypes()[argumentIndex];
@@ -47,7 +47,7 @@ public class AstrixLibraryFactory<T> implements AstrixFactoryBeanPlugin<T>, Astr
 	public T create(String qualifier) {
 		Object[] args = new Object[factoryMethod.getParameterTypes().length];
 		for (int argumentIndex = 0; argumentIndex < factoryMethod.getParameterTypes().length; argumentIndex++) {
-			AstrixBeanKey dep = astrixBeanDependencies.get(argumentIndex);
+			AstrixBeanKey<?> dep = astrixBeanDependencies.get(argumentIndex);
 			Class<?> argumentType = dep.getBeanType();
 			String parameterQualifier = dep.getQualifier();
 			args[argumentIndex] = beans.getBean(argumentType, parameterQualifier);
@@ -56,9 +56,9 @@ public class AstrixLibraryFactory<T> implements AstrixFactoryBeanPlugin<T>, Astr
 		try {
 			result = factoryMethod.invoke(factoryInstance, args);
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to instantiate library using: " + factoryMethod.toString() + " on " + type.getName(), e);
+			throw new RuntimeException("Failed to instantiate library using: " + factoryMethod.toString() + " on " + factoryInstance.getClass().getName(), e);
 		}
-		return type.cast(result);
+		return beanKey.getBeanType().cast(result);
 	}
 
 	private String getParameterQualifier(int argumentIndex) {
@@ -71,8 +71,8 @@ public class AstrixLibraryFactory<T> implements AstrixFactoryBeanPlugin<T>, Astr
 	}
 	
 	@Override
-	public Class<T> getBeanType() {
-		return this.type;
+	public AstrixBeanKey<T> getBeanKey() {
+		return this.beanKey;
 	}
 	
 	@Override
@@ -81,7 +81,7 @@ public class AstrixLibraryFactory<T> implements AstrixFactoryBeanPlugin<T>, Astr
 	}
 	
 	@Override
-	public List<AstrixBeanKey> getBeanDependencies() {
+	public List<AstrixBeanKey<?>> getBeanDependencies() {
 		return this.astrixBeanDependencies;
 	}
 
