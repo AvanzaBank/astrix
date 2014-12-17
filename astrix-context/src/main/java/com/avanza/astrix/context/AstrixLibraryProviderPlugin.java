@@ -69,17 +69,6 @@ public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
 	}
 	
 	@Override
-	public List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor) {
-		List<Class<?>> result = new ArrayList<>();
-		for (Method m : descriptor.getDescriptorClass().getMethods()) {
-			if (m.isAnnotationPresent(AstrixExport.class)) {
-				result.add(m.getReturnType());
-			}
-		}
-		return result;
-	}
-	
-	@Override
 	public List<Class<?>> getProvidedServices(AstrixApiDescriptor descriptor) {
 		return Collections.emptyList();
 	}

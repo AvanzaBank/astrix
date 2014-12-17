@@ -16,7 +16,6 @@
 package com.avanza.astrix.context;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -110,8 +109,7 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 		throw new IllegalArgumentException(String.format("Descriptor does not provide service. descriptor=%s service=%s", descriptor, providedService.getName()));
 	}
 
-	@Override
-	public List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor) {
+	private List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor) {
 		Class<?>[] providedApis = descriptor.getAnnotation(AstrixApiProvider.class).value();
 		List<Class<?>> result = new ArrayList<>();
 		for (Class<?> providedApi : providedApis) {
@@ -150,7 +148,18 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 	@Override
 	public boolean hasStatefulBeans() {
 		// TODO: this is not good! This means treating libraries as stateful as
-		// well, which works but is not a good solution. 
+		// well, which works but is not a good solution.
+		/**
+		 * solution:
+		 * 
+		 * introduce method:
+		 *     AstrixBeanDefinition getProvidedBeans();
+		 *     
+		 *     let AstrixBeanDefinition contain
+		 *     	1. versioning info
+		 *      2. Whether the bean is stateful
+		 *      4. whether the bean is a service.
+		 */
 		return true;
 	}
 	

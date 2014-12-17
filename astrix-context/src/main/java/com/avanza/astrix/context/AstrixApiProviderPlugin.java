@@ -43,8 +43,6 @@ public interface AstrixApiProviderPlugin {
 	
 	List<AstrixFactoryBeanPlugin<?>> createFactoryBeans(AstrixApiDescriptor descriptor);
 	
-	List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor);
-	
 	List<Class<?>> getProvidedServices(AstrixApiDescriptor descriptor);
 	
 	Class<? extends Annotation> getProviderAnnotationType();

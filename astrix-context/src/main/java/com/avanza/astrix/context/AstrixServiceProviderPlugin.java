@@ -63,8 +63,7 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 		return serviceLookupFactory.createServiceLookup(descriptor.getDescriptorClass());
 	}
 
-	@Override
-	public List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor) {
+	private List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor) {
 		return getProvidedServices(descriptor);
 	}
 	
