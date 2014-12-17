@@ -24,8 +24,6 @@ package com.avanza.astrix.context;
  */
 public interface AstrixBeans {
 	
-	<T> T getBean(Class<T> beanType);
+	<T> T getBean(AstrixBeanKey<T> beanKey);
 
-	<T> T getBean(Class<T> beanType, String qualifier);
-	
 }

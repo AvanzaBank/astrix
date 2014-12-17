@@ -50,7 +50,7 @@ public class AstrixLibraryFactory<T> implements AstrixFactoryBeanPlugin<T>, Astr
 			AstrixBeanKey<?> dep = astrixBeanDependencies.get(argumentIndex);
 			Class<?> argumentType = dep.getBeanType();
 			String parameterQualifier = dep.getQualifier();
-			args[argumentIndex] = beans.getBean(argumentType, parameterQualifier);
+			args[argumentIndex] = beans.getBean(AstrixBeanKey.create(argumentType, parameterQualifier));
 		}
 		Object result;
 		try {

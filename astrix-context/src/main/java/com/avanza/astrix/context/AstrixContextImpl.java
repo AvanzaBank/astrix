@@ -142,19 +142,14 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 	private void injectBeanDependencies(final AstrixBeanAware beanDependenciesAware) {
 		beanDependenciesAware.setAstrixBeans(new AstrixBeans() {
 			@Override
-			public <T> T getBean(Class<T> beanType) {
-				return getBean(beanType, null);
-			}
-			
-			@Override
-			public <T> T getBean(Class<T> beanType, String qualifier) {
-				if (!beanDependenciesAware.getBeanDependencies().contains(AstrixBeanKey.create(beanType, qualifier))) {
-					throw new RuntimeException("Undeclared bean dependency: " + beanType);
+			public <T> T getBean(AstrixBeanKey<T> beanKey) {
+				if (!beanDependenciesAware.getBeanDependencies().contains(beanKey)) {
+					throw new RuntimeException("Undeclared bean dependency: " + beanKey);
 				}
 				try {
-					return AstrixContextImpl.this.getBean(beanType, qualifier);
+					return AstrixContextImpl.this.getBean(beanKey);
 				} catch (MissingBeanProviderException e) {
-					throw new MissingBeanDependencyException(beanDependenciesAware, AstrixBeanKey.create(beanType, qualifier));
+					throw new MissingBeanDependencyException(beanDependenciesAware, beanKey);
 				}
 			}
 			
@@ -173,6 +168,10 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 	@Override
 	public <T> T getBean(Class<T> beanType, String qualifier) {
 		return objectCache.getInstance(ObjectId.astrixBean(AstrixBeanKey.create(beanType, qualifier)));
+	}
+	
+	public <T> T getBean(AstrixBeanKey<T> beanKey) {
+		return objectCache.getInstance(ObjectId.astrixBean(beanKey));
 	}
 
 	private <T> AstrixFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanType) {
