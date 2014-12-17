@@ -49,7 +49,7 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 				// Detect circular dependencies by retrieving transitive bean dependencies
 				// "just in time" when an astrix-bean is created.
 				getTransitiveBeanDependenciesForBean(beanId.getKey());
-				return (T) getFactoryBean(beanId.getKey()).create(beanId.getKey().getQualifier());
+				return (T) getFactoryBean(beanId.getKey()).create();
 			}
 			T result =  (T) objectId.getType().newInstance();
 			injectDependencies(result);
