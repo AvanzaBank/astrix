@@ -71,6 +71,11 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 	public Class<T> getBeanType() {
 		return api;
 	}
+	
+	@Override
+	public boolean isStateful() {
+		return true;
+	}
 
 	private boolean isAllowedToInvokeService(String providerSubsystem) {
 		if (versioningContext.isVersioned()) {

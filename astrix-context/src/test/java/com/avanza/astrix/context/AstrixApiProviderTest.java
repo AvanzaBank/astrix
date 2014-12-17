@@ -42,6 +42,16 @@ public class AstrixApiProviderTest {
 		assertEquals("foo", ping.ping("foo"));
 	}
 	
+	@Test
+	public void librariesShouldNotBeStateful() throws Exception {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(PingLibraryProvider.class);
+		AstrixContext context = astrixConfigurer.configure();
+		
+		PingLib ping = context.getBean(PingLib.class);
+		assertEquals("Expected non-stateful astrix bean without a proxy.", PingLibImpl.class, ping.getClass());
+	}
+	
 	@Test(expected = IllegalAstrixApiProviderException.class)
 	public void apiProviderNotProvidingDefinedLibrary() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();

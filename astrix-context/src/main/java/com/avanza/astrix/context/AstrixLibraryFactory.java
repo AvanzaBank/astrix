@@ -76,6 +76,11 @@ public class AstrixLibraryFactory<T> implements AstrixFactoryBeanPlugin<T>, Astr
 	}
 	
 	@Override
+	public boolean isStateful() {
+		return false;
+	}
+	
+	@Override
 	public List<AstrixBeanKey> getBeanDependencies() {
 		return this.astrixBeanDependencies;
 	}

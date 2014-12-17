@@ -87,11 +87,6 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 	public Class<? extends Annotation> getProviderAnnotationType() {
 		return AstrixServiceProvider.class;
 	}
-
-	@Override
-	public boolean hasStatefulBeans() {
-		return true;
-	}
 	
 	@AstrixInject
 	public void setServiceLookupFactory(AstrixServiceLookupFactory serviceLookupFactory) {

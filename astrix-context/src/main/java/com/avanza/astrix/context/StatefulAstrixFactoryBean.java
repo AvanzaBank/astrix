@@ -73,5 +73,10 @@ final class StatefulAstrixFactoryBean<T> implements AstrixFactoryBeanPlugin<T>, 
 	public void setBeanStateWorker(AstrixBeanStateWorker worker) {
 		this.beanStateWorker = worker;
 	}
+	
+	@Override
+	public boolean isStateful() {
+		return true;
+	}
 
 }

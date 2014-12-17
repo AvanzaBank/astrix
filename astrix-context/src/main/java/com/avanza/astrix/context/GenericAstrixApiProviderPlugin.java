@@ -158,24 +158,6 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 		return AstrixApiProvider.class;
 	}
 	
-	@Override
-	public boolean hasStatefulBeans() {
-		// TODO: this is not good! This means treating libraries as stateful as
-		// well, which works but is not a good solution.
-		/**
-		 * solution:
-		 * 
-		 * introduce method:
-		 *     AstrixBeanDefinition getProvidedBeans();
-		 *     
-		 *     let AstrixBeanDefinition contain
-		 *     	1. versioning info
-		 *      2. Whether the bean is stateful
-		 *      4. whether the bean is a service.
-		 */
-		return true;
-	}
-	
 	@AstrixInject
 	public void setInstanceCache(ObjectCache instanceCache) {
 		this.instanceCache = instanceCache;

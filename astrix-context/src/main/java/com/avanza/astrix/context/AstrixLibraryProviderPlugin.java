@@ -58,11 +58,6 @@ public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
 		return AstrixLibraryProvider.class;
 	}
 	
-	@Override
-	public boolean hasStatefulBeans() {
-		return false;
-	}
-	
 	@AstrixInject
 	public void setInstanceCache(ObjectCache instanceCache) {
 		this.instanceCache = instanceCache;

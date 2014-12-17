@@ -120,6 +120,11 @@ public class TestAstrixConfigurer {
 			return type;
 		}
 		
+		@Override
+		public boolean isStateful() {
+			return false;
+		}
+		
 	}
 
 	public void enableVersioning(boolean enableVersioning) {
