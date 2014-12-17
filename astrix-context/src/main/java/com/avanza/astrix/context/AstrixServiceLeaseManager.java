@@ -61,13 +61,13 @@ public class AstrixServiceLeaseManager extends Thread implements AstrixSettingsA
 		}
 	}
 
-	public <T> T startManageLease(T service, AstrixServiceProperties currentProperties, String qualifier, AstrixServiceFactory<T> serviceFactory, AstrixServiceLookup serviceLookup) {
+	public <T> T startManageLease(T service, AstrixServiceProperties currentProperties, AstrixServiceFactory<T> serviceFactory, AstrixServiceLookup serviceLookup) {
 		synchronized (this) {
 			if (!isAlive()) {
 				start(); // TODO: what if thread is interrupted? Just allow exception to be thrown? 
 			}
 		}
-		LeasedService<T> leasedService = new LeasedService<>(service, qualifier, currentProperties, serviceFactory, serviceLookup);
+		LeasedService<T> leasedService = new LeasedService<>(service, currentProperties, serviceFactory, serviceLookup);
 		leasedServices.add(leasedService);
 		Object leasedServiceProxy = Proxy.newProxyInstance(serviceFactory.getBeanKey().getBeanType().getClassLoader(), new Class[]{serviceFactory.getBeanKey().getBeanType()}, leasedService);
 		return serviceFactory.getBeanKey().getBeanType().cast(leasedServiceProxy);

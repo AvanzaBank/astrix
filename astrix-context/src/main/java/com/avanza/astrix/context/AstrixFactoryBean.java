@@ -48,7 +48,7 @@ public final class AstrixFactoryBean<T> implements AstrixDecorator {
 	}
 
 	public T create(String optionalQualifier) {
-		return this.plugin.create(optionalQualifier);
+		return this.plugin.create();
 	}
 	
 	public Class<T> getBeanType() {

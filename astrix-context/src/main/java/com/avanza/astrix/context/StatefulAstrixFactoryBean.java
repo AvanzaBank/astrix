@@ -43,8 +43,8 @@ final class StatefulAstrixFactoryBean<T> implements AstrixFactoryBeanPlugin<T>, 
 	}
 
 	@Override
-	public T create(String optionalQualifier) {
-		StatefulAstrixBean<T> handler = new StatefulAstrixBean<>(targetFactory, optionalQualifier, eventBus);
+	public T create() {
+		StatefulAstrixBean<T> handler = new StatefulAstrixBean<>(targetFactory, eventBus);
 		try {
 			handler.bind();
 		} catch (Exception e) {

@@ -26,7 +26,7 @@ package com.avanza.astrix.context;
  */
 public interface AstrixFactoryBeanPlugin<T> {
 	
-	T create(String optionalQualifier);
+	T create();
 	
 	AstrixBeanKey<T> getBeanKey();
 	

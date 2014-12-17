@@ -111,7 +111,7 @@ public class TestAstrixConfigurer {
 		}
 
 		@Override
-		public T create(String optionalQualifier) {
+		public T create() {
 			return instance;
 		}
 

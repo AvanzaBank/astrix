@@ -44,7 +44,7 @@ public class AstrixLibraryFactory<T> implements AstrixFactoryBeanPlugin<T>, Astr
 	}
 
 	@Override
-	public T create(String qualifier) {
+	public T create() {
 		Object[] args = new Object[factoryMethod.getParameterTypes().length];
 		for (int argumentIndex = 0; argumentIndex < factoryMethod.getParameterTypes().length; argumentIndex++) {
 			AstrixBeanKey<?> dep = astrixBeanDependencies.get(argumentIndex);

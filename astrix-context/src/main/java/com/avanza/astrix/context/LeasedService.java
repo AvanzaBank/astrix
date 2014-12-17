@@ -34,15 +34,12 @@ class LeasedService<T> implements InvocationHandler {
 	private volatile T currentInstance;
 	private volatile AstrixServiceProperties currentProperties;
 	private AstrixServiceFactory<T> serviceFactory;
-	private String qualifier;
 
 	public LeasedService(T currentInstance, 
-			String qualifier,
 			AstrixServiceProperties currentProperties,
 			AstrixServiceFactory<T> serviceFactory,
 			AstrixServiceLookup serviceLookup) {
 		this.currentInstance = currentInstance;
-		this.qualifier = qualifier;
 		this.currentProperties = currentProperties;
 		this.serviceFactory = serviceFactory;
 		this.serviceLookup = serviceLookup;
@@ -58,8 +55,9 @@ class LeasedService<T> implements InvocationHandler {
 		return serviceFactory.getBeanKey().getBeanType();
 	}
 	
+	@Deprecated
 	public String getQualifier() {
-		return qualifier;
+		return serviceFactory.getBeanKey().getQualifier();
 	}
 
 	public void renew() {
@@ -70,7 +68,7 @@ class LeasedService<T> implements InvocationHandler {
 	private void refreshServiceProperties(AstrixServiceProperties serviceProperties) {
 		if (serviceHasChanged(serviceProperties)) {
 			if (serviceProperties != null) {
-				currentInstance = serviceFactory.create(qualifier, serviceProperties);
+				currentInstance = serviceFactory.create(serviceProperties);
 			} else {
 				currentInstance = (T) Proxy.newProxyInstance(getType().getClassLoader(), new Class[]{getType()}, new NotRegistered());
 			}

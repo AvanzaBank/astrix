@@ -54,17 +54,17 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 	}
 
 	@Override
-	public T create(String qualifier) {
+	public T create() {
 		AstrixServiceProperties serviceProperties = serviceLookup.lookup(beanKey.getBeanType(), beanKey.getQualifier());
 		if (serviceProperties == null) {
-			throw new RuntimeException(String.format("No service-provider found: bean=%s qualifier=%s serviceLookup=%s", beanKey, qualifier, serviceLookup));
+			throw new RuntimeException(String.format("No service-provider found: bean=%s serviceLookup=%s", beanKey, serviceLookup));
 		}
 		String providerSubsystem = serviceProperties.getProperty(AstrixServiceProperties.SUBSYSTEM);
 		if (!isAllowedToInvokeService(providerSubsystem)) {
 			return createIllegalSubsystemProxy(providerSubsystem);
 		}
-		T service = create(qualifier, serviceProperties);
-		return leaseManager.startManageLease(service, serviceProperties, qualifier, this, serviceLookup);
+		T service = create(serviceProperties);
+		return leaseManager.startManageLease(service, serviceProperties, this, serviceLookup);
 	}
 	
 	@Override
@@ -94,9 +94,9 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 									   new IllegalSubsystemProxy(subsystem, providerSubsystem, beanKey.getBeanType())));
 	}
 
-	public T create(String qualifier, AstrixServiceProperties serviceProperties) {
+	public T create(AstrixServiceProperties serviceProperties) {
 		if (serviceProperties == null) {
-			throw new RuntimeException(String.format("Misssing entry in service-registry api=%s qualifier=%s: ", beanKey.getBeanType().getName(), qualifier));
+			throw new RuntimeException(String.format("Misssing entry in service-registry beanKey=%s", beanKey));
 		}
 		AstrixServiceComponent serviceComponent = getServiceComponent(serviceProperties);
 		return serviceComponent.createService(versioningContext, beanKey.getBeanType(), serviceProperties);
