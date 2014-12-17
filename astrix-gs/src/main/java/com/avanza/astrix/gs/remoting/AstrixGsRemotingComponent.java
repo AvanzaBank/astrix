@@ -90,8 +90,8 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	}
 	
 	@Override
-	public List<AstrixExportedServiceInfo> getImplicitExportedServices() {
-		return Collections.emptyList();
+	public boolean requiresProviderInstance() {
+		return true;
 	}
 	
 	@AstrixInject

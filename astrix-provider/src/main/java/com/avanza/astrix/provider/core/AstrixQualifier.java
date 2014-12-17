@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 /**
  * @author Elias Lindholm (elilin)
  */
-@Target(value = { ElementType.PARAMETER})
+@Target(value = { ElementType.PARAMETER, ElementType.METHOD})
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
 public @interface AstrixQualifier {

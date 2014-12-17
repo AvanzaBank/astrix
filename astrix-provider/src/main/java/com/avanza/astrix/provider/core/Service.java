@@ -29,5 +29,14 @@ import java.lang.annotation.Target;
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
 public @interface Service {
+
+	/**
+	 * Optional service component name. If set
+	 * this will be the service-component used
+	 * to export the service from a server. <p>
+	 * 
+	 * @return
+	 */
+	String value() default "";
 	
 }

@@ -17,6 +17,7 @@ package com.avanza.astrix.service.registry.server;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.context.AstrixBeanKey;
 import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceRegistryPlugin;
@@ -27,8 +28,8 @@ public class AstrixServiceRegistryPluginImpl implements AstrixServiceRegistryPlu
 	private AstrixServiceRegistryExporterWorker serviceRegistryExporterWorker;
 	
 	@Override
-	public <T> void addProvider(Class<T> beanType, AstrixServiceComponent serviceComponent) {
-		serviceRegistryExporterWorker.addServiceBuilder(new AstrixServicePropertiesBuilderHolder(serviceComponent, beanType));
+	public <T> void addProvider(AstrixBeanKey beanKey, AstrixServiceComponent serviceComponent) {
+		serviceRegistryExporterWorker.addServiceBuilder(new AstrixServicePropertiesBuilderHolder(serviceComponent, beanKey));
 	}
 	
 	@AstrixInject

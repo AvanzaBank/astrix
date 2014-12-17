@@ -17,12 +17,12 @@ package com.avanza.astrix.context;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.provider.core.AstrixServiceProvider;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 /**
@@ -40,10 +40,11 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 	public List<AstrixFactoryBeanPlugin<?>> createFactoryBeans(AstrixApiDescriptor descriptor) {
 		List<AstrixFactoryBeanPlugin<?>> result = new ArrayList<>();
 		ServiceVersioningContext versioningContext = createVersioningContext(descriptor, null);
-		for (Class<?> exportedApi : getProvidedBeans(descriptor)) {
+		for (AstrixServiceBeanDefinition serviceBeanDefinition : getProvidedBeans(descriptor)) {
 			AstrixServiceLookup serviceLookup = getLookupStrategy(descriptor);
-			result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, exportedApi));
-			Class<?> asyncInterface = serviceMetaFactory.loadInterfaceIfExists(exportedApi.getName() + "Async");
+			Class<?> beanType = serviceBeanDefinition.getBeanKey().getBeanType();
+			result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, beanType));
+			Class<?> asyncInterface = serviceMetaFactory.loadInterfaceIfExists(beanType.getName() + "Async");
 			if (asyncInterface != null) {
 				result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, asyncInterface));
 			}
@@ -62,15 +63,24 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 	private AstrixServiceLookup getLookupStrategy(AstrixApiDescriptor descriptor) {
 		return serviceLookupFactory.createServiceLookup(descriptor.getDescriptorClass());
 	}
+	
+	private boolean usesServiceRegistry(AstrixApiDescriptor descriptor) { 
+		return serviceLookupFactory.getLookupStrategy(descriptor.getDescriptorClass()).equals(AstrixServiceRegistryLookup.class);
+	}
 
-	private List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor) {
+	private List<AstrixServiceBeanDefinition> getProvidedBeans(AstrixApiDescriptor descriptor) {
 		return getProvidedServices(descriptor);
 	}
 	
 	@Override
-	public List<Class<?>> getProvidedServices(AstrixApiDescriptor descriptor) {
-		Class<?>[] providedServices = descriptor.getAnnotation(AstrixServiceProvider.class).value();
-		return Arrays.asList(providedServices);
+	public List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiDescriptor descriptor) {
+		List<AstrixServiceBeanDefinition> result = new ArrayList<>();
+		for (Class<?> providedService : descriptor.getAnnotation(AstrixServiceProvider.class).value()) {
+			AstrixBeanKey beanKey = AstrixBeanKey.create(providedService, null);
+			boolean usesServiceRegistry = usesServiceRegistry(descriptor);
+			result.add(new AstrixServiceBeanDefinition(beanKey, descriptor, this, usesServiceRegistry, null));
+		}
+		return result;
 	}
 
 	@Override

@@ -25,6 +25,8 @@ import java.util.Set;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.provider.core.AstrixApiProvider;
+import com.avanza.astrix.provider.core.AstrixQualifier;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.library.AstrixExport;
@@ -123,13 +125,24 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 	}
 
 	@Override
-	public List<Class<?>> getProvidedServices(AstrixApiDescriptor descriptor) {
-		Class<?>[] providedApis = descriptor.getAnnotation(AstrixApiProvider.class).value();
-		List<Class<?>> result = new ArrayList<>();
-		for (Class<?> providedApi : providedApis) {
-			for (Method m : providedApi.getMethods()) {
-				if (m.isAnnotationPresent(Service.class)) {
-					result.add(m.getReturnType());
+	public List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiDescriptor descriptor) {
+		Class<?>[] apiDefinitions = descriptor.getAnnotation(AstrixApiProvider.class).value();
+		List<AstrixServiceBeanDefinition> result = new ArrayList<>();
+		for (Class<?> apiDefinition : apiDefinitions) {
+			for (Method declaredBean : apiDefinition.getMethods()) {
+				if (declaredBean.isAnnotationPresent(Service.class)) {
+					String qualifier = null;
+					if (declaredBean.isAnnotationPresent(AstrixQualifier.class)) {
+						qualifier = declaredBean.getAnnotation(AstrixQualifier.class).value();
+					}
+					
+					String serviceComponentName = null;
+					if (!declaredBean.getAnnotation(Service.class).value().isEmpty()) {
+						serviceComponentName = declaredBean.getAnnotation(Service.class).value();
+					}
+					AstrixBeanKey serviceBeanKey = AstrixBeanKey.create(declaredBean.getReturnType(), qualifier);
+					boolean usesServiceRegistry = this.serviceLookupFactory.getLookupStrategy(declaredBean).equals(AstrixServiceRegistryLookup.class);
+					result.add(new AstrixServiceBeanDefinition(serviceBeanKey, descriptor, this, usesServiceRegistry, serviceComponentName));
 				}
 			}
 		}

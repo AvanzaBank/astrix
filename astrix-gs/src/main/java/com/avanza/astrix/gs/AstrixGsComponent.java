@@ -79,11 +79,8 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 	}
 	
 	@Override
-	public List<AstrixExportedServiceInfo> getImplicitExportedServices() {
-		if (!astrixContext.getSettings().getBoolean(AstrixSettings.EXPORT_GIGASPACE, true)) {
-			return Collections.emptyList();
-		}
-		return Arrays.asList(new AstrixExportedServiceInfo(GigaSpace.class, AstrixApiDescriptor.create(GigaSpaceProvider.class), ServiceVersioningContext.nonVersioned(), getName(), null));
+	public boolean requiresProviderInstance() {
+		return false;
 	}
 	
 	@Override

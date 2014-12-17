@@ -59,7 +59,7 @@ public class AstrixServiceLookupFactory implements AstrixPluginsAware {
 		return getLookupStrategy(apiDescriptor.getDescriptorClass()).equals(AstrixServiceRegistryLookup.class);
 	}
 	
-	private Class<?> getLookupStrategy(AnnotatedElement annotatedElement) {
+	public Class<?> getLookupStrategy(AnnotatedElement annotatedElement) {
 		for (AstrixServiceLookupPlugin<?> lookupPlugin : lookupStrategyByAnnotationType.values()) {
 			if (annotatedElement.isAnnotationPresent(lookupPlugin.getLookupAnnotationType())) {
 				return lookupPlugin.getLookupAnnotationType();

@@ -220,8 +220,8 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 	}
 	
 	@Override
-	public List<AstrixExportedServiceInfo> getImplicitExportedServices() {
-		return Collections.emptyList();
+	public boolean requiresProviderInstance() {
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override

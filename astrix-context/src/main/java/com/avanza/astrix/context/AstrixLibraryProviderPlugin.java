@@ -69,7 +69,7 @@ public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
 	}
 	
 	@Override
-	public List<Class<?>> getProvidedServices(AstrixApiDescriptor descriptor) {
+	public List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiDescriptor descriptor) {
 		return Collections.emptyList();
 	}
 	

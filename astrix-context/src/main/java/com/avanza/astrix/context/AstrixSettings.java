@@ -60,6 +60,7 @@ public class AstrixSettings implements AstrixExternalConfig {
 	
 	public static final String ENABLE_FAULT_TOLERANCE = "AstrixContextImpl.enableFaultTolerance";
 	public static final String ENABLE_VERSIONING = "AstrixContextImpl.enableVersioning";
+	@Deprecated
 	public static final String EXPORT_GIGASPACE = "AstrixGsComponent.exportGigaSpace";
 	
 	private final Map<String, String> settings = new ConcurrentHashMap<>();
