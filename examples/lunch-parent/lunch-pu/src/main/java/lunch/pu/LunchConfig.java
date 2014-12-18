@@ -22,7 +22,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.avanza.astrix.context.AstrixFrameworkBean;
+import com.avanza.astrix.spring.AstrixFrameworkBean;
+
 
 @Configuration
 public class LunchConfig {

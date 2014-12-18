@@ -73,7 +73,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	private List<Class<?>> consumedAstrixBeans = new ArrayList<>();
 	private String subsystem;
 	private Map<String, String> settings = new HashMap<>();
-	private AstrixApplicationDescriptor serviceDescriptor;
+	private AstrixApplicationDescriptor applicationDescriptor;
 	private AstrixContextImpl astrixContext;
 	
 	public AstrixFrameworkBean() {
@@ -111,9 +111,22 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	 * will be loaded with all required components for the given serviceDescriptor.
 	 * 
 	 * @param serviceDescriptor
+	 * @deprecated - replaced by {@link AstrixFrameworkBean#setApplicationDescriptor(Class)}
 	 */
+	@Deprecated
 	public void setServiceDescriptor(Class<?> serviceDescriptorHolder) {
-		this.serviceDescriptor = AstrixApplicationDescriptor.create(serviceDescriptorHolder);
+		this.applicationDescriptor = AstrixApplicationDescriptor.create(serviceDescriptorHolder);
+	}
+	
+	/**
+	 * If an application descriptor is provided, then the service exporting part of the framework
+	 * will be loaded with all required components to provided the services defined in
+	 * the api's provided by the given applicatinDescriptor.
+	 * 
+	 * @param serviceDescriptor
+	 */
+	public void setApplicationDescriptor(Class<?> applicationDescriptorHolder) {
+		this.applicationDescriptor = AstrixApplicationDescriptor.create(applicationDescriptorHolder);
 	}
 	
 	/**
@@ -168,11 +181,11 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	}
 
 	private void exportAllProvidedServices() {
-		if (serviceDescriptor == null) {
+		if (applicationDescriptor == null) {
 			return; // current application exports no services
 		}
 		AstrixServiceExporter serviceExporter = astrixContext.getInstance(AstrixServiceExporter.class);
-		serviceExporter.setServiceDescriptor(serviceDescriptor); // TODO This is a hack. Avoid setting serviceDescriptor explicitly here
+		serviceExporter.setServiceDescriptor(applicationDescriptor); // TODO This is a hack. Avoid setting serviceDescriptor explicitly here
 		serviceExporter.exportProvidedServices();
 		astrixContext.getPlugin(AstrixServiceRegistryPlugin.class).startPublishServices();
 	}
