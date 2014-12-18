@@ -52,8 +52,7 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 		return result;
 	}
 
-	@Override
-	public ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, Class<?> api) {
+	private ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, Class<?> api) {
 		if (descriptor.isAnnotationPresent(AstrixVersioned.class)) {
 			return ServiceVersioningContext.versionedService(descriptor.getAnnotation(AstrixVersioned.class));
 		}
@@ -76,9 +75,9 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 	public List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiDescriptor descriptor) {
 		List<AstrixServiceBeanDefinition> result = new ArrayList<>();
 		for (Class<?> providedService : descriptor.getAnnotation(AstrixServiceProvider.class).value()) {
-			AstrixBeanKey beanKey = AstrixBeanKey.create(providedService, null);
+			AstrixBeanKey<?> beanKey = AstrixBeanKey.create(providedService, null);
 			boolean usesServiceRegistry = usesServiceRegistry(descriptor);
-			result.add(new AstrixServiceBeanDefinition(beanKey, descriptor, this, usesServiceRegistry, null));
+			result.add(new AstrixServiceBeanDefinition(beanKey, createVersioningContext(descriptor, providedService), usesServiceRegistry, null));
 		}
 		return result;
 	}

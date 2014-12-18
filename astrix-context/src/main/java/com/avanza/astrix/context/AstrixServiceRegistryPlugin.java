@@ -18,7 +18,7 @@ package com.avanza.astrix.context;
 
 public interface AstrixServiceRegistryPlugin {
 
-	<T> void addProvider(AstrixBeanKey beanKey, AstrixServiceComponent serviceComponent);
+	<T> void addProvider(AstrixBeanKey<T> beanKey, AstrixServiceComponent serviceComponent);
 	
 	void startPublishServices();
 

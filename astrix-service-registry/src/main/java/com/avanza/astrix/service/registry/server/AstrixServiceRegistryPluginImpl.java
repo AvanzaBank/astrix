@@ -28,7 +28,7 @@ public class AstrixServiceRegistryPluginImpl implements AstrixServiceRegistryPlu
 	private AstrixServiceRegistryExporterWorker serviceRegistryExporterWorker;
 	
 	@Override
-	public <T> void addProvider(AstrixBeanKey beanKey, AstrixServiceComponent serviceComponent) {
+	public <T> void addProvider(AstrixBeanKey<T> beanKey, AstrixServiceComponent serviceComponent) {
 		serviceRegistryExporterWorker.addServiceBuilder(new AstrixServicePropertiesBuilderHolder(serviceComponent, beanKey));
 	}
 	

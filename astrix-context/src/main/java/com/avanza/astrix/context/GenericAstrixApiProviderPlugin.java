@@ -95,8 +95,7 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 		return result;
 	}
 	
-	@Override
-	public ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, Class<?> providedService) {
+	private ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, Class<?> providedService) {
 		if (!getDeclaringApi(descriptor, providedService).isAnnotationPresent(Versioned.class)) {
 			return ServiceVersioningContext.nonVersioned();
 		}
@@ -154,7 +153,7 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 					}
 					AstrixBeanKey<?> serviceBeanKey = AstrixBeanKey.create(declaredBean.getReturnType(), qualifier);
 					boolean usesServiceRegistry = this.serviceLookupFactory.getLookupStrategy(declaredBean).equals(AstrixServiceRegistryLookup.class);
-					result.add(new AstrixServiceBeanDefinition(serviceBeanKey, descriptor, this, usesServiceRegistry, serviceComponentName));
+					result.add(new AstrixServiceBeanDefinition(serviceBeanKey, createVersioningContext(descriptor, serviceBeanKey.getBeanType()), usesServiceRegistry, serviceComponentName));
 				}
 			}
 		}

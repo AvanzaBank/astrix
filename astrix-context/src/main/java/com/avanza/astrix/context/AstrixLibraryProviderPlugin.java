@@ -25,7 +25,6 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.provider.library.AstrixExport;
 import com.avanza.astrix.provider.library.AstrixLibraryProvider;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 @MetaInfServices(AstrixApiProviderPlugin.class)
 public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
@@ -42,11 +41,6 @@ public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
 			}
 		}
 		return result;
-	}
-	
-	@Override
-	public ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, Class<?> api) {
-		return ServiceVersioningContext.nonVersioned();
 	}
 
 	private Object initInstanceProvider(AstrixApiDescriptor descriptor) {

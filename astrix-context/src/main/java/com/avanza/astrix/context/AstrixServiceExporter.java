@@ -73,7 +73,7 @@ public class AstrixServiceExporter {
 
 	public void exportProvidedServices() {
 		for (AstrixServiceBeanDefinition serviceBeanDefintion : serviceBeanDefinitions) {
-			ServiceVersioningContext versioningContext = serviceBeanDefintion.createVersioningContext();
+			ServiceVersioningContext versioningContext = serviceBeanDefintion.getVersioningContext();
 			AstrixServiceComponent serviceComponent = getServiceComponent(serviceBeanDefintion);
 			Object provider = null;
 			if (serviceComponent.requiresProviderInstance()) {
