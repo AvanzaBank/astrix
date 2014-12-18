@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.context;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -75,11 +76,19 @@ public class AstrixConfigurer {
 		}
 		String basePackage = context.getSettings().getString(AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, "");
 		if (basePackage.trim().isEmpty()) {
-			return new AstrixApiDescriptorScanner();
+			return new AstrixApiDescriptorScanner(getAllDescriptorAnnotationsTypes(), "com.avanza.astrix"); // Always scan com.avanza.astrix package
 		}
-		return new AstrixApiDescriptorScanner(basePackage.split(","));
+		return new AstrixApiDescriptorScanner(getAllDescriptorAnnotationsTypes(), "com.avanza.astrix", basePackage.split(","));
 	}
 	
+	private List<Class<? extends Annotation>> getAllDescriptorAnnotationsTypes() {
+		List<Class<? extends Annotation>> result = new ArrayList<>();
+		for (AstrixApiProviderPlugin plugin : AstrixPluginDiscovery.discoverAllPlugins(AstrixApiProviderPlugin.class)) {
+			result.add(plugin.getProviderAnnotationType());
+		}
+		return result;
+	}
+
 	public void setBasePackage(String basePackage) {
 		 this.settings.set(AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, basePackage);
 	}

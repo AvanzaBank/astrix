@@ -18,9 +18,9 @@ package com.avanza.astrix.context;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -35,12 +35,14 @@ public class AstrixApiDescriptorScanner implements AstrixApiDescriptors {
 
 	private final Logger log = LoggerFactory.getLogger(AstrixApiDescriptorScanner.class);
 	
-	private static final Map<String, List<AstrixApiDescriptor>> apiDescriptorsByBasePackage = new HashMap<String, List<AstrixApiDescriptor>>();
-	private List<String> basePackages = new ArrayList<>();
+	private static final Map<String, List<AstrixApiDescriptor>> apiDescriptorsByBasePackage = new ConcurrentHashMap<>();
+	private final List<String> basePackages = new ArrayList<>();
+	private final List<Class<? extends Annotation>> descriptorAnnotationsToScanFor;
 	
-	public AstrixApiDescriptorScanner(String... basePackages) {
-		this.basePackages.add("com.avanza.astrix"); // Always scan for com.avanza.astrix package
-		this.basePackages.addAll(Arrays.asList(basePackages));
+	public AstrixApiDescriptorScanner(List<Class<? extends Annotation>> descriptorAnnotationsToScanFor, String basePackage, String... otherBasePackages) {
+		this.descriptorAnnotationsToScanFor = descriptorAnnotationsToScanFor;
+		this.basePackages.add(basePackage);
+		this.basePackages.addAll(Arrays.asList(otherBasePackages));
 	}
 	
 	@Override
@@ -78,11 +80,7 @@ public class AstrixApiDescriptorScanner implements AstrixApiDescriptors {
 	}
 
 	private List<Class<? extends Annotation>> getAllProviderAnnotationTypes() {
-		List<Class<? extends Annotation>> result = new ArrayList<>();
-		for (AstrixApiProviderPlugin plugin : AstrixPluginDiscovery.discoverAllPlugins(AstrixApiProviderPlugin.class)) {
-			result.add(plugin.getProviderAnnotationType());
-		}
-		return result;
+		return descriptorAnnotationsToScanFor;
 	}
 
 }
