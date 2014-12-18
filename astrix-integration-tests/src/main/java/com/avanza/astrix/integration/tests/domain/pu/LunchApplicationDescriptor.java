@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tutorial.p3.server;
+package com.avanza.astrix.integration.tests.domain.pu;
 
-import tutorial.p3.provider.LunchServiceProvider;
-
+import com.avanza.astrix.integration.tests.domain.apiruntime.LunchApiProvider;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
-import com.avanza.astrix.provider.core.AstrixService;
+import com.avanza.astrix.provider.core.AstrixApplication;
 
-@AstrixService(
+
+@AstrixApplication(
 	apiDescriptors = {
-		LunchServiceProvider.class
+		LunchApiProvider.class
 	},
 	component = AstrixServiceComponentNames.GS_REMOTING
 )
-public class LunchServiceDescriptor {
+public class LunchApplicationDescriptor {
 }
+
+

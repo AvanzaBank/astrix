@@ -31,7 +31,7 @@ public class LunchConfig {
 	public AstrixFrameworkBean astrix(@Value("${externalConfigUri}") String externalConfigUri) {
 		AstrixFrameworkBean result = new AstrixFrameworkBean();
 		result.setSubsystem("lunch-service");
-		result.setServiceDescriptor(LunchServiceDescriptor.class);
+		result.setServiceDescriptor(LunchApplicationDescriptor.class);
 		result.setExternalConfigUri(externalConfigUri);
 		return result;
 	}

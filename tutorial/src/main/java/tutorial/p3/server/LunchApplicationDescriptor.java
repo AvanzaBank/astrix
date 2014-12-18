@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package lunch.grader.pu;
+package tutorial.p3.server;
 
-import lunch.grader.api.provider.LunchGradeApiDescriptor;
+import tutorial.p3.provider.LunchServiceProvider;
 
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
-import com.avanza.astrix.provider.core.AstrixService;
+import com.avanza.astrix.provider.core.AstrixApplication;
 
-
-@AstrixService(
+@AstrixApplication(
 	apiDescriptors = {
-		LunchGradeApiDescriptor.class
+		LunchServiceProvider.class
 	},
 	component = AstrixServiceComponentNames.GS_REMOTING
 )
-public class LunchGradeServiceDescriptor {
-	
+public class LunchApplicationDescriptor {
 }
-
-

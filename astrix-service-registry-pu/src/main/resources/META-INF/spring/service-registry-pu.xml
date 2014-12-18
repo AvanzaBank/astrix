@@ -12,7 +12,7 @@
 
 	<bean class="com.avanza.astrix.spring.AstrixFrameworkBean">
 		<property name="serviceDescriptor"
-			value="com.avanza.astrix.service.registry.pu.AstrixServiceRegistryServiceDescriptor" />
+			value="com.avanza.astrix.service.registry.pu.AstrixServiceRegistryApplicationDescriptor" />
 		<property name="settings">
 			<map>
 				<entry key="AstrixGsComponent.exportGigaSpace" value="false"/>

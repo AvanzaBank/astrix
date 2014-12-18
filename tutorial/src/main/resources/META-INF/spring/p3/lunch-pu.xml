@@ -14,7 +14,7 @@
     <os-core:giga-space id="gigaSpace" space="space"/>
     
 	<bean id="astrixFrameworkBean" class="com.avanza.astrix.spring.AstrixFrameworkBean">
-		<property name="serviceDescriptor" value="tutorial.p3.server.LunchServiceDescriptor"/>
+		<property name="serviceDescriptor" value="tutorial.p3.server.LunchApplicationDescriptor"/>
 		<property name="externalConfigUri" value="${externalConfigUri}"/>
 	</bean>
 	    
