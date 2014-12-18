@@ -194,6 +194,14 @@ public class AstrixApiProviderTest {
 		PingLib pingLib();
 	}
 	
+	@AstrixApiProvider(PingLibraryApi.class)
+	public static class PingLibraryProvider {
+		@AstrixExport
+		public PingLib myLib() {
+			return new PingLibImpl();
+		}
+	}
+	
 	public interface PingAndReversePingLibraryApi {
 
 		@AstrixQualifier("ping")
@@ -203,37 +211,6 @@ public class AstrixApiProviderTest {
 		@AstrixQualifier("reverse-ping")
 		@Library
 		PingLib reversePingLib();
-	}
-	
-	public interface PingAndReversePingServiceApi {
-
-		@AstrixConfigLookup("pingServiceUri")
-		@AstrixQualifier("ping")
-		@Service
-		PingService pingLib();
-
-		@AstrixConfigLookup("reversePingServiceUri")
-		@AstrixQualifier("reverse-ping")
-		@Service
-		PingService reversePingLib();
-	}
-
-
-	public interface PingServiceAndLibraryApi {
-		@Library
-		PingLib pingLib();
-		
-		@AstrixConfigLookup("pingServiceUri")
-		@Service
-		PingService pingService();
-	}
-	
-	@AstrixApiProvider(PingLibraryApi.class)
-	public static class PingLibraryProvider {
-		@AstrixExport
-		public PingLib myLib() {
-			return new PingLibImpl();
-		}
 	}
 	
 	@AstrixApiProvider(PingAndReversePingLibraryApi.class)
@@ -252,8 +229,30 @@ public class AstrixApiProviderTest {
 		}
 	}
 	
+	public interface PingAndReversePingServiceApi {
+
+		@AstrixConfigLookup("pingServiceUri")
+		@AstrixQualifier("ping")
+		@Service
+		PingService pingLib();
+
+		@AstrixConfigLookup("reversePingServiceUri")
+		@AstrixQualifier("reverse-ping")
+		@Service
+		PingService reversePingLib();
+	}
+	
 	@AstrixApiProvider(PingAndReversePingServiceApi.class)
 	public static class PingAndReversePingServiceProvider {
+	}
+	
+	public interface PingServiceAndLibraryApi {
+		@Library
+		PingLib pingLib();
+		
+		@AstrixConfigLookup("pingServiceUri")
+		@Service
+		PingService pingService();
 	}
 	
 	@AstrixApiProvider(PingServiceAndLibraryApi.class)
