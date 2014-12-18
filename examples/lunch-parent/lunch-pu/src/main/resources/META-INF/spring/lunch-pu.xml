@@ -16,7 +16,7 @@
     
     <!-- Astrix service framework (provider and consumer) -->
 	<bean id="astrixFrameworkBean" class="com.avanza.astrix.spring.AstrixFrameworkBean">
-		<property name="serviceDescriptor" value="lunch.pu.LunchApplicationDescriptor"/>
+		<property name="applicationDescriptor" value="lunch.pu.LunchApplicationDescriptor"/>
 		<property name="subsystem" value="lunch-service"/>
 		<property name="externalConfigUri" value="${externalConfigUri}"/>
 	</bean>

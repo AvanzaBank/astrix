@@ -11,7 +11,7 @@
 	<os-core:giga-space id="gigaSpace" space="space" />
 
 	<bean class="com.avanza.astrix.spring.AstrixFrameworkBean">
-		<property name="serviceDescriptor"
+		<property name="applicationDescriptor"
 			value="com.avanza.astrix.service.registry.pu.AstrixServiceRegistryApplicationDescriptor" />
 		<property name="settings">
 			<map>

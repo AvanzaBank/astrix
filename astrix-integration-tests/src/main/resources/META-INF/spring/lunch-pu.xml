@@ -16,7 +16,7 @@
     
     <!-- Astrix service framework (provider and consumer) -->
 	<bean id="AstrixFrameworkBean" class="com.avanza.astrix.spring.AstrixFrameworkBean">
-		<property name="serviceDescriptor" value="com.avanza.astrix.integration.tests.domain.pu.LunchApplicationDescriptor"/>
+		<property name="applicationDescriptor" value="com.avanza.astrix.integration.tests.domain.pu.LunchApplicationDescriptor"/>
 		<property name="subsystem" value="lunch-system"/>
 		<property name="settings">
 			<map>

@@ -20,7 +20,7 @@
 				<value>lunch.api.provider.feeder.InternalLunchFeeder</value>
 			</list>
 		</property>
-		<property name="serviceDescriptor" value="lunch.grader.pu.LunchGradeApplicationDescriptor" />
+		<property name="applicationDescriptor" value="lunch.grader.pu.LunchGradeApplicationDescriptor" />
 		<property name="subsystem" value="lunch-service"/>
 		<property name="externalConfigUri" value="${externalConfigUri}"/>
 	</bean>
