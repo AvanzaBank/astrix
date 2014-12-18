@@ -32,13 +32,11 @@ package com.avanza.astrix.context;
 public final class AstrixFactoryBean<T> implements AstrixDecorator {
 	
 	private final AstrixFactoryBeanPlugin <T> plugin;
-	private final Class<T> beanType;
 	private final AstrixApiDescriptor apiDescriptor;
 	
 	private AstrixFactoryBean(AstrixFactoryBeanPlugin<T> factoryPlugin, AstrixApiDescriptor apiDescriptor) {
 		this.plugin = factoryPlugin;
 		this.apiDescriptor = apiDescriptor;
-		this.beanType = factoryPlugin.getBeanType();
 	}
 
 	public static <T> AstrixFactoryBean<T> stateful(AstrixFactoryBeanPlugin<T> factoryBean, AstrixApiDescriptor descriptor) {
@@ -49,14 +47,18 @@ public final class AstrixFactoryBean<T> implements AstrixDecorator {
 		return new AstrixFactoryBean<>(factoryBean, descriptor);
 	}
 
-	public T create(String optionalQualifier) {
-		return this.plugin.create(optionalQualifier);
+	public T create() {
+		return this.plugin.create();
 	}
 	
 	public Class<T> getBeanType() {
-		return this.beanType;
+		return this.plugin.getBeanKey().getBeanType();
 	}
-
+	
+	public AstrixBeanKey<T> getBeanKey() {
+		return this.plugin.getBeanKey();
+	}
+	
 	@Override
 	public Object getTarget() {
 		return plugin;

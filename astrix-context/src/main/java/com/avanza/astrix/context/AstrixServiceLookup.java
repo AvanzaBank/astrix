@@ -40,6 +40,12 @@ public class AstrixServiceLookup {
 		return impl.lookup(beanType, optionalQualifier);
 	}
 	
+	@Override
+	public String toString() {
+		return impl.toString();
+	}
+	
+	
 	private static class Impl<T extends Annotation> {
 		private AstrixServiceLookupPlugin<T> serviceLookup;
 		private T lookupInfo;
@@ -51,6 +57,11 @@ public class AstrixServiceLookup {
 
 		AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier) {
 			return serviceLookup.lookup(beanType, optionalQualifier, lookupInfo);
+		}
+
+		@Override
+		public String toString() {
+			return serviceLookup.getClass().getSimpleName() + "-" + lookupInfo;
 		}
 	}
 	

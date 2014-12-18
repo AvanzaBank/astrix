@@ -15,20 +15,21 @@
  */
 package com.avanza.astrix.service.registry.server;
 
+import com.avanza.astrix.context.AstrixBeanKey;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceProperties;
 
 class AstrixServicePropertiesBuilderHolder {
 	
-	private Class<?> exportedService;
+	private AstrixBeanKey exportedService;
 	private Class<?> asyncService;
 	private AstrixServiceComponent serviceComponent;
 	
-	public AstrixServicePropertiesBuilderHolder(AstrixServiceComponent serviceComponent, Class<?> exportedService) {
+	public AstrixServicePropertiesBuilderHolder(AstrixServiceComponent serviceComponent, AstrixBeanKey exportedServiceBeanKey) {
 		this.serviceComponent = serviceComponent;
-		this.exportedService = exportedService;
+		this.exportedService = exportedServiceBeanKey;
 		if (serviceComponent.supportsAsyncApis()) {
-			this.asyncService = loadInterfaceIfExists(exportedService.getName() + "Async");
+			this.asyncService = loadInterfaceIfExists(exportedServiceBeanKey.getBeanType().getName() + "Async");
 		}
 	}
 
@@ -49,8 +50,9 @@ class AstrixServicePropertiesBuilderHolder {
 	}
 
 	public AstrixServiceProperties exportServiceProperties() {
-		AstrixServiceProperties serviceProperties = serviceComponent.createServiceProperties(exportedService);
-		serviceProperties.setApi(exportedService);
+		AstrixServiceProperties serviceProperties = serviceComponent.createServiceProperties(exportedService.getBeanType());
+		serviceProperties.setApi(exportedService.getBeanType());
+		serviceProperties.setQualifier(exportedService.getQualifier());
 		serviceProperties.setComponent(serviceComponent.getName());
 		return serviceProperties;
 	}

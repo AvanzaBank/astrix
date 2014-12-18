@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain.apiruntime;
+package com.avanza.astrix.provider.versioning;
 
-import com.avanza.astrix.integration.tests.domain.apiruntime.feeder.LunchFeederApiDescriptor;
-import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
-import com.avanza.astrix.provider.core.AstrixService;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 
-@AstrixService(
-	apiDescriptors = {
-		LunchServiceProvider.class,
-		LunchFeederApiDescriptor.class
-	},
-	component = AstrixServiceComponentNames.GS_REMOTING
-)
-public class LunchServiceDescriptor {
+/**
+ * @author Elias Lindholm (elilin)
+ */
+@Target(value = { ElementType.TYPE })
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface Versioned {
 }
-
-

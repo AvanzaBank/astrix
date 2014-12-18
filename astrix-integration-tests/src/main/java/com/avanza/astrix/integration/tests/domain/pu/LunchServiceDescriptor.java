@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.gs;
+package com.avanza.astrix.integration.tests.domain.pu;
 
-import org.openspaces.core.GigaSpace;
+import com.avanza.astrix.integration.tests.domain.apiruntime.LunchApiProvider;
+import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.provider.core.AstrixService;
 
-import com.avanza.astrix.provider.core.AstrixServiceProvider;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
-/**
- * Provides the GigaSpace interface as a service using the service-registry. <p>
- * 
- * @author Elias Lindholm
- *
- */
-@AstrixServiceRegistryLookup
-@AstrixServiceProvider(GigaSpace.class)
-public class GigaSpaceProvider {
+
+@AstrixService(
+	apiDescriptors = {
+		LunchApiProvider.class
+	},
+	component = AstrixServiceComponentNames.GS_REMOTING
+)
+public class LunchServiceDescriptor {
 }
+
+

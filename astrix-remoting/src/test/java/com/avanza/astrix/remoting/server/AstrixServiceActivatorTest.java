@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import org.junit.Test;
 
 import rx.Observable;
 
-import com.avanza.astrix.context.AstrixDirectComponent;
+import com.avanza.astrix.context.JavaSerializationSerializer;
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixRemoteResult;
@@ -54,27 +55,7 @@ import com.avanza.astrix.remoting.client.RoutingStrategy;
  */
 public class AstrixServiceActivatorTest {
 
-	
-	AstrixObjectSerializer objectSerializer = new AstrixObjectSerializer() {
-		@Override
-		public <T> T deserialize(Object element, Type type, int version) {
-			return AstrixDirectComponent.getServiceProvider(element.toString());
-		}
-
-		@Override
-		public Object serialize(Object element, int version) {
-			return register(element, element.getClass());
-		}
-
-		private <T> Object register(Object element, Class<T> type) {
-			return AstrixDirectComponent.register(type, type.cast(element));
-		}
-
-		@Override
-		public int version() {
-			return 1;
-		}
-	};
+	AstrixObjectSerializer objectSerializer = new JavaSerializationSerializer(1);
 	AstrixServiceActivator activator = new AstrixServiceActivator();
 	
 	private static class NoRoutingStrategy implements RoutingStrategy {
@@ -428,7 +409,8 @@ public class AstrixServiceActivatorTest {
 		activator.register(new Object(), objectSerializer, TestService.class);
 	}
 	
-	public static class HelloRequest {
+	@SuppressWarnings("serial")
+	public static class HelloRequest implements Serializable {
 		private String messsage;
 		
 		public HelloRequest(String messsage) {
@@ -438,7 +420,6 @@ public class AstrixServiceActivatorTest {
 		public HelloRequest() {
 		}
 		
-//		@SpaceRouting
 		public String getMesssage() {
 			return messsage;
 		}
@@ -448,7 +429,8 @@ public class AstrixServiceActivatorTest {
 		}
 	}
 	
-	public static class BroadcastRequest {
+	@SuppressWarnings("serial")
+	public static class BroadcastRequest implements Serializable {
 		private String messsage;
 		
 		public BroadcastRequest(String messsage) {
@@ -467,7 +449,8 @@ public class AstrixServiceActivatorTest {
 		}
 	}
 	
-	public static class HelloResponse {
+	@SuppressWarnings("serial")
+	public static class HelloResponse implements Serializable {
 		private String greeting;
 		
 		public HelloResponse() {

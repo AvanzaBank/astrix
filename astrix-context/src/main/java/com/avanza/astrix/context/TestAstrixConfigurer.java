@@ -102,24 +102,33 @@ public class TestAstrixConfigurer {
 	}
 	
 	private static class StandaloneFactoryBean<T> implements AstrixFactoryBeanPlugin<T> {
-		private Class<T> type;
+		private AstrixBeanKey<T> type;
 		private T instance;
 
 		public StandaloneFactoryBean(Class<T> type, T instance) {
-			this.type = type;
+			this.type = AstrixBeanKey.create(type, null);
 			this.instance = instance;
 		}
 
 		@Override
-		public T create(String optionalQualifier) {
+		public T create() {
 			return instance;
 		}
 
 		@Override
-		public Class<T> getBeanType() {
+		public AstrixBeanKey<T> getBeanKey() {
 			return type;
 		}
 		
+		@Override
+		public boolean isStateful() {
+			return false;
+		}
+		
+	}
+
+	public void enableVersioning(boolean enableVersioning) {
+		this.configurer.enableVersioning(enableVersioning);
 	}
 	
 }

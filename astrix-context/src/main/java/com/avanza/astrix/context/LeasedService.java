@@ -34,39 +34,43 @@ class LeasedService<T> implements InvocationHandler {
 	private volatile T currentInstance;
 	private volatile AstrixServiceProperties currentProperties;
 	private AstrixServiceFactory<T> serviceFactory;
-	private String qualifier;
 
 	public LeasedService(T currentInstance, 
-			String qualifier,
 			AstrixServiceProperties currentProperties,
 			AstrixServiceFactory<T> serviceFactory,
 			AstrixServiceLookup serviceLookup) {
 		this.currentInstance = currentInstance;
-		this.qualifier = qualifier;
 		this.currentProperties = currentProperties;
 		this.serviceFactory = serviceFactory;
 		this.serviceLookup = serviceLookup;
 	}
 
-	public Class<T> getBeanType() {
-		return serviceFactory.getBeanType();
+	// TODO: rename to getBeanKey
+	public AstrixBeanKey<T> getBeanType() {
+		return serviceFactory.getBeanKey();
 	}
 	
+	// TODO: rename to getBeanType
+	public Class<T> getType() {
+		return serviceFactory.getBeanKey().getBeanType();
+	}
+	
+	@Deprecated
 	public String getQualifier() {
-		return qualifier;
+		return serviceFactory.getBeanKey().getQualifier();
 	}
 
 	public void renew() {
-		AstrixServiceProperties serviceProperties = serviceLookup.lookup(getBeanType(), getQualifier());
+		AstrixServiceProperties serviceProperties = serviceLookup.lookup(getType(), getQualifier());
 		refreshServiceProperties(serviceProperties);
 	}
 
 	private void refreshServiceProperties(AstrixServiceProperties serviceProperties) {
 		if (serviceHasChanged(serviceProperties)) {
 			if (serviceProperties != null) {
-				currentInstance = serviceFactory.create(qualifier, serviceProperties);
+				currentInstance = serviceFactory.create(serviceProperties);
 			} else {
-				currentInstance = (T) Proxy.newProxyInstance(getBeanType().getClassLoader(), new Class[]{getBeanType()}, new NotRegistered());
+				currentInstance = (T) Proxy.newProxyInstance(getType().getClassLoader(), new Class[]{getType()}, new NotRegistered());
 			}
 			currentProperties = serviceProperties;
 		}
@@ -88,7 +92,7 @@ class LeasedService<T> implements InvocationHandler {
 	private class NotRegistered implements InvocationHandler {
 
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			throw new ServiceUnavailableException("Service not available in registry. type=" + getBeanType().getName() + ", qualifier=" + getQualifier());
+			throw new ServiceUnavailableException("Service not available in registry. type=" + getType().getName() + ", qualifier=" + getQualifier());
 		}
 	}
 

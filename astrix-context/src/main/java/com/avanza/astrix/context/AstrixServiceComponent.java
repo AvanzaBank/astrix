@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.context;
 
-import java.util.List;
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 
 /**
@@ -28,9 +28,9 @@ import java.util.List;
  */
 public interface AstrixServiceComponent {
 	
-	<T> T createService(AstrixApiDescriptor apiDescriptor, Class<T> type, AstrixServiceProperties serviceProperties);
+	<T> T createService(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties);
 	
-	<T> AstrixServiceProperties createServiceProperties(String serviceUri);
+	AstrixServiceProperties createServiceProperties(String serviceUri);
 	
 	<T> AstrixServiceProperties createServiceProperties(Class<T> exportedService);
 	
@@ -41,7 +41,7 @@ public interface AstrixServiceComponent {
 	 */
 	String getName();
 
-	<T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor);
+	<T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext);
 	
 	/**
 	 * Whether the api supports an async version based on the following naming
@@ -58,8 +58,15 @@ public interface AstrixServiceComponent {
 	 * @return
 	 */
 	boolean supportsAsyncApis();
-
-	List<AstrixExportedServiceInfo> getImplicitExportedServices();
-
 	
+	/**
+	 * Defines whether an instance implementing a provided api is required when invoking AstrixServiceComponent.exportService.
+	 * 
+	 * If true, Astrix will identify an instance that implements the given api and pass it to the exportService method and
+	 * never pass null. If this property is false then null will be passed to exportService.
+	 * 
+	 * @return
+	 */
+	boolean requiresProviderInstance();
+
 }

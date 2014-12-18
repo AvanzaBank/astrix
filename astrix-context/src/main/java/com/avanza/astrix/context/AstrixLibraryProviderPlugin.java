@@ -18,6 +18,7 @@ package com.avanza.astrix.context;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
@@ -36,7 +37,7 @@ public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
 		List<AstrixFactoryBeanPlugin<?>> result = new ArrayList<>();
 		for (Method m : descriptorHolder.getDescriptorClass().getMethods()) {
 			if (m.isAnnotationPresent(AstrixExport.class)) {
-				result.add(new AstrixLibraryFactory<>(libraryProviderInstance, m));
+				result.add(new AstrixLibraryFactory<>(libraryProviderInstance, m, null));
 			}
 		}
 		return result;
@@ -51,25 +52,14 @@ public class AstrixLibraryProviderPlugin implements AstrixApiProviderPlugin {
 		return AstrixLibraryProvider.class;
 	}
 	
-	@Override
-	public boolean hasStatefulBeans() {
-		return false;
-	}
-	
 	@AstrixInject
 	public void setInstanceCache(ObjectCache instanceCache) {
 		this.instanceCache = instanceCache;
 	}
 	
 	@Override
-	public List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor) {
-		List<Class<?>> result = new ArrayList<>();
-		for (Method m : descriptor.getDescriptorClass().getMethods()) {
-			if (m.isAnnotationPresent(AstrixExport.class)) {
-				result.add(m.getReturnType());
-			}
-		}
-		return result;
+	public List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiDescriptor descriptor) {
+		return Collections.emptyList();
 	}
 	
 }

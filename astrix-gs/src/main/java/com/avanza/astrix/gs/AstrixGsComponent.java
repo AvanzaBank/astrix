@@ -15,26 +15,20 @@
  */
 package com.avanza.astrix.gs;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
-import com.avanza.astrix.context.AstrixApiDescriptor;
 import com.avanza.astrix.context.AstrixContextImpl;
-import com.avanza.astrix.context.AstrixExportedServiceInfo;
 import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
 import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixPlugins;
 import com.avanza.astrix.context.AstrixPluginsAware;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceProperties;
-import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.FaultToleranceSpecification;
 import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
 /**
  * Service component allowing GigaSpace clustered proxy to be used as a service. 
@@ -49,7 +43,7 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 	private AstrixContextImpl astrixContext;
 	
 	@Override
-	public <T> T createService(AstrixApiDescriptor apiDescriptor, Class<T> type, AstrixServiceProperties serviceProperties) {
+	public <T> T createService(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
 		if (!GigaSpace.class.isAssignableFrom(type)) {
 			throw new IllegalStateException("Programming error, attempted to create: " + type);
 		}
@@ -61,7 +55,7 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 	}
 
 	@Override
-	public <T> AstrixServiceProperties createServiceProperties(String serviceUri) {
+	public AstrixServiceProperties createServiceProperties(String serviceUri) {
 		return GsBinder.createServiceProperties(serviceUri);
 	}
 
@@ -73,16 +67,13 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 	
 
 	@Override
-	public <T> void exportService(Class<T> providedApi, T provider, AstrixApiDescriptor apiDescriptor) {
+	public <T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext) {
 		// Intentionally empty
 	}
 	
 	@Override
-	public List<AstrixExportedServiceInfo> getImplicitExportedServices() {
-		if (!astrixContext.getSettings().getBoolean(AstrixSettings.EXPORT_GIGASPACE, true)) {
-			return Collections.emptyList();
-		}
-		return Arrays.asList(new AstrixExportedServiceInfo(GigaSpace.class, AstrixApiDescriptor.create(GigaSpaceProvider.class), getName(), null));
+	public boolean requiresProviderInstance() {
+		return false;
 	}
 	
 	@Override

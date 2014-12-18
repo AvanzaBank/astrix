@@ -27,17 +27,19 @@ import java.util.concurrent.ConcurrentMap;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixApiProvider {
+final class AstrixApiProvider {
 	
-	private final ConcurrentMap<Class<?>, AstrixFactoryBean<?>> factoryByProvidedType = new ConcurrentHashMap<>();
+	private final ConcurrentMap<AstrixBeanKey<?>, AstrixFactoryBean<?>> factoryByProvidedType = new ConcurrentHashMap<>();
 	
 	public AstrixApiProvider(List<AstrixFactoryBean<?>> factories, AstrixApiDescriptor descriptorHolder) {
 		for (AstrixFactoryBean<?> factory : factories) {
-			AstrixFactoryBean<?> previous = this.factoryByProvidedType.putIfAbsent(factory.getBeanType(), factory);
+			AstrixFactoryBean<?> previous = this.factoryByProvidedType.putIfAbsent(factory.getBeanKey(), factory);
 			if (previous != null) {
 				throw new IllegalArgumentException(
-						String.format("Duplicate bean factories found. type=%s descriptor=%s",
-								factory.getBeanType().getName(), descriptorHolder.getName()));
+						String.format("Duplicate bean factories found. bean=%s descriptorA=%s, descriptorB=%s",
+								factory.getBeanKey(), 
+								factory.getApiDescriptor(),
+								previous.getApiDescriptor()));
 			}
 		}
 	}
@@ -48,13 +50,13 @@ public class AstrixApiProvider {
 	 * 
 	 * @return
 	 */
-	public Collection<Class<?>> providedApis() {
+	public Collection<AstrixBeanKey<?>> providedApis() {
 		return this.factoryByProvidedType.keySet();
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> AstrixFactoryBean<T> getFactory(Class<T> type) {
-		return (AstrixFactoryBean<T>) this.factoryByProvidedType.get(type);
+	public <T> AstrixFactoryBean<T> getFactory(AstrixBeanKey<T> beanKey) {
+		return (AstrixFactoryBean<T>) this.factoryByProvidedType.get(beanKey);
 	}
 
 }

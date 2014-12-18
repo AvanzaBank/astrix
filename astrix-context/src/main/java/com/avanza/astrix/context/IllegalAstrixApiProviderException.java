@@ -15,34 +15,17 @@
  */
 package com.avanza.astrix.context;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public final class AstrixEventLogger implements AstrixPluginsAware {
-	
-	private final List<AstrixEventLoggerPlugin> eventLoggers = new CopyOnWriteArrayList<>();
-	
-	public AstrixEventLogger() {
-	}
-	
-	public AstrixEventLogger(AstrixEventLoggerPlugin... loggers) {
-		this.eventLoggers.addAll(Arrays.asList(loggers));
-	}
-	
-	public void increment(String event) {
-		for (AstrixEventLoggerPlugin eventLogger : eventLoggers) {
-			eventLogger.increment(event);
-		}
-	}
+public class IllegalAstrixApiProviderException extends RuntimeException {
 
-	@Override
-	public void setPlugins(AstrixPlugins plugins) {
-		this.eventLoggers.addAll(plugins.getPlugins(AstrixEventLoggerPlugin.class));
+	private static final long serialVersionUID = 1L;
+
+	public IllegalAstrixApiProviderException(String msg) {
+		super(msg);
 	}
 
 }

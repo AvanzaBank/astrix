@@ -38,7 +38,7 @@ public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupPlu
 
 	@Override
 	public AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier, AstrixServiceRegistryLookup lookupAnnotation) {
-		AstrixServiceRegistryClient serviceRegistryClient = beans.getBean(AstrixServiceRegistryClient.class);
+		AstrixServiceRegistryClient serviceRegistryClient = beans.getBean(AstrixBeanKey.create(AstrixServiceRegistryClient.class, null));
 		return serviceRegistryClient.lookup(beanType, optionalQualifier);
 	}
 
@@ -48,8 +48,8 @@ public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupPlu
 	}
 
 	@Override
-	public List<AstrixBeanKey> getBeanDependencies() {
-		return Arrays.asList(AstrixBeanKey.create(AstrixServiceRegistryClient.class, null));
+	public List<AstrixBeanKey<? extends Object>> getBeanDependencies() {
+		return Arrays.<AstrixBeanKey<?>>asList(AstrixBeanKey.create(AstrixServiceRegistryClient.class, null));
 	}
 
 	@Override

@@ -13,14 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.provider.core;
 
-public class MissingExternalDependencyException extends RuntimeException {
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-	private static final long serialVersionUID = 1L;
+
+/**
+ * @author Elias Lindholm (elilin)
+ */
+@Target(value = { ElementType.METHOD})
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface Service {
+
+	/**
+	 * Optional service component name. If set
+	 * this will be the service-component used
+	 * to export the service from a server. <p>
+	 * 
+	 * @return
+	 */
+	String value() default "";
 	
-	public MissingExternalDependencyException(Class<?> type) {
-		super("Missing external dependency: " + type.getName());
-	}
-
 }

@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.integration.tests.common;
 
-import java.util.List;
-/**
- * The bean aware interface allows "Astrix-plugin-instances" to depend on
- * Astrix-managed-beans, ie api-elements hooked into Astrix. <p> 
- * 
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface AstrixBeanAware {
+import org.openspaces.remoting.Routing;
+
+public interface Ping {
 	
-	List<AstrixBeanKey<? extends Object>> getBeanDependencies();
-	
-	void setAstrixBeans(AstrixBeans beans);
+	String ping(@Routing String msg);
 
 }

@@ -17,17 +17,18 @@ package com.avanza.astrix.context;
 
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixObjectSerializer.NoVersioningSupport;
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 
 public interface AstrixVersioningPlugin {
 	
-	public AstrixObjectSerializer create(AstrixApiDescriptor descriptor);
+	public AstrixObjectSerializer create(ServiceVersioningContext versioningContext);
 	
 	public static class Default {
 		public static AstrixVersioningPlugin create() {
 			return new AstrixVersioningPlugin() {
 				@Override
-				public AstrixObjectSerializer create(AstrixApiDescriptor AstrixApiDescriptor) {
+				public AstrixObjectSerializer create(ServiceVersioningContext AstrixApiDescriptor) {
 					return new NoVersioningSupport();
 				}
 			};

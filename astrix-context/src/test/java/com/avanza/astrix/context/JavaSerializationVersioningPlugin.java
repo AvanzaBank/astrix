@@ -15,19 +15,18 @@
  */
 package com.avanza.astrix.context;
 
-import java.util.List;
-/**
- * The bean aware interface allows "Astrix-plugin-instances" to depend on
- * Astrix-managed-beans, ie api-elements hooked into Astrix. <p> 
- * 
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface AstrixBeanAware {
-	
-	List<AstrixBeanKey<? extends Object>> getBeanDependencies();
-	
-	void setAstrixBeans(AstrixBeans beans);
 
+import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
+
+public class JavaSerializationVersioningPlugin implements AstrixVersioningPlugin {
+
+	@Override
+	public AstrixObjectSerializer create(ServiceVersioningContext versioningContext) {
+		if (versioningContext.isVersioned()) {
+			return new JavaSerializationSerializer(versioningContext.version());
+		}
+		return new AstrixObjectSerializer.NoVersioningSupport();
+	}
+	
 }

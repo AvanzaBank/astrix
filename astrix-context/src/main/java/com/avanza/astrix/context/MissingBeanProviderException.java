@@ -24,8 +24,8 @@ public class MissingBeanProviderException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	public MissingBeanProviderException(Class<?> beanType) {
-		super("No provider found for bean: " + beanType.getName());
+	public MissingBeanProviderException(AstrixBeanKey<? extends Object> beanType) {
+		super("No provider found for bean: " + beanType);
 	}
 
 }

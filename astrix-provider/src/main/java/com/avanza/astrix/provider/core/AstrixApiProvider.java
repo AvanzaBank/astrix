@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.provider.core;
 
-import java.util.List;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+
 /**
- * The bean aware interface allows "Astrix-plugin-instances" to depend on
- * Astrix-managed-beans, ie api-elements hooked into Astrix. <p> 
- * 
- * 
  * @author Elias Lindholm (elilin)
- *
  */
-public interface AstrixBeanAware {
-	
-	List<AstrixBeanKey<? extends Object>> getBeanDependencies();
-	
-	void setAstrixBeans(AstrixBeans beans);
+@Target(value = { ElementType.TYPE})
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface AstrixApiProvider {
 
+	Class<?>[] value();
+	
 }

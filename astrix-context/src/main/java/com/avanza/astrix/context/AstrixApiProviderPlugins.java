@@ -40,10 +40,10 @@ public class AstrixApiProviderPlugins {
 		}
 	}
 	
-	public List<Class<?>> getExportedBeans(AstrixApiDescriptor descriptor) {
-		AstrixApiProviderPlugin providerFactoryPlugin = getProviderPlugin(descriptor);
-		List<Class<?>> result = new ArrayList<>();
-		result.addAll(providerFactoryPlugin.getProvidedBeans(descriptor));
+	public List<AstrixServiceBeanDefinition> getExportedServices(AstrixApiDescriptor descriptor) {
+		AstrixApiProviderPlugin apiProviderPlugin = getProviderPlugin(descriptor);
+		List<AstrixServiceBeanDefinition> result = new ArrayList<>();
+		result.addAll(apiProviderPlugin.getProvidedServices(descriptor));
 		return result;
 	}
 	
@@ -55,5 +55,5 @@ public class AstrixApiProviderPlugins {
 		}
 		throw new IllegalArgumentException("No plugin registered that can handle descriptor: " + descriptor);
 	}
-
+	
 }

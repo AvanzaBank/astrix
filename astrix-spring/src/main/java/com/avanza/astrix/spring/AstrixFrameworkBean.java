@@ -172,7 +172,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 			return; // current application exports no services
 		}
 		AstrixServiceExporter serviceExporter = astrixContext.getInstance(AstrixServiceExporter.class);
-		serviceExporter.setSericeDescriptor(serviceDescriptor); // TODO This is a hack. Avoid setting serviceDescriptor explicitly here
+		serviceExporter.setServiceDescriptor(serviceDescriptor); // TODO This is a hack. Avoid setting serviceDescriptor explicitly here
 		serviceExporter.exportProvidedServices();
 		astrixContext.getPlugin(AstrixServiceRegistryPlugin.class).startPublishServices();
 	}

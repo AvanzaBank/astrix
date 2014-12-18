@@ -26,7 +26,7 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 /**
  * @author Elias Lindholm (elilin)
  */
-@Target(value = { ElementType.TYPE })
+@Target(value = { ElementType.TYPE})
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
 public @interface AstrixServiceComponentName {

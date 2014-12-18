@@ -13,9 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.provider.core;
 
-public interface AstrixEventLoggerPlugin {
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-	void increment(String event);
+
+/**
+ * @author Elias Lindholm (elilin)
+ */
+@Target(value = { ElementType.METHOD})
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface Library {
+	
 }

@@ -17,25 +17,33 @@ package com.avanza.astrix.integration.tests.domain.apiruntime;
 
 import org.openspaces.core.GigaSpace;
 
+import com.avanza.astrix.integration.tests.domain.api.LunchApi;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.api.LunchStatistics;
 import com.avanza.astrix.integration.tests.domain.api.LunchUtil;
+import com.avanza.astrix.integration.tests.domain.apiruntime.feeder.InternalLunchApi;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.library.AstrixExport;
-import com.avanza.astrix.provider.library.AstrixLibraryProvider;
+import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 
-@AstrixLibraryProvider
-public class LunchLibraryProvider {
+@AstrixObjectSerializerConfig(
+	version = 2,
+	objectSerializerConfigurer = LunchApiObjectSerializerConfigurer.class
+)
+@AstrixApiProvider({
+	LunchApi.class, 
+	InternalLunchApi.class
+})
+public class LunchApiProvider {
 
 	@AstrixExport
-	public LunchUtil createLunchUtil(LunchService lunchService) {
+	public LunchUtil lunchUtil(LunchService lunchService) {
 		return new LunchUtilImpl(lunchService);
 	}
 	
-	// This will only be allowed to be used within the same subsystem
 	@AstrixExport
 	public LunchStatistics createLunchGraderUtil(@AstrixQualifier("lunch-space") GigaSpace lunchSpaceProxy) {
 		return new LunchStatisticsImpl(lunchSpaceProxy);
 	}
-	
 }

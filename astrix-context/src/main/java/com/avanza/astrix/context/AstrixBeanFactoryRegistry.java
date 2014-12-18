@@ -27,33 +27,33 @@ import org.slf4j.LoggerFactory;
  */
 public class AstrixBeanFactoryRegistry {
 	
-	private final ConcurrentMap<Class<?>, AstrixFactoryBean<?>> factoryByBeanType = new ConcurrentHashMap<>();
+	private final ConcurrentMap<AstrixBeanKey<?>, AstrixFactoryBean<?>> factoryByBeanType = new ConcurrentHashMap<>();
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	@SuppressWarnings("unchecked")
-	public <T> AstrixFactoryBean<T> getFactoryBean(Class<T> beanType) {
-		AstrixFactoryBean<T> factoryBean = (AstrixFactoryBean<T>) this.factoryByBeanType.get(beanType);
+	public <T> AstrixFactoryBean<T> getFactoryBean(AstrixBeanKey<T>  beanKey) {
+		AstrixFactoryBean<T> factoryBean = (AstrixFactoryBean<T>) this.factoryByBeanType.get(beanKey);
 		if (factoryBean == null) {
-			throw new IllegalStateException(String.format("No providers found for beanType=%s",
-				 		  beanType.getName())); 
+			throw new IllegalStateException(String.format("No providers found for bean=%s",
+				 		  								  beanKey)); 
 		}
 		return factoryBean;
 	}
 	
 	public <T> void registerFactory(AstrixFactoryBean<T> factory) {
-		Class<T> providedApi = factory.getBeanType();
+		AstrixBeanKey<T> providedApi = factory.getBeanKey();
 		AstrixFactoryBean<?> duplicateFactory = factoryByBeanType.putIfAbsent(providedApi, factory);
-		log.debug("Registering provider: api={} provider={}", providedApi.getName(), factory.getApiDescriptor().getName());
+		log.debug("Registering provider: bean={} provider={}", providedApi, factory.getApiDescriptor().getName());
 		if (duplicateFactory != null) {
 			throw new IllegalStateException(String.format("Multiple providers discovered for api=%s. %s and %s",
-												 		  providedApi.getName(), 
+												 		  providedApi, 
 												 		  factory.getApiDescriptor().getName(), 
 												 		  duplicateFactory.getApiDescriptor().getName()));
 		}
 	}
 
-	public boolean hasBeanFactoryFor(Class<?> beanType) {
-		return this.factoryByBeanType.containsKey(beanType);
+	public boolean hasBeanFactoryFor(AstrixBeanKey<? extends Object> beanKey) {
+		return this.factoryByBeanType.containsKey(beanKey);
 	}
 
 }

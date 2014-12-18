@@ -34,15 +34,13 @@ public class StatefulAstrixBean<T> implements InvocationHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(StatefulAstrixBean.class);
 	private final AstrixFactoryBeanPlugin<T> beanFactory;
-	private final String optionalQualifier;
 	private volatile InvocationHandler state;
 	private static final AtomicInteger nextId = new AtomicInteger(0);
 	private final String id = nextId.incrementAndGet() + ""; // Used for debugging to distinguish between many context's started within same jvm.
 	private final EventBus eventBus;
 	
-	StatefulAstrixBean(AstrixFactoryBeanPlugin<T> beanFactory, String optionalQualifier, EventBus eventBus) {
+	StatefulAstrixBean(AstrixFactoryBeanPlugin<T> beanFactory, EventBus eventBus) {
 		this.beanFactory = beanFactory;
-		this.optionalQualifier = optionalQualifier;
 		this.eventBus = eventBus;
 		this.state = new Unbound();
 	}
@@ -61,22 +59,22 @@ public class StatefulAstrixBean<T> implements InvocationHandler {
 	}
 
 	public void bind() {
-		T bean = this.beanFactory.create(optionalQualifier);
+		T bean = this.beanFactory.create();
 		this.state = new Bound(bean);
-		AstrixBeanKey beanKey = AstrixBeanKey.create(beanFactory.getBeanType(), optionalQualifier);
+		AstrixBeanKey<T> beanKey = beanFactory.getBeanKey();
 		this.eventBus.fireEvent(new AstrixBeanStateChangedEvent(beanKey, AstrixBeanState.BOUND));
 		log.info("Successfully bound to " + beanKey + ", AstrixBeanId=" + id);
 	}
 	
 	public void rebind() {
-		T bean = this.beanFactory.create(optionalQualifier);
+		T bean = this.beanFactory.create();
 		this.state = new Bound(bean);
-		log.info("Successfully rebound to " + beanFactory.getBeanType() + ", AstrixBeanId=" + id);
+		log.info("Successfully rebound to " + beanFactory.getBeanKey() + ", AstrixBeanId=" + id);
 	}
 	
 	@Override
 	public String toString() {
-		return "StatefulAsterixBean[" + this.beanFactory.getBeanType().getName() + "]";
+		return "StatefulAsterixBean[" + this.beanFactory.getBeanKey() + "]";
 	}
 	
 
@@ -111,7 +109,7 @@ public class StatefulAstrixBean<T> implements InvocationHandler {
 			if (method.getDeclaringClass().equals(Object.class)) {
 				return method.invoke(StatefulAstrixBean.this, args);
 			}
-			throw new ServiceUnavailableException("AstrixBeanId=" + id + " beanType="+ beanFactory.getBeanType().getName() + " qualifier=" + optionalQualifier);
+			throw new ServiceUnavailableException("AstrixBeanId=" + id + " bean="+ beanFactory.getBeanKey());
 		}
 	}
 

@@ -31,6 +31,7 @@ import org.openspaces.core.GigaSpace;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixSettings;
+import com.avanza.astrix.context.IllegalSubsystemException;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
@@ -65,6 +66,7 @@ public class ClusteredProxyLibraryTest {
 	
 	private LunchService lunchService;
 
+	private AstrixConfigurer configurer = new AstrixConfigurer();
 	private AstrixContext astrix;
 	
 	static {
@@ -78,22 +80,31 @@ public class ClusteredProxyLibraryTest {
 		GigaSpace proxy = lunchPu.getClusteredGigaSpace();
 		proxy.clear(null);
 		
-		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.enableFaultTolerance(true);
 		configurer.enableVersioning(true);
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1000);
 		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, config.getExternalConfigUri());
-		configurer.setSubsystem("lunch-system");
-		astrix = configurer.configure();
-		this.lunchService = astrix.waitForBean(LunchService.class, 10000);
 	}
 	
 	
 	@Test
 	public void aClusteredProxyIsConsumableUsingTheServiceRegistryFromTheSameSubsystem() throws Exception {
+		configurer.setSubsystem("lunch-system");
+		astrix = configurer.configure();
+		this.lunchService = astrix.waitForBean(LunchService.class, 10000);
+		
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		
 		assertEquals(1, astrix.getBean(LunchStatistics.class).getRestaurantCount());
+	}
+	
+	
+	@Test(expected = IllegalSubsystemException.class)
+	public void aClusteredProxyIsNotConsumableFromAnotherSubsystem() throws Exception {
+		configurer.setSubsystem("another-subsystem");
+		astrix = configurer.configure();
+		
+		astrix.getBean(LunchStatistics.class).getRestaurantCount();
 	}
 
 }

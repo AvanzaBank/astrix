@@ -16,8 +16,7 @@
 package com.avanza.astrix.context;
 
 import java.lang.annotation.Annotation;
-
-import com.avanza.astrix.provider.versioning.AstrixVersioned;
+import java.util.Objects;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -45,8 +44,6 @@ public abstract class AstrixApiDescriptor {
 	public final String toString() {
 		return getName();
 	}
-	
-	public abstract boolean isVersioned();
 	
 	private static class SimpleApiDescriptor extends AstrixApiDescriptor {
 
@@ -77,10 +74,22 @@ public abstract class AstrixApiDescriptor {
 		}
 
 		@Override
-		public boolean isVersioned() {
-			return false;
+		public int hashCode() {
+			return Objects.hash(name);
 		}
 
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			SimpleApiDescriptor other = (SimpleApiDescriptor) obj;
+			return Objects.equals(name, other.name);
+		}
+		
 	}
 	
 	private static class AnnotationApiDescriptor extends AstrixApiDescriptor {
@@ -106,8 +115,22 @@ public abstract class AstrixApiDescriptor {
 			return descriptorHolder;
 		}
 		
-		public boolean isVersioned() {
-			return descriptorHolder.isAnnotationPresent(AstrixVersioned.class);
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(descriptorHolder);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			AnnotationApiDescriptor other = (AnnotationApiDescriptor) obj;
+			return Objects.equals(descriptorHolder, other.descriptorHolder);
 		}
 		
 	}

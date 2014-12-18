@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.context;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -75,11 +76,19 @@ public class AstrixConfigurer {
 		}
 		String basePackage = context.getSettings().getString(AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, "");
 		if (basePackage.trim().isEmpty()) {
-			return new AstrixApiDescriptorScanner();
+			return new AstrixApiDescriptorScanner(getAllDescriptorAnnotationsTypes(), "com.avanza.astrix"); // Always scan com.avanza.astrix package
 		}
-		return new AstrixApiDescriptorScanner(basePackage.split(","));
+		return new AstrixApiDescriptorScanner(getAllDescriptorAnnotationsTypes(), "com.avanza.astrix", basePackage.split(","));
 	}
 	
+	private List<Class<? extends Annotation>> getAllDescriptorAnnotationsTypes() {
+		List<Class<? extends Annotation>> result = new ArrayList<>();
+		for (AstrixApiProviderPlugin plugin : AstrixPluginDiscovery.discoverAllPlugins(AstrixApiProviderPlugin.class)) {
+			result.add(plugin.getProviderAnnotationType());
+		}
+		return result;
+	}
+
 	public void setBasePackage(String basePackage) {
 		 this.settings.set(AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, basePackage);
 	}
@@ -123,11 +132,9 @@ public class AstrixConfigurer {
 		}
 	}
 	
-	private static <T> T discoverOnePlugin(AstrixContextImpl context, Class<T> type) {
-		T provider = AstrixPluginDiscovery.discoverOnePlugin(type);
+	private static <T> void discoverOnePlugin(AstrixContextImpl context, Class<T> type) {
+		T provider = context.getPlugin(type);
 		log.debug("Found plugin for {}, using {}", type.getName(), provider.getClass().getName());
-		context.registerPlugin(type, provider);
-		return provider;
 	}
 
 	// package private. Used for internal testing only
@@ -137,7 +144,7 @@ public class AstrixConfigurer {
 	
 	// package private. Used for internal testing only
 	<T> void registerPlugin(Class<T> c, T provider) {
-		plugins .add(new PluginHolder<>(c, provider));
+		plugins.add(new PluginHolder<>(c, provider));
 	}
 
 	public void set(String settingName, long value) {

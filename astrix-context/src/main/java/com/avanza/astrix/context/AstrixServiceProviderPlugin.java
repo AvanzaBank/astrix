@@ -17,74 +17,74 @@ package com.avanza.astrix.context;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.provider.core.AstrixServiceProvider;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
+import com.avanza.astrix.provider.versioning.AstrixVersioned;
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 @MetaInfServices(AstrixApiProviderPlugin.class)
-public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin, AstrixSettingsAware {
+public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin {
 	
-	private AstrixServiceComponents serviceComponents;
 	private AstrixServiceLookupFactory serviceLookupFactory;
-	private AstrixServiceLeaseManager leaseManager;
-	private AstrixSettingsReader settings;
+	private AstrixServiceMetaFactory serviceMetaFactory;
 
 	@Override
 	public List<AstrixFactoryBeanPlugin<?>> createFactoryBeans(AstrixApiDescriptor descriptor) {
 		List<AstrixFactoryBeanPlugin<?>> result = new ArrayList<>();
-		for (Class<?> exportedApi : getProvidedBeans(descriptor)) {
+		ServiceVersioningContext versioningContext = createVersioningContext(descriptor, null);
+		for (AstrixServiceBeanDefinition serviceBeanDefinition : getProvidedBeans(descriptor)) {
 			AstrixServiceLookup serviceLookup = getLookupStrategy(descriptor);
-			result.add(new AstrixServiceFactory<>(descriptor, exportedApi, serviceLookup, serviceComponents, leaseManager, settings));
-			Class<?> asyncInterface = loadInterfaceIfExists(exportedApi.getName() + "Async");
+			Class<?> beanType = serviceBeanDefinition.getBeanKey().getBeanType();
+			result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, AstrixBeanKey.create(beanType, null)));
+			Class<?> asyncInterface = serviceMetaFactory.loadInterfaceIfExists(beanType.getName() + "Async");
 			if (asyncInterface != null) {
-				result.add(new AstrixServiceFactory<>(descriptor, asyncInterface, serviceLookup, serviceComponents, leaseManager, settings));
+				result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, AstrixBeanKey.create(asyncInterface, null)));
 			}
 		}
 		return result;
 	}
 
-	private AstrixServiceLookup getLookupStrategy(AstrixApiDescriptor descriptor) {
-		return serviceLookupFactory.createServiceLookup(descriptor);
+	private ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, Class<?> api) {
+		if (descriptor.isAnnotationPresent(AstrixVersioned.class)) {
+			return ServiceVersioningContext.versionedService(descriptor.getAnnotation(AstrixVersioned.class));
+		}
+		return ServiceVersioningContext.nonVersioned();
 	}
 
+	private AstrixServiceLookup getLookupStrategy(AstrixApiDescriptor descriptor) {
+		return serviceLookupFactory.createServiceLookup(descriptor.getDescriptorClass());
+	}
+	
+	private boolean usesServiceRegistry(AstrixApiDescriptor descriptor) { 
+		return serviceLookupFactory.getLookupStrategy(descriptor.getDescriptorClass()).equals(AstrixServiceRegistryLookup.class);
+	}
+
+	private List<AstrixServiceBeanDefinition> getProvidedBeans(AstrixApiDescriptor descriptor) {
+		return getProvidedServices(descriptor);
+	}
+	
 	@Override
-	public List<Class<?>> getProvidedBeans(AstrixApiDescriptor descriptor) {
-		Class<?>[] providedServices = descriptor.getAnnotation(AstrixServiceProvider.class).value();
-		return Arrays.asList(providedServices);
+	public List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiDescriptor descriptor) {
+		List<AstrixServiceBeanDefinition> result = new ArrayList<>();
+		for (Class<?> providedService : descriptor.getAnnotation(AstrixServiceProvider.class).value()) {
+			AstrixBeanKey<?> beanKey = AstrixBeanKey.create(providedService, null);
+			boolean usesServiceRegistry = usesServiceRegistry(descriptor);
+			result.add(new AstrixServiceBeanDefinition(beanKey, createVersioningContext(descriptor, providedService), usesServiceRegistry, null));
+		}
+		return result;
 	}
 
 	@Override
 	public Class<? extends Annotation> getProviderAnnotationType() {
 		return AstrixServiceProvider.class;
-	}
-
-	@Override
-	public boolean hasStatefulBeans() {
-		return true;
-	}
-
-	private Class<?> loadInterfaceIfExists(String interfaceName) {
-		try {
-			Class<?> c = Class.forName(interfaceName);
-			if (c.isInterface()) {
-				return c;
-			}
-		} catch (ClassNotFoundException e) {
-			// fall through and return null
-		}
-		return null;
-	}
-	
-	@AstrixInject
-	public void setServiceComponents(AstrixServiceComponents serviceComponents) {
-		this.serviceComponents = serviceComponents;
 	}
 	
 	@AstrixInject
@@ -93,13 +93,8 @@ public class AstrixServiceProviderPlugin implements AstrixApiProviderPlugin, Ast
 	}
 	
 	@AstrixInject
-	public void setLeaseManager(AstrixServiceLeaseManager leaseManager) {
-		this.leaseManager = leaseManager;
+	public void setServiceMetaFactory(AstrixServiceMetaFactory serviceMetaFactory) {
+		this.serviceMetaFactory = serviceMetaFactory;
 	}
-
-	@Override
-	public void setSettings(AstrixSettingsReader settings) {
-		this.settings = settings;
-	}
-
+	
 }
