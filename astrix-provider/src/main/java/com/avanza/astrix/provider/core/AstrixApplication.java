@@ -24,15 +24,19 @@ import java.lang.annotation.Target;
 /**
  * 
  * @author Elias Lindholm (elilin)
- * @deprecated replaced by {@link AstrixApplication}
  *
  */
 @Target(value = { ElementType.TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
-@Deprecated
-public @interface AstrixService {
+public @interface AstrixApplication {
 	
+	/**
+	 * All provided apis by this application. Only
+	 * services are considered. <p>
+	 * 
+	 * @return
+	 */
 	Class<?>[] apiDescriptors();
 
 	/**

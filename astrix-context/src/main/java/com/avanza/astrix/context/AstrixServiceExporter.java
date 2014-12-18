@@ -25,7 +25,7 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 /**
  * Server side component used to export all services provided by a given server as defined by
- * an {@link AstrixServiceDescriptor}. <p>
+ * an {@link AstrixApplicationDescriptor}. <p>
  * 
  * @author Elias Lindholm (elilin)
  *
@@ -33,7 +33,7 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 public class AstrixServiceExporter {
 	
 	private AstrixServiceComponents serviceComponents;
-	private AstrixServiceDescriptor serviceDescriptor;
+	private AstrixApplicationDescriptor serviceDescriptor;
 	private final Collection<AstrixServiceBeanDefinition> serviceBeanDefinitions = new CopyOnWriteArrayList<>();
 	private AstrixContextImpl astrixContext;
 	private final ConcurrentMap<Class<?>, Object> serviceProviderByType = new ConcurrentHashMap<>();
@@ -64,7 +64,7 @@ public class AstrixServiceExporter {
 		}
 	}
 
-	public void setServiceDescriptor(AstrixServiceDescriptor serviceDescriptor) {
+	public void setServiceDescriptor(AstrixApplicationDescriptor serviceDescriptor) {
 		this.serviceDescriptor = serviceDescriptor;		// TODO: How to inject service descriptor??? 
 		for (AstrixApiDescriptor apiDescriptor : serviceDescriptor.getApiDescriptors()) {
 			this.serviceBeanDefinitions.addAll(astrixContext.getExportedServices(apiDescriptor));

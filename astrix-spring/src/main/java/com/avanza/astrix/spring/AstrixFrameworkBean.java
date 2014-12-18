@@ -36,7 +36,7 @@ import org.springframework.context.event.ContextStoppedEvent;
 
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContextImpl;
-import com.avanza.astrix.context.AstrixServiceDescriptor;
+import com.avanza.astrix.context.AstrixApplicationDescriptor;
 import com.avanza.astrix.context.AstrixServiceExporter;
 import com.avanza.astrix.context.AstrixServiceRegistryPlugin;
 import com.avanza.astrix.context.AstrixSettings;
@@ -73,7 +73,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	private List<Class<?>> consumedAstrixBeans = new ArrayList<>();
 	private String subsystem;
 	private Map<String, String> settings = new HashMap<>();
-	private AstrixServiceDescriptor serviceDescriptor;
+	private AstrixApplicationDescriptor serviceDescriptor;
 	private AstrixContextImpl astrixContext;
 	
 	public AstrixFrameworkBean() {
@@ -113,7 +113,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	 * @param serviceDescriptor
 	 */
 	public void setServiceDescriptor(Class<?> serviceDescriptorHolder) {
-		this.serviceDescriptor = AstrixServiceDescriptor.create(serviceDescriptorHolder);
+		this.serviceDescriptor = AstrixApplicationDescriptor.create(serviceDescriptorHolder);
 	}
 	
 	/**
