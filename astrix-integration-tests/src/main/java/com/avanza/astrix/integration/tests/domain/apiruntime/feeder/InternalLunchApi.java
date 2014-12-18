@@ -17,13 +17,14 @@ package com.avanza.astrix.integration.tests.domain.apiruntime.feeder;
 
 import org.openspaces.core.GigaSpace;
 
+import com.avanza.astrix.integration.tests.common.Ping;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Service;
 
 
 
-public interface LunchFeederApi {
+public interface InternalLunchApi {
 	
 	@Service
 	InternalLunchFeeder internalLunchFeeder();
@@ -31,6 +32,7 @@ public interface LunchFeederApi {
 	@AstrixQualifier("lunch-space")
 	@Service(AstrixServiceComponentNames.GS)
 	GigaSpace gigaSpace();
+	
 }
 
 

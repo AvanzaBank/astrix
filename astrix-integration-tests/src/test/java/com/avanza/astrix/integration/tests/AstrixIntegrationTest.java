@@ -42,6 +42,7 @@ import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.IllegalSubsystemException;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
+import com.avanza.astrix.integration.tests.common.Ping;
 import com.avanza.astrix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
@@ -108,6 +109,8 @@ public class AstrixIntegrationTest {
 	private AstrixContext astrix;
 	private AstrixServiceRegistryClient serviceRegistryClient;
 
+	private Ping lunchPing;
+
 	static {
 		BasicConfigurator.configure();
 		Logger.getRootLogger().setLevel(Level.WARN);
@@ -132,6 +135,7 @@ public class AstrixIntegrationTest {
 		this.asyncLunchService = astrix.getBean(LunchServiceAsync.class);
 		this.publicLunchFeeder = astrix.getBean(PublicLunchFeeder.class);
 		this.serviceRegistryClient = astrix.getBean(AstrixServiceRegistryClient.class);
+		this.lunchPing = astrix.getBean(Ping.class, "lunch-ping");
 		astrix.waitForBean(LunchService.class, 5000);
 		astrix.waitForBean(LunchUtil.class, 5000);
 		astrix.waitForBean(LunchRestaurantGrader.class, 5000);
@@ -139,16 +143,7 @@ public class AstrixIntegrationTest {
 		astrix.waitForBean(PublicLunchFeeder.class, 5000);
 		astrix.waitForBean(AstrixServiceRegistry.class, 5000);
 		astrix.waitForBean(LunchStatistics.class, 5000);
-	}
-	
-	@Test
-	public void testPuThatConsumesAnotherService() throws Exception {
-		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
-		
-		lunchRestaurantGrader.grade("Martins Green Room", 2);
-		lunchRestaurantGrader.grade("Martins Green Room", 4);
-		
-		assertEquals(3.0, lunchRestaurantGrader.getAvarageGrade("Martins Green Room"), 0.01D);
+		astrix.waitForBean(Ping.class, "lunch-ping", 5000);
 	}
 
 	@Test
@@ -160,6 +155,21 @@ public class AstrixIntegrationTest {
 		
 		LunchRestaurant r = lunchService.getLunchRestaurant(request);
 		assertEquals("Martins Green Room", r.getName());
+	}
+	
+	@Test
+	public void requestToQualifiedService() throws Exception {
+		assertEquals("hi", lunchPing.ping("hi"));
+	}
+	
+	@Test
+	public void testPuThatConsumesAnotherService() throws Exception {
+		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
+		
+		lunchRestaurantGrader.grade("Martins Green Room", 2);
+		lunchRestaurantGrader.grade("Martins Green Room", 4);
+		
+		assertEquals(3.0, lunchRestaurantGrader.getAvarageGrade("Martins Green Room"), 0.01D);
 	}
 	
 	@Test

@@ -13,27 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain.api;
+package com.avanza.astrix.integration.tests.common;
 
-import com.avanza.astrix.integration.tests.common.Ping;
-import com.avanza.astrix.provider.core.AstrixQualifier;
-import com.avanza.astrix.provider.core.Library;
-import com.avanza.astrix.provider.core.Service;
-import com.avanza.astrix.provider.versioning.Versioned;
+import com.avanza.astrix.provider.core.AstrixServiceExport;
 
-@Versioned
-public interface LunchApi {
-	
-	@Service
-	LunchService lunchService();
-	
-	@AstrixQualifier("lunch-ping")
-	@Service
-	Ping ping();
-	
-	@Library
-	LunchUtil lunchUtil();
-	
-	@Library
-	LunchStatistics lunchStatistics();
+@AstrixServiceExport(Ping.class)
+public class PingBean implements Ping {
+
+	@Override
+	public String ping(String msg) {
+		return msg;
+	}
+
 }

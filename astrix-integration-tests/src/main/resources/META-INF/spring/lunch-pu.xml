@@ -29,5 +29,6 @@
     <bean id="lunchService" class="com.avanza.astrix.integration.tests.domain.pu.LunchServiceImpl"/>
 	<bean id="lunchRestaurantRepoFactory" class="com.avanza.astrix.integration.tests.domain.pu.LunchRestaurantRepoFactory"/>
 	<bean id="lunchRestaurantRepo" factory-bean="lunchRestaurantRepoFactory" factory-method="create"/>
+	<bean id="lunchPing" class="com.avanza.astrix.integration.tests.common.PingBean"/>
 	    
 </beans>

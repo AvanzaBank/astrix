@@ -21,7 +21,7 @@ import com.avanza.astrix.integration.tests.domain.api.LunchApi;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.api.LunchStatistics;
 import com.avanza.astrix.integration.tests.domain.api.LunchUtil;
-import com.avanza.astrix.integration.tests.domain.apiruntime.feeder.LunchFeederApi;
+import com.avanza.astrix.integration.tests.domain.apiruntime.feeder.InternalLunchApi;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.library.AstrixExport;
@@ -33,7 +33,7 @@ import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 )
 @AstrixApiProvider({
 	LunchApi.class, 
-	LunchFeederApi.class
+	InternalLunchApi.class
 })
 public class LunchApiProvider {
 
