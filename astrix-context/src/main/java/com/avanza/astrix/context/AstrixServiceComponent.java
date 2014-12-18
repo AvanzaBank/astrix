@@ -30,7 +30,7 @@ public interface AstrixServiceComponent {
 	
 	<T> T createService(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties);
 	
-	<T> AstrixServiceProperties createServiceProperties(String serviceUri);
+	AstrixServiceProperties createServiceProperties(String serviceUri);
 	
 	<T> AstrixServiceProperties createServiceProperties(Class<T> exportedService);
 	

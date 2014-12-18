@@ -15,23 +15,16 @@
  */
 package com.avanza.astrix.gs;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
-import com.avanza.astrix.context.AstrixApiDescriptor;
 import com.avanza.astrix.context.AstrixContextImpl;
-import com.avanza.astrix.context.AstrixExportedServiceInfo;
 import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
 import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixPlugins;
 import com.avanza.astrix.context.AstrixPluginsAware;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceProperties;
-import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.FaultToleranceSpecification;
 import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -62,7 +55,7 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 	}
 
 	@Override
-	public <T> AstrixServiceProperties createServiceProperties(String serviceUri) {
+	public AstrixServiceProperties createServiceProperties(String serviceUri) {
 		return GsBinder.createServiceProperties(serviceUri);
 	}
 

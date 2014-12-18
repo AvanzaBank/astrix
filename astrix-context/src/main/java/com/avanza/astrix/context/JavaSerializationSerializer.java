@@ -22,10 +22,49 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Type;
 
-public class SerializationUtil {
+import com.avanza.astrix.core.AstrixObjectSerializer;
+/**
+ * {@link AstrixObjectSerializer} using java serialization mechanism. Does not use version number. <p>
+ * 
+ * Mainly used to support testing. <p>
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public final class JavaSerializationSerializer implements AstrixObjectSerializer {
+	private int version;
 	
-	public static Object readObject(byte[] data) throws IOException, ClassNotFoundException {
+	public JavaSerializationSerializer(int version) {
+		this.version = version;
+	}
+	
+	@Override
+	public <T> T deserialize(Object element, Type type, int version) {
+		try {
+			byte[] data = (byte[]) element;
+			return (T) readObject(data);
+		} catch (ClassNotFoundException | IOException e) {
+			throw new RuntimeException("Deserialization failed", e);
+		}
+	}
+	
+	@Override
+	public Object serialize(Object element, int version) {
+		try {
+			return writeObject(element);
+		} catch (IOException e) {
+			throw new RuntimeException("Serialization failed", e);
+		}
+	}
+	
+	@Override
+	public int version() {
+		return 1;
+	}
+	
+	private static Object readObject(byte[] data) throws IOException, ClassNotFoundException {
 		try (ByteArrayInputStream bis = new ByteArrayInputStream(data)) {
 			try (ObjectInput in = new ObjectInputStream(bis)) {
 				return in.readObject();
@@ -33,7 +72,7 @@ public class SerializationUtil {
 		}
 	}
 	
-	public static byte[] writeObject(Object object) throws IOException {
+	private static byte[] writeObject(Object object) throws IOException {
 		try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
 			try (ObjectOutput out = new ObjectOutputStream(bos)) {
 				out.writeObject(object);
@@ -41,6 +80,4 @@ public class SerializationUtil {
 			}
 		}
 	}
-	
-
 }

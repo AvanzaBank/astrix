@@ -19,10 +19,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -54,9 +51,8 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 	}
 	
 	@Override
-	public <T> AstrixServiceProperties createServiceProperties(String componentSpecificUri) {
-		String providerId = componentSpecificUri;
-		return getServiceProperties(providerId);
+	public AstrixServiceProperties createServiceProperties(String componentSpecificUri) {
+		return getServiceProperties(componentSpecificUri);
 	}
 
 	@Override
@@ -101,14 +97,6 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 	}
 	
 	public static <T> T getServiceProvider(Class<T> expectedType, String id) {
-		ServiceProvider<T> provider = (ServiceProvider<T>) providerById.get(id);
-		if (provider == null) {
-			throw new IllegalArgumentException("No provider registered with id: " + id);
-		}
-		return provider.getProvider(AstrixVersioningPlugin.Default.create(), ServiceVersioningContext.nonVersioned());
-	}
-	
-	public static <T> T getServiceProvider(String id) {
 		ServiceProvider<T> provider = (ServiceProvider<T>) providerById.get(id);
 		if (provider == null) {
 			throw new IllegalArgumentException("No provider registered with id: " + id);

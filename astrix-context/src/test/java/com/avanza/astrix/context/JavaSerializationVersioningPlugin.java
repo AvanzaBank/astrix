@@ -15,8 +15,6 @@
  */
 package com.avanza.astrix.context;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
 
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
@@ -26,41 +24,9 @@ public class JavaSerializationVersioningPlugin implements AstrixVersioningPlugin
 	@Override
 	public AstrixObjectSerializer create(ServiceVersioningContext versioningContext) {
 		if (versioningContext.isVersioned()) {
-			return new Serializer(versioningContext.version());
+			return new JavaSerializationSerializer(versioningContext.version());
 		}
 		return new AstrixObjectSerializer.NoVersioningSupport();
-	}
-	
-	public static class Serializer implements AstrixObjectSerializer {
-		private int version;
-		
-		public Serializer(int version) {
-			this.version = version;
-		}
-		
-		@Override
-		public <T> T deserialize(Object element, Type type, int version) {
-			try {
-				byte[] data = (byte[]) element;
-				return (T) SerializationUtil.readObject(data);
-			} catch (ClassNotFoundException | IOException e) {
-				throw new RuntimeException("Deserialization failed", e);
-			}
-		}
-		
-		@Override
-		public Object serialize(Object element, int version) {
-			try {
-				return SerializationUtil.writeObject(element);
-			} catch (IOException e) {
-				throw new RuntimeException("Serialization failed", e);
-			}
-		}
-		
-		@Override
-		public int version() {
-			return 1;
-		}
 	}
 	
 }

@@ -15,14 +15,10 @@
  */
 package com.avanza.astrix.gs.remoting;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.context.AstrixContextImpl;
-import com.avanza.astrix.context.AstrixExportedServiceInfo;
 import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
 import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixPlugins;
@@ -69,7 +65,7 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	}
 	
 	@Override
-	public <T> AstrixServiceProperties createServiceProperties(String serviceUri) {
+	public AstrixServiceProperties createServiceProperties(String serviceUri) {
 		return GsBinder.createServiceProperties(serviceUri);
 	}
 	

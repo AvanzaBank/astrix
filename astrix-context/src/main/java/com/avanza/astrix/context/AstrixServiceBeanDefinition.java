@@ -23,14 +23,14 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  */
 public class AstrixServiceBeanDefinition {
 	
-	private AstrixBeanKey beanKey;
+	private AstrixBeanKey<?> beanKey;
 	private AstrixApiDescriptor apiDescriptor;
 	private AstrixApiProviderPlugin apiProvider;
 	private String componentName;
 	private boolean usesServiceRegistry;
 	
 
-	public AstrixServiceBeanDefinition(AstrixBeanKey beanKey,
+	public AstrixServiceBeanDefinition(AstrixBeanKey<?> beanKey,
 									   AstrixApiDescriptor apiDescriptor,
 									   AstrixApiProviderPlugin apiProvider,
 									   boolean usesServiceRegistry,
@@ -43,7 +43,7 @@ public class AstrixServiceBeanDefinition {
 		this.componentName = componentName;
 	}
 
-	public AstrixBeanKey getBeanKey() {
+	public AstrixBeanKey<?> getBeanKey() {
 		return this.beanKey;
 	}
 	
