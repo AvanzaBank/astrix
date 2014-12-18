@@ -96,9 +96,6 @@ public class AstrixBeanStateWorker extends Thread implements AstrixSettingsAware
 			log.debug("Binding bean. astrixBeanId=" + astrixBean.getId());
 			try {
 				astrixBean.bind();
-			} catch (MissingExternalDependencyException e) {
-				log.error("Runtime configuration error. Failed to create " + astrixBean.getBeanFactory().getBeanKey(), e);
-				return;
 			} catch (Exception e) {
 				log.info("Failed to bind to " + astrixBean.getBeanFactory().getBeanKey().getBeanType().getName() + " astrixBeanId=" + astrixBean.getId(), e);
 			}
