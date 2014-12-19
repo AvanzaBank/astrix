@@ -120,7 +120,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	
 	/**
 	 * If an application descriptor is provided, then the service exporting part of the framework
-	 * will be loaded with all required components to provided the services defined in
+	 * will be loaded with all required components to provide the services defined in
 	 * the api's provided by the given applicatinDescriptor.
 	 * 
 	 * @param serviceDescriptor
