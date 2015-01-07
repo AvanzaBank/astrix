@@ -35,6 +35,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 
 import com.avanza.astrix.context.AstrixConfigurer;
+import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixApplicationDescriptor;
 import com.avanza.astrix.context.AstrixServiceExporter;
@@ -85,8 +86,8 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		for (Class<?> consumedAstrixBean : this.consumedAstrixBeans) {
 			beanFactory.registerSingleton(consumedAstrixBean.getName(), astrixContext.getBean(consumedAstrixBean));
 		}
-		beanFactory.registerSingleton("_astrixSpringContext", astrixContext.getInstance(AstrixSpringContext.class));
-		beanFactory.registerSingleton("_astrixContext", astrixContext);
+		beanFactory.registerSingleton(AstrixSpringContext.class.getName(), astrixContext.getInstance(AstrixSpringContext.class));
+		beanFactory.registerSingleton(AstrixContext.class.getName(), astrixContext);
 		beanFactory.addBeanPostProcessor(astrixContext.getInstance(AstrixBeanPostProcessor.class));
 	}
 
