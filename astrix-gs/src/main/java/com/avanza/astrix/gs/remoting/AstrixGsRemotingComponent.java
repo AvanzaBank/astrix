@@ -102,8 +102,8 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 
 	@Override
 	public <T> AstrixServiceProperties createServiceProperties(Class<T> exportedService) {
-		GigaSpace gigaSpace = astrixContext.getInstance(AstrixSpringContext.class).getApplicationContext().getBean(GigaSpace.class);
-		AstrixServiceProperties serviceProperties = GsBinder.createProperties(gigaSpace);
+		GigaSpace space = GsBinder.getEmbeddedSpace(astrixContext.getInstance(AstrixSpringContext.class).getApplicationContext());
+		AstrixServiceProperties serviceProperties = GsBinder.createProperties(space);
 		serviceProperties.setQualifier(null);
 		return serviceProperties;
 	}

@@ -86,7 +86,7 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 		if (!type.equals(GigaSpace.class)) {
 			throw new IllegalArgumentException("Can't export: " + type);
 		}
-		GigaSpace space = astrixContext.getInstance(AstrixSpringContext.class).getApplicationContext().getBean(GigaSpace.class);
+		GigaSpace space = GsBinder.getEmbeddedSpace(astrixContext.getInstance(AstrixSpringContext.class).getApplicationContext());
 		return GsBinder.createProperties(space);
 	}
 	

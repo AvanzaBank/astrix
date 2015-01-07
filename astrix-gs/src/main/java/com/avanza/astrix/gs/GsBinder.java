@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.openspaces.core.GigaSpace;
+import org.springframework.context.ApplicationContext;
 
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.j_spaces.core.client.SpaceURL;
@@ -38,6 +39,20 @@ public class GsBinder {
 	public static GsFactory createGsFactory(AstrixServiceProperties properties) {
 		String spaceUrl = properties.getProperty(SPACE_URL_PROPERTY);
 		return new GsFactory(spaceUrl);
+	}
+	
+	public static GigaSpace getEmbeddedSpace(ApplicationContext applicationContext) {
+		GigaSpace result = null;
+		for (GigaSpace gigaSpace : applicationContext.getBeansOfType(GigaSpace.class).values()) {
+			if (gigaSpace.getSpace().isEmbedded()) {
+				if (result != null) {
+					throw new IllegalStateException("Multiple embedded spaces defined in applicationContext");
+				} else {
+					result = gigaSpace;
+				}
+			}
+		}
+		return result;
 	}
 	
 	public static AstrixServiceProperties createProperties(GigaSpace space) {
