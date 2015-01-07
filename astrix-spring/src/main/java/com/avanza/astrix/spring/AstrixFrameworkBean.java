@@ -75,6 +75,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	private Map<String, String> settings = new HashMap<>();
 	private AstrixApplicationDescriptor applicationDescriptor;
 	private AstrixContextImpl astrixContext;
+	private volatile boolean serviceExporterStarted = false;
 	
 	public AstrixFrameworkBean() {
 	}
@@ -164,9 +165,10 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 
 	@Override
 	public void onApplicationEvent(ApplicationContextEvent event) {
-		if (event instanceof ContextRefreshedEvent) {
+		if (event instanceof ContextRefreshedEvent && !serviceExporterStarted) {
 			// Application initialization complete. Export asterix-services.
 			exportAllProvidedServices();
+			serviceExporterStarted = true;
 		} else if (event instanceof ContextClosedEvent || event instanceof ContextStoppedEvent) {
 			/*
 			 * What's the difference between the "stopped" and "closed" event? In our embedded
