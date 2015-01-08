@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.avanza.astrix.config.ConfigSource;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.DynamicLongProperty;
 
 /**
  * 
@@ -86,10 +87,6 @@ public class AstrixSettingsReader {
 		return new AstrixSettingsReader(settings, externalConfig);
 	}
 
-	public long getLong(String settingsName, long deafualtValue) {
-		return this.dynamicConfig.getLongProperty(settingsName, deafualtValue).get();
-	}
-
 	public boolean getBoolean(String settingsName, boolean defaultValue) {
 		return this.dynamicConfig.getBooleanProperty(settingsName, defaultValue).get();
 	}
@@ -102,12 +99,10 @@ public class AstrixSettingsReader {
 		return this.dynamicConfig.getStringProperty(name, defaultValue).get();
 	}
 
-	public DynamicBooleanProperty getDynamicBooleanProperty(String name, boolean defaultValue) {
+	public DynamicBooleanProperty getBooleanProperty(String name, boolean defaultValue) {
 		boolean property = getBoolean(name, defaultValue);
 		return this.dynamicConfig.getBooleanProperty(name, property);
 	}
-	
-	
 	
 	private static class PropertiesAdapter implements ConfigSource {
 		private final Properties properties;
@@ -133,6 +128,10 @@ public class AstrixSettingsReader {
 		public String get(String propertyName) {
 			return externalConfig.lookup(propertyName);
 		}
+	}
+
+	public DynamicLongProperty getLongProperty(String name, long defaultValue) {
+		return this.dynamicConfig.getLongProperty(name, defaultValue);
 	}
 
 }

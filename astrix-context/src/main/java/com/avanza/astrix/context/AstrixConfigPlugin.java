@@ -15,15 +15,34 @@
  */
 package com.avanza.astrix.context;
 
+import java.util.List;
 
+import com.avanza.astrix.config.ConfigSource;
 /**
  * 
  * @author Elias Lindholm (elilin)
- *@deprecated replaced by AstrixConfigPlugin
+ *
  */
-@Deprecated
-public interface AstrixExternalConfigPlugin {
-
-	AstrixExternalConfig getConfig(String locator);
+public interface AstrixConfigPlugin {
 	
+	/**
+	 * Returns a list of config sources. All config sources defined
+	 * here takes precedence over the standard config locations which is:
+	 *  
+	 * 1. Programatic settings on AstrixConfigurer
+	 * 2. Classpath override mechanism
+	 * 3. Astrix default values
+	 * 
+	 * The config sources will be queried in order returned.
+	 * 
+	 * @param uri
+	 * @return
+	 */
+	List<ConfigSource> getConfigSources(String uri);
+	
+	
+	// AstrixConfigPluginSettings
+	
+	// the.setting.name=avanza:avanza.jndi.primary=testapp01.test.aza.se:34000
+	// the.setting.name=in-memory:213234
 }

@@ -39,7 +39,7 @@ public class HystrixFaultTolerancePlugin implements AstrixFaultTolerancePlugin, 
 	@Override
 	public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec) {
 		Objects.requireNonNull(spec);
-		DynamicBooleanProperty useFaultTolerance = settings.getDynamicBooleanProperty("astrix.faultTolerance." + spec.getGroup() + "." + spec.getApi().getName() + ".enabled", true);
+		DynamicBooleanProperty useFaultTolerance = settings.getBooleanProperty("astrix.faultTolerance." + spec.getGroup() + "." + spec.getApi().getName() + ".enabled", true);
 		T faultToleranceProtectedProvider = HystrixAdapter.create(spec);
 		FaultToleranceToggle<T> fsToggle = new FaultToleranceToggle<T>(faultToleranceProtectedProvider, spec.getProvider(), useFaultTolerance);
 		return spec.getApi().cast(Proxy.newProxyInstance(spec.getApi().getClassLoader(), new Class[]{spec.getApi()}, fsToggle));

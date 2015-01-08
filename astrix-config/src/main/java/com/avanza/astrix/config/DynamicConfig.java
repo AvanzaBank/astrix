@@ -27,7 +27,7 @@ import java.util.List;
  */
 public final class DynamicConfig {
 
-	private List<DynamicConfigSource> configSources;
+	private final List<DynamicConfigSource> configSources;
 
 	public DynamicConfig(ConfigSource configSource) {
 		this(Arrays.asList(configSource));

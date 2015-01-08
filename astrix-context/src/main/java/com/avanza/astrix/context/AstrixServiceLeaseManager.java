@@ -46,7 +46,7 @@ public class AstrixServiceLeaseManager extends Thread implements AstrixSettingsA
 				renewLease(leasedService);
 			}
 			try {
-				Thread.sleep(settings.getLong(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 30_000L));
+				Thread.sleep(settings.getLongProperty(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 30_000L).get());
 			} catch (InterruptedException e) {
 				interrupt();
 			}

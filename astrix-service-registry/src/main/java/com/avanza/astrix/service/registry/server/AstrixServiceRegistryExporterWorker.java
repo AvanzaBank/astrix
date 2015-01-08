@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.avanza.astrix.config.DynamicLongProperty;
 import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixServiceProperties;
@@ -43,9 +44,9 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 	private List<AstrixServicePropertiesBuilderHolder> serviceBuilders = new CopyOnWriteArrayList<>();
 	private AstrixServiceRegistryClient serviceRegistryClient;
 	private Logger log = LoggerFactory.getLogger(AstrixServiceRegistryExporterWorker.class);
-	private long exportIntervallMillis;		  
-	private long serviceLeaseTimeMillis;
-	private long retryIntervallMillis;
+	private DynamicLongProperty exportIntervallMillis;		  
+	private DynamicLongProperty serviceLeaseTimeMillis;
+	private DynamicLongProperty retryIntervallMillis;
 	private AstrixContextImpl astrixContext;
 
 	public AstrixServiceRegistryExporterWorker() {
@@ -64,9 +65,9 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 		}
 		this.serviceRegistryClient = astrixContext.getBean(AstrixServiceRegistryClient.class);
 		AstrixSettingsReader settings = astrixContext.getSettings();
-		this.exportIntervallMillis = settings.getLong(AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 30_000L);
-		this.retryIntervallMillis = settings.getLong(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 5_000L);
-		this.serviceLeaseTimeMillis = settings.getLong(AstrixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
+		this.exportIntervallMillis = settings.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 30_000L);
+		this.retryIntervallMillis = settings.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 5_000L);
+		this.serviceLeaseTimeMillis = settings.getLongProperty(AstrixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
 		start();
 	}
 	
@@ -78,12 +79,12 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 	@Override
 	public void run() {
 		while (!interrupted()) {
-			long sleepTimeUntilNextAttempt = this.exportIntervallMillis;
+			long sleepTimeUntilNextAttempt = this.exportIntervallMillis.get();
 			try {
 				exportProvidedServcies();
 			} catch (ServiceUnavailableException e) {
 				// Not bound to service registry
-				sleepTimeUntilNextAttempt = this.retryIntervallMillis;
+				sleepTimeUntilNextAttempt = this.retryIntervallMillis.get();
 				log.info(String.format("Failed to export serivces to registry. Sleeping %s millis until next attempt.", sleepTimeUntilNextAttempt), e);
 			} catch (Exception e) {
 				log.info(String.format("Failed to export serivces to registry. Sleeping %s millis until next attempt.", sleepTimeUntilNextAttempt), e);
@@ -99,11 +100,11 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 	private void exportProvidedServcies() {
 		for (AstrixServicePropertiesBuilderHolder serviceBuilder : serviceBuilders) {
 			AstrixServiceProperties serviceProperties = serviceBuilder.exportServiceProperties();
-			serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis);
+			serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());
 			log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			if (serviceBuilder.exportsAsyncApi()) {
 				serviceProperties = serviceBuilder.exportAsyncServiceProperties();
-				serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis);
+				serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());
 				log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			}
 		}

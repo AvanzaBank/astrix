@@ -25,6 +25,8 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.avanza.astrix.config.DynamicLongProperty;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -34,7 +36,7 @@ public class AstrixBeanStateWorker extends Thread implements AstrixSettingsAware
 
 	private static final Logger log = LoggerFactory.getLogger(AstrixBeanStateWorker.class);
 	private final Collection<StatefulAstrixBean<?>> managedBeans = new CopyOnWriteArrayList<>();
-	private long beanRebindAttemptIntervalMillis;
+	private DynamicLongProperty beanRebindAttemptIntervalMillis;
 	private final ExecutorService beanStateWorkerThreadPool = Executors.newSingleThreadExecutor(new ThreadFactory() {
 		@Override
 		public Thread newThread(Runnable r) {
@@ -71,7 +73,7 @@ public class AstrixBeanStateWorker extends Thread implements AstrixSettingsAware
 			}
 			try {
 				log.debug("Waiting " + this.beanRebindAttemptIntervalMillis + " ms until next bean state inspection");
-				Thread.sleep(this.beanRebindAttemptIntervalMillis);
+				Thread.sleep(this.beanRebindAttemptIntervalMillis.get());
 			} catch (InterruptedException e) {
 				interrupt();
 			} 
@@ -104,7 +106,7 @@ public class AstrixBeanStateWorker extends Thread implements AstrixSettingsAware
 
 	@Override
 	public void setSettings(AstrixSettingsReader settings) {
-		this.beanRebindAttemptIntervalMillis = settings.getLong(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10_000L);
+		this.beanRebindAttemptIntervalMillis = settings.getLongProperty(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10_000L);
 	}
 	
 }
