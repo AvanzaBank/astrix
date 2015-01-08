@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.config.archauis;
 
-import com.avanza.astrix.config.DynamicConfigSource;
+import com.avanza.astrix.config.AbstractDynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
 import com.netflix.config.DynamicPropertyFactory;
 import com.netflix.config.DynamicStringProperty;
@@ -24,7 +24,7 @@ import com.netflix.config.DynamicStringProperty;
  * @author Elias Lindholm (elilin)
  *
  */
-public class ArchauisConfigAdapter implements DynamicConfigSource {
+public class ArchauisConfigAdapter extends AbstractDynamicConfigSource {
 	
 	private static final String LOOKUP_MISS = "_______LOOKUP_MISS______";
 	private DynamicPropertyFactory dynamicPropertyFactory;
@@ -34,7 +34,7 @@ public class ArchauisConfigAdapter implements DynamicConfigSource {
 	}
 	
 	@Override
-	public String get(final String name, final DynamicPropertyListener propertyChangeListener) {
+	public String get(final String name, final DynamicPropertyListener<String> propertyChangeListener) {
 		DynamicStringProperty stringProperty = dynamicPropertyFactory.getStringProperty(name, LOOKUP_MISS, new Runnable() {
 			@Override
 			public void run() {

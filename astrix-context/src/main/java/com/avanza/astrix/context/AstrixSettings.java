@@ -16,15 +16,17 @@
 package com.avanza.astrix.context;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
+import com.avanza.astrix.config.DynamicConfigSource;
+import com.avanza.astrix.config.DynamicPropertyListener;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.provider.core.AstrixPluginQualifier;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixSettings implements AstrixExternalConfig {
+public class AstrixSettings implements AstrixExternalConfig, DynamicConfigSource {
 	
 	public static final String BEAN_BIND_ATTEMPT_INTERVAL = "StatefulAstrixBean.beanBindAttemptInterval";
 	/**
@@ -63,7 +65,7 @@ public class AstrixSettings implements AstrixExternalConfig {
 	@Deprecated
 	public static final String EXPORT_GIGASPACE = "AstrixGsComponent.exportGigaSpace";
 	
-	private final Map<String, String> settings = new ConcurrentHashMap<>();
+	private final MapConfigSource config = new MapConfigSource();
 	private final String serviceId;
 	
 	public AstrixSettings() {
@@ -85,15 +87,15 @@ public class AstrixSettings implements AstrixExternalConfig {
 	}
 
 	public final void set(String settingName, long value) {
-		this.settings.put(settingName, Long.toString(value));
+		this.config.set(settingName, Long.toString(value));
 	}
 	
 	public final void set(String settingName, String value) {
-		this.settings.put(settingName, value);
+		this.config.set(settingName, value);
 	}
 	
 	public final void remove(String settingName) {
-		this.settings.remove(settingName);
+		this.config.set(settingName, null);
 	}
 
 	public static AstrixSettings from(Map<String, String> settings) {
@@ -106,16 +108,16 @@ public class AstrixSettings implements AstrixExternalConfig {
 
 	public final void setAll(Map<String, String> settings) {
 		for (Map.Entry<String, String> setting : settings.entrySet()) {
-			this.settings.put(setting.getKey(), setting.getValue());
+			this.config.set(setting.getKey(), setting.getValue());
 		}
 	}
 
 	public final void set(String settingName, boolean value) {
-		this.settings.put(settingName, Boolean.toString(value));
+		this.config.set(settingName, Boolean.toString(value));
 	}
 
 	public final String getString(String name) {
-		Object result = this.settings.get(name);
+		Object result = this.config.get(name);
 		if (result == null) {
 			return null;
 		}
@@ -123,21 +125,27 @@ public class AstrixSettings implements AstrixExternalConfig {
 	}
 
 	public final void setAll(AstrixSettings settings) {
-		this.settings.putAll(settings.settings);
+		this.config.setAll(settings.config);
 	}
 	
 	@Override
 	public final String toString() {
-		return this.settings.toString();
+		return this.config.toString();
 	}
 
 	public final String get(String settingName) {
-		return this.settings.get(settingName);
+		return this.config.get(settingName);
 	}
 
 	@Override
 	public final String lookup(String name) {
 		return getString(name);
+	}
+	
+	@Override
+	public String get(String propertyName,
+			DynamicPropertyListener<String> propertyChangeListener) {
+		return this.config.get(propertyName, propertyChangeListener);
 	}
 	
 

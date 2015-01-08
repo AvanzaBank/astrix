@@ -16,6 +16,7 @@
 package com.avanza.astrix.ft.plugin;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
@@ -38,8 +39,8 @@ public class HystrixFaultTolerancePlugin implements AstrixFaultTolerancePlugin, 
 	@Override
 	public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec) {
 		Objects.requireNonNull(spec);
+		DynamicBooleanProperty useFaultTolerance = settings.getDynamicBooleanProperty("astrix.faultTolerance." + spec.getGroup() + "." + spec.getApi().getName() + ".enabled", true);
 		T faultToleranceProtectedProvider = HystrixAdapter.create(spec);
-		DynamicBooleanProperty useFaultTolerance = settings.getDynamicBooleanProperty("astrix.faultTolerance." + spec.getApi().getName() + ".enabled", true);
 		FaultToleranceToggle<T> fsToggle = new FaultToleranceToggle<T>(faultToleranceProtectedProvider, spec.getProvider(), useFaultTolerance);
 		return spec.getApi().cast(Proxy.newProxyInstance(spec.getApi().getClassLoader(), new Class[]{spec.getApi()}, fsToggle));
 	}
@@ -57,8 +58,12 @@ public class HystrixFaultTolerancePlugin implements AstrixFaultTolerancePlugin, 
 
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			T provider = getProvider();
-			return method.invoke(provider, args);
+			try {
+				T provider = getProvider();
+				return method.invoke(provider, args);
+			} catch (InvocationTargetException e) {
+				throw e.getCause();
+			}
 		}
 
 		private T getProvider() {

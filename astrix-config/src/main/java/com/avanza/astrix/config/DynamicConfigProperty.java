@@ -64,7 +64,7 @@ public class DynamicConfigProperty<T> implements DynamicPropertyListener<String>
 		set(newValue);
 	}
 	
-	public static <T> DynamicConfigProperty<T> chained(DynamicPropertyListener<T> propertyChangeListener, PropertyParser<T> propertyParser) {
+	public static <T> DynamicConfigProperty<T> create(DynamicPropertyListener<T> propertyChangeListener, PropertyParser<T> propertyParser) {
 		return new DynamicConfigProperty<>(propertyChangeListener, propertyParser);
 	}
 

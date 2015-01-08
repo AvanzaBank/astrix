@@ -20,10 +20,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.junit.Test;
 
@@ -76,47 +72,6 @@ public class DynamicConfigTest {
 		
 		secondSource.set("foo", "false");
 		assertFalse(booleanProperty.get());
-	}
-	
-	private static class MapConfigSource implements DynamicConfigSource {
-		
-		private ConcurrentMap<String, ListenabeStringProperty> propertyValues = new ConcurrentHashMap<>();
-		
-		@Override
-		public String get(String propertyName, DynamicPropertyListener<String> propertyChangeListener) {
-			ListenabeStringProperty dynamicProperty = getProperty(propertyName);
-			dynamicProperty.listeners.add(propertyChangeListener);
-			return dynamicProperty.value;
-		}
-		
-		public void set(String propertyName, String value) {
-			getProperty(propertyName).set(value);
-		}
-
-		private ListenabeStringProperty getProperty(String propertyName) {
-			propertyValues.putIfAbsent(propertyName, new ListenabeStringProperty());
-			ListenabeStringProperty dynamicProperty = propertyValues.get(propertyName);
-			return dynamicProperty;
-		}
-		
-		
-	}
-	
-	static class ListenabeStringProperty {
-		
-		private final List<DynamicPropertyListener<String>> listeners = new LinkedList<>();
-		private volatile String value;
-		
-		void propertyChanged(String newValue) {
-			for (DynamicPropertyListener<String> l : listeners) {
-				l.propertyChanged(newValue);
-			}
-		}
-
-		void set(String value) {
-			this.value = value;
-			propertyChanged(value);
-		}
 	}
 	
 

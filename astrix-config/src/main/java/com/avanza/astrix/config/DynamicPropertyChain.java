@@ -52,7 +52,7 @@ public class DynamicPropertyChain<T> implements DynamicPropertyListener<T> {
 	}
 
 	public DynamicConfigProperty<T> prependValue() {
-		DynamicConfigProperty<T> property = DynamicConfigProperty.chained(this, parser);
+		DynamicConfigProperty<T> property = DynamicConfigProperty.create(this, parser);
 		chain.addFirst(property);
 		return property;
 	}
@@ -64,6 +64,12 @@ public class DynamicPropertyChain<T> implements DynamicPropertyListener<T> {
 			// Resolved value was updated, fire property change
 			propertyListener.propertyChanged(get());
 		}
+	}
+
+	public DynamicConfigProperty<T> appendValue() {
+		DynamicConfigProperty<T> property = DynamicConfigProperty.create(this, parser);
+		chain.addLast(property);
+		return property;
 	}
 	
 }

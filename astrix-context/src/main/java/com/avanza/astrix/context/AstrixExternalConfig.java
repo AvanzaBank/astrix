@@ -16,8 +16,10 @@
 package com.avanza.astrix.context;
 
 
+@Deprecated
 public interface AstrixExternalConfig {
 
+	@Deprecated
 	String lookup(String name);
 
 }

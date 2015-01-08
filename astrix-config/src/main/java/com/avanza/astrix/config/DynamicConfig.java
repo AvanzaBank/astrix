@@ -29,13 +29,31 @@ public final class DynamicConfig {
 
 	private List<DynamicConfigSource> configSources;
 
-	public DynamicConfig(DynamicConfigSource configSource) {
-		this.configSources = Arrays.asList(configSource);
+	public DynamicConfig(ConfigSource configSource) {
+		this(Arrays.asList(configSource));
 	}
 	
-	public DynamicConfig(List<? extends DynamicConfigSource> configSources) {
-		this.configSources = new ArrayList<>(configSources);
-		Collections.reverse(this.configSources);
+	public DynamicConfig(List<? extends ConfigSource> configSources) {
+		this.configSources = new ArrayList<>(configSources.size());
+		for (ConfigSource configSource : configSources) {
+			if (configSource instanceof DynamicConfigSource) {
+				this.configSources.add(DynamicConfigSource.class.cast(configSource));
+			} else {
+				this.configSources.add(new DynamicConfigSourceAdapter(configSource));
+			}
+		}
+	}
+	
+	private static class DynamicConfigSourceAdapter extends AbstractDynamicConfigSource {
+		private final ConfigSource configSource;
+		public DynamicConfigSourceAdapter(ConfigSource configSource) {
+			this.configSource = configSource;
+		}
+		@Override
+		public String get(String propertyName, DynamicPropertyListener<String> propertyChangeListener) {
+			return configSource.get(propertyName);
+		}
+		
 	}
 
 	public DynamicStringProperty getStringProperty(String name, String defaultValue) {
@@ -62,10 +80,22 @@ public final class DynamicConfig {
 		return result;
 	}
 	
+	public DynamicLongProperty getLongProperty(String name, long deafualtValue) {
+		final DynamicLongProperty result = new DynamicLongProperty();
+		final DynamicPropertyChain<Long> chain = getPropertyChain(name, Long.valueOf(deafualtValue), new DynamicPropertyChainListener<Long>() {
+			@Override
+			public void propertyChanged(Long newValue) {
+				result.set(newValue.longValue());
+			}
+		}, new PropertyParser.LongParser());
+		result.set(chain.get());
+		return result;
+	}
+	
 	private <T> DynamicPropertyChain<T> getPropertyChain(String name, T defaultValue, DynamicPropertyChainListener<T> dynamicPropertyListener, PropertyParser<T> propertyParser) {
 		DynamicPropertyChain<T> chain = DynamicPropertyChain.createWithDefaultValue(defaultValue, dynamicPropertyListener, propertyParser);
 		for (DynamicConfigSource configSource : configSources) {
-			DynamicConfigProperty<T> newValueInChain = chain.prependValue();
+			DynamicConfigProperty<T> newValueInChain = chain.appendValue();
 			String propertyValue = configSource.get(name, newValueInChain);
 			newValueInChain.set(propertyValue);
 		}

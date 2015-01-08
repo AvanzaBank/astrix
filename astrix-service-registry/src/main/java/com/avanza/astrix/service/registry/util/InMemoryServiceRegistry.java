@@ -18,9 +18,11 @@ package com.avanza.astrix.service.registry.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.avanza.astrix.config.DynamicConfigSource;
+import com.avanza.astrix.config.DynamicPropertyListener;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.AstrixExternalConfig;
 import com.avanza.astrix.context.AstrixServiceProperties;
@@ -39,18 +41,18 @@ import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
  * @author Elias Lindholm (elilin)
  *
  */
-public class InMemoryServiceRegistry implements AstrixServiceRegistry, AstrixExternalConfig {
+public class InMemoryServiceRegistry implements AstrixServiceRegistry, AstrixExternalConfig, DynamicConfigSource {
 	
+	private final MapConfigSource configSource = new MapConfigSource();
 	private Map<ServiceKey, AstrixServiceRegistryEntry> servicePropertiesByKey = new ConcurrentHashMap<>();
 	private String id;
-	private Properties externalConfig = new Properties();
 	private String externalConfigId;
 	
 	public InMemoryServiceRegistry() {
 		this.id = AstrixDirectComponent.register(AstrixServiceRegistry.class, this);
 		// TODO: allow registering multiple provided interfaces under same id in direct-component
 		this.externalConfigId = AstrixDirectComponent.register(AstrixExternalConfig.class, this);
-		this.externalConfig.put(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, getServiceUri());
+		this.configSource.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, getServiceUri());
 	}
 	
 	@Override
@@ -80,16 +82,11 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry, AstrixExt
 	}
 	
 	public void set(String settingName, String value) {
-		this.externalConfig.setProperty(settingName, value);
+		this.configSource.set(settingName, value);
 	}
 	
 	public void addConfig(String settingName, long value) {
-		this.externalConfig.setProperty(settingName, Long.toString(value));
-	}
-
-	@Override
-	public String lookup(String name) {
-		return this.externalConfig.getProperty(name);
+		this.configSource.set(settingName, Long.toString(value));
 	}
 
 	public String getExternalConfigUri() {
@@ -99,5 +96,20 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry, AstrixExt
 	public <T> void registerProvider(Class<T> api, T provider, String subsystem) {
 		AstrixServiceRegistryClientImpl serviceRegistryClient = new AstrixServiceRegistryClientImpl(this, subsystem);
 		serviceRegistryClient.register(api, AstrixDirectComponent.registerAndGetProperties(api, provider), 60_000);
+	}
+	
+	@Override
+	public String lookup(String name) {
+		return this.configSource.get(name);
+	}
+
+	@Override
+	public String get(String propertyName) {
+		return configSource.get(propertyName);
+	}
+
+	@Override
+	public String get(String propertyName, DynamicPropertyListener<String> propertyChangeListener) {
+		return configSource.get(propertyName, propertyChangeListener);
 	}
 }

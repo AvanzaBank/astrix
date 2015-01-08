@@ -17,9 +17,10 @@ package com.avanza.astrix.config;
 
 public interface PropertyParser<T> {
 
+
 	T parse(String value);
 	
-	static class BooleanParser implements PropertyParser<Boolean> {
+	class BooleanParser implements PropertyParser<Boolean> {
 		@Override
 		public Boolean parse(String value) {
 			if ("false".equalsIgnoreCase(value)) {
@@ -32,10 +33,17 @@ public interface PropertyParser<T> {
 		}
 	};
 	
-	static class StringParser implements PropertyParser<String> {
+	class StringParser implements PropertyParser<String> {
 		@Override
 		public String parse(String value) {
 			return value;
 		}
 	};
+
+	class LongParser implements PropertyParser<Long> {
+		@Override
+		public Long parse(String value) {
+			return Long.parseLong(value);
+		}
+	}
 }

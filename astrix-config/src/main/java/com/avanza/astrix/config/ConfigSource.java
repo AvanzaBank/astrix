@@ -19,8 +19,8 @@ package com.avanza.astrix.config;
  * @author Elias Lindholm (elilin)
  *
  */
-public interface DynamicConfigSource extends ConfigSource {
+public interface ConfigSource {
 	
-	String get(String propertyName, DynamicPropertyListener<String> propertyChangeListener);
-
+	String get(String propertyName);
+	
 }

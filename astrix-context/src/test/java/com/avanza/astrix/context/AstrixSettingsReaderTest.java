@@ -33,7 +33,7 @@ public class AstrixSettingsReaderTest {
 	@Test
 	public void externalConfigTakesHighestPrecedence() throws Exception {
 		settings.set("mySetting", "programaticSettingsValue");
-		settings.set("mySetting", "externalConfigValue");
+		externalConfig.set("mySetting", "externalConfigValue");
 		String configUrl = AstrixSettingsReader.getString("mySetting", "lastFallbackValue");
 		assertEquals("externalConfigValue", configUrl);
 	}

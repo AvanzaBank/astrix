@@ -23,6 +23,13 @@ public final class DynamicBooleanProperty {
 	
 	private volatile boolean value;
 	
+	public DynamicBooleanProperty() {
+	}
+	
+	public DynamicBooleanProperty(boolean value) {
+		this.value = value;
+	}
+	
 	public boolean get() {
 		return value;
 	}
