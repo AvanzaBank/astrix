@@ -49,14 +49,16 @@ public class DynamicPropertyChainTest {
 	}
 	
 	@Test
-	public void chainClearsReturnsToDefaultValue() throws Exception {
+	public void chainReturnsToDefaultValueWhenAllPropertiesInChainAreNull() throws Exception {
 		DynamicPropertyChain<String> propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", DUMMY_LISTENER, new PropertyParser.StringParser());
 		DynamicConfigProperty<String> dynamicProperty = propertyChain.prependValue();
 		assertEquals("defaultFoo", propertyChain.get());
+		
 		dynamicProperty.set("Foo");
 		assertEquals("Foo", dynamicProperty.get());
+		
 		dynamicProperty.set(null);
-		assertEquals("defaultFoo", dynamicProperty.get());
+		assertEquals("defaultFoo", propertyChain.get());
 	}
 	
 	@Test

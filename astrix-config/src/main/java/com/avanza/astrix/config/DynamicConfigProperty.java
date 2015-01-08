@@ -24,12 +24,12 @@ import org.slf4j.LoggerFactory;
  * @author Elias Lindholm (elilin)
  *
  */
-public abstract class DynamicConfigProperty<T> implements DynamicPropertyListener<String> {
+public class DynamicConfigProperty<T> implements DynamicPropertyListener<String> {
 	
 	private final Logger logger = LoggerFactory.getLogger(DynamicConfigProperty.class);
-	private DynamicPropertyListener<T> propertyChangeListener;
-	private volatile T value;
+	private final DynamicPropertyListener<T> propertyChangeListener;
 	private final PropertyParser<T> parser;
+	private volatile T value;
 	
 	private DynamicConfigProperty(DynamicPropertyListener<T> propertyChangeListener, PropertyParser<T> propertyParser) {
 		this.propertyChangeListener = propertyChangeListener;
@@ -64,38 +64,8 @@ public abstract class DynamicConfigProperty<T> implements DynamicPropertyListene
 		set(newValue);
 	}
 	
-	public static <T> DynamicConfigProperty<T> chained(DynamicConfigProperty<T> next, DynamicPropertyListener<T> propertyChangeListener, PropertyParser<T> propretyParser) {
-		return new ChainedElement<T>(next, propertyChangeListener, propretyParser);
-	}
-	
-	public static <T> DynamicConfigProperty<T> terminal(T value, DynamicPropertyListener<T> listener, PropertyParser<T> propertyParser) {
-		return new TerminalValue<T>(value, listener, propertyParser);
-	}
-	
-	static class ChainedElement<T> extends DynamicConfigProperty<T> {	
-		private final DynamicConfigProperty<T> next;
-		
-		public ChainedElement(DynamicConfigProperty<T> next, DynamicPropertyListener<T> propertyChangeListener, PropertyParser<T> propertyParser) {
-			super(propertyChangeListener, propertyParser);
-			this.next = next;
-		}
-
-		public T get() {
-			T result = super.get();
-			if (result != null) {
-				return result;
-			}
-			return next.get();
-		}
-
-	}
-	
-	static class TerminalValue<T> extends DynamicConfigProperty<T> {
-		
-		public TerminalValue(T value, DynamicPropertyListener<T> propertyChangeListener, PropertyParser<T> propertyParser) {
-			super(propertyChangeListener, value, propertyParser);
-		}
-		
+	public static <T> DynamicConfigProperty<T> chained(DynamicPropertyListener<T> propertyChangeListener, PropertyParser<T> propertyParser) {
+		return new DynamicConfigProperty<>(propertyChangeListener, propertyParser);
 	}
 
 }

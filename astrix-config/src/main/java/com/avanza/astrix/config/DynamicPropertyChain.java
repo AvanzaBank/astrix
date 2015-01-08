@@ -15,36 +15,46 @@
  */
 package com.avanza.astrix.config;
 
+import java.util.LinkedList;
 import java.util.Objects;
 
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ * @param <T>
+ */
 public class DynamicPropertyChain<T> implements DynamicPropertyListener<T> {
+
+	private final LinkedList<DynamicConfigProperty<T>> chain = new LinkedList<>();
+	private final DynamicPropertyChainListener<T> propertyListener;
+	private final PropertyParser<T> parser;
+	private final T defaultValue;
 	
-	private volatile DynamicConfigProperty<T> chain;
-	private DynamicPropertyChainListener<T> propertyListener;
-	private PropertyParser<T> parser;
-	
-	public DynamicPropertyChain(DynamicConfigProperty<T> chain, DynamicPropertyChainListener<T> propertyListener, PropertyParser<T> parser) {
-		this.chain = chain;
+	public DynamicPropertyChain(T defaultValue, DynamicPropertyChainListener<T> propertyListener, PropertyParser<T> parser) {
+		this.defaultValue = defaultValue;
 		this.propertyListener = propertyListener;
 		this.parser = parser;
 	}
 
 	public static <T> DynamicPropertyChain<T> createWithDefaultValue(T defaultValue, DynamicPropertyChainListener<T> listener, PropertyParser<T> parser) {
-		return new DynamicPropertyChain<>(DynamicConfigProperty.terminal(defaultValue, new DynamicPropertyListener<T>() {
-			@Override
-			public void propertyChanged(T newValue) {
-			}
-		}, parser), listener, parser);
+		return new DynamicPropertyChain<>(defaultValue, listener, parser);
 	}
 	
 	public T get() {
-		return chain.get();
+		for (DynamicConfigProperty<T> prop : chain) {
+			T value = prop.get();
+			if (value != null) {
+				return value;
+			}
+		}
+		return defaultValue;
 	}
 
 	public DynamicConfigProperty<T> prependValue() {
-		chain = DynamicConfigProperty.chained(chain, this, parser);
-		return chain;
+		DynamicConfigProperty<T> property = DynamicConfigProperty.chained(this, parser);
+		chain.addFirst(property);
+		return property;
 	}
 
 	@Override
