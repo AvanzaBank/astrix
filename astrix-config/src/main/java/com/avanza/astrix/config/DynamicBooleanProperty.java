@@ -19,8 +19,15 @@ package com.avanza.astrix.config;
  * @author Elias Lindholm (elilin)
  *
  */
-public interface DynamicConfigSource {
+public final class DynamicBooleanProperty {
 	
-	String get(String propertyName, DynamicStringPropertyListener propertyChangeListener);
-
+	private volatile boolean value;
+	
+	public boolean get() {
+		return value;
+	}
+	
+	public void set(boolean value) {
+		this.value = value;
+	}
 }

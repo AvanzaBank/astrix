@@ -22,7 +22,7 @@ import java.util.Objects;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.config.BooleanProperty;
+import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
 import com.avanza.astrix.context.AstrixSettingsAware;
 import com.avanza.astrix.context.AstrixSettingsReader;
@@ -39,7 +39,7 @@ public class HystrixFaultTolerancePlugin implements AstrixFaultTolerancePlugin, 
 	public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec) {
 		Objects.requireNonNull(spec);
 		T faultToleranceProtectedProvider = HystrixAdapter.create(spec);
-		BooleanProperty useFaultTolerance = settings.getDynamicBooleanProperty("astrix.faultTolerance." + spec.getApi().getName() + ".enabled", true);
+		DynamicBooleanProperty useFaultTolerance = settings.getDynamicBooleanProperty("astrix.faultTolerance." + spec.getApi().getName() + ".enabled", true);
 		FaultToleranceToggle<T> fsToggle = new FaultToleranceToggle<T>(faultToleranceProtectedProvider, spec.getProvider(), useFaultTolerance);
 		return spec.getApi().cast(Proxy.newProxyInstance(spec.getApi().getClassLoader(), new Class[]{spec.getApi()}, fsToggle));
 	}
@@ -47,9 +47,9 @@ public class HystrixFaultTolerancePlugin implements AstrixFaultTolerancePlugin, 
 	private class FaultToleranceToggle<T> implements InvocationHandler {
 		private final T faultToleranceProtectedProvider;
 		private final T rawProvider;
-		private final BooleanProperty useFaultTolerance;
+		private final DynamicBooleanProperty useFaultTolerance;
 		
-		public FaultToleranceToggle(T faultToleranceProtectedProvider, T rawProvider, BooleanProperty useFaultTolerance) {
+		public FaultToleranceToggle(T faultToleranceProtectedProvider, T rawProvider, DynamicBooleanProperty useFaultTolerance) {
 			this.faultToleranceProtectedProvider = faultToleranceProtectedProvider;
 			this.rawProvider = rawProvider;
 			this.useFaultTolerance = useFaultTolerance;

@@ -18,7 +18,7 @@ package com.avanza.astrix.config;
 import java.util.Objects;
 
 
-public class DynamicPropertyChain implements DynamicPropertyListener {
+public class DynamicPropertyChain implements DynamicStringPropertyListener {
 	
 	private volatile DynamicConfigProperty chain;
 	private DynamicPropertyChainListener propertyListener;
@@ -29,7 +29,7 @@ public class DynamicPropertyChain implements DynamicPropertyListener {
 	}
 
 	public static DynamicPropertyChain createWithDefaultValue(String defaultValue, DynamicPropertyChainListener listener) {
-		return new DynamicPropertyChain(DynamicConfigProperty.terminal(defaultValue, new DynamicPropertyListener() {
+		return new DynamicPropertyChain(DynamicConfigProperty.terminal(defaultValue, new DynamicStringPropertyListener() {
 			@Override
 			public void propertyChanged(String newValue) {
 			}

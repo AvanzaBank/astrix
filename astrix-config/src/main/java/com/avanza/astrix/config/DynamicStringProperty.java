@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.config;
 
+import java.util.Objects;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -22,23 +24,23 @@ package com.avanza.astrix.config;
  */
 public final class DynamicStringProperty {
 	
-	private static final DynamicPropertyListener NO_LISTENER = new DynamicPropertyListener() {
+	private static final DynamicStringPropertyListener NO_LISTENER = new DynamicStringPropertyListener() {
 		@Override
 		public void propertyChanged(String newValue) {
 		}
 	};
 	
 	private volatile String value;
-	private final DynamicPropertyListener listener;
+	private final DynamicStringPropertyListener listener;
 	
 	public DynamicStringProperty(String initialValue) {
 		this.value = initialValue;
 		this.listener = NO_LISTENER;
 	}
 	
-	public DynamicStringProperty(String initialValue, DynamicPropertyListener listener) {
+	public DynamicStringProperty(String initialValue, DynamicStringPropertyListener listener) {
 		this.value = initialValue;
-		this.listener = listener;
+		this.listener = Objects.requireNonNull(listener);
 	}
 
 	public String get() {
@@ -47,6 +49,7 @@ public final class DynamicStringProperty {
 	
 	public void set(String value) {
 		this.value = value;
+		this.listener.propertyChanged(value);
 	}
 
 }

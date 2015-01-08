@@ -19,15 +19,8 @@ package com.avanza.astrix.config;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class BooleanProperty {
-	
-	private volatile boolean value;
-	
-	public boolean get() {
-		return value;
-	}
-	
-	public void set(boolean value) {
-		this.value = value;
-	}
+public interface DynamicStringPropertyListener {
+
+	void propertyChanged(String newValue);
+
 }

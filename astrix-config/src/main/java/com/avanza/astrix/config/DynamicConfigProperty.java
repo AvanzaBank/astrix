@@ -21,16 +21,16 @@ package com.avanza.astrix.config;
  * @author Elias Lindholm (elilin)
  *
  */
-public abstract class DynamicConfigProperty implements DynamicPropertyListener {
+public abstract class DynamicConfigProperty implements DynamicStringPropertyListener {
 	
-	private DynamicPropertyListener propertyChangeListener;
+	private DynamicStringPropertyListener propertyChangeListener;
 	private volatile String value;
 	
-	private DynamicConfigProperty(DynamicPropertyListener propertyChangeListener) {
+	private DynamicConfigProperty(DynamicStringPropertyListener propertyChangeListener) {
 		this.propertyChangeListener = propertyChangeListener;
 	}
 	
-	private DynamicConfigProperty(DynamicPropertyListener propertyChangeListener, String value) {
+	private DynamicConfigProperty(DynamicStringPropertyListener propertyChangeListener, String value) {
 		this.propertyChangeListener = propertyChangeListener;
 		this.value = value;
 	}
@@ -50,18 +50,18 @@ public abstract class DynamicConfigProperty implements DynamicPropertyListener {
 		propertyChangeListener.propertyChanged(newValue);
 	}
 	
-	public static DynamicConfigProperty chained(DynamicConfigProperty next, DynamicPropertyListener propertyChangeListener) {
+	public static DynamicConfigProperty chained(DynamicConfigProperty next, DynamicStringPropertyListener propertyChangeListener) {
 		return new ChainedElement(next, propertyChangeListener);
 	}
 	
-	public static DynamicConfigProperty terminal(String value, DynamicPropertyListener listener) {
+	public static DynamicConfigProperty terminal(String value, DynamicStringPropertyListener listener) {
 		return new TerminalValue(value, listener);
 	}
 	
 	static class ChainedElement extends DynamicConfigProperty {	
 		private final DynamicConfigProperty next;
 		
-		public ChainedElement(DynamicConfigProperty next, DynamicPropertyListener propertyChangeListener) {
+		public ChainedElement(DynamicConfigProperty next, DynamicStringPropertyListener propertyChangeListener) {
 			super(propertyChangeListener);
 			this.next = next;
 		}
@@ -78,7 +78,7 @@ public abstract class DynamicConfigProperty implements DynamicPropertyListener {
 	
 	static class TerminalValue extends DynamicConfigProperty {
 		
-		public TerminalValue(String value, DynamicPropertyListener propertyChangeListener) {
+		public TerminalValue(String value, DynamicStringPropertyListener propertyChangeListener) {
 			super(propertyChangeListener, value);
 		}
 		

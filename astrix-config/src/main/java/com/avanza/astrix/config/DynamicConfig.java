@@ -20,6 +20,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -27,6 +30,7 @@ import java.util.List;
  */
 public final class DynamicConfig {
 
+	private final Logger logger = LoggerFactory.getLogger(DynamicConfig.class);
 	private List<DynamicConfigSource> configSources;
 
 	public DynamicConfig(DynamicConfigSource configSource) {
@@ -50,18 +54,33 @@ public final class DynamicConfig {
 		return result;
 	}
 	
-	public BooleanProperty getBooleanProperty(String name, boolean defaultValue) {
-		final BooleanProperty result = new BooleanProperty();
+	public DynamicBooleanProperty getBooleanProperty(String name, boolean defaultValue) {
+		final DynamicBooleanProperty result = new DynamicBooleanProperty();
 		final DynamicPropertyChain chain = getPropertyChain(name, Boolean.toString(defaultValue), new DynamicPropertyChainListener() {
 			@Override
 			public void propertyChanged(String newValue) {
-				result.set(Boolean.parseBoolean(newValue));
+				try {
+					result.set(validateBoolean(newValue));
+				} catch (Exception e) {
+					logger.warn("Failed to set boolean value for: " + newValue, e);
+				}
 			}
+
 		});
-		result.set(Boolean.parseBoolean(chain.get()));
+		result.set(validateBoolean(chain.get()));
 		return result;
 	}
-
+	
+	private boolean validateBoolean(String newValue) {
+		if (newValue.equalsIgnoreCase("false")) {
+			return false;
+		}
+		if (newValue.equalsIgnoreCase("true")) {
+			return true;
+		}
+		throw new IllegalArgumentException("Cannot parse boolean value: \"" + newValue + "\"");
+	}
+	
 	private DynamicPropertyChain getPropertyChain(String name, String defaultValue, DynamicPropertyChainListener dynamicPropertyListener) {
 		DynamicPropertyChain chain = DynamicPropertyChain.createWithDefaultValue(defaultValue, dynamicPropertyListener);
 		for (DynamicConfigSource configSource : configSources) {

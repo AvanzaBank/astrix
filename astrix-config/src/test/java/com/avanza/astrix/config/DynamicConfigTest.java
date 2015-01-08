@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.config;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -29,19 +30,6 @@ import org.junit.Test;
 
 public class DynamicConfigTest {
 	
-	
-	@Test
-	public void testName() throws Exception {
-		MapConfigSource configSource = new MapConfigSource();
-		DynamicConfig dynamicConfig = new DynamicConfig(configSource);
-		
-		DynamicStringProperty stringProperty = dynamicConfig.getStringProperty("foo", "defaultFoo");
-		
-		assertEquals("defaultFoo", stringProperty.get());
-		
-		configSource.set("foo", "fooValue");
-		assertEquals("fooValue", stringProperty.get());
-	}
 	
 	@Test
 	public void propertyIsResolvedByFirstOccurence() throws Exception {
@@ -61,13 +49,58 @@ public class DynamicConfigTest {
 		assertEquals("firstValue", stringProperty.get());
 	}
 	
+	@Test
+	public void booleanProperty() throws Exception {
+		MapConfigSource firstSource = new MapConfigSource();
+		MapConfigSource secondSource = new MapConfigSource();
+		DynamicConfig dynamicConfig = new DynamicConfig(Arrays.asList(firstSource, secondSource));
+		
+		DynamicBooleanProperty booleanProperty = dynamicConfig.getBooleanProperty("foo", false);
+		
+		secondSource.set("foo", "true");
+		assertTrue(booleanProperty.get());
+		
+		firstSource.set("foo", "false");
+		assertFalse(booleanProperty.get());
+	}
+	
+	@Test
+	public void unparsablePropertiesAreIgnored() throws Exception {
+		MapConfigSource firstSource = new MapConfigSource();
+		MapConfigSource secondSource = new MapConfigSource();
+		DynamicConfig dynamicConfig = new DynamicConfig(Arrays.asList(firstSource, secondSource));
+		
+		DynamicBooleanProperty booleanProperty = dynamicConfig.getBooleanProperty("foo", false);
+		
+		secondSource.set("foo", "true");
+		assertTrue(booleanProperty.get());
+		
+		firstSource.set("foo", "true[L]");
+		assertTrue(booleanProperty.get());
+		
+		secondSource.set("foo", "MALFORMED");
+		assertTrue(booleanProperty.get());
+	}
+	
+//	@Test
+	public void unparsablePropertiesAreIgnored2() throws Exception {
+		MapConfigSource firstSource = new MapConfigSource();
+		MapConfigSource secondSource = new MapConfigSource();
+		secondSource.set("foo", "true[2]");
+		firstSource.set("foo", "true[L]");
+		DynamicConfig dynamicConfig = new DynamicConfig(Arrays.asList(firstSource, secondSource));
+		
+		DynamicBooleanProperty booleanProperty = dynamicConfig.getBooleanProperty("foo", true);
+		assertTrue(booleanProperty.get());
+	}
+	
 	private static class MapConfigSource implements DynamicConfigSource {
 		
-		private ConcurrentMap<String, DynamicStringProperty2> propertyValues = new ConcurrentHashMap<>();
+		private ConcurrentMap<String, ListenabeStringProperty> propertyValues = new ConcurrentHashMap<>();
 		
 		@Override
-		public String get(String propertyName, DynamicPropertyListener propertyChangeListener) {
-			DynamicStringProperty2 dynamicProperty = getProperty(propertyName);
+		public String get(String propertyName, DynamicStringPropertyListener propertyChangeListener) {
+			ListenabeStringProperty dynamicProperty = getProperty(propertyName);
 			dynamicProperty.listeners.add(propertyChangeListener);
 			return dynamicProperty.value;
 		}
@@ -76,22 +109,22 @@ public class DynamicConfigTest {
 			getProperty(propertyName).set(value);
 		}
 
-		private DynamicStringProperty2 getProperty(String propertyName) {
-			propertyValues.putIfAbsent(propertyName, new DynamicStringProperty2());
-			DynamicStringProperty2 dynamicProperty = propertyValues.get(propertyName);
+		private ListenabeStringProperty getProperty(String propertyName) {
+			propertyValues.putIfAbsent(propertyName, new ListenabeStringProperty());
+			ListenabeStringProperty dynamicProperty = propertyValues.get(propertyName);
 			return dynamicProperty;
 		}
 		
 		
 	}
 	
-	static class DynamicStringProperty2 {
+	static class ListenabeStringProperty {
 		
-		private final List<DynamicPropertyListener> listeners = new LinkedList<>();
+		private final List<DynamicStringPropertyListener> listeners = new LinkedList<>();
 		private volatile String value;
 		
 		void propertyChanged(String newValue) {
-			for (DynamicPropertyListener l : listeners) {
+			for (DynamicStringPropertyListener l : listeners) {
 				l.propertyChanged(newValue);
 			}
 		}

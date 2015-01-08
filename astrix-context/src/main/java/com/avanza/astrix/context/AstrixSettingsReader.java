@@ -21,7 +21,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.config.BooleanProperty;
+import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 
 /**
@@ -125,7 +125,7 @@ public class AstrixSettingsReader {
 		return setting;
 	}
 	
-	public BooleanProperty getDynamicBooleanProperty(String name, boolean defaultValue) {
+	public DynamicBooleanProperty getDynamicBooleanProperty(String name, boolean defaultValue) {
 		boolean property = getBoolean(name, defaultValue);
 		return this.dynamicConfig.getBooleanProperty(name, property);
 	}
