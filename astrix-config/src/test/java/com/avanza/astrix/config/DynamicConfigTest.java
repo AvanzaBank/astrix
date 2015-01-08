@@ -15,8 +15,9 @@
  */
 package com.avanza.astrix.config;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -31,12 +32,12 @@ import org.junit.Test;
 public class DynamicConfigTest {
 	
 	
+	MapConfigSource firstSource = new MapConfigSource();
+	MapConfigSource secondSource = new MapConfigSource();
+	DynamicConfig dynamicConfig = new DynamicConfig(Arrays.asList(firstSource, secondSource));
+	
 	@Test
-	public void propertyIsResolvedByFirstOccurence() throws Exception {
-		MapConfigSource firstSource = new MapConfigSource();
-		MapConfigSource secondSource = new MapConfigSource();
-		DynamicConfig dynamicConfig = new DynamicConfig(Arrays.asList(firstSource, secondSource));
-		
+	public void propertyIsResolvedToFirstOccurenceInConfigSources() throws Exception {
 		DynamicStringProperty stringProperty = dynamicConfig.getStringProperty("foo", "defaultFoo");
 		
 		secondSource.set("foo", "secondValue");
@@ -51,10 +52,6 @@ public class DynamicConfigTest {
 	
 	@Test
 	public void booleanProperty() throws Exception {
-		MapConfigSource firstSource = new MapConfigSource();
-		MapConfigSource secondSource = new MapConfigSource();
-		DynamicConfig dynamicConfig = new DynamicConfig(Arrays.asList(firstSource, secondSource));
-		
 		DynamicBooleanProperty booleanProperty = dynamicConfig.getBooleanProperty("foo", false);
 		
 		secondSource.set("foo", "true");
@@ -65,11 +62,7 @@ public class DynamicConfigTest {
 	}
 	
 	@Test
-	public void unparsablePropertiesAreIgnored() throws Exception {
-		MapConfigSource firstSource = new MapConfigSource();
-		MapConfigSource secondSource = new MapConfigSource();
-		DynamicConfig dynamicConfig = new DynamicConfig(Arrays.asList(firstSource, secondSource));
-		
+	public void unparsableBooleanPropertiesAreIgnored() throws Exception {
 		DynamicBooleanProperty booleanProperty = dynamicConfig.getBooleanProperty("foo", false);
 		
 		secondSource.set("foo", "true");
@@ -80,18 +73,9 @@ public class DynamicConfigTest {
 		
 		secondSource.set("foo", "MALFORMED");
 		assertTrue(booleanProperty.get());
-	}
-	
-	@Test
-	public void ifAllPropertiesAreUnparsableItFallbacksToDefaultValue() throws Exception {
-		MapConfigSource firstSource = new MapConfigSource();
-		MapConfigSource secondSource = new MapConfigSource();
-		secondSource.set("foo", "true[2]");
-		firstSource.set("foo", "true[L]");
-		DynamicConfig dynamicConfig = new DynamicConfig(Arrays.asList(firstSource, secondSource));
 		
-		DynamicBooleanProperty booleanProperty = dynamicConfig.getBooleanProperty("foo", true);
-		assertTrue(booleanProperty.get());
+		secondSource.set("foo", "false");
+		assertFalse(booleanProperty.get());
 	}
 	
 	private static class MapConfigSource implements DynamicConfigSource {
@@ -99,7 +83,7 @@ public class DynamicConfigTest {
 		private ConcurrentMap<String, ListenabeStringProperty> propertyValues = new ConcurrentHashMap<>();
 		
 		@Override
-		public String get(String propertyName, DynamicPropertyListener propertyChangeListener) {
+		public String get(String propertyName, DynamicPropertyListener<String> propertyChangeListener) {
 			ListenabeStringProperty dynamicProperty = getProperty(propertyName);
 			dynamicProperty.listeners.add(propertyChangeListener);
 			return dynamicProperty.value;
@@ -120,11 +104,11 @@ public class DynamicConfigTest {
 	
 	static class ListenabeStringProperty {
 		
-		private final List<DynamicPropertyListener> listeners = new LinkedList<>();
+		private final List<DynamicPropertyListener<String>> listeners = new LinkedList<>();
 		private volatile String value;
 		
 		void propertyChanged(String newValue) {
-			for (DynamicPropertyListener l : listeners) {
+			for (DynamicPropertyListener<String> l : listeners) {
 				l.propertyChanged(newValue);
 			}
 		}

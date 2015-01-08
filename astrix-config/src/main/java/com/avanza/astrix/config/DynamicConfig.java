@@ -20,9 +20,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -30,7 +27,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class DynamicConfig {
 
-	private final Logger logger = LoggerFactory.getLogger(DynamicConfig.class);
 	private List<DynamicConfigSource> configSources;
 
 	public DynamicConfig(DynamicConfigSource configSource) {

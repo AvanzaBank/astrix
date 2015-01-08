@@ -38,7 +38,7 @@ public final class DynamicStringProperty {
 		this.listener = NO_LISTENER;
 	}
 	
-	public DynamicStringProperty(String initialValue, DynamicPropertyListener listener) {
+	public DynamicStringProperty(String initialValue, DynamicPropertyListener<String> listener) {
 		this.value = initialValue;
 		this.listener = Objects.requireNonNull(listener);
 	}
