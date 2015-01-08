@@ -15,25 +15,8 @@
  */
 package com.avanza.astrix.config;
 
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public final class StringProperty {
-	
-	private volatile String value;
-	
-	public StringProperty(String initialValue) {
-		this.value = initialValue;
-	}
+public interface DynamicPropertyChainListener {
 
-	public String get() {
-		return this.value;
-	}
-	
-	public void set(String value) {
-		this.value = value;
-	}
+	void propertyChanged(String resolvedValue);
 
 }

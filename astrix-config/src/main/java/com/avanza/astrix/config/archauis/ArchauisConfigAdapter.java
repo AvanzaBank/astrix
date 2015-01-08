@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.config.archauis;
 
-import com.avanza.astrix.config.ConfigSource;
+import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
 import com.netflix.config.DynamicPropertyFactory;
 import com.netflix.config.DynamicStringProperty;
@@ -24,8 +24,9 @@ import com.netflix.config.DynamicStringProperty;
  * @author Elias Lindholm (elilin)
  *
  */
-public class ArchauisConfigAdapter implements ConfigSource {
+public class ArchauisConfigAdapter implements DynamicConfigSource {
 	
+	private static final String LOOKUP_MISS = "_______LOOKUP_MISS______";
 	private DynamicPropertyFactory dynamicPropertyFactory;
 	
 	public ArchauisConfigAdapter(DynamicPropertyFactory dynamicPropertyFactory) {
@@ -33,15 +34,23 @@ public class ArchauisConfigAdapter implements ConfigSource {
 	}
 	
 	@Override
-	public String get(final String name, final String defaultValue, final DynamicPropertyListener propertyChangeListener) {
-		DynamicStringProperty stringProperty = dynamicPropertyFactory.getStringProperty(name, defaultValue, new Runnable() {
+	public String get(final String name, final DynamicPropertyListener propertyChangeListener) {
+		DynamicStringProperty stringProperty = dynamicPropertyFactory.getStringProperty(name, LOOKUP_MISS, new Runnable() {
 			@Override
 			public void run() {
-				String newValue = dynamicPropertyFactory.getStringProperty(name, defaultValue).get();
-				propertyChangeListener.propertyChanged(newValue);
+				String newValue = dynamicPropertyFactory.getStringProperty(name, LOOKUP_MISS).get();
+				if (LOOKUP_MISS.equals(newValue)) {
+					propertyChangeListener.propertyChanged(null);
+				} else {
+					propertyChangeListener.propertyChanged(newValue);
+				}
 			}
 		});
-		return stringProperty.get();
+		String result = stringProperty.get();
+		if (LOOKUP_MISS.equals(result)) {
+			return null; 
+		}
+		return result;
 	}
 
 }

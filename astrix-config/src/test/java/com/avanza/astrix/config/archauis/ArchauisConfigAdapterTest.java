@@ -15,12 +15,12 @@
  */
 package com.avanza.astrix.config.archauis;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.avanza.astrix.config.Config;
-import com.avanza.astrix.config.StringProperty;
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.DynamicStringProperty;
 import com.netflix.config.DynamicConfiguration;
 import com.netflix.config.DynamicPropertyFactory;
 
@@ -30,14 +30,13 @@ public class ArchauisConfigAdapterTest {
 	
 	@Test
 	public void testName() throws Exception {
-		
 		DynamicConfiguration archauisConfig = new DynamicConfiguration();
 		DynamicPropertyFactory archaiusPropertyFactory = DynamicPropertyFactory.initWithConfigurationSource(archauisConfig);
 		
 		ArchauisConfigAdapter archauisConfigSource = new ArchauisConfigAdapter(archaiusPropertyFactory);
-		Config config = new Config(archauisConfigSource);
+		DynamicConfig config = new DynamicConfig(archauisConfigSource);
 		
-		StringProperty fooProp = config.getStringProperty("foo", "defaultFoo");
+		DynamicStringProperty fooProp = config.getStringProperty("foo", "defaultFoo");
 		assertEquals("defaultFoo", fooProp.get());
 		
 		archauisConfig.setProperty("foo", "fooValue");
@@ -45,7 +44,6 @@ public class ArchauisConfigAdapterTest {
 
 		archauisConfig.setProperty("foo", "fooNewValue");
 		assertEquals("fooNewValue", fooProp.get());
-		
 	}
-
+	
 }

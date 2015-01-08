@@ -21,6 +21,9 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.config.BooleanProperty;
+import com.avanza.astrix.config.DynamicConfig;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -32,6 +35,7 @@ public class AstrixSettingsReader {
 	
 	private AstrixSettings settings;
 	private AstrixExternalConfig externalConfig;
+	private DynamicConfig dynamicConfig;
 	private Properties classpathOverride = new Properties();
 	
 	private AstrixSettingsReader(AstrixSettings settings, AstrixExternalConfig externalConfig) {
@@ -58,7 +62,7 @@ public class AstrixSettingsReader {
 		 *  NOTE: 
 		 *  This behavior might look weird. We must create a AstrixSettingsReader too lookup the ASTRIX_CONFIG_URI setting
 		 *  in order to create the AstrixExternalConfig. The reason is that we want the same chain of lookup
-		 *  to take place event when reading the external_config_url.
+		 *  to take place even when reading the external_config_url.
 		 */
 		String configUrl = new AstrixSettingsReader(settings, settings).getString(AstrixSettings.ASTRIX_CONFIG_URI);
 		if (configUrl == null) {
@@ -83,10 +87,10 @@ public class AstrixSettingsReader {
 		return Long.parseLong(value);
 	}
 
-	public boolean getBoolean(String settingsName, boolean deafualtValue) {
+	public boolean getBoolean(String settingsName, boolean defaultValue) {
 		String value = get(settingsName);
 		if (value == null) {
-			return deafualtValue;
+			return defaultValue;
 		}
 		return Boolean.parseBoolean(value);
 	}
@@ -119,6 +123,11 @@ public class AstrixSettingsReader {
 			log.trace("Resolved setting using classpathOverride: name={} value={}", settingName, setting);
 		}
 		return setting;
+	}
+	
+	public BooleanProperty getDynamicBooleanProperty(String name, boolean defaultValue) {
+		boolean property = getBoolean(name, defaultValue);
+		return this.dynamicConfig.getBooleanProperty(name, property);
 	}
 
 }

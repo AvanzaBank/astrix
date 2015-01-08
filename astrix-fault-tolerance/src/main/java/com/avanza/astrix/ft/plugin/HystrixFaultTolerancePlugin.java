@@ -15,22 +15,65 @@
  */
 package com.avanza.astrix.ft.plugin;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Objects;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.config.BooleanProperty;
 import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
+import com.avanza.astrix.context.AstrixSettingsAware;
+import com.avanza.astrix.context.AstrixSettingsReader;
 import com.avanza.astrix.context.FaultToleranceSpecification;
 import com.avanza.astrix.ft.HystrixAdapter;
 
 
 @MetaInfServices(value = AstrixFaultTolerancePlugin.class)
-public class HystrixFaultTolerancePlugin implements AstrixFaultTolerancePlugin {
+public class HystrixFaultTolerancePlugin implements AstrixFaultTolerancePlugin, AstrixSettingsAware {
+	
+	private AstrixSettingsReader settings;
 	
 	@Override
 	public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec) {
 		Objects.requireNonNull(spec);
-		return HystrixAdapter.create(spec);
+		T faultToleranceProtectedProvider = HystrixAdapter.create(spec);
+		BooleanProperty useFaultTolerance = settings.getDynamicBooleanProperty("astrix.faultTolerance." + spec.getApi().getName() + ".enabled", true);
+		FaultToleranceToggle<T> fsToggle = new FaultToleranceToggle<T>(faultToleranceProtectedProvider, spec.getProvider(), useFaultTolerance);
+		return spec.getApi().cast(Proxy.newProxyInstance(spec.getApi().getClassLoader(), new Class[]{spec.getApi()}, fsToggle));
 	}
+	
+	private class FaultToleranceToggle<T> implements InvocationHandler {
+		private final T faultToleranceProtectedProvider;
+		private final T rawProvider;
+		private final BooleanProperty useFaultTolerance;
+		
+		public FaultToleranceToggle(T faultToleranceProtectedProvider, T rawProvider, BooleanProperty useFaultTolerance) {
+			this.faultToleranceProtectedProvider = faultToleranceProtectedProvider;
+			this.rawProvider = rawProvider;
+			this.useFaultTolerance = useFaultTolerance;
+		}
+
+		@Override
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			T provider = getProvider();
+			return method.invoke(provider, args);
+		}
+
+		private T getProvider() {
+			if (useFaultTolerance.get()) {
+				return faultToleranceProtectedProvider;
+			}
+			return rawProvider;
+		}
+	}
+
+	@Override
+	public void setSettings(AstrixSettingsReader settings) {
+		this.settings = settings;
+	}
+	
+	
 
 }

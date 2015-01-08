@@ -20,24 +20,33 @@ package com.avanza.astrix.config;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class Config {
-
-	private ConfigSource configSource;
-
-	public Config(ConfigSource configSource) {
-		this.configSource = configSource;
-	}
-
-	public StringProperty getStringProperty(String name, String defaultValue) {
-		final StringProperty result = new StringProperty(null);
-		String propertyValue = configSource.get(name, defaultValue, new DynamicPropertyListener() {
-			@Override
-			public void propertyChanged(String newValue) {
-				result.set(newValue);
-			}
-		});
-		result.set(propertyValue);
-		return result;
+public final class DynamicStringProperty {
+	
+	private static final DynamicPropertyListener NO_LISTENER = new DynamicPropertyListener() {
+		@Override
+		public void propertyChanged(String newValue) {
+		}
+	};
+	
+	private volatile String value;
+	private final DynamicPropertyListener listener;
+	
+	public DynamicStringProperty(String initialValue) {
+		this.value = initialValue;
+		this.listener = NO_LISTENER;
 	}
 	
+	public DynamicStringProperty(String initialValue, DynamicPropertyListener listener) {
+		this.value = initialValue;
+		this.listener = listener;
+	}
+
+	public String get() {
+		return this.value;
+	}
+	
+	public void set(String value) {
+		this.value = value;
+	}
+
 }
