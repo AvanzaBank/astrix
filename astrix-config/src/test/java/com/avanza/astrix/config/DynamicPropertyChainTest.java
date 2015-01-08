@@ -27,7 +27,7 @@ import org.junit.Test;
 
 public class DynamicPropertyChainTest {
 	
-	private static final DynamicPropertyChainListener DUMMY_LISTENER = new DynamicPropertyChainListener() {
+	private static final DynamicPropertyChainListener<String> DUMMY_LISTENER = new DynamicPropertyChainListener<String>() {
 		@Override
 		public void propertyChanged(String newValue) {
 		}
@@ -35,14 +35,14 @@ public class DynamicPropertyChainTest {
 	
 	@Test
 	public void emptyChainReturnsDefaultValue() throws Exception {
-		DynamicPropertyChain propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", DUMMY_LISTENER);
+		DynamicPropertyChain<String> propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", DUMMY_LISTENER, new PropertyParser.StringParser());
 		assertEquals("defaultFoo", propertyChain.get());
 	}
 	
 	@Test
 	public void chainReturnsDefaultValue() throws Exception {
-		DynamicPropertyChain propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", DUMMY_LISTENER);
-		DynamicConfigProperty dynamicProperty = propertyChain.prependValue();
+		DynamicPropertyChain<String> propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", DUMMY_LISTENER, new PropertyParser.StringParser());
+		DynamicConfigProperty<String> dynamicProperty = propertyChain.prependValue();
 		assertEquals("defaultFoo", propertyChain.get());
 		dynamicProperty.set("Foo");
 		assertEquals("Foo", dynamicProperty.get());
@@ -50,8 +50,8 @@ public class DynamicPropertyChainTest {
 	
 	@Test
 	public void chainClearsReturnsToDefaultValue() throws Exception {
-		DynamicPropertyChain propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", DUMMY_LISTENER);
-		DynamicConfigProperty dynamicProperty = propertyChain.prependValue();
+		DynamicPropertyChain<String> propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", DUMMY_LISTENER, new PropertyParser.StringParser());
+		DynamicConfigProperty<String> dynamicProperty = propertyChain.prependValue();
 		assertEquals("defaultFoo", propertyChain.get());
 		dynamicProperty.set("Foo");
 		assertEquals("Foo", dynamicProperty.get());
@@ -61,9 +61,9 @@ public class DynamicPropertyChainTest {
 	
 	@Test
 	public void resolvesPropertyInOrder() throws Exception {
-		DynamicPropertyChain propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", DUMMY_LISTENER);
-		DynamicConfigProperty secondPropertyInChain = propertyChain.prependValue();
-		DynamicConfigProperty firstPropertyInChain = propertyChain.prependValue();
+		DynamicPropertyChain<String> propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", DUMMY_LISTENER, new PropertyParser.StringParser());
+		DynamicConfigProperty<String> secondPropertyInChain = propertyChain.prependValue();
+		DynamicConfigProperty<String> firstPropertyInChain = propertyChain.prependValue();
 		
 		secondPropertyInChain.set("Foo");
 		assertEquals("Foo", propertyChain.get());
@@ -76,15 +76,15 @@ public class DynamicPropertyChainTest {
 	@Test
 	public void notifiesListener() throws Exception {
 		final Queue<String> propertyChanges = new LinkedList<>();
-		DynamicPropertyChain propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", new DynamicPropertyChainListener() {
+		DynamicPropertyChain<String> propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", new DynamicPropertyChainListener<String>() {
 			@Override
 			public void propertyChanged(String newValue) {
 				propertyChanges.add(newValue);
 			}
-		});
+		}, new PropertyParser.StringParser());
 		
-		DynamicConfigProperty secondPropertyInChain = propertyChain.prependValue();
-		DynamicConfigProperty firstPropertyInChain = propertyChain.prependValue();
+		DynamicConfigProperty<String> secondPropertyInChain = propertyChain.prependValue();
+		DynamicConfigProperty<String> firstPropertyInChain = propertyChain.prependValue();
 		
 		secondPropertyInChain.set("Foo");
 		assertEquals("Foo", propertyChanges.poll());

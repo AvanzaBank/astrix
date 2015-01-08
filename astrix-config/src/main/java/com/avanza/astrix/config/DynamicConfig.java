@@ -44,47 +44,32 @@ public final class DynamicConfig {
 
 	public DynamicStringProperty getStringProperty(String name, String defaultValue) {
 		final DynamicStringProperty result = new DynamicStringProperty(null);
-		final DynamicPropertyChain chain = getPropertyChain(name, defaultValue, new DynamicPropertyChainListener() {
+		final DynamicPropertyChain<String> chain = getPropertyChain(name, defaultValue, new DynamicPropertyChainListener<String>() {
 			@Override
 			public void propertyChanged(String newValue) {
 				result.set(newValue);
 			}
-		});
+		}, new PropertyParser.StringParser());
 		result.set(chain.get());
 		return result;
 	}
 	
 	public DynamicBooleanProperty getBooleanProperty(String name, boolean defaultValue) {
 		final DynamicBooleanProperty result = new DynamicBooleanProperty();
-		final DynamicPropertyChain chain = getPropertyChain(name, Boolean.toString(defaultValue), new DynamicPropertyChainListener() {
+		final DynamicPropertyChain<Boolean> chain = getPropertyChain(name, defaultValue, new DynamicPropertyChainListener<Boolean>() {
 			@Override
-			public void propertyChanged(String newValue) {
-				try {
-					result.set(validateBoolean(newValue));
-				} catch (Exception e) {
-					logger.warn("Failed to set boolean value for: " + newValue, e);
-				}
+			public void propertyChanged(Boolean newValue) {
+				result.set(newValue.booleanValue());
 			}
-
-		});
-		result.set(validateBoolean(chain.get()));
+		}, new PropertyParser.BooleanParser());
+		result.set(chain.get());
 		return result;
 	}
 	
-	private boolean validateBoolean(String newValue) {
-		if (newValue.equalsIgnoreCase("false")) {
-			return false;
-		}
-		if (newValue.equalsIgnoreCase("true")) {
-			return true;
-		}
-		throw new IllegalArgumentException("Cannot parse boolean value: \"" + newValue + "\"");
-	}
-	
-	private DynamicPropertyChain getPropertyChain(String name, String defaultValue, DynamicPropertyChainListener dynamicPropertyListener) {
-		DynamicPropertyChain chain = DynamicPropertyChain.createWithDefaultValue(defaultValue, dynamicPropertyListener);
+	private <T> DynamicPropertyChain<T> getPropertyChain(String name, T defaultValue, DynamicPropertyChainListener<T> dynamicPropertyListener, PropertyParser<T> propertyParser) {
+		DynamicPropertyChain<T> chain = DynamicPropertyChain.createWithDefaultValue(defaultValue, dynamicPropertyListener, propertyParser);
 		for (DynamicConfigSource configSource : configSources) {
-			DynamicConfigProperty newValueInChain = chain.prependValue();
+			DynamicConfigProperty<T> newValueInChain = chain.prependValue();
 			String propertyValue = configSource.get(name, newValueInChain);
 			newValueInChain.set(propertyValue);
 		}

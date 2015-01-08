@@ -82,8 +82,8 @@ public class DynamicConfigTest {
 		assertTrue(booleanProperty.get());
 	}
 	
-//	@Test
-	public void unparsablePropertiesAreIgnored2() throws Exception {
+	@Test
+	public void ifAllPropertiesAreUnparsableItFallbacksToDefaultValue() throws Exception {
 		MapConfigSource firstSource = new MapConfigSource();
 		MapConfigSource secondSource = new MapConfigSource();
 		secondSource.set("foo", "true[2]");
@@ -99,7 +99,7 @@ public class DynamicConfigTest {
 		private ConcurrentMap<String, ListenabeStringProperty> propertyValues = new ConcurrentHashMap<>();
 		
 		@Override
-		public String get(String propertyName, DynamicStringPropertyListener propertyChangeListener) {
+		public String get(String propertyName, DynamicPropertyListener propertyChangeListener) {
 			ListenabeStringProperty dynamicProperty = getProperty(propertyName);
 			dynamicProperty.listeners.add(propertyChangeListener);
 			return dynamicProperty.value;
@@ -120,11 +120,11 @@ public class DynamicConfigTest {
 	
 	static class ListenabeStringProperty {
 		
-		private final List<DynamicStringPropertyListener> listeners = new LinkedList<>();
+		private final List<DynamicPropertyListener> listeners = new LinkedList<>();
 		private volatile String value;
 		
 		void propertyChanged(String newValue) {
-			for (DynamicStringPropertyListener l : listeners) {
+			for (DynamicPropertyListener l : listeners) {
 				l.propertyChanged(newValue);
 			}
 		}

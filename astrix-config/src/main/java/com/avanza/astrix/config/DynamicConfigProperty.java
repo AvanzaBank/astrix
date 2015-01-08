@@ -15,59 +15,73 @@
  */
 package com.avanza.astrix.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public abstract class DynamicConfigProperty implements DynamicStringPropertyListener {
+public abstract class DynamicConfigProperty<T> implements DynamicPropertyListener<String> {
 	
-	private DynamicStringPropertyListener propertyChangeListener;
-	private volatile String value;
+	private final Logger logger = LoggerFactory.getLogger(DynamicConfigProperty.class);
+	private DynamicPropertyListener<T> propertyChangeListener;
+	private volatile T value;
+	private final PropertyParser<T> parser;
 	
-	private DynamicConfigProperty(DynamicStringPropertyListener propertyChangeListener) {
+	private DynamicConfigProperty(DynamicPropertyListener<T> propertyChangeListener, PropertyParser<T> propertyParser) {
 		this.propertyChangeListener = propertyChangeListener;
+		this.parser = propertyParser;
 	}
 	
-	private DynamicConfigProperty(DynamicStringPropertyListener propertyChangeListener, String value) {
+	private DynamicConfigProperty(DynamicPropertyListener<T> propertyChangeListener, T value, PropertyParser<T> propertyParser) {
 		this.propertyChangeListener = propertyChangeListener;
 		this.value = value;
+		this.parser = propertyParser;
 	}
 	
-	public String get() {
+	public T get() {
 		return this.value;
 	}
 	
 	public final void set(String value) {
-		this.value = value;
-		propertyChangeListener.propertyChanged(value);
+		try {
+			if (value != null) {
+				this.value = parser.parse(value);
+			} else {
+				this.value = null;
+			}
+			propertyChangeListener.propertyChanged(this.value);
+		} catch (Exception e) {
+			logger.error("Failed to parse: " + value, e);
+		}
 	}
 	
 	@Override
 	public void propertyChanged(String newValue) {
-		this.value = newValue;
-		propertyChangeListener.propertyChanged(newValue);
+		set(newValue);
 	}
 	
-	public static DynamicConfigProperty chained(DynamicConfigProperty next, DynamicStringPropertyListener propertyChangeListener) {
-		return new ChainedElement(next, propertyChangeListener);
+	public static <T> DynamicConfigProperty<T> chained(DynamicConfigProperty<T> next, DynamicPropertyListener<T> propertyChangeListener, PropertyParser<T> propretyParser) {
+		return new ChainedElement<T>(next, propertyChangeListener, propretyParser);
 	}
 	
-	public static DynamicConfigProperty terminal(String value, DynamicStringPropertyListener listener) {
-		return new TerminalValue(value, listener);
+	public static <T> DynamicConfigProperty<T> terminal(T value, DynamicPropertyListener<T> listener, PropertyParser<T> propertyParser) {
+		return new TerminalValue<T>(value, listener, propertyParser);
 	}
 	
-	static class ChainedElement extends DynamicConfigProperty {	
-		private final DynamicConfigProperty next;
+	static class ChainedElement<T> extends DynamicConfigProperty<T> {	
+		private final DynamicConfigProperty<T> next;
 		
-		public ChainedElement(DynamicConfigProperty next, DynamicStringPropertyListener propertyChangeListener) {
-			super(propertyChangeListener);
+		public ChainedElement(DynamicConfigProperty<T> next, DynamicPropertyListener<T> propertyChangeListener, PropertyParser<T> propertyParser) {
+			super(propertyChangeListener, propertyParser);
 			this.next = next;
 		}
 
-		public String get() {
-			String result = super.get();
+		public T get() {
+			T result = super.get();
 			if (result != null) {
 				return result;
 			}
@@ -76,10 +90,10 @@ public abstract class DynamicConfigProperty implements DynamicStringPropertyList
 
 	}
 	
-	static class TerminalValue extends DynamicConfigProperty {
+	static class TerminalValue<T> extends DynamicConfigProperty<T> {
 		
-		public TerminalValue(String value, DynamicStringPropertyListener propertyChangeListener) {
-			super(propertyChangeListener, value);
+		public TerminalValue(T value, DynamicPropertyListener<T> propertyChangeListener, PropertyParser<T> propertyParser) {
+			super(propertyChangeListener, value, propertyParser);
 		}
 		
 	}

@@ -14,10 +14,28 @@
  * limitations under the License.
  */
 package com.avanza.astrix.config;
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface DynamicBooleanPropertyListener {
+
+public interface PropertyParser<T> {
+
+	T parse(String value);
+	
+	static class BooleanParser implements PropertyParser<Boolean> {
+		@Override
+		public Boolean parse(String value) {
+			if ("false".equalsIgnoreCase(value)) {
+				return false;
+			}
+			if ("true".equalsIgnoreCase(value)) {
+				return true;
+			}
+			throw new IllegalArgumentException("Cannot parse boolean value: \"" + value + "\"");
+		}
+	};
+	
+	static class StringParser implements PropertyParser<String> {
+		@Override
+		public String parse(String value) {
+			return value;
+		}
+	};
 }

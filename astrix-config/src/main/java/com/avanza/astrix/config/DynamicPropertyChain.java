@@ -18,36 +18,38 @@ package com.avanza.astrix.config;
 import java.util.Objects;
 
 
-public class DynamicPropertyChain implements DynamicStringPropertyListener {
+public class DynamicPropertyChain<T> implements DynamicPropertyListener<T> {
 	
-	private volatile DynamicConfigProperty chain;
-	private DynamicPropertyChainListener propertyListener;
+	private volatile DynamicConfigProperty<T> chain;
+	private DynamicPropertyChainListener<T> propertyListener;
+	private PropertyParser<T> parser;
 	
-	public DynamicPropertyChain(DynamicConfigProperty chain, DynamicPropertyChainListener propertyListener) {
+	public DynamicPropertyChain(DynamicConfigProperty<T> chain, DynamicPropertyChainListener<T> propertyListener, PropertyParser<T> parser) {
 		this.chain = chain;
 		this.propertyListener = propertyListener;
+		this.parser = parser;
 	}
 
-	public static DynamicPropertyChain createWithDefaultValue(String defaultValue, DynamicPropertyChainListener listener) {
-		return new DynamicPropertyChain(DynamicConfigProperty.terminal(defaultValue, new DynamicStringPropertyListener() {
+	public static <T> DynamicPropertyChain<T> createWithDefaultValue(T defaultValue, DynamicPropertyChainListener<T> listener, PropertyParser<T> parser) {
+		return new DynamicPropertyChain<>(DynamicConfigProperty.terminal(defaultValue, new DynamicPropertyListener<T>() {
 			@Override
-			public void propertyChanged(String newValue) {
+			public void propertyChanged(T newValue) {
 			}
-		}), listener);
+		}, parser), listener, parser);
 	}
 	
-	public String get() {
+	public T get() {
 		return chain.get();
 	}
 
-	public DynamicConfigProperty prependValue() {
-		chain = DynamicConfigProperty.chained(chain, this);
+	public DynamicConfigProperty<T> prependValue() {
+		chain = DynamicConfigProperty.chained(chain, this, parser);
 		return chain;
 	}
 
 	@Override
-	public void propertyChanged(String newValue) {
-		String resolvedValue = get();
+	public void propertyChanged(T newValue) {
+		T resolvedValue = get();
 		if (Objects.equals(newValue, resolvedValue)) {
 			// Resolved value was updated, fire property change
 			propertyListener.propertyChanged(get());

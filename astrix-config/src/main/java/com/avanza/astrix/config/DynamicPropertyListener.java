@@ -19,8 +19,8 @@ package com.avanza.astrix.config;
  * @author Elias Lindholm (elilin)
  *
  */
-public interface DynamicStringPropertyListener {
-
-	void propertyChanged(String newValue);
+public interface DynamicPropertyListener<T> {
+	
+	void propertyChanged(T newValue);
 
 }

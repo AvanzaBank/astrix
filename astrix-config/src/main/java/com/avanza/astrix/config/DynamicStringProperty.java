@@ -24,21 +24,21 @@ import java.util.Objects;
  */
 public final class DynamicStringProperty {
 	
-	private static final DynamicStringPropertyListener NO_LISTENER = new DynamicStringPropertyListener() {
+	private static final DynamicPropertyListener<String> NO_LISTENER = new DynamicPropertyListener<String>() {
 		@Override
 		public void propertyChanged(String newValue) {
 		}
 	};
 	
 	private volatile String value;
-	private final DynamicStringPropertyListener listener;
+	private final DynamicPropertyListener<String> listener;
 	
 	public DynamicStringProperty(String initialValue) {
 		this.value = initialValue;
 		this.listener = NO_LISTENER;
 	}
 	
-	public DynamicStringProperty(String initialValue, DynamicStringPropertyListener listener) {
+	public DynamicStringProperty(String initialValue, DynamicPropertyListener listener) {
 		this.value = initialValue;
 		this.listener = Objects.requireNonNull(listener);
 	}
