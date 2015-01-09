@@ -36,6 +36,11 @@ public class AstrixSettings implements AstrixExternalConfig, DynamicConfigSource
 	public static final String BEAN_REBIND_ATTEMPT_INTERVAL = BEAN_BIND_ATTEMPT_INTERVAL;
 	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AstrixServiceLeaseManager.leaseRenewInterval";
 	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AstrixContextImpl.enforceSubsystemBoundaries";
+	/**
+	 * @deprecated AstrixExternalConfigPlugin is replaced by AstrixConfigPlugin and corresponding
+	 * {@link AstrixSettings#ASTRIX_CONFIG_PLUGIN_SETTINGS} property.
+	 */
+	@Deprecated
 	public static final String ASTRIX_CONFIG_URI = "AstrixConfig.uri";
 	public static final String ASTRIX_CONFIG_PLUGIN_SETTINGS = "AstrixConfigPlugin.settings";
 	public static final String ASTRIX_SERVICE_REGISTRY_URI = "AstrixServiceRegistry.serviceUri";
