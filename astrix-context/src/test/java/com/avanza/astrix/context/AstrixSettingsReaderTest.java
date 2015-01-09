@@ -15,12 +15,16 @@
  */
 package com.avanza.astrix.context;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
-import com.avanza.astrix.context.AstrixSettings;
-import com.avanza.astrix.context.AstrixSettingsReader;
+import com.avanza.astrix.config.ConfigSource;
+import com.avanza.astrix.config.MapConfigSource;
+import com.avanza.astrix.provider.core.AstrixPluginQualifier;
 
 
 
@@ -28,33 +32,72 @@ public class AstrixSettingsReaderTest {
 
 	AstrixSettings settings = new AstrixSettings();
 	AstrixSettings externalConfig = new AstrixSettings();
-	AstrixSettingsReader AstrixSettingsReader = new AstrixSettingsReader(settings, externalConfig, "META-INF/astrix/settings_test.properties");
+	AstrixSettingsReader astrixSettingsReader = new AstrixSettingsReader(settings, externalConfig, "META-INF/astrix/settings_test.properties");
 	
 	@Test
 	public void externalConfigTakesHighestPrecedence() throws Exception {
 		settings.set("mySetting", "programaticSettingsValue");
 		externalConfig.set("mySetting", "externalConfigValue");
-		String configUrl = AstrixSettingsReader.getString("mySetting", "lastFallbackValue");
+		String configUrl = astrixSettingsReader.getString("mySetting", "lastFallbackValue");
 		assertEquals("externalConfigValue", configUrl);
 	}
 	
 	@Test
 	public void programaticSettingsTakeSecondHighestPrecedence() throws Exception {
 		settings.set("mySetting", "programaticSettingsValue");
-		String configUrl = AstrixSettingsReader.getString("mySetting", "lastFallbackValue");
+		String configUrl = astrixSettingsReader.getString("mySetting", "lastFallbackValue");
 		assertEquals("programaticSettingsValue", configUrl);
 	}
 	
 	@Test
 	public void classpathOverrideTakeThirdHighestPrecedence() throws Exception {
-		String configUrl = AstrixSettingsReader.getString("mySetting", "lastFallbackValue");
+		String configUrl = astrixSettingsReader.getString("mySetting", "lastFallbackValue");
 		assertEquals("mySettingClasspathValue", configUrl);
 	}
 	
 	@Test
 	public void usesLastFallbackValueIfSettingNotDefinedInAnyOtherConfigurationSource() throws Exception {
-		String configUrl = AstrixSettingsReader.getString("anotherSetting", "lastFallbackValue");
+		String configUrl = astrixSettingsReader.getString("anotherSetting", "lastFallbackValue");
 		assertEquals("lastFallbackValue", configUrl);
 	}
+	
+	
+	@Test
+	public void readAstrixConfigPluginSettingsToFindConfigPlugin() throws Exception {
+		final MapConfigSource configSource = new MapConfigSource();
+		AstrixPlugins plugins = new AstrixPlugins(new AstrixPluginInitializer() {
+			@Override
+			public void init(Object plugin) {
+			}
+		});
+		FakeConfigPlugin configPlugin = new FakeConfigPlugin(configSource);
+		plugins.registerPlugin(AstrixConfigPlugin.class, configPlugin);
+
+		settings.set(AstrixSettings.ASTRIX_CONFIG_PLUGIN_SETTINGS, "fakeConfigPlugin:foo:properties");
+		astrixSettingsReader = AstrixSettingsReader.create(plugins, settings);
+		
+		configSource.set("foo", "fooConfigSourceValue");
+		assertEquals("fooConfigSourceValue", astrixSettingsReader.getString("foo"));
+		assertEquals("foo:properties", configPlugin.lastParsedUri);
+	}
+	
+	@AstrixPluginQualifier("fakeConfigPlugin")
+	static class FakeConfigPlugin implements AstrixConfigPlugin {
+		
+		ConfigSource configSource;
+		String lastParsedUri;
+		
+		FakeConfigPlugin(ConfigSource configSource) {
+			this.configSource = configSource;
+		}
+
+		@Override
+		public List<? extends ConfigSource> getConfigSources(String uri) {
+			this.lastParsedUri = uri;
+			return Arrays.asList(configSource);
+		}
+	}
+	
+	
 
 }

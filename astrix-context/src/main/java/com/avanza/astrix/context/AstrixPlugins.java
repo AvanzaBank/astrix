@@ -153,7 +153,7 @@ public class AstrixPlugins {
 					}
 				}
 			}
-			throw new IllegalArgumentException(String.format("Found no provider of type: %s with qualifier %s", this.type, qualifier));
+			throw new IllegalArgumentException(String.format("Found no provider of type: %s with qualifier \"%s\"", this.type, qualifier));
 		}
 
 		public List<T> getAll() {

@@ -16,8 +16,12 @@
 package com.avanza.astrix.context;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,20 +37,26 @@ import com.avanza.astrix.config.DynamicLongProperty;
  *
  */
 public class AstrixSettingsReader {
-
+	
+	private static final Pattern CONFIG_URI_PATTERN = Pattern.compile("([^:]*)(:(.*))?");
 	private final Logger log = LoggerFactory.getLogger(AstrixSettingsReader.class);
-
 	private final DynamicConfig dynamicConfig;
 	
-	private AstrixSettingsReader(AstrixSettings settings, AstrixExternalConfig externalConfig) {
-		this(settings, externalConfig, "META-INF/astrix/settings.properties");
+	private AstrixSettingsReader(AstrixSettings settings, List<? extends ConfigSource> externalConfigSources) {
+		this(settings, externalConfigSources, "META-INF/astrix/settings.properties");
 	}
 	
 	AstrixSettingsReader(AstrixSettings settings, AstrixExternalConfig externalConfig, String defaultSettingsOverrideFile) {
+		this(settings, Arrays.asList(new ExternalConfigAdapter(externalConfig)), defaultSettingsOverrideFile);
+	}
+	
+	AstrixSettingsReader(AstrixSettings settings, List<? extends ConfigSource> externalConfigSources, String defaultSettingsOverrideFile) {
 		Properties classpathOverride = getClasspathOverrideProperites(defaultSettingsOverrideFile);
-		this.dynamicConfig = new DynamicConfig(Arrays.asList(new ExternalConfigAdapter(externalConfig),
-															 settings,		
-															 new PropertiesAdapter(classpathOverride)));
+		List<ConfigSource> configSources = new ArrayList<>(externalConfigSources.size() + 2);
+		configSources.addAll(externalConfigSources);
+		configSources.add(settings);
+		configSources.add(new PropertiesAdapter(classpathOverride));
+		this.dynamicConfig = new DynamicConfig(configSources);
 	}
 
 	private Properties getClasspathOverrideProperites(
@@ -72,19 +82,29 @@ public class AstrixSettingsReader {
 		 *  in order to create the AstrixExternalConfig. The reason is that we want the same chain of lookup
 		 *  to take place even when reading the external_config_url.
 		 */
-		String configUrl = new AstrixSettingsReader(settings, settings).getString(AstrixSettings.ASTRIX_CONFIG_URI);
+		String configPluginSettings = new AstrixSettingsReader(settings, Arrays.asList(settings)).getString(AstrixSettings.ASTRIX_CONFIG_PLUGIN_SETTINGS);
+		if (configPluginSettings != null) {
+			return new AstrixSettingsReader(settings, createConfigSources(configPluginSettings, plugins));
+		}
+		String configUrl = new AstrixSettingsReader(settings, Arrays.asList(settings)).getString(AstrixSettings.ASTRIX_CONFIG_URI);
 		if (configUrl == null) {
-			return new AstrixSettingsReader(settings, new AstrixSettings());
+			return new AstrixSettingsReader(settings, Arrays.asList(new AstrixSettings()));
 		}
-		int splitAt = configUrl.indexOf(":");
-		String configPlugin = configUrl;
-		String locator = "";
-		if (splitAt > 0) {
-			configPlugin = configUrl.substring(0, splitAt);
-			locator = configUrl.substring(splitAt + 1);
-		}
-		AstrixExternalConfig externalConfig = plugins.getPlugin(AstrixExternalConfigPlugin.class, configPlugin).getConfig(locator);
-		return new AstrixSettingsReader(settings, externalConfig);
+		Matcher matcher = CONFIG_URI_PATTERN.matcher(configUrl);
+		matcher.find();
+		String externalConfigPluginName = matcher.group(1);
+		String optionalPluginSettings = matcher.group(3);
+		AstrixExternalConfig externalConfig = plugins.getPlugin(AstrixExternalConfigPlugin.class, externalConfigPluginName).getConfig(optionalPluginSettings);
+		return new AstrixSettingsReader(settings, Arrays.asList(new ExternalConfigAdapter(externalConfig)));
+	}
+	
+	private static List<? extends ConfigSource> createConfigSources(String configPluginSettings, AstrixPlugins plugins) {
+		Matcher matcher = CONFIG_URI_PATTERN.matcher(configPluginSettings);
+		matcher.find();
+		String configPluginName = matcher.group(1);
+		String optionalPluginSettings = matcher.group(3);
+		List<? extends ConfigSource> configSources = plugins.getPlugin(AstrixConfigPlugin.class, configPluginName).getConfigSources(optionalPluginSettings);
+		return configSources;
 	}
 
 	public boolean getBoolean(String settingsName, boolean defaultValue) {

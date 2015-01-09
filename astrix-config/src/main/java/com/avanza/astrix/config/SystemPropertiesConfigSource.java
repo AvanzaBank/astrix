@@ -13,30 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
-
-import java.util.List;
-
-import com.avanza.astrix.config.ConfigSource;
+package com.avanza.astrix.config;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AstrixConfigPlugin {
-	
-	/**
-	 * Returns a list of config sources. All config sources defined
-	 * here takes precedence over the standard config locations which is:
-	 *  
-	 * 1. Programatic settings on AstrixConfigurer
-	 * 2. Classpath override mechanism
-	 * 3. Astrix default values
-	 * 
-	 * The config sources will be queried in order returned.
-	 * 
-	 * @param uri
-	 * @return
-	 */
-	List<? extends ConfigSource> getConfigSources(String uri);
+public class SystemPropertiesConfigSource implements ConfigSource {
+	@Override
+	public String get(String propertyName) {
+		return System.getProperty(propertyName);
+	}
 }
