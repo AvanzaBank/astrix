@@ -62,6 +62,7 @@ public class AstrixSettings implements AstrixExternalConfig {
 	public static final String ENABLE_VERSIONING = "AstrixContextImpl.enableVersioning";
 	@Deprecated
 	public static final String EXPORT_GIGASPACE = "AstrixGsComponent.exportGigaSpace";
+	public static final String GIGA_SPACE_BEAN_NAME = "AstrixGsComponent.gigaSpaceBeanName";
 	
 	private final Map<String, String> settings = new ConcurrentHashMap<>();
 	private final String serviceId;

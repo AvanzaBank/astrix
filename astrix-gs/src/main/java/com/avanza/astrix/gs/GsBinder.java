@@ -22,6 +22,9 @@ import org.openspaces.core.GigaSpace;
 import org.springframework.context.ApplicationContext;
 
 import com.avanza.astrix.context.AstrixServiceProperties;
+import com.avanza.astrix.context.AstrixSettings;
+import com.avanza.astrix.context.AstrixSettingsAware;
+import com.avanza.astrix.context.AstrixSettingsReader;
 import com.j_spaces.core.client.SpaceURL;
 
 /**
@@ -29,19 +32,28 @@ import com.j_spaces.core.client.SpaceURL;
  * @author Elias Lindholm
  *
  */
-public class GsBinder {
+public class GsBinder implements AstrixSettingsAware {
 	
 	public static final String SPACE_NAME_PROPERTY = "spaceName";
 	public static final String SPACE_URL_PROPERTY = "spaceUrl";
 	
 	private static final Pattern SPACE_URL_PATTERN = Pattern.compile("jini://.*?/.*?/(.*)?[?](.*)");
+	private AstrixSettingsReader settings;
 	
-	public static GsFactory createGsFactory(AstrixServiceProperties properties) {
+	public GsFactory createGsFactory(AstrixServiceProperties properties) {
 		String spaceUrl = properties.getProperty(SPACE_URL_PROPERTY);
 		return new GsFactory(spaceUrl);
 	}
 	
-	public static GigaSpace getEmbeddedSpace(ApplicationContext applicationContext) {
+	public GigaSpace getEmbeddedSpace(ApplicationContext applicationContext) {
+		String optionalGigaSpaceBeanName = settings.getString(AstrixSettings.GIGA_SPACE_BEAN_NAME, null);
+		if (optionalGigaSpaceBeanName  != null) {
+			return applicationContext.getBean(optionalGigaSpaceBeanName, GigaSpace.class);
+		}
+		return findEmbeddedSpace(applicationContext);
+	}
+
+	private GigaSpace findEmbeddedSpace(ApplicationContext applicationContext) {
 		GigaSpace result = null;
 		for (GigaSpace gigaSpace : applicationContext.getBeansOfType(GigaSpace.class).values()) {
 			if (gigaSpace.getSpace().isEmbedded()) {
@@ -55,7 +67,7 @@ public class GsBinder {
 		return result;
 	}
 	
-	public static AstrixServiceProperties createProperties(GigaSpace space) {
+	public AstrixServiceProperties createProperties(GigaSpace space) {
 		AstrixServiceProperties result = new AstrixServiceProperties();
 		result.setApi(GigaSpace.class);
 		result.setProperty(SPACE_NAME_PROPERTY, space.getSpace().getName());
@@ -64,7 +76,7 @@ public class GsBinder {
 		return result;
 	}
 
-	public static AstrixServiceProperties createServiceProperties(String spaceUrl) {
+	public AstrixServiceProperties createServiceProperties(String spaceUrl) {
 		Matcher spaceUrlMatcher = SPACE_URL_PATTERN.matcher(spaceUrl);
 		if (!spaceUrlMatcher.find()) {
 			throw new IllegalArgumentException("Invalid spaceUrl: " + spaceUrl);
@@ -105,6 +117,11 @@ public class GsBinder {
 			return result.toString();
 		}
 		
+	}
+
+	@Override
+	public void setSettings(AstrixSettingsReader settings) {
+		this.settings = settings;
 	}
 
 }

@@ -96,7 +96,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	}
 
 	public void setSettings(Map<String, String> settings) {
-		this.settings = settings;
+		this.settings.putAll(settings);
 	}
 	
 	public Map<String, String> getSettings() {

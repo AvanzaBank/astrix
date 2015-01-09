@@ -53,6 +53,10 @@ public class AstrixSettingsReader {
 		}
 	}
 	
+	public static AstrixSettingsReader create(AstrixSettings settings) {
+		return new AstrixSettingsReader(settings, settings);
+	}
+	
 	static AstrixSettingsReader create(AstrixPlugins plugins, AstrixSettings settings) {
 		/*
 		 *  NOTE: 
