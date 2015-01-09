@@ -76,7 +76,7 @@ public class AstrixSettingsReader {
 	}
 	
 	public static AstrixSettingsReader create(AstrixSettings settings) {
-		return new AstrixSettingsReader(settings, settings);
+		return new AstrixSettingsReader(settings, Arrays.asList(settings));
 	}
 	
 	static AstrixSettingsReader create(AstrixPlugins plugins, AstrixSettings settings) {
