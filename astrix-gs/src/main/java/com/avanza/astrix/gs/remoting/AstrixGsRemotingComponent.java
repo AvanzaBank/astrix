@@ -47,6 +47,7 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	
 	private AstrixPlugins plugins;
 	private AstrixContextImpl astrixContext;
+	private GsBinder gsBinder;
 	
 	@Override
 	public <T> T createService(ServiceVersioningContext versioningContext, Class<T> api, AstrixServiceProperties serviceProperties) {
@@ -54,7 +55,7 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 		AstrixFaultTolerancePlugin faultTolerance = plugins.getPlugin(AstrixFaultTolerancePlugin.class);
 		
 		String targetSpace = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
-		GigaSpace space = GsBinder.createGsFactory(serviceProperties).create();
+		GigaSpace space = gsBinder.createGsFactory(serviceProperties).create();
 		AstrixRemotingTransport remotingTransport = GsRemotingTransport.remoteSpace(space);
 		
 		T proxy = AstrixRemotingProxy.create(api, remotingTransport, objectSerializer, new GsRoutingStrategy());
@@ -66,7 +67,7 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	
 	@Override
 	public AstrixServiceProperties createServiceProperties(String serviceUri) {
-		return GsBinder.createServiceProperties(serviceUri);
+		return gsBinder.createServiceProperties(serviceUri);
 	}
 	
 	@Override
@@ -94,6 +95,11 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	public void setAstrixContext(AstrixContextImpl astrixContext) {
 		this.astrixContext = astrixContext;
 	}
+	
+	@AstrixInject
+	public void setGsBinder(GsBinder gsBinder) {
+		this.gsBinder = gsBinder;
+	}
 
 	@Override
 	public boolean supportsAsyncApis() {
@@ -102,8 +108,8 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 
 	@Override
 	public <T> AstrixServiceProperties createServiceProperties(Class<T> exportedService) {
-		GigaSpace space = GsBinder.getEmbeddedSpace(astrixContext.getInstance(AstrixSpringContext.class).getApplicationContext());
-		AstrixServiceProperties serviceProperties = GsBinder.createProperties(space);
+		GigaSpace space = gsBinder.getEmbeddedSpace(astrixContext.getInstance(AstrixSpringContext.class).getApplicationContext());
+		AstrixServiceProperties serviceProperties = gsBinder.createProperties(space);
 		serviceProperties.setQualifier(null);
 		return serviceProperties;
 	}

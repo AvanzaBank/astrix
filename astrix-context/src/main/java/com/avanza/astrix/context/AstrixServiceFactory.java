@@ -58,7 +58,7 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 	public T create() {
 		AstrixServiceProperties serviceProperties = serviceLookup.lookup(beanKey.getBeanType(), beanKey.getQualifier());
 		if (serviceProperties == null) {
-			throw new RuntimeException(String.format("No service-provider found: bean=%s serviceLookup=%s", beanKey, serviceLookup));
+			throw new RuntimeException(String.format("Did not find service using serviceLookup: bean=%s serviceLookup=%s", beanKey, serviceLookup));
 		}
 		String providerSubsystem = serviceProperties.getProperty(AstrixServiceProperties.SUBSYSTEM);
 		if (!isAllowedToInvokeService(providerSubsystem)) {

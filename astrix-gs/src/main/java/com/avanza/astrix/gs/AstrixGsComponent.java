@@ -37,17 +37,19 @@ import com.avanza.astrix.spring.AstrixSpringContext;
  *
  */
 @MetaInfServices(AstrixServiceComponent.class)
-public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsAware {
+public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsAware{
 
 	private AstrixPlugins plugins;
 	private AstrixContextImpl astrixContext;
+	private GsBinder gsBinder;
+	
 	
 	@Override
 	public <T> T createService(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
 		if (!GigaSpace.class.isAssignableFrom(type)) {
 			throw new IllegalStateException("Programming error, attempted to create: " + type);
 		}
-		T gigaSpace = type.cast(GsBinder.createGsFactory(serviceProperties).create());
+		T gigaSpace = type.cast(gsBinder.createGsFactory(serviceProperties).create());
 		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
 		FaultToleranceSpecification<T> ftSpec = FaultToleranceSpecification.builder(type).provider(gigaSpace)
 				.isolationStrategy(IsolationStrategy.THREAD).group(spaceName).build();
@@ -56,7 +58,7 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 
 	@Override
 	public AstrixServiceProperties createServiceProperties(String serviceUri) {
-		return GsBinder.createServiceProperties(serviceUri);
+		return gsBinder.createServiceProperties(serviceUri);
 	}
 
 
@@ -86,18 +88,23 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 		if (!type.equals(GigaSpace.class)) {
 			throw new IllegalArgumentException("Can't export: " + type);
 		}
-		GigaSpace space = GsBinder.getEmbeddedSpace(astrixContext.getInstance(AstrixSpringContext.class).getApplicationContext());
-		return GsBinder.createProperties(space);
+		GigaSpace space = gsBinder.getEmbeddedSpace(astrixContext.getInstance(AstrixSpringContext.class).getApplicationContext());
+		return gsBinder.createProperties(space);
 	}
 	
 	@AstrixInject
 	public void setAstrixContext(AstrixContextImpl astrixContext) {
 		this.astrixContext = astrixContext;
 	}
+	
+	@AstrixInject
+	public void setGsBinder(GsBinder gsBinder) {
+		this.gsBinder = gsBinder;
+	}
 
 	@Override
 	public void setPlugins(AstrixPlugins plugins) {
 		this.plugins = plugins;
 	}
-	
+
 }
