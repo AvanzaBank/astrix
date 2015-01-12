@@ -17,6 +17,7 @@ package com.avanza.astrix.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -30,6 +31,18 @@ public final class DynamicConfig {
 
 	public DynamicConfig(ConfigSource configSource) {
 		this(Arrays.asList(configSource));
+	}
+	
+	public static DynamicConfig create(ConfigSource first, ConfigSource... other) {
+		List<ConfigSource> sources = new LinkedList<>();
+		sources.add(first);
+		sources.addAll(Arrays.asList(other));
+		return new DynamicConfig(sources);
+	}
+	
+
+	public static DynamicConfig create(List<? extends ConfigSource> sources) {
+		return new DynamicConfig(sources);
 	}
 	
 	public DynamicConfig(List<? extends ConfigSource> configSources) {
