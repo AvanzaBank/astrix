@@ -23,7 +23,7 @@ public class LunchGraderPuRunner {
 	public static void main(String[] args) {
 		AstrixSettings externalConfig = new AstrixSettings();
 		System.setProperty("com.gs.jini_lus.groups", Config.LOOKUP_GROUP_NAME);
-		System.setProperty("externalConfigUri", externalConfig.getExternalConfigUri());
+		System.setProperty("configSourceId", externalConfig.getConfigSourceId());
 		PuApp.run("classpath:/META-INF/spring/lunch-grader-pu.xml");
 	}
 

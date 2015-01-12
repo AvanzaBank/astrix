@@ -15,12 +15,6 @@
  */
 package com.avanza.astrix.context;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import com.avanza.astrix.config.ConfigSource;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicLongProperty;
@@ -34,24 +28,7 @@ import com.avanza.astrix.config.PropertiesConfigSource;
 @Deprecated
 public class AstrixSettingsReader {
 	
-	private static final Pattern CONFIG_URI_PATTERN = Pattern.compile("([^:]*)(:(.*))?");
 	private final DynamicConfig dynamicConfig;
-	
-	@Deprecated
-	private AstrixSettingsReader(AstrixSettings settings, List<? extends ConfigSource> externalConfigSources) {
-		this(settings, externalConfigSources, "META-INF/astrix/settings.properties");
-	}
-	
-	@Deprecated
-	AstrixSettingsReader(AstrixSettings settings, AstrixExternalConfig externalConfig, String defaultSettingsOverrideFile) {
-		this(settings, Arrays.asList(new ExternalConfigAdapter(externalConfig)), defaultSettingsOverrideFile);
-	}
-	
-
-	@Deprecated
-	AstrixSettingsReader(AstrixSettings settings, List<? extends ConfigSource> externalConfigSources, String defaultSettingsOverrideFile) {
-		this.dynamicConfig = DynamicConfig.merged(DynamicConfig.create(externalConfigSources), createDefaultConfiguration(settings, defaultSettingsOverrideFile));
-	}
 	
 	static DynamicConfig createDefaultConfiguration(AstrixSettings settings, String defaultSettingsOverrideFile) {
 		return DynamicConfig.create(settings, PropertiesConfigSource.optionalClasspathPropertiesFile(defaultSettingsOverrideFile));
@@ -86,19 +63,6 @@ public class AstrixSettingsReader {
 		return this.dynamicConfig.getBooleanProperty(name, property);
 	}
 	
-	private static class ExternalConfigAdapter implements ConfigSource {
-		private final AstrixExternalConfig externalConfig;
-
-		public ExternalConfigAdapter(AstrixExternalConfig externalConfig) {
-			this.externalConfig = externalConfig;
-		}
-
-		@Override
-		public String get(String propertyName) {
-			return externalConfig.lookup(propertyName);
-		}
-	}
-
 	public DynamicLongProperty getLongProperty(String name, long defaultValue) {
 		return this.dynamicConfig.getLongProperty(name, defaultValue);
 	}

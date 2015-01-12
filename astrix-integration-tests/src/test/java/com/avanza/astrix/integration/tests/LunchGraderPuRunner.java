@@ -20,7 +20,6 @@ import java.io.IOException;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.RootLogger;
 
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.gs.test.util.PartitionedPu;
@@ -37,7 +36,7 @@ public class LunchGraderPuRunner {
 		settings.setServiceRegistryUri(AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=service-registry");
 		PartitionedPu partitionedPu = new PartitionedPu(PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
 				.numberOfPrimaries(1)
-				.contextProperty("configUrl", settings.getExternalConfigUri())
+				.contextProperty("configSourceId", settings.getConfigSourceId())
 				.numberOfBackups(0));
 		partitionedPu.run();
 	}

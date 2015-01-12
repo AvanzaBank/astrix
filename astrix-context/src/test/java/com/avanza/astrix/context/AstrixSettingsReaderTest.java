@@ -26,14 +26,17 @@ import com.avanza.astrix.config.MapConfigSource;
 
 public class AstrixSettingsReaderTest {
 
+	// TODO: what to do about this test?
+
+	MapConfigSource configSource = new MapConfigSource();
+	DynamicConfig dynamicConfig = new DynamicConfig(configSource);
 	AstrixSettings settings = new AstrixSettings();
-	AstrixSettings externalConfig = new AstrixSettings();
-	AstrixSettingsReader astrixSettingsReader = new AstrixSettingsReader(settings, externalConfig, "META-INF/astrix/settings_test.properties");
+	AstrixSettingsReader astrixSettingsReader = AstrixSettingsReader.create(settings, "META-INF/astrix/settings_test.properties", dynamicConfig);
 	
 	@Test
 	public void externalConfigTakesHighestPrecedence() throws Exception {
 		settings.set("mySetting", "programaticSettingsValue");
-		externalConfig.set("mySetting", "externalConfigValue");
+		configSource.set("mySetting", "externalConfigValue");
 		String configUrl = astrixSettingsReader.getString("mySetting", "lastFallbackValue");
 		assertEquals("externalConfigValue", configUrl);
 	}
@@ -57,15 +60,5 @@ public class AstrixSettingsReaderTest {
 		assertEquals("lastFallbackValue", configUrl);
 	}
 	
-	@Test
-	public void preCreatedDynamicConfigTakesPrecedenceOverDefaultSettings() throws Exception {
-		final MapConfigSource configSource = new MapConfigSource();
-		DynamicConfig dynamicConfig = new DynamicConfig(configSource);
-		astrixSettingsReader = AstrixSettingsReader.create(settings, "META-INF/astrix/settings_test.properties", dynamicConfig);
-		
-		settings.set("foo", "settingsValue");
-		configSource.set("foo", "fooConfigSourceValue");
-		assertEquals("fooConfigSourceValue", astrixSettingsReader.getString("foo"));
-	}
 	
 }

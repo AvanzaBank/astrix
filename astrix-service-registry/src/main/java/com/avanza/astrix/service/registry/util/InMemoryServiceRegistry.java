@@ -25,13 +25,10 @@ import com.avanza.astrix.config.DynamicPropertyListener;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixDirectComponent;
-import com.avanza.astrix.context.AstrixExternalConfig;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixSettings;
-import com.avanza.astrix.context.InMemoryExternalConfigPlugin;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
-import com.avanza.astrix.provider.core.AstrixPluginQualifier;
 import com.avanza.astrix.service.registry.app.ServiceKey;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistry;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistryApiDescriptor;
@@ -42,18 +39,15 @@ import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
  * @author Elias Lindholm (elilin)
  *
  */
-public class InMemoryServiceRegistry implements AstrixServiceRegistry, AstrixExternalConfig, DynamicConfigSource {
+public class InMemoryServiceRegistry implements AstrixServiceRegistry, DynamicConfigSource {
 	
 	private final MapConfigSource configSource = new MapConfigSource();
 	private Map<ServiceKey, AstrixServiceRegistryEntry> servicePropertiesByKey = new ConcurrentHashMap<>();
 	private String id;
-	@Deprecated
-	private String externalConfigId;
 	private String configSourceId;
 	
 	public InMemoryServiceRegistry() {
 		this.id = AstrixDirectComponent.register(AstrixServiceRegistry.class, this);
-		this.externalConfigId = AstrixDirectComponent.register(AstrixExternalConfig.class, this);
 		this.configSourceId = GlobalConfigSourceRegistry.register(this);
 		this.configSource.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, getServiceUri());
 	}
@@ -97,20 +91,11 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry, AstrixExt
 		this.configSource.set(settingName, Long.toString(value));
 	}
 
-	public String getExternalConfigUri() {
-		return InMemoryExternalConfigPlugin.class.getAnnotation(AstrixPluginQualifier.class).value() + ":" + this.externalConfigId;
-	}
-
 	public <T> void registerProvider(Class<T> api, T provider, String subsystem) {
 		AstrixServiceRegistryClientImpl serviceRegistryClient = new AstrixServiceRegistryClientImpl(this, subsystem);
 		serviceRegistryClient.register(api, AstrixDirectComponent.registerAndGetProperties(api, provider), 60_000);
 	}
 	
-	@Override
-	public String lookup(String name) {
-		return this.configSource.get(name);
-	}
-
 	@Override
 	public String get(String propertyName) {
 		return configSource.get(propertyName);

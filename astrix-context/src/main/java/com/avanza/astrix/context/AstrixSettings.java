@@ -17,18 +17,16 @@ package com.avanza.astrix.context;
 
 import java.util.Map;
 
-import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
-import com.avanza.astrix.provider.core.AstrixPluginQualifier;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixSettings implements AstrixExternalConfig, DynamicConfigSource {
+public class AstrixSettings implements DynamicConfigSource {
 	
 	public static final String BEAN_BIND_ATTEMPT_INTERVAL = "StatefulAstrixBean.beanBindAttemptInterval";
 	/**
@@ -68,23 +66,10 @@ public class AstrixSettings implements AstrixExternalConfig, DynamicConfigSource
 	public static final String GIGA_SPACE_BEAN_NAME = "AstrixGsComponent.gigaSpaceBeanName";
 	
 	private final MapConfigSource config = new MapConfigSource();
-	@Deprecated
-	private final String serviceId;
 	private final String configSourceId;
 	
 	public AstrixSettings() {
-		this.serviceId = AstrixDirectComponent.register(AstrixExternalConfig.class, this);
 		this.configSourceId = GlobalConfigSourceRegistry.register(this);
-	}
-	
-	/**
-	 * Returns a uri that can be used to use this instance of AstrixSettings as an external config provider.
-	 * NOTE: This does not retrieve a setting in this settings. It returns a uri to THIS instance.  
-	 * 
-	 * @return
-	 */
-	public final String getExternalConfigUri() {
-		return InMemoryExternalConfigPlugin.class.getAnnotation(AstrixPluginQualifier.class).value() + ":" + this.serviceId;
 	}
 	
 	public String getConfigSourceId() {
@@ -146,11 +131,6 @@ public class AstrixSettings implements AstrixExternalConfig, DynamicConfigSource
 		return this.config.get(settingName);
 	}
 
-	@Override
-	public final String lookup(String name) {
-		return getString(name);
-	}
-	
 	@Override
 	public String get(String propertyName,
 			DynamicPropertyListener<String> propertyChangeListener) {
