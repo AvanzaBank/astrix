@@ -42,16 +42,10 @@ public class AstrixConfigurer {
 		set(SUBSYSTEM_NAME, "default");
 	}};
 	
-	private DynamicConfig config = null;
-	private final DynamicConfig defaultConfig = DynamicConfig.create(settings, PropertiesConfigSource.optionalClasspathPropertiesFile(CLASSPATH_OVERRIDE_SETTINGS));
-	
+	private DynamicConfig customConfig = null;
+	private final DynamicConfig wellKnownConfigSources = DynamicConfig.create(settings, PropertiesConfigSource.optionalClasspathPropertiesFile(CLASSPATH_OVERRIDE_SETTINGS));
 	public AstrixContext configure() {
-		AstrixContextImpl context;
-		if (config == null) {
-			context = new AstrixContextImpl(settings);
-		} else {
-			context = new AstrixContextImpl(DynamicConfig.merged(config, defaultConfig));
-		}
+		AstrixContextImpl context = new AstrixContextImpl(createDynamicConfig());
 		for (PluginHolder<?> plugin : plugins) {
 			registerPlugin(context, plugin);
 		}
@@ -69,6 +63,27 @@ public class AstrixConfigurer {
 			context.registerBeanFactory(factoryBean);
 		}
 		return context;
+	}
+	
+	private DynamicConfig createDynamicConfig() {
+		if (customConfig != null) {
+			return DynamicConfig.merged(customConfig, wellKnownConfigSources);
+		}
+		String dynamicConfigFactoryClass = wellKnownConfigSources.getStringProperty("Astrix.defaultDynamicConfigFactory", null).get();
+		if (dynamicConfigFactoryClass != null) {
+			AstrixDynamicConfigFactory dynamicConfigFactory = initFactory(dynamicConfigFactoryClass);
+			DynamicConfig config = dynamicConfigFactory.create();
+			return DynamicConfig.merged(config, wellKnownConfigSources);
+		}
+		return wellKnownConfigSources;
+	}
+
+	private AstrixDynamicConfigFactory initFactory(String dynamicConfigFactoryClass) {
+		try {
+			return (AstrixDynamicConfigFactory) Class.forName(dynamicConfigFactoryClass).newInstance();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			throw new RuntimeException("Failed to init AstrixDynamicConfigFactoryClass: " + dynamicConfigFactoryClass, e);
+		}
 	}
 	
 	private <T> void registerPlugin(AstrixContextImpl context, PluginHolder<T> pluginHolder) {
@@ -177,7 +192,7 @@ public class AstrixConfigurer {
 	}
 	
 	public void setConfig(DynamicConfig config) {
-		this.config = config;
+		this.customConfig = config;
 	}
 	
 	public void setAstrixSettings(AstrixSettings settings) {

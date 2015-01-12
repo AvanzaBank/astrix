@@ -66,6 +66,11 @@ public final class DynamicConfig {
 			return configSource.get(propertyName);
 		}
 		
+		@Override
+		public String toString() {
+			return this.configSource.toString();
+		}
+		
 	}
 
 	public DynamicStringProperty getStringProperty(String name, String defaultValue) {
@@ -119,6 +124,11 @@ public final class DynamicConfig {
 		merged.addAll(dynamicConfigA.configSources);
 		merged.addAll(dynamicConfigB.configSources);
 		return new DynamicConfig(merged);
+	}
+	
+	@Override
+	public String toString() {
+		return this.configSources.toString();
 	}
 	
 }

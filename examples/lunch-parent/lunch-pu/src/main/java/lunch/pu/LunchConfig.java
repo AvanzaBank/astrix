@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.spring.AstrixFrameworkBean;
 
 
@@ -29,12 +31,16 @@ import com.avanza.astrix.spring.AstrixFrameworkBean;
 public class LunchConfig {
 	
 	@Bean
-	public AstrixFrameworkBean astrix(@Value("${externalConfigUri}") String externalConfigUri) {
+	public AstrixFrameworkBean astrix() {
 		AstrixFrameworkBean result = new AstrixFrameworkBean();
 		result.setSubsystem("lunch-service");
-		result.setServiceDescriptor(LunchApplicationDescriptor.class);
-		result.setExternalConfigUri(externalConfigUri);
+		result.setApplicationDescriptor(LunchApplicationDescriptor.class);
 		return result;
+	}
+	
+	@Bean
+	public DynamicConfig dynamicConfig(@Value("${configSourceId}") String configSourceId) {
+		return DynamicConfig.create(GlobalConfigSourceRegistry.getConfigSource(configSourceId));
 	}
 	
 	@Bean

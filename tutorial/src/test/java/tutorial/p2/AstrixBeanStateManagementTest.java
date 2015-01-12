@@ -36,8 +36,9 @@ import com.avanza.astrix.core.ServiceUnavailableException;
 
 public class AstrixBeanStateManagementTest {
 	
-	private AstrixSettings settings = new AstrixSettings();
+//	private AstrixSettings settings = new AstrixSettings();
 	private AstrixContext astrix;
+	TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 	
 	@After
 	public void after() {
@@ -46,12 +47,10 @@ public class AstrixBeanStateManagementTest {
 	
 	@Test
 	public void astrixManagesStateForEachServiceBean() throws Exception {
-		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		// The BEAN_BIND_ATTEMPT_INTERVAL determines how often 
 		// Astrix will attempt to bind a given bean (millis).
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		// Set the uri to the external config.
-		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, settings.getExternalConfigUri());
 		configurer.registerApiProvider(LunchServiceProvider.class);
 		configurer.registerApiProvider(LunchLibraryProvider.class);
 		astrix = configurer.configure();
@@ -73,7 +72,7 @@ public class AstrixBeanStateManagementTest {
 		// Register mock instance in direct-component
 		String serviceUri = AstrixDirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinder);
 		// Add restaurantFinderUri entry to configuration pointing to the mock
-		settings.set("restaurantFinderUri", serviceUri);
+		configurer.set("restaurantFinderUri", serviceUri);
 		
 		// Astrix allows us to wait for a bean to be bound
 		// Note that we are waiting for a Library. Astrix is clever and

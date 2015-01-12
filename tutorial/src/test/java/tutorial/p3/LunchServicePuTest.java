@@ -47,11 +47,10 @@ public class LunchServicePuTest {
 		astrix.destroy();
 	}
 	
-	
 	@Test
 	public void testName() throws Exception {
 		AstrixConfigurer astrixConfigurer = new AstrixConfigurer();
-		astrixConfigurer.set(AstrixSettings.ASTRIX_CONFIG_URI, serviceRegistry.getExternalConfigUri());
+		astrixConfigurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
 		astrixConfigurer.setBasePackage("tutorial.p3");
 		astrix = astrixConfigurer.configure();

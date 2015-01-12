@@ -47,12 +47,12 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry, AstrixExt
 	private final MapConfigSource configSource = new MapConfigSource();
 	private Map<ServiceKey, AstrixServiceRegistryEntry> servicePropertiesByKey = new ConcurrentHashMap<>();
 	private String id;
+	@Deprecated
 	private String externalConfigId;
 	private String configSourceId;
 	
 	public InMemoryServiceRegistry() {
 		this.id = AstrixDirectComponent.register(AstrixServiceRegistry.class, this);
-		// TODO: allow registering multiple provided interfaces under same id in direct-component
 		this.externalConfigId = AstrixDirectComponent.register(AstrixExternalConfig.class, this);
 		this.configSourceId = GlobalConfigSourceRegistry.register(this);
 		this.configSource.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, getServiceUri());

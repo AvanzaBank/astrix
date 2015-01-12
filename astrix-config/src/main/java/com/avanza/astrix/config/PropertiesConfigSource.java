@@ -55,4 +55,8 @@ public class PropertiesConfigSource implements ConfigSource {
 		}
 		return new PropertiesConfigSource(classpathOverride);
 	}
+	
+	public String toString() {
+		return "PropertiesConfigSource: " + this.properties.toString();
+	}
 }

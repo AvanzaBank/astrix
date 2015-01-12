@@ -20,9 +20,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avanza.astrix.config.ConfigSource;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
@@ -37,7 +34,6 @@ import com.avanza.astrix.config.PropertiesConfigSource;
 @Deprecated
 public class AstrixSettingsReader {
 	
-	private static final Logger log = LoggerFactory.getLogger(AstrixSettingsReader.class);
 	private static final Pattern CONFIG_URI_PATTERN = Pattern.compile("([^:]*)(:(.*))?");
 	private final DynamicConfig dynamicConfig;
 	
@@ -71,25 +67,6 @@ public class AstrixSettingsReader {
 
 	public static AstrixSettingsReader create(AstrixSettings settings, String defaultSettingsOverrideFile, DynamicConfig dynamicConfig) {
 		return new AstrixSettingsReader(DynamicConfig.merged(dynamicConfig, createDefaultConfiguration(settings, defaultSettingsOverrideFile)));
-	}
-	
-	static AstrixSettingsReader create(AstrixPlugins plugins, AstrixSettings settings) {
-		/*
-		 *  NOTE: 
-		 *  This behavior might look weird. We must create a AstrixSettingsReader too lookup the ASTRIX_CONFIG_URI setting
-		 *  in order to create the AstrixExternalConfig. The reason is that we want the same chain of lookup
-		 *  to take place even when reading the external_config_url.
-		 */
-		String configUrl = new AstrixSettingsReader(settings, Arrays.asList(settings)).getString(AstrixSettings.ASTRIX_CONFIG_URI);
-		if (configUrl == null) {
-			return new AstrixSettingsReader(settings, Arrays.asList(new AstrixSettings()));
-		}
-		Matcher matcher = CONFIG_URI_PATTERN.matcher(configUrl);
-		matcher.find();
-		String externalConfigPluginName = matcher.group(1);
-		String optionalPluginSettings = matcher.group(3);
-		AstrixExternalConfig externalConfig = plugins.getPlugin(AstrixExternalConfigPlugin.class, externalConfigPluginName).getConfig(optionalPluginSettings);
-		return new AstrixSettingsReader(settings, Arrays.asList(new ExternalConfigAdapter(externalConfig)));
 	}
 	
 	public boolean getBoolean(String settingsName, boolean defaultValue) {
@@ -128,6 +105,11 @@ public class AstrixSettingsReader {
 
 	public static AstrixSettingsReader create(DynamicConfig dynamicConfig) {
 		return new AstrixSettingsReader(dynamicConfig);
+	}
+	
+	@Override
+	public String toString() {
+		return this.dynamicConfig.toString();
 	}
 
 }

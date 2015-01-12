@@ -57,18 +57,6 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		}
 	});
 	
-	@Deprecated
-	public AstrixContextImpl(AstrixSettings settings) {
-		this.plugins = new AstrixPlugins(new AstrixPluginInitializer() {
-			@Override
-			public void init(Object plugin) {
-				injectDependencies(plugin);
-			}
-		});
-		this.settingsReader = AstrixSettingsReader.create(plugins, settings);
-		getInstance(EventBus.class).addEventListener(AstrixBeanStateChangedEvent.class, beanStates);
-	}
-	
 	public AstrixContextImpl(DynamicConfig dynamicConfig) {
 		this.plugins = new AstrixPlugins(new AstrixPluginInitializer() {
 			@Override

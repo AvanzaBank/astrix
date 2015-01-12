@@ -28,6 +28,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
 
+import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixSettings;
@@ -83,7 +84,7 @@ public class ClusteredProxyLibraryTest {
 		configurer.enableFaultTolerance(true);
 		configurer.enableVersioning(true);
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1000);
-		configurer.set(AstrixSettings.ASTRIX_CONFIG_URI, config.getExternalConfigUri());
+		configurer.setConfig(DynamicConfig.create(config));
 	}
 	
 	
