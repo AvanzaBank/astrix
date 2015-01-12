@@ -30,10 +30,6 @@ public class AstrixSettingsReader {
 	
 	private final DynamicConfig dynamicConfig;
 	
-	static DynamicConfig createDefaultConfiguration(AstrixSettings settings, String defaultSettingsOverrideFile) {
-		return DynamicConfig.create(settings, PropertiesConfigSource.optionalClasspathPropertiesFile(defaultSettingsOverrideFile));
-	}
-	
 	private AstrixSettingsReader(DynamicConfig config) {
 		this.dynamicConfig = config;
 	}
@@ -44,6 +40,10 @@ public class AstrixSettingsReader {
 
 	public static AstrixSettingsReader create(AstrixSettings settings, String defaultSettingsOverrideFile, DynamicConfig dynamicConfig) {
 		return new AstrixSettingsReader(DynamicConfig.merged(dynamicConfig, createDefaultConfiguration(settings, defaultSettingsOverrideFile)));
+	}
+	
+	private static DynamicConfig createDefaultConfiguration(AstrixSettings settings, String defaultSettingsOverrideFile) {
+		return DynamicConfig.create(settings, PropertiesConfigSource.optionalClasspathPropertiesFile(defaultSettingsOverrideFile));
 	}
 	
 	public boolean getBoolean(String settingsName, boolean defaultValue) {

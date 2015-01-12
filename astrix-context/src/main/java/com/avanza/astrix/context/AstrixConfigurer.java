@@ -69,7 +69,7 @@ public class AstrixConfigurer {
 		if (customConfig != null) {
 			return DynamicConfig.merged(customConfig, wellKnownConfigSources);
 		}
-		String dynamicConfigFactoryClass = wellKnownConfigSources.getStringProperty("Astrix.defaultDynamicConfigFactory", null).get();
+		String dynamicConfigFactoryClass = wellKnownConfigSources.getStringProperty("com.avanza.astrix.context.AstrixDynamicConfigFactory", null).get();
 		if (dynamicConfigFactoryClass != null) {
 			AstrixDynamicConfigFactory dynamicConfigFactory = initFactory(dynamicConfigFactoryClass);
 			DynamicConfig config = dynamicConfigFactory.create();
