@@ -15,14 +15,13 @@
     <os-core:giga-space id="gigaSpace" space="space"/>
     
     <!-- Astrix service framework (provider and consumer) -->
-	<bean id="AstrixFrameworkBean" class="com.avanza.astrix.spring.AstrixFrameworkBean">
+	<bean id="astrixFrameworkBean" class="com.avanza.astrix.spring.AstrixFrameworkBean">
 		<property name="applicationDescriptor" value="com.avanza.astrix.integration.tests.domain.pu.LunchApplicationDescriptor"/>
 		<property name="subsystem" value="lunch-system"/>
-		<property name="settings">
-			<map>
-				<entry key="AstrixConfig.uri" value="${configUrl}"/>
-			</map>
-		</property>
+	</bean>
+	
+	<bean id="config" class="com.avanza.astrix.spring.DynamicConfigFactory">
+		<property name="configSourceId" value="${configSourceId}"/>
 	</bean>
 	
 	<!-- The actual service implementation(s) -->

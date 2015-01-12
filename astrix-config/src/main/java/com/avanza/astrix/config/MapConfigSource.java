@@ -15,11 +15,11 @@
  */
 package com.avanza.astrix.config;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Map backed {@link DynamicConfigSource} useful in testing. <p> 
@@ -64,7 +64,7 @@ public class MapConfigSource extends AbstractDynamicConfigSource {
 
 	private static class ListenableStringProperty {
 		
-		final List<DynamicPropertyListener<String>> listeners = new LinkedList<>();
+		final List<DynamicPropertyListener<String>> listeners = new CopyOnWriteArrayList<>();
 		volatile String value;
 		
 		void propertyChanged(String newValue) {

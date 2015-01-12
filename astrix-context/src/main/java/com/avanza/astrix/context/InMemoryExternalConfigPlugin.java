@@ -21,9 +21,7 @@ import com.avanza.astrix.provider.core.AstrixPluginQualifier;
 
 @MetaInfServices(AstrixExternalConfigPlugin.class)
 @AstrixPluginQualifier("inMemory")
-public class AstrixSettingsExternalConfigPlugin implements AstrixExternalConfigPlugin {
-	
-	// TODO: rename to InMemoryExternalConfigPlugin or AstrixDirectExternalConigPlugin?
+public class InMemoryExternalConfigPlugin implements AstrixExternalConfigPlugin {
 	
 	@Override
 	public AstrixExternalConfig getConfig(String locator) {

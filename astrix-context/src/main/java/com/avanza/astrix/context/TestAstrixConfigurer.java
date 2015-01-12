@@ -130,5 +130,9 @@ public class TestAstrixConfigurer {
 	public void enableVersioning(boolean enableVersioning) {
 		this.configurer.enableVersioning(enableVersioning);
 	}
-	
+
+	public void removeSetting(String name) {
+		this.configurer.removeSetting(name);
+	}
+
 }

@@ -22,12 +22,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
+import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.AstrixExternalConfig;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixSettings;
-import com.avanza.astrix.context.AstrixSettingsExternalConfigPlugin;
+import com.avanza.astrix.context.InMemoryExternalConfigPlugin;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
 import com.avanza.astrix.provider.core.AstrixPluginQualifier;
@@ -47,11 +48,13 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry, AstrixExt
 	private Map<ServiceKey, AstrixServiceRegistryEntry> servicePropertiesByKey = new ConcurrentHashMap<>();
 	private String id;
 	private String externalConfigId;
+	private String configSourceId;
 	
 	public InMemoryServiceRegistry() {
 		this.id = AstrixDirectComponent.register(AstrixServiceRegistry.class, this);
 		// TODO: allow registering multiple provided interfaces under same id in direct-component
 		this.externalConfigId = AstrixDirectComponent.register(AstrixExternalConfig.class, this);
+		this.configSourceId = GlobalConfigSourceRegistry.register(this);
 		this.configSource.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, getServiceUri());
 	}
 	
@@ -59,6 +62,11 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry, AstrixExt
 	public <T> AstrixServiceRegistryEntry lookup(String type, String qualifier) {
 		return this.servicePropertiesByKey.get(new ServiceKey(type, qualifier));
 	}
+	
+	public String getConfigSourceId() {
+		return configSourceId;
+	}
+	
 	@Override
 	public <T> void register(AstrixServiceRegistryEntry properties, long lease) {
 		ServiceKey key = new ServiceKey(properties.getServiceBeanType(), properties.getServiceProperties().get(AstrixServiceProperties.QUALIFIER));
@@ -90,7 +98,7 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry, AstrixExt
 	}
 
 	public String getExternalConfigUri() {
-		return AstrixSettingsExternalConfigPlugin.class.getAnnotation(AstrixPluginQualifier.class).value() + ":" + this.externalConfigId;
+		return InMemoryExternalConfigPlugin.class.getAnnotation(AstrixPluginQualifier.class).value() + ":" + this.externalConfigId;
 	}
 
 	public <T> void registerProvider(Class<T> api, T provider, String subsystem) {

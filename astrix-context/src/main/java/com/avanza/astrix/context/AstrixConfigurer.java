@@ -25,8 +25,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.PropertiesConfigSource;
+
 public class AstrixConfigurer {
 
+
+	private static final String CLASSPATH_OVERRIDE_SETTINGS = "META-INF/astrix/settings.properties";
 
 	private static final Logger log = LoggerFactory.getLogger(AstrixConfigurer.class);
 	
@@ -37,8 +42,16 @@ public class AstrixConfigurer {
 		set(SUBSYSTEM_NAME, "default");
 	}};
 	
+	private DynamicConfig config = null;
+	private final DynamicConfig defaultConfig = DynamicConfig.create(settings, PropertiesConfigSource.optionalClasspathPropertiesFile(CLASSPATH_OVERRIDE_SETTINGS));
+	
 	public AstrixContext configure() {
-		AstrixContextImpl context = new AstrixContextImpl(settings);
+		AstrixContextImpl context;
+		if (config == null) {
+			context = new AstrixContextImpl(settings);
+		} else {
+			context = new AstrixContextImpl(DynamicConfig.merged(config, defaultConfig));
+		}
 		for (PluginHolder<?> plugin : plugins) {
 			registerPlugin(context, plugin);
 		}
@@ -163,6 +176,10 @@ public class AstrixConfigurer {
 		this.settings.setAll(settings);
 	}
 	
+	public void setConfig(DynamicConfig config) {
+		this.config = config;
+	}
+	
 	public void setAstrixSettings(AstrixSettings settings) {
 		this.settings.setAll(settings);
 	}
@@ -189,6 +206,10 @@ public class AstrixConfigurer {
 
 	public void addFactoryBean(AstrixFactoryBean<?> factoryBean) {
 		this.standaloneFactories.add(factoryBean);
+	}
+
+	void removeSetting(String name) {
+		this.settings.remove(name);
 	}
 
 }

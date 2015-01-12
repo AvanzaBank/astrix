@@ -17,8 +17,10 @@ package com.avanza.astrix.context;
 
 import java.util.Map;
 
+import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
+import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.provider.core.AstrixPluginQualifier;
 /**
@@ -37,12 +39,10 @@ public class AstrixSettings implements AstrixExternalConfig, DynamicConfigSource
 	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AstrixServiceLeaseManager.leaseRenewInterval";
 	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AstrixContextImpl.enforceSubsystemBoundaries";
 	/**
-	 * @deprecated AstrixExternalConfigPlugin is replaced by AstrixConfigPlugin and corresponding
-	 * {@link AstrixSettings#ASTRIX_CONFIG_PLUGIN_SETTINGS} property.
+	 * @deprecated AstrixExternalConfigPlugin is replaced by setting a {@link DynamicConfig}
 	 */
 	@Deprecated
 	public static final String ASTRIX_CONFIG_URI = "AstrixConfig.uri";
-	public static final String ASTRIX_CONFIG_PLUGIN_SETTINGS = "AstrixConfigPlugin.settings";
 	public static final String ASTRIX_SERVICE_REGISTRY_URI = "AstrixServiceRegistry.serviceUri";
 	
 	/**
@@ -73,10 +73,13 @@ public class AstrixSettings implements AstrixExternalConfig, DynamicConfigSource
 	public static final String GIGA_SPACE_BEAN_NAME = "AstrixGsComponent.gigaSpaceBeanName";
 	
 	private final MapConfigSource config = new MapConfigSource();
+	@Deprecated
 	private final String serviceId;
+	private final String configSourceId;
 	
 	public AstrixSettings() {
 		this.serviceId = AstrixDirectComponent.register(AstrixExternalConfig.class, this);
+		this.configSourceId = GlobalConfigSourceRegistry.register(this);
 	}
 	
 	/**
@@ -86,7 +89,11 @@ public class AstrixSettings implements AstrixExternalConfig, DynamicConfigSource
 	 * @return
 	 */
 	public final String getExternalConfigUri() {
-		return AstrixSettingsExternalConfigPlugin.class.getAnnotation(AstrixPluginQualifier.class).value() + ":" + this.serviceId;
+		return InMemoryExternalConfigPlugin.class.getAnnotation(AstrixPluginQualifier.class).value() + ":" + this.serviceId;
+	}
+	
+	public String getConfigSourceId() {
+		return configSourceId;
 	}
 	
 	public final void setServiceRegistryUri(String serviceRegistryUri) {

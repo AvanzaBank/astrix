@@ -15,11 +15,8 @@
  */
 package com.avanza.astrix.context;
 
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,53 +27,50 @@ import com.avanza.astrix.config.ConfigSource;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicLongProperty;
+import com.avanza.astrix.config.PropertiesConfigSource;
 
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
+@Deprecated
 public class AstrixSettingsReader {
 	
+	private static final Logger log = LoggerFactory.getLogger(AstrixSettingsReader.class);
 	private static final Pattern CONFIG_URI_PATTERN = Pattern.compile("([^:]*)(:(.*))?");
-	private final Logger log = LoggerFactory.getLogger(AstrixSettingsReader.class);
 	private final DynamicConfig dynamicConfig;
 	
+	@Deprecated
 	private AstrixSettingsReader(AstrixSettings settings, List<? extends ConfigSource> externalConfigSources) {
 		this(settings, externalConfigSources, "META-INF/astrix/settings.properties");
 	}
 	
+	@Deprecated
 	AstrixSettingsReader(AstrixSettings settings, AstrixExternalConfig externalConfig, String defaultSettingsOverrideFile) {
 		this(settings, Arrays.asList(new ExternalConfigAdapter(externalConfig)), defaultSettingsOverrideFile);
 	}
 	
-	AstrixSettingsReader(AstrixSettings settings, List<? extends ConfigSource> externalConfigSources, String defaultSettingsOverrideFile) {
-		Properties classpathOverride = getClasspathOverrideProperites(defaultSettingsOverrideFile);
-		List<ConfigSource> configSources = new ArrayList<>(externalConfigSources.size() + 2);
-		configSources.addAll(externalConfigSources);
-		configSources.add(settings);
-		configSources.add(new PropertiesAdapter(classpathOverride));
-		this.dynamicConfig = new DynamicConfig(configSources);
-	}
 
-	private Properties getClasspathOverrideProperites(
-			String defaultSettingsOverrideFile) {
-		Properties classpathOverride = new Properties();
-		try {
-			InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream(defaultSettingsOverrideFile);
-			if (resourceAsStream == null) {
-				log.info("No Astrix classpath-override settings found. (file: " + defaultSettingsOverrideFile + ")");
-				return classpathOverride;
-			}
-			classpathOverride.load(resourceAsStream);
-		} catch (Exception e) {
-			log.warn("Failed to load classpath-override settings for Astrix from file: " + defaultSettingsOverrideFile);
-		}
-		return classpathOverride;
+	@Deprecated
+	AstrixSettingsReader(AstrixSettings settings, List<? extends ConfigSource> externalConfigSources, String defaultSettingsOverrideFile) {
+		this.dynamicConfig = DynamicConfig.merged(DynamicConfig.create(externalConfigSources), createDefaultConfiguration(settings, defaultSettingsOverrideFile));
 	}
 	
+	static DynamicConfig createDefaultConfiguration(AstrixSettings settings, String defaultSettingsOverrideFile) {
+		return DynamicConfig.create(settings, PropertiesConfigSource.optionalClasspathPropertiesFile(defaultSettingsOverrideFile));
+	}
+	
+	private AstrixSettingsReader(DynamicConfig config) {
+		this.dynamicConfig = config;
+	}
+
 	public static AstrixSettingsReader create(AstrixSettings settings) {
-		return new AstrixSettingsReader(settings, Arrays.asList(settings));
+		return new AstrixSettingsReader(DynamicConfig.create(settings));
+	}
+
+	public static AstrixSettingsReader create(AstrixSettings settings, String defaultSettingsOverrideFile, DynamicConfig dynamicConfig) {
+		return new AstrixSettingsReader(DynamicConfig.merged(dynamicConfig, createDefaultConfiguration(settings, defaultSettingsOverrideFile)));
 	}
 	
 	static AstrixSettingsReader create(AstrixPlugins plugins, AstrixSettings settings) {
@@ -86,10 +80,6 @@ public class AstrixSettingsReader {
 		 *  in order to create the AstrixExternalConfig. The reason is that we want the same chain of lookup
 		 *  to take place even when reading the external_config_url.
 		 */
-		String configPluginSettings = new AstrixSettingsReader(settings, Arrays.asList(settings)).getString(AstrixSettings.ASTRIX_CONFIG_PLUGIN_SETTINGS);
-		if (configPluginSettings != null) {
-			return new AstrixSettingsReader(settings, createConfigSources(configPluginSettings, plugins));
-		}
 		String configUrl = new AstrixSettingsReader(settings, Arrays.asList(settings)).getString(AstrixSettings.ASTRIX_CONFIG_URI);
 		if (configUrl == null) {
 			return new AstrixSettingsReader(settings, Arrays.asList(new AstrixSettings()));
@@ -102,15 +92,6 @@ public class AstrixSettingsReader {
 		return new AstrixSettingsReader(settings, Arrays.asList(new ExternalConfigAdapter(externalConfig)));
 	}
 	
-	private static List<? extends ConfigSource> createConfigSources(String configPluginSettings, AstrixPlugins plugins) {
-		Matcher matcher = CONFIG_URI_PATTERN.matcher(configPluginSettings);
-		matcher.find();
-		String configPluginName = matcher.group(1);
-		String optionalPluginSettings = matcher.group(3);
-		List<? extends ConfigSource> configSources = plugins.getPlugin(AstrixConfigPlugin.class, configPluginName).getConfigSources(optionalPluginSettings);
-		return configSources;
-	}
-
 	public boolean getBoolean(String settingsName, boolean defaultValue) {
 		return this.dynamicConfig.getBooleanProperty(settingsName, defaultValue).get();
 	}
@@ -128,19 +109,6 @@ public class AstrixSettingsReader {
 		return this.dynamicConfig.getBooleanProperty(name, property);
 	}
 	
-	private static class PropertiesAdapter implements ConfigSource {
-		private final Properties properties;
-
-		public PropertiesAdapter(Properties properties) {
-			this.properties = properties;
-		}
-
-		@Override
-		public String get(String propertyName) {
-			return properties.getProperty(propertyName);
-		}
-	}
-	
 	private static class ExternalConfigAdapter implements ConfigSource {
 		private final AstrixExternalConfig externalConfig;
 
@@ -156,6 +124,10 @@ public class AstrixSettingsReader {
 
 	public DynamicLongProperty getLongProperty(String name, long defaultValue) {
 		return this.dynamicConfig.getLongProperty(name, defaultValue);
+	}
+
+	public static AstrixSettingsReader create(DynamicConfig dynamicConfig) {
+		return new AstrixSettingsReader(dynamicConfig);
 	}
 
 }

@@ -60,7 +60,7 @@ public class ClusteredProxyLibraryTest {
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
-											  .contextProperty("configUrl", config.getExternalConfigUri())
+									  		  .contextProperty("configSourceId", config.getConfigSourceId())
 											  .startAsync(true)
 											  .configure();
 	

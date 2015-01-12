@@ -15,7 +15,10 @@
     
 	<bean id="astrixFrameworkBean" class="com.avanza.astrix.spring.AstrixFrameworkBean">
 		<property name="serviceDescriptor" value="tutorial.p3.server.LunchApplicationDescriptor"/>
-		<property name="externalConfigUri" value="${externalConfigUri}"/>
+	</bean>
+	
+	<bean id="config" class="com.avanza.astrix.spring.DynamicConfigFactory">
+		<property name="configSourceId" value="${configSourceId}"/>
 	</bean>
 	    
 	<!-- The actual service implementation(s) -->

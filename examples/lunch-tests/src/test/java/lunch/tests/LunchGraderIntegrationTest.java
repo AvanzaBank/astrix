@@ -42,7 +42,7 @@ public class LunchGraderIntegrationTest {
 	
 	@ClassRule
 	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
-			   											 .contextProperty("externalConfigUri", serviceRegistry.getExternalConfigUri())
+			   											 .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
 			   											 .startAsync(false)
 														 .configure();
 	

@@ -17,14 +17,10 @@ package com.avanza.astrix.context;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Test;
 
-import com.avanza.astrix.config.ConfigSource;
+import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.MapConfigSource;
-import com.avanza.astrix.provider.core.AstrixPluginQualifier;
 
 
 
@@ -61,43 +57,15 @@ public class AstrixSettingsReaderTest {
 		assertEquals("lastFallbackValue", configUrl);
 	}
 	
-	
 	@Test
-	public void readAstrixConfigPluginSettingsToFindConfigPlugin() throws Exception {
+	public void preCreatedDynamicConfigTakesPrecedenceOverDefaultSettings() throws Exception {
 		final MapConfigSource configSource = new MapConfigSource();
-		AstrixPlugins plugins = new AstrixPlugins(new AstrixPluginInitializer() {
-			@Override
-			public void init(Object plugin) {
-			}
-		});
-		FakeConfigPlugin configPlugin = new FakeConfigPlugin(configSource);
-		plugins.registerPlugin(AstrixConfigPlugin.class, configPlugin);
-
-		settings.set(AstrixSettings.ASTRIX_CONFIG_PLUGIN_SETTINGS, "fakeConfigPlugin:foo:properties");
-		astrixSettingsReader = AstrixSettingsReader.create(plugins, settings);
+		DynamicConfig dynamicConfig = new DynamicConfig(configSource);
+		astrixSettingsReader = AstrixSettingsReader.create(settings, "META-INF/astrix/settings_test.properties", dynamicConfig);
 		
+		settings.set("foo", "settingsValue");
 		configSource.set("foo", "fooConfigSourceValue");
 		assertEquals("fooConfigSourceValue", astrixSettingsReader.getString("foo"));
-		assertEquals("foo:properties", configPlugin.lastParsedUri);
 	}
 	
-	@AstrixPluginQualifier("fakeConfigPlugin")
-	static class FakeConfigPlugin implements AstrixConfigPlugin {
-		
-		ConfigSource configSource;
-		String lastParsedUri;
-		
-		FakeConfigPlugin(ConfigSource configSource) {
-			this.configSource = configSource;
-		}
-
-		@Override
-		public List<? extends ConfigSource> getConfigSources(String uri) {
-			this.lastParsedUri = uri;
-			return Arrays.asList(configSource);
-		}
-	}
-	
-	
-
 }

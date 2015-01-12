@@ -17,6 +17,7 @@ package com.avanza.astrix.spring;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 
+import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixContextImpl;
@@ -150,13 +152,27 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		astrixContext = createAsterixContext();
+		astrixContext = createAsterixContext(getDynamicConfig(applicationContext));
 		astrixContext.getInstance(AstrixSpringContext.class).setApplicationContext(applicationContext);
 	}
 	
-	private AstrixContextImpl createAsterixContext() {
+	private DynamicConfig getDynamicConfig(ApplicationContext applicationContext) {
+		Collection<DynamicConfig> dynamicConfigs = applicationContext.getBeansOfType(DynamicConfig.class).values();
+		if (dynamicConfigs.isEmpty()) {
+			return null;
+		}
+		if (dynamicConfigs.size() == 1) {
+			return dynamicConfigs.iterator().next();
+		}
+		throw new IllegalArgumentException("Multiple DynamicConfig instances found in ApplicationContext");
+	}
+	
+	private AstrixContextImpl createAsterixContext(DynamicConfig optionalConfig) {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setSettings(this.settings);
+		if (optionalConfig != null) {
+			configurer.setConfig(optionalConfig);
+		}
 		if (this.subsystem != null) {
 			configurer.setSubsystem(this.subsystem);
 		}

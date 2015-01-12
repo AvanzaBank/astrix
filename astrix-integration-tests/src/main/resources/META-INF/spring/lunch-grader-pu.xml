@@ -24,10 +24,13 @@
 		<property name="subsystem" value="lunch-system"/>
 		<property name="settings">
 			<map>
-				<entry key="AstrixConfig.uri" value="${configUrl}"/>
 				<entry key="StatefulAstrixBean.beanBindAttemptInterval" value="100" />
 			</map>
 		</property>
+	</bean>
+	
+	<bean id="configFactory" class="com.avanza.astrix.spring.DynamicConfigFactory">
+		<property name="configSourceId" value="${configSourceId}"/>
 	</bean>
 
 	<bean id="lunchRestaurantGrader" class="com.avanza.astrix.integration.tests.domain2.pu.LunchRestaurantGraderImpl" />

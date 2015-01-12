@@ -89,7 +89,7 @@ public class AstrixIntegrationTest {
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
-											  .contextProperty("configUrl", config.getExternalConfigUri())
+											  .contextProperty("configSourceId", config.getConfigSourceId())
 											  .startAsync(true)
 											  .configure();
 	
@@ -97,7 +97,7 @@ public class AstrixIntegrationTest {
 	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
 														.numberOfPrimaries(1)
 														.numberOfBackups(0)
-														.contextProperty("configUrl", config.getExternalConfigUri())
+													    .contextProperty("configSourceId", config.getConfigSourceId())
 														.startAsync(true)
 														.configure();
 

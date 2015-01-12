@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.annotation.PreDestroy;
 
+import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.ObjectId.AstrixBeanId;
 /**
  * An AstrixContextImpl is the runtime-environment for the astrix-framework. It is used
@@ -38,7 +39,6 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 	private final AstrixBeanFactoryRegistry beanFactoryRegistry = new AstrixBeanFactoryRegistry();
 	private final AstrixBeanStates beanStates = new AstrixBeanStates();
 	private final AstrixSettingsReader settingsReader;
-	private final AstrixSettingsWriter settingsWriter;
 	private AstrixApiProviderPlugins apiProviderPlugins;
 	private final ObjectCache objectCache = new ObjectCache(new ObjectCache.ObjectFactory() {
 		@Override
@@ -57,7 +57,7 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		}
 	});
 	
-	
+	@Deprecated
 	public AstrixContextImpl(AstrixSettings settings) {
 		this.plugins = new AstrixPlugins(new AstrixPluginInitializer() {
 			@Override
@@ -66,7 +66,17 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 			}
 		});
 		this.settingsReader = AstrixSettingsReader.create(plugins, settings);
-		this.settingsWriter = AstrixSettingsWriter.create(settings);
+		getInstance(EventBus.class).addEventListener(AstrixBeanStateChangedEvent.class, beanStates);
+	}
+	
+	public AstrixContextImpl(DynamicConfig dynamicConfig) {
+		this.plugins = new AstrixPlugins(new AstrixPluginInitializer() {
+			@Override
+			public void init(Object plugin) {
+				injectDependencies(plugin);
+			}
+		});
+		this.settingsReader = AstrixSettingsReader.create(dynamicConfig);
 		getInstance(EventBus.class).addEventListener(AstrixBeanStateChangedEvent.class, beanStates);
 	}
 	
@@ -306,16 +316,8 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		return settingsReader;
 	}
 
-	void set(String settingName, String settingValue) {
-		this.settingsWriter.set(settingName, settingValue);
-	}
-
 	String getCurrentSubsystem() {
 		return this.settingsReader.getString(AstrixSettings.SUBSYSTEM_NAME);
 	}
 
-	public void removeSetting(String settingName) {
-		this.settingsWriter.remove(settingName);
-	}
-	
 }

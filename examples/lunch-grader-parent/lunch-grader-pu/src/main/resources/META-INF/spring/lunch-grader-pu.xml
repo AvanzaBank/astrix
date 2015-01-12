@@ -13,7 +13,7 @@
 		mirror="false" />
 	<os-core:giga-space id="gigaSpace" space="space" />
 
-	<bean id="AstrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
+	<bean id="AstrixFrameworkBean" class="com.avanza.astrix.spring.AstrixFrameworkBean">
 		<property name="consumedAstrixBeans">
 			<list>
 				<value>lunch.api.LunchService</value>
@@ -22,8 +22,12 @@
 		</property>
 		<property name="applicationDescriptor" value="lunch.grader.pu.LunchGradeApplicationDescriptor" />
 		<property name="subsystem" value="lunch-service"/>
-		<property name="externalConfigUri" value="${externalConfigUri}"/>
 	</bean>
+	
+	<bean id="configFactory" class="com.avanza.astrix.spring.DynamicConfigFactory">
+		<property name="configSourceId" value="${configSourceId}"/>
+	</bean>
+	
 	
 	<bean id="lunchRestaurantGrader" class="lunch.grader.pu.LunchRestaurantGraderImpl" />
 	<bean id="lunchFeeder" class="lunch.grader.pu.PublicLunchFeederImpl"/>
