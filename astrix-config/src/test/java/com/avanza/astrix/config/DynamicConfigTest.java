@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.config;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -72,6 +73,29 @@ public class DynamicConfigTest {
 		
 		secondSource.set("foo", "false");
 		assertFalse(booleanProperty.get());
+	}
+	
+	@Test
+	public void merge() throws Exception {
+		MapConfigSource firstSource = new MapConfigSource();
+		MapConfigSource secondSource = new MapConfigSource();
+		MapConfigSource thirdSource = new MapConfigSource();
+		DynamicConfig dynamicConfigA = new DynamicConfig(Arrays.asList(firstSource, secondSource));
+		DynamicConfig dynamicConfigB = new DynamicConfig(Arrays.asList(thirdSource));
+		
+		DynamicConfig merged = DynamicConfig.merged(dynamicConfigA, dynamicConfigB);
+		
+		assertEquals("defaultValue", merged.getStringProperty("foo", "defaultValue").get());
+		
+		thirdSource.set("foo", "thirdValue");
+		assertEquals("thirdValue", merged.getStringProperty("foo", "defaultValue").get());
+		
+		firstSource.set("foo", "firstValue");
+		assertEquals("firstValue", merged.getStringProperty("foo", "defaultValue").get());
+		
+		secondSource.set("foo", "secondValue");
+		assertEquals("firstValue", merged.getStringProperty("foo", "defaultValue").get());
+
 	}
 	
 

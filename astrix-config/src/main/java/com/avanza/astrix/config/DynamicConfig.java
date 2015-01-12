@@ -17,7 +17,6 @@ package com.avanza.astrix.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -100,6 +99,13 @@ public final class DynamicConfig {
 			newValueInChain.set(propertyValue);
 		}
 		return chain;
+	}
+
+	public static DynamicConfig merged(DynamicConfig dynamicConfigA, DynamicConfig dynamicConfigB) {
+		List<ConfigSource> merged = new ArrayList<>(dynamicConfigA.configSources.size() + dynamicConfigB.configSources.size());
+		merged.addAll(dynamicConfigA.configSources);
+		merged.addAll(dynamicConfigB.configSources);
+		return new DynamicConfig(merged);
 	}
 	
 }
