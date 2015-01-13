@@ -69,7 +69,7 @@ public class AstrixConfigurer {
 		if (customConfig != null) {
 			return DynamicConfig.merged(customConfig, wellKnownConfigSources);
 		}
-		String dynamicConfigFactoryClass = wellKnownConfigSources.getStringProperty("com.avanza.astrix.context.AstrixDynamicConfigFactory", null).get();
+		String dynamicConfigFactoryClass = wellKnownConfigSources.getStringProperty(AstrixSettings.DYNAMIC_CONFIG_FACTORY, null).get();
 		if (dynamicConfigFactoryClass != null) {
 			AstrixDynamicConfigFactory dynamicConfigFactory = initFactory(dynamicConfigFactoryClass);
 			DynamicConfig config = dynamicConfigFactory.create();
@@ -153,7 +153,7 @@ public class AstrixConfigurer {
 	}
 	
 	private void configureFaultTolerance(AstrixContextImpl context) {
-		if (context.getSettings().getBoolean(AstrixSettings.ENABLE_FAULT_TOLERANCE, false)) {
+		if (context.getSettings().getBoolean(AstrixSettings.ENABLE_FAULT_TOLERANCE, true)) {
 			discoverOnePlugin(context, AstrixFaultTolerancePlugin.class);
 		} else {
 			context.registerPlugin(AstrixFaultTolerancePlugin.class, AstrixFaultTolerancePlugin.Default.create());

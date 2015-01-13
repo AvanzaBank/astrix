@@ -64,7 +64,7 @@ public class AstrixSettings implements DynamicConfigSource {
 	@Deprecated
 	public static final String EXPORT_GIGASPACE = "AstrixGsComponent.exportGigaSpace";
 	public static final String GIGA_SPACE_BEAN_NAME = "AstrixGsComponent.gigaSpaceBeanName";
-	public static final String DynamicConfigFactory = "Astrix.astrixDynamicConfigFactory";
+	public static final String DYNAMIC_CONFIG_FACTORY = "com.avanza.astrix.context.AstrixDynamicConfigFactory";
 	
 	private final MapConfigSource config = new MapConfigSource();
 	private final String configSourceId;
