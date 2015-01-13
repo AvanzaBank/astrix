@@ -34,6 +34,7 @@ import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
+import org.springframework.core.Ordered;
 
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
@@ -48,7 +49,7 @@ import com.avanza.astrix.context.AstrixSettings;
  * 
  * @author Elias Lindholm (elilin)
  */
-public class AstrixFrameworkBean implements BeanFactoryPostProcessor, ApplicationContextAware, ApplicationListener<ApplicationContextEvent> {
+public class AstrixFrameworkBean implements BeanFactoryPostProcessor, ApplicationContextAware, ApplicationListener<ApplicationContextEvent>, Ordered {
 	
 	/*
 	 * IMPLEMENTATION NOTE - Astrix startup
@@ -213,6 +214,12 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 
 	public void setConsumedAstrixBeans(Class<?>... consumedAstrixBeans) {
 		setConsumedAstrixBeans(Arrays.asList(consumedAstrixBeans));
+	}
+	
+	@Override
+	public int getOrder() {
+		// Run this class as late as possible
+		return Ordered.LOWEST_PRECEDENCE;
 	}
 	
 }
