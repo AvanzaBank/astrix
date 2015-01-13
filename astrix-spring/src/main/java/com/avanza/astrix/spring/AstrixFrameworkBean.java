@@ -79,12 +79,15 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	private AstrixApplicationDescriptor applicationDescriptor;
 	private AstrixContextImpl astrixContext;
 	private volatile boolean serviceExporterStarted = false;
+	private ApplicationContext applicationContext;
 	
 	public AstrixFrameworkBean() {
 	}
 	
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		astrixContext = createAsterixContext(getDynamicConfig(applicationContext));
+		astrixContext.getInstance(AstrixSpringContext.class).setApplicationContext(applicationContext);
 		for (Class<?> consumedAstrixBean : this.consumedAstrixBeans) {
 			beanFactory.registerSingleton(consumedAstrixBean.getName(), astrixContext.getBean(consumedAstrixBean));
 		}
@@ -152,8 +155,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		astrixContext = createAsterixContext(getDynamicConfig(applicationContext));
-		astrixContext.getInstance(AstrixSpringContext.class).setApplicationContext(applicationContext);
+		this.applicationContext = applicationContext;
 	}
 	
 	private DynamicConfig getDynamicConfig(ApplicationContext applicationContext) {
