@@ -11,7 +11,7 @@
 
 	<context:property-placeholder/>
     <context:annotation-config/>
-    <os-core:space id="space" url="/./lunch-space" mirror="false"/>
+    <os-core:space id="space" url="/./lunch-space" mirror="false" versioned="true"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
     
     <!-- Astrix service framework (provider and consumer) -->

@@ -94,11 +94,13 @@ public class GsBinder implements AstrixSettingsAware {
 		private String locators;
 		private String groups;
 		private String spaceName;
+		private String versioned;
 		
 		public SpaceUrlBuilder(GigaSpace space) {
 			SpaceURL finderURL = space.getSpace().getFinderURL();
 			this.locators = finderURL.getProperty("locators");
 			this.groups = finderURL.getProperty("groups");
+			this.versioned = Boolean.toString(space.getSpace().isOptimisticLockingEnabled());
 			this.spaceName = finderURL.getSpaceName();
 		}
 
@@ -114,6 +116,7 @@ public class GsBinder implements AstrixSettingsAware {
 				result.append("groups=");
 				result.append(groups);
 			}
+			result.append("&versioned=").append(this.versioned);
 			return result.toString();
 		}
 		

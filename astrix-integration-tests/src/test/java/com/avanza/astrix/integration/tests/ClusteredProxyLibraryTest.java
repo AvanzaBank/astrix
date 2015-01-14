@@ -16,6 +16,7 @@
 package com.avanza.astrix.integration.tests;
 
 import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Properties;
@@ -87,7 +88,6 @@ public class ClusteredProxyLibraryTest {
 		configurer.setConfig(DynamicConfig.create(config));
 	}
 	
-	
 	@Test
 	public void aClusteredProxyIsConsumableUsingTheServiceRegistryFromTheSameSubsystem() throws Exception {
 		configurer.setSubsystem("lunch-system");
@@ -99,13 +99,20 @@ public class ClusteredProxyLibraryTest {
 		assertEquals(1, astrix.getBean(LunchStatistics.class).getRestaurantCount());
 	}
 	
-	
 	@Test(expected = IllegalSubsystemException.class)
 	public void aClusteredProxyIsNotConsumableFromAnotherSubsystem() throws Exception {
 		configurer.setSubsystem("another-subsystem");
 		astrix = configurer.configure();
 		
 		astrix.getBean(LunchStatistics.class).getRestaurantCount();
+	}
+	
+	@Test
+	public void aClusteredProxyUsesOptimisticLockinWhenMasterSpaceIsConfiguredForOptimisticLocking() throws Exception {
+		configurer.setSubsystem("lunch-system");
+		astrix = configurer.configure();
+		GigaSpace proxy = astrix.waitForBean(GigaSpace.class, "lunch-space", 10000);
+		assertTrue(proxy.getSpace().isOptimisticLockingEnabled());
 	}
 
 }
