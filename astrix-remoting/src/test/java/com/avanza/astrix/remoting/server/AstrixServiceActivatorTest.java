@@ -16,6 +16,7 @@
 package com.avanza.astrix.remoting.server;
 
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -407,6 +408,22 @@ public class AstrixServiceActivatorTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void throwsExceptionWhenRegisteringProviderForNonImplementedInterface() throws Exception {
 		activator.register(new Object(), objectSerializer, TestService.class);
+	}
+	
+	@Test
+	public void remotingProxiesDoesNotDelegateMethodCallsForMethodsDefinedIn_java_lang_Object() throws Exception {
+		activator.register(new VoidService() {
+			@Override
+			public void hello(String message) {
+			}
+			@Override
+			public String toString() {
+				return "RemotingServiceToString";
+			}
+		}, objectSerializer, VoidService.class);
+		
+		VoidService testService = AstrixRemotingProxy.create(VoidService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
+		assertEquals("AstrixRemotingProxy[" + VoidService.class.getName() + "]", testService.toString());
 	}
 	
 	@SuppressWarnings("serial")

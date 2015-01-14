@@ -90,7 +90,15 @@ public class AstrixRemotingProxy implements InvocationHandler {
 	}
 	
 	@Override
+	public String toString() {
+		return "AstrixRemotingProxy[" + this.serviceApi + "]";
+	}
+	
+	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		if (method.getDeclaringClass().equals(Object.class)) {
+			return method.invoke(this, args);
+		}
 		RemoteServiceMethod serviceMethod = this.remoteServiceMethodByMethod.get(method);
 		
 		RoutingKey routingKey = serviceMethod.getRoutingKey(args);
@@ -261,6 +269,5 @@ public class AstrixRemotingProxy implements InvocationHandler {
 	private <T> T unmarshall(AstrixServiceInvocationResponse response, Type returnType, int version) {
 		return objectSerializer.deserialize(response.getResponseBody(), returnType, version);
 	}
-
 	
 }
