@@ -96,6 +96,16 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry, DynamicCo
 		serviceRegistryClient.register(api, AstrixDirectComponent.registerAndGetProperties(api, provider), 60_000);
 	}
 	
+	/**
+	 * Registers a provider for a given service that belongs to the 'default' subsystem.
+	 * 
+	 * @param api
+	 * @param provider
+	 */
+	public <T> void registerProvider(Class<T> api, T provider) {
+		registerProvider(api, provider, "default");
+	}
+	
 	@Override
 	public String get(String propertyName) {
 		return configSource.get(propertyName);
