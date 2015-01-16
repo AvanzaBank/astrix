@@ -30,6 +30,50 @@ import java.lang.annotation.Target;
 @Documented
 public @interface AstrixApiProvider {
 
-	Class<?>[] value();
+	/**
+	 * @return
+	 * @deprecated Don't split api into "api-definition" class and "api-provider" class anymore.
+	 * 
+	 * For instance, dont do this:
+	 * 
+	 * class MyApi {
+	 *     @Service
+	 *     MySevice service();
+	 * }
+	 * 
+	 * @AstrixApiProvider(MyApi.class)
+	 * class MyApiProvider {
+	 * 
+	 * }
+	 * 
+	 * Put the AstrixApiProvider annotation directly on the same class/interface that defines the api.
+	 * 
+	 * For instance:
+	 * 
+	 * @AstrixApiProvider
+	 * interface MyServiceProvider {
+	 *     @Service
+	 *     MyService service();
+	 *     
+	 *     // Other service definition
+	 * }
+	 * 
+	 * Or for a library:
+	 * 
+	 * @AstrixApiProvider
+	 * class MyLibProvider {
+	 *     @Library
+	 *     MyLibrary lib() {
+	 *         return new MyLibImpl();
+	 *     }
+	 *     
+	 *     // Other library definitions
+	 * }
+	 * 
+	 * 
+	 * 
+	 */
+	@Deprecated
+	Class<?>[] value() default {};
 	
 }
