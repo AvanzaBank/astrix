@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 /**
  * @author Elias Lindholm (elilin)
  */
-@Target(value = { ElementType.TYPE })
+@Target(value = { ElementType.TYPE, ElementType.METHOD })
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
 public @interface Versioned {

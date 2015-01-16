@@ -294,8 +294,17 @@ public class AstrixApiProviderTest {
 		version = 1,
 		objectSerializerConfigurer = DummyObjectSerializerConfigurer.class
 	)
-	@AstrixApiProvider({PingServiceApi.class, InternalPingServiceApi.class})
-	public static class PublicAndInternalPingServiceProvider {
+	@AstrixApiProvider
+	public interface PublicAndInternalPingServiceProvider {
+		
+		@Versioned
+		@AstrixConfigLookup("pingServiceUri")
+		@Service
+		PingService pingService();
+		
+		@AstrixConfigLookup("internalPingServiceUri")
+		@Service
+		InternalPingService internalPingService();
 	}
 	
 	public static class DummyObjectSerializerConfigurer implements AstrixObjectSerializerConfigurer {
