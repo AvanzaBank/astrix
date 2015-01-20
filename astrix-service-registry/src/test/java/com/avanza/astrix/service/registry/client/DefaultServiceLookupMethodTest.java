@@ -23,7 +23,8 @@ import org.junit.Test;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
-import com.avanza.astrix.provider.core.AstrixServiceProvider;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
+import com.avanza.astrix.provider.core.Service;
 
 
 public class DefaultServiceLookupMethodTest {
@@ -51,8 +52,11 @@ public class DefaultServiceLookupMethodTest {
 		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), greetingService.hello("kalle"));
 	}
 
-	@AstrixServiceProvider(GreetingService.class)
-	public static class GreetingApiProviderNoLookupDefined {
+	@AstrixApiProvider
+	interface GreetingApiProviderNoLookupDefined {
+		
+		@Service
+		GreetingService greetingService();
 	}
 	
 	public interface GreetingService {

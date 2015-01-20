@@ -23,10 +23,11 @@ import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.IllegalSubsystemException;
 import com.avanza.astrix.context.TestAstrixConfigurer;
-import com.avanza.astrix.provider.core.AstrixServiceProvider;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
+import com.avanza.astrix.provider.core.Service;
+import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
-import com.avanza.astrix.provider.versioning.AstrixVersioned;
+import com.avanza.astrix.provider.versioning.Versioned;
 import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
 
 public class AstrixSubsystemTest {
@@ -95,18 +96,21 @@ public class AstrixSubsystemTest {
 		greetingServiceA.hello("bar");
 	}
 	
-	@AstrixServiceRegistryLookup
-	@AstrixServiceProvider(GreetingService.class)
-	public static class GreetingServiceProvider {
+	@AstrixApiProvider
+	interface GreetingServiceProvider {
+		@Service
+		GreetingService greetingService();
 	}
 	
-	@AstrixVersioned(
+	@AstrixObjectSerializerConfig(
 		objectSerializerConfigurer = DummyConfigurer.class,
 		version = 1
 	)
-	@AstrixServiceRegistryLookup
-	@AstrixServiceProvider(GreetingService.class)
-	public static class VersionedGreetingServiceProvider {
+	@AstrixApiProvider
+	interface VersionedGreetingServiceProvider {
+		@Versioned
+		@Service
+		GreetingService greetingService();
 	}
 	
 	public static class DummyConfigurer implements AstrixObjectSerializerConfigurer {

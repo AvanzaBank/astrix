@@ -15,7 +15,7 @@
  */
 package lunch.pu;
 
-import lunch.api.provider.LunchApiDescriptor;
+import lunch.api.provider.LunchApiProvider;
 import lunch.api.provider.feeder.LunchFeederApiDescriptor;
 
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -24,7 +24,7 @@ import com.avanza.astrix.provider.core.AstrixApplication;
 
 @AstrixApplication(
 	apiDescriptors = {
-		LunchApiDescriptor.class,
+		LunchApiProvider.class,
 		LunchFeederApiDescriptor.class
 	},
 	component = AstrixServiceComponentNames.GS_REMOTING
