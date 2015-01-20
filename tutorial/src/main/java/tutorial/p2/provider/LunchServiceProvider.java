@@ -18,11 +18,15 @@ package tutorial.p2.provider;
 
 import tutorial.p2.api.LunchRestaurantFinder;
 
+import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
-import com.avanza.astrix.provider.core.AstrixServiceProvider;
+import com.avanza.astrix.provider.core.Service;
 
-@AstrixConfigLookup("restaurantFinderUri")
-@AstrixServiceProvider(LunchRestaurantFinder.class)
-public class LunchServiceProvider {
+@AstrixApiProvider
+public interface LunchServiceProvider {
+	
+	@AstrixConfigLookup("restaurantFinderUri")
+	@Service
+	LunchRestaurantFinder lunchRestaurantFinder();
 
 }

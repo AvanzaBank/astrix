@@ -15,7 +15,7 @@
  */
 package lunch.grader.pu;
 
-import lunch.grader.api.provider.LunchGradeApiDescriptor;
+import lunch.grader.api.provider.LunchGradeApiProvider;
 
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixApplication;
@@ -23,7 +23,7 @@ import com.avanza.astrix.provider.core.AstrixApplication;
 
 @AstrixApplication(
 	apiDescriptors = {
-		LunchGradeApiDescriptor.class
+		LunchGradeApiProvider.class
 	},
 	component = AstrixServiceComponentNames.GS_REMOTING
 )

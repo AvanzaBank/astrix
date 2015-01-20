@@ -15,13 +15,15 @@
  */
 package lunch.api.provider.feeder;
 
-import com.avanza.astrix.provider.core.AstrixServiceProvider;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
+import com.avanza.astrix.provider.core.Service;
 
 
-@AstrixServiceRegistryLookup
-@AstrixServiceProvider(InternalLunchFeeder.class)
-public class LunchFeederApiDescriptor {
+@AstrixApiProvider
+public interface LunchFeederApiDescriptor {
+	
+	@Service
+	InternalLunchFeeder internalLunchFeeder();
 }
 
 
