@@ -27,8 +27,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
-import com.avanza.astrix.provider.core.AstrixServiceProvider;
+import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 import com.avanza.astrix.test.util.Supplier;
@@ -118,9 +119,11 @@ public class AstrixServiceTest {
 		new Poller(1000, 1).check(probe);
 	}
 	
-	@AstrixConfigLookup(GREETING_SERVICE_URI)
-	@AstrixServiceProvider(GreetingService.class)
-	public static class GreetingApiProvider {
+	@AstrixApiProvider
+	public interface GreetingApiProvider {
+		@AstrixConfigLookup(GREETING_SERVICE_URI)
+		@Service
+		GreetingService greetingService();
 	}
 	
 	public interface GreetingService {

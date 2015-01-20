@@ -22,9 +22,8 @@ import org.junit.Test;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
-import com.avanza.astrix.provider.core.AstrixServiceProvider;
-import com.avanza.astrix.provider.library.AstrixExport;
-import com.avanza.astrix.provider.library.AstrixLibraryProvider;
+import com.avanza.astrix.provider.core.Library;
+import com.avanza.astrix.provider.core.Service;
 
 public class AstrixBeanStateListenerTest {
 	
@@ -81,18 +80,21 @@ public class AstrixBeanStateListenerTest {
 		}
 	}
 	
-	@AstrixLibraryProvider
+	@com.avanza.astrix.provider.core.AstrixApiProvider
 	public static class MyLibraryProvider {
 		
-		@AstrixExport
+		@Library
 		public MyClient myClient(MyService service) {
 			return new MyClientImpl(service);
 		}
 	}
 	
-	@AstrixConfigLookup("myService")
-	@AstrixServiceProvider(MyService.class)
-	public static class MyServiceProvider {
+	@com.avanza.astrix.provider.core.AstrixApiProvider
+	public interface MyServiceProvider {
+		
+		@AstrixConfigLookup("myService")
+		@Service
+		MyService myServcie();
 	}
 	
 	

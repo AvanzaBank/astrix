@@ -104,7 +104,7 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 		}
 		if (!descriptor.isAnnotationPresent(AstrixObjectSerializerConfig.class)) {
 			throw new IllegalArgumentException("Illegal api-provider. Api is versioned but provider does not declare a @AstrixObjectSerializerConfig." +
-					" providedService=" + serviceDefinition.getBeanType().getName() + ", descriptor=" + descriptor.getName());
+					" providedService=" + serviceDefinition.getBeanType().getName() + ", provider=" + descriptor.getName());
 		} 
 		AstrixObjectSerializerConfig serializerConfig = descriptor.getAnnotation(AstrixObjectSerializerConfig.class);
 		return ServiceVersioningContext.versionedService(serializerConfig.version(), serializerConfig.objectSerializerConfigurer());

@@ -13,18 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain.apiruntime.feeder;
+package com.avanza.astrix.integration.tests.domain.apiruntime;
 
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.integration.tests.common.Ping;
+import com.avanza.astrix.integration.tests.domain.api.LunchService;
+import com.avanza.astrix.integration.tests.domain.apiruntime.feeder.InternalLunchFeeder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Service;
+import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
+import com.avanza.astrix.provider.versioning.Versioned;
 
-
-
-public interface InternalLunchApi {
+@AstrixObjectSerializerConfig(
+	version = 2,
+	objectSerializerConfigurer = LunchApiObjectSerializerConfigurer.class
+)
+@AstrixApiProvider
+public interface LunchServiceProvider {
+	
+	@Versioned
+	@Service
+	LunchService lunchService();
+	
+	@Versioned
+	@AstrixQualifier("lunch-ping")
+	@Service
+	Ping ping();
 	
 	@Service
 	InternalLunchFeeder internalLunchFeeder();
@@ -34,5 +51,3 @@ public interface InternalLunchApi {
 	GigaSpace gigaSpace();
 	
 }
-
-

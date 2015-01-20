@@ -13,27 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain.api;
+package com.avanza.astrix.integration.tests.domain.apiruntime;
 
-import com.avanza.astrix.integration.tests.common.Ping;
+import org.openspaces.core.GigaSpace;
+
+import com.avanza.astrix.integration.tests.domain.api.LunchService;
+import com.avanza.astrix.integration.tests.domain.api.LunchStatistics;
+import com.avanza.astrix.integration.tests.domain.api.LunchUtil;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;
-import com.avanza.astrix.provider.core.Service;
-import com.avanza.astrix.provider.versioning.Versioned;
 
-@Versioned
-public interface LunchApi {
-	
-	@Service
-	LunchService lunchService();
-	
-	@AstrixQualifier("lunch-ping")
-	@Service
-	Ping ping();
+@AstrixApiProvider
+public class LunchLibraryProvider {
+
+	@Library
+	public LunchUtil lunchUtil(LunchService lunchService) {
+		return new LunchUtilImpl(lunchService);
+	}
 	
 	@Library
-	LunchUtil lunchUtil();
+	public LunchStatistics createLunchGraderUtil(@AstrixQualifier("lunch-space") GigaSpace lunchSpaceProxy) {
+		return new LunchStatisticsImpl(lunchSpaceProxy);
+	}
 	
-	@Library
-	LunchStatistics lunchStatistics();
 }
