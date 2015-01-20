@@ -28,8 +28,8 @@ import tutorial.p1.provider.LunchSuggesterImpl;
 
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
-import com.avanza.astrix.provider.library.AstrixExport;
-import com.avanza.astrix.provider.library.AstrixLibraryProvider;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
+import com.avanza.astrix.provider.core.Library;
 
 public class MockingAstrixBeansTest {
 	
@@ -54,13 +54,13 @@ public class MockingAstrixBeansTest {
 		assertEquals("Max", lunchSuggester.randomLunchRestaurant());
 	}
 
-	@AstrixLibraryProvider
+	@AstrixApiProvider
 	public static class LunchLibraryProvider {
 		
 		// Note that this library don't provide the LunchService, lets
 		// pretend that its a remote-service provided by another team.
 		
-		@AstrixExport
+		@Library
 		public LunchSuggester lunchUtil(LunchRestaurantFinder restaurantFinder) {
 			return new LunchSuggesterImpl(restaurantFinder);
 		}

@@ -25,6 +25,8 @@ import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
+import com.avanza.astrix.provider.core.AstrixApiProvider;
+import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.library.AstrixExport;
 import com.avanza.astrix.provider.library.AstrixLibraryProvider;
 
@@ -140,10 +142,10 @@ public class AstrixContextImplTest {
 		assertTrue(helloBean2.destroyed);
 	}
 	
-	@AstrixLibraryProvider
+	@AstrixApiProvider
 	static class DependentApi {
 		
-		@AstrixExport
+		@Library
 		public DependentBean create(GoodbyeBean bean) {
 			return new DependentBean();
 		}
@@ -161,9 +163,9 @@ public class AstrixContextImplTest {
 		}
 	}
 	
-	@AstrixLibraryProvider
+	@AstrixApiProvider
 	static class HelloBeanLibrary {
-		@AstrixExport
+		@Library
 		public HelloBean create() {
 			return new HelloBean();
 		}

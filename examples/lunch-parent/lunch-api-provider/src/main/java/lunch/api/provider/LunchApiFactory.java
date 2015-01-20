@@ -18,13 +18,13 @@ package lunch.api.provider;
 import lunch.api.LunchService;
 import lunch.api.LunchUtil;
 
-import com.avanza.astrix.provider.library.AstrixExport;
-import com.avanza.astrix.provider.library.AstrixLibraryProvider;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
+import com.avanza.astrix.provider.core.Library;
 
-@AstrixLibraryProvider
+@AstrixApiProvider
 public class LunchApiFactory {
 
-	@AstrixExport
+	@Library
 	public LunchUtil createLunchUtil(LunchService lunchService) {
 		return new LunchUtilImpl(lunchService);
 	}

@@ -18,20 +18,20 @@ package com.avanza.astrix.service.registry.client;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.AstrixSettingsAware;
 import com.avanza.astrix.context.AstrixSettingsReader;
-import com.avanza.astrix.provider.library.AstrixExport;
-import com.avanza.astrix.provider.library.AstrixLibraryProvider;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
+import com.avanza.astrix.provider.core.Library;
 
-@AstrixLibraryProvider
+@AstrixApiProvider
 public class AstrixServiceRegistryLibraryProvider implements AstrixSettingsAware {
 	
 	private AstrixSettingsReader settings;
 
-	@AstrixExport
+	@Library
 	public AstrixServiceRegistryClient createClient(AstrixServiceRegistry serviceRegistry) {
 		return new AstrixServiceRegistryClientImpl(serviceRegistry, settings.getString(AstrixSettings.SUBSYSTEM_NAME));
 	}
 	
-	@AstrixExport
+	@Library
 	public AstrixServiceRegistryAdministrator createAdministrator(AstrixServiceRegistry serviceRegistry) {
 		return new AstrixServiceRegistryAdministratorImpl(serviceRegistry);
 	}

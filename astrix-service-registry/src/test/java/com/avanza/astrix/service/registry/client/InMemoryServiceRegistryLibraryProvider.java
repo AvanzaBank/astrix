@@ -15,14 +15,13 @@
  */
 package com.avanza.astrix.service.registry.client;
 
-import com.avanza.astrix.provider.library.AstrixExport;
-import com.avanza.astrix.provider.library.AstrixLibraryProvider;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistry;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
+import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
 
-@AstrixLibraryProvider
+@AstrixApiProvider
 public class InMemoryServiceRegistryLibraryProvider {
-	@AstrixExport
+	@Library
 	public AstrixServiceRegistry create() {
 		return new InMemoryServiceRegistry();
 	}

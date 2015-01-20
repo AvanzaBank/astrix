@@ -25,8 +25,8 @@ import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
-import com.avanza.astrix.provider.library.AstrixExport;
-import com.avanza.astrix.provider.library.AstrixLibraryProvider;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
+import com.avanza.astrix.provider.core.Library;
 
 
 public class AstrixLibraryTest {
@@ -114,11 +114,11 @@ public class AstrixLibraryTest {
 		}
 	}
 	
-	@AstrixLibraryProvider
+	@AstrixApiProvider
 	static class MyLibraryProvider {
 		private HelloBeanImpl instance = new HelloBeanImpl();
 		
-		@AstrixExport
+		@Library
 		public HelloBean create() {
 			return instance;
 		}
@@ -129,56 +129,56 @@ public class AstrixLibraryTest {
 		}
 	}
 	
-	@AstrixLibraryProvider
+	@AstrixApiProvider
 	static class MyLibraryProviderNoInterface {
 		
-		@AstrixExport
+		@Library
 		public HelloBeanImpl create() {
 			return new HelloBeanImpl();
 		}
 	}
 	
-	@AstrixLibraryProvider
+	@AstrixApiProvider
 	static class CircularApiA {
 		
-		@AstrixExport
+		@Library
 		public HelloBeanImpl create(GoodbyeBeanImpl goodbyeBean) {
 			// we don't actually need to use goodbyeBean
 			return new HelloBeanImpl();
 		}
 	}
 	
-	@AstrixLibraryProvider
+	@AstrixApiProvider
 	static class CircularApiB {
 		
-		@AstrixExport
+		@Library
 		public GoodbyeBeanImpl create(ChatBeanImpl chatBean) {
 			return new GoodbyeBeanImpl();
 		}
 	}
 	
-	@AstrixLibraryProvider
+	@AstrixApiProvider
 	static class CircularApiC {
 		
-		@AstrixExport
+		@Library
 		public ChatBeanImpl create(HelloBeanImpl helloBean) {
 			return new ChatBeanImpl();
 		}
 	}
 
-	@AstrixLibraryProvider
+	@AstrixApiProvider
 	static class DependentApi {
 		
-		@AstrixExport
+		@Library
 		public DependentBean create(NonProvidedBean bean) {
 			return new DependentBean();
 		}
 	}
 	
-	@AstrixLibraryProvider
+	@AstrixApiProvider
 	static class IndependentApi {
 		
-		@AstrixExport
+		@Library
 		public IndependentApi create() {
 			return new IndependentApi();
 		}
