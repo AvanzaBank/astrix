@@ -24,10 +24,12 @@ import java.lang.annotation.Target;
 
 /**
  * @author Elias Lindholm (elilin)
+ * @deprecated - Replaced by {@link AstrixApiProvider}
  */
 @Target(value = { ElementType.TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
+@Deprecated
 public @interface AstrixServiceProvider {
 	Class<?>[] value();
 }
