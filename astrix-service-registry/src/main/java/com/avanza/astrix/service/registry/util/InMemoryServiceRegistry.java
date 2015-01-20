@@ -31,7 +31,7 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
 import com.avanza.astrix.service.registry.app.ServiceKey;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistry;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryApiDescriptor;
+import com.avanza.astrix.service.registry.client.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistryClientImpl;
 import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
 /**
@@ -71,7 +71,7 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry, DynamicCo
 		this.servicePropertiesByKey.clear();
 	}
 	public String getConfigEntryName() {
-		return AstrixServiceRegistryApiDescriptor.class.getAnnotation(AstrixConfigLookup.class).value();
+		return AstrixServiceRegistryServiceProvider.class.getAnnotation(AstrixConfigLookup.class).value();
 	}
 	
 	public String getServiceUri() {

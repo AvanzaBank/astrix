@@ -16,9 +16,11 @@
 package com.avanza.astrix.service.registry.client;
 
 import com.avanza.astrix.context.AstrixSettings;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
-import com.avanza.astrix.provider.core.AstrixServiceProvider;
-import com.avanza.astrix.provider.versioning.AstrixVersioned;
+import com.avanza.astrix.provider.core.Service;
+import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
+import com.avanza.astrix.provider.versioning.Versioned;
 
 /**
  * The service registry api uses Astrix-remoting to export its service. Note that
@@ -28,13 +30,17 @@ import com.avanza.astrix.provider.versioning.AstrixVersioned;
  * @author Elias Lindholm (elilin)
  *
  */
-@AstrixVersioned (
+@AstrixObjectSerializerConfig (
 	version = 1,
 	objectSerializerConfigurer = ServiceRegistryObjectSerializerConfigurer.class
 )
-@AstrixConfigLookup(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI)
-@AstrixServiceProvider(AstrixServiceRegistry.class)
-public class AstrixServiceRegistryApiDescriptor {
+@AstrixApiProvider
+public interface AstrixServiceRegistryServiceProvider {
+	
+	@AstrixConfigLookup(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI)
+	@Versioned
+	@Service
+	AstrixServiceRegistry serviceRegistry();
 }
 
 

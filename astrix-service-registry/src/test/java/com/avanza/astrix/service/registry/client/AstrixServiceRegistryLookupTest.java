@@ -31,8 +31,10 @@ import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixServiceProvider;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
+import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
@@ -100,9 +102,11 @@ public class AstrixServiceRegistryLookupTest {
 		new Poller(1000, 1).check(probe);
 	}
 	
-	@AstrixServiceRegistryLookup
-	@AstrixServiceProvider(GreetingService.class)
-	public static class GreetingApiProvider {
+	@AstrixApiProvider
+	interface GreetingApiProvider {
+		
+		@Service
+		GreetingService greetingService();
 	}
 	
 	public interface GreetingService {

@@ -17,7 +17,7 @@ package com.avanza.astrix.service.registry.pu;
 
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixApplication;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryApiDescriptor;
+import com.avanza.astrix.service.registry.client.AstrixServiceRegistryServiceProvider;
 
 
 /**
@@ -30,7 +30,7 @@ import com.avanza.astrix.service.registry.client.AstrixServiceRegistryApiDescrip
  */
 @AstrixApplication(
 	apiDescriptors = {
-		AstrixServiceRegistryApiDescriptor.class
+		AstrixServiceRegistryServiceProvider.class
 	},
 	component = AstrixServiceComponentNames.GS_REMOTING
 )
