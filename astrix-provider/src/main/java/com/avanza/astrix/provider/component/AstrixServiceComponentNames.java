@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.provider.component;
 /**
- * 
+ * Contains well-known AstrixServiceComponent implementations. <p>
  * @author Elias Lindholm (elilin)
  *
  */
@@ -27,7 +27,17 @@ public class AstrixServiceComponentNames {
 	 */
 	public static final String DIRECT = "direct";
 	
+	/**
+	 * This component can only be used to export GigaSpace as a service. Any
+	 * attempt to export other service-interfaces using this component will throw
+	 * UnsupportedOperationException.
+	 */
 	public static final String GS = "gs";
+	
+	/**
+	 * This component can be used to export remote services using gigaspaces
+	 * as service transport.
+	 */
 	public static final String GS_REMOTING = "gs-remoting";
 
 }

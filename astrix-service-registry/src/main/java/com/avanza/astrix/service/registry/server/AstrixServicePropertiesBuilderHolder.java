@@ -21,11 +21,11 @@ import com.avanza.astrix.context.AstrixServiceProperties;
 
 class AstrixServicePropertiesBuilderHolder {
 	
-	private AstrixBeanKey exportedService;
+	private AstrixBeanKey<?> exportedService;
 	private Class<?> asyncService;
 	private AstrixServiceComponent serviceComponent;
 	
-	public AstrixServicePropertiesBuilderHolder(AstrixServiceComponent serviceComponent, AstrixBeanKey exportedServiceBeanKey) {
+	public AstrixServicePropertiesBuilderHolder(AstrixServiceComponent serviceComponent, AstrixBeanKey<?> exportedServiceBeanKey) {
 		this.serviceComponent = serviceComponent;
 		this.exportedService = exportedServiceBeanKey;
 		if (serviceComponent.supportsAsyncApis()) {

@@ -32,15 +32,17 @@ import java.lang.annotation.Target;
 public @interface AstrixApplication {
 	
 	/**
-	 * All provided apis by this application. Only
-	 * services are considered. <p>
+	 * Identifies what services this application provides by pointing to
+	 * a list of AstrixApiProvider's. All defined services (@Service annotated methods)
+	 * will be provided by the current application.
 	 * 
 	 * @return
 	 */
 	Class<?>[] apiDescriptors();
 
 	/**
-	 * Default component used when exporting services.
+	 * Default AstrixServiceComponent to use when exporting services provided by this application.
+	 * 
 	 * @return
 	 */
 	String component();
