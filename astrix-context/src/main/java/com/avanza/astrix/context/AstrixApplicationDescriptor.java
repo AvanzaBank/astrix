@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.avanza.astrix.provider.core.AstrixApplication;
-import com.avanza.astrix.provider.core.AstrixService;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -42,11 +41,7 @@ public class AstrixApplicationDescriptor {
 	public static AstrixApplicationDescriptor create(Class<?> applicationDescriptorHolder) {
 		String component;
 		Class<?>[] apiDescriptorHolders;
-		if (applicationDescriptorHolder.isAnnotationPresent(AstrixService.class)) {
-			AstrixService astrixService = applicationDescriptorHolder.getAnnotation(AstrixService.class);
-			component = astrixService.component();
-			apiDescriptorHolders = astrixService.apiDescriptors();
-		} else if (applicationDescriptorHolder.isAnnotationPresent(AstrixApplication.class)) {
+		if (applicationDescriptorHolder.isAnnotationPresent(AstrixApplication.class)) {
 			AstrixApplication astrixApplication = applicationDescriptorHolder.getAnnotation(AstrixApplication.class);
 			component = astrixApplication.component();
 			apiDescriptorHolders = astrixApplication.apiDescriptors();
