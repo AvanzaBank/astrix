@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.remoting.client;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,19 +43,6 @@ public class AstrixRemotingTransport {
 		return new AstrixRemotingTransport(impl);
 	}
 
-	public AstrixServiceInvocationResponse processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
-		return impl.processRoutedRequest(request, routingKey).toBlocking().first();
-	}
-	
-	public List<AstrixServiceInvocationResponse> processBroadcastRequest(AstrixServiceInvocationRequest request) {
-		List<AstrixServiceInvocationResponse> result = impl.processBroadcastRequest(request).toBlocking().first();
-		List<AstrixServiceInvocationResponse> responses = new ArrayList<>();
-		for (AstrixServiceInvocationResponse asyncInvocationResponse : result) {
-			responses.add(asyncInvocationResponse);
-		}
-		return responses;
-	}
-	
 	public Observable<AstrixServiceInvocationResponse> observeProcessRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
 		return impl.processRoutedRequest(request, routingKey);
 	}
