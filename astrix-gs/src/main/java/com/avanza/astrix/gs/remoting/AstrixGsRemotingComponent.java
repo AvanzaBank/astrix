@@ -50,7 +50,7 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	private GsBinder gsBinder;
 	
 	@Override
-	public <T> T createService(ServiceVersioningContext versioningContext, Class<T> api, AstrixServiceProperties serviceProperties) {
+	public <T> T bind(ServiceVersioningContext versioningContext, Class<T> api, AstrixServiceProperties serviceProperties) {
 		AstrixObjectSerializer objectSerializer = plugins.getPlugin(AstrixVersioningPlugin.class).create(versioningContext);
 		AstrixFaultTolerancePlugin faultTolerance = plugins.getPlugin(AstrixFaultTolerancePlugin.class);
 		

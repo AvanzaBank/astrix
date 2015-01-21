@@ -41,7 +41,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 	private AstrixPlugins astrixPlugins;
 	
 	@Override
-	public <T> T createService(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
+	public <T> T bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
 		String providerName = serviceProperties.getProperty("providerId");
 		ServiceProvider<?> serviceProvider = providerById.get(providerName);
 		if (serviceProvider == null) {

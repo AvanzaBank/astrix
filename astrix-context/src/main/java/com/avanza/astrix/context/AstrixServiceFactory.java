@@ -100,7 +100,7 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 			throw new RuntimeException(String.format("Misssing entry in service-registry beanKey=%s", beanKey));
 		}
 		AstrixServiceComponent serviceComponent = getServiceComponent(serviceProperties);
-		return serviceComponent.createService(versioningContext, beanKey.getBeanType(), serviceProperties);
+		return serviceComponent.bind(versioningContext, beanKey.getBeanType(), serviceProperties);
 	}
 	
 	private AstrixServiceComponent getServiceComponent(AstrixServiceProperties serviceProperties) {
