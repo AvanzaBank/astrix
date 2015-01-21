@@ -70,8 +70,9 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry, DynamicCo
 	public void clear() {
 		this.servicePropertiesByKey.clear();
 	}
+	
 	public String getConfigEntryName() {
-		return AstrixServiceRegistryServiceProvider.class.getAnnotation(AstrixConfigLookup.class).value();
+		return AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI;
 	}
 	
 	public String getServiceUri() {
