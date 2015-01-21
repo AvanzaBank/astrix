@@ -23,6 +23,8 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.avanza.astrix.core.AstrixRemoteResult;
+import com.avanza.astrix.core.CorrelationId;
+import com.avanza.astrix.core.ServiceInvocationException;
 import com.avanza.astrix.test.util.AstrixTestUtil;
 
 
@@ -44,7 +46,7 @@ public class GenericAstrixMapReducerTest {
 	
 	@Test(expected = MyRuntimeException.class)
 	public void reduce_rethrowsException() throws Exception {
-		GenericAstrixMapReducer<String, Integer> reducer = new GenericAstrixMapReducer<String, Integer>();
+		GenericAstrixMapReducer<String, Integer> reducer = new GenericAstrixMapReducer<>();
 		reducer.reduce(Arrays.asList(
 				AstrixRemoteResult.successful(newMap("a", 1).build()),
 				AstrixRemoteResult.<Map<String, Integer>>failure(new MyRuntimeException())));
@@ -54,8 +56,19 @@ public class GenericAstrixMapReducerTest {
 		return new AstrixTestUtil.MapBuilder(key, value);
 	}
 	
-	private static final class MyRuntimeException extends RuntimeException {
+	private static final class MyRuntimeException extends ServiceInvocationException {
 		private static final long serialVersionUID = 1L;
+		public MyRuntimeException(CorrelationId correlationId) {
+			super(correlationId);
+		}
+		public MyRuntimeException() {
+			super(UNDEFINED_CORRELACTION_ID);
+		}
+
+		@Override
+		public ServiceInvocationException reCreateOnClientSide(CorrelationId correlationId) {
+			return new MyRuntimeException(correlationId);
+		}
 	}
 	
 }

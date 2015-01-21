@@ -24,6 +24,8 @@ import org.junit.Test;
 import org.openspaces.remoting.SpaceRemotingResult;
 
 import com.avanza.astrix.core.AstrixRemoteResult;
+import com.avanza.astrix.core.CorrelationId;
+import com.avanza.astrix.core.ServiceInvocationException;
 
 public class GsUtilTest {
 
@@ -71,7 +73,15 @@ public class GsUtilTest {
 		}
 	}
 	
-	public static class MyException extends RuntimeException {
+	public static class MyException extends ServiceInvocationException {
+		public MyException(CorrelationId correlationId) {
+			super(correlationId);
+		}
+		
+		public MyException() {
+			super(UNDEFINED_CORRELACTION_ID);
+		}
+
 		private static final long serialVersionUID = 1L;
 		@Override
 		public boolean equals(Object obj) {
@@ -86,9 +96,15 @@ public class GsUtilTest {
 			}
 			return true;
 		}
+		
 		@Override
 		public int hashCode() {
 			return Objects.hash(1);
+		}
+		
+		@Override
+		public ServiceInvocationException reCreateOnClientSide(CorrelationId correlationId) {
+			return new MyException(correlationId);
 		}
 	}
 	

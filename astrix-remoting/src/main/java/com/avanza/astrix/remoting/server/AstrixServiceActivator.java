@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.core.ServiceInvocationException;
 import com.avanza.astrix.remoting.client.AstrixMissingServiceException;
 import com.avanza.astrix.remoting.client.AstrixMissingServiceMethodException;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
@@ -118,7 +119,11 @@ public class AstrixServiceActivator {
 			AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
 			invocationResponse.setExceptionMsg(exceptionThrownByService.getMessage());
 			invocationResponse.setCorrelationId(UUID.randomUUID().toString());
-			invocationResponse.setThrownExceptionType(exceptionThrownByService.getClass().getName());
+			if (exceptionThrownByService instanceof ServiceInvocationException) {
+				invocationResponse.setException((ServiceInvocationException) exceptionThrownByService);
+			} else {
+				invocationResponse.setThrownExceptionType(exceptionThrownByService.getClass().getName());
+			}
 			logger.info(String.format("Service invocation ended with exception. request=%s correlationId=%s", request, invocationResponse.getCorrelationId()), exceptionThrownByService);
 			return invocationResponse;
 		}

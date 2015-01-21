@@ -21,6 +21,8 @@ import java.util.List;
 import org.openspaces.remoting.SpaceRemotingResult;
 
 import com.avanza.astrix.core.AstrixRemoteResult;
+import com.avanza.astrix.core.RemoteServiceInvocationException;
+import com.avanza.astrix.core.ServiceInvocationException;
 
 /**
  * @author joasah
@@ -39,11 +41,11 @@ public class GsUtil {
 		return converted;
 	}
 	
-	private static RuntimeException toRuntimeException(Throwable exception) {
+	private static ServiceInvocationException toRuntimeException(Throwable exception) {
 		if (exception instanceof RuntimeException) {
-			return (RuntimeException) exception;
+			return (ServiceInvocationException) exception;
 		} else {
-			return new RuntimeException(exception);
+			return new RemoteServiceInvocationException("Remote service threw exception: " + exception.getMessage(), exception.getClass().getName(), ServiceInvocationException.UNDEFINED_CORRELACTION_ID);
 		}
 	}
 	

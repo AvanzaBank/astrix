@@ -41,6 +41,7 @@ import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.IllegalSubsystemException;
+import com.avanza.astrix.core.RemoteServiceInvocationException;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.common.Ping;
@@ -54,7 +55,6 @@ import com.avanza.astrix.integration.tests.domain.apiruntime.feeder.InternalLunc
 import com.avanza.astrix.integration.tests.domain2.api.LunchRestaurantGrader;
 import com.avanza.astrix.integration.tests.domain2.apiruntime.PublicLunchFeeder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
-import com.avanza.astrix.remoting.client.AstrixRemoteServiceException;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistry;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistryClient;
 import com.avanza.astrix.test.util.AstrixTestUtil;
@@ -187,7 +187,7 @@ public class AstrixIntegrationTest {
 			GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
 			request.setName("throwException"); // LunchServiceImpl is hard-coded to throw exception for this name.
 			lunchService.getLunchRestaurant(request);
-		} catch (AstrixRemoteServiceException e) {
+		} catch (RemoteServiceInvocationException e) {
 			assertEquals(IllegalArgumentException.class.getName(), e.getExceptionType());
 			assertThat(e.getMessage(), startsWith("Remote service threw exception, see server log for details. [java.lang.IllegalArgumentException: Illegal restaurant: throwException]"));
 		}

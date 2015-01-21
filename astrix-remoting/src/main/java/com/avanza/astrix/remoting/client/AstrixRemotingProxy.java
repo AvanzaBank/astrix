@@ -257,7 +257,7 @@ public class AstrixRemotingProxy implements InvocationHandler {
 
 	private <T> AstrixRemoteResult<T> toRemoteResult(AstrixServiceInvocationResponse response, Type returnType, int version) {
 		if (response.hasThrownException()) {
-			return AstrixRemoteResult.failure(new AstrixRemoteServiceException(response.getExceptionMsg(), response.getThrownExceptionType(), response.getCorrelationId()));
+			return AstrixRemoteResult.failure(response.createClientSideException());
 		}
 		if (returnType.equals(Void.TYPE)) {
 			return AstrixRemoteResult.voidResult();

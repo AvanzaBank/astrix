@@ -18,6 +18,10 @@ package com.avanza.astrix.remoting.client;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.avanza.astrix.core.CorrelationId;
+import com.avanza.astrix.core.RemoteServiceInvocationException;
+import com.avanza.astrix.core.ServiceInvocationException;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -27,6 +31,12 @@ public class AstrixServiceInvocationResponse implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Object responseBody;
+	/*
+	 * If the exception thrown on the server side was of type ServiceInvocationException, 
+	 * then this field will be populated. Otherwise only thrownExceptionType and
+	 * exceptionMsg will be populated
+	 */
+	private ServiceInvocationException thrownException;
 	private String thrownExceptionType;
 	private String exceptionMsg;
 	private String correlationId;
@@ -39,6 +49,14 @@ public class AstrixServiceInvocationResponse implements Serializable {
 	
 	public Object getResponseBody() {
 		return responseBody;
+	}
+	
+	public Object getException() {
+		return thrownException;
+	}
+	
+	public void setException(ServiceInvocationException exception) {
+		this.thrownException = exception;
 	}
 	
 	public void setExceptionMsg(String exceptionMsg) {
@@ -58,7 +76,7 @@ public class AstrixServiceInvocationResponse implements Serializable {
 	}
 	
 	public boolean hasThrownException() {
-		return this.thrownExceptionType != null;
+		return this.thrownExceptionType != null || this.thrownException != null;
 	}
 	
 	public void setHeader(String name, String value) {
@@ -75,5 +93,12 @@ public class AstrixServiceInvocationResponse implements Serializable {
 	
 	public String getCorrelationId() {
 		return correlationId;
+	}
+
+	public ServiceInvocationException createClientSideException() {
+		if (this.thrownException != null) {
+			return this.thrownException.reCreateOnClientSide(CorrelationId.valueOf(this.correlationId));
+		}
+		return new RemoteServiceInvocationException(getExceptionMsg(), getThrownExceptionType(), CorrelationId.valueOf(correlationId));
 	}
 }

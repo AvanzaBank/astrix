@@ -21,9 +21,9 @@ import java.util.Objects;
 public final class AstrixRemoteResult<T> {
 	
 	private final T result;
-	private final RuntimeException exception;
+	private final ServiceInvocationException exception;
 
-	private AstrixRemoteResult(T result, RuntimeException exception) {
+	private AstrixRemoteResult(T result, ServiceInvocationException exception) {
 		this.result = result;
 		this.exception = exception;
 	}
@@ -32,28 +32,15 @@ public final class AstrixRemoteResult<T> {
 		return new AstrixRemoteResult<>(result, null);
 	}
 	
-	public static <T> AstrixRemoteResult<T> failure(RuntimeException exception) {
+	public static <T> AstrixRemoteResult<T> failure(ServiceInvocationException exception) {
 		return new AstrixRemoteResult<>(null, exception);
 	}
 	
 	public T getResult() {
 		if (hasThrownException()) {
-			appendCurrentCallStackToThrowable(exception);
-			throw exception;
+			exception.reThrow();
 		}
 		return result;
-	}
-	
-	/*
-	 * Since the execution of an AstrixCommand does not contain the call-stack where the command were created and invoked, 
-	 * we append the current callstack to the exception for increased tracability.
-	 */
-	private static void appendCurrentCallStackToThrowable(Throwable throwable) {
-		if (throwable.getCause() == null) {
-			throwable.initCause(new AstrixCallStackTrace());
-		} else {
-			appendCurrentCallStackToThrowable(throwable.getCause());
-		}
 	}
 
 	public boolean hasThrownException() {
@@ -84,4 +71,5 @@ public final class AstrixRemoteResult<T> {
 	public int hashCode() {
 		return Objects.hash(result, exception);
 	}
+
 }

@@ -16,7 +16,6 @@
 package com.avanza.astrix.remoting.server;
 
 import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -41,8 +40,10 @@ import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.core.CorrelationId;
+import com.avanza.astrix.core.RemoteServiceInvocationException;
+import com.avanza.astrix.core.ServiceInvocationException;
 import com.avanza.astrix.remoting.client.AstrixMissingServiceException;
-import com.avanza.astrix.remoting.client.AstrixRemoteServiceException;
 import com.avanza.astrix.remoting.client.AstrixRemotingProxy;
 import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
 import com.avanza.astrix.remoting.client.Router;
@@ -152,7 +153,7 @@ public class AstrixServiceActivatorTest {
 	
 	
 	@Test
-	public void routedRequest_throwsException() throws Exception {
+	public void routedRequest_throwsExceptionOfNonServiceInvocationExceptionType() throws Exception {
 		try {
 			TestService impl = new TestService() {
 				@Override
@@ -169,11 +170,37 @@ public class AstrixServiceActivatorTest {
 			TestService testService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 			testService.hello(new HelloRequest("foo"));
 			fail("Expected remote service exception to be thrown");
-		} catch (AstrixRemoteServiceException e) {
+		} catch (RemoteServiceInvocationException e) {
 			assertEquals(IllegalArgumentException.class.getName(), e.getExceptionType());
 			assertThat(e.getMessage(), startsWith("Remote service threw exception, see server log for details. [java.lang.IllegalArgumentException: Remote service error message]"));
 		}
 	}
+	
+	@Test
+	public void routedRequest_throwsExceptionOfServiceInvocationType() throws Exception {
+		try {
+			TestService impl = new TestService() {
+				@Override
+				public HelloResponse hello(HelloRequest message) {
+					throw new MyCustomServiceException();
+				}
+				@Override
+				public String hello(HelloRequest message, String greeting) {
+					return "overload-" + message.getMesssage();
+				}
+			};
+			activator.register(impl, objectSerializer, TestService.class);
+
+			TestService testService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
+			testService.hello(new HelloRequest("foo"));
+			fail("Expected remote service exception to be thrown");
+		} catch (MyCustomServiceException e) {
+			// Expected
+		} catch (Exception e) {
+			fail("Excpected exception of type MyCustomerServiceException, but was: " + e);
+		}
+	}
+
 	
 	@Test
 	public void broadcastRequest_throwsException() throws Exception {
@@ -189,7 +216,7 @@ public class AstrixServiceActivatorTest {
 			BroadcastService broadcastService = AstrixRemotingProxy.create(BroadcastService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 			broadcastService.broadcast(new BroadcastRequest("foo"));
 			fail("Expected remote service exception to be thrown");
-		} catch (AstrixRemoteServiceException e) {
+		} catch (RemoteServiceInvocationException e) {
 			assertEquals(IllegalArgumentException.class.getName(), e.getExceptionType());
 			assertThat(e.getMessage(), startsWith("Remote service threw exception, see server log for details. [java.lang.IllegalArgumentException: Broadcast error message]"));
 		}
@@ -232,7 +259,7 @@ public class AstrixServiceActivatorTest {
 		try {
 			TestService missingRemoteService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
 			missingRemoteService.hello(new HelloRequest("foo"));
-		} catch (AstrixRemoteServiceException e) {
+		} catch (RemoteServiceInvocationException e) {
 			assertEquals(AstrixMissingServiceException.class.getName(), e.getExceptionType());
 		}
 	}
@@ -558,6 +585,25 @@ public class AstrixServiceActivatorTest {
 			return result.get(0).getResult(); // Only one 'partition'
 		}
 
+	}
+	
+	public static class MyCustomServiceException extends ServiceInvocationException {
+
+		private static final long serialVersionUID = 1L;
+		
+		public MyCustomServiceException() {
+			super(UNDEFINED_CORRELACTION_ID, "my-custom-message");
+		}
+
+		public MyCustomServiceException(String msg, CorrelationId correlationId) {
+			super(correlationId, msg);
+		}
+		
+		@Override
+		public ServiceInvocationException reCreateOnClientSide(CorrelationId correlationId) {
+			return new MyCustomServiceException(getMessage(), correlationId);
+		}
+		
 	}
 	
 }

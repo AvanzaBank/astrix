@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package com.avanza.astrix.core;
+
+import java.util.Objects;
+
 /**
  * Thrown on the client side when the server side service invocation ended with an exception.
  * 
@@ -21,40 +24,52 @@ package com.avanza.astrix.core;
  * invocation never returned a response at all, either because timeout was reached or because
  * the fault-tolerance layer rejected the operation.
  * 
+ * If the service-api's throws exceptions as part of an api, then such exceptions should subclass
+ * this exception to propagate correctly to the client. All exceptions thrown of other types than
+ * ServiceInvocationException will be wrapped by a RemoteServiceInvocationException by a service-implementation
+ *  
+ * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class ServiceInvocationException extends RuntimeException {
-	
-	private static final long serialVersionUID = 1L;
-	
-	private final String exceptionType;
-	private final String serviceExceptionMessage;
-	private final String correlationId;
+public abstract class ServiceInvocationException extends RuntimeException {
 
-	/**
-	 * 
-	 * @param msg - 
-	 * @param serviceExceptionMessage - the message from the exception thrown 
-	 * @param serviceExceptionType - the type of the thrown exception
-	 * @param correlationId - a correlation id to identify the exception in server side logs.
-	 */
-	public ServiceInvocationException(String msg, String serviceExceptionMessage, String serviceExceptionType, String correlationId) {
+	
+	public static final CorrelationId UNDEFINED_CORRELACTION_ID = CorrelationId.undefined();
+	private static final long serialVersionUID = 1L;
+	private final CorrelationId correlationId;
+	
+	public ServiceInvocationException(CorrelationId correlationId) {
+		this.correlationId = Objects.requireNonNull(correlationId);
+	}
+
+	public ServiceInvocationException(CorrelationId correlationId, String msg) {
 		super(msg);
-		this.serviceExceptionMessage = serviceExceptionMessage;
-		this.exceptionType = serviceExceptionType;
-		this.correlationId = correlationId;
+		this.correlationId = Objects.requireNonNull(correlationId);
 	}
 	
-	public String getExceptionType() {
-		return exceptionType;
-	}
-	
-	public String getServiceExceptionMessage() {
-		return serviceExceptionMessage;
-	}
-	
-	public String getCorrelationId() {
+	public final CorrelationId getCorrelationId() {
 		return correlationId;
 	}
+	
+	
+	/**
+	 * Invoked on the client-side to create a new instance of this exception with a proper
+	 * stack-trace containing the actual service call.
+	 * 
+	 * The correlationId should be passed to the returned ServiceInvocationException
+	 * 
+	 * @param correlationId
+	 * @return
+	 */
+	public abstract ServiceInvocationException reCreateOnClientSide(CorrelationId correlationId);
+
+	/*
+	 * Recreates exception and throws is.
+	 */
+	void reThrow() {
+		throw reCreateOnClientSide(correlationId);
+	}
+
 }
+
