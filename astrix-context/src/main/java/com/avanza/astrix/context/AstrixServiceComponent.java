@@ -28,6 +28,7 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  */
 public interface AstrixServiceComponent {
 	
+	// TODO: rename to bind?
 	<T> T createService(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties);
 	
 	AstrixServiceProperties createServiceProperties(String serviceUri);
