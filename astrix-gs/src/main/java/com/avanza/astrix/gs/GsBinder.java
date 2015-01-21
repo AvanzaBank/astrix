@@ -56,7 +56,7 @@ public class GsBinder implements AstrixSettingsAware {
 	private GigaSpace findEmbeddedSpace(ApplicationContext applicationContext) {
 		GigaSpace result = null;
 		for (GigaSpace gigaSpace : applicationContext.getBeansOfType(GigaSpace.class).values()) {
-			if (gigaSpace.getSpace().isEmbedded()) {
+			if (isEmbedded(gigaSpace)) {
 				if (result != null) {
 					throw new IllegalStateException("Multiple embedded spaces defined in applicationContext");
 				} else {
@@ -65,6 +65,15 @@ public class GsBinder implements AstrixSettingsAware {
 			}
 		}
 		return result;
+	}
+
+	private boolean isEmbedded(GigaSpace gigaSpace) {
+		try {
+			return gigaSpace.getSpace().isEmbedded();
+		} catch (Exception e) {
+			// Clearly not an embedded space since they are not stateful
+			return false;
+		}
 	}
 	
 	public AstrixServiceProperties createProperties(GigaSpace space) {
