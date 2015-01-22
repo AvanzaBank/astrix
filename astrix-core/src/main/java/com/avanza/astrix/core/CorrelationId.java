@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.core;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -22,8 +23,9 @@ import java.util.Objects;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class CorrelationId {
+public final class CorrelationId implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	private final String id;
 	
 	private CorrelationId(String id) {
