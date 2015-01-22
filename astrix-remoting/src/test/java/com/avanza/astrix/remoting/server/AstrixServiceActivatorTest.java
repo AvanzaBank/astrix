@@ -16,10 +16,18 @@
 package com.avanza.astrix.remoting.server;
 
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -592,7 +600,7 @@ public class AstrixServiceActivatorTest {
 		private static final long serialVersionUID = 1L;
 		
 		public MyCustomServiceException() {
-			super(UNDEFINED_CORRELACTION_ID, "my-custom-message");
+			super(UNDEFINED_CORRELATION_ID, "my-custom-message");
 		}
 
 		public MyCustomServiceException(String msg, CorrelationId correlationId) {

@@ -62,7 +62,7 @@ public class GenericAstrixMapReducerTest {
 			super(correlationId);
 		}
 		public MyRuntimeException() {
-			super(UNDEFINED_CORRELACTION_ID);
+			super(UNDEFINED_CORRELATION_ID);
 		}
 
 		@Override

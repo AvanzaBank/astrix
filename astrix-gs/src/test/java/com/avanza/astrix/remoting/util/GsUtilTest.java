@@ -79,7 +79,7 @@ public class GsUtilTest {
 		}
 		
 		public MyException() {
-			super(UNDEFINED_CORRELACTION_ID);
+			super(UNDEFINED_CORRELATION_ID);
 		}
 
 		private static final long serialVersionUID = 1L;

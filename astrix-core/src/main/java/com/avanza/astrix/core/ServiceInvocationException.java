@@ -35,7 +35,10 @@ import java.util.Objects;
 public abstract class ServiceInvocationException extends RuntimeException {
 
 	
-	public static final CorrelationId UNDEFINED_CORRELACTION_ID = CorrelationId.undefined();
+	public static final CorrelationId UNDEFINED_CORRELATION_ID = CorrelationId.undefined();
+	@Deprecated
+	public static final CorrelationId UNDEFINED_CORRELACTION_ID = UNDEFINED_CORRELATION_ID;
+	
 	private static final long serialVersionUID = 1L;
 	private final CorrelationId correlationId;
 	
