@@ -65,7 +65,7 @@ public abstract class ServiceInvocationException extends RuntimeException {
 	public abstract ServiceInvocationException reCreateOnClientSide(CorrelationId correlationId);
 
 	/*
-	 * Recreates exception and throws is.
+	 * Recreates exception and throws it.
 	 */
 	void reThrow() {
 		throw reCreateOnClientSide(correlationId);
