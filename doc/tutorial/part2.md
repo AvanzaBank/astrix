@@ -8,22 +8,22 @@ Service binding is done in two steps:
 1. Lookup the service properties associated with the given service. This involves identifying what `AstrixServiceComponent` to use and find all properties required by the `AstrixServiceComponent` to bind to the service.
 2. Use the `AstrixServiceComponent` to bind to the given service.
 
-Those two steps offers two levels of indirection. The first one is how to lookup the service-properties associated with a service. Out of the box Astrix supports two mechanisms for service lookup. One using configuration, `@AstrixConfigLookup`, and another using the service-registry, `@AstrixServiceRegistryLookup`, which will be introduced later. The other level of indirection is how Astrix binds to a service, which done by the `AstrixServiceComponent`. Astrix comes with a number of service-component implementations out of the box which will be introduced throughout the tutorial. 
+Each of those two steps offers two levels of indirection. The first one is how to lookup the service-properties associated with a service. Out of the box Astrix supports two mechanisms for service lookup. One using configuration, `@AstrixConfigLookup`, and another using the service-registry, `@AstrixServiceRegistryLookup`, which will be introduced later. The other one is how Astrix binds to a service, which done by the `AstrixServiceComponent`. Astrix comes with a number of service-component implementations out of the box which will be introduced throughout the tutorial. 
 
 
 ### Service binding using AstrixDirectComponent and @AstrixConfigLookup
 The first service-component covered is the `AstrixDirectComponent` which is a useful tool to support testing. It allows binding to a service within the same process, i.e. an ordinary object within the same jvm. The true power of the `AstrixDirectComponent` comes when using it in combination with the service-registry, which we will se later in the tutorial when introducing the service-registry. This example introduces the `AstrixDirectComponent` in combination with a `@AstrixConfigLookup`.
 
-In this example the api i split into one library, `LunchSuggester`, and one service, `LunchRestaruantFinder`. A service is created using a `@AstrixServiceProvider` annotation which has a property indicating what api-elements to export as a service. A service-provider must also define what lookup-mechanism to use to locate the provided services. The `LunchServiceProvider` is annotated with `@AstrixConfigLookup` indicating that the properties required to bind to the provided service should be looked up in the configuration. 
+In this example the api i split into one library, `LunchSuggester`, and one service, `LunchRestaruantFinder`. A service is provided in i similar way as a library, but by using the `@Service` annotation to define a provide service. Each exported service must also define what lookup-mechanism to use to locate the provided services. The method exporting `LunchRestaurantFinder` is annotated with `@AstrixConfigLookup` indicating that the properties required to bind to the provided service should be looked up in configuration. 
 
 ```java
 public interface LunchSuggester {
 	String randomLunchRestaurant();
 }
 
-@AstrixLibraryProvider
+@AstrixApiProvider
 public class LunchLibraryProvider {
-	@AstrixExport
+	@Library
 	public LunchSuggester lunchSuggester(LunchRestaurantFinder restaurantFinder) {
 		return new LunchSuggesterImpl(restaurantFinder);
 	}
@@ -36,9 +36,13 @@ public interface LunchRestaurantFinder {
 	List<String> getAllRestaurants();
 }
 
-@AstrixConfigLookup("restaurantFinderUri")
-@AstrixServiceProvider(LunchRestaurantFinder.class)
-public class LunchServiceProvider {
+@AstrixApiProvider
+public interface LunchServiceProvider {
+	
+	@AstrixConfigLookup("restaurantFinderUri")
+	@Service
+	LunchRestaurantFinder lunchRestaurantFinder();
+
 }
 ```
 
@@ -77,22 +81,22 @@ In the test we want to stub out the `LunchRestaurantFinder` using Mockito. This 
 
 When we configure Astrix we provide a setting, `"restaurantFinderUri"` with a value that contains the serviceUri to the `LunchRestaurantFinder` mock instance. When Astrix creates an instance of `LunchRestaurantFinder` (which is done indirectly when we create the `LunchSuggester` bean in the test) the process goes like this:
 
-1. Astrix sees that it is a service (the api-provider is annotated with `@AstrixServiceProvider`) and that service properties should be looked up in configuration (`@AstrixConfigApi`)
-3. Astrix queries the configuration for the entry name defined by the `@AstrixConfigApi` annotation ("restaurantFinderUri") to get the serviceUri, lets say that its value is `"direct:21"`
+1. Astrix sees that it is a service (the ApiProvider exports the bean as `@Service`) and that the service properties should be looked up in configuration (defined by the `@AstrixConfigLookup` annotation)
+2. Astrix queries the configuration for the entry name defined by the `@AstrixConfigLookup` annotation ("restaurantFinderUri") to get the serviceUri, lets say that its value is `"direct:21"`
 3. Astrix parses the serviceUri to find what `AstrixServiceComponent` to use for binding, in this case `"direct"`
 4. Astrix delegates service binding to `AstrixDirectComponent`, passing in all component-specific properties, in this case `"21"`
 5. The `AstrixDirectComponent` queries its internal registry of objects and finds our mock instance and returns it
 
 
 ### Configuration
-The previous example uses the configuration mechanism to lookup service-properties required to bind to `LunchRestaurantFinder`. The configuration mechanism in Astrix is hierarchical and an entry is resolved in the following order.
+The previous example uses the configuration mechanism to lookup service-properties required to bind to `LunchRestaurantFinder`. Astrixs ships with a small standalone configuration framework called `DynamicConfig`. A configuration property is resolved in the following order:
 
-1. External configuration
+1. Custom ConfigurationSource's
 2. Programmatic configuration set on `AstrixConfigurer`
 3. `META-INF/astrix/settings.properties`
 4. Default values
 
-Astrix will use the first value found for a given setting. Hence the External Configuration takes precedence over the Programatic configuration and so on. The external configuration is pluggable by implementing the `AstrixExternalConfig` spi. By default Astrix will not use any external configuration. The `settings.properties` provides a convenient way to override the default values provided by Astrix. It could be used to set corporate wide default-values by sharing a single `settings.properties` file. For instance it could be used to say that `"com.mycorp"` should be scanned for api-providers, avoiding the need to dupplicate such configurations on every instance of AstrixConfigurer throughout an enterprise.
+Astrix will use the first value found for a given setting. Hence the Custom ConfigurationSource's takes precedence over the Programatic configuration and so on. The custom configuration is pluggable by implementing the `ConfigSource` and/or `DynamicConfigSource` spi. By default Astrix will not use any external configuration. The `settings.properties` provides a convenient way to override the default values provided by Astrix. It could be used to set corporate wide default-values by sharing a single `settings.properties` file. For instance it could be used to say that `"com.mycorp"` should be scanned for api-providers, avoiding the need to dupplicate such configurations on every instance of AstrixConfigurer throughout an enterprise.
 
 ```java
 TODO: configuration example?

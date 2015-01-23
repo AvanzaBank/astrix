@@ -48,22 +48,22 @@ public class LunchSuggesterImpl implements LunchSuggester {
 
 }
 ```
-Finally, an `ApiProvider` is created to export the library. An `ApiProvider` is what makes the api available as an astrix-api. Two kinds of `ApiProvider` exists and the one associated with libraries is called `AstrixLibraryProvider`. The `ApiProvider` is typically located in the same module as the implementing classes.
+Finally, an `ApiProvider` is created to export the library. An `ApiProvider` is what makes the api available as an astrix-api. The `ApiProvider` is typically located in the same module as the implementing classes.
 
 
 ```java
-@AstrixLibraryProvider
+@AstrixApiProvider
 public class LunchLibraryProvider {
 	
-	@AstrixExport
-	public LunchSuggester lunchSuggester() {
-		return new LunchSuggesterImpl();
+	@Library
+	public LunchSuggester lunchUtil(LunchRestaurantFinder restaurantFinder) {
+		return new LunchSuggesterImpl(restaurantFinder);
 	}
-
+	
 }
 ```
  
-The `@AstrixLibraryProvider` annotation tells Astrix that this class is a library api. Each method annotated with `@AstrixExport` will act as a factory method to create a given api element, which is defined by the return type of the factory method, which is `LunchSuggester` in this example.
+The `@AstrixApiProvider` annotation tells Astrix that this class defines and provides an api. Each method annotated with `@Library` will act as a factory method to create a given api element, which is defined by the return type of the factory method, which is `LunchSuggester` in this example.
 
 ### Consuming the Library
 Consumption of the LunchApi is done by first creating an `AstrixContext` and then use it as a factory, as in the following unit test.
@@ -133,18 +133,19 @@ public class LunchSuggesterImpl implements LunchSuggester {
 And finally we have to update the `LunchLibraryProvider`. For the point of illustration we are depending on Astrix to inject the LunchRestaurantFinder into the factory-method for `LunchSuggester`:
 
 ```java
-@AstrixLibraryProvider
+@AstrixApiProvider
 public class LunchLibraryProvider {
-
-	@AstrixExport
-	public LunchSuggester lunchSuggester(LunchRestaurantFinder restaurantFinder) {
+	
+	@Library
+	public LunchSuggester lunchUtil(LunchRestaurantFinder restaurantFinder) {
 		return new LunchSuggesterImpl(restaurantFinder);
 	}
-
-	@AstrixExport
+	
+	@Library
 	public LunchRestaurantFinder lunchRestaurantFinder() {
 		return new LunchRestaurantsFinderImpl();
 	}
+
 }
 ```
 
@@ -260,14 +261,14 @@ public class MockingAstrixBeansTest {
 		assertEquals("Max", lunchSuggester.randomLunchRestaurant());
 	}
 
-	@AstrixLibraryProvider
+	@AstrixApiProvider
 	public static class LunchLibraryProvider {
 		
-		// Note that this library don't provide the LunchRestaurantFinder, lets
+		// Note that this library don't provide the LunchService, lets
 		// pretend that its a remote-service provided by another team.
 		
-		@AstrixExport
-		public LunchSuggester lunchSuggester(LunchRestaurantFinder restaurantFinder) {
+		@Library
+		public LunchSuggester lunchUtil(LunchRestaurantFinder restaurantFinder) {
 			return new LunchSuggesterImpl(restaurantFinder);
 		}
 		
