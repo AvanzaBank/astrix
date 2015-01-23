@@ -65,13 +65,33 @@ public class AstrixServiceActivator {
 			return service;
 		}
 		
-		public AstrixServiceInvocationResponse doInvoke(AstrixServiceInvocationRequest request, int version, String serviceApi) throws Exception {
+		private AstrixServiceInvocationResponse invoke(AstrixServiceInvocationRequest request, int version, String serviceApi) {
+			try {
+				return invokeService(request, version, serviceApi);
+			} catch (Exception e) {
+				Throwable exceptionThrownByService = resolveException(e);
+				AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
+				invocationResponse.setExceptionMsg(exceptionThrownByService.getMessage());
+				invocationResponse.setCorrelationId(UUID.randomUUID().toString());
+				if (exceptionThrownByService instanceof ServiceInvocationException) {
+					invocationResponse.setException(this.objectSerializer.serialize(exceptionThrownByService, version));
+				} else {
+					invocationResponse.setThrownExceptionType(exceptionThrownByService.getClass().getName());
+				}
+				logger.info(String.format("Service invocation ended with exception. request=%s correlationId=%s", request, invocationResponse.getCorrelationId()), exceptionThrownByService);
+				return invocationResponse;
+			}
+		}
+
+		private AstrixServiceInvocationResponse invokeService(
+				AstrixServiceInvocationRequest request, int version,
+				String serviceApi) throws IllegalAccessException,
+				InvocationTargetException {
 			String serviceMethodSignature = request.getHeader("serviceMethodSignature");
 			Method serviceMethod = methodBySignature.get(serviceMethodSignature);
 			if (serviceMethod == null) {
 				throw new AstrixMissingServiceMethodException(String.format("Missing service method: service=%s method=%s", serviceApi, serviceMethodSignature));
 			}
-			
 			Object[] arguments = unmarshal(request.getArguments(), serviceMethod.getGenericParameterTypes(), version);
 			Object result = serviceMethod.invoke(service, arguments);
 			AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
@@ -106,30 +126,17 @@ public class AstrixServiceActivator {
 	 * @return
 	 */
 	public AstrixServiceInvocationResponse invokeService(AstrixServiceInvocationRequest request) {
-		try {
-			int version = Integer.parseInt(request.getHeader("apiVersion"));
-			String serviceApi = request.getHeader("serviceApi");
-			PublishedService<?> publishedService = this.serviceByType.get(serviceApi);
-			if (publishedService == null) {
-				throw new AstrixMissingServiceException("No such service: " + serviceApi);
-			}
-			return publishedService.doInvoke(request, version, serviceApi);
-		} catch (Exception e) {
-			Throwable exceptionThrownByService = resolveException(e);
-			AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
-			invocationResponse.setExceptionMsg(exceptionThrownByService.getMessage());
-			invocationResponse.setCorrelationId(UUID.randomUUID().toString());
-			if (exceptionThrownByService instanceof ServiceInvocationException) {
-				invocationResponse.setException((ServiceInvocationException) exceptionThrownByService);
-			} else {
-				invocationResponse.setThrownExceptionType(exceptionThrownByService.getClass().getName());
-			}
-			logger.info(String.format("Service invocation ended with exception. request=%s correlationId=%s", request, invocationResponse.getCorrelationId()), exceptionThrownByService);
-			return invocationResponse;
+		PublishedService<?> publishedService = null;
+		int version = Integer.parseInt(request.getHeader("apiVersion"));
+		String serviceApi = request.getHeader("serviceApi");
+		publishedService = this.serviceByType.get(serviceApi);
+		if (publishedService == null) {
+			throw new AstrixMissingServiceException("No such service: " + serviceApi);
 		}
+		return publishedService.invoke(request, version, serviceApi);
 	}
 
-	private Throwable resolveException(Exception e) {
+	private static Throwable resolveException(Exception e) {
 		if (e instanceof InvocationTargetException) {
 			// Invoked service threw an exception
 			return InvocationTargetException.class.cast(e).getTargetException();

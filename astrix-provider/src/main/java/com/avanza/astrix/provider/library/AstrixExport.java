@@ -28,10 +28,12 @@ import java.lang.annotation.Target;
  * @author Elias Lindholm (elilin)
  * @author Andreas Skoog (andsko)
  *
+ * @deprecated - replaced by @Library
  */
 @Target(value={ElementType.METHOD})
 @Retention(value=RetentionPolicy.RUNTIME)
 @Documented
+@Deprecated
 public @interface AstrixExport {
 
 }

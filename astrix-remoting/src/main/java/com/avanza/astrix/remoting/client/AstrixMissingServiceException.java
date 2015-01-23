@@ -15,12 +15,24 @@
  */
 package com.avanza.astrix.remoting.client;
 
-public class AstrixMissingServiceException extends RuntimeException {
+import com.avanza.astrix.core.CorrelationId;
+import com.avanza.astrix.core.ServiceInvocationException;
+
+public class AstrixMissingServiceException extends ServiceInvocationException {
 
 	private static final long serialVersionUID = 1L;
 	
 	public AstrixMissingServiceException(String message) {
-		super(message);
+		super(UNDEFINED_CORRELATION_ID, message);
+	}
+
+	public AstrixMissingServiceException(String message, CorrelationId correlationId) {
+		super(correlationId, message);
+	}
+
+	@Override
+	public ServiceInvocationException reCreateOnClientSide(CorrelationId correlationId) {
+		return new AstrixMissingServiceException(getMessage(), correlationId);
 	}
 
 }

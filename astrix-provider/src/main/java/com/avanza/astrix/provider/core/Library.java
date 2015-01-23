@@ -23,6 +23,9 @@ import java.lang.annotation.Target;
 
 
 /**
+ * Used to export a method in a {@link AstrixApiProvider} as a factory
+ * for creating a given api type. <p>
+ * 
  * @author Elias Lindholm (elilin)
  */
 @Target(value = { ElementType.METHOD})

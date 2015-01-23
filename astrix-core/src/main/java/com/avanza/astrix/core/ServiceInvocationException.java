@@ -65,7 +65,9 @@ public abstract class ServiceInvocationException extends RuntimeException {
 	 * @param correlationId
 	 * @return
 	 */
+	// TODO: rename to recreateOnClientSide (with lowercase c)
 	public abstract ServiceInvocationException reCreateOnClientSide(CorrelationId correlationId);
+	
 
 	/*
 	 * Recreates exception and throws it.

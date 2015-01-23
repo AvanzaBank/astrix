@@ -15,13 +15,18 @@
  */
 package com.avanza.astrix.gs;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.openspaces.core.GigaSpace;
+import org.openspaces.core.GigaSpaceConfigurer;
+import org.openspaces.core.space.UrlSpaceConfigurer;
 
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.AstrixSettingsReader;
+import com.j_spaces.core.IJSpace;
 
 
 

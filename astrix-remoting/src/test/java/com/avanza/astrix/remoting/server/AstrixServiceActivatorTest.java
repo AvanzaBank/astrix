@@ -205,7 +205,8 @@ public class AstrixServiceActivatorTest {
 		} catch (MyCustomServiceException e) {
 			// Expected
 		} catch (Exception e) {
-			fail("Excpected exception of type MyCustomerServiceException, but was: " + e);
+			e.printStackTrace();
+			fail("Excpected exception of type MyCustomServiceException, but was: " + e);
 		}
 	}
 
@@ -262,14 +263,10 @@ public class AstrixServiceActivatorTest {
 		assertEquals(provider.broadcast(new BroadcastRequest("kalle")), broadcastService.broadcast(new BroadcastRequest("kalle")));
 	}
 	
-	@Test
+	@Test(expected = AstrixMissingServiceException.class)
 	public void request_NoCorrespondingService_throwsException() throws Exception {
-		try {
-			TestService missingRemoteService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
-			missingRemoteService.hello(new HelloRequest("foo"));
-		} catch (RemoteServiceInvocationException e) {
-			assertEquals(AstrixMissingServiceException.class.getName(), e.getExceptionType());
-		}
+		TestService missingRemoteService = AstrixRemotingProxy.create(TestService.class, AstrixRemotingTransport.direct(activator), objectSerializer, new NoRoutingStrategy());
+		missingRemoteService.hello(new HelloRequest("foo"));
 	}
 	
 	@Test

@@ -18,10 +18,6 @@ package com.avanza.astrix.remoting.client;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.avanza.astrix.core.CorrelationId;
-import com.avanza.astrix.core.RemoteServiceInvocationException;
-import com.avanza.astrix.core.ServiceInvocationException;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -36,7 +32,7 @@ public class AstrixServiceInvocationResponse implements Serializable {
 	 * then this field will be populated. Otherwise only thrownExceptionType and
 	 * exceptionMsg will be populated
 	 */
-	private ServiceInvocationException thrownException;
+	private Object thrownException;
 	private String thrownExceptionType;
 	private String exceptionMsg;
 	private String correlationId;
@@ -55,7 +51,7 @@ public class AstrixServiceInvocationResponse implements Serializable {
 		return thrownException;
 	}
 	
-	public void setException(ServiceInvocationException exception) {
+	public void setException(Object exception) {
 		this.thrownException = exception;
 	}
 	
@@ -95,10 +91,8 @@ public class AstrixServiceInvocationResponse implements Serializable {
 		return correlationId;
 	}
 
-	public ServiceInvocationException createClientSideException() {
-		if (this.thrownException != null) {
-			return this.thrownException.reCreateOnClientSide(CorrelationId.valueOf(this.correlationId));
-		}
-		return new RemoteServiceInvocationException(getExceptionMsg(), getThrownExceptionType(), CorrelationId.valueOf(correlationId));
+	public Object getThrownException() {
+		return thrownException;
 	}
+	
 }

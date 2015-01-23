@@ -38,6 +38,9 @@ import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.core.CorrelationId;
+import com.avanza.astrix.core.RemoteServiceInvocationException;
+import com.avanza.astrix.core.ServiceInvocationException;
 import com.avanza.astrix.remoting.util.MethodSignatureBuilder;
 /**
  * 
@@ -257,7 +260,7 @@ public class AstrixRemotingProxy implements InvocationHandler {
 
 	private <T> AstrixRemoteResult<T> toRemoteResult(AstrixServiceInvocationResponse response, Type returnType, int version) {
 		if (response.hasThrownException()) {
-			return AstrixRemoteResult.failure(response.createClientSideException());
+			return AstrixRemoteResult.failure(createClientSideException(response, version));
 		}
 		if (returnType.equals(Void.TYPE)) {
 			return AstrixRemoteResult.voidResult();
@@ -268,6 +271,16 @@ public class AstrixRemotingProxy implements InvocationHandler {
 
 	private <T> T unmarshall(AstrixServiceInvocationResponse response, Type returnType, int version) {
 		return objectSerializer.deserialize(response.getResponseBody(), returnType, version);
+	}
+	
+	public ServiceInvocationException createClientSideException(AstrixServiceInvocationResponse response, int version) {
+		if (response.getException() != null) {
+			ServiceInvocationException exception = objectSerializer.deserialize(response.getException(), 
+																		ServiceInvocationException.class, 
+																		version);
+			return exception.reCreateOnClientSide(CorrelationId.valueOf(response.getCorrelationId()));
+		}
+		return new RemoteServiceInvocationException(response.getExceptionMsg(), response.getThrownExceptionType(), CorrelationId.valueOf(response.getCorrelationId()));
 	}
 	
 }
