@@ -35,7 +35,7 @@ public class AstrixSettings implements DynamicConfigSource {
 	@Deprecated
 	public static final String BEAN_REBIND_ATTEMPT_INTERVAL = BEAN_BIND_ATTEMPT_INTERVAL;
 	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AstrixServiceLeaseManager.leaseRenewInterval";
-	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AstrixContextImpl.enforceSubsystemBoundaries";
+	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AstrixContext.enforceSubsystemBoundaries";
 	public static final String ASTRIX_SERVICE_REGISTRY_URI = "AstrixServiceRegistry.serviceUri";
 	
 	/**
@@ -57,10 +57,10 @@ public class AstrixSettings implements DynamicConfigSource {
 	public static final String SERVICE_REGISTRY_LEASE = "AstrixServiceRegistryExporterWorker.serviceLeaseTimeMillis";
 	public static final String API_DESCRIPTOR_SCANNER_BASE_PACKAGE = "AstrixApiDescriptorScanner.basePackage";
 	
-	public static final String SUBSYSTEM_NAME = "AstrixContextImpl.subsystem";
+	public static final String SUBSYSTEM_NAME = "AstrixContext.subsystem";
 	
-	public static final String ENABLE_FAULT_TOLERANCE = "AstrixContextImpl.enableFaultTolerance";
-	public static final String ENABLE_VERSIONING = "AstrixContextImpl.enableVersioning";
+	public static final String ENABLE_FAULT_TOLERANCE = "AstrixContext.enableFaultTolerance";
+	public static final String ENABLE_VERSIONING = "AstrixContext.enableVersioning";
 	@Deprecated
 	public static final String EXPORT_GIGASPACE = "AstrixGsComponent.exportGigaSpace";
 	public static final String GIGA_SPACE_BEAN_NAME = "AstrixGsComponent.gigaSpaceBeanName";
