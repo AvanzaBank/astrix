@@ -49,7 +49,6 @@ public class AstrixConfigurer {
 		for (PluginHolder<?> plugin : plugins) {
 			registerPlugin(context, plugin);
 		}
-		configureFaultTolerance(context);
 		configureVersioning(context);
 		discoverApiProviderPlugins(context);
 		AstrixApiProviderPlugins apiProviderPlugins = new AstrixApiProviderPlugins(context.getPlugins(AstrixApiProviderPlugin.class));
@@ -149,14 +148,6 @@ public class AstrixConfigurer {
 			discoverOnePlugin(context, AstrixVersioningPlugin.class);
 		} else {
 			context.registerPlugin(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Default.create());
-		}
-	}
-	
-	private void configureFaultTolerance(AstrixContextImpl context) {
-		if (context.getSettings().getBoolean(AstrixSettings.ENABLE_FAULT_TOLERANCE, true)) {
-			discoverOnePlugin(context, AstrixFaultTolerancePlugin.class);
-		} else {
-			context.registerPlugin(AstrixFaultTolerancePlugin.class, AstrixFaultTolerancePlugin.Default.create());
 		}
 	}
 	

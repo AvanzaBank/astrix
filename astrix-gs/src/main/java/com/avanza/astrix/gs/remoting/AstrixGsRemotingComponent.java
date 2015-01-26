@@ -19,7 +19,7 @@ import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.context.AstrixContextImpl;
-import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
+import com.avanza.astrix.context.AstrixFaultTolerance;
 import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixPlugins;
 import com.avanza.astrix.context.AstrixPluginsAware;
@@ -48,11 +48,11 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	private AstrixPlugins plugins;
 	private AstrixContextImpl astrixContext;
 	private GsBinder gsBinder;
+	private AstrixFaultTolerance faultTolerance;
 	
 	@Override
 	public <T> T bind(ServiceVersioningContext versioningContext, Class<T> api, AstrixServiceProperties serviceProperties) {
 		AstrixObjectSerializer objectSerializer = plugins.getPlugin(AstrixVersioningPlugin.class).create(versioningContext);
-		AstrixFaultTolerancePlugin faultTolerance = plugins.getPlugin(AstrixFaultTolerancePlugin.class);
 		
 		String targetSpace = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
 		GigaSpace space = gsBinder.createGsFactory(serviceProperties).create();
@@ -99,6 +99,11 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	@AstrixInject
 	public void setGsBinder(GsBinder gsBinder) {
 		this.gsBinder = gsBinder;
+	}
+	
+	@AstrixInject
+	public void setFaultTolerance(AstrixFaultTolerance faultTolerance) {
+		this.faultTolerance = faultTolerance;
 	}
 
 	@Override

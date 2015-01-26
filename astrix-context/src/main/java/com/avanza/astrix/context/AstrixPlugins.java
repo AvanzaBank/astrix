@@ -107,7 +107,7 @@ public class AstrixPlugins {
 				Method defaultFactory = getDefaultFactory(type);
 				if (defaultFactory != null) {
 					try {
-						log.debug("Plugin not found {}. Using default factory to create {}", type, defaultFactory);
+						log.warn("Plugin not found {}. Using default factory to create {}", type, defaultFactory);
 						plugins.add((T) defaultFactory.invoke(null));
 					} catch (Exception e) {
 						log.warn("Failed to create default plugin for type=" + type, e);

@@ -39,6 +39,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 	private final static AtomicLong idGen = new AtomicLong();
 	private final static Map<String, ServiceProvider<?>> providerById = new ConcurrentHashMap<>();
 	private AstrixPlugins astrixPlugins;
+	private AstrixFaultTolerance faultTolerance;
 	
 	@Override
 	public <T> T bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
@@ -47,7 +48,14 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 		if (serviceProvider == null) {
 			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + type);
 		}
-		return type.cast(serviceProvider.getProvider(astrixPlugins.getPlugin(AstrixVersioningPlugin.class), versioningContext));
+		T provider = type.cast(serviceProvider.getProvider(astrixPlugins.getPlugin(AstrixVersioningPlugin.class), versioningContext));
+		FaultToleranceSpecification<T> ftSpec = FaultToleranceSpecification.builder(type)
+																		   .group("in-memory")
+																		   .provider(provider)
+																		   .isolationStrategy(IsolationStrategy.SEMAPHORE)
+																		   .build();
+		T providerWithFT = faultTolerance.addFaultTolerance(ftSpec);
+		return providerWithFT;
 	}
 	
 	@Override
@@ -258,5 +266,11 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 	public void setPlugins(AstrixPlugins plugins) {
 		astrixPlugins = plugins;
 	}
+	
+	@AstrixInject
+	public void setFaultTolerance(AstrixFaultTolerance faultTolerance) {
+		this.faultTolerance = faultTolerance;
+	}
+	
 
 }

@@ -96,6 +96,10 @@ public class TestAstrixConfigurer {
 		configurer.set(name, value);
 	}
 	
+	public void set(String name, boolean value) {
+		configurer.set(name, value);
+	}
+	
 	/*
 	 * Sets the current subsystem name and enables enforcing of
 	 * subsystem boundaries

@@ -19,10 +19,8 @@ import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.context.AstrixContextImpl;
-import com.avanza.astrix.context.AstrixFaultTolerancePlugin;
+import com.avanza.astrix.context.AstrixFaultTolerance;
 import com.avanza.astrix.context.AstrixInject;
-import com.avanza.astrix.context.AstrixPlugins;
-import com.avanza.astrix.context.AstrixPluginsAware;
 import com.avanza.astrix.context.AstrixServiceComponent;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.FaultToleranceSpecification;
@@ -37,11 +35,11 @@ import com.avanza.astrix.spring.AstrixSpringContext;
  *
  */
 @MetaInfServices(AstrixServiceComponent.class)
-public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsAware{
+public class AstrixGsComponent implements AstrixServiceComponent {
 
-	private AstrixPlugins plugins;
 	private AstrixContextImpl astrixContext;
 	private GsBinder gsBinder;
+	private AstrixFaultTolerance faultTolerance;
 	
 	
 	@Override
@@ -53,7 +51,7 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
 		FaultToleranceSpecification<T> ftSpec = FaultToleranceSpecification.builder(type).provider(gigaSpace)
 				.isolationStrategy(IsolationStrategy.THREAD).group(spaceName).build();
-		return plugins.getPlugin(AstrixFaultTolerancePlugin.class).addFaultTolerance(ftSpec);
+		return faultTolerance.addFaultTolerance(ftSpec);
 	}
 
 	@Override
@@ -101,10 +99,10 @@ public class AstrixGsComponent implements AstrixServiceComponent, AstrixPluginsA
 	public void setGsBinder(GsBinder gsBinder) {
 		this.gsBinder = gsBinder;
 	}
-
-	@Override
-	public void setPlugins(AstrixPlugins plugins) {
-		this.plugins = plugins;
+	
+	@AstrixInject
+	public void setFaultTolerance(AstrixFaultTolerance faultTolerance) {
+		this.faultTolerance = faultTolerance;
 	}
 
 }
