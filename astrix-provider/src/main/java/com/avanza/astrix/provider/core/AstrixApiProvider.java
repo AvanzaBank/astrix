@@ -72,12 +72,12 @@ import java.lang.annotation.Target;
  * Example of a service provider exporting two services that are located using the service registry:
  * 
  * <pre>
- * @AstrixApiProvider
+ * {@literal @}AstrixApiProvider
  * interface MyServiceProvider {
- *     @Service
+ *     {@literal @}Service
  *     MyService service();
  *     
- *     @Service
+ *     {@literal @}Service
  *     AnotherService anotherService();
  * }
  * </pre>
@@ -86,9 +86,9 @@ import java.lang.annotation.Target;
  * Example library provider exporting a single library Astrix bean. 
  * 
  * <pre>
- * @AstrixApiProvider
+ * {@literal @}AstrixApiProvider
  * class MyLibProvider {
- *     @Library
+ *     {@literal @}Library
  *     MyLibrary lib() {
  *         return new MyLibImpl();
  *     }

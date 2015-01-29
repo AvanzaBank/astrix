@@ -21,6 +21,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -41,7 +43,9 @@ public @interface AstrixApplication {
 	Class<?>[] apiDescriptors();
 
 	/**
-	 * Default AstrixServiceComponent to use when exporting services provided by this application.
+	 * Default {@link AstrixServiceComponent} to use when exporting services provided by this application,
+	 * see {@link AstrixServiceComponentNames} for well known AstrixServiceComponent's.
+	 * 
 	 * 
 	 * @return
 	 */
