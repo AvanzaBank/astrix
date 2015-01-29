@@ -143,4 +143,8 @@ public class TestAstrixConfigurer {
 		this.configurer.removeSetting(name);
 	}
 
+	public void activateProfile(String profile) {
+		this.configurer.activateProfile(profile);
+	}
+
 }

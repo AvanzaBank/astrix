@@ -18,15 +18,19 @@ package com.avanza.astrix.context;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.PropertiesConfigSource;
+import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
+import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 
 public class AstrixConfigurer {
 
@@ -44,6 +48,9 @@ public class AstrixConfigurer {
 	
 	private DynamicConfig customConfig = null;
 	private final DynamicConfig wellKnownConfigSources = DynamicConfig.create(settings, PropertiesConfigSource.optionalClasspathPropertiesFile(CLASSPATH_OVERRIDE_SETTINGS));
+
+	private final Set<String> activeProfiles = new HashSet<>();
+	
 	public AstrixContext configure() {
 		AstrixContextImpl context = new AstrixContextImpl(createDynamicConfig());
 		for (PluginHolder<?> plugin : plugins) {
@@ -92,9 +99,27 @@ public class AstrixConfigurer {
 	private List<AstrixApiProvider> createApiProviders(AstrixApiProviderFactory apiProviderFactory, AstrixContextImpl context) {
 		List<AstrixApiProvider> result = new ArrayList<>();
 		for (AstrixApiDescriptor descriptor : getApiDescriptors(context).getAll()) {
-			result.add(apiProviderFactory.create(descriptor));
+			if (isActive(descriptor)) {
+				result.add(apiProviderFactory.create(descriptor));
+			}
 		}
 		return result;
+	}
+	
+	private boolean isActive(AstrixApiDescriptor descriptor) {
+		if (descriptor.isAnnotationPresent(AstrixIncludedByProfile.class)) {
+			AstrixIncludedByProfile activatedBy = descriptor.getAnnotation(AstrixIncludedByProfile.class);
+			if (!this.activeProfiles.contains(activatedBy.value())) {
+				return false;
+			}
+		}
+		if (descriptor.isAnnotationPresent(AstrixExcludedByProfile.class)) {
+			AstrixExcludedByProfile deactivatedBy = descriptor.getAnnotation(AstrixExcludedByProfile.class);
+			if (this.activeProfiles.contains(deactivatedBy.value())) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private AstrixApiDescriptors getApiDescriptors(AstrixContextImpl context) {
@@ -216,6 +241,10 @@ public class AstrixConfigurer {
 
 	void removeSetting(String name) {
 		this.settings.remove(name);
+	}
+
+	public void activateProfile(String profile) {
+		this.activeProfiles.add(profile);
 	}
 
 }
