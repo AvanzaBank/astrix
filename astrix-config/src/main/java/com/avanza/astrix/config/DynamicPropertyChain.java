@@ -24,7 +24,7 @@ import java.util.Objects;
  *
  * @param <T>
  */
-public class DynamicPropertyChain<T> implements DynamicPropertyListener<T> {
+final class DynamicPropertyChain<T> implements DynamicPropertyListener<T> {
 
 	private final LinkedList<DynamicConfigProperty<T>> chain = new LinkedList<>();
 	private final DynamicPropertyChainListener<T> propertyListener;

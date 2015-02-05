@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.config;
 
-public interface PropertyParser<T> {
+interface PropertyParser<T> {
 
 
 	T parse(String value);

@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author Elias Lindholm (elilin)
  *
  */
-public class DynamicConfigProperty<T> implements DynamicPropertyListener<String> {
+final class DynamicConfigProperty<T> implements DynamicPropertyListener<String> {
 	
 	private final Logger logger = LoggerFactory.getLogger(DynamicConfigProperty.class);
 	private final DynamicPropertyListener<T> propertyChangeListener;
