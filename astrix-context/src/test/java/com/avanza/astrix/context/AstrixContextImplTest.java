@@ -27,8 +27,6 @@ import org.junit.Test;
 
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
-import com.avanza.astrix.provider.library.AstrixExport;
-import com.avanza.astrix.provider.library.AstrixLibraryProvider;
 
 public class AstrixContextImplTest {
 	

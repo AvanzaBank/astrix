@@ -24,7 +24,6 @@ import com.avanza.astrix.provider.core.AstrixConfigLookup;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
-import com.avanza.astrix.provider.library.AstrixExport;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
@@ -196,7 +195,7 @@ public class AstrixApiProviderTest {
 	
 	@AstrixApiProvider(PingLibraryApi.class)
 	public static class PingLibraryProvider {
-		@AstrixExport
+		@Library
 		public PingLib myLib() {
 			return new PingLibImpl();
 		}
@@ -217,13 +216,13 @@ public class AstrixApiProviderTest {
 	public static class PingAndReversePingLibraryProvider {
 
 		@AstrixQualifier("ping")
-		@AstrixExport
+		@Library
 		public PingLib ping() {
 			return new PingLibImpl();
 		}
 
 		@AstrixQualifier("reverse-ping")
-		@AstrixExport
+		@Library
 		public PingLib reversePing() {
 			return new ReversePingLibImpl();
 		}
@@ -257,7 +256,7 @@ public class AstrixApiProviderTest {
 	
 	@AstrixApiProvider(PingServiceAndLibraryApi.class)
 	public static class PingServiceAndLibraryProvider {
-		@AstrixExport
+		@Library
 		public PingLib myLib() {
 			return new PingLibImpl();
 		}

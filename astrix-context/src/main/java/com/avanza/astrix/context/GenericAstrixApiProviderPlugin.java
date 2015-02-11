@@ -31,7 +31,6 @@ import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
-import com.avanza.astrix.provider.library.AstrixExport;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.provider.versioning.Versioned;
@@ -189,7 +188,7 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 		}
 
 		public boolean isLibrary() {
-			return method.isAnnotationPresent(AstrixExport.class) || method.isAnnotationPresent(Library.class);
+			return method.isAnnotationPresent(Library.class);
 		}
 
 		public AstrixBeanKey<?> getBeanKey() {
