@@ -78,13 +78,6 @@ public class AstrixApiProviderTest {
 		assertEquals("olleh", reversePing.ping("hello"));
 	}
 	
-	@Test(expected = IllegalAstrixApiProviderException.class)
-	public void apiProviderNotProvidingDefinedLibrary() throws Exception {
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.registerApiProvider(InvalidPingLibraryProvider.class);
-		astrixConfigurer.configure();
-	}
-	
 	@Test
 	public void apiWithOneLibraryAndOneService() throws Exception {
 		String pingServiceUri = AstrixDirectComponent.registerAndGetUri(PingService.class, new PingServiceImpl());
@@ -188,12 +181,7 @@ public class AstrixApiProviderTest {
 		}
 	}
 	
-	public interface PingLibraryApi {
-		@Library
-		PingLib pingLib();
-	}
-	
-	@AstrixApiProvider(PingLibraryApi.class)
+	@AstrixApiProvider
 	public static class PingLibraryProvider {
 		@Library
 		public PingLib myLib() {
@@ -201,18 +189,7 @@ public class AstrixApiProviderTest {
 		}
 	}
 	
-	public interface PingAndReversePingLibraryApi {
-
-		@AstrixQualifier("ping")
-		@Library
-		PingLib pingLib();
-		
-		@AstrixQualifier("reverse-ping")
-		@Library
-		PingLib reversePingLib();
-	}
-	
-	@AstrixApiProvider(PingAndReversePingLibraryApi.class)
+	@AstrixApiProvider
 	public static class PingAndReversePingLibraryProvider {
 
 		@AstrixQualifier("ping")
@@ -227,8 +204,8 @@ public class AstrixApiProviderTest {
 			return new ReversePingLibImpl();
 		}
 	}
-	
-	public interface PingAndReversePingServiceApi {
+	@AstrixApiProvider
+	public interface PingAndReversePingServiceProvider {
 
 		@AstrixConfigLookup("pingServiceUri")
 		@AstrixQualifier("ping")
@@ -240,53 +217,38 @@ public class AstrixApiProviderTest {
 		@Service
 		PingService reversePingLib();
 	}
-	
-	@AstrixApiProvider(PingAndReversePingServiceApi.class)
-	public static class PingAndReversePingServiceProvider {
-	}
-	
-	public interface PingServiceAndLibraryApi {
-		@Library
-		PingLib pingLib();
-		
-		@AstrixConfigLookup("pingServiceUri")
-		@Service
-		PingService pingService();
-	}
-	
-	@AstrixApiProvider(PingServiceAndLibraryApi.class)
+
+	@AstrixApiProvider
 	public static class PingServiceAndLibraryProvider {
 		@Library
 		public PingLib myLib() {
 			return new PingLibImpl();
 		}
-	}
-	
-	@AstrixApiProvider(PingLibraryApi.class)
-	public static class InvalidPingLibraryProvider {
-		// No export of PingLib
+		
+		@AstrixConfigLookup("pingServiceUri")
+		@Service
+		public PingService pingService() {
+			return null;
+		}
 	}
 	
 	@AstrixObjectSerializerConfig(
 		version = 1,
 		objectSerializerConfigurer = DummyObjectSerializerConfigurer.class
 	)
-	@AstrixApiProvider(PingServiceApi.class)
-	public static class VersionedPingServiceProvider {
+	@AstrixApiProvider
+	public interface VersionedPingServiceProvider {
+		
+		@Versioned
+		@AstrixConfigLookup("pingServiceUri")
+		@Service
+		PingService pingService();
 	}
 
 	public interface InternalPingServiceApi {
 		@AstrixConfigLookup("internalPingServiceUri")
 		@Service
 		InternalPingService internalPingService();
-	}
-	
-	@Versioned
-	public interface PingServiceApi {
-		
-		@AstrixConfigLookup("pingServiceUri")
-		@Service
-		PingService pingService();
 	}
 	
 	@AstrixObjectSerializerConfig(
