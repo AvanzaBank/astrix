@@ -21,6 +21,7 @@ import java.lang.reflect.Proxy;
 import java.util.Objects;
 
 import com.avanza.astrix.config.DynamicBooleanProperty;
+import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 /**
@@ -44,14 +45,14 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 								AstrixServiceLookup serviceLookup, 
 								AstrixServiceComponents serviceComponents, 
 								AstrixServiceLeaseManager leaseManager,
-								AstrixSettingsReader settings) {
+								DynamicConfig config) {
 		this.versioningContext = Objects.requireNonNull(versioningContext);
 		this.beanKey = Objects.requireNonNull(beanType);
 		this.serviceLookup = Objects.requireNonNull(serviceLookup);
 		this.serviceComponents = Objects.requireNonNull(serviceComponents);
 		this.leaseManager = Objects.requireNonNull(leaseManager);
-		this.subsystem = Objects.requireNonNull(settings.getString(AstrixSettings.SUBSYSTEM_NAME));
-		this.enforceSubsystemBoundaries = settings.getBooleanProperty(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
+		this.subsystem = Objects.requireNonNull(config.getStringProperty(AstrixSettings.SUBSYSTEM_NAME, null).get());
+		this.enforceSubsystemBoundaries = config.getBooleanProperty(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
 	}
 
 	@Override

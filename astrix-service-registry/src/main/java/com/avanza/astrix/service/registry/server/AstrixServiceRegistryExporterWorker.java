@@ -24,12 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicLongProperty;
 import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixInject;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixSettings;
-import com.avanza.astrix.context.AstrixSettingsReader;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistryClient;
 /**
@@ -64,10 +64,10 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 			return;
 		}
 		this.serviceRegistryClient = astrixContext.getBean(AstrixServiceRegistryClient.class);
-		AstrixSettingsReader settings = astrixContext.getSettings();
-		this.exportIntervallMillis = settings.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 30_000L);
-		this.retryIntervallMillis = settings.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 5_000L);
-		this.serviceLeaseTimeMillis = settings.getLongProperty(AstrixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
+		DynamicConfig config = astrixContext.getConfig();
+		this.exportIntervallMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 30_000L);
+		this.retryIntervallMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 5_000L);
+		this.serviceLeaseTimeMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
 		start();
 	}
 	

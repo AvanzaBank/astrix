@@ -26,13 +26,14 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicLongProperty;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixBeanStateWorker extends Thread implements AstrixSettingsAware {
+public class AstrixBeanStateWorker extends Thread implements AstrixConfigAware {
 
 	private static final Logger log = LoggerFactory.getLogger(AstrixBeanStateWorker.class);
 	private final Collection<StatefulAstrixBean<?>> managedBeans = new CopyOnWriteArrayList<>();
@@ -105,8 +106,8 @@ public class AstrixBeanStateWorker extends Thread implements AstrixSettingsAware
 	}
 
 	@Override
-	public void setSettings(AstrixSettingsReader settings) {
-		this.beanRebindAttemptIntervalMillis = settings.getLongProperty(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10_000L);
+	public void setConfig(DynamicConfig config) {
+		this.beanRebindAttemptIntervalMillis = config.getLongProperty(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10_000L);
 	}
 	
 }

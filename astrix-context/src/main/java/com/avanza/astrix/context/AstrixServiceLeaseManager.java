@@ -23,16 +23,18 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.avanza.astrix.config.DynamicConfig;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceLeaseManager extends Thread implements AstrixSettingsAware {
+public class AstrixServiceLeaseManager extends Thread implements AstrixConfigAware {
 	
 	private final Logger log = LoggerFactory.getLogger(AstrixServiceLeaseManager.class);
 	private final List<LeasedService<?>> leasedServices = new CopyOnWriteArrayList<>();
-	private AstrixSettingsReader settings;
+	private DynamicConfig config;
 	
 	public AstrixServiceLeaseManager() {
 		super("Astrix-ServiceLeaseManager");
@@ -46,7 +48,7 @@ public class AstrixServiceLeaseManager extends Thread implements AstrixSettingsA
 				renewLease(leasedService);
 			}
 			try {
-				Thread.sleep(settings.getLongProperty(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 30_000L).get());
+				Thread.sleep(config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 30_000L).get());
 			} catch (InterruptedException e) {
 				interrupt();
 			}
@@ -79,8 +81,8 @@ public class AstrixServiceLeaseManager extends Thread implements AstrixSettingsA
 	}
 
 	@Override
-	public void setSettings(AstrixSettingsReader settings) {
-		this.settings = settings;
+	public void setConfig(DynamicConfig config) {
+		this.config = config;
 	}
 	
 }

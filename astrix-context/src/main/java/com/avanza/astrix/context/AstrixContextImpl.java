@@ -38,7 +38,6 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 	private final AstrixPlugins plugins;
 	private final AstrixBeanFactoryRegistry beanFactoryRegistry = new AstrixBeanFactoryRegistry();
 	private final AstrixBeanStates beanStates = new AstrixBeanStates();
-	private final AstrixSettingsReader settingsReader;
 	private AstrixApiProviderPlugins apiProviderPlugins;
 	private final ObjectCache objectCache = new ObjectCache(new ObjectCache.ObjectFactory() {
 		@Override
@@ -56,15 +55,16 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 			return result;
 		}
 	});
+	private final DynamicConfig dynamicConfig;
 	
 	public AstrixContextImpl(DynamicConfig dynamicConfig) {
+		this.dynamicConfig = dynamicConfig;
 		this.plugins = new AstrixPlugins(new AstrixPluginInitializer() {
 			@Override
 			public void init(Object plugin) {
 				injectDependencies(plugin);
 			}
 		});
-		this.settingsReader = AstrixSettingsReader.create(dynamicConfig);
 		getInstance(EventBus.class).addEventListener(AstrixBeanStateChangedEvent.class, beanStates);
 	}
 	
@@ -132,8 +132,8 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		if (object instanceof AstrixDecorator) {
 			injectDependencies(AstrixDecorator.class.cast(object).getTarget());
 		}
-		if (object instanceof AstrixSettingsAware) {
-			AstrixSettingsAware.class.cast(object).setSettings(settingsReader);
+		if (object instanceof AstrixConfigAware) {
+			AstrixConfigAware.class.cast(object).setConfig(this.dynamicConfig);
 		}
 	}
 	
@@ -300,12 +300,12 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		return this.objectCache.getInstance(ObjectId.internalClass(classType));
 	}
 	
-	public AstrixSettingsReader getSettings() {
-		return settingsReader;
+	public DynamicConfig getConfig() {
+		return dynamicConfig;
 	}
-
+	
 	String getCurrentSubsystem() {
-		return this.settingsReader.getString(AstrixSettings.SUBSYSTEM_NAME);
+		return this.dynamicConfig.getStringProperty(AstrixSettings.SUBSYSTEM_NAME, null).get();
 	}
 
 }

@@ -25,6 +25,7 @@ import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
+import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 
@@ -99,7 +100,7 @@ public class AstrixContextImplTest {
 		AstrixContextImpl AstrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 		InternalFrameworkClass simple = AstrixContext.getInstance(InternalFrameworkClass.class);
 		
-		assertNotNull(simple.settings);
+		assertNotNull(simple.config);
 	}
 	
 	@Test
@@ -169,13 +170,14 @@ public class AstrixContextImplTest {
 		}
 	}
 	
-	static class InternalFrameworkClass implements AstrixSettingsAware {
-		private AstrixSettingsReader settings;
-
+	static class InternalFrameworkClass implements AstrixConfigAware {
+		private DynamicConfig config;
+		
 		@Override
-		public void setSettings(AstrixSettingsReader settings) {
-			this.settings = settings;
+		public void setConfig(DynamicConfig config) {
+			this.config = config;
 		}
+
 	}
 	
 	static class HelloBean {

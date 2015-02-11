@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import com.avanza.astrix.config.DynamicBooleanProperty;
+import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.core.util.ProxyUtil;
 
 /**
@@ -27,14 +28,14 @@ import com.avanza.astrix.core.util.ProxyUtil;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class AstrixFaultTolerance implements AstrixPluginsAware, AstrixSettingsAware {
+public final class AstrixFaultTolerance implements AstrixPluginsAware, AstrixConfigAware {
 	
 	private AstrixFaultTolerancePlugin faultTolerancePlugin;
-	private AstrixSettingsReader settings;
+	private DynamicConfig config;
 	
 	public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec) {
-		DynamicBooleanProperty faultToleranceEnabledForCircuit = settings.getBooleanProperty("astrix.faultTolerance." + spec.getApi().getName() + ".enabled", true);
-		DynamicBooleanProperty faultToleranceEnabled = settings.getBooleanProperty(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
+		DynamicBooleanProperty faultToleranceEnabledForCircuit = config.getBooleanProperty("astrix.faultTolerance." + spec.getApi().getName() + ".enabled", true);
+		DynamicBooleanProperty faultToleranceEnabled = config.getBooleanProperty(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
 		T withFaultTolerance = faultTolerancePlugin.addFaultTolerance(spec);
 		return ProxyUtil.newProxy(spec.getApi(), new FaultToleranceToggle<>(withFaultTolerance, spec.getProvider(), faultToleranceEnabled, faultToleranceEnabledForCircuit));
 	}
@@ -76,8 +77,8 @@ public final class AstrixFaultTolerance implements AstrixPluginsAware, AstrixSet
 	}
 
 	@Override
-	public void setSettings(AstrixSettingsReader settings) {
-		this.settings = settings;
+	public void setConfig(DynamicConfig config) {
+		this.config = config;
 	}
 	
 }

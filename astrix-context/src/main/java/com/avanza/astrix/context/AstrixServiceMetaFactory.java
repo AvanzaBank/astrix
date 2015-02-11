@@ -15,20 +15,21 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public final class AstrixServiceMetaFactory implements AstrixSettingsAware {
+public final class AstrixServiceMetaFactory implements AstrixConfigAware {
 
 	private AstrixServiceComponents serviceComponents;
 	private AstrixServiceLeaseManager leaseManager;
-	private AstrixSettingsReader settings;
+	private DynamicConfig config;
 
 	public <T> AstrixServiceFactory<T> createServiceFactory(ServiceVersioningContext versioningContext, AstrixServiceLookup serviceLookup, AstrixBeanKey<T> serviceBean) {
-		return new AstrixServiceFactory<>(versioningContext, serviceBean, serviceLookup, serviceComponents, leaseManager, settings);
+		return new AstrixServiceFactory<>(versioningContext, serviceBean, serviceLookup, serviceComponents, leaseManager, config);
 	}
 	
 	public Class<?> loadInterfaceIfExists(String interfaceName) {
@@ -54,8 +55,8 @@ public final class AstrixServiceMetaFactory implements AstrixSettingsAware {
 	}
 	
 	@Override
-	public void setSettings(AstrixSettingsReader settings) {
-		this.settings = settings;
+	public void setConfig(DynamicConfig config) {
+		this.config = config;
 	}
 
 

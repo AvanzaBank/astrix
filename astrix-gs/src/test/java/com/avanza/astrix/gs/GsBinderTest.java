@@ -15,29 +15,24 @@
  */
 package com.avanza.astrix.gs;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.openspaces.core.GigaSpace;
-import org.openspaces.core.GigaSpaceConfigurer;
-import org.openspaces.core.space.UrlSpaceConfigurer;
 
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixServiceProperties;
-import com.avanza.astrix.context.AstrixSettings;
-import com.avanza.astrix.context.AstrixSettingsReader;
-import com.j_spaces.core.IJSpace;
 
 
 
 public class GsBinderTest {
 	
-	private AstrixSettings settings = new AstrixSettings();
+	private MapConfigSource config = new MapConfigSource();
 	
 	@Test
 	public void parsesASpaceUrl() throws Exception {
 		GsBinder gsBinder = new GsBinder();
-		gsBinder.setSettings(AstrixSettingsReader.create(settings));
+		gsBinder.setConfig(DynamicConfig.create(config));
 		AstrixServiceProperties serviceProperties = gsBinder.createServiceProperties("jini://*/*/service-registry-space?locators=testgssystem01.test.aza.se,testgssystem02.test.aza.se");
 		assertEquals("service-registry-space", serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY));
 		assertEquals("service-registry-space", serviceProperties.getQualifier());
@@ -47,7 +42,7 @@ public class GsBinderTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void throwsIllegalArgumentExceptionForInvalidSpaceUrls() throws Exception {
 		GsBinder gsBinder = new GsBinder();
-		gsBinder.setSettings(AstrixSettingsReader.create(settings));
+		gsBinder.setConfig(DynamicConfig.create(config));
 		gsBinder.createServiceProperties("jini://service-registry-space?locators=testgssystem01.test.aza.se,testgssystem02.test.aza.se");
 	}
 

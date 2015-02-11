@@ -15,8 +15,10 @@
  */
 package com.avanza.astrix.context;
 
-public interface AstrixSettingsAware {
+import com.avanza.astrix.config.DynamicConfig;
+
+public interface AstrixConfigAware {
 	
-	void setSettings(AstrixSettingsReader settings);
+	void setConfig(DynamicConfig config);
 
 }

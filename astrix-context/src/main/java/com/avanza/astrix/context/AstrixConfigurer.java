@@ -29,8 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.PropertiesConfigSource;
-import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
+import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
 
 public class AstrixConfigurer {
 
@@ -126,7 +126,7 @@ public class AstrixConfigurer {
 		if (this.AstrixApiDescriptors != null) {
 			return AstrixApiDescriptors;
 		}
-		String basePackage = context.getSettings().getString(AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, "");
+		String basePackage = context.getConfig().getStringProperty(AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, "").get();
 		if (basePackage.trim().isEmpty()) {
 			return new AstrixApiDescriptorScanner(getAllDescriptorAnnotationsTypes(), "com.avanza.astrix"); // Always scan com.avanza.astrix package
 		}
@@ -169,7 +169,7 @@ public class AstrixConfigurer {
 	}
 
 	private void configureVersioning(AstrixContextImpl context) {
-		if (context.getSettings().getBoolean(AstrixSettings.ENABLE_VERSIONING, true)) {
+		if (context.getConfig().getBooleanProperty(AstrixSettings.ENABLE_VERSIONING, true).get()) {
 			discoverOnePlugin(context, AstrixVersioningPlugin.class);
 		} else {
 			context.registerPlugin(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Default.create());

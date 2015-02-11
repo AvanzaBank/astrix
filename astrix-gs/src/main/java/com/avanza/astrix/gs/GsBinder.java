@@ -21,10 +21,10 @@ import java.util.regex.Pattern;
 import org.openspaces.core.GigaSpace;
 import org.springframework.context.ApplicationContext;
 
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.context.AstrixConfigAware;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixSettings;
-import com.avanza.astrix.context.AstrixSettingsAware;
-import com.avanza.astrix.context.AstrixSettingsReader;
 import com.j_spaces.core.client.SpaceURL;
 
 /**
@@ -32,13 +32,13 @@ import com.j_spaces.core.client.SpaceURL;
  * @author Elias Lindholm
  *
  */
-public class GsBinder implements AstrixSettingsAware {
+public class GsBinder implements AstrixConfigAware {
 	
 	public static final String SPACE_NAME_PROPERTY = "spaceName";
 	public static final String SPACE_URL_PROPERTY = "spaceUrl";
 	
 	private static final Pattern SPACE_URL_PATTERN = Pattern.compile("jini://.*?/.*?/(.*)?[?](.*)");
-	private AstrixSettingsReader settings;
+	private DynamicConfig config;
 	
 	public GsFactory createGsFactory(AstrixServiceProperties properties) {
 		String spaceUrl = properties.getProperty(SPACE_URL_PROPERTY);
@@ -46,7 +46,7 @@ public class GsBinder implements AstrixSettingsAware {
 	}
 	
 	public GigaSpace getEmbeddedSpace(ApplicationContext applicationContext) {
-		String optionalGigaSpaceBeanName = settings.getString(AstrixSettings.GIGA_SPACE_BEAN_NAME, null);
+		String optionalGigaSpaceBeanName = config.getStringProperty(AstrixSettings.GIGA_SPACE_BEAN_NAME, null).get();
 		if (optionalGigaSpaceBeanName  != null) {
 			return applicationContext.getBean(optionalGigaSpaceBeanName, GigaSpace.class);
 		}
@@ -132,8 +132,8 @@ public class GsBinder implements AstrixSettingsAware {
 	}
 
 	@Override
-	public void setSettings(AstrixSettingsReader settings) {
-		this.settings = settings;
+	public void setConfig(DynamicConfig config) {
+		this.config = config;
 	}
 
 }

@@ -15,8 +15,8 @@
  */
 package com.avanza.astrix.integration.tests;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Test;
@@ -26,14 +26,16 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixSettings;
-import com.avanza.astrix.context.AstrixSettingsReader;
 import com.avanza.astrix.gs.GsBinder;
 import com.j_spaces.core.IJSpace;
 
 public class GsBinderIntegrationTest {
 
-	private AstrixSettings settings = new AstrixSettings();
+
+	private MapConfigSource config = new MapConfigSource();
 	private AnnotationConfigApplicationContext applicationContext;
 	
 	@After
@@ -45,8 +47,8 @@ public class GsBinderIntegrationTest {
 	public void usesQualifierToIdentifyWhatEmbeddedSpaceToUse() throws Exception {
 		applicationContext = new AnnotationConfigApplicationContext(AppWithTwoEmbeddedSpaces.class);
 		GsBinder gsBinder = new GsBinder();
-		gsBinder.setSettings(AstrixSettingsReader.create(settings));
-		settings.set(AstrixSettings.GIGA_SPACE_BEAN_NAME, "gigaSpace");
+		gsBinder.setConfig(DynamicConfig.create(config));
+		config.set(AstrixSettings.GIGA_SPACE_BEAN_NAME, "gigaSpace");
 		GigaSpace gigaSpace = gsBinder.getEmbeddedSpace(applicationContext);
 		
 		GigaSpace expected = applicationContext.getBean("gigaSpace", GigaSpace.class);
@@ -57,7 +59,7 @@ public class GsBinderIntegrationTest {
 	public void usesEmbeddedSpaceOverClusterdProxies() throws Exception {
 		applicationContext = new AnnotationConfigApplicationContext(AppWithClusterdProxyAndEmbeddedSpace.class);
 		GsBinder gsBinder = new GsBinder();
-		gsBinder.setSettings(AstrixSettingsReader.create(settings));
+		gsBinder.setConfig(DynamicConfig.create(config));
 		GigaSpace gigaSpace = gsBinder.getEmbeddedSpace(applicationContext);
 		
 		GigaSpace expected = applicationContext.getBean("gigaSpace", GigaSpace.class);

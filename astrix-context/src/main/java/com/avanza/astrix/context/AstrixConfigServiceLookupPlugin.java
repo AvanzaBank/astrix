@@ -17,6 +17,7 @@ package com.avanza.astrix.context;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
 /**
  * 
@@ -24,14 +25,14 @@ import com.avanza.astrix.provider.core.AstrixConfigLookup;
  *
  */
 @MetaInfServices(AstrixServiceLookupPlugin.class)
-public class AstrixConfigServiceLookupPlugin implements AstrixServiceLookupPlugin<AstrixConfigLookup>, AstrixSettingsAware {
+public class AstrixConfigServiceLookupPlugin implements AstrixServiceLookupPlugin<AstrixConfigLookup>, AstrixConfigAware {
 
 	private AstrixServiceComponents serviceComponents;
-	private AstrixSettingsReader settings;
+	private DynamicConfig config;
 
 	@Override
 	public AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier, AstrixConfigLookup lookupAnnotation) {
-		String serviceUri = settings.getString(lookupAnnotation.value());
+		String serviceUri = config.getStringProperty(lookupAnnotation.value(), null).get();
 		if (serviceUri == null) {
 			return null;
 		}
@@ -56,8 +57,8 @@ public class AstrixConfigServiceLookupPlugin implements AstrixServiceLookupPlugi
 	}
 
 	@Override
-	public void setSettings(AstrixSettingsReader settings) {
-		this.settings = settings;
+	public void setConfig(DynamicConfig config) {
+		this.config = config;
 	}
 	
 	@AstrixInject
