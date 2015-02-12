@@ -25,6 +25,7 @@ import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.factory.AstrixCircularDependency;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 
@@ -115,7 +116,7 @@ public class AstrixLibraryTest {
 	}
 	
 	@AstrixApiProvider
-	static class MyLibraryProvider {
+	public static class MyLibraryProvider {
 		private HelloBeanImpl instance = new HelloBeanImpl();
 		
 		@Library

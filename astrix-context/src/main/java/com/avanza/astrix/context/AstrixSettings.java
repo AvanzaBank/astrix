@@ -27,13 +27,20 @@ import com.avanza.astrix.config.MapConfigSource;
  *
  */
 public class AstrixSettings implements DynamicConfigSource {
-	
-	public static final String BEAN_BIND_ATTEMPT_INTERVAL = "StatefulAstrixBean.beanBindAttemptInterval";
+	/**
+	 * Defines how long to wait between consecutive bind attempts when a service bean is
+	 * in UNBOUND state.
+	 */
+	public static final String BEAN_BIND_ATTEMPT_INTERVAL = "StatefulAstrixBeanInstance.beanBindAttemptInterval";
 	/**
 	 * @deprecated - replaced by BEAN_BIND_ATTEMPT_INTERVAL
 	 */
 	@Deprecated
 	public static final String BEAN_REBIND_ATTEMPT_INTERVAL = BEAN_BIND_ATTEMPT_INTERVAL;
+	/**
+	 * Defines how long the service-lease-manager will wait between consecutive lease renewals
+	 * for a service bean that is in BOUND sate.
+	 */
 	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = "AstrixServiceLeaseManager.leaseRenewInterval";
 	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AstrixContext.enforceSubsystemBoundaries";
 	public static final String ASTRIX_SERVICE_REGISTRY_URI = "AstrixServiceRegistry.serviceUri";

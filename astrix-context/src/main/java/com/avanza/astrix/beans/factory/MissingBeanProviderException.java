@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.factory;
+
 
 /**
- * Used by Astrix-plugins that dependends on Astrix-managed beans to 
- * get an instance of the given depenendencies at runtime. <p> 
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AstrixBeans {
-	
-	<T> T getBean(AstrixBeanKey<T> beanKey);
+public class MissingBeanProviderException extends RuntimeException {
+
+	private static final long serialVersionUID = 1L;
+
+	public MissingBeanProviderException(AstrixBeanKey<? extends Object> beanType) {
+		super("No provider found for bean: " + beanType);
+	}
 
 }

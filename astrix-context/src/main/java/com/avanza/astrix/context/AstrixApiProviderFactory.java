@@ -18,6 +18,8 @@ package com.avanza.astrix.context;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.avanza.astrix.beans.factory.AstrixFactoryBean;
+
 
 /**
  * This component is used to create runtime factory representations (AstrixApiProvider) for api's hooked
@@ -38,17 +40,13 @@ public class AstrixApiProviderFactory {
 		this.apiProviderPlugins = apiProviderPlugins;
 	}
 	
-	public AstrixApiProvider create(AstrixApiDescriptor descriptor) {
+	public List<AstrixFactoryBean<?>> create(AstrixApiDescriptor descriptor) {
 		AstrixApiProviderPlugin providerFactoryPlugin = getProviderPlugin(descriptor);
 		List<AstrixFactoryBean<?>> factoryBeans = new ArrayList<>();
-		for (AstrixFactoryBeanPlugin<?> factoryBean : providerFactoryPlugin.createFactoryBeans(descriptor)) {
-			if (factoryBean.isStateful()) {
-				factoryBeans.add(AstrixFactoryBean.stateful(factoryBean, descriptor));
-			} else {
-				factoryBeans.add(AstrixFactoryBean.nonStateful(factoryBean, descriptor));
-			}
+		for (AstrixFactoryBean<?> factoryBean : providerFactoryPlugin.createFactoryBeans(descriptor)) {
+			factoryBeans.add(factoryBean);
 		}
-		return new AstrixApiProvider(factoryBeans, descriptor); 
+		return factoryBeans;
 	}
 	
 	private AstrixApiProviderPlugin getProviderPlugin(AstrixApiDescriptor descriptor) {

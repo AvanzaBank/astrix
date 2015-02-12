@@ -17,9 +17,11 @@ package com.avanza.astrix.context;
 
 import java.lang.annotation.Annotation;
 
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+
 public interface AstrixServiceLookupPlugin<T extends Annotation> {
 	
-	AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier, T lookupAnnotation);
+	AstrixServiceProperties lookup(AstrixBeanKey<?> beanKey, T lookupAnnotation);
 	
 	Class<T> getLookupAnnotationType();
 	

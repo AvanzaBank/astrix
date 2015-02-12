@@ -13,14 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.factory;
+
+
 /**
+ * Strategy used by {@link AstrixBeanFactory} to create a given bean
+ * in the factory.
  * 
  * @author Elias Lindholm (elilin)
  *
+ * @param <T>
  */
-public enum AstrixBeanState {
-	UNKNOWN, 
-	BOUND,
-	UNBOUND
+public interface AstrixFactoryBean<T> {
+	
+	/**
+	 * Creates the associated bean. Dependencies
+	 * required by the given bean may be pulled out
+	 * from the {@link AstrixBeans} argument, which
+	 * will trigger creation (or returned a cached instance)
+	 * of the requested bean in the given {@link AstrixBeanFactory}. 
+	 * 
+	 * @param beans
+	 * @return
+	 */
+	T create(AstrixBeans beans);
+	
+	/**
+	 * Identifier for the bean created by this factory.
+	 * 
+	 * @return
+	 */
+	AstrixBeanKey<T> getBeanKey();
+	
 }

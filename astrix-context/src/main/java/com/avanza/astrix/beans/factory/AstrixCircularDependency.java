@@ -13,21 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.factory;
 
-import java.util.List;
+import java.util.Stack;
+
+
+
 /**
- * The bean aware interface allows "Astrix-plugin-instances" to depend on
- * Astrix-managed-beans, ie api-elements hooked into Astrix. <p> 
- * 
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AstrixBeanAware {
+public class AstrixCircularDependency extends RuntimeException {
+
+	private static final long serialVersionUID = 1L;
+
+	public AstrixCircularDependency(Class<?> beanA, Class<?> beanB) {
+		super("Circular dependency detected. beanA=" + beanA.getName() + ", beanB=" + beanB.getName());
+	}
 	
-	List<AstrixBeanKey<? extends Object>> getBeanDependencies();
-	
-	void setAstrixBeans(AstrixBeans beans);
+	public AstrixCircularDependency(Stack<AstrixBeanKey<?>> trace) {
+		super("Circular dependency detected. trace=" + trace);
+	}
 
 }

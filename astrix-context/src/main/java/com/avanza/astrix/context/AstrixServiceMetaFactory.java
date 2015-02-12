@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 /**

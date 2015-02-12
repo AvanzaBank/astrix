@@ -22,117 +22,53 @@ import java.util.Objects;
  * @author Elias Lindholm (elilin)
  *
  */
-public abstract class AstrixApiDescriptor {
+public final class AstrixApiDescriptor {
 
 	public static AstrixApiDescriptor create(Class<?> descriptorHolder) {
-		return new AnnotationApiDescriptor(descriptorHolder);
+		return new AstrixApiDescriptor(descriptorHolder);
+	}
+	private Class<?> descriptorHolder;
+
+	private AstrixApiDescriptor(Class<?> annotationHolder) {
+		this.descriptorHolder = annotationHolder;
 	}
 	
-	public static AstrixApiDescriptor simple(String name) {
-		return new SimpleApiDescriptor(name);
+	public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+		return descriptorHolder.isAnnotationPresent(annotationClass);
 	}
 
-	public abstract boolean isAnnotationPresent(Class<? extends Annotation> annotationClass);
+	public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+		return descriptorHolder.getAnnotation(annotationClass);
+	}
+	
+	public String getName() {
+		return this.descriptorHolder.getName();
+	}
 
-	public abstract <T extends Annotation> T getAnnotation(Class<T> annotationClass);
-	
-	public abstract String getName();
-	
-	public abstract Class<?> getDescriptorClass();
+	public Class<?> getDescriptorClass() {
+		return descriptorHolder;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(descriptorHolder);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AstrixApiDescriptor other = (AstrixApiDescriptor) obj;
+		return Objects.equals(descriptorHolder, other.descriptorHolder);
+	}
 	
 	@Override
 	public final String toString() {
 		return getName();
 	}
 	
-	private static class SimpleApiDescriptor extends AstrixApiDescriptor {
-
-		private String name;
-		
-		public SimpleApiDescriptor(String name) {
-			this.name = name;
-		}
-
-		@Override
-		public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-			return false;
-		}
-
-		@Override
-		public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-			return null;
-		}
-
-		@Override
-		public String getName() {
-			return name;
-		}
-
-		@Override
-		public Class<?> getDescriptorClass() {
-			return null;
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(name);
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			SimpleApiDescriptor other = (SimpleApiDescriptor) obj;
-			return Objects.equals(name, other.name);
-		}
-		
-	}
-	
-	private static class AnnotationApiDescriptor extends AstrixApiDescriptor {
-		private Class<?> descriptorHolder;
-
-		private AnnotationApiDescriptor(Class<?> annotationHolder) {
-			this.descriptorHolder = annotationHolder;
-		}
-		
-		public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-			return descriptorHolder.isAnnotationPresent(annotationClass);
-		}
-
-		public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-			return descriptorHolder.getAnnotation(annotationClass);
-		}
-		
-		public String getName() {
-			return this.descriptorHolder.getName();
-		}
-
-		public Class<?> getDescriptorClass() {
-			return descriptorHolder;
-		}
-		
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(descriptorHolder);
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			AnnotationApiDescriptor other = (AnnotationApiDescriptor) obj;
-			return Objects.equals(descriptorHolder, other.descriptorHolder);
-		}
-		
-	}
-
 }

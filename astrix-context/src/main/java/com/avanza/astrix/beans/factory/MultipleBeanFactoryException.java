@@ -13,28 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public class AstrixBeanStateChangedEvent {
-	
-	private final AstrixBeanKey beanKey;
-	private final AstrixBeanState newBeanState;
+package com.avanza.astrix.beans.factory;
 
-	public AstrixBeanStateChangedEvent(AstrixBeanKey beanKey, AstrixBeanState beanState) {
-		this.beanKey = beanKey;
-		this.newBeanState = beanState;
+public class MultipleBeanFactoryException extends RuntimeException {
+
+	private static final long serialVersionUID = 1L;
+
+	public MultipleBeanFactoryException(AstrixBeanKey<?> beanKey) {
+		super("Multiple factories for bean: " + beanKey);
 	}
 
-	public AstrixBeanKey getBeanKey() {
-		return beanKey;
-	}
-
-	public AstrixBeanState getNewBeanState() {
-		return this.newBeanState;
-	}
-	
 }

@@ -15,15 +15,18 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.beans.factory.AstrixBeans;
+
 /**
- * Used internally by Astrix 'decorator' classes to allow AstrixContextImpl
- * to inject dependencies to decorated Astrix classes.
+ * The bean aware interface allows "Astrix-plugin-instances" to depend on
+ * Astrix-managed-beans, ie api-elements hooked into Astrix. <p> 
+ * 
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AstrixDecorator {
-
-	Object getTarget();
+public interface AstrixBeansAware {
+	
+	void setAstrixBeans(AstrixBeans beans);
 
 }

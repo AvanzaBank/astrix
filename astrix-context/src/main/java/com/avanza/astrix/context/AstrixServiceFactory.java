@@ -15,12 +15,15 @@
  */
 package com.avanza.astrix.context;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
 
-import com.avanza.astrix.config.DynamicBooleanProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.factory.AstrixBeans;
+import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
@@ -30,15 +33,14 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  *
  * @param <T>
  */
-public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
-	
+public class AstrixServiceFactory<T> implements AstrixFactoryBean<T> {
+	private final Logger log = LoggerFactory.getLogger(AstrixServiceFactory.class);
 	private final AstrixBeanKey<T> beanKey;
 	private final AstrixServiceComponents serviceComponents;
 	private final AstrixServiceLookup serviceLookup;
-	private final String subsystem;
-	private final DynamicBooleanProperty enforceSubsystemBoundaries;
 	private final AstrixServiceLeaseManager leaseManager;
 	private final ServiceVersioningContext versioningContext;
+	private DynamicConfig config;
 
 	public AstrixServiceFactory(ServiceVersioningContext versioningContext, 
 								AstrixBeanKey<T> beanType, 
@@ -46,56 +48,40 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 								AstrixServiceComponents serviceComponents, 
 								AstrixServiceLeaseManager leaseManager,
 								DynamicConfig config) {
+		this.config = config;
 		this.versioningContext = Objects.requireNonNull(versioningContext);
 		this.beanKey = Objects.requireNonNull(beanType);
 		this.serviceLookup = Objects.requireNonNull(serviceLookup);
 		this.serviceComponents = Objects.requireNonNull(serviceComponents);
 		this.leaseManager = Objects.requireNonNull(leaseManager);
-		this.subsystem = Objects.requireNonNull(config.getStringProperty(AstrixSettings.SUBSYSTEM_NAME, null).get());
-		this.enforceSubsystemBoundaries = config.getBooleanProperty(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
 	}
 
 	@Override
-	public T create() {
-		AstrixServiceProperties serviceProperties = serviceLookup.lookup(beanKey.getBeanType(), beanKey.getQualifier());
-		if (serviceProperties == null) {
-			throw new RuntimeException(String.format("Did not find service using serviceLookup: bean=%s serviceLookup=%s", beanKey, serviceLookup));
+	public T create(AstrixBeans beans) {
+		AstrixServiceBeanInstance<T> serviceBeanInstance = AstrixServiceBeanInstance.create(versioningContext, beanKey, serviceLookup, serviceComponents, config);
+		AstrixServiceProperties serviceProperties = null;
+		try {
+			serviceProperties = serviceLookup.lookup(beanKey);
+			if (serviceProperties == null) {
+				log.warn("Did not find service using serviceLookup: bean=%s serviceLookup=%s", beanKey, serviceLookup);
+			} else {
+				serviceBeanInstance.bind(serviceProperties);
+			}
+		} catch (Exception e) {
+			log.warn("Failed to bind service bean=" + this.beanKey, e);
 		}
-		String providerSubsystem = serviceProperties.getProperty(AstrixServiceProperties.SUBSYSTEM);
-		if (!isAllowedToInvokeService(providerSubsystem)) {
-			return createIllegalSubsystemProxy(providerSubsystem);
-		}
-		T service = create(serviceProperties);
-		return leaseManager.startManageLease(service, serviceProperties, this, serviceLookup);
+		leaseManager.startManageLease(serviceBeanInstance, serviceProperties, serviceLookup);
+		return beanKey.getBeanType().cast(
+				Proxy.newProxyInstance(beanKey.getBeanType().getClassLoader(), 
+									   new Class[]{beanKey.getBeanType(), StatefulAstrixBean.class}, 
+									   serviceBeanInstance));
 	}
-	
+
 	@Override
 	public AstrixBeanKey<T> getBeanKey() {
 		return beanKey;
 	}
 	
-	@Override
-	public boolean isStateful() {
-		return true;
-	}
-
-	private boolean isAllowedToInvokeService(String providerSubsystem) {
-		if (versioningContext.isVersioned()) {
-			return true;
-		}
-		if (!enforceSubsystemBoundaries.get()) {
-			return true;
-		}
-		return this.subsystem.equals(providerSubsystem);
-	}
-	
-	private T createIllegalSubsystemProxy(String providerSubsystem) {
-		return beanKey.getBeanType().cast(
-				Proxy.newProxyInstance(beanKey.getBeanType().getClassLoader(), 
-									   new Class[]{beanKey.getBeanType()}, 
-									   new IllegalSubsystemProxy(subsystem, providerSubsystem, beanKey.getBeanType())));
-	}
-
 	public T create(AstrixServiceProperties serviceProperties) {
 		if (serviceProperties == null) {
 			throw new RuntimeException(String.format("Misssing entry in service-registry beanKey=%s", beanKey));
@@ -110,25 +96,6 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBeanPlugin<T> {
 			throw new IllegalArgumentException("Expected a componentName to be set on serviceProperties: " + serviceProperties);
 		}
 		return serviceComponents.getComponent(componentName);
-	}
-	
-	private class IllegalSubsystemProxy implements InvocationHandler {
-		
-		private String currentSubsystem;
-		private String providerSubsystem;
-		private Class<?> beanType;
-		
-
-		public IllegalSubsystemProxy(String currentSubsystem, String providerSubsystem, Class<?> beanType) {
-			this.currentSubsystem = currentSubsystem;
-			this.providerSubsystem = providerSubsystem;
-			this.beanType = beanType;
-		}
-
-		@Override
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			throw new IllegalSubsystemException(currentSubsystem, providerSubsystem, beanType);
-		}
 	}
 	
 }

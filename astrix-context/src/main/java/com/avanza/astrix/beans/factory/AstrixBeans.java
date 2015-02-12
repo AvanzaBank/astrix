@@ -13,18 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.factory;
+
+
 /**
+ * Allows astrix-beans that dependend on other Astrix-managed beans to 
+ * get an instance of a given depenendency at runtime. <p> 
+ * 
+ * If the instance isn't created before it will be created when first
+ * requested. The AstrixBeanFactory will detect circular dependencies
+ * and throw a {@link AstrixCircularDependency} if two beans depend
+ * on each other.
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixCircularDependency extends RuntimeException {
-
-	private static final long serialVersionUID = 1L;
-
-	public AstrixCircularDependency(Class<?> beanA, Class<?> beanB) {
-		super("Circular dependency detected. beanA=" + beanA.getName() + ", beanB=" + beanB.getName());
-	}
+public interface AstrixBeans {
+	
+	<T> T getBean(AstrixBeanKey<T> beanKey);
 
 }

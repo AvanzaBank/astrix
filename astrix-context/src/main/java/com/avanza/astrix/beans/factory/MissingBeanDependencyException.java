@@ -13,23 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.factory;
+
+import java.util.Stack;
 
 public class MissingBeanDependencyException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 
-	public MissingBeanDependencyException(AstrixBeanAware beanDependenciesAware, AstrixBeanKey<?> beanKey) {
-		super(createErrorMessage(beanDependenciesAware, beanKey));
-	}
-
-	private static String createErrorMessage(AstrixBeanAware beanDependenciesAware, AstrixBeanKey<?> beanKey) {
-		String requiredBy = beanDependenciesAware.getClass().getName();
-		if (beanDependenciesAware instanceof AstrixFactoryBeanPlugin<?>) {
-			AstrixFactoryBeanPlugin<?> factory = (AstrixFactoryBeanPlugin<?>) beanDependenciesAware;
-			requiredBy = requiredBy + "["+ factory.getBeanKey() + "]";
-		}
-		return "Missing bean provider. requiredBean=" + beanKey + " requiredBy=" + requiredBy;
+	public MissingBeanDependencyException(Stack<AstrixBeanKey<?>> creationTrace) {
+		super("Missing bean dependency: creation trace: " + creationTrace);
 	}
 
 }

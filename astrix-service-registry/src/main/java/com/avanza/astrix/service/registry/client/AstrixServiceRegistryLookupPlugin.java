@@ -15,14 +15,11 @@
  */
 package com.avanza.astrix.service.registry.client;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.context.AstrixBeanAware;
-import com.avanza.astrix.context.AstrixBeanKey;
-import com.avanza.astrix.context.AstrixBeans;
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.factory.AstrixBeans;
+import com.avanza.astrix.context.AstrixBeansAware;
 import com.avanza.astrix.context.AstrixServiceLookupPlugin;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
@@ -32,24 +29,19 @@ import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
  *
  */
 @MetaInfServices(AstrixServiceLookupPlugin.class)
-public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupPlugin<AstrixServiceRegistryLookup>, AstrixBeanAware {
+public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupPlugin<AstrixServiceRegistryLookup>, AstrixBeansAware {
 
 	private AstrixBeans beans;
 
 	@Override
-	public AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier, AstrixServiceRegistryLookup lookupAnnotation) {
+	public AstrixServiceProperties lookup(AstrixBeanKey<?> beanKey, AstrixServiceRegistryLookup lookupAnnotation) {
 		AstrixServiceRegistryClient serviceRegistryClient = beans.getBean(AstrixBeanKey.create(AstrixServiceRegistryClient.class, null));
-		return serviceRegistryClient.lookup(beanType, optionalQualifier);
+		return serviceRegistryClient.lookup(beanKey);
 	}
 
 	@Override
 	public Class<AstrixServiceRegistryLookup> getLookupAnnotationType() {
 		return AstrixServiceRegistryLookup.class;
-	}
-
-	@Override
-	public List<AstrixBeanKey<? extends Object>> getBeanDependencies() {
-		return Arrays.<AstrixBeanKey<?>>asList(AstrixBeanKey.create(AstrixServiceRegistryClient.class, null));
 	}
 
 	@Override

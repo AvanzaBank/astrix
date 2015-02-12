@@ -13,19 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.factory;
 
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public class MissingBeanProviderException extends RuntimeException {
+public interface AstrixFactoryBeanRegistry {
 
-	private static final long serialVersionUID = 1L;
-
-	public MissingBeanProviderException(AstrixBeanKey<? extends Object> beanType) {
-		super("No provider found for bean: " + beanType);
-	}
+	<T> AstrixFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey);
 
 }

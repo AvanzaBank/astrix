@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
@@ -39,17 +41,17 @@ import com.avanza.astrix.provider.versioning.Versioned;
 @MetaInfServices(AstrixApiProviderPlugin.class)
 public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin {
 	
-	private ObjectCache instanceCache;
+	private AstrixContextImpl astrixContext;
 	private AstrixServiceMetaFactory serviceMetaFactory;
 	private AstrixServiceLookupFactory serviceLookupFactory;
 	
 	@Override
-	public List<AstrixFactoryBeanPlugin<?>> createFactoryBeans(AstrixApiDescriptor descriptor) {
+	public List<AstrixFactoryBean<?>> createFactoryBeans(AstrixApiDescriptor descriptor) {
 		return getFactoryBeans(descriptor);
 	}
 
-	private List<AstrixFactoryBeanPlugin<?>> getFactoryBeans(AstrixApiDescriptor descriptor) {
-		List<AstrixFactoryBeanPlugin<?>> result = new ArrayList<>();
+	private List<AstrixFactoryBean<?>> getFactoryBeans(AstrixApiDescriptor descriptor) {
+		List<AstrixFactoryBean<?>> result = new ArrayList<>();
 		// Create library factories
 		for (Method astrixBeanDefinitionMethod : descriptor.getDescriptorClass().getMethods()) {
 			AstrixBeanDefinition beanDefinition = AstrixBeanDefinition.create(astrixBeanDefinitionMethod);
@@ -114,7 +116,7 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 	}
 
 	private Object getInstanceProvider(Class<?> provider) {
-		return instanceCache.getInstance(ObjectId.internalClass(provider));
+		return astrixContext.getInstance(provider);
 	}
 
 	@Override
@@ -123,8 +125,8 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 	}
 	
 	@AstrixInject
-	public void setInstanceCache(ObjectCache instanceCache) {
-		this.instanceCache = instanceCache;
+	public void setInstanceCache(AstrixContextImpl astrixContext) {
+		this.astrixContext = astrixContext;
 	}
 	
 	@AstrixInject

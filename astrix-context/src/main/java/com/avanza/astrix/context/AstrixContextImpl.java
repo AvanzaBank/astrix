@@ -17,15 +17,17 @@ package com.avanza.astrix.context;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.PreDestroy;
 
+import com.avanza.astrix.beans.factory.AstrixBeanFactory;
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.factory.AstrixBeans;
+import com.avanza.astrix.beans.factory.AstrixFactoryBean;
+import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
+import com.avanza.astrix.beans.factory.ObjectCache;
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.context.ObjectId.AstrixBeanId;
 /**
  * An AstrixContextImpl is the runtime-environment for the astrix-framework. It is used
  * both by consuming applications as well as server applications. AstrixContextImpl providers access
@@ -36,25 +38,10 @@ import com.avanza.astrix.context.ObjectId.AstrixBeanId;
 public class AstrixContextImpl implements Astrix, AstrixContext {
 	
 	private final AstrixPlugins plugins;
-	private final AstrixBeanFactoryRegistry beanFactoryRegistry = new AstrixBeanFactoryRegistry();
-	private final AstrixBeanStates beanStates = new AstrixBeanStates();
+	private final SimpleAstrixFactoryBeanRegistry beanFactoryRegistry = new SimpleAstrixFactoryBeanRegistry();
 	private AstrixApiProviderPlugins apiProviderPlugins;
-	private final ObjectCache objectCache = new ObjectCache(new ObjectCache.ObjectFactory() {
-		@Override
-		@SuppressWarnings("unchecked")
-		public <T> T create(ObjectId objectId) throws Exception {
-			if (objectId.isAstrixBean()) {
-				AstrixBeanId beanId = (AstrixBeanId) objectId;
-				// Detect circular dependencies by retrieving transitive bean dependencies
-				// "just in time" when an astrix-bean is created.
-				getTransitiveBeanDependenciesForBean(beanId.getKey());
-				return (T) getFactoryBean(beanId.getKey()).create();
-			}
-			T result =  (T) objectId.getType().newInstance();
-			injectDependencies(result);
-			return result;
-		}
-	});
+	private final ObjectCache objectCache = new ObjectCache();
+	private final AstrixBeanFactory beanFactory;
 	private final DynamicConfig dynamicConfig;
 	
 	public AstrixContextImpl(DynamicConfig dynamicConfig) {
@@ -65,7 +52,7 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 				injectDependencies(plugin);
 			}
 		});
-		getInstance(EventBus.class).addEventListener(AstrixBeanStateChangedEvent.class, beanStates);
+		this.beanFactory = objectCache.create(AstrixBeanFactory.class, new AstrixBeanFactory(beanFactoryRegistry));
 	}
 	
 	public <T> List<T> getPlugins(Class<T> type) {
@@ -76,13 +63,6 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		plugins.registerPlugin(type, provider);
 	}
 	
-	void registerApiProvider(AstrixApiProvider apiProvider) {
-		for (AstrixBeanKey<?> beanType : apiProvider.providedApis()) {
-			AstrixFactoryBean<?> beanFactory = apiProvider.getFactory(beanType);
-			registerBeanFactory(beanFactory);
-		}
-	}
-
 	<T> void registerBeanFactory(AstrixFactoryBean<T> beanFactory) {
 		injectDependencies(beanFactory);
 		this.beanFactoryRegistry.registerFactory(beanFactory);
@@ -123,39 +103,24 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 	}
 
 	private void injectAwareDependencies(Object object) {
-		if (object instanceof AstrixBeanAware) {
-			injectBeanDependencies((AstrixBeanAware)object);
+		if (object instanceof AstrixBeansAware) {
+			injectBeanDependencies((AstrixBeansAware)object);
 		}
 		if (object instanceof AstrixPluginsAware) {
 			AstrixPluginsAware.class.cast(object).setPlugins(getPlugins());
-		}
-		if (object instanceof AstrixDecorator) {
-			injectDependencies(AstrixDecorator.class.cast(object).getTarget());
 		}
 		if (object instanceof AstrixConfigAware) {
 			AstrixConfigAware.class.cast(object).setConfig(this.dynamicConfig);
 		}
 	}
 	
-	private void injectBeanDependencies(final AstrixBeanAware beanDependenciesAware) {
+	private void injectBeanDependencies(final AstrixBeansAware beanDependenciesAware) {
 		beanDependenciesAware.setAstrixBeans(new AstrixBeans() {
 			@Override
 			public <T> T getBean(AstrixBeanKey<T> beanKey) {
-				if (!beanDependenciesAware.getBeanDependencies().contains(beanKey)) {
-					throw new RuntimeException("Undeclared bean dependency: " + beanKey);
-				}
-				try {
-					return AstrixContextImpl.this.getBean(beanKey);
-				} catch (MissingBeanProviderException e) {
-					throw new MissingBeanDependencyException(beanDependenciesAware, beanKey);
-				}
+				return AstrixContextImpl.this.getBean(beanKey);
 			}
-			
 		});
-	}
-
-	private boolean hasBeanFactoryFor(AstrixBeanKey<? extends Object> beanKey) {
-		return this.beanFactoryRegistry.hasBeanFactoryFor(beanKey);
 	}
 
 	@Override
@@ -165,20 +130,13 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 	
 	@Override
 	public <T> T getBean(Class<T> beanType, String qualifier) {
-		return objectCache.getInstance(ObjectId.astrixBean(AstrixBeanKey.create(beanType, qualifier)));
+		return beanFactory.getBean(AstrixBeanKey.create(beanType, qualifier));
 	}
 	
 	public <T> T getBean(AstrixBeanKey<T> beanKey) {
-		return objectCache.getInstance(ObjectId.astrixBean(beanKey));
+		return beanFactory.getBean(beanKey);
 	}
 
-	private <T> AstrixFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanType) {
-		if (!hasBeanFactoryFor(beanType)) {
-			throw new MissingBeanProviderException(beanType);
-		}
-		return this.beanFactoryRegistry.getFactoryBean(beanType);
-	}
-	
 	public AstrixPlugins getPlugins() {
 		return this.plugins;
 	}
@@ -190,83 +148,21 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 	
 	@Override
 	public <T> T waitForBean(Class<T> beanType, String qualifier, long timeoutMillis) throws InterruptedException {
-		T result = getBean(beanType, qualifier); // Trigger creation of bean
-		waitForBeanAndTransitiveDependenciesToBeBound(AstrixBeanKey.create(beanType, qualifier), timeoutMillis);
-		return result;
-	}
-	
-	private void waitForBeanAndTransitiveDependenciesToBeBound(AstrixBeanKey<?> beanKey, long timeoutMillis) throws InterruptedException {
-		for (AstrixBeanKey<?> dependencyKey: getTransitiveBeanDependenciesForBean(beanKey)) {
-			waitForBeanToBeBound(dependencyKey, timeoutMillis);
+		AstrixBeanKey<T> beanKey = AstrixBeanKey.create(beanType, qualifier);
+		T bean = beanFactory.getBean(beanKey);
+		for (AstrixBeanKey<?> dependencyKey : beanFactory.getDependencies(beanKey)) {
+			Object dependency = beanFactory.getBean(dependencyKey);
+			waitForBeanToBeBound(dependency, timeoutMillis);
 		}
-		waitForBeanToBeBound(beanKey, timeoutMillis);
+		waitForBeanToBeBound(bean, timeoutMillis);
+		return bean;
 	}
-
-	private void waitForBeanToBeBound(AstrixBeanKey<?> beanKey, long timeoutMillis)
-			throws InterruptedException {
-		if (!isStatefulBean(beanKey)) {
-			return;
+	private void waitForBeanToBeBound(Object bean, long timeoutMillis) throws InterruptedException {
+		if (bean instanceof StatefulAstrixBean) {
+			StatefulAstrixBean.class.cast(bean).waitUntilBound(timeoutMillis);
 		}
-		this.beanStates.waitForBeanToBeBound(beanKey, timeoutMillis);
 	}
 
-	private boolean isStatefulBean(AstrixBeanKey<?> beanKey) {
-		return this.beanFactoryRegistry.getFactoryBean(beanKey).isStateful();
-	}
-
-	/**
-	 * Returns the transitive bean dependencies required to create a bean of given type, 
-	 * ie the beans that are used by, or during creation, of a given bean.
-	 * 
-	 * @param beanType
-	 * @return
-	 */
-	public Collection<AstrixBeanKey<?>> getTransitiveBeanDependenciesForBean(AstrixBeanKey<? extends Object> beanType) {
-		return new TransitiveBeanDependencyResolver(getFactoryBean(beanType)).resolve();
-	}
-	
-	private class TransitiveBeanDependencyResolver {
-
-		private AstrixFactoryBeanPlugin<?> rootFactory;
-		private AstrixFactoryBean<?> root;
-		private Set<AstrixBeanKey<?>> transitiveDependencies = new HashSet<>();
-		
-		public TransitiveBeanDependencyResolver(AstrixFactoryBean<?> rootFactory) {
-			this.root = rootFactory;			
-			this.rootFactory = (AstrixFactoryBeanPlugin<?>) rootFactory.getTarget();
-		}
-
-		public Set<AstrixBeanKey<?>> resolve() {
-			resolveTransitiveDependencies(rootFactory);
-			return transitiveDependencies;
-		}
-
-		private void resolveTransitiveDependencies(AstrixFactoryBeanPlugin<?> beanFactory) {
-			if (beanFactory instanceof AstrixBeanAware) {
-				AstrixBeanAware beanAwareFactory = AstrixBeanAware.class.cast(beanFactory);
-				for (AstrixBeanKey<?> transitiveDependency : beanAwareFactory.getBeanDependencies()) {
-					if (this.rootFactory.getBeanKey().equals(transitiveDependency)) {
-						throw new AstrixCircularDependency(root.getBeanType(), beanFactory.getBeanKey().getBeanType());
-					}
-					transitiveDependencies.add(transitiveDependency);
-					try {
-						resolveTransitiveDependencies(getFactoryBean(transitiveDependency));
-					} catch (MissingBeanProviderException e) {
-						throw new MissingBeanDependencyException(beanAwareFactory, transitiveDependency);
-					}
-				}
-			}
-			if (beanFactory instanceof AstrixDecorator) {
-				AstrixFactoryBeanPlugin<?> decoratedFactory = (AstrixFactoryBeanPlugin<?>)AstrixDecorator.class.cast(beanFactory).getTarget();
-				resolveTransitiveDependencies(decoratedFactory);
-			}
-		}
-		
-		private void resolveTransitiveDependencies(AstrixFactoryBean<?> beanFactory) {
-			resolveTransitiveDependencies(AstrixFactoryBeanPlugin.class.cast(beanFactory.getTarget()));
-		}
-		
-	}
 
 	List<AstrixServiceBeanDefinition> getExportedServices(AstrixApiDescriptor apiDescriptor) {
 		return apiProviderPlugins.getExportedServices(apiDescriptor);
@@ -285,7 +181,7 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 	 * @param classType
 	 * @return
 	 */
-	public final <T> T getInstance(Class<T> classType) {
+	public final <T> T getInstance(final Class<T> classType) {
 		// We allow injecting an instance of ObjectCache, hence this
 		// check.
 		if (classType.equals(ObjectCache.class)) {
@@ -297,7 +193,15 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		if (classType.equals(AstrixApiProviderPlugins.class)) {
 			return classType.cast(this.apiProviderPlugins);
 		}
-		return this.objectCache.getInstance(ObjectId.internalClass(classType));
+		return this.objectCache.getInstance(classType, new ObjectCache.ObjectFactory<T>() {
+			@Override
+			@SuppressWarnings("unchecked")
+			public T create() throws Exception {
+				T result =  (T) classType.newInstance();
+				injectDependencies(result);
+				return result;
+			}
+		});
 	}
 	
 	public DynamicConfig getConfig() {

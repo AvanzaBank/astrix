@@ -46,12 +46,12 @@ public class AstrixTestUtil {
 			
 			@Override
 			public void describeFailureTo(Description description) {
-				description.appendText("Expected serviceInovcation to return: ");
+				description.appendText("Expected serviceInovcation to return:\n");
 				matcher.describeTo(description);
 				if (lastException != null) {
-					description.appendText("\nBut last serviceInvocation threw exception: " + lastException.toString());
+					description.appendText("\nBut last serviceInvocation threw exception:\n" + lastException.toString());
 				} else {
-					description.appendText("\nBut last serviceInvocation returnded " + lastResult);
+					description.appendText("\nBut last serviceInvocation returned:\n" + lastResult);
 				}
 			}
 		};

@@ -15,85 +15,59 @@
  */
 package com.avanza.astrix.context;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.Objects;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  * @param <T>
  */
-class LeasedService<T> implements InvocationHandler {
+class LeasedService<T> {
 
-	private AstrixServiceLookup serviceLookup;
-	private volatile T currentInstance;
+	private final AstrixServiceLookup serviceLookup;
+	private final AstrixServiceBeanInstance<T> instance;
 	private volatile AstrixServiceProperties currentProperties;
-	private AstrixServiceFactory<T> serviceFactory;
+	private final Lock stateLock = new ReentrantLock();
 
-	public LeasedService(T currentInstance, 
+	public LeasedService(AstrixServiceBeanInstance<T> instance, 
 			AstrixServiceProperties currentProperties,
-			AstrixServiceFactory<T> serviceFactory,
 			AstrixServiceLookup serviceLookup) {
-		this.currentInstance = currentInstance;
+		this.instance = instance;
 		this.currentProperties = currentProperties;
-		this.serviceFactory = serviceFactory;
 		this.serviceLookup = serviceLookup;
 	}
 
-	// TODO: rename to getBeanKey
-	public AstrixBeanKey<T> getBeanType() {
-		return serviceFactory.getBeanKey();
-	}
-	
-	// TODO: rename to getBeanType
-	public Class<T> getType() {
-		return serviceFactory.getBeanKey().getBeanType();
-	}
-	
-	@Deprecated
-	public String getQualifier() {
-		return serviceFactory.getBeanKey().getQualifier();
-	}
-
 	public void renew() {
-		AstrixServiceProperties serviceProperties = serviceLookup.lookup(getType(), getQualifier());
-		refreshServiceProperties(serviceProperties);
+		stateLock.lock();
+		try {
+			AstrixServiceProperties serviceProperties = serviceLookup.lookup(getBeanKey());
+			refreshServiceProperties(serviceProperties);
+		} finally {
+			stateLock.unlock();
+		}
 	}
-
+	
+	public boolean isBound() {
+		return this.instance.isBound();
+	}
+	
 	private void refreshServiceProperties(AstrixServiceProperties serviceProperties) {
 		if (serviceHasChanged(serviceProperties)) {
-			if (serviceProperties != null) {
-				currentInstance = serviceFactory.create(serviceProperties);
-			} else {
-				currentInstance = (T) Proxy.newProxyInstance(getType().getClassLoader(), new Class[]{getType()}, new NotRegistered());
-			}
+			this.instance.bind(serviceProperties);
 			currentProperties = serviceProperties;
 		}
 	}
-	@Override
-	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		try {
-			return method.invoke(currentInstance, args);
-		} catch (InvocationTargetException e) {
-			throw e.getCause();
-		}
-	}
-	
 
 	private boolean serviceHasChanged(AstrixServiceProperties serviceProperties) {
 		return !Objects.equals(currentProperties, serviceProperties);
 	}
 
-	private class NotRegistered implements InvocationHandler {
-
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			throw new ServiceUnavailableException("Service not available in registry. type=" + getType().getName() + ", qualifier=" + getQualifier());
-		}
+	AstrixBeanKey<T> getBeanKey() {
+		return this.instance.getBeanKey();
 	}
 
 }
