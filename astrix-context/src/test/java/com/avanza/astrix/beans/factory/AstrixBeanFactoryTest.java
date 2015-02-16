@@ -19,19 +19,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.avanza.astrix.beans.factory.AstrixBeanFactory;
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.factory.AstrixBeans;
-import com.avanza.astrix.beans.factory.AstrixCircularDependency;
-import com.avanza.astrix.beans.factory.AstrixFactoryBean;
-import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
-import com.avanza.astrix.config.DynamicLongProperty;
-
 
 
 public class AstrixBeanFactoryTest {
-	
-	private DynamicLongProperty beanBindAttemptInterval = new DynamicLongProperty(100);
 	
 	@Test(expected = AstrixCircularDependency.class)
 	public void detectsCircularDependencies1() throws Exception {

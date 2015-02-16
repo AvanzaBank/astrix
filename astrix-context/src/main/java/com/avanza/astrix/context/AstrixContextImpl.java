@@ -190,9 +190,9 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		if (classType.equals(AstrixContextImpl.class)) {
 			return classType.cast(this);
 		}
-		if (classType.equals(AstrixApiProviderPlugins.class)) {
-			return classType.cast(this.apiProviderPlugins);
-		}
+//		if (classType.equals(AstrixApiProviderPlugins.class)) {
+//			return classType.cast(this.apiProviderPlugins);
+//		}
 		return this.objectCache.getInstance(classType, new ObjectCache.ObjectFactory<T>() {
 			@Override
 			@SuppressWarnings("unchecked")
