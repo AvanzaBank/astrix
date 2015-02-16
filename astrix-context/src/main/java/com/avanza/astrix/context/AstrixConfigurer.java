@@ -27,6 +27,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
@@ -61,10 +62,7 @@ public class AstrixConfigurer {
 		AstrixApiProviderPlugins apiProviderPlugins = new AstrixApiProviderPlugins(context.getPlugins(AstrixApiProviderPlugin.class));
 		context.setApiProviderPlugins(apiProviderPlugins);
 		AstrixApiProviderFactory apiProviderFactory = new AstrixApiProviderFactory(apiProviderPlugins);
-		List<AstrixApiProvider> apiProviders = createApiProviders(apiProviderFactory, context);
-		for (AstrixApiProvider apiProvider : apiProviders) {
-			context.registerApiProvider(apiProvider);
-		}
+		createApiProviders(apiProviderFactory, context);
 		for (AstrixFactoryBean<?> factoryBean : this.standaloneFactories) {
 			context.registerBeanFactory(factoryBean);
 		}
@@ -96,14 +94,16 @@ public class AstrixConfigurer {
 		context.registerPlugin(pluginHolder.pluginType, pluginHolder.pluginProvider);
 	}
 
-	private List<AstrixApiProvider> createApiProviders(AstrixApiProviderFactory apiProviderFactory, AstrixContextImpl context) {
-		List<AstrixApiProvider> result = new ArrayList<>();
+	private void createApiProviders(AstrixApiProviderFactory apiProviderFactory, AstrixContextImpl context) {
 		for (AstrixApiDescriptor descriptor : getApiDescriptors(context).getAll()) {
 			if (isActive(descriptor)) {
-				result.add(apiProviderFactory.create(descriptor));
+				List<AstrixFactoryBean<?>> beanFactories = apiProviderFactory.create(descriptor);
+				for (AstrixFactoryBean<?> beanFactory : beanFactories) {
+					log.debug("Registering provider: bean={} provider={}", beanFactory.getBeanKey(), descriptor.getName());
+					context.registerBeanFactory(beanFactory);
+				}
 			}
 		}
-		return result;
 	}
 	
 	private boolean isActive(AstrixApiDescriptor descriptor) {

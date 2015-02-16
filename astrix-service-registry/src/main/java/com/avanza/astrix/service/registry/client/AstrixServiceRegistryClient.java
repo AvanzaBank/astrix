@@ -17,6 +17,7 @@ package com.avanza.astrix.service.registry.client;
 
 import org.openspaces.remoting.Routing;
 
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.context.AstrixServiceProperties;
 
 
@@ -25,7 +26,7 @@ public interface AstrixServiceRegistryClient {
 	
 	<T> AstrixServiceProperties lookup(@Routing Class<T> type);
 	
-	<T> AstrixServiceProperties lookup(@Routing Class<T> type, String qualifier);
+	<T> AstrixServiceProperties lookup(AstrixBeanKey<T> beanKey);
 	
 	<T> void register(@Routing Class<T> type, AstrixServiceProperties properties, long lease);
 	

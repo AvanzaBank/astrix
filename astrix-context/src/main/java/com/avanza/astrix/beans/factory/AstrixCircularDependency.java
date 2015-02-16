@@ -13,17 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.factory;
+
+import java.util.Stack;
+
+
 
 /**
- * Used internally by Astrix 'decorator' classes to allow AstrixContextImpl
- * to inject dependencies to decorated Astrix classes.
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AstrixDecorator {
+public class AstrixCircularDependency extends RuntimeException {
 
-	Object getTarget();
+	private static final long serialVersionUID = 1L;
+
+	public AstrixCircularDependency(Class<?> beanA, Class<?> beanB) {
+		super("Circular dependency detected. beanA=" + beanA.getName() + ", beanB=" + beanB.getName());
+	}
+	
+	public AstrixCircularDependency(Stack<AstrixBeanKey<?>> trace) {
+		super("Circular dependency detected. trace=" + trace);
+	}
 
 }

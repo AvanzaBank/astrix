@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+
 
 public interface AstrixServiceRegistryPlugin {
 

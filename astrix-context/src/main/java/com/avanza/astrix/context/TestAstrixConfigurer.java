@@ -20,6 +20,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.factory.AstrixBeans;
+import com.avanza.astrix.beans.factory.AstrixFactoryBean;
+
 public class TestAstrixConfigurer {
 	
 	private AstrixConfigurer configurer;
@@ -74,9 +78,7 @@ public class TestAstrixConfigurer {
 	}
 	
 	public <T> void registerAstrixBean(Class<T> beanType, T provider, String qualifier) {
-		StandaloneFactoryBean<T> factoryPlugin = new StandaloneFactoryBean<>(beanType, provider, qualifier);
-		AstrixApiDescriptor apiDescriptor = AstrixApiDescriptor.simple(provider.getClass().getName());
-		AstrixFactoryBean<T> factoryBean = AstrixFactoryBean.nonStateful(factoryPlugin, apiDescriptor);
+		StandaloneFactoryBean<T> factoryBean = new StandaloneFactoryBean<>(beanType, provider, qualifier);
 		standaloneFactories.add(factoryBean);
 	}
 
@@ -109,7 +111,7 @@ public class TestAstrixConfigurer {
 		this.configurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
 	}
 	
-	private static class StandaloneFactoryBean<T> implements AstrixFactoryBeanPlugin<T> {
+	private static class StandaloneFactoryBean<T> implements AstrixFactoryBean<T> {
 		private AstrixBeanKey<T> type;
 		private T instance;
 
@@ -119,18 +121,13 @@ public class TestAstrixConfigurer {
 		}
 
 		@Override
-		public T create() {
+		public T create(AstrixBeans beans) {
 			return instance;
 		}
 
 		@Override
 		public AstrixBeanKey<T> getBeanKey() {
 			return type;
-		}
-		
-		@Override
-		public boolean isStateful() {
-			return false;
 		}
 		
 	}

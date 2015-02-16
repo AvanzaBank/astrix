@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
-
-import java.util.List;
+package com.avanza.astrix.beans.factory;
 /**
- * The bean aware interface allows "Astrix-plugin-instances" to depend on
- * Astrix-managed-beans, ie api-elements hooked into Astrix. <p> 
- * 
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AstrixBeanAware {
-	
-	List<AstrixBeanKey<? extends Object>> getBeanDependencies();
-	
-	void setAstrixBeans(AstrixBeans beans);
+public interface AstrixFactoryBeanRegistry {
+
+	/**
+	 * @param beanKey
+	 * @throws MissingBeanProviderException this registry doesn't contain a factory for the requested bean
+	 * @return
+	 */
+	<T> AstrixFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey);
 
 }

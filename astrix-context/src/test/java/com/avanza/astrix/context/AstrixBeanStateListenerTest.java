@@ -35,7 +35,7 @@ public class AstrixBeanStateListenerTest {
 		testAstrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
 		testAstrixConfigurer.registerApiProvider(MyLibraryProvider.class);
 		testAstrixConfigurer.registerApiProvider(MyServiceProvider.class);
-		AstrixContextImpl astrix = (AstrixContextImpl) testAstrixConfigurer.configure();
+		AstrixContext astrix = testAstrixConfigurer.configure();
 		
 		final MyClient myClient = astrix.getBean(MyClient.class);
 		

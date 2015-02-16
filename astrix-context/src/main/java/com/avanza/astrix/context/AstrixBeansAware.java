@@ -15,15 +15,18 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.beans.factory.AstrixBeans;
+
 /**
- * Used by Astrix-plugins that dependends on Astrix-managed beans to 
- * get an instance of the given depenendencies at runtime. <p> 
+ * The bean aware interface allows "Astrix-plugin-instances" to depend on
+ * Astrix-managed-beans, ie api-elements hooked into Astrix. <p> 
+ * 
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AstrixBeans {
+public interface AstrixBeansAware {
 	
-	<T> T getBean(AstrixBeanKey<T> beanKey);
+	void setAstrixBeans(AstrixBeans beans);
 
 }

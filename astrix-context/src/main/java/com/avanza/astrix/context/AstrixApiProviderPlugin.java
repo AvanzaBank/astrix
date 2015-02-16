@@ -18,9 +18,11 @@ package com.avanza.astrix.context;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+import com.avanza.astrix.beans.factory.AstrixFactoryBean;
+
 
 /**
- * An AstrixApiProviderPlugin is responsible for creating AstrixFactoryBeanPlugin for
+ * An AstrixApiProviderPlugin is responsible for creating AstrixFactoryBean for
  * all parts of a given "type" of api. By "type" in this context, we don't mean the
  * different api's that are hooked into Astrix for consumption, but rather a mechanism
  * for an api-provider to publish the different part's of the api, thereby allowing it
@@ -39,7 +41,7 @@ import java.util.List;
  */
 public interface AstrixApiProviderPlugin {
 	
-	List<AstrixFactoryBeanPlugin<?>> createFactoryBeans(AstrixApiDescriptor descriptor);
+	List<AstrixFactoryBean<?>> createFactoryBeans(AstrixApiDescriptor descriptor);
 	
 	List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiDescriptor descriptor);
 	

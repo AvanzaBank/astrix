@@ -80,11 +80,11 @@ public class AstrixFaultToleranceTest {
 		assertEquals(1, faultTolerancePlugin.appliedFaultToleranceCount.get());
 	}
 	
-	interface Ping {
+	public interface Ping {
 		String ping(String name);
 	}
 	
-	static class PingImpl implements Ping {
+	public static class PingImpl implements Ping {
 		public String ping(String name) {
 			return name;
 		}
@@ -97,7 +97,7 @@ public class AstrixFaultToleranceTest {
 		Ping ping();
 	}
 	
-	static class FakeFaultTolerancePlugin implements AstrixFaultTolerancePlugin {
+	public static class FakeFaultTolerancePlugin implements AstrixFaultTolerancePlugin {
 		
 		private final AtomicInteger appliedFaultToleranceCount = new AtomicInteger();
 		

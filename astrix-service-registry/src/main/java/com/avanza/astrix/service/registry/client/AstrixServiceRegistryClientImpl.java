@@ -19,6 +19,7 @@ import java.util.Objects;
 
 import org.openspaces.remoting.Routing;
 
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
 /**
@@ -38,12 +39,12 @@ public class AstrixServiceRegistryClientImpl implements AstrixServiceRegistryCli
 
 	@Override
 	public <T> AstrixServiceProperties lookup(@Routing Class<T> type) {
-		return lookup(type, null);
+		return lookup(AstrixBeanKey.create(type, null));
 	}
 
 	@Override
-	public <T> AstrixServiceProperties lookup(@Routing Class<T> type, String qualifier) {
-		AstrixServiceRegistryEntry entry = serviceRegistry.lookup(type.getName(), qualifier);
+	public <T> AstrixServiceProperties lookup(AstrixBeanKey<T> beanKey) {
+		AstrixServiceRegistryEntry entry = serviceRegistry.lookup(beanKey.getBeanType().getName(), beanKey.getQualifier());
 		if (entry == null) {
 			return null;
 		}

@@ -25,6 +25,8 @@ import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.factory.MissingBeanDependencyException;
+import com.avanza.astrix.beans.factory.MissingBeanProviderException;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
@@ -180,7 +182,7 @@ public class AstrixContextImplTest {
 
 	}
 	
-	static class HelloBean {
+	public static class HelloBean {
 		
 		boolean initialized = false;
 		boolean destroyed = false;

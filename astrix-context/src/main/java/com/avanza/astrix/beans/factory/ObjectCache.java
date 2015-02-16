@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.factory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -39,32 +38,22 @@ import org.slf4j.LoggerFactory;
  * When the ObjectCache is destroyed all objects in the cache will be destroyed by invoking
  * all @PreDestroy annotated methods on every instance in the cache.
  * 
- * Three types object exists:
- * 1. AstrixBeans
- * 2. Internal Classes
- * 3. Plugins (currently not managed)
- *  
  * @author Elias Lindholm (elilin)
  *
  */
-final class ObjectCache {
+public final class ObjectCache {
 	
-	private final Logger logger = LoggerFactory.getLogger(ObjectCache.class);
-	private final ConcurrentMap<ObjectId, Object> instanceById = new ConcurrentHashMap<>();
-	private final ConcurrentMap<ObjectId, Lock> lockedObjects = new ConcurrentHashMap<>();
-	private final ObjectFactory objectFactory;
+	private static final Logger logger = LoggerFactory.getLogger(ObjectCache.class);
+	private final ConcurrentMap<Object, Object> instanceById = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Object, Lock> lockedObjects = new ConcurrentHashMap<>();
 	
-	public ObjectCache(ObjectFactory objectFactory) {
-		this.objectFactory = Objects.requireNonNull(objectFactory);
-	}
-
 	@SuppressWarnings("unchecked")
-	public <T> T getInstance(ObjectId objectId) {
+	public <T> T getInstance(Object objectId, ObjectFactory<T> factory) {
 		T object = (T) this.instanceById.get(objectId);
 		if (object != null) {
 			return object;
 		}
-		return create(objectId);
+		return create(objectId, factory);
 	}
 	
 	public void destroy() {
@@ -73,7 +62,7 @@ final class ObjectCache {
 		}
 	}
 
-	private void destroy(Object object) {
+	public static void destroy(Object object) {
 		List<Method> methods = getMethodsAnnotatedWith(object.getClass(), PreDestroy.class);
 		for (Method m : methods) {
 			try {
@@ -83,7 +72,8 @@ final class ObjectCache {
 			}
 		}
 	}
-	private void init(Object object) {
+	
+	public static void init(Object object) {
 		List<Method> methods = getMethodsAnnotatedWith(object.getClass(), PostConstruct.class);
 		for (Method m : methods) {
 			try {
@@ -95,7 +85,7 @@ final class ObjectCache {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private <T> T create(ObjectId id) {
+	private <T> T create(Object id, ObjectFactory<T> objectFactory) {
 		Lock lock = new ReentrantLock();
 		Lock existingLock = lockedObjects.putIfAbsent(id, lock);
 		if (existingLock != null) {
@@ -112,7 +102,7 @@ final class ObjectCache {
 			// Create instance
 			T instance;
 			try {
-				instance = objectFactory.create(id);
+				instance = objectFactory.create();
 				init(instance);
 				this.instanceById.put(id, instance);
 				return instance;
@@ -131,8 +121,17 @@ final class ObjectCache {
 		}
 	}
 	
-	interface ObjectFactory {
-		<T> T create(ObjectId instanceId) throws Exception;
+	public <T> T create(Object id, final T instance) {
+		return create(id, new ObjectFactory<T>() {
+			@Override
+			public T create() throws Exception {
+				return instance;
+			}
+		});
+	}
+	
+	public interface ObjectFactory<T> {
+		T create() throws Exception;
 	}
 	
 	private static List<Method> getMethodsAnnotatedWith(final Class<?> type, final Class<? extends Annotation> annotation) {

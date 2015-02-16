@@ -23,6 +23,13 @@ public class DynamicLongProperty {
 	
 	private volatile long value;
 	
+	public DynamicLongProperty() {
+	}
+	
+	public DynamicLongProperty(long initialValue) {
+		this.value = initialValue;
+	}
+	
 	public long get() {
 		return value;
 	}

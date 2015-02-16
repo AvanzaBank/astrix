@@ -17,6 +17,8 @@ package com.avanza.astrix.context;
 
 import java.lang.annotation.Annotation;
 
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+
 
 
 /**
@@ -36,8 +38,8 @@ public class AstrixServiceLookup {
 		return new AstrixServiceLookup(new Impl<T>(serviceLookupPlugin, lookupInfo));
 	}
 
-	public AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier) {
-		return impl.lookup(beanType, optionalQualifier);
+	public AstrixServiceProperties lookup(AstrixBeanKey<?> beanKey) {
+		return impl.lookup(beanKey);
 	}
 	
 	@Override
@@ -55,8 +57,8 @@ public class AstrixServiceLookup {
 			this.lookupInfo = lookupInfo;
 		}
 
-		AstrixServiceProperties lookup(Class<?> beanType, String optionalQualifier) {
-			return serviceLookup.lookup(beanType, optionalQualifier, lookupInfo);
+		AstrixServiceProperties lookup(AstrixBeanKey<?> beanKey) {
+			return serviceLookup.lookup(beanKey, lookupInfo);
 		}
 
 		@Override
