@@ -18,7 +18,6 @@ package com.avanza.astrix.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.Test;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -29,9 +28,6 @@ import com.avanza.astrix.provider.core.Service;
 public class AstrixBeanStateListenerTest {
 	
 	TestAstrixConfigurer testAstrixConfigurer = new TestAstrixConfigurer();
-	static {
-		BasicConfigurator.configure();
-	}
 	
 	@Test
 	public void waitForBean_beanIsLibrary_waitsUntilAllTransitiveDependenciesAreBeBound() throws Exception {

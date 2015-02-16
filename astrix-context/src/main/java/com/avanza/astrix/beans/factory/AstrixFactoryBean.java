@@ -27,12 +27,17 @@ package com.avanza.astrix.beans.factory;
 public interface AstrixFactoryBean<T> {
 	
 	/**
-	 * Creates the associated bean. Dependencies
-	 * required by the given bean may be pulled out
+	 * Creates the bean. Dependencies
+	 * required by the bean may be pulled out
 	 * from the {@link AstrixBeans} argument, which
 	 * will trigger creation (or returned a cached instance)
 	 * of the requested bean in the given {@link AstrixBeanFactory}. 
 	 * 
+	 * @throws AstrixCircularDependency
+	 * 			if requesting a bean from the passed in {@link AstrixBeans} that is	currently 
+	 * 	        being created and in turn triggered creation of the bean associated with this
+	 *          factory.
+	 *          
 	 * @param beans
 	 * @return
 	 */

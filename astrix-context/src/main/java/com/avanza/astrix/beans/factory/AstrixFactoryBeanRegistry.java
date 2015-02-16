@@ -14,9 +14,18 @@
  * limitations under the License.
  */
 package com.avanza.astrix.beans.factory;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public interface AstrixFactoryBeanRegistry {
 
+	/**
+	 * @param beanKey
+	 * @throws MissingBeanProviderException this registry doesn't contain a factory for the requested bean
+	 * @return
+	 */
 	<T> AstrixFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey);
 
 }

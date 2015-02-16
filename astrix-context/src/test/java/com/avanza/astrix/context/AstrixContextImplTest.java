@@ -23,7 +23,6 @@ import static org.junit.Assert.assertTrue;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.factory.MissingBeanDependencyException;
@@ -33,10 +32,6 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 
 public class AstrixContextImplTest {
-	
-	static {
-		BasicConfigurator.configure();
-	}
 	
 	@Test
 	public void astrixContextShouldInstantiateAndInjectRequiredClasses() throws Exception {
