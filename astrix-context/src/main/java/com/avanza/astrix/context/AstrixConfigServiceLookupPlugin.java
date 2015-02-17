@@ -18,6 +18,11 @@ package com.avanza.astrix.context;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.service.AstrixServiceComponent;
+import com.avanza.astrix.beans.service.AstrixServiceComponents;
+import com.avanza.astrix.beans.service.AstrixServiceLookupPlugin;
+import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
 /**
@@ -30,7 +35,7 @@ public class AstrixConfigServiceLookupPlugin implements AstrixServiceLookupPlugi
 
 	private AstrixServiceComponents serviceComponents;
 	private DynamicConfig config;
-
+	
 	@Override
 	public AstrixServiceProperties lookup(AstrixBeanKey<?> beanKey, AstrixConfigLookup lookupAnnotation) {
 		String serviceUri = config.getStringProperty(lookupAnnotation.value(), null).get();
@@ -52,6 +57,7 @@ public class AstrixConfigServiceLookupPlugin implements AstrixServiceLookupPlugi
 	private AstrixServiceComponent getServiceComponent(String componentName) {
 		return serviceComponents.getComponent(componentName);
 	}
+	
 	@Override
 	public Class<AstrixConfigLookup> getLookupAnnotationType() {
 		return AstrixConfigLookup.class;

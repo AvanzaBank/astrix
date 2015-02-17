@@ -20,6 +20,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
 import com.avanza.astrix.provider.core.Library;

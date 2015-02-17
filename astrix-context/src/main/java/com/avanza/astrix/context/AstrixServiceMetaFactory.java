@@ -16,6 +16,11 @@
 package com.avanza.astrix.context;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.service.AstrixServiceComponents;
+import com.avanza.astrix.beans.service.AstrixServiceFactory;
+import com.avanza.astrix.beans.service.AstrixServiceLeaseManager;
+import com.avanza.astrix.beans.service.AstrixServiceLookup;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 /**

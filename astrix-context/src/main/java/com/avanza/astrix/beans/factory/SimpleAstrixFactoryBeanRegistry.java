@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.beans.factory;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -39,6 +41,17 @@ public class SimpleAstrixFactoryBeanRegistry implements AstrixFactoryBeanRegistr
 		return (AstrixFactoryBean<T>) this.factoryByBeanKey.get(beanKey);
 	}
 	
+	@Override
+	public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
+		Set<AstrixBeanKey<T>> result = new HashSet<>();
+		for (AstrixBeanKey<?> key : this.factoryByBeanKey.keySet()) {
+			if (key.getBeanType().equals(type)) {
+				result.add((AstrixBeanKey<T>) key);
+			}
+		}
+		return result;
+	}
+	
 	public <T> void registerFactory(AstrixFactoryBean<T> factory) {
 		AstrixFactoryBean<?> duplicateFactory = factoryByBeanKey.putIfAbsent(factory.getBeanKey(), factory);
 		if (duplicateFactory != null) {
@@ -50,4 +63,9 @@ public class SimpleAstrixFactoryBeanRegistry implements AstrixFactoryBeanRegistr
 		return this.factoryByBeanKey.containsKey(beanKey);
 	}
 
+	@Override
+	public <T> AstrixBeanKey<? extends T> resolveBean(AstrixBeanKey<T> beanKey) {
+		return beanKey;
+	}
+	
 }

@@ -17,10 +17,9 @@ package com.avanza.astrix.service.registry.client;
 
 import java.util.Objects;
 
-import org.openspaces.remoting.Routing;
-
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.context.AstrixServiceProperties;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
+import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
 /**
  * 
@@ -38,7 +37,7 @@ public class AstrixServiceRegistryClientImpl implements AstrixServiceRegistryCli
 	}
 
 	@Override
-	public <T> AstrixServiceProperties lookup(@Routing Class<T> type) {
+	public <T> AstrixServiceProperties lookup(Class<T> type) {
 		return lookup(AstrixBeanKey.create(type, null));
 	}
 
@@ -52,7 +51,7 @@ public class AstrixServiceRegistryClientImpl implements AstrixServiceRegistryCli
 	}
 
 	@Override
-	public <T> void register(@Routing Class<T> type, AstrixServiceProperties properties, long lease) {
+	public <T> void register(Class<T> type, AstrixServiceProperties properties, long lease) {
 		properties.setProperty(AstrixServiceProperties.SUBSYSTEM, this.subsystem);
 		AstrixServiceRegistryEntry entry = new AstrixServiceRegistryEntry();
 		entry.setServiceProperties(properties.getProperties());

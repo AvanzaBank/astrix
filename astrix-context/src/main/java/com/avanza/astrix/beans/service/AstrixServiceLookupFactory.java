@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.service;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 
 /**
@@ -27,9 +29,16 @@ import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceLookupFactory implements AstrixPluginsAware {
+public class AstrixServiceLookupFactory {
 	
 	private final ConcurrentMap<Class<?>, AstrixServiceLookupPlugin<?>> lookupStrategyByAnnotationType = new ConcurrentHashMap<>();
+	
+	public AstrixServiceLookupFactory(List<AstrixServiceLookupPlugin<?>> serviceLookupPlugins) {
+		for (AstrixServiceLookupPlugin<?> lookupPlugin : serviceLookupPlugins) {
+			this.lookupStrategyByAnnotationType.put(lookupPlugin.getLookupAnnotationType(), lookupPlugin);
+		}
+	}
+	
 
 	public AstrixServiceLookup createServiceLookup(AnnotatedElement annotatedElement) {
 		AstrixServiceLookupPlugin<?> servcieLookupPlugin = getServiceLookupPlugin(annotatedElement);
@@ -48,12 +57,6 @@ public class AstrixServiceLookupFactory implements AstrixPluginsAware {
 		return lookupStrategyByAnnotationType.get(lookupStrategy);
 	}
 	
-	@Override
-	public void setPlugins(AstrixPlugins plugins) {
-		for (AstrixServiceLookupPlugin<?> lookupPlugin : plugins.getPlugins(AstrixServiceLookupPlugin.class)) {
-			this.lookupStrategyByAnnotationType.put(lookupPlugin.getLookupAnnotationType(), lookupPlugin);
-		}
-	}
 
 	public boolean usesServiceRegistry(AstrixApiDescriptor apiDescriptor) {
 		return getLookupStrategy(apiDescriptor.getDescriptorClass()).equals(AstrixServiceRegistryLookup.class);

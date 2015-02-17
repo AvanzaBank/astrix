@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.beans.factory;
 
+import java.util.Set;
+
 
 /**
  * Allows astrix-beans that dependend on other Astrix-managed beans to 
@@ -31,5 +33,7 @@ package com.avanza.astrix.beans.factory;
 public interface AstrixBeans {
 	
 	<T> T getBean(AstrixBeanKey<T> beanKey);
+
+	<T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type);
 
 }

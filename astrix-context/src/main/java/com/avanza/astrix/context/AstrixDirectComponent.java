@@ -25,6 +25,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.service.AstrixServiceComponent;
+import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
@@ -34,12 +37,18 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  *
  */
 @MetaInfServices(AstrixServiceComponent.class)
-public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPluginsAware {
+public class AstrixDirectComponent implements AstrixServiceComponent {
 	
 	private final static AtomicLong idGen = new AtomicLong();
 	private final static Map<String, ServiceProvider<?>> providerById = new ConcurrentHashMap<>();
-	private AstrixPlugins astrixPlugins;
 	private AstrixFaultTolerance faultTolerance;
+	private AstrixVersioningPlugin versioningPlugin;
+	
+	@AstrixInject
+	public void setVersioningPlugin(AstrixVersioningPlugin versioningPlugin) {
+		this.versioningPlugin = versioningPlugin;
+	}
+	
 	
 	@Override
 	public <T> T bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
@@ -48,7 +57,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 		if (serviceProvider == null) {
 			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + type);
 		}
-		T provider = type.cast(serviceProvider.getProvider(astrixPlugins.getPlugin(AstrixVersioningPlugin.class), versioningContext));
+		T provider = type.cast(serviceProvider.getProvider(versioningPlugin, versioningContext));
 		FaultToleranceSpecification<T> ftSpec = FaultToleranceSpecification.builder(type)
 																		   .group("in-memory")
 																		   .provider(provider)
@@ -262,11 +271,6 @@ public class AstrixDirectComponent implements AstrixServiceComponent, AstrixPlug
 		return getServiceUri(id);
 	}
 
-	@Override
-	public void setPlugins(AstrixPlugins plugins) {
-		astrixPlugins = plugins;
-	}
-	
 	@AstrixInject
 	public void setFaultTolerance(AstrixFaultTolerance faultTolerance) {
 		this.faultTolerance = faultTolerance;

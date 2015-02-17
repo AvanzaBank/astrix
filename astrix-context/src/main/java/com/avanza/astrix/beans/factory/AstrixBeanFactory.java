@@ -15,8 +15,10 @@
  */
 package com.avanza.astrix.beans.factory;
 
+import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.PreDestroy;
 /**
@@ -28,6 +30,7 @@ public class AstrixBeanFactory {
 	
 	private final AstrixFactoryBeanRegistry registry;
 	private final ObjectCache beanInstanceCache = new ObjectCache();
+	private final List<AstrixBeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
 	
 	public AstrixBeanFactory(AstrixFactoryBeanRegistry registry) {
 		this.registry = registry;
@@ -35,6 +38,10 @@ public class AstrixBeanFactory {
 	
 	public <T> T getBean(final AstrixBeanKey<T> key) {
 		return new CircularDependencyAwareAstrixBeanInstances().getBean(key);
+	}
+	
+	public <T> Set<AstrixBeanKey<T>> getBeanKeysOfType(Class<T> type) {
+		return this.registry.getBeansOfType(type);
 	}
 
 	@PreDestroy
@@ -70,17 +77,18 @@ public class AstrixBeanFactory {
 			return getBeanInstance(beanKey).get();
 		}
 		
-		public <T> AstrixBeanInstance<T> getBeanInstance(final AstrixBeanKey<T> beanKey) {
-			return beanInstanceCache.getInstance(beanKey, new ObjectCache.ObjectFactory<AstrixBeanInstance<T>>() {
+		public <T> AstrixBeanInstance<? extends T> getBeanInstance(AstrixBeanKey<T> beanKey) {
+			final AstrixBeanKey<? extends T> resolvedBeanKey = registry.resolveBean(beanKey);
+			return beanInstanceCache.getInstance(resolvedBeanKey, new ObjectCache.ObjectFactory<AstrixBeanInstance<? extends T>>() {
 				@Override
-				public AstrixBeanInstance<T> create() throws Exception {
+				public AstrixBeanInstance<? extends T> create() throws Exception {
 					// Bean instance not created, create!
 					try {
-						return doCreateBean(beanKey);
+						return doCreateBean(resolvedBeanKey);
 					} catch (MissingBeanProviderException e) {
 						if (constructionStack.size() > 1) {
 							// Its a dependency thats missing
-							throw new MissingBeanDependencyException(constructionStack);
+							throw new MissingBeanDependencyException(e.getBeanType(), constructionStack);
 						}
 						// It's the top level bean thats missing, propagate
 						throw e;
@@ -89,13 +97,16 @@ public class AstrixBeanFactory {
 			});
 		}
 		
-		private <T> AstrixBeanInstance<T> doCreateBean(final AstrixBeanKey<T> beanKey) {
+		private <T> AstrixBeanInstance<? extends T> doCreateBean(final AstrixBeanKey<T> beanKey) {
 			if (constructionStack.contains(beanKey)) {
 				throw new AstrixCircularDependency(constructionStack);
 			}
 			constructionStack.add(beanKey);
-			AstrixFactoryBean<T> factoryBean = registry.getFactoryBean(beanKey);
-			AstrixBeanInstance<T> instance = createBeanInstance(factoryBean);
+			AstrixFactoryBean<? extends T> factoryBean = registry.getFactoryBean(beanKey);
+			AstrixBeanInstance<? extends T> instance = createBeanInstance(factoryBean);
+			for (AstrixBeanPostProcessor beanPostProcessor : beanPostProcessors) {
+				beanPostProcessor.postProcess(instance.get(), this);
+			}
 			constructionStack.pop();
 			return instance;
 		}
@@ -103,5 +114,15 @@ public class AstrixBeanFactory {
 		private <T> AstrixBeanInstance<T> createBeanInstance(AstrixFactoryBean<T> factoryBean) {
 			return AstrixBeanInstance.create(this, factoryBean);
 		}
+		
+		@Override
+		public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
+			return registry.getBeansOfType(type);
+		}
+		
+	}
+
+	public void registerBeanPostProcessor(AstrixBeanPostProcessor beanPostProcessor) {
+		this.beanPostProcessors.add(beanPostProcessor);
 	}
 }

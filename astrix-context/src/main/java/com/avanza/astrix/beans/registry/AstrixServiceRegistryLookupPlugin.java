@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.client;
+package com.avanza.astrix.beans.registry;
 
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
-import com.avanza.astrix.context.AstrixBeansAware;
-import com.avanza.astrix.context.AstrixServiceLookupPlugin;
-import com.avanza.astrix.context.AstrixServiceProperties;
+import com.avanza.astrix.beans.factory.AstrixBeansAware;
+import com.avanza.astrix.beans.service.AstrixServiceLookupPlugin;
+import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 /**
  * 

@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.registry;
 
-import com.avanza.astrix.beans.factory.AstrixBeans;
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.service.AstrixServiceComponent;
 
-/**
- * The bean aware interface allows "Astrix-plugin-instances" to depend on
- * Astrix-managed-beans, ie api-elements hooked into Astrix. <p> 
- * 
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface AstrixBeansAware {
+
+public interface AstrixServiceRegistryPlugin {
+
+	<T> void addProvider(AstrixBeanKey<T> beanKey, AstrixServiceComponent serviceComponent);
 	
-	void setAstrixBeans(AstrixBeans beans);
+	void startPublishServices();
 
 }

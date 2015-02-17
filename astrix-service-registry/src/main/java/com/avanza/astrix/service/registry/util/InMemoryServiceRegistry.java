@@ -20,13 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixDirectComponent;
-import com.avanza.astrix.context.AstrixServiceProperties;
-import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
 import com.avanza.astrix.service.registry.app.ServiceKey;

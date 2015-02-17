@@ -18,7 +18,7 @@ package com.avanza.astrix.spring;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
-import com.avanza.astrix.context.AstrixInject;
+import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.context.AstrixServiceExporter;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 /**

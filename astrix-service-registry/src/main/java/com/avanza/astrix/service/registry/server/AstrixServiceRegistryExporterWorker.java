@@ -24,14 +24,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.factory.AstrixBeans;
+import com.avanza.astrix.beans.factory.AstrixBeansAware;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
+import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicLongProperty;
-import com.avanza.astrix.context.AstrixContextImpl;
-import com.avanza.astrix.context.AstrixInject;
-import com.avanza.astrix.context.AstrixServiceProperties;
-import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryClient;
 /**
  * The service registry worker is a server-side component responsible for continuously publishing 
  * all exported services from the current application onto the service registry.
@@ -39,17 +40,19 @@ import com.avanza.astrix.service.registry.client.AstrixServiceRegistryClient;
  * @author Elias Lindholm (elilin)
  * 
  */
-public class AstrixServiceRegistryExporterWorker extends Thread {
+public class AstrixServiceRegistryExporterWorker extends Thread implements AstrixBeansAware {
 	
 	private List<AstrixServicePropertiesBuilderHolder> serviceBuilders = new CopyOnWriteArrayList<>();
 	private AstrixServiceRegistryClient serviceRegistryClient;
-	private Logger log = LoggerFactory.getLogger(AstrixServiceRegistryExporterWorker.class);
-	private DynamicLongProperty exportIntervallMillis;		  
-	private DynamicLongProperty serviceLeaseTimeMillis;
-	private DynamicLongProperty retryIntervallMillis;
-	private AstrixContextImpl astrixContext;
+	private final Logger log = LoggerFactory.getLogger(AstrixServiceRegistryExporterWorker.class);
+	private final DynamicLongProperty exportIntervallMillis;		  
+	private final DynamicLongProperty serviceLeaseTimeMillis;
+	private final DynamicLongProperty retryIntervallMillis;
 
-	public AstrixServiceRegistryExporterWorker() {
+	public AstrixServiceRegistryExporterWorker(DynamicConfig config) {
+		this.exportIntervallMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 30_000L);
+		this.retryIntervallMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 5_000L);
+		this.serviceLeaseTimeMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
 	}
 	
 	@Autowired(required = false)
@@ -63,11 +66,6 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 			log.info("No ServiceExporters configured. No services will be published to service registry");
 			return;
 		}
-		this.serviceRegistryClient = astrixContext.getBean(AstrixServiceRegistryClient.class);
-		DynamicConfig config = astrixContext.getConfig();
-		this.exportIntervallMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 30_000L);
-		this.retryIntervallMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 5_000L);
-		this.serviceLeaseTimeMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
 		start();
 	}
 	
@@ -110,14 +108,14 @@ public class AstrixServiceRegistryExporterWorker extends Thread {
 		}
 	}
 	
-	@AstrixInject
-	public void setAstrixContext(AstrixContextImpl astrixContext) {
-		this.astrixContext = astrixContext;
-	}
-
 	public void addServiceBuilder(
 			AstrixServicePropertiesBuilderHolder astrixServicePropertiesBuilderHolder) {
 		this.serviceBuilders.add(astrixServicePropertiesBuilderHolder);
+	}
+
+	@Override
+	public void setAstrixBeans(AstrixBeans beans) {
+		this.serviceRegistryClient = beans.getBean(AstrixBeanKey.create(AstrixServiceRegistryClient.class));
 	}
 	
 

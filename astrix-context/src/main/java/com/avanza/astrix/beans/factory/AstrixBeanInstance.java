@@ -87,6 +87,16 @@ public class AstrixBeanInstance<T> {
 		public Set<AstrixBeanKey<?>> getTransitiveDependencies() {
 			return transitiveDependencies;
 		}
+		
+		@Override
+		public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
+			return beanCreationContext.getBeansOfType(type);
+		}
+	}
+	
+	@Override
+	public String toString() {
+		return this.beanKey.toString();
 	}
 	
 }

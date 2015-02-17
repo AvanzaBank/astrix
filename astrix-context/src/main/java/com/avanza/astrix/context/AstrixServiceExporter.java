@@ -20,6 +20,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.avanza.astrix.beans.core.AstrixApiDescriptor;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryPlugin;
+import com.avanza.astrix.beans.service.AstrixServiceComponent;
+import com.avanza.astrix.beans.service.AstrixServiceComponents;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
@@ -35,19 +39,18 @@ public class AstrixServiceExporter {
 	private AstrixServiceComponents serviceComponents;
 	private AstrixApplicationDescriptor serviceDescriptor;
 	private final Collection<AstrixServiceBeanDefinition> serviceBeanDefinitions = new CopyOnWriteArrayList<>();
-	private AstrixContextImpl astrixContext;
+	private final AstrixServiceRegistryPlugin serviceRegistryPlugin;
 	private final ConcurrentMap<Class<?>, Object> serviceProviderByType = new ConcurrentHashMap<>();
+	private final AstrixApiProviderPlugins apiProviderPlugins;
 	
-	@AstrixInject
-	public void setServiceComponents(AstrixServiceComponents serviceComponents) {
+	
+	
+	public AstrixServiceExporter(AstrixServiceComponents serviceComponents, AstrixServiceRegistryPlugin serviceRegistryPlugin, AstrixApiProviderPlugins apiProviderPlugins) {
 		this.serviceComponents = serviceComponents;
+		this.serviceRegistryPlugin = serviceRegistryPlugin;
+		this.apiProviderPlugins = apiProviderPlugins;
 	}
-	
-	@AstrixInject
-	public void setAstrixContext(AstrixContextImpl astrixContext) {
-		this.astrixContext = astrixContext;
-	}
-	
+
 	public void addServiceProvider(Object bean) {
 		if (!bean.getClass().isAnnotationPresent(AstrixServiceExport.class)) {
 			throw new IllegalArgumentException("Service provider beans must be annotated with @AstrixServiceExport. bean: " + bean.getClass().getName());
@@ -67,7 +70,7 @@ public class AstrixServiceExporter {
 	public void setServiceDescriptor(AstrixApplicationDescriptor serviceDescriptor) {
 		this.serviceDescriptor = serviceDescriptor;		// TODO: How to inject service descriptor??? 
 		for (AstrixApiDescriptor apiDescriptor : serviceDescriptor.getApiDescriptors()) {
-			this.serviceBeanDefinitions.addAll(astrixContext.getExportedServices(apiDescriptor));
+			this.serviceBeanDefinitions.addAll(apiProviderPlugins.getExportedServices(apiDescriptor));
 		}
 	}
 
@@ -81,7 +84,6 @@ public class AstrixServiceExporter {
 			}
 			exportService(serviceBeanDefintion.getBeanType(), provider, versioningContext, serviceComponent);
 			if (serviceBeanDefintion.usesServiceRegistry()) {
-				AstrixServiceRegistryPlugin serviceRegistryPlugin = astrixContext.getPlugin(AstrixServiceRegistryPlugin.class);
 				serviceRegistryPlugin.addProvider(serviceBeanDefintion.getBeanKey(), serviceComponent);
 			}
 		}

@@ -29,11 +29,11 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.service.IllegalSubsystemException;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.AstrixSettings;
-import com.avanza.astrix.context.IllegalSubsystemException;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;

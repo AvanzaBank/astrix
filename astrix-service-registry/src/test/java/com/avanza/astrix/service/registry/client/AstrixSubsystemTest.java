@@ -19,9 +19,10 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
+import com.avanza.astrix.beans.service.IllegalSubsystemException;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
-import com.avanza.astrix.context.IllegalSubsystemException;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
@@ -31,7 +32,7 @@ import com.avanza.astrix.provider.versioning.Versioned;
 import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
 
 public class AstrixSubsystemTest {
-
+	
 	@Test(expected = IllegalSubsystemException.class)
 	public void itsNotAllowedToInvokeNonVersionedServicesInOtherSubsystems() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();

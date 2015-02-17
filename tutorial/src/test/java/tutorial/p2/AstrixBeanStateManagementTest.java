@@ -28,9 +28,9 @@ import tutorial.p2.api.LunchSuggester;
 import tutorial.p2.provider.LunchLibraryProvider;
 import tutorial.p2.provider.LunchServiceProvider;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
-import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
 

@@ -18,9 +18,9 @@ package com.avanza.astrix.service.registry.server;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.context.AstrixInject;
-import com.avanza.astrix.context.AstrixServiceComponent;
-import com.avanza.astrix.context.AstrixServiceRegistryPlugin;
+import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryPlugin;
+import com.avanza.astrix.beans.service.AstrixServiceComponent;
 
 @MetaInfServices(AstrixServiceRegistryPlugin.class)
 public class AstrixServiceRegistryPluginImpl implements AstrixServiceRegistryPlugin {

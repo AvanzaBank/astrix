@@ -15,13 +15,13 @@
  */
 package com.avanza.astrix.context;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
+import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
 import com.avanza.astrix.provider.core.Library;
 
 public class AstrixContextProfileTest {
@@ -48,11 +48,10 @@ public class AstrixContextProfileTest {
 		Ping ping = context.getBean(Ping.class);
 		assertEquals("oof", ping.ping("foo"));
 	}
-
 	
 	@AstrixExcludedByProfile("test")
 	@AstrixApiProvider
-	static class NormalPingProvider {
+	public static class NormalPingProvider {
 		@Library
 		public Ping ping() {
 			return new NormalPing();
@@ -61,7 +60,7 @@ public class AstrixContextProfileTest {
 	
 	@AstrixIncludedByProfile("test")
 	@AstrixApiProvider
-	static class ReversePingProvider {
+	public static class ReversePingProvider {
 		
 		@Library
 		public Ping ping() {

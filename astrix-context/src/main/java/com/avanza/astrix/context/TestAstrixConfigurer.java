@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import com.avanza.astrix.beans.core.AstrixApiDescriptor;
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBean;
@@ -27,7 +29,7 @@ import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 public class TestAstrixConfigurer {
 	
 	private AstrixConfigurer configurer;
-	private final Set<AstrixApiDescriptor> descriptors = new HashSet<>();
+	private final Set<AstrixApiDescriptor> apiProviders = new HashSet<>();
 	private final Collection<AstrixFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	
 	public TestAstrixConfigurer() {
@@ -35,7 +37,7 @@ public class TestAstrixConfigurer {
 		configurer.setAstrixApiDescriptors(new AstrixApiDescriptors() {
 			@Override
 			public Collection<AstrixApiDescriptor> getAll() {
-				return descriptors;
+				return apiProviders;
 			}
 		});
 		configurer.enableVersioning(false);
@@ -69,7 +71,7 @@ public class TestAstrixConfigurer {
 	 */
 	public void registerApiProvider(Class<?>... providers) {
 		for (Class<?> provider : providers) {
-			descriptors.add(AstrixApiDescriptor.create(provider));
+			apiProviders.add(AstrixApiDescriptor.create(provider));
 		}
 	}
 

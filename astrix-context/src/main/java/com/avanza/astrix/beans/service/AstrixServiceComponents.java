@@ -13,15 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.service;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AstrixServiceComponents implements AstrixPluginsAware {
+
+public class AstrixServiceComponents {
 
 	private final Map<String, AstrixServiceComponent> componentsByName = new ConcurrentHashMap<>();
+	
+	public AstrixServiceComponents(List<AstrixServiceComponent> serviceComponents) {
+		for (AstrixServiceComponent serviceComponent : serviceComponents) {
+			componentsByName.put(serviceComponent.getName(), serviceComponent);
+		}
+	}
 	
 	public AstrixServiceComponent getComponent(String name) {
 		AstrixServiceComponent serviceComponent = componentsByName.get(name);
@@ -30,14 +38,7 @@ public class AstrixServiceComponents implements AstrixPluginsAware {
 		}
 		return serviceComponent;
 	}
-
-	@Override
-	public void setPlugins(AstrixPlugins plugins) {
-		for (AstrixServiceComponent serviceComponent : plugins.getPlugins(AstrixServiceComponent.class)) {
-			componentsByName.put(serviceComponent.getName(), serviceComponent);
-		}
-	}
-
+	
 	public Collection<AstrixServiceComponent> getAll() {
 		return this.componentsByName.values();
 	}

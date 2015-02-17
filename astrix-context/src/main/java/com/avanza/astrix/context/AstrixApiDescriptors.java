@@ -16,6 +16,8 @@
 package com.avanza.astrix.context;
 
 import java.util.Collection;
+
+import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 /**
  * 
  * @author Elias Lindholm (elilin)

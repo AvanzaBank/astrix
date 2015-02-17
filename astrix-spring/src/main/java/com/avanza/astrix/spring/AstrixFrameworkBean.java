@@ -36,14 +36,14 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.core.Ordered;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryPlugin;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixApplicationDescriptor;
 import com.avanza.astrix.context.AstrixServiceExporter;
-import com.avanza.astrix.context.AstrixServiceRegistryPlugin;
-import com.avanza.astrix.context.AstrixSettings;
 
 /**
  * 

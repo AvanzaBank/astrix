@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.service;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -24,22 +24,24 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.config.DynamicConfig;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceLeaseManager implements AstrixConfigAware {
+public class AstrixServiceLeaseManager {
 	
 	private final Logger log = LoggerFactory.getLogger(AstrixServiceLeaseManager.class);
 	private final List<LeasedService<?>> leasedServices = new CopyOnWriteArrayList<>();
-	private DynamicConfig config;
+	private final DynamicConfig config;
 	private final ServiceLeaseRenewalThread leaseRenewalThread = new ServiceLeaseRenewalThread();
 	private final ServiceBindThread serviceBindThread = new ServiceBindThread();
 	private final AtomicBoolean isStarted = new AtomicBoolean(false);
 	
-	public AstrixServiceLeaseManager() {
+	public AstrixServiceLeaseManager(DynamicConfig config) {
+		this.config = config;
 	}
 	
 	public <T> void startManageLease(AstrixServiceBeanInstance<T> serviceBeanInstance, AstrixServiceProperties currentProperties, AstrixServiceLookup serviceLookup) {
@@ -64,11 +66,6 @@ public class AstrixServiceLeaseManager implements AstrixConfigAware {
 		this.serviceBindThread.interrupt();
 	}
 
-	@Override
-	public void setConfig(DynamicConfig config) {
-		this.config = config;
-	}
-	
 	private class ServiceBindThread extends Thread {
 		
 		public ServiceBindThread() {

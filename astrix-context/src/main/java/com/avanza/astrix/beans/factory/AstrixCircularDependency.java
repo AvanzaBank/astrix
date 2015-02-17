@@ -28,12 +28,18 @@ public class AstrixCircularDependency extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	public AstrixCircularDependency(Class<?> beanA, Class<?> beanB) {
-		super("Circular dependency detected. beanA=" + beanA.getName() + ", beanB=" + beanB.getName());
-	}
-	
 	public AstrixCircularDependency(Stack<AstrixBeanKey<?>> trace) {
-		super("Circular dependency detected. trace=" + trace);
+		super("Circular dependency detected, dependency tree:\n" + createTrace(trace));
+	}
+
+	private static String createTrace(Stack<AstrixBeanKey<?>> trace) {
+		StringBuilder result = new StringBuilder();
+		StringBuilder indent = new StringBuilder();
+		for (AstrixBeanKey<?> key : trace) {
+			result.append(indent.toString()).append(key).append("\n");
+			indent.append("  ");
+		}
+		return result.toString();
 	}
 
 }

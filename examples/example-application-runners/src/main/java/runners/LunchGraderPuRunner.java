@@ -15,7 +15,7 @@
  */
 package runners;
 
-import com.avanza.astrix.context.AstrixSettings;
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.gs.test.util.PuApp;
 
 public class LunchGraderPuRunner {

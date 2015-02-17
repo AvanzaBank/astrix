@@ -22,8 +22,13 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixFactoryBean;
+import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.inject.AstrixInjector;
+import com.avanza.astrix.beans.service.AstrixServiceLookup;
+import com.avanza.astrix.beans.service.AstrixServiceLookupFactory;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
@@ -41,7 +46,8 @@ import com.avanza.astrix.provider.versioning.Versioned;
 @MetaInfServices(AstrixApiProviderPlugin.class)
 public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin {
 	
-	private AstrixContextImpl astrixContext;
+//	private AstrixContextImpl astrixContext;
+	private AstrixInjector injector;
 	private AstrixServiceMetaFactory serviceMetaFactory;
 	private AstrixServiceLookupFactory serviceLookupFactory;
 	
@@ -116,7 +122,7 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 	}
 
 	private Object getInstanceProvider(Class<?> provider) {
-		return astrixContext.getInstance(provider);
+		return injector.getBean(provider);
 	}
 
 	@Override
@@ -125,8 +131,8 @@ public class GenericAstrixApiProviderPlugin  implements AstrixApiProviderPlugin 
 	}
 	
 	@AstrixInject
-	public void setInstanceCache(AstrixContextImpl astrixContext) {
-		this.astrixContext = astrixContext;
+	public void setAstrixContext(AstrixInjector injector) {
+		this.injector = injector;
 	}
 	
 	@AstrixInject

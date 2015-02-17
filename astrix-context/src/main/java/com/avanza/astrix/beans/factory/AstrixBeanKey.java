@@ -31,6 +31,10 @@ public final class AstrixBeanKey<T> {
 		this.qualifier = qualifier;
 	}
 	
+	public static <T> AstrixBeanKey<T> create(Class<T> beanType) {
+		return create(beanType, null);
+	}
+	
 	public static <T> AstrixBeanKey<T> create(Class<T> beanType, String qualifier) {
 		if (qualifier == null) {
 			return new AstrixBeanKey<>(beanType, "-");
@@ -77,7 +81,5 @@ public final class AstrixBeanKey<T> {
 		}
 		return getBeanTypeName() + "-" + qualifier;
 	}
-	
-	
 
 }

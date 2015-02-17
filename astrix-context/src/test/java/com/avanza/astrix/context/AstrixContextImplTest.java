@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.factory.MissingBeanDependencyException;
 import com.avanza.astrix.beans.factory.MissingBeanProviderException;
+import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
@@ -144,7 +145,7 @@ public class AstrixContextImplTest {
 	}
 	
 	@AstrixApiProvider
-	static class DependentApi {
+	public static class DependentApi {
 		
 		@Library
 		public DependentBean create(GoodbyeBean bean) {
@@ -152,27 +153,27 @@ public class AstrixContextImplTest {
 		}
 	}
 	
-	static class DependentBean {
+	public static class DependentBean {
 		public String chat(String msg) {
 			return "yada yada yada: " + msg;
 		}
 	}
 	
-	static class GoodbyeBean {
+	public static class GoodbyeBean {
 		public String goodbye() {
 			return "goodbye";
 		}
 	}
 	
 	@AstrixApiProvider
-	static class HelloBeanLibrary {
+	public static class HelloBeanLibrary {
 		@Library
 		public HelloBean create() {
 			return new HelloBean();
 		}
 	}
 	
-	static class InternalFrameworkClass implements AstrixConfigAware {
+	public static class InternalFrameworkClass implements AstrixConfigAware {
 		private DynamicConfig config;
 		
 		@Override
@@ -201,7 +202,7 @@ public class AstrixContextImplTest {
 		}
 	}
 
-	static class MultipleDependentClass {
+	public static class MultipleDependentClass {
 		
 		private GoodbyeBean dep;
 		private HelloBean dep2;

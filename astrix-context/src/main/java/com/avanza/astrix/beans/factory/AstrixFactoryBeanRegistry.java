@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package com.avanza.astrix.beans.factory;
+
+import java.util.Set;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -27,5 +30,16 @@ public interface AstrixFactoryBeanRegistry {
 	 * @return
 	 */
 	<T> AstrixFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey);
+	
+	/**
+	 * Invoked before requesting a factory from the registry. Allows the registry
+	 * to bind multiple keys to the same factory and thereby the same instance at runtime. <p>
+	 * 
+	 * @param beanKey
+	 * @return
+	 */
+	<T> AstrixBeanKey<? extends T> resolveBean(AstrixBeanKey<T> beanKey);
+	
+	<T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type);
 
 }

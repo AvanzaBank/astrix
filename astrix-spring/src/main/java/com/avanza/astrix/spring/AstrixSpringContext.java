@@ -17,8 +17,8 @@ package com.avanza.astrix.spring;
 
 import org.springframework.context.ApplicationContext;
 
-import com.avanza.astrix.context.AstrixContextImpl;
-import com.avanza.astrix.context.AstrixInject;
+import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.inject.AstrixInjector;
 /**
  * Acts as a bride between Astrix and Spring.
  * 
@@ -30,12 +30,18 @@ import com.avanza.astrix.context.AstrixInject;
  */
 public class AstrixSpringContext {
 	
-	private AstrixContextImpl astrixContext;
+	/* TODO: Depending on AstrixInjector feels weird... 
+	 * It would be more natural to depend on AstrixContext but it causes circular dependency
+	 * right now. When introducing "service-unit" as a concept then this class should depend on
+	 * ServiceUnitContext instead of AstrixInjector.. 
+	 */
+	
+	private AstrixInjector astrixInjector;
 	private ApplicationContext applicationContext;
 
 	@AstrixInject
-	public void setAstrixContext(AstrixContextImpl astrixContext) {
-		this.astrixContext = astrixContext;
+	public void setAstrixInjector(AstrixInjector astrixInjector) {
+		this.astrixInjector = astrixInjector;
 	}
 	
 	public void setApplicationContext(ApplicationContext applicationContext) {
@@ -46,8 +52,13 @@ public class AstrixSpringContext {
 		return applicationContext;
 	}
 	
-	public AstrixContextImpl getAstrixContext() {
-		return astrixContext;
+	public AstrixInjector getAstrixInjector() {
+		return astrixInjector;
 	}
 
+	public <T> T getInstance(
+			Class<T> type) {
+		return astrixInjector.getBean(type);
+	}
+	
 }

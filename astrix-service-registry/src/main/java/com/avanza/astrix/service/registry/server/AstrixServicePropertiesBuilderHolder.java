@@ -16,8 +16,8 @@
 package com.avanza.astrix.service.registry.server;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.context.AstrixServiceComponent;
-import com.avanza.astrix.context.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.AstrixServiceComponent;
+import com.avanza.astrix.beans.service.AstrixServiceProperties;
 
 class AstrixServicePropertiesBuilderHolder {
 	

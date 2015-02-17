@@ -15,18 +15,17 @@
  */
 package com.avanza.astrix.context;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 
-import javax.annotation.PreDestroy;
-
+import com.avanza.astrix.beans.core.AstrixApiDescriptor;
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBean;
+import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
-import com.avanza.astrix.beans.factory.ObjectCache;
+import com.avanza.astrix.beans.inject.AstrixInjector;
+import com.avanza.astrix.beans.service.StatefulAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
 /**
  * An AstrixContextImpl is the runtime-environment for the astrix-framework. It is used
@@ -37,92 +36,36 @@ import com.avanza.astrix.config.DynamicConfig;
  */
 public class AstrixContextImpl implements Astrix, AstrixContext {
 	
-	private final AstrixPlugins plugins;
-	private final SimpleAstrixFactoryBeanRegistry beanFactoryRegistry = new SimpleAstrixFactoryBeanRegistry();
-	private AstrixApiProviderPlugins apiProviderPlugins;
-	private final ObjectCache objectCache = new ObjectCache();
+	private final SimpleAstrixFactoryBeanRegistry beanFactoryRegistry;
+	private final AstrixApiProviderPlugins apiProviderPlugins;
 	private final AstrixBeanFactory beanFactory;
 	private final DynamicConfig dynamicConfig;
+	private final AstrixInjector astrixInjector;
 	
-	public AstrixContextImpl(DynamicConfig dynamicConfig) {
+	
+	public AstrixContextImpl(DynamicConfig dynamicConfig, AstrixInjector injector, AstrixApiProviderPlugins apiProviderPlugins) {
 		this.dynamicConfig = dynamicConfig;
-		this.plugins = new AstrixPlugins(new AstrixPluginInitializer() {
-			@Override
-			public void init(Object plugin) {
-				injectDependencies(plugin);
+		this.astrixInjector = injector;
+		this.apiProviderPlugins = apiProviderPlugins;
+		this.beanFactory = this.astrixInjector.getBean(AstrixBeanFactory.class); // The bean-factory used for apis managed by astrix
+		this.beanFactoryRegistry = (SimpleAstrixFactoryBeanRegistry) this.astrixInjector.getBean(AstrixFactoryBeanRegistry.class);
+		for (AstrixApiDescriptor descriptor : this.astrixInjector.getBean(AstrixApiDescriptors.class).getAll()) {
+			for (AstrixFactoryBean<?> factory : this.apiProviderPlugins.getProviderPlugin(descriptor).createFactoryBeans(descriptor)) {
+				this.beanFactoryRegistry.registerFactory(factory);
 			}
-		});
-		this.beanFactory = objectCache.create(AstrixBeanFactory.class, new AstrixBeanFactory(beanFactoryRegistry));
+		}
 	}
 	
-	public <T> List<T> getPlugins(Class<T> type) {
-		return plugins.getPlugins(type);
-	}
-
-	public <T> void registerPlugin(Class<T> type, T provider) {
-		plugins.registerPlugin(type, provider);
-	}
 	
 	<T> void registerBeanFactory(AstrixFactoryBean<T> beanFactory) {
-		injectDependencies(beanFactory);
 		this.beanFactoryRegistry.registerFactory(beanFactory);
 	}
 	
 	@Override
-	@PreDestroy
 	public void destroy() {
-		this.objectCache.destroy();
+		this.astrixInjector.destroy();
 	}
 	
-	private void injectDependencies(Object object) {
-		injectAwareDependencies(object);
-		injectAstrixClasses(object);
-	}
-
-	private void injectAstrixClasses(Object object) {
-		for (Method m : object.getClass().getMethods()) {
-			if (!m.isAnnotationPresent(AstrixInject.class)) {
-				continue;
-			}
-			if (m.getParameterTypes().length == 0) {
-				throw new IllegalArgumentException(String.format("@AstrixInject annotated methods must accept at least one dependency. Class: %s, method: %s"
-						, object.getClass().getName()
-						, m.getName()));
-			}
-			Object[] deps = new Object[m.getParameterTypes().length];
-			for (int argIndex = 0; argIndex < deps.length; argIndex++) {
-				Class<?> dep = m.getParameterTypes()[argIndex];
-				deps[argIndex] = getInstance(dep);
-			}
-			try {
-				m.invoke(object, deps);
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new RuntimeException("Failed to inject dependencies into Astrix managed component: " + object.getClass().getName(), e);
-			}
-		}
-	}
-
-	private void injectAwareDependencies(Object object) {
-		if (object instanceof AstrixBeansAware) {
-			injectBeanDependencies((AstrixBeansAware)object);
-		}
-		if (object instanceof AstrixPluginsAware) {
-			AstrixPluginsAware.class.cast(object).setPlugins(getPlugins());
-		}
-		if (object instanceof AstrixConfigAware) {
-			AstrixConfigAware.class.cast(object).setConfig(this.dynamicConfig);
-		}
-	}
-	
-	private void injectBeanDependencies(final AstrixBeansAware beanDependenciesAware) {
-		beanDependenciesAware.setAstrixBeans(new AstrixBeans() {
-			@Override
-			public <T> T getBean(AstrixBeanKey<T> beanKey) {
-				return AstrixContextImpl.this.getBean(beanKey);
-			}
-		});
-	}
-
 	@Override
 	public <T> T getBean(Class<T> beanType) {
 		return getBean(beanType, null);
@@ -135,10 +78,6 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 	
 	public <T> T getBean(AstrixBeanKey<T> beanKey) {
 		return beanFactory.getBean(beanKey);
-	}
-
-	public AstrixPlugins getPlugins() {
-		return this.plugins;
 	}
 
 	@Override
@@ -168,12 +107,8 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		return apiProviderPlugins.getExportedServices(apiDescriptor);
 	}
 
-	void setApiProviderPlugins(AstrixApiProviderPlugins apiProviderPlugins) {
-		this.apiProviderPlugins = apiProviderPlugins;
-	}
-
 	public <T> T getPlugin(Class<T> pluginType) {
-		return getPlugins().getPlugin(pluginType);
+		return this.astrixInjector.getBean(pluginType);
 	}
 	
 	/**
@@ -182,26 +117,7 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 	 * @return
 	 */
 	public final <T> T getInstance(final Class<T> classType) {
-		// We allow injecting an instance of ObjectCache, hence this
-		// check.
-		if (classType.equals(ObjectCache.class)) {
-			return classType.cast(objectCache);
-		}
-		if (classType.equals(AstrixContextImpl.class)) {
-			return classType.cast(this);
-		}
-//		if (classType.equals(AstrixApiProviderPlugins.class)) {
-//			return classType.cast(this.apiProviderPlugins);
-//		}
-		return this.objectCache.getInstance(classType, new ObjectCache.ObjectFactory<T>() {
-			@Override
-			@SuppressWarnings("unchecked")
-			public T create() throws Exception {
-				T result =  (T) classType.newInstance();
-				injectDependencies(result);
-				return result;
-			}
-		});
+		return this.astrixInjector.getBean(classType);
 	}
 	
 	public DynamicConfig getConfig() {

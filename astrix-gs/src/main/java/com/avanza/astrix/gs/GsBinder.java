@@ -21,10 +21,10 @@ import java.util.regex.Pattern;
 import org.openspaces.core.GigaSpace;
 import org.springframework.context.ApplicationContext;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigAware;
-import com.avanza.astrix.context.AstrixServiceProperties;
-import com.avanza.astrix.context.AstrixSettings;
 import com.j_spaces.core.client.SpaceURL;
 
 /**

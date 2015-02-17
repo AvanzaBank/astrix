@@ -22,7 +22,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.RootLogger;
 
-import com.avanza.astrix.context.AstrixSettings;
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.gs.test.util.PartitionedPu;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;

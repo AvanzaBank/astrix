@@ -25,6 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 /**
  * Uses classpath scanning to locate api-descriptors. <p>
  * 

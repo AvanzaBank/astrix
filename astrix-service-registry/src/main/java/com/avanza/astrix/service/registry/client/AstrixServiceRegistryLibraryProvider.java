@@ -15,9 +15,10 @@
  */
 package com.avanza.astrix.service.registry.client;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigAware;
-import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 

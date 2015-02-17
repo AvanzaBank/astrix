@@ -26,6 +26,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.avanza.astrix.beans.core.AstrixApiDescriptor;
+
 
 
 public class AstrixApiDescriptorScannerTest {

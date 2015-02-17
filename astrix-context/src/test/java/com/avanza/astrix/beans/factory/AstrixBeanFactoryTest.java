@@ -23,6 +23,7 @@ import org.junit.Test;
 
 public class AstrixBeanFactoryTest {
 	
+	
 	@Test(expected = AstrixCircularDependency.class)
 	public void detectsCircularDependencies1() throws Exception {
 		/*    __________________
@@ -182,7 +183,34 @@ public class AstrixBeanFactoryTest {
 		assertEquals(1, pingpongFactory.creationCount);
 	}
 	
+	@Test
+	public void appliesBeanPostProcessorToCreatedBeans() throws Exception {
+		SimpleAstrixFactoryBean<Ping> pingFactory = new SimpleAstrixFactoryBean<Ping>(Ping.class) {
+			@Override
+			public Ping create(AstrixBeans context) {
+				return new Ping();
+			}
+		};
+		SimpleAstrixFactoryBeanRegistry registry = new SimpleAstrixFactoryBeanRegistry();
+		registry.registerFactory(pingFactory);
+		
+		AstrixBeanFactory beanFactory = new AstrixBeanFactory(registry);
+		beanFactory.registerBeanPostProcessor(new AstrixBeanPostProcessor() {
+			@Override
+			public void postProcess(Object bean, AstrixBeans beans) {
+				if (bean instanceof Ping) {
+					Ping.class.cast(bean).initValue = "post-processor-run";
+				}
+			}
+		});
+		
+		Ping ping = beanFactory.getBean(beanKey(Ping.class));
+		assertEquals("post-processor-run", ping.initValue);
+	}
+	
 	static class Ping {
+		
+		private String initValue;
 	}
 	
 	static class Pong {

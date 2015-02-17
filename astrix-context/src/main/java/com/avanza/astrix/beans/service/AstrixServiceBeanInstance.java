@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.service;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -28,6 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
@@ -83,7 +84,7 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 	 * 
 	 * Throws exception if bind attempt fails.
 	 */
-	void bind(AstrixServiceProperties serviceProperties) {
+	public void bind(AstrixServiceProperties serviceProperties) {
 		if (serviceProperties == null) {
 			this.state = new Unbound();
 			return;

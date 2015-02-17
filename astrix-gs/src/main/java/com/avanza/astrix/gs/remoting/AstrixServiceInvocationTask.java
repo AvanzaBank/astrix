@@ -46,7 +46,7 @@ public class AstrixServiceInvocationTask implements Task<AstrixServiceInvocation
 
 	@Override
 	public AstrixServiceInvocationResponse execute() throws Exception {
-		AstrixServiceActivator serviceActivator = astrixSpringContext.getAstrixContext().getInstance(AstrixServiceActivator.class);
+		AstrixServiceActivator serviceActivator = astrixSpringContext.getInstance(AstrixServiceActivator.class);
 		return serviceActivator.invokeService(invocationRequest);
 	}
 

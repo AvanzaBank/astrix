@@ -25,9 +25,9 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.AstrixSettings;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;

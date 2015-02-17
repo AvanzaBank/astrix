@@ -13,10 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.factory;
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public interface AstrixBeanPostProcessor {
 
-public interface AstrixPluginInitializer {
-	
-	public void init(Object plugin);
+	/**
+	 * Invoked right after an astrix bean is created in a {@link AstrixBeanFactory}. <p>
+	 * 
+	 * @param bean
+	 */
+	void postProcess(Object bean, AstrixBeans astrixBeans);
 
 }

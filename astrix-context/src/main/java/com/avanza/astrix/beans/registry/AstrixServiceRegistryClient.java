@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.registry;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.service.AstrixServiceProperties;
 
 
-/**
- * @author Elias Lindholm (elilin)
- */
-@Target(value = { ElementType.METHOD })
-@Retention(value = RetentionPolicy.RUNTIME)
-@Documented
-public @interface AstrixInject {
+
+public interface AstrixServiceRegistryClient {
+	
+	<T> AstrixServiceProperties lookup(Class<T> type);
+	
+	<T> AstrixServiceProperties lookup(AstrixBeanKey<T> beanKey);
+	
+	<T> void register(Class<T> type, AstrixServiceProperties properties, long lease);
+	
 }

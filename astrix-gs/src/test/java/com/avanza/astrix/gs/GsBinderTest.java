@@ -19,9 +19,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.MapConfigSource;
-import com.avanza.astrix.context.AstrixServiceProperties;
 
 
 

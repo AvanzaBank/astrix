@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.inject;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 
-public interface AstrixServiceRegistryPlugin {
-
-	<T> void addProvider(AstrixBeanKey<T> beanKey, AstrixServiceComponent serviceComponent);
-	
-	void startPublishServices();
-
+/**
+ * @author Elias Lindholm (elilin)
+ */
+@Target(value = { ElementType.METHOD })
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface AstrixInject {
 }

@@ -13,21 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.client;
+package com.avanza.astrix.beans.service;
 
-import org.openspaces.remoting.Routing;
+public interface StatefulAstrixBean {
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.context.AstrixServiceProperties;
-
-
-
-public interface AstrixServiceRegistryClient {
-	
-	<T> AstrixServiceProperties lookup(@Routing Class<T> type);
-	
-	<T> AstrixServiceProperties lookup(AstrixBeanKey<T> beanKey);
-	
-	<T> void register(@Routing Class<T> type, AstrixServiceProperties properties, long lease);
+	void waitUntilBound(long timeoutMillis) throws InterruptedException;
 	
 }

@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class ObjectCache {
+final class ObjectCache {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ObjectCache.class);
 	private final ConcurrentMap<Object, Object> instanceById = new ConcurrentHashMap<>();

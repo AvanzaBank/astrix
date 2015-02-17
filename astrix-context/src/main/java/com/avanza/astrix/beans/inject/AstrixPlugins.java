@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.inject;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -33,10 +34,8 @@ public class AstrixPlugins {
 	
 	private final ConcurrentMap<Class<?>, Plugin<?>> pluginsByType = new ConcurrentHashMap<>();
 	private final boolean autodiscover = true;
-	private final AstrixPluginInitializer pluginInitializer;
 	
-	public AstrixPlugins(AstrixPluginInitializer plugininitializer) {
-		this.pluginInitializer = plugininitializer;
+	public AstrixPlugins() {
 	}
 
 	/**
@@ -64,10 +63,17 @@ public class AstrixPlugins {
 	}
 	
 	public <T> void registerPlugin(Class<T> pluginType, T pluginProvider) {
-		this.pluginInitializer.init(pluginProvider);
+		registerPlugin(new Plugin<T>(pluginType, Arrays.asList(pluginProvider)));
+	}
+	
+
+	public <T> void registerPlugin(Plugin<T> plugin) {
+		Class<T> pluginType = plugin.getType();
 		this.pluginsByType.putIfAbsent(pluginType, new Plugin<>(pluginType));
-		Plugin<T> plugin = (Plugin<T>) pluginsByType.get(pluginType);
-		plugin.add(pluginProvider);
+		Plugin<T> pluginHolder = (Plugin<T>) pluginsByType.get(pluginType);
+		for (T pluginInstance : plugin.getAll()) {
+			pluginHolder.add(pluginInstance);
+		}
 	}
 	
 	private <T> Plugin<T> getPluginHolder(Class<T> type) {
@@ -76,12 +82,12 @@ public class AstrixPlugins {
 			 return plugin;
 		 }
 		 if (autodiscover) {
-			this.pluginsByType.put(type, Plugin.autoDiscover(type, pluginInitializer)); 
+			this.pluginsByType.put(type, Plugin.autoDiscover(type)); 
 		 }
 		 return (Plugin<T>) pluginsByType.get(type);
 	}
 	
-	static class Plugin<T> {
+	public static class Plugin<T> {
 		private Class<T> type;
 		private List<T> providers;
 		
@@ -101,7 +107,7 @@ public class AstrixPlugins {
 			return type;
 		}
 		
-		public static <T> Plugin<T> autoDiscover(Class<T> type, AstrixPluginInitializer initializer) {
+		public static <T> Plugin<T> autoDiscover(Class<T> type) {
 			List<T> plugins = AstrixPluginDiscovery.discoverAllPlugins(type);
 			if (plugins.isEmpty()) {
 				Method defaultFactory = getDefaultFactory(type);
@@ -113,9 +119,6 @@ public class AstrixPlugins {
 						log.warn("Failed to create default plugin for type=" + type, e);
 					}
 				}
-			}
-			for (T plugin : plugins) {
-				initializer.init(plugin);
 			}
 			return new Plugin<T>(type, plugins);
 		}
@@ -139,7 +142,7 @@ public class AstrixPlugins {
 				throw new IllegalArgumentException("No provider registered for type: " + type);
 			}
 			if (providers.size() != 1) {
-				throw new IllegalArgumentException("Expected one provider for: " + type + " found: + "+ providers);
+				throw new IllegalArgumentException("Expected one provider for: " + type.getName() + " found: + "+ providers);
 			}
 			return providers.get(0);
 		}
@@ -171,8 +174,7 @@ public class AstrixPlugins {
 		return plugin.getOne(qualifier);
 	}
 
-	public <T> T getPluginInstance(
-			Class<T> providerType) {
+	public <T> T getPluginInstance(Class<T> providerType) {
 		for (Class<?> pluginTypeCandidate : providerType.getInterfaces()) {
 			for (Object pluginProvider : getPlugins(pluginTypeCandidate)) {
 				if (pluginProvider.getClass().equals(providerType)) {
@@ -181,6 +183,15 @@ public class AstrixPlugins {
 			}
 		}
 		throw new IllegalArgumentException("Plugin provider not found: " + providerType.getName());
+	}
+	
+	public <T> T getPluginInstance(Class<T> pluginInterface, Class<? extends T> pluginProviderType) {
+		for (Object candidate : getPlugins(pluginInterface)) {
+			if (candidate.getClass().equals(pluginProviderType)) {
+				return  pluginInterface.cast(candidate);
+			}
+		}
+		throw new IllegalArgumentException("Plugin provider not found: " + pluginProviderType.getName());
 	}
 	
 }

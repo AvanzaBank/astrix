@@ -26,6 +26,7 @@ import javax.annotation.PreDestroy;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.factory.AstrixCircularDependency;
+import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 
@@ -77,8 +78,8 @@ public class AstrixLibraryTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void injectAnnotatedMethodMustAcceptAtLeastOneDependency() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		AstrixContextImpl AstrixContext = (AstrixContextImpl) astrixConfigurer.configure();
-		AstrixContext.getInstance(IllegalDependendClass.class);
+		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
+		astrixContext.getInstance(IllegalDependendClass.class);
 	}
 	
 	@Test
@@ -109,7 +110,7 @@ public class AstrixLibraryTest {
 		assertNotSame(helloBean1, helloBean2);
 	}
 	
-	static class IllegalDependendClass {
+	public static class IllegalDependendClass {
 		@AstrixInject
 		public void setVersioningPlugin() {
 		}
@@ -131,7 +132,7 @@ public class AstrixLibraryTest {
 	}
 	
 	@AstrixApiProvider
-	static class MyLibraryProviderNoInterface {
+	public static class MyLibraryProviderNoInterface {
 		
 		@Library
 		public HelloBeanImpl create() {
@@ -140,7 +141,7 @@ public class AstrixLibraryTest {
 	}
 	
 	@AstrixApiProvider
-	static class CircularApiA {
+	public static class CircularApiA {
 		
 		@Library
 		public HelloBeanImpl create(GoodbyeBeanImpl goodbyeBean) {
@@ -150,7 +151,7 @@ public class AstrixLibraryTest {
 	}
 	
 	@AstrixApiProvider
-	static class CircularApiB {
+	public static class CircularApiB {
 		
 		@Library
 		public GoodbyeBeanImpl create(ChatBeanImpl chatBean) {
@@ -159,7 +160,7 @@ public class AstrixLibraryTest {
 	}
 	
 	@AstrixApiProvider
-	static class CircularApiC {
+	public static class CircularApiC {
 		
 		@Library
 		public ChatBeanImpl create(HelloBeanImpl helloBean) {
@@ -168,7 +169,7 @@ public class AstrixLibraryTest {
 	}
 
 	@AstrixApiProvider
-	static class DependentApi {
+	public  static class DependentApi {
 		
 		@Library
 		public DependentBean create(NonProvidedBean bean) {
@@ -177,7 +178,7 @@ public class AstrixLibraryTest {
 	}
 	
 	@AstrixApiProvider
-	static class IndependentApi {
+	public static class IndependentApi {
 		
 		@Library
 		public IndependentApi create() {

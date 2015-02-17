@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 import com.avanza.astrix.provider.core.AstrixApplication;
 /**
  * 

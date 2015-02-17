@@ -18,11 +18,10 @@ package com.avanza.astrix.gs;
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
-import com.avanza.astrix.context.AstrixContextImpl;
+import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.service.AstrixServiceComponent;
+import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixFaultTolerance;
-import com.avanza.astrix.context.AstrixInject;
-import com.avanza.astrix.context.AstrixServiceComponent;
-import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.FaultToleranceSpecification;
 import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -37,9 +36,9 @@ import com.avanza.astrix.spring.AstrixSpringContext;
 @MetaInfServices(AstrixServiceComponent.class)
 public class AstrixGsComponent implements AstrixServiceComponent {
 
-	private AstrixContextImpl astrixContext;
 	private GsBinder gsBinder;
 	private AstrixFaultTolerance faultTolerance;
+	private AstrixSpringContext astrixSpringContext;
 	
 	
 	@Override
@@ -86,13 +85,13 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 		if (!type.equals(GigaSpace.class)) {
 			throw new IllegalArgumentException("Can't export: " + type);
 		}
-		GigaSpace space = gsBinder.getEmbeddedSpace(astrixContext.getInstance(AstrixSpringContext.class).getApplicationContext());
+		GigaSpace space = gsBinder.getEmbeddedSpace(astrixSpringContext.getApplicationContext());
 		return gsBinder.createProperties(space);
 	}
 	
 	@AstrixInject
-	public void setAstrixContext(AstrixContextImpl astrixContext) {
-		this.astrixContext = astrixContext;
+	public void setAstrixContext(AstrixSpringContext astrixSpringContext) {
+		this.astrixSpringContext = astrixSpringContext;
 	}
 	
 	@AstrixInject

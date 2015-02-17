@@ -24,9 +24,15 @@ package com.avanza.astrix.beans.factory;
 public class MissingBeanProviderException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
+	private AstrixBeanKey<? extends Object> beanType;
 
 	public MissingBeanProviderException(AstrixBeanKey<? extends Object> beanType) {
 		super("No provider found for bean: " + beanType);
+		this.beanType = beanType;
+	}
+	
+	public AstrixBeanKey<? extends Object> getBeanType() {
+		return beanType;
 	}
 
 }

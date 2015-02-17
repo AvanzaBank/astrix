@@ -18,6 +18,7 @@ package com.avanza.astrix.context;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 
 

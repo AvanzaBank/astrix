@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.beans.inject.AstrixPlugins;
+
 public interface AstrixPluginsAware {
 	
 	void setPlugins(AstrixPlugins plugins);

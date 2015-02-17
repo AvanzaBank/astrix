@@ -13,10 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.factory;
 
-public interface StatefulAstrixBean {
 
-	void waitUntilBound(long timeoutMillis) throws InterruptedException;
+/**
+ * The bean aware interface allows "Astrix-plugin-instances" to depend on
+ * Astrix-managed-beans, ie api-elements hooked into Astrix. <p> 
+ * 
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public interface AstrixBeansAware {
 	
+	// TODO: Is this really part of the beans-factory? Its placed here to avoid circular dependency. Maybee rename this interface and create new abstractions for AstrixBeans used in this purpose
+	
+	void setAstrixBeans(AstrixBeans beans);
+
 }

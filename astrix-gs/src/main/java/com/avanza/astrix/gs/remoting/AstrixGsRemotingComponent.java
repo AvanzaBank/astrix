@@ -18,13 +18,13 @@ package com.avanza.astrix.gs.remoting;
 import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
+import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.inject.AstrixPlugins;
+import com.avanza.astrix.beans.service.AstrixServiceComponent;
+import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixFaultTolerance;
-import com.avanza.astrix.context.AstrixInject;
-import com.avanza.astrix.context.AstrixPlugins;
 import com.avanza.astrix.context.AstrixPluginsAware;
-import com.avanza.astrix.context.AstrixServiceComponent;
-import com.avanza.astrix.context.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixVersioningPlugin;
 import com.avanza.astrix.context.FaultToleranceSpecification;
 import com.avanza.astrix.context.IsolationStrategy;
@@ -46,9 +46,10 @@ import com.avanza.astrix.spring.AstrixSpringContext;
 public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServiceComponent {
 	
 	private AstrixPlugins plugins;
-	private AstrixContextImpl astrixContext;
 	private GsBinder gsBinder;
 	private AstrixFaultTolerance faultTolerance;
+	private AstrixSpringContext astrixSpringContext;
+	private AstrixServiceActivator serviceActivator;
 	
 	@Override
 	public <T> T bind(ServiceVersioningContext versioningContext, Class<T> api, AstrixServiceProperties serviceProperties) {
@@ -83,7 +84,7 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	@Override
 	public <T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext) {
 		AstrixObjectSerializer objectSerializer = plugins.getPlugin(AstrixVersioningPlugin.class).create(versioningContext); 
-		this.astrixContext.getInstance(AstrixServiceActivator.class).register(provider, objectSerializer, providedApi);
+		this.serviceActivator.register(provider, objectSerializer, providedApi);
 	}
 	
 	@Override
@@ -92,13 +93,18 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	}
 	
 	@AstrixInject
-	public void setAstrixContext(AstrixContextImpl astrixContext) {
-		this.astrixContext = astrixContext;
+	public void setGsBinder(GsBinder gsBinder) {
+		this.gsBinder = gsBinder;
 	}
 	
 	@AstrixInject
-	public void setGsBinder(GsBinder gsBinder) {
-		this.gsBinder = gsBinder;
+	public void setAstrixSpringContext(AstrixSpringContext astrixSpringContext) {
+		this.astrixSpringContext = astrixSpringContext;
+	}
+	
+	@AstrixInject
+	public void setServiceActivator(AstrixServiceActivator serviceActivator) {
+		this.serviceActivator = serviceActivator;
 	}
 	
 	@AstrixInject
@@ -113,7 +119,7 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 
 	@Override
 	public <T> AstrixServiceProperties createServiceProperties(Class<T> exportedService) {
-		GigaSpace space = gsBinder.getEmbeddedSpace(astrixContext.getInstance(AstrixSpringContext.class).getApplicationContext());
+		GigaSpace space = gsBinder.getEmbeddedSpace(astrixSpringContext.getApplicationContext());
 		AstrixServiceProperties serviceProperties = gsBinder.createProperties(space);
 		serviceProperties.setQualifier(null);
 		return serviceProperties;
