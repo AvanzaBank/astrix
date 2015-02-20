@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.serviceunit;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,14 +41,14 @@ public class AstrixServiceExporter {
 	private final Collection<AstrixServiceBeanDefinition> serviceBeanDefinitions = new CopyOnWriteArrayList<>();
 	private final AstrixServiceRegistryPlugin serviceRegistryPlugin;
 	private final ConcurrentMap<Class<?>, Object> serviceProviderByType = new ConcurrentHashMap<>();
-	private final AstrixApiProviderPlugins apiProviderPlugins;
+	private final AstrixServiceProviderPlugins serviceProviderPlugins;
 	
 	
 	
-	public AstrixServiceExporter(AstrixServiceComponents serviceComponents, AstrixServiceRegistryPlugin serviceRegistryPlugin, AstrixApiProviderPlugins apiProviderPlugins) {
+	public AstrixServiceExporter(AstrixServiceComponents serviceComponents, AstrixServiceRegistryPlugin serviceRegistryPlugin, AstrixServiceProviderPlugins serviceProviderPlugins) {
 		this.serviceComponents = serviceComponents;
 		this.serviceRegistryPlugin = serviceRegistryPlugin;
-		this.apiProviderPlugins = apiProviderPlugins;
+		this.serviceProviderPlugins = serviceProviderPlugins;
 	}
 
 	public void addServiceProvider(Object bean) {
@@ -70,7 +70,7 @@ public class AstrixServiceExporter {
 	public void setServiceDescriptor(AstrixApplicationDescriptor serviceDescriptor) {
 		this.serviceDescriptor = serviceDescriptor;		// TODO: How to inject service descriptor??? 
 		for (AstrixApiDescriptor apiDescriptor : serviceDescriptor.getApiDescriptors()) {
-			this.serviceBeanDefinitions.addAll(apiProviderPlugins.getExportedServices(apiDescriptor));
+			this.serviceBeanDefinitions.addAll(serviceProviderPlugins.getExportedServices(apiDescriptor));
 		}
 	}
 

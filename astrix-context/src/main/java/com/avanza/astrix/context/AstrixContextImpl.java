@@ -25,8 +25,11 @@ import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.inject.AstrixInjector;
+import com.avanza.astrix.beans.publish.AstrixApiDescriptors;
+import com.avanza.astrix.beans.publish.AstrixApiProviderPlugins;
 import com.avanza.astrix.beans.service.StatefulAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.serviceunit.AstrixServiceBeanDefinition;
 /**
  * An AstrixContextImpl is the runtime-environment for the astrix-framework. It is used
  * both by consuming applications as well as server applications. AstrixContextImpl providers access
@@ -100,11 +103,6 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		if (bean instanceof StatefulAstrixBean) {
 			StatefulAstrixBean.class.cast(bean).waitUntilBound(timeoutMillis);
 		}
-	}
-
-
-	List<AstrixServiceBeanDefinition> getExportedServices(AstrixApiDescriptor apiDescriptor) {
-		return apiProviderPlugins.getExportedServices(apiDescriptor);
 	}
 
 	public <T> T getPlugin(Class<T> pluginType) {

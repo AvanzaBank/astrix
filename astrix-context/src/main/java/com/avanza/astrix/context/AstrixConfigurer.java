@@ -34,12 +34,15 @@ import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
-import com.avanza.astrix.beans.factory.AstrixBeansAware;
 import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.inject.AstrixPlugins;
+import com.avanza.astrix.beans.publish.AstrixApiDescriptors;
+import com.avanza.astrix.beans.publish.AstrixApiProviderPlugin;
+import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
+import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
@@ -267,8 +270,8 @@ public class AstrixConfigurer {
 		}
 		
 		private void injectAwareDependencies(Object object, AstrixBeans beans) {
-			if (object instanceof AstrixBeansAware) {
-				injectBeanDependencies((AstrixBeansAware)object);
+			if (object instanceof AstrixPublishedBeansAware) {
+				injectBeanDependencies((AstrixPublishedBeansAware)object);
 			}
 			if (object instanceof AstrixPluginsAware) {
 				AstrixPluginsAware.class.cast(object).setPlugins(plugins);
@@ -278,16 +281,11 @@ public class AstrixConfigurer {
 			}
 		}
 		
-		private void injectBeanDependencies(AstrixBeansAware beanDependenciesAware) {
-			beanDependenciesAware.setAstrixBeans(new AstrixBeans() {
+		private void injectBeanDependencies(AstrixPublishedBeansAware beanDependenciesAware) {
+			beanDependenciesAware.setAstrixBeans(new AstrixPublishedBeans() {
 				@Override
 				public <T> T getBean(AstrixBeanKey<T> beanKey) {
 					return publishedApis.getBean(beanKey);
-				}
-				
-				@Override
-				public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
-					return publishedApis.getBeanKeysOfType(type);
 				}
 			});
 		}

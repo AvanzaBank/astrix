@@ -42,8 +42,8 @@ import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixContextImpl;
-import com.avanza.astrix.context.AstrixApplicationDescriptor;
-import com.avanza.astrix.context.AstrixServiceExporter;
+import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
+import com.avanza.astrix.serviceunit.AstrixServiceExporter;
 
 /**
  * 

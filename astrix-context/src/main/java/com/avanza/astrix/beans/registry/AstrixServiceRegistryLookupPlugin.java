@@ -18,8 +18,8 @@ package com.avanza.astrix.beans.registry;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.factory.AstrixBeans;
-import com.avanza.astrix.beans.factory.AstrixBeansAware;
+import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
+import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
 import com.avanza.astrix.beans.service.AstrixServiceLookupPlugin;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
@@ -29,9 +29,9 @@ import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
  *
  */
 @MetaInfServices(AstrixServiceLookupPlugin.class)
-public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupPlugin<AstrixServiceRegistryLookup>, AstrixBeansAware {
+public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupPlugin<AstrixServiceRegistryLookup>, AstrixPublishedBeansAware {
 
-	private AstrixBeans beans;
+	private AstrixPublishedBeans beans;
 
 	@Override
 	public AstrixServiceProperties lookup(AstrixBeanKey<?> beanKey, AstrixServiceRegistryLookup lookupAnnotation) {
@@ -45,7 +45,7 @@ public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupPlu
 	}
 
 	@Override
-	public void setAstrixBeans(AstrixBeans beans) {
+	public void setAstrixBeans(AstrixPublishedBeans beans) {
 		this.beans = beans;
 	}
 

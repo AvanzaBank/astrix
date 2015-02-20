@@ -26,8 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.factory.AstrixBeans;
-import com.avanza.astrix.beans.factory.AstrixBeansAware;
+import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
+import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
@@ -40,7 +40,7 @@ import com.avanza.astrix.core.ServiceUnavailableException;
  * @author Elias Lindholm (elilin)
  * 
  */
-public class AstrixServiceRegistryExporterWorker extends Thread implements AstrixBeansAware {
+public class AstrixServiceRegistryExporterWorker extends Thread implements AstrixPublishedBeansAware {
 	
 	private List<AstrixServicePropertiesBuilderHolder> serviceBuilders = new CopyOnWriteArrayList<>();
 	private AstrixServiceRegistryClient serviceRegistryClient;
@@ -114,7 +114,7 @@ public class AstrixServiceRegistryExporterWorker extends Thread implements Astri
 	}
 
 	@Override
-	public void setAstrixBeans(AstrixBeans beans) {
+	public void setAstrixBeans(AstrixPublishedBeans beans) {
 		this.serviceRegistryClient = beans.getBean(AstrixBeanKey.create(AstrixServiceRegistryClient.class));
 	}
 	

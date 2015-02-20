@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.serviceunit;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -23,39 +23,34 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.avanza.astrix.beans.core.AstrixApiDescriptor;
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public class AstrixApiProviderPlugins {
+
+public class AstrixServiceProviderPlugins {
 	
-	private final ConcurrentMap<Class<? extends Annotation>, AstrixApiProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Class<? extends Annotation>, AstrixServiceProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	
-	public AstrixApiProviderPlugins(Collection<AstrixApiProviderPlugin> apiProviderPlugins) {
-		for (AstrixApiProviderPlugin plugin : apiProviderPlugins) {
-			AstrixApiProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
+	public AstrixServiceProviderPlugins(Collection<AstrixServiceProviderPlugin> apiProviderPlugins) {
+		for (AstrixServiceProviderPlugin plugin : apiProviderPlugins) {
+			AstrixServiceProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
-				throw new IllegalArgumentException(String.format("Multiple AstrixApiProviderPlugin's found for providerAnnotationType=%s. p1=%s p2=%s", 
+				throw new IllegalArgumentException(String.format("Multiple AstrixServiceProviderPlugin's found for providerAnnotationType=%s. p1=%s p2=%s", 
 						plugin.getProviderAnnotationType().getName(), plugin.getClass().getName(), previous.getClass().getName()));
 			}
 		}
 	}
 	
 	public List<AstrixServiceBeanDefinition> getExportedServices(AstrixApiDescriptor descriptor) {
-		AstrixApiProviderPlugin apiProviderPlugin = getProviderPlugin(descriptor);
+		AstrixServiceProviderPlugin apiProviderPlugin = getProviderPlugin(descriptor);
 		List<AstrixServiceBeanDefinition> result = new ArrayList<>();
 		result.addAll(apiProviderPlugin.getProvidedServices(descriptor));
 		return result;
 	}
 	
-	public AstrixApiProviderPlugin getProviderPlugin(AstrixApiDescriptor descriptor) {
-		for (AstrixApiProviderPlugin plugin : pluginByAnnotationType.values()) {
+	private AstrixServiceProviderPlugin getProviderPlugin(AstrixApiDescriptor descriptor) {
+		for (AstrixServiceProviderPlugin plugin : pluginByAnnotationType.values()) {
 			if (descriptor.isAnnotationPresent(plugin.getProviderAnnotationType())) {
 				return plugin;
 			}
 		}
 		throw new IllegalArgumentException("No plugin registered that can handle descriptor: " + descriptor);
 	}
-	
 }

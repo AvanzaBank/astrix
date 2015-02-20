@@ -13,24 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.publish;
 
-import java.util.Collection;
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface AstrixApiDescriptors {
 
-	/**
-	 * Strategy for locating all AstrixApiDescriptor's available in
-	 * the current runtime. <p>
-	 * 
-	 * @return
-	 */
-	Collection<AstrixApiDescriptor> getAll();
-	
+public interface AstrixPublishedBeans {
+
+	<T> T getBean(AstrixBeanKey<T> beanKey);
+
 }

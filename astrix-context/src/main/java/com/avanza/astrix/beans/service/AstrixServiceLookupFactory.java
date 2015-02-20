@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 
 /**
@@ -55,11 +54,6 @@ public class AstrixServiceLookupFactory {
 	private AstrixServiceLookupPlugin<?> getServiceLookupPlugin(AnnotatedElement annotatedElement) {
 		Class<?> lookupStrategy = getLookupStrategy(annotatedElement);
 		return lookupStrategyByAnnotationType.get(lookupStrategy);
-	}
-	
-
-	public boolean usesServiceRegistry(AstrixApiDescriptor apiDescriptor) {
-		return getLookupStrategy(apiDescriptor.getDescriptorClass()).equals(AstrixServiceRegistryLookup.class);
 	}
 	
 	public Class<?> getLookupStrategy(AnnotatedElement annotatedElement) {

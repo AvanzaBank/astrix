@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.publish;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -44,8 +44,6 @@ import com.avanza.astrix.beans.service.AstrixServiceComponent;
 public interface AstrixApiProviderPlugin {
 	
 	List<AstrixFactoryBean<?>> createFactoryBeans(AstrixApiDescriptor descriptor);
-	
-	List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiDescriptor descriptor);
 	
 	Class<? extends Annotation> getProviderAnnotationType();
 	
