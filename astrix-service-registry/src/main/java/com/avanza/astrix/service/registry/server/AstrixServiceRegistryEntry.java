@@ -18,7 +18,7 @@ package com.avanza.astrix.service.registry.server;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.gigaspaces.annotation.pojo.SpaceRouting;
+import com.avanza.astrix.core.AstrixRouting;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -50,7 +50,7 @@ public class AstrixServiceRegistryEntry {
 		this.serviceMetadata = serviceMetadata;
 	}
 	
-	@SpaceRouting
+	@AstrixRouting
 	public String getServiceBeanType() {
 		return serviceBeanType;
 	}

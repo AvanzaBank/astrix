@@ -13,39 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.gs.remoting;
+package com.avanza.astrix.remoting.client;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.openspaces.remoting.Routing;
 
-import com.avanza.astrix.remoting.client.AmbiguousRoutingException;
-import com.avanza.astrix.remoting.client.Router;
-import com.avanza.astrix.remoting.client.RoutingKey;
+import com.avanza.astrix.core.AstrixRouting;
 
-public class RemoteServiceMethodTest {
-	
+public class DefaultAstrixRoutingStrategyTest {
 	
 	@Test
 	public void routesOnRoutingAnnotatedArgument() throws Exception {
 		class Service {
-			public void hello(@Routing String routingArg, String anotherArg) {
+			public void hello(@AstrixRouting String routingArg, String anotherArg) {
 			}
 		}
-		Router router = new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
-		RoutingKey routingKey = router.getRoutingKey("routing-arg");
+		Router router = new DefaultAstrixRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
+		RoutingKey routingKey = router.getRoutingKey("routing-arg", "another-arg");
 		assertEquals(RoutingKey.create("routing-arg"), routingKey);
 	}
 	
 	@Test
 	public void routesOnRoutingAnnotatedArgumentPropertyIfDefined() throws Exception {
 		class Service {
-			public void hello(@Routing("getRouting") ProperRoutingMethod routingArg) {
+			public void hello(@AstrixRouting("getRouting") ProperRoutingMethod routingArg) {
 			}
 		}
 		
-		Router router = new GsRoutingStrategy().create(Service.class.getMethod("hello", ProperRoutingMethod.class));
+		Router router = new DefaultAstrixRoutingStrategy().create(Service.class.getMethod("hello", ProperRoutingMethod.class));
 		RoutingKey routingKey = router.getRoutingKey(new ProperRoutingMethod());
 		assertEquals(RoutingKey.create("routing-arg"), routingKey);
 	}
@@ -53,38 +49,29 @@ public class RemoteServiceMethodTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void missingPropertyMethod_throwsIllegalArgumentException() throws Exception {
 		class Service {
-			public void hello(@Routing("getRouting") MissingRoutingMethod routingArg) {
+			public void hello(@AstrixRouting("getRouting") MissingRoutingMethod routingArg) {
 			}
 		}
-		new GsRoutingStrategy().create(Service.class.getMethod("hello", MissingRoutingMethod.class));
+		new DefaultAstrixRoutingStrategy().create(Service.class.getMethod("hello", MissingRoutingMethod.class));
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void invalidPropertyMethod_throwsIllegalArgumentException() throws Exception {
 		class Service {
-			public void hello(@Routing("getRouting") IllegalRoutingMethod routingArg) {
+			public void hello(@AstrixRouting("getRouting") IllegalRoutingMethod routingArg) {
 			}
 		}
 		
-		new GsRoutingStrategy().create(Service.class.getMethod("hello", IllegalRoutingMethod.class));
+		new DefaultAstrixRoutingStrategy().create(Service.class.getMethod("hello", IllegalRoutingMethod.class));
 	}
 	
 	@Test(expected = AmbiguousRoutingException.class)
 	public void multipleRoutingAnnotations_throwsAmbiguousRoutingException() throws Exception {
 		class Service {
-			public void hello(@Routing String routingArg, @Routing String routingArg2) {
+			public void hello(@AstrixRouting String routingArg, @AstrixRouting String routingArg2) {
 			}
 		}
-		new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
-	}
-	
-	@Test(expected = AmbiguousRoutingException.class)
-	public void noRoutingArgument_throwsAmbiguousRoutingException() throws Exception {
-		class Service {
-			public void hello(String routingArg, String routingArg2) {
-			}
-		}
-		new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
+		new DefaultAstrixRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
 	}
 	
 	public static class ProperRoutingMethod {
@@ -101,5 +88,6 @@ public class RemoteServiceMethodTest {
 			return "";
 		}
 	}
+
 
 }

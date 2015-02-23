@@ -13,34 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.gs.remoting;
+package com.avanza.astrix.remoting.client;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import org.openspaces.remoting.Routing;
-
-import com.avanza.astrix.core.AstrixBroadcast;
-import com.avanza.astrix.remoting.client.AmbiguousRoutingException;
-import com.avanza.astrix.remoting.client.AnnotatedArgumentInstanceRouter;
-import com.avanza.astrix.remoting.client.AnnotatedArgumentRouter;
-import com.avanza.astrix.remoting.client.BroadcastRouter;
-import com.avanza.astrix.remoting.client.DefaultAstrixRoutingStrategy;
-import com.avanza.astrix.remoting.client.PropertyOnAnnotatedArgumentRoutingStrategy;
-import com.avanza.astrix.remoting.client.Router;
-import com.avanza.astrix.remoting.client.RoutingStrategy;
+import com.avanza.astrix.core.AstrixRouting;
 import com.avanza.astrix.remoting.util.RoutingKeyMethodCache;
-import com.gigaspaces.annotation.pojo.SpaceRouting;
 /**
- * Provides a routing strategy compatible with the routing used by native 
- * gigaspaces remoting, (@Routing annotated arguments).
  * 
- * @author Elias Lindholm
+ * @author Elias Lindholm (elilin)
  *
  */
-public class GsRoutingStrategy implements RoutingStrategy {
-	
-	private static final RoutingKeyMethodCache<SpaceRouting> routingKeyMethodCache = new RoutingKeyMethodCache<>(SpaceRouting.class);
+public class DefaultAstrixRoutingStrategy implements RoutingStrategy {
+
+	private RoutingKeyMethodCache<AstrixRouting> routingKeyMethodCache = new RoutingKeyMethodCache<>(AstrixRouting.class);
 
 	@Override
 	public Router create(Method serviceMethod) {
@@ -48,11 +35,7 @@ public class GsRoutingStrategy implements RoutingStrategy {
 	}
 	
 	private Router createRoutingStrategy(Method m) {
-		Router result = new DefaultAstrixRoutingStrategy().create(m);
-		if (result != null) {
-			return result;
-		}
-		result = lookForRoutingAnnotationInMethodSignature(m);
+		Router result = lookForRoutingAnnotationInMethodSignature(m);
 		if (result != null) {
 			return result;
 		}
@@ -60,11 +43,7 @@ public class GsRoutingStrategy implements RoutingStrategy {
 		if (result != null) {
 			return result;
 		}
-		if (m.getAnnotation(AstrixBroadcast.class) == null) {
-			throw new AmbiguousRoutingException(String.format("Ambiguous routing. No routing argument defined in method signature or on method " +
-					"arguments and method not annotated with @AstrixBroadcast. serviceMethod=%s", m.toString()));
-		}
-		return new BroadcastRouter();
+		return null;
 	}
 
 	private Router lookForRoutingAnnotationOnMethodArguments(Method m) {
@@ -73,8 +52,8 @@ public class GsRoutingStrategy implements RoutingStrategy {
 			Method routingKeyMethod = routingKeyMethodCache.getRoutingKeyMethod(m.getParameterTypes()[argumentIndex]);
 			if (routingKeyMethod != null) {
 				if (result != null) {
-					throw new AmbiguousRoutingException(String.format("Ambiguous routing, multiple arguments with @SpaceRouting annotated methods." +
-							" Use @Routing on one service argument to identify routing method, or @AstrixBroadcast for broadcast" +
+					throw new AmbiguousRoutingException(String.format("Ambiguous routing, multiple arguments with @AstrixRouting annotated methods." +
+							" Use @AstrixRouting on one service argument to identify routing method, or @AstrixBroadcast for broadcast" +
 							" operations. service method=%s", m.toString()));
 				}
 				result = new AnnotatedArgumentInstanceRouter(argumentIndex, routingKeyMethod);
@@ -87,18 +66,18 @@ public class GsRoutingStrategy implements RoutingStrategy {
 		Router routingStrategy = null;
 		for (int argumentIndex = 0; argumentIndex < m.getParameterTypes().length; argumentIndex++) {
 			for (Annotation a : m.getParameterAnnotations()[argumentIndex]) {
-				if (a.annotationType().equals(Routing.class)) {
+				if (a.annotationType().equals(AstrixRouting.class)) {
 					if (routingStrategy != null) {
-						throw new AmbiguousRoutingException(String.format("Ambiguous routing, multiple @Routing annotated methods on %s", m.toString()));
+						throw new AmbiguousRoutingException(String.format("Ambiguous routing, multiple @AstrixRouting annotated methods on %s", m.toString()));
 					}
-					routingStrategy = createRoutingStrategy(m, argumentIndex, (Routing) a);
+					routingStrategy = createRoutingStrategy(m, argumentIndex, (AstrixRouting) a);
 				}
 			}
 		}
 		return routingStrategy;
 	}
 
-	public static Router createRoutingStrategy(Method serviceMethod, int routingArgumentIndex, Routing routingAnnotation) {
+	public static Router createRoutingStrategy(Method serviceMethod, int routingArgumentIndex, AstrixRouting routingAnnotation) {
 		if (routingAnnotation.value().trim().isEmpty()) {
 			return new AnnotatedArgumentRouter(routingArgumentIndex);
 		} 
@@ -111,6 +90,5 @@ public class GsRoutingStrategy implements RoutingStrategy {
 			throw new IllegalArgumentException("Cant route using: " + targetRoutingMethod , e);
 		}
 	}
-
 
 }

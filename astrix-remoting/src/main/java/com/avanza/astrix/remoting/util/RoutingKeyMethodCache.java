@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.gs.remoting;
+package com.avanza.astrix.remoting.util;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -23,17 +24,22 @@ import java.util.concurrent.ConcurrentMap;
  * @author Elias Lindholm (elilin)
  *
  */
-final class RoutingKeyMethodCache {
+public final class RoutingKeyMethodCache<T extends Annotation> {
 	
 	private final ConcurrentMap<Class<?>, CachedRoutingKeyMethod> routingKeyMethodByType = new ConcurrentHashMap<>();
 	private final RoutingKeyMethodScanner scanner = new RoutingKeyMethodScanner();
+	private final Class<T> routingAnnotation;
 	
+	public RoutingKeyMethodCache(Class<T> routingAnnotation) {
+		this.routingAnnotation = routingAnnotation;
+	}
+
 	public Method getRoutingKeyMethod(Class<?> spaceObjectClass) {
 		CachedRoutingKeyMethod cachedMethod = routingKeyMethodByType.get(spaceObjectClass);
 		if (cachedMethod != null) {
 			return cachedMethod.get(); 
 		}
-		Method routingKeyMethod = scanner.getRoutingKeyMethod(spaceObjectClass);
+		Method routingKeyMethod = scanner.getRoutingKeyMethod(routingAnnotation, spaceObjectClass);
 		routingKeyMethodByType.putIfAbsent(spaceObjectClass, new CachedRoutingKeyMethod(routingKeyMethod));
 		return routingKeyMethod;
 	}

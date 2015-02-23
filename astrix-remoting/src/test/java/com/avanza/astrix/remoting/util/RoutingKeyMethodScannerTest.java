@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.gs.remoting;
+package com.avanza.astrix.remoting.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -22,17 +22,17 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 
-import com.avanza.astrix.gs.remoting.RoutingKeyMethodScanner;
-import com.gigaspaces.annotation.pojo.SpaceRouting;
+import com.avanza.astrix.core.AstrixRouting;
+import com.avanza.astrix.remoting.util.RoutingKeyMethodScanner;
 
 
 
 public class RoutingKeyMethodScannerTest {
 	
 	@Test
-	public void findsNoArgumentMethodWithSpaceRoutingAnnotation() throws Exception {
+	public void findsNoArgumentMethodWithAstrixRoutingAnnotation() throws Exception {
 		class Test {
-			@SpaceRouting
+			@AstrixRouting
 			public String routingMethod() {
 				return null;
 			}
@@ -42,29 +42,29 @@ public class RoutingKeyMethodScannerTest {
 			}
 		}
 		RoutingKeyMethodScanner scanner = new RoutingKeyMethodScanner();
-		Method routingKeyMethod = scanner.getRoutingKeyMethod(Test.class);
+		Method routingKeyMethod = scanner.getRoutingKeyMethod(AstrixRouting.class, Test.class);
 		assertEquals(Test.class.getMethod("routingMethod"), routingKeyMethod);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
-	public void throwsIllegalArgumentExceptionForTypeWithMultipleSpaceRoutingAnnotations() throws Exception {
+	public void throwsIllegalArgumentExceptionForTypeWithMultipleAstrixRoutingAnnotations() throws Exception {
 		class Test {
-			@SpaceRouting
+			@AstrixRouting
 			public String routingMethod() {
 				return null;
 			}
 
-			@SpaceRouting
+			@AstrixRouting
 			public String anotherMethod() {
 				return null;
 			}
 		}
 		RoutingKeyMethodScanner scanner = new RoutingKeyMethodScanner();
-		scanner.getRoutingKeyMethod(Test.class);
+		scanner.getRoutingKeyMethod(AstrixRouting.class, Test.class);
 	}
 	
 	@Test
-	public void returnsNullIfNoMethodIsMethodHasSpaceRoutingAnnotating() throws Exception {
+	public void returnsNullIfNoMethodIsMethodHasAstrixRoutingAnnotating() throws Exception {
 		class Test {
 			@SuppressWarnings("unused")
 			public String routingMethod() {
@@ -76,7 +76,7 @@ public class RoutingKeyMethodScannerTest {
 			}
 		}
 		RoutingKeyMethodScanner scanner = new RoutingKeyMethodScanner();
-		assertNull(scanner.getRoutingKeyMethod(Test.class));
+		assertNull(scanner.getRoutingKeyMethod(AstrixRouting.class, Test.class));
 	}
 
 }

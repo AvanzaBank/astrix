@@ -15,16 +15,16 @@
  */
 package com.avanza.astrix.remoting.client;
 
-public class AnnotatedArgumentRoutingStrategy implements Router {
+public class AnnotatedArgumentRouter implements Router {
 	
 	private int argumentIndex;
 
-	public AnnotatedArgumentRoutingStrategy(int argumentIndex) {
+	public AnnotatedArgumentRouter(int argumentIndex) {
 		this.argumentIndex = argumentIndex;
 	}
 
 	@Override
-	public RoutingKey getRoutingKey(Object[] args) {
+	public RoutingKey getRoutingKey(Object... args) {
 		return RoutingKey.create(args[argumentIndex]);
 	}
 }

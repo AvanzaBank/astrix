@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.gs.remoting;
+package com.avanza.astrix.remoting.util;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-
-import com.gigaspaces.annotation.pojo.SpaceRouting;
 /**
- * Scans a given class for a @SpaceRouting annotated method. 
+ * Scans a given class for a method annotated with a given annotation.
  * 
  * @author Elias Lindholm (elilin)
  *
@@ -32,10 +31,10 @@ final class RoutingKeyMethodScanner {
 	 * @param spaceObject
 	 * @return	the routing key method if one exists, null otherwise
 	 */
-	public Method getRoutingKeyMethod(Class<?> spaceObjectClass) {
+	public <T extends Annotation> Method getRoutingKeyMethod(Class<T> annotationType, Class<?> spaceObjectClass) {
 		Method result = null;
 		for (Method m : spaceObjectClass.getMethods()) {
-			if (m.isAnnotationPresent(SpaceRouting.class)) {
+			if (m.isAnnotationPresent(annotationType)) {
 				if (result != null) {
 					throw new IllegalArgumentException("Multiple methods annotated with @SpaceRouting found on class: " + spaceObjectClass.getName());
 				}

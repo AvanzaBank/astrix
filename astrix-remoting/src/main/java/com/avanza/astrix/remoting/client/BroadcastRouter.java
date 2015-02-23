@@ -15,20 +15,9 @@
  */
 package com.avanza.astrix.remoting.client;
 
-import java.lang.reflect.Method;
-
-public class AnnotatedArgumentInstanceRoutingStrategy implements Router {
-	
-	private int argumentIndex;
-	private Method routingKeyMethod;
-	
-	public AnnotatedArgumentInstanceRoutingStrategy(int argumentIndex, Method routingKeyMethod) {
-		this.argumentIndex = argumentIndex;
-		this.routingKeyMethod = routingKeyMethod;
-	}
-
+public class BroadcastRouter implements Router {
 	@Override
-	public RoutingKey getRoutingKey(Object... args) throws Exception {
-		return RoutingKey.create(routingKeyMethod.invoke(args[argumentIndex]));
+	public RoutingKey getRoutingKey(Object[] args) {
+		return null;
 	}
 }

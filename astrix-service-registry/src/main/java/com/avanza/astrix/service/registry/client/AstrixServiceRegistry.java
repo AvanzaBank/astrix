@@ -17,14 +17,13 @@ package com.avanza.astrix.service.registry.client;
 
 import java.util.List;
 
-import org.openspaces.remoting.Routing;
-
 import com.avanza.astrix.core.AstrixBroadcast;
+import com.avanza.astrix.core.AstrixRouting;
 import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
 
 public interface AstrixServiceRegistry {
 	
-	<T> AstrixServiceRegistryEntry lookup(@Routing String type, String qualifier);
+	<T> AstrixServiceRegistryEntry lookup(@AstrixRouting String type, String qualifier);
 	
 	<T> void register(AstrixServiceRegistryEntry properties, long lease);
 	
