@@ -26,9 +26,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistryAdministrator;
-import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
 
 @RestController
 @RequestMapping("/services")

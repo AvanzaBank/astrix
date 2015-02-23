@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.beans.service.IllegalSubsystemException;
@@ -56,7 +57,6 @@ import com.avanza.astrix.integration.tests.domain.apiruntime.feeder.InternalLunc
 import com.avanza.astrix.integration.tests.domain2.api.LunchRestaurantGrader;
 import com.avanza.astrix.integration.tests.domain2.apiruntime.PublicLunchFeeder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistry;
 import com.avanza.astrix.test.util.AstrixTestUtil;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;

@@ -17,7 +17,7 @@ package com.avanza.astrix.service.registry.client;
 
 import java.util.List;
 
-import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 
 public interface AstrixServiceRegistryAdministrator {
 

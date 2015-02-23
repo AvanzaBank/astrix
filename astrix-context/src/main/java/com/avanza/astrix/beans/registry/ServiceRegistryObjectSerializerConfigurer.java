@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.client;
+package com.avanza.astrix.beans.registry;
 
+import java.util.Collections;
 import java.util.List;
 
-import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
+import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
+import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
+import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
 
-public class AstrixServiceRegistryAdministratorImpl implements AstrixServiceRegistryAdministrator {
-
-	private AstrixServiceRegistry serviceRegistry;
-
-	public AstrixServiceRegistryAdministratorImpl(AstrixServiceRegistry serviceRegistry) {
-		this.serviceRegistry = serviceRegistry;
-	}
+public class ServiceRegistryObjectSerializerConfigurer implements Jackson1ObjectSerializerConfigurer {
 
 	@Override
-	public List<AstrixServiceRegistryEntry> listServices() {
-		return serviceRegistry.listServices();
+	public List<? extends AstrixJsonApiMigration> apiMigrations() {
+		return Collections.emptyList();
 	}
+	
+	@Override
+	public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
+	}
+
 
 }

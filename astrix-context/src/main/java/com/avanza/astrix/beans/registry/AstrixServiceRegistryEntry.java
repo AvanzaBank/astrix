@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.server;
+package com.avanza.astrix.beans.registry;
 
 import java.util.HashMap;
 import java.util.Map;

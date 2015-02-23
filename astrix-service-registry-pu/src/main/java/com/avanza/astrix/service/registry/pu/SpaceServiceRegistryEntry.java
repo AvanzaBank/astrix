@@ -18,7 +18,7 @@ package com.avanza.astrix.service.registry.pu;
 import java.io.Serializable;
 import java.util.Map;
 
-import com.avanza.astrix.service.registry.app.ServiceKey;
+import com.avanza.astrix.beans.registry.ServiceKey;
 import com.gigaspaces.annotation.pojo.SpaceId;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 

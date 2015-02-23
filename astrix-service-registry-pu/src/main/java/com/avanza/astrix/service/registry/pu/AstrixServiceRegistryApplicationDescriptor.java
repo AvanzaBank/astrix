@@ -15,9 +15,9 @@
  */
 package com.avanza.astrix.service.registry.pu;
 
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixApplication;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryServiceProvider;
 
 
 /**

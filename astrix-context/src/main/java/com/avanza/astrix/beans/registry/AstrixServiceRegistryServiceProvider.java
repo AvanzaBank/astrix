@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.client;
+package com.avanza.astrix.beans.registry;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.provider.core.AstrixApiProvider;

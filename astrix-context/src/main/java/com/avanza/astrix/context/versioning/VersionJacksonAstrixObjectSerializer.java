@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.versioning.plugin;
+package com.avanza.astrix.context.versioning;
 
 import java.lang.reflect.Type;
 
@@ -22,6 +22,7 @@ import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.versioning.JsonObjectMapper;
 import com.avanza.astrix.versioning.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
+import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
 
 public class VersionJacksonAstrixObjectSerializer implements AstrixObjectSerializer {
 

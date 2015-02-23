@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.client;
+package com.avanza.astrix.beans.registry;
 
 import java.util.Objects;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
-import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
 /**
  * 
  * @author Elias Lindholm (elilin)

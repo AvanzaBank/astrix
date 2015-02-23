@@ -24,11 +24,11 @@ import java.util.Map;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
+import com.avanza.astrix.beans.registry.ServiceKey;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
-import com.avanza.astrix.service.registry.app.ServiceKey;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistry;
-import com.avanza.astrix.service.registry.server.AstrixServiceRegistryEntry;
 
 @AstrixServiceExport(AstrixServiceRegistry.class)
 public class AstrixServiceRegistryImpl implements AstrixServiceRegistry {

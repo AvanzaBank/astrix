@@ -19,7 +19,10 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
+import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.service.IllegalSubsystemException;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
@@ -29,7 +32,6 @@ import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.provider.versioning.Versioned;
-import com.avanza.astrix.service.registry.util.InMemoryServiceRegistry;
 
 public class AstrixSubsystemTest {
 	

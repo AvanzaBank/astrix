@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.client;
+package com.avanza.astrix.beans.registry;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigAware;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -32,14 +31,10 @@ public class AstrixServiceRegistryLibraryProvider implements AstrixConfigAware {
 		return new AstrixServiceRegistryClientImpl(serviceRegistry, config.getStringProperty(AstrixSettings.SUBSYSTEM_NAME, null).get());
 	}
 	
-	@Library
-	public AstrixServiceRegistryAdministrator createAdministrator(AstrixServiceRegistry serviceRegistry) {
-		return new AstrixServiceRegistryAdministratorImpl(serviceRegistry);
-	}
-	
 	@Override
 	public void setConfig(DynamicConfig config) {
 		this.config = config;
 	}
 
+	
 }

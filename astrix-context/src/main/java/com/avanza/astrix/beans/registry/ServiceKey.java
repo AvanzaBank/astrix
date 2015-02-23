@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.app;
+package com.avanza.astrix.beans.registry;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -24,6 +24,7 @@ import java.util.Objects;
  */
 public class ServiceKey implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	private String apiClassName;
 	private String qualifier;
 

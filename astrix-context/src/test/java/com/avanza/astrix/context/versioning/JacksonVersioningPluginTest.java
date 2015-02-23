@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.versioning.plugin;
+package com.avanza.astrix.context.versioning;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,6 +29,7 @@ import com.avanza.astrix.provider.versioning.AstrixJsonMessageMigration;
 import com.avanza.astrix.provider.versioning.AstrixVersioned;
 import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
+import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
 
 public class JacksonVersioningPluginTest {
 	
