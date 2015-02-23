@@ -18,7 +18,7 @@ package com.avanza.astrix.serviceunit;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
+import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
 
 public interface AstrixServiceProviderPlugin {
 	

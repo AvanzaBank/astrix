@@ -28,7 +28,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
@@ -39,6 +38,7 @@ import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.inject.AstrixPlugins;
+import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
 import com.avanza.astrix.beans.publish.AstrixApiDescriptors;
 import com.avanza.astrix.beans.publish.AstrixApiProviderPlugin;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;

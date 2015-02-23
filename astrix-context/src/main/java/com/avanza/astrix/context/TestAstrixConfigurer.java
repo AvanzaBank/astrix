@@ -20,11 +20,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBean;
+import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
 import com.avanza.astrix.beans.publish.AstrixApiDescriptors;
 
 public class TestAstrixConfigurer {

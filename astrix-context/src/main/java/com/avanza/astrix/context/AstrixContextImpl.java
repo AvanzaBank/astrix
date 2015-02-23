@@ -17,7 +17,6 @@ package com.avanza.astrix.context;
 
 import java.util.List;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
@@ -25,6 +24,7 @@ import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.inject.AstrixInjector;
+import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
 import com.avanza.astrix.beans.publish.AstrixApiDescriptors;
 import com.avanza.astrix.beans.publish.AstrixApiProviderPlugins;
 import com.avanza.astrix.beans.service.StatefulAstrixBean;

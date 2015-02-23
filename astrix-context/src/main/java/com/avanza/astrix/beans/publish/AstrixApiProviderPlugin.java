@@ -18,7 +18,6 @@ package com.avanza.astrix.beans.publish;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 

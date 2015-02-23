@@ -26,7 +26,7 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
+import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
 import com.avanza.astrix.beans.publish.AstrixApiDescriptors;
 /**
  * Uses classpath scanning to locate api-descriptors. <p>

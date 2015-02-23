@@ -22,11 +22,11 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.inject.AstrixInjector;
+import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
 import com.avanza.astrix.beans.publish.AstrixApiProviderPlugin;
 import com.avanza.astrix.beans.service.AstrixServiceLookup;
 import com.avanza.astrix.beans.service.AstrixServiceLookupFactory;

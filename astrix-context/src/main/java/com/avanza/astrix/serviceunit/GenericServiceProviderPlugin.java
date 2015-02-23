@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
 import com.avanza.astrix.beans.service.AstrixServiceLookupFactory;
 import com.avanza.astrix.context.AstrixPublishedBeanDefinitionMethod;
 import com.avanza.astrix.provider.core.AstrixApiProvider;

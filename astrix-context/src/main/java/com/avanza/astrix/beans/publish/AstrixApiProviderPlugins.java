@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 /**
  * 
  * @author Elias Lindholm (elilin)

@@ -26,7 +26,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
+import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
 
 
 

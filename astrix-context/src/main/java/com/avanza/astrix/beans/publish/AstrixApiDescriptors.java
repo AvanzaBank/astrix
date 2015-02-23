@@ -17,7 +17,6 @@ package com.avanza.astrix.beans.publish;
 
 import java.util.Collection;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
 /**
  * 
  * @author Elias Lindholm (elilin)

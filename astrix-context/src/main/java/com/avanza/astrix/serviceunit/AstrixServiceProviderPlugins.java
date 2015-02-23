@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.avanza.astrix.beans.core.AstrixApiDescriptor;
+import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
 
 public class AstrixServiceProviderPlugins {
 	
