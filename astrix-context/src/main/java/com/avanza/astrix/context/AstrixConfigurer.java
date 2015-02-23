@@ -75,7 +75,7 @@ public class AstrixConfigurer {
 		injector.bind(AstrixContext.class, AstrixContextImpl.class);
 		injector.bind(AstrixFactoryBeanRegistry.class, SimpleAstrixFactoryBeanRegistry.class);
 		injector.bind(AstrixApiDescriptors.class, new FilteredApiDescriptors(getApiDescriptors(astrixPlugins), activeProfiles));
-		injector.registerBeanPostProcessor(new InternalBeanPostProcessor(astrixPlugins, injector.getBean(AstrixBeanFactory.class)));
+		injector.registerBeanPostProcessor(new InternalBeanPostProcessor(injector.getBean(AstrixBeanFactory.class)));
 		AstrixContextImpl context = injector.getBean(AstrixContextImpl.class);
 		for (AstrixFactoryBean<?> beanFactory : standaloneFactories) {
 			log.debug("Registering standalone factory: bean={}", beanFactory.getBeanKey());
@@ -256,11 +256,9 @@ public class AstrixConfigurer {
 	
 	public static  class InternalBeanPostProcessor implements AstrixBeanPostProcessor {
 		
-		private final AstrixPlugins plugins;
 		private final AstrixBeanFactory publishedApis;
 		
-		public InternalBeanPostProcessor(AstrixPlugins plugins, AstrixBeanFactory publishedApis) {
-			this.plugins = plugins;
+		public InternalBeanPostProcessor(AstrixBeanFactory publishedApis) {
 			this.publishedApis = publishedApis;
 		}
 
@@ -272,9 +270,6 @@ public class AstrixConfigurer {
 		private void injectAwareDependencies(Object object, AstrixBeans beans) {
 			if (object instanceof AstrixPublishedBeansAware) {
 				injectBeanDependencies((AstrixPublishedBeansAware)object);
-			}
-			if (object instanceof AstrixPluginsAware) {
-				AstrixPluginsAware.class.cast(object).setPlugins(plugins);
 			}
 			if (object instanceof AstrixConfigAware) {
 				AstrixConfigAware.class.cast(object).setConfig(beans.getBean(AstrixBeanKey.create(DynamicConfig.class)));

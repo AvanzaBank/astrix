@@ -19,12 +19,9 @@ import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.inject.AstrixPlugins;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
-import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.AstrixFaultTolerance;
-import com.avanza.astrix.context.AstrixPluginsAware;
 import com.avanza.astrix.context.AstrixVersioningPlugin;
 import com.avanza.astrix.context.FaultToleranceSpecification;
 import com.avanza.astrix.context.IsolationStrategy;
@@ -43,17 +40,17 @@ import com.avanza.astrix.spring.AstrixSpringContext;
  *
  */
 @MetaInfServices(AstrixServiceComponent.class)
-public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServiceComponent {
+public class AstrixGsRemotingComponent implements AstrixServiceComponent {
 	
-	private AstrixPlugins plugins;
 	private GsBinder gsBinder;
 	private AstrixFaultTolerance faultTolerance;
 	private AstrixSpringContext astrixSpringContext;
 	private AstrixServiceActivator serviceActivator;
+	private AstrixVersioningPlugin versioningPlugin;
 	
 	@Override
 	public <T> T bind(ServiceVersioningContext versioningContext, Class<T> api, AstrixServiceProperties serviceProperties) {
-		AstrixObjectSerializer objectSerializer = plugins.getPlugin(AstrixVersioningPlugin.class).create(versioningContext);
+		AstrixObjectSerializer objectSerializer = versioningPlugin.create(versioningContext);
 		
 		String targetSpace = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
 		GigaSpace space = gsBinder.createGsFactory(serviceProperties).create();
@@ -72,18 +69,13 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	}
 	
 	@Override
-	public void setPlugins(AstrixPlugins plugins) {
-		this.plugins = plugins;
-	}
-
-	@Override
 	public String getName() {
 		return AstrixServiceComponentNames.GS_REMOTING;
 	}
 	
 	@Override
 	public <T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext) {
-		AstrixObjectSerializer objectSerializer = plugins.getPlugin(AstrixVersioningPlugin.class).create(versioningContext); 
+		AstrixObjectSerializer objectSerializer = versioningPlugin.create(versioningContext); 
 		this.serviceActivator.register(provider, objectSerializer, providedApi);
 	}
 	
@@ -91,6 +83,7 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	public boolean requiresProviderInstance() {
 		return true;
 	}
+	
 	
 	@AstrixInject
 	public void setGsBinder(GsBinder gsBinder) {
@@ -110,6 +103,11 @@ public class AstrixGsRemotingComponent implements AstrixPluginsAware, AstrixServ
 	@AstrixInject
 	public void setFaultTolerance(AstrixFaultTolerance faultTolerance) {
 		this.faultTolerance = faultTolerance;
+	}
+	
+	@AstrixInject
+	public void setVersioningPlugin(AstrixVersioningPlugin versioningPlugin) {
+		this.versioningPlugin = versioningPlugin;
 	}
 
 	@Override

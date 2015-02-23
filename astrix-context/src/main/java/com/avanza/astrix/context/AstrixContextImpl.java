@@ -15,8 +15,6 @@
  */
 package com.avanza.astrix.context;
 
-import java.util.List;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
@@ -29,7 +27,6 @@ import com.avanza.astrix.beans.publish.AstrixApiDescriptors;
 import com.avanza.astrix.beans.publish.AstrixApiProviderPlugins;
 import com.avanza.astrix.beans.service.StatefulAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.serviceunit.AstrixServiceBeanDefinition;
 /**
  * An AstrixContextImpl is the runtime-environment for the astrix-framework. It is used
  * both by consuming applications as well as server applications. AstrixContextImpl providers access
