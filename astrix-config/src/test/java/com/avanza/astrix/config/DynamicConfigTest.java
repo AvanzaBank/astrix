@@ -32,6 +32,23 @@ public class DynamicConfigTest {
 	MapConfigSource secondSource = new MapConfigSource();
 	DynamicConfig dynamicConfig = new DynamicConfig(Arrays.asList(firstSource, secondSource));
 	
+	
+	public static void main(String[] args) throws InterruptedException {
+		MapConfigSource firstSource = new MapConfigSource();
+		MapConfigSource secondSource = new MapConfigSource();
+		DynamicConfig dynamicConfig = new DynamicConfig(Arrays.asList(firstSource, secondSource));
+		
+		while (true) {
+			firstSource.set("foo", "" + Math.random());
+			secondSource.set("foo", "" + Math.random());
+			for (int i = 0; i < 10; i++) {
+				dynamicConfig.getStringProperty("foo", "bar");
+				
+			}
+			Thread.sleep(100);
+		}
+	}
+	
 	@Test
 	public void propertyIsResolvedToFirstOccurenceInConfigSources() throws Exception {
 		DynamicStringProperty stringProperty = dynamicConfig.getStringProperty("foo", "defaultFoo");

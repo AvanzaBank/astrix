@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.avanza.astrix.config.ObjectCache.ObjectFactory;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -27,6 +29,7 @@ import java.util.List;
  */
 public final class DynamicConfig {
 
+	private final ObjectCache configCache = new ObjectCache();
 	private final List<DynamicConfigSource> configSources;
 
 	public DynamicConfig(ConfigSource configSource) {
@@ -73,43 +76,60 @@ public final class DynamicConfig {
 		
 	}
 
-	public DynamicStringProperty getStringProperty(String name, String defaultValue) {
-		final DynamicStringProperty result = new DynamicStringProperty(null);
-		final DynamicPropertyChain<String> chain = getPropertyChain(name, defaultValue, new DynamicPropertyChainListener<String>() {
+	public DynamicStringProperty getStringProperty(final String name, final String defaultValue) {
+		return this.configCache.getInstance("string." + name, new ObjectFactory<DynamicStringProperty>() {
+
 			@Override
-			public void propertyChanged(String newValue) {
-				result.set(newValue);
+			public DynamicStringProperty create() throws Exception {
+				final DynamicStringProperty result = new DynamicStringProperty(null);
+				final DynamicPropertyChain<String> chain = createPropertyChain(name, defaultValue, new DynamicPropertyChainListener<String>() {
+					@Override
+					public void propertyChanged(String newValue) {
+						result.set(newValue);
+					}
+				}, new PropertyParser.StringParser());
+				result.set(chain.get());
+				return result;
 			}
-		}, new PropertyParser.StringParser());
-		result.set(chain.get());
-		return result;
+		});
 	}
 	
-	public DynamicBooleanProperty getBooleanProperty(String name, boolean defaultValue) {
-		final DynamicBooleanProperty result = new DynamicBooleanProperty();
-		final DynamicPropertyChain<Boolean> chain = getPropertyChain(name, defaultValue, new DynamicPropertyChainListener<Boolean>() {
+	public DynamicBooleanProperty getBooleanProperty(final String name, final boolean defaultValue) {
+		return this.configCache.getInstance("boolean." + name, new ObjectFactory<DynamicBooleanProperty>() {
+
 			@Override
-			public void propertyChanged(Boolean newValue) {
-				result.set(newValue.booleanValue());
+			public DynamicBooleanProperty create() throws Exception {
+				final DynamicBooleanProperty result = new DynamicBooleanProperty();
+				final DynamicPropertyChain<Boolean> chain = createPropertyChain(name, defaultValue, new DynamicPropertyChainListener<Boolean>() {
+					@Override
+					public void propertyChanged(Boolean newValue) {
+						result.set(newValue.booleanValue());
+					}
+				}, new PropertyParser.BooleanParser());
+				result.set(chain.get());
+				return result;
 			}
-		}, new PropertyParser.BooleanParser());
-		result.set(chain.get());
-		return result;
+		});
 	}
 	
-	public DynamicLongProperty getLongProperty(String name, long deafualtValue) {
-		final DynamicLongProperty result = new DynamicLongProperty();
-		final DynamicPropertyChain<Long> chain = getPropertyChain(name, Long.valueOf(deafualtValue), new DynamicPropertyChainListener<Long>() {
+	public DynamicLongProperty getLongProperty(final String name, final long deafualtValue) {
+		return this.configCache.getInstance("long." + name, new ObjectFactory<DynamicLongProperty>() {
 			@Override
-			public void propertyChanged(Long newValue) {
-				result.set(newValue.longValue());
+			public DynamicLongProperty create() throws Exception {
+				final DynamicLongProperty result = new DynamicLongProperty();
+				final DynamicPropertyChain<Long> chain = createPropertyChain(name, Long.valueOf(deafualtValue), new DynamicPropertyChainListener<Long>() {
+					@Override
+					public void propertyChanged(Long newValue) {
+						result.set(newValue.longValue());
+					}
+				}, new PropertyParser.LongParser());
+				result.set(chain.get());
+				return result;
 			}
-		}, new PropertyParser.LongParser());
-		result.set(chain.get());
-		return result;
+		});
 	}
 	
-	private <T> DynamicPropertyChain<T> getPropertyChain(String name, T defaultValue, DynamicPropertyChainListener<T> dynamicPropertyListener, PropertyParser<T> propertyParser) {
+	private <T> DynamicPropertyChain<T> createPropertyChain(String name, T defaultValue, DynamicPropertyChainListener<T> dynamicPropertyListener, PropertyParser<T> propertyParser) {
 		DynamicPropertyChain<T> chain = DynamicPropertyChain.createWithDefaultValue(defaultValue, dynamicPropertyListener, propertyParser);
 		for (DynamicConfigSource configSource : configSources) {
 			DynamicConfigProperty<T> newValueInChain = chain.appendValue();
