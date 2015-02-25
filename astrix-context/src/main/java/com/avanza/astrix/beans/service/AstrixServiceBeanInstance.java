@@ -86,6 +86,7 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 	 */
 	public void bind(AstrixServiceProperties serviceProperties) {
 		if (serviceProperties == null) {
+			log.info("Service moving to unbound state " + beanKey + ", AstrixBeanId=" + id);
 			this.state = new Unbound();
 			return;
 		}

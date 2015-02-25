@@ -63,7 +63,7 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBean<T> {
 		try {
 			serviceProperties = serviceLookup.lookup(beanKey);
 			if (serviceProperties == null) {
-				log.warn("Did not find service using serviceLookup: bean=%s serviceLookup=%s", beanKey, serviceLookup);
+				log.warn(String.format("Did not find service using serviceLookup: bean=%s serviceLookup=%s", beanKey, serviceLookup));
 			} else {
 				serviceBeanInstance.bind(serviceProperties);
 			}

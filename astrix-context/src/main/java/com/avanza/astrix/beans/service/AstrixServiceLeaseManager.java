@@ -87,10 +87,12 @@ public class AstrixServiceLeaseManager {
 					interrupt();
 				}
 			}
+			log.info("Terminating thread=" + getName());
 		}
 		
 		private void bind(LeasedService<?> leasedService) {
 			try {
+				log.debug("Attempting to bind service={}", leasedService.getBeanKey());
 				leasedService.renew();
 			} catch (Exception e) {
 				log.warn("Failed to bind service: " + leasedService.getBeanKey(), e);
@@ -117,6 +119,7 @@ public class AstrixServiceLeaseManager {
 					interrupt();
 				}
 			}
+			log.info("Terminating thread=" + getName());
 		}
 		
 		private void renewLease(LeasedService<?> leasedService) {

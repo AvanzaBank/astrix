@@ -19,6 +19,9 @@ import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 /**
  * 
@@ -28,11 +31,13 @@ import com.avanza.astrix.beans.factory.AstrixBeanKey;
  */
 class LeasedService<T> {
 
+	private static final Logger log = LoggerFactory.getLogger(LeasedService.class);
+	
 	private final AstrixServiceLookup serviceLookup;
 	private final AstrixServiceBeanInstance<T> instance;
 	private volatile AstrixServiceProperties currentProperties;
 	private final Lock stateLock = new ReentrantLock();
-
+	
 	public LeasedService(AstrixServiceBeanInstance<T> instance, 
 			AstrixServiceProperties currentProperties,
 			AstrixServiceLookup serviceLookup) {
@@ -45,7 +50,11 @@ class LeasedService<T> {
 		stateLock.lock();
 		try {
 			AstrixServiceProperties serviceProperties = serviceLookup.lookup(getBeanKey());
-			refreshServiceProperties(serviceProperties);
+			if (serviceHasChanged(serviceProperties) || !this.instance.isBound()) {
+				bind(serviceProperties);
+			} else {
+				log.debug("Service properties have not changed. No need to bind bean=" + instance.getBeanKey());
+			}
 		} finally {
 			stateLock.unlock();
 		}
@@ -55,11 +64,9 @@ class LeasedService<T> {
 		return this.instance.isBound();
 	}
 	
-	private void refreshServiceProperties(AstrixServiceProperties serviceProperties) {
-		if (serviceHasChanged(serviceProperties)) {
-			this.instance.bind(serviceProperties);
-			currentProperties = serviceProperties;
-		}
+	private void bind(AstrixServiceProperties serviceProperties) {
+		this.instance.bind(serviceProperties);
+		currentProperties = serviceProperties;
 	}
 
 	private boolean serviceHasChanged(AstrixServiceProperties serviceProperties) {

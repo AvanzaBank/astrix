@@ -83,6 +83,16 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 		return id;
 	}
 	
+	public static <T> String register(Class<T> type, T provider, String id) {
+		providerById.put(id, new ServiceProvider<T>(id, type, provider));
+		return id;
+	}
+	
+	public static <T> void unregister(String id) {
+		providerById.remove(id);
+	}
+	
+	
 	private static <T> String register(Class<T> type, T provider, ServiceVersioningContext serverVersioningContext) {
 		String id = String.valueOf(idGen.incrementAndGet());
 		providerById.put(id, new VersioningAwareServiceProvider<>(id, type, provider, serverVersioningContext));
@@ -95,10 +105,6 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	}
 	
 	public static AstrixServiceProperties getServiceProperties(String id) {
-		ServiceProvider<?> provider = providerById.get(id);
-		if (provider == null) {
-			throw new IllegalArgumentException("No provider registered with id: " + id);
-		}
 		AstrixServiceProperties serviceProperties = new AstrixServiceProperties();
 		serviceProperties.setProperty("providerId", id);
 		serviceProperties.setComponent(AstrixServiceComponentNames.DIRECT);
