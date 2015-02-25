@@ -13,32 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.ft;
 
 import java.util.Objects;
+
+import com.avanza.astrix.context.IsolationStrategy;
 
 /**
  * @author Kristoffer Erlandsson (krierl)
  */
 public class FaultToleranceSpecification<T> {
+	
 	private final Class<T> api;
-	private final T provider;
 	private final String group;
 	private final IsolationStrategy isolationStrategy;
 	
-	private FaultToleranceSpecification(Class<T> api, T provider, String group, IsolationStrategy isolationStrategy) {
+	private FaultToleranceSpecification(Class<T> api, String group, IsolationStrategy isolationStrategy) {
 		this.api = api;
-		this.provider = provider;
 		this.group = group;
 		this.isolationStrategy = isolationStrategy;
 	}
 	
 	public Class<T> getApi() {
 		return api;
-	}
-
-	public T getProvider() {
-		return provider;
 	}
 
 	public String getGroup() {
@@ -50,7 +47,6 @@ public class FaultToleranceSpecification<T> {
 	}
 
 	public static class Builder<T> {
-		private T provider;
 		private String group;
 		private IsolationStrategy isolationStrategy;
 		private Class<T> api;
@@ -58,11 +54,6 @@ public class FaultToleranceSpecification<T> {
 		public Builder(Class<T> api) {
 			Objects.requireNonNull(api);
 			this.api = api;
-		}
-		
-		public Builder<T> provider(T provider) {
-			this.provider = provider;
-			return this;
 		}
 		
 		public Builder<T> isolationStrategy(IsolationStrategy isolationStrategy) {
@@ -76,10 +67,9 @@ public class FaultToleranceSpecification<T> {
 		}
 		
 		public FaultToleranceSpecification<T> build() {
-			Objects.requireNonNull(provider);
 			Objects.requireNonNull(group);
 			Objects.requireNonNull(isolationStrategy);
-			return new FaultToleranceSpecification<T>(api, provider, group, isolationStrategy);
+			return new FaultToleranceSpecification<T>(api, group, isolationStrategy);
 		}
 		
 	}

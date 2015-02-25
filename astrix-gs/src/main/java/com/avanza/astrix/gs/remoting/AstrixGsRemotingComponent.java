@@ -19,19 +19,16 @@ import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
-import com.avanza.astrix.beans.service.SimpleBoundServiceBeanInstance;
-import com.avanza.astrix.context.AstrixFaultTolerance;
+import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.context.AstrixVersioningPlugin;
-import com.avanza.astrix.context.FaultToleranceSpecification;
-import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.ft.plugin.AstrixFaultTolerance;
 import com.avanza.astrix.gs.BoundProxyServiceBeanInstance;
 import com.avanza.astrix.gs.ClusteredProxyCache;
-import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.gs.ClusteredProxyCache.GigaSpaceInstance;
+import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.remoting.client.AstrixRemotingProxy;
@@ -58,15 +55,11 @@ public class AstrixGsRemotingComponent implements AstrixServiceComponent {
 	public <T> BoundServiceBeanInstance<T> bind(ServiceVersioningContext versioningContext, Class<T> api, AstrixServiceProperties serviceProperties) {
 		AstrixObjectSerializer objectSerializer = versioningPlugin.create(versioningContext);
 		
-		String targetSpace = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
 		GigaSpaceInstance proxyInstance = proxyCache.getProxy(serviceProperties);
-		AstrixRemotingTransport remotingTransport = GsRemotingTransport.remoteSpace(proxyInstance.get());
+		AstrixRemotingTransport remotingTransport = GsRemotingTransport.remoteSpace(proxyInstance.get(), faultTolerance);
 		
 		T proxy = AstrixRemotingProxy.create(api, remotingTransport, objectSerializer, new GsRoutingStrategy());
-		FaultToleranceSpecification<T> ftSpec = FaultToleranceSpecification.builder(api).provider(proxy)
-				.group(targetSpace).isolationStrategy(IsolationStrategy.THREAD).build();
-		T proxyWithFaultTolerance = faultTolerance.addFaultTolerance(ftSpec);
-		return BoundProxyServiceBeanInstance.create(proxyWithFaultTolerance, proxyInstance);
+		return BoundProxyServiceBeanInstance.create(proxy, proxyInstance);
 	}
 	
 	@Override

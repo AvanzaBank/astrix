@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft.plugin;
+package com.avanza.astrix.gs;
 
-import java.util.Objects;
+import org.openspaces.core.cluster.ClusterInfo;
+import org.openspaces.core.cluster.ClusterInfoAware;
 
-import org.kohsuke.MetaInfServices;
+public class ClusterInfoHolder implements ClusterInfoAware {
 
-import com.avanza.astrix.ft.FaultToleranceSpecification;
-import com.avanza.astrix.ft.HystrixAdapter;
+	private ClusterInfo clusterInfo;
 
-
-@MetaInfServices(value = AstrixFaultTolerancePlugin.class)
-public class HystrixFaultTolerancePlugin implements AstrixFaultTolerancePlugin {
-	
 	@Override
-	public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec, T provider) {
-		Objects.requireNonNull(spec);
-		return HystrixAdapter.create(spec, provider);
+	public void setClusterInfo(ClusterInfo clusterInfo) {
+		this.clusterInfo = clusterInfo;
 	}
 	
+	public ClusterInfo getClusterInfo() {
+		return clusterInfo;
+	}
+
 }

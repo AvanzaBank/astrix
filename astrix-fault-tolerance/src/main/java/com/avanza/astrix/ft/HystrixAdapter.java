@@ -24,7 +24,6 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.context.FaultToleranceSpecification;
 import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -51,19 +50,19 @@ public class HystrixAdapter<T> implements InvocationHandler {
 	private final IsolationStrategy isolationStrategy;
 
 
-	public HystrixAdapter(FaultToleranceSpecification<T> spec) {
-		this(spec, new HystrixCommandSettings());
+	public HystrixAdapter(FaultToleranceSpecification<T> spec, T provider) {
+		this(spec, provider, new HystrixCommandSettings());
 	}
 
-	private HystrixAdapter(FaultToleranceSpecification<T> spec, HystrixCommandSettings settings) {
+	private HystrixAdapter(FaultToleranceSpecification<T> spec, T provider, HystrixCommandSettings settings) {
 		this.api = spec.getApi();
-		this.provider = spec.getProvider();
+		this.provider = provider;
 		this.group = spec.getGroup();
 		this.isolationStrategy = spec.getIsolationStrategy();
 		this.hystrixConfiguration = getHystrixConfiguration(settings);
 	}
 
-	public static <T> T create(FaultToleranceSpecification<T> spec,  HystrixCommandSettings settings) {
+	public static <T> T create(FaultToleranceSpecification<T> spec, T provider, HystrixCommandSettings settings) {
 		Objects.requireNonNull(spec);
 		Objects.requireNonNull(settings);
 		Class<T> api = spec.getApi();
@@ -73,11 +72,11 @@ public class HystrixAdapter<T> implements InvocationHandler {
 					"Can only add fault tolerance to an api exposed using an interface. Exposed api=" + api);
 		}
 		return api.cast(Proxy.newProxyInstance(HystrixAdapter.class.getClassLoader(), new Class[] { api },
-				new HystrixAdapter<T>(spec, settings)));
+				new HystrixAdapter<T>(spec, provider, settings)));
 	}
 
-	public static <T> T create(FaultToleranceSpecification<T> spec) {
-		return create(spec, new HystrixCommandSettings());
+	public static <T> T create(FaultToleranceSpecification<T> spec, T provider) {
+		return create(spec, provider, new HystrixCommandSettings());
 	}
 
 	@Override

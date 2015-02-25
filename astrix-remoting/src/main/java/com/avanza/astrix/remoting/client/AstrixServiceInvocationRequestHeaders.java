@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.remoting.client;
 
-public interface AstrixFaultTolerancePlugin {
+public class AstrixServiceInvocationRequestHeaders {
 	
-	public static class Default {
-		public static AstrixFaultTolerancePlugin create() {
-			return new AstrixFaultTolerancePlugin() {
-				@Override
-				public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec) {
-					return spec.getProvider();
-				}
-			};
-		}
-	}
-
-	<T> T addFaultTolerance(FaultToleranceSpecification<T> spec);
+	public static final String API_VERSION = "apiVersion";
+	public static final String SERVICE_METHOD_SIGNATURE = "serviceMethodSignature";
+	public static final String SERVICE_API = "serviceApi";
 
 }

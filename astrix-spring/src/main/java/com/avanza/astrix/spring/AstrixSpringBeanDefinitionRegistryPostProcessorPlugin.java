@@ -13,23 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft.plugin;
+package com.avanza.astrix.spring;
 
-import java.util.Objects;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
-import org.kohsuke.MetaInfServices;
+public interface AstrixSpringBeanDefinitionRegistryPostProcessorPlugin {
 
-import com.avanza.astrix.ft.FaultToleranceSpecification;
-import com.avanza.astrix.ft.HystrixAdapter;
+	void postProcess(BeanDefinitionRegistry registry);
 
-
-@MetaInfServices(value = AstrixFaultTolerancePlugin.class)
-public class HystrixFaultTolerancePlugin implements AstrixFaultTolerancePlugin {
-	
-	@Override
-	public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec, T provider) {
-		Objects.requireNonNull(spec);
-		return HystrixAdapter.create(spec, provider);
-	}
-	
 }

@@ -29,7 +29,6 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.avanza.astrix.context.FaultToleranceSpecification;
 import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.ft.HystrixAdapter;
@@ -55,12 +54,12 @@ public abstract class FaultToleranceIntegrationTest {
 
 	@Before
 	public void createService() {
-		testService = HystrixAdapter.create(specRandomGroup(), settingsRandomCommandKey());
+		testService = HystrixAdapter.create(specRandomGroup(), provider, settingsRandomCommandKey());
 	}
 	
 	@Test
 	public void createWithDefaultSettings() throws Exception {
-		SimpleService create = HystrixAdapter.create(specRandomGroup());
+		SimpleService create = HystrixAdapter.create(specRandomGroup(), provider);
 		create.echo("");
 	}
 
@@ -146,7 +145,7 @@ public abstract class FaultToleranceIntegrationTest {
 		settings.setMaxQueueSize(-1); // sync queue
 		settings.setExecutionIsolationThreadTimeoutInMilliseconds(5000);
 		settings.setSemaphoreMaxConcurrentRequests(3);
-		SimpleService serviceWithFt = HystrixAdapter.create(specRandomGroup(), settings);
+		SimpleService serviceWithFt = HystrixAdapter.create(specRandomGroup(), provider, settings);
 		ExecutorService pool = Executors.newCachedThreadPool();
 		Collection<R> runners = new ArrayList<R>();
 		for (int i = 0; i < 5; i++) {
@@ -223,7 +222,7 @@ public abstract class FaultToleranceIntegrationTest {
 	}
 	
 	private FaultToleranceSpecification<SimpleService> specRandomGroup() {
-		return FaultToleranceSpecification.builder(api).provider(provider).group(randomString()).isolationStrategy(isolationStrategy()).build();
+		return FaultToleranceSpecification.builder(api).group(randomString()).isolationStrategy(isolationStrategy()).build();
 	}
 	
 	private String randomString() {

@@ -26,9 +26,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.SimpleBoundServiceBeanInstance;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -43,7 +43,6 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	
 	private final static AtomicLong idGen = new AtomicLong();
 	private final static Map<String, ServiceProvider<?>> providerById = new ConcurrentHashMap<>();
-	private AstrixFaultTolerance faultTolerance;
 	private AstrixVersioningPlugin versioningPlugin;
 	
 	@AstrixInject
@@ -60,13 +59,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + type);
 		}
 		T provider = type.cast(serviceProvider.getProvider(versioningPlugin, versioningContext));
-		FaultToleranceSpecification<T> ftSpec = FaultToleranceSpecification.builder(type)
-																		   .group("in-memory")
-																		   .provider(provider)
-																		   .isolationStrategy(IsolationStrategy.SEMAPHORE)
-																		   .build();
-		T providerWithFT = faultTolerance.addFaultTolerance(ftSpec);
-		return SimpleBoundServiceBeanInstance.create(providerWithFT);
+		return SimpleBoundServiceBeanInstance.create(provider);
 	}
 	
 	@Override
@@ -278,11 +271,5 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 		String id = register(api, provider, serverVersioningContext);
 		return getServiceUri(id);
 	}
-
-	@AstrixInject
-	public void setFaultTolerance(AstrixFaultTolerance faultTolerance) {
-		this.faultTolerance = faultTolerance;
-	}
-	
 
 }

@@ -13,16 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.ft.plugin;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import rx.Observable;
+
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.context.AstrixConfigAware;
 import com.avanza.astrix.core.util.ProxyUtil;
+import com.avanza.astrix.ft.FaultToleranceSpecification;
+import com.avanza.astrix.ft.HystrixObservableCommandFacade;
+import com.avanza.astrix.ft.ObservableCommandSettings;
 
 /**
  * 
@@ -39,11 +45,26 @@ public final class AstrixFaultTolerance implements AstrixConfigAware {
 		this.faultTolerancePlugin = faultTolerancePlugin;
 	}
 
-	public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec) {
+	public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec, T provider) {
 		DynamicBooleanProperty faultToleranceEnabledForCircuit = config.getBooleanProperty("astrix.faultTolerance." + spec.getApi().getName() + ".enabled", true);
 		DynamicBooleanProperty faultToleranceEnabled = config.getBooleanProperty(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
-		T withFaultTolerance = faultTolerancePlugin.addFaultTolerance(spec);
-		return ProxyUtil.newProxy(spec.getApi(), new FaultToleranceToggle<>(withFaultTolerance, spec.getProvider(), faultToleranceEnabled, faultToleranceEnabledForCircuit));
+		T withFaultTolerance = faultTolerancePlugin.addFaultTolerance(spec, provider);
+		return ProxyUtil.newProxy(spec.getApi(), new FaultToleranceToggle<>(withFaultTolerance, provider, faultToleranceEnabled, faultToleranceEnabledForCircuit));
+	}
+	
+	public <T> Observable<T> observe(Observable<T> observable, ObservableCommandSettings settings) {
+		if (faultToleranceEnabled(settings)) {
+			return HystrixObservableCommandFacade.observe(observable, settings);
+		} else {
+			return observable;
+		}
+	}
+
+	private <T> boolean faultToleranceEnabled(ObservableCommandSettings settings) {
+		DynamicBooleanProperty faultToleranceEnabledForCircuit = config.getBooleanProperty("astrix.faultTolerance." + settings.getCommandKey() + ".enabled", true);
+		DynamicBooleanProperty faultToleranceEnabled = config.getBooleanProperty(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
+		boolean enabled = faultToleranceEnabled.get() && faultToleranceEnabledForCircuit.get();
+		return enabled;
 	}
 
 	private class FaultToleranceToggle<T> implements InvocationHandler {

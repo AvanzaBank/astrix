@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.ft.plugin;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,7 +24,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.MapConfigSource;
+import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.core.util.ProxyUtil;
+import com.avanza.astrix.ft.FaultToleranceSpecification;
+import com.avanza.astrix.ft.plugin.AstrixFaultTolerance;
+import com.avanza.astrix.ft.plugin.AstrixFaultTolerancePlugin;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
 import com.avanza.astrix.provider.core.Service;
@@ -33,51 +39,50 @@ public class AstrixFaultToleranceTest {
 	
 	@Test
 	public void itShouldBePossibleToDisableFaultToleranceGloballyAtRuntime() throws Exception {
+		MapConfigSource config = new MapConfigSource();
 		FakeFaultTolerancePlugin faultTolerancePlugin = new FakeFaultTolerancePlugin();
+
+		AstrixFaultTolerance faultTolerance = new AstrixFaultTolerance(faultTolerancePlugin);
+		faultTolerance.setConfig(new DynamicConfig(config));
 		
-		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
-		configurer.registerPlugin(AstrixFaultTolerancePlugin.class, faultTolerancePlugin);
-		configurer.registerApiProvider(MyServiceProvider.class);
-		configurer.enableFaultTolerance(true);
-		configurer.set("pingUri", AstrixDirectComponent.registerAndGetUri(Ping.class, new PingImpl()));
-		
-		AstrixContext context = configurer.configure();
-		
-		Ping ping = context.getBean(Ping.class);
+		Ping pingWithFt = faultTolerance.addFaultTolerance(FaultToleranceSpecification.builder(Ping.class)
+																							.group("foo")
+																							.isolationStrategy(IsolationStrategy.SEMAPHORE)
+																							.build(), 
+																new PingImpl());
 		
 		assertEquals(0, faultTolerancePlugin.appliedFaultToleranceCount.get());
-		assertEquals("foo", ping.ping("foo"));
+		assertEquals("foo", pingWithFt.ping("foo"));
 		assertEquals(1, faultTolerancePlugin.appliedFaultToleranceCount.get());
 
-		configurer.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
+		config.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, "false");
 		
-		assertEquals("foo", ping.ping("foo"));
+		assertEquals("foo", pingWithFt.ping("foo"));
 		assertEquals(1, faultTolerancePlugin.appliedFaultToleranceCount.get());
 	}
 	
 	@Test
 	public void itShouldBePossibleToDisableFaultToleranceAtRuntimeForAGivenCircuit() throws Exception {
+		MapConfigSource config = new MapConfigSource();
 		FakeFaultTolerancePlugin faultTolerancePlugin = new FakeFaultTolerancePlugin();
+
+		AstrixFaultTolerance faultTolerance = new AstrixFaultTolerance(faultTolerancePlugin);
+		faultTolerance.setConfig(new DynamicConfig(config));
 		
-		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
-		configurer.registerPlugin(AstrixFaultTolerancePlugin.class, faultTolerancePlugin);
-		configurer.registerApiProvider(MyServiceProvider.class);
-		configurer.enableFaultTolerance(true);
-		configurer.set("pingUri", AstrixDirectComponent.registerAndGetUri(Ping.class, new PingImpl()));
-		
-		AstrixContext context = configurer.configure();
-		
-		Ping ping = context.getBean(Ping.class);
-		
-		configurer.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
+		Ping pingWithFt = faultTolerance.addFaultTolerance(FaultToleranceSpecification.builder(Ping.class)
+																							.group("foo")
+																							.isolationStrategy(IsolationStrategy.SEMAPHORE)
+																							.build(), 
+																new PingImpl());
+		config.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, "true");
 		assertEquals(0, faultTolerancePlugin.appliedFaultToleranceCount.get());
-		assertEquals("foo", ping.ping("foo"));
+		assertEquals("foo", pingWithFt.ping("foo"));
 		assertEquals(1, faultTolerancePlugin.appliedFaultToleranceCount.get());
 
 		
 
-		configurer.set("astrix.faultTolerance." + Ping.class.getName() + ".enabled", false);
-		assertEquals("foo", ping.ping("foo"));
+		config.set("astrix.faultTolerance." + Ping.class.getName() + ".enabled", "false");
+		assertEquals("foo", pingWithFt.ping("foo"));
 		assertEquals(1, faultTolerancePlugin.appliedFaultToleranceCount.get());
 	}
 	
@@ -103,8 +108,8 @@ public class AstrixFaultToleranceTest {
 		private final AtomicInteger appliedFaultToleranceCount = new AtomicInteger();
 		
 		@Override
-		public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec) {
-			return ProxyUtil.newProxy(spec.getApi(), new InvocationCounterProxy(appliedFaultToleranceCount, spec.getProvider()));
+		public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec, T provider) {
+			return ProxyUtil.newProxy(spec.getApi(), new InvocationCounterProxy(appliedFaultToleranceCount, provider));
 		}
 
 	}
