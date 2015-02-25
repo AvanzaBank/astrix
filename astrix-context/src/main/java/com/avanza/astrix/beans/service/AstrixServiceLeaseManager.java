@@ -93,7 +93,7 @@ public class AstrixServiceLeaseManager {
 			try {
 				leasedService.renew();
 			} catch (Exception e) {
-				log.warn("Failed to bind service: " + leasedService.getBeanKey());
+				log.warn("Failed to bind service: " + leasedService.getBeanKey(), e);
 			}
 		}
 	}
@@ -123,7 +123,7 @@ public class AstrixServiceLeaseManager {
 			try {
 				leasedService.renew();
 			} catch (Exception e) {
-				log.warn("Failed to renew lease for service: " + leasedService.getBeanKey());
+				log.warn("Failed to renew lease for service: " + leasedService.getBeanKey(), e);
 			}
 		}
 	}
