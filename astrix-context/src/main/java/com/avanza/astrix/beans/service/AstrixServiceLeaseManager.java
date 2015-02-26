@@ -44,7 +44,7 @@ public class AstrixServiceLeaseManager {
 		this.config = config;
 	}
 	
-	public <T> void startManageLease(AstrixServiceBeanInstance<T> serviceBeanInstance, AstrixServiceProperties currentProperties, AstrixServiceLookup serviceLookup) {
+	public <T> void startManageLease(ManagedAstrixServiceBeanInstance<T> serviceBeanInstance, AstrixServiceProperties currentProperties, AstrixServiceLookup serviceLookup) {
 		synchronized (isStarted) {
 			if (!isStarted.get()) {
 				start();

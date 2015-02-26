@@ -29,6 +29,8 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.avanza.astrix.beans.core.KeyLock;
 /**
  * Manages the life-cycle of each object created by Astrix. Each object created will be cached.
  * 
@@ -41,11 +43,11 @@ import org.slf4j.LoggerFactory;
  * @author Elias Lindholm (elilin)
  *
  */
-final class ObjectCache {
+public final class ObjectCache {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ObjectCache.class);
 	private final ConcurrentMap<Object, Object> instanceById = new ConcurrentHashMap<>();
-	private final ConcurrentMap<Object, Lock> lockedObjects = new ConcurrentHashMap<>();
+	private final KeyLock<Object> lockedObjects = new KeyLock<>();
 	
 	@SuppressWarnings("unchecked")
 	public <T> T getInstance(Object objectId, ObjectFactory<T> factory) {
@@ -54,6 +56,27 @@ final class ObjectCache {
 			return object;
 		}
 		return create(objectId, factory);
+	}
+	
+	public void destroyInCache(Object id) {
+		lockedObjects.lock(id);
+		try {
+			Object object = this.instanceById.remove(id);
+			if (object == null) {
+				// Already destroyed
+				return;
+			}
+			// destroy instance
+			try {
+				destroy(object);
+			} catch (RuntimeException e) {
+				throw e;
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to destroy instance of: " + id, e);
+			}
+		} finally {
+			lockedObjects.unlock(id);
+		}
 	}
 	
 	public void destroy() {
@@ -86,13 +109,7 @@ final class ObjectCache {
 	
 	@SuppressWarnings("unchecked")
 	private <T> T create(Object id, ObjectFactory<T> objectFactory) {
-		Lock lock = new ReentrantLock();
-		Lock existingLock = lockedObjects.putIfAbsent(id, lock);
-		if (existingLock != null) {
-			// Another thread is already crating  object
-			lock = existingLock;
-		}
-		lock.lock();
+		lockedObjects.lock(id);
 		try {
 			T object = (T) this.instanceById.get(id);
 			if (object != null) {
@@ -104,7 +121,7 @@ final class ObjectCache {
 			try {
 				instance = objectFactory.create();
 				init(instance);
-				this.instanceById.put(id, instance);
+				this.instanceById.put(id, instance);;
 				return instance;
 			} catch (RuntimeException e) {
 				throw e;
@@ -112,12 +129,7 @@ final class ObjectCache {
 				throw new RuntimeException("Failed to create instance of: " + id);
 			}
 		} finally {
-			lock.unlock();
-			/*
-			 * If object was created on current thread, then remove the lock.
-			 * If another thread created the object, this will have no effect.
-			 */
-			lockedObjects.remove(id);
+			lockedObjects.unlock(id);
 		}
 	}
 	

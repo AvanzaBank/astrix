@@ -26,8 +26,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.SimpleBoundServiceBeanInstance;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
@@ -51,7 +53,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	
 	
 	@Override
-	public <T> T bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
+	public <T> BoundServiceBeanInstance<T> bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
 		String providerName = serviceProperties.getProperty("providerId");
 		ServiceProvider<?> serviceProvider = providerById.get(providerName);
 		if (serviceProvider == null) {
@@ -64,7 +66,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 																		   .isolationStrategy(IsolationStrategy.SEMAPHORE)
 																		   .build();
 		T providerWithFT = faultTolerance.addFaultTolerance(ftSpec);
-		return providerWithFT;
+		return SimpleBoundServiceBeanInstance.create(providerWithFT);
 	}
 	
 	@Override

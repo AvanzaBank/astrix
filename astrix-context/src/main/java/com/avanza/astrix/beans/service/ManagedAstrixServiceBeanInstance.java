@@ -41,9 +41,9 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  *
  * @param <T>
  */
-public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHandler {
+public class ManagedAstrixServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHandler {
 	
-	private static final Logger log = LoggerFactory.getLogger(AstrixServiceBeanInstance.class);
+	private static final Logger log = LoggerFactory.getLogger(ManagedAstrixServiceBeanInstance.class);
 
 	private static final AtomicInteger nextId = new AtomicInteger(0);
 	private final String id = nextId.incrementAndGet() + ""; // Used for debugging to distinguish between many context's started within same jvm.
@@ -58,7 +58,7 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 	private final Lock boundStateLock = new ReentrantLock();
 	private final Condition boundCondition = boundStateLock.newCondition();
 
-	private AstrixServiceBeanInstance(ServiceVersioningContext versioningContext, 
+	private ManagedAstrixServiceBeanInstance(ServiceVersioningContext versioningContext, 
 								AstrixBeanKey<T> beanKey, 
 								AstrixServiceLookup serviceLookup, 
 								AstrixServiceComponents serviceComponents, 
@@ -71,12 +71,12 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 		this.state = new Unbound();
 	}
 	
-	public static <T> AstrixServiceBeanInstance<T> create(ServiceVersioningContext versioningContext, 
+	public static <T> ManagedAstrixServiceBeanInstance<T> create(ServiceVersioningContext versioningContext, 
 								AstrixBeanKey<T> beanKey, 
 								AstrixServiceLookup serviceLookup, 
 								AstrixServiceComponents serviceComponents, 
 								DynamicConfig config) {
-		return new AstrixServiceBeanInstance<T>(versioningContext, beanKey, serviceLookup, serviceComponents, config);
+		return new ManagedAstrixServiceBeanInstance<T>(versioningContext, beanKey, serviceLookup, serviceComponents, config);
 	}
 	
 	/**
@@ -85,19 +85,29 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 	 * Throws exception if bind attempt fails.
 	 */
 	public void bind(AstrixServiceProperties serviceProperties) {
+		InvocationHandler previousState = this.state;
 		if (serviceProperties == null) {
 			log.info("Service moving to unbound state " + beanKey + ", AstrixBeanId=" + id);
 			this.state = new Unbound();
+			releaseInstanceIfBound(previousState);
 			return;
 		}
 		String providerSubsystem = serviceProperties.getProperty(AstrixServiceProperties.SUBSYSTEM);
 		if (!isAllowedToInvokeService(providerSubsystem)) {
 			this.state = new IllegalSubsystemState(subsystem, providerSubsystem, beanKey.getBeanType());
 		} else {
-			this.state = new Bound(create(serviceProperties));
+			this.state = create(serviceProperties);
 			log.info("Successfully bound to " + beanKey + ", AstrixBeanId=" + id);
 		}
 		notifyBound();
+		releaseInstanceIfBound(previousState);
+	}
+
+	private void releaseInstanceIfBound(InvocationHandler previousState) {
+		if (previousState.getClass().equals(Bound.class)) {
+			Bound<T> boundState = (Bound<T>) previousState;
+			boundState.releaseInstance();
+		}
 	}
 	
 	private void notifyBound() {
@@ -120,12 +130,12 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 		return this.subsystem.equals(providerSubsystem);
 	}
 	
-	private T create(AstrixServiceProperties serviceProperties) {
+	private Bound<T> create(AstrixServiceProperties serviceProperties) {
 		if (serviceProperties == null) {
 			throw new RuntimeException(String.format("Misssing entry in service-registry beanKey=%s", beanKey));
 		}
 		AstrixServiceComponent serviceComponent = getServiceComponent(serviceProperties);
-		return serviceComponent.bind(versioningContext, beanKey.getBeanType(), serviceProperties);
+		return new Bound<>(serviceComponent.bind(versioningContext, beanKey.getBeanType(), serviceProperties));
 	}
 	
 	private AstrixServiceComponent getServiceComponent(AstrixServiceProperties serviceProperties) {
@@ -192,18 +202,22 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 		}
 	}
 	
-	private class Bound implements InvocationHandler {
+	private static class Bound<T> implements InvocationHandler {
 
-		private final T bean;
+		private final BoundServiceBeanInstance<T> serviceBeanInstance;
 		
-		public Bound(T bean) {
-			this.bean = bean;
+		public Bound(BoundServiceBeanInstance<T> bean) {
+			this.serviceBeanInstance = bean;
+		}
+
+		public void releaseInstance() {
+			serviceBeanInstance.release();
 		}
 
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			try {
-				return method.invoke(bean, args);
+				return method.invoke(serviceBeanInstance.get(), args);
 			} catch (InvocationTargetException e) {
 				log.debug("Service invocation threw exception", e);
 				throw e.getTargetException();

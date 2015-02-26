@@ -28,7 +28,7 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  */
 public interface AstrixServiceComponent {
 	
-	<T> T bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties);
+	<T> BoundServiceBeanInstance<T> bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties);
 	
 	AstrixServiceProperties createServiceProperties(String serviceUri);
 	

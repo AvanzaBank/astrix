@@ -40,11 +40,6 @@ public class GsBinder implements AstrixConfigAware {
 	private static final Pattern SPACE_URL_PATTERN = Pattern.compile("jini://.*?/.*?/(.*)?[?](.*)");
 	private DynamicConfig config;
 	
-	public GsFactory createGsFactory(AstrixServiceProperties properties) {
-		String spaceUrl = properties.getProperty(SPACE_URL_PROPERTY);
-		return new GsFactory(spaceUrl);
-	}
-	
 	public GigaSpace getEmbeddedSpace(ApplicationContext applicationContext) {
 		String optionalGigaSpaceBeanName = config.getStringProperty(AstrixSettings.GIGA_SPACE_BEAN_NAME, null).get();
 		if (optionalGigaSpaceBeanName  != null) {

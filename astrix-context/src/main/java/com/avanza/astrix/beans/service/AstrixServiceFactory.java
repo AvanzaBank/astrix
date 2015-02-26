@@ -58,7 +58,7 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBean<T> {
 
 	@Override
 	public T create(AstrixBeans beans) {
-		AstrixServiceBeanInstance<T> serviceBeanInstance = AstrixServiceBeanInstance.create(versioningContext, beanKey, serviceLookup, serviceComponents, config);
+		ManagedAstrixServiceBeanInstance<T> serviceBeanInstance = ManagedAstrixServiceBeanInstance.create(versioningContext, beanKey, serviceLookup, serviceComponents, config);
 		AstrixServiceProperties serviceProperties = null;
 		try {
 			serviceProperties = serviceLookup.lookup(beanKey);
@@ -80,14 +80,6 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBean<T> {
 	@Override
 	public AstrixBeanKey<T> getBeanKey() {
 		return beanKey;
-	}
-	
-	public T create(AstrixServiceProperties serviceProperties) {
-		if (serviceProperties == null) {
-			throw new RuntimeException(String.format("Misssing entry in service-registry beanKey=%s", beanKey));
-		}
-		AstrixServiceComponent serviceComponent = getServiceComponent(serviceProperties);
-		return serviceComponent.bind(versioningContext, beanKey.getBeanType(), serviceProperties);
 	}
 	
 	private AstrixServiceComponent getServiceComponent(AstrixServiceProperties serviceProperties) {

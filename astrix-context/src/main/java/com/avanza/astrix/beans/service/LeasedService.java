@@ -34,11 +34,11 @@ class LeasedService<T> {
 	private static final Logger log = LoggerFactory.getLogger(LeasedService.class);
 	
 	private final AstrixServiceLookup serviceLookup;
-	private final AstrixServiceBeanInstance<T> instance;
+	private final ManagedAstrixServiceBeanInstance<T> instance;
 	private volatile AstrixServiceProperties currentProperties;
 	private final Lock stateLock = new ReentrantLock();
 	
-	public LeasedService(AstrixServiceBeanInstance<T> instance, 
+	public LeasedService(ManagedAstrixServiceBeanInstance<T> instance, 
 			AstrixServiceProperties currentProperties,
 			AstrixServiceLookup serviceLookup) {
 		this.instance = instance;

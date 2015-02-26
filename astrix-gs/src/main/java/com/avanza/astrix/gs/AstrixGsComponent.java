@@ -19,11 +19,14 @@ import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.SimpleBoundServiceBeanInstance;
 import com.avanza.astrix.context.AstrixFaultTolerance;
 import com.avanza.astrix.context.FaultToleranceSpecification;
 import com.avanza.astrix.context.IsolationStrategy;
+import com.avanza.astrix.gs.ClusteredProxyCache.GigaSpaceInstance;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
@@ -39,20 +42,21 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 	private GsBinder gsBinder;
 	private AstrixFaultTolerance faultTolerance;
 	private AstrixSpringContext astrixSpringContext;
+	private ClusteredProxyCache proxyCache;
 	
 	
 	@Override
-	public <T> T bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
+	public <T> BoundServiceBeanInstance<T> bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
 		if (!GigaSpace.class.isAssignableFrom(type)) {
 			throw new IllegalStateException("Programming error, attempted to create: " + type);
 		}
-		T gigaSpace = type.cast(gsBinder.createGsFactory(serviceProperties).create());
+		GigaSpaceInstance gigaSpaceInstance = proxyCache.getProxy(serviceProperties);
 		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
-		FaultToleranceSpecification<T> ftSpec = FaultToleranceSpecification.builder(type).provider(gigaSpace)
+		FaultToleranceSpecification<T> ftSpec = FaultToleranceSpecification.builder(type).provider(type.cast(gigaSpaceInstance.get()))
 				.isolationStrategy(IsolationStrategy.THREAD).group(spaceName).build();
-		return faultTolerance.addFaultTolerance(ftSpec);
+		return BoundProxyServiceBeanInstance.create(faultTolerance.addFaultTolerance(ftSpec), gigaSpaceInstance);
 	}
-
+	
 	@Override
 	public AstrixServiceProperties createServiceProperties(String serviceUri) {
 		return gsBinder.createServiceProperties(serviceUri);
@@ -92,6 +96,11 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 	@AstrixInject
 	public void setAstrixContext(AstrixSpringContext astrixSpringContext) {
 		this.astrixSpringContext = astrixSpringContext;
+	}
+	
+	@AstrixInject
+	public void setProxyCache(ClusteredProxyCache proxyCache) {
+		this.proxyCache = proxyCache;
 	}
 	
 	@AstrixInject

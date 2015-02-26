@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -146,6 +147,11 @@ public class AstrixIntegrationTest {
 		astrix.waitForBean(AstrixServiceRegistry.class, 5000);
 		astrix.waitForBean(LunchStatistics.class, 5000);
 		astrix.waitForBean(Ping.class, "lunch-ping", 5000);
+	}
+	
+	@After
+	public void after() {
+		astrix.destroy();
 	}
 
 	@Test

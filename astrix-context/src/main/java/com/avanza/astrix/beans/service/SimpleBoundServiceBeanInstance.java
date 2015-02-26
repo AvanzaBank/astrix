@@ -13,30 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.gs;
+package com.avanza.astrix.beans.service;
 
-import org.openspaces.core.GigaSpace;
-import org.openspaces.core.GigaSpaceConfigurer;
-import org.openspaces.core.space.UrlSpaceConfigurer;
+public class SimpleBoundServiceBeanInstance<T> implements BoundServiceBeanInstance<T> {
 
-import com.j_spaces.core.IJSpace;
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public class GsFactory  {
+	private T instance;
 	
-	private final String spaceUrl;
-
-	public GsFactory(String spaceUrl) {
-		this.spaceUrl = spaceUrl;
-	}
-
-	public GigaSpace create() {
-		IJSpace space = new UrlSpaceConfigurer(spaceUrl).create();
-		return new GigaSpaceConfigurer(space).create();
+	public SimpleBoundServiceBeanInstance(T instance) {
+		this.instance = instance;
 	}
 	
+	public static <T> BoundServiceBeanInstance<T> create(T instance) {
+		return new SimpleBoundServiceBeanInstance<T>(instance);
+	}
+
+	@Override
+	public T get() {
+		return instance;
+	}
+
+	@Override
+	public void release() {
+	}
+
 }
-
