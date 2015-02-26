@@ -77,4 +77,13 @@ class LeasedService<T> {
 		return this.instance.getBeanKey();
 	}
 
+	public void release() {
+		stateLock.lock();
+		try {
+			this.instance.release();
+		} finally {
+			this.stateLock.unlock();
+		}
+	}
+
 }

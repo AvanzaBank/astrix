@@ -102,6 +102,10 @@ public class ManagedAstrixServiceBeanInstance<T> implements StatefulAstrixBean, 
 		notifyBound();
 		releaseInstanceIfBound(previousState);
 	}
+	
+	void release() {
+		this.releaseInstanceIfBound(this.state);
+	}
 
 	private void releaseInstanceIfBound(InvocationHandler previousState) {
 		if (previousState.getClass().equals(Bound.class)) {

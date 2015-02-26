@@ -64,6 +64,13 @@ public class AstrixServiceLeaseManager {
 	public void destroy() {
 		this.leaseRenewalThread.interrupt();
 		this.serviceBindThread.interrupt();
+		for (LeasedService<?> leasedService : this.leasedServices) {
+			try {
+				leasedService.release();
+			} catch (Exception e) {
+				log.warn(String.format("Failed to release service bean: %s", leasedService.getBeanKey()), e);
+			}
+		}
 	}
 
 	private class ServiceBindThread extends Thread {

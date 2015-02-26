@@ -40,7 +40,7 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBean<T> {
 	private final AstrixServiceLookup serviceLookup;
 	private final AstrixServiceLeaseManager leaseManager;
 	private final ServiceVersioningContext versioningContext;
-	private DynamicConfig config;
+	private final DynamicConfig config;
 
 	public AstrixServiceFactory(ServiceVersioningContext versioningContext, 
 								AstrixBeanKey<T> beanType, 
@@ -80,14 +80,6 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBean<T> {
 	@Override
 	public AstrixBeanKey<T> getBeanKey() {
 		return beanKey;
-	}
-	
-	private AstrixServiceComponent getServiceComponent(AstrixServiceProperties serviceProperties) {
-		String componentName = serviceProperties.getComponent();
-		if (componentName == null) {
-			throw new IllegalArgumentException("Expected a componentName to be set on serviceProperties: " + serviceProperties);
-		}
-		return serviceComponents.getComponent(componentName);
 	}
 	
 }
