@@ -37,7 +37,7 @@ public class ServiceRegistryTest {
 	}
 	
 	@Test
-	public void testName() throws Exception {
+	public void whenServiceNotAvailableOnFirstBindAttemptTheServiceBeanShouldReattemptToBindLater() throws Exception {
 		// "Reserve" id for PingImpl
 		String serviceId = AstrixDirectComponent.register(Ping.class, new PingImpl());
 		

@@ -50,11 +50,24 @@ class LeasedService<T> {
 		stateLock.lock();
 		try {
 			AstrixServiceProperties serviceProperties = serviceLookup.lookup(getBeanKey());
-			if (serviceHasChanged(serviceProperties) || !this.instance.isBound()) {
+			if (serviceHasChanged(serviceProperties)) {
 				bind(serviceProperties);
 			} else {
 				log.debug("Service properties have not changed. No need to bind bean=" + instance.getBeanKey());
 			}
+		} finally {
+			stateLock.unlock();
+		}
+	}
+	
+	public void bind() {
+		stateLock.lock();
+		try {
+			if (isBound()) {
+				return;
+			}
+			AstrixServiceProperties serviceProperties = serviceLookup.lookup(getBeanKey());
+			bind(serviceProperties);
 		} finally {
 			stateLock.unlock();
 		}

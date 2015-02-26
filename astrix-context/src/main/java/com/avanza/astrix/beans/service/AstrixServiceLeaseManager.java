@@ -100,7 +100,7 @@ public class AstrixServiceLeaseManager {
 		private void bind(LeasedService<?> leasedService) {
 			try {
 				log.debug("Attempting to bind service={}", leasedService.getBeanKey());
-				leasedService.renew();
+				leasedService.bind();
 			} catch (Exception e) {
 				log.warn("Failed to bind service: " + leasedService.getBeanKey(), e);
 			}
