@@ -15,13 +15,9 @@
  */
 package com.avanza.astrix.remoting.client;
 
-import java.util.Arrays;
 import java.util.List;
 
 import rx.Observable;
-import rx.Subscriber;
-
-import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -35,10 +31,6 @@ public class AstrixRemotingTransport {
 		this.impl = impl;
 	}
 
-	public static AstrixRemotingTransport direct(AstrixServiceActivator activator) {
-		return new AstrixRemotingTransport(new Direct(activator));
-	}
-	
 	public static AstrixRemotingTransport create(RemotingTransportSpi impl) {
 		return new AstrixRemotingTransport(impl);
 	}
@@ -50,41 +42,6 @@ public class AstrixRemotingTransport {
 	public Observable<List<AstrixServiceInvocationResponse>> observeProcessBroadcastRequest(AstrixServiceInvocationRequest request) {
 		return impl.processBroadcastRequest(request);
 	}
-	
-	private static class Direct implements RemotingTransportSpi {
-
-		private AstrixServiceActivator activator;
-
-		public Direct(AstrixServiceActivator activator) {
-			this.activator = activator;
-		}
-
-		@Override
-		public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey){
-			final AstrixServiceInvocationResponse response = activator.invokeService(request);
-			return Observable.create(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {
-				@Override
-				public void call(Subscriber<? super AstrixServiceInvocationResponse> t1) {
-					t1.onNext(response);
-					t1.onCompleted();
-				}
-			});
-		}
-
-		@Override
-		public Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request) {
-			final AstrixServiceInvocationResponse response = activator.invokeService(request);
-			return Observable.create(new Observable.OnSubscribe<List<AstrixServiceInvocationResponse>>() {
-				@Override
-				public void call(Subscriber<? super List<AstrixServiceInvocationResponse>> t1) {
-					t1.onNext(Arrays.asList(response));
-					t1.onCompleted();
-				}
-			});
-		}
-		
-	}
-
 	
 
 }
