@@ -22,7 +22,6 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
@@ -55,12 +54,6 @@ public class AstrixServiceRegistryExporterWorker extends Thread implements Astri
 		this.serviceLeaseTimeMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
 	}
 	
-	@Autowired(required = false)
-	public void setServiceBuilders(List<AstrixServicePropertiesBuilderHolder> serviceBuilders) {
-		this.serviceBuilders = serviceBuilders;
-	}
-	
-
 	public void startServiceExporter() {
 		if (serviceBuilders.isEmpty()) {
 			log.info("No ServiceExporters configured. No services will be published to service registry");

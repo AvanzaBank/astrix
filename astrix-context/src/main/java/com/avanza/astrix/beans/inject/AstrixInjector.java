@@ -62,7 +62,7 @@ public class AstrixInjector {
 
 	public <T> void bind(Class<T> type, T provider) {
 		AstrixBeanKey<T> beanKey = AstrixBeanKey.create(type);
-		this.beanFactoryRegistry.providerByBeanKey.put(beanKey, new AlreadyInstantiadedFactoryBean<>(beanKey, provider));
+		this.beanFactoryRegistry.providerByBeanKey.put(beanKey, new AlreadyInstantiatedFactoryBean<>(beanKey, provider));
 	}
 	
 	public <T> T getBean(Class<T> type) {
@@ -82,7 +82,7 @@ public class AstrixInjector {
 		@Override
 		public <T> AstrixFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey) {
 			if (beanKey.getBeanType().isAssignableFrom(AstrixInjector.class)) {
-				return new AlreadyInstantiadedFactoryBean<>(beanKey, beanKey.getBeanType().cast(AstrixInjector.this));
+				return new AlreadyInstantiatedFactoryBean<>(beanKey, beanKey.getBeanType().cast(AstrixInjector.this));
 			}
 			AstrixFactoryBean<T> factory = (AstrixFactoryBean<T>) providerByBeanKey.get(beanKey);
 			if (factory != null) {
@@ -133,12 +133,12 @@ public class AstrixInjector {
 		}
 	}
 	
-	private static class AlreadyInstantiadedFactoryBean<T> implements AstrixFactoryBean<T> {
+	private static class AlreadyInstantiatedFactoryBean<T> implements AstrixFactoryBean<T> {
 
 		private AstrixBeanKey<T> beanKey;
 		private T instance;
 		
-		public AlreadyInstantiadedFactoryBean(AstrixBeanKey<T> beanKey, T instance) {
+		public AlreadyInstantiatedFactoryBean(AstrixBeanKey<T> beanKey, T instance) {
 			this.beanKey = beanKey;
 			this.instance = instance;
 		}

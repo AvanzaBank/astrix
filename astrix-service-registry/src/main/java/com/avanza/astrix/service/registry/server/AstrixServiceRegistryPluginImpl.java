@@ -15,31 +15,47 @@
  */
 package com.avanza.astrix.service.registry.server;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.kohsuke.MetaInfServices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryPlugin;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 
 @MetaInfServices(AstrixServiceRegistryPlugin.class)
 public class AstrixServiceRegistryPluginImpl implements AstrixServiceRegistryPlugin {
 	
-	private AstrixServiceRegistryExporterWorker serviceRegistryExporterWorker;
+	private static final Logger log = LoggerFactory.getLogger(AstrixServiceRegistryPluginImpl.class);
+	private final List<AstrixServicePropertiesBuilderHolder> serviceBuilders = new CopyOnWriteArrayList<>();
+	private AstrixInjector injector;
 	
 	@Override
 	public <T> void addProvider(AstrixBeanKey<T> beanKey, AstrixServiceComponent serviceComponent) {
-		serviceRegistryExporterWorker.addServiceBuilder(new AstrixServicePropertiesBuilderHolder(serviceComponent, beanKey));
+		serviceBuilders.add(new AstrixServicePropertiesBuilderHolder(serviceComponent, beanKey));
 	}
 	
 	@AstrixInject
-	public void setServiceRegistryExporterWorker(AstrixServiceRegistryExporterWorker serviceRegistryExporterWorker) {
-		this.serviceRegistryExporterWorker = serviceRegistryExporterWorker;
+	public void setInjector(AstrixInjector injector) {
+		this.injector = injector;
 	}
-
+	
 	@Override
 	public void startPublishServices() {
-		serviceRegistryExporterWorker.startServiceExporter();
+		if (serviceBuilders.isEmpty()) {
+			log.info("No ServiceExporters configured. No services will be published to service registry.");
+			return;
+		}
+		AstrixServiceRegistryExporterWorker exporterWorker = injector.getBean(AstrixServiceRegistryExporterWorker.class); 
+		for (AstrixServicePropertiesBuilderHolder serviceProperties : this.serviceBuilders) {
+			exporterWorker.addServiceBuilder(serviceProperties);
+		}
+		exporterWorker.startServiceExporter();
 	}
 	
 }
