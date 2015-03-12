@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.avanza.astrix</groupId>
 	<artifactId>astrix-parent</artifactId>
-	<version>0.16.6-SNAPSHOT</version>
+	<version>0.17.1</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>astrix-core</module>
@@ -28,7 +28,7 @@
 	<scm>
 		<connection>scm:git:git@git01.test.aza.se:asterix/asterix.git</connection>
 		<url>http://http://git01.test.aza.se/asterix/asterix/tree/master</url>
-		<tag>HEAD</tag>
+		<tag>astrix-parent-0.17.1</tag>
 	</scm>
 	<distributionManagement>
 		<repository>
@@ -422,8 +422,7 @@
 						<phase>test</phase>
 						<configuration>
 							<rules>
-								<NoPackageCyclesRule
-									implementation="de.andrena.tools.nopackagecycles.NoPackageCyclesRule" />
+								<NoPackageCyclesRule implementation="de.andrena.tools.nopackagecycles.NoPackageCyclesRule" />
 							</rules>
 						</configuration>
 					</execution>
