@@ -76,9 +76,9 @@ public class AstrixServiceRegistryExporterWorker extends Thread implements Astri
 			} catch (ServiceUnavailableException e) {
 				// Not bound to service registry
 				sleepTimeUntilNextAttempt = this.retryIntervallMillis.get();
-				log.info(String.format("Failed to export serivces to registry. Sleeping %s millis until next attempt.", sleepTimeUntilNextAttempt), e);
+				log.info(String.format("Failed to export services to registry. Sleeping %s millis until next attempt.", sleepTimeUntilNextAttempt), e);
 			} catch (Exception e) {
-				log.info(String.format("Failed to export serivces to registry. Sleeping %s millis until next attempt.", sleepTimeUntilNextAttempt), e);
+				log.info(String.format("Failed to export services to registry. Sleeping %s millis until next attempt.", sleepTimeUntilNextAttempt), e);
 			} 
 			try {
 				sleep(sleepTimeUntilNextAttempt);

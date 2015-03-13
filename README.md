@@ -170,7 +170,7 @@ public class LunchApiV1Migration implements AstrixJsonApiMigration {
 ### Service implementations
 
 ```java
-// The @AstrixServiceExport tells astrix that a given spring beans provides a given set of serivces.
+// The @AstrixServiceExport tells astrix that a given spring bean provides a given set of services.
 @AstrixServiceExport({LunchService.class, InternalLunchFeeder.class})
 public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 }
