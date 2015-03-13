@@ -7,9 +7,9 @@ Some of the features provided:
 - service versioning
 - fault tolerance
 
-Astrix is designed to support an organization where many teams develop different services and make those services available for other teams using Astrix. Astrix simplifies development of micro services as well as maintenance by limiting what is exposed to service consumers. That is, it gives the service provider full control over what is exposed, and what constitutes an internal implementation detail.
+Astrix is designed to support an organization where many teams develop different services and make those services available for other teams using Astrix. Astrix simplifies development of microservices as well as maintenance by limiting what is exposed to service consumers. That is, it gives the service provider full control over what is exposed, and what constitutes an internal implementation detail.
 
-Astrix extends the normal notion of what constitutes a (micro)service by allowing service-providers to build libraries on top of services. Such "fat clients" allow the service provider to execute domain rules on the client side or providing mashups of many sevices. Mashups are a great way to give the service provider full control over the granularity of each service.
+Astrix extends the normal notion of what constitutes a microservice by allowing service-providers to build libraries on top of services. Such "fat clients" allow the service provider to execute domain rules on the client side, or provide a single interface for a set of services.
 
 ## Service Registry
 Service registration and discovery is done using the service registry. It is an application that allows service-providers to register all services they provide and by service-consumers to discover providers of given services.
@@ -51,8 +51,7 @@ Astrix is well integrated with spring. It can be viewed as an extension to sprin
 
 
 ## Documentation
-[Tutorial](doc/tutorial/index.md)  
-[Documentation](doc/index.md) 
+[Tutorial](doc/tutorial/index.md)
 
 
 ## Generic module layout
@@ -69,7 +68,7 @@ Modules
 * lunch-server 
 
 
-### API (lunch-api) 
+### API (located in lunch-api) 
 ```java
 interface LunchService {
 	@AstrixBroadcast(reducer = LunchSuggestionReducer.class)
@@ -81,42 +80,56 @@ interface LunchRestaurantAdministrator {
 }
 
 interface LunchRestaurantGrader {
-	void grade(@Routing String restaurantName, int grade);
-	double getAvarageGrade(@Routing String restaurantName);
+	void grade(@AstrixRouting String restaurantName, int grade);
+	double getAvarageGrade(@AstrixRouting String restaurantName);
 }
 ```
 
-### API descriptor (lunch-api-provider)
+### API provider (lunch-api-provider)
 
 ```java
 // The API is versioned.
-@AstrixVersioned(
-	apiMigrations = {
-		LunchApiV1Migration.class
-	},	
+@AstrixObjectSerializerConfig(
 	version = 2,
-	objectMapperConfigurer = LunchApiObjectMapperConfigurer.class
+	objectSerializerConfigurer = LunchApiObjectSerializerConfigurer.class
 )
-// The service is exported to the service-registry. Service is bound by Astrix at runtime using service-registry
-@AstrixServiceRegistryApi({
-	LunchService.class,
-	LunchAdministrator.class,
-	LunchRestaurantGrader.class
-})
-public class LunchApiDescriptor {
+// The service is exported to the service-registry. Consumers queries the service-registry to bind to servers.
+@AstrixApiProvider
+public interface LunchServiceProvider {
+	
+	@Versioned
+	@Service
+	LunchService lunchService();
+
+	@Versioned
+	@Service
+	LunchRestaurantAdministrator lunchRestaurantAdministrator();
+
+	@Versioned
+	@Service
+	LunchRestaurantGrader lunchRestaurantGrader();
+}
+```
+
+### Object Serializer Configurer (lunch-api-provider)
+```java
+public class LunchApiObjectSerializerConfigurer implements Jackson1ObjectSerializerConfigurer {
+	
+	@Override
+	public List<? extends AstrixJsonApiMigration> apiMigrations() {
+		return Arrays.asList(new LunchApiV1Migration());
+	}
+
+	@Override
+	public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
+		// No custom configuration of Jackson required.
+	}
+
 }
 ```
 
 ### Migration (lunch-api-provider)
-
 ```java
-public interface AstrixJsonApiMigration {
-	
-	int fromVersion();
-	
-	AstrixJsonMessageMigration<?>[] getMigrations();
-
-}
 
 public class LunchApiV1Migration implements AstrixJsonApiMigration {
 
@@ -152,11 +165,12 @@ public class LunchApiV1Migration implements AstrixJsonApiMigration {
 }
 ```
 
-## Providing the lunch-api
+## Providing the lunch-api with a processing unit
 
 ### Service implementations
 
 ```java
+// The @AstrixServiceExport tells astrix that a given spring beans provides a given set of serivces.
 @AstrixServiceExport({LunchService.class, InternalLunchFeeder.class})
 public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 }
@@ -164,18 +178,16 @@ public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 // And other service-implementations
 ```
 
-### Service Descriptor
+### Application Descriptor
 
 ```java
-@AstrixService(
+@AstrixApplication(
 	apiDescriptors = {
-		LunchApiDescriptor.class,
-		LunchFeederApiDescriptor.class
+		LunchServiceProvider.class
 	},
-	subsystem = "lunch-service",
 	component = AstrixServiceComponentNames.GS_REMOTING
 )
-public class LunchServiceDescriptor {
+public class LunchApplicationDescriptor {
 }
 ```
 
@@ -183,8 +195,11 @@ public class LunchServiceDescriptor {
 
 ```xml
 <!-- Astrix service framework (provider and consumer) -->
-<bean id="astrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
-	<property name="serviceDescriptor" value="com.avanza.astrix.integration.tests.domain.apiruntime.LunchServiceDescriptor"/>
+<bean id="astrixFrameworkBean" class="com.avanza.astrix.spring.AstrixFrameworkBean">
+	<property name="serviceDescriptor" value="com.avanza.astrix.integration.tests.domain.apiruntime.LunchApplicationDescriptor"/>
+	<!-- The subsystem is used by the versionsing framework. Astrix only allows
+         invocation of NON-versioned services withing the same subsystem. -->
+	<property name="subsystem" value="lunch-system"/>
 </bean>
 
 <!-- The actual service implementation(s) -->
@@ -198,7 +213,7 @@ public class LunchServiceDescriptor {
 ### pu.xml (or an ordinary spring.xml)
 
 ```xml
-<bean id="astrixFrameworkBean" class="com.avanza.astrix.context.AstrixFrameworkBean">
+<bean id="astrixFrameworkBean" class="com.avanza.astrix.spring.AstrixFrameworkBean">
 	<property name="consumedAstrixBeans">
 		<list>
 			<value>com.avanza.astrix.integration.tests.domain.api.LunchService</value>
