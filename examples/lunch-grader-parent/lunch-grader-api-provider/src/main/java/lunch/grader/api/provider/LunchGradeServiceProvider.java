@@ -27,7 +27,7 @@ import com.avanza.astrix.provider.versioning.Versioned;
 	objectSerializerConfigurer = LunchGradeApiObjectMapperConfigurer.class
 )
 @AstrixApiProvider
-public interface LunchGradeApiProvider {
+public interface LunchGradeServiceProvider {
 
 	@Versioned
 	@Service

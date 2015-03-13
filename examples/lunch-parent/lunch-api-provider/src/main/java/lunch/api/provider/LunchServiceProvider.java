@@ -16,17 +16,25 @@
 package lunch.api.provider;
 
 import lunch.api.LunchService;
-import lunch.api.LunchUtil;
 
 import com.avanza.astrix.provider.core.AstrixApiProvider;
-import com.avanza.astrix.provider.core.Library;
+import com.avanza.astrix.provider.core.Service;
+import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
+import com.avanza.astrix.provider.versioning.Versioned;
 
+
+// The API is versioned.
+@AstrixObjectSerializerConfig(
+	version = 2,
+	objectSerializerConfigurer = LunchApiObjectSerializerConfigurer.class
+)
+// The service is exported to the service-registry. Consumers queries the service-registry to bind to servers.
 @AstrixApiProvider
-public class LunchApiFactory {
-
-	@Library
-	public LunchUtil createLunchUtil(LunchService lunchService) {
-		return new LunchUtilImpl(lunchService);
-	}
+public interface LunchServiceProvider {
 	
+	@Versioned
+	@Service
+	LunchService lunchService();
 }
+
+

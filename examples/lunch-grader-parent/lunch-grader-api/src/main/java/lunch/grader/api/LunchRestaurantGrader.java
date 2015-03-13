@@ -15,15 +15,14 @@
  */
 package lunch.grader.api;
 
-import org.openspaces.remoting.Routing;
-
 import com.avanza.astrix.core.AstrixBroadcast;
+import com.avanza.astrix.core.AstrixRouting;
 
 public interface LunchRestaurantGrader {
 	
-	void grade(@Routing String restaurantName, int grade);
+	void grade(@AstrixRouting String restaurantName, int grade);
 	
-	Double getAvarageGrade(@Routing String restaurantName);
+	Double getAvarageGrade(@AstrixRouting String restaurantName);
 	
 	@AstrixBroadcast
 	LunchRestaurantGrade getHighestGrade();
