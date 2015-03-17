@@ -39,11 +39,16 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
 import com.j_spaces.core.IJSpace;
-
+/**
+ * Allows publishing a GigaSpace's local-view.
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 @MetaInfServices(AstrixServiceComponent.class)
 public class AstrixGsLocalViewComponent implements AstrixServiceComponent, AstrixConfigAware {
 
-	private Logger log = LoggerFactory.getLogger(AstrixGsLocalViewComponent.class);
+	private static Logger log = LoggerFactory.getLogger(AstrixGsLocalViewComponent.class);
 	private GsBinder gsBinder;
 	private AstrixSpringContext astrixSpringContext;
 	private DynamicBooleanProperty disableLocalView;
@@ -61,12 +66,12 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 		if (!GigaSpace.class.isAssignableFrom(type)) {
 			throw new IllegalStateException("Programming error, attempted to create: " + type);
 		}
-		// TODO: protect creation of localView with fault-tolerance?
 		if (disableLocalView.get()) {
 			log.info("LocalView is disabled. Creating reqular proxy");
 			AstrixServiceComponent gsComponent = injector.getBean(AstrixServiceComponents.class).getComponent(AstrixServiceComponentNames.GS);
 			return gsComponent.bind(versioningContext, type, serviceProperties);
 		}
+		// TODO: protect creation of localView with fault-tolerance?
 		Class<LocalViewConfigurer> serviceConfigClass = versioningContext.getServiceConfigClass(LocalViewConfigurer.class);	
 		LocalViewConfigurer localViewConfigurer = ProxyUtil.newInstance(serviceConfigClass);
 		UrlSpaceConfigurer gsSpaceConfigurer = new UrlSpaceConfigurer(serviceProperties.getProperty(GsBinder.SPACE_URL_PROPERTY));
@@ -163,7 +168,7 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 				localViewSpaceConfigurer.destroy();
 				spaceConfigurer.destroy();
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("Failed to destroy local-view", e);
 			}
 		}
 	}

@@ -18,7 +18,9 @@ package com.avanza.astrix.gs.localview;
 import org.openspaces.core.space.cache.LocalViewSpaceConfigurer;
 
 import com.j_spaces.core.client.SQLQuery;
-
+/**
+ * @author Elias Lindholm (elilin)
+ */
 public class LocalViewSpaceConfigurerAdapter implements LocalViewDefinition {
 	
 	private final LocalViewSpaceConfigurer localViewSpaceConfigurer;

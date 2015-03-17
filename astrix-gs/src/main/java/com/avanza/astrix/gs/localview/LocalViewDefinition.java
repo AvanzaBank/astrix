@@ -15,12 +15,27 @@
  */
 package com.avanza.astrix.gs.localview;
 
-import com.j_spaces.core.client.SQLQuery;
+import org.openspaces.core.space.cache.LocalViewSpaceConfigurer;
 
+import com.j_spaces.core.client.SQLQuery;
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public interface LocalViewDefinition {
 
+	/**
+	 * See {@link LocalViewSpaceConfigurer#addViewQuery(SQLQuery)}
+	 * 
+	 * @param sqlQuery
+	 */
 	void addViewQuery(SQLQuery<?> sqlQuery);
 	
+	/**
+	 * See {@link LocalViewSpaceConfigurer#batchSize(int)}
+	 * @param size
+	 */
 	void setBatchSize(int size);
 
 }

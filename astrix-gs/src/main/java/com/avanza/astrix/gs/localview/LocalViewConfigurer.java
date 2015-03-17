@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 package com.avanza.astrix.gs.localview;
-
+/**
+ * @author Elias Lindholm (elilin)
+ */
 public interface LocalViewConfigurer {
 
-	void configure(LocalViewDefinition localView);
+	/**
+	 * Configures the underlying local-view. 
+	 * 
+	 * @param localViewDefinition
+	 */
+	void configure(LocalViewDefinition localViewDefinition);
 
 }
