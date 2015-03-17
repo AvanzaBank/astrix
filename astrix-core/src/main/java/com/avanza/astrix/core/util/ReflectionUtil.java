@@ -18,9 +18,7 @@ package com.avanza.astrix.core.util;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
-public class ProxyUtil {
-	
-	// TODO: rename to ReflectionUtil
+public class ReflectionUtil {
 	
 	@SuppressWarnings("unchecked")
 	public static <T> T newProxy(Class<T> type, InvocationHandler handler) {

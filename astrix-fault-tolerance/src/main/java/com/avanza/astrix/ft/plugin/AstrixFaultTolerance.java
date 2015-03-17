@@ -25,7 +25,7 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigAware;
-import com.avanza.astrix.core.util.ProxyUtil;
+import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.FaultToleranceSpecification;
 import com.avanza.astrix.ft.HystrixObservableCommandFacade;
 import com.avanza.astrix.ft.ObservableCommandSettings;
@@ -49,7 +49,7 @@ public final class AstrixFaultTolerance implements AstrixConfigAware {
 		DynamicBooleanProperty faultToleranceEnabledForCircuit = config.getBooleanProperty("astrix.faultTolerance." + spec.getApi().getName() + ".enabled", true);
 		DynamicBooleanProperty faultToleranceEnabled = config.getBooleanProperty(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
 		T withFaultTolerance = faultTolerancePlugin.addFaultTolerance(spec, provider);
-		return ProxyUtil.newProxy(spec.getApi(), new FaultToleranceToggle<>(withFaultTolerance, provider, faultToleranceEnabled, faultToleranceEnabledForCircuit));
+		return ReflectionUtil.newProxy(spec.getApi(), new FaultToleranceToggle<>(withFaultTolerance, provider, faultToleranceEnabled, faultToleranceEnabledForCircuit));
 	}
 	
 	public <T> Observable<T> observe(Observable<T> observable, ObservableCommandSettings settings) {

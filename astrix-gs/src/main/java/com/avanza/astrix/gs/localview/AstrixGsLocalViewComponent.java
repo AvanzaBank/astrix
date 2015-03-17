@@ -33,7 +33,7 @@ import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigAware;
-import com.avanza.astrix.core.util.ProxyUtil;
+import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
@@ -73,7 +73,7 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 		}
 		// TODO: protect creation of localView with fault-tolerance?
 		Class<LocalViewConfigurer> serviceConfigClass = versioningContext.getServiceConfigClass(LocalViewConfigurer.class);	
-		LocalViewConfigurer localViewConfigurer = ProxyUtil.newInstance(serviceConfigClass);
+		LocalViewConfigurer localViewConfigurer = ReflectionUtil.newInstance(serviceConfigClass);
 		UrlSpaceConfigurer gsSpaceConfigurer = new UrlSpaceConfigurer(serviceProperties.getProperty(GsBinder.SPACE_URL_PROPERTY));
 		IJSpace space = gsSpaceConfigurer.lookupTimeout(1_000).create();
 		

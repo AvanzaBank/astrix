@@ -27,7 +27,7 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.IsolationStrategy;
-import com.avanza.astrix.core.util.ProxyUtil;
+import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.FaultToleranceSpecification;
 import com.avanza.astrix.ft.plugin.AstrixFaultTolerance;
 import com.avanza.astrix.ft.plugin.AstrixFaultTolerancePlugin;
@@ -109,7 +109,7 @@ public class AstrixFaultToleranceTest {
 		
 		@Override
 		public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec, T provider) {
-			return ProxyUtil.newProxy(spec.getApi(), new InvocationCounterProxy(appliedFaultToleranceCount, provider));
+			return ReflectionUtil.newProxy(spec.getApi(), new InvocationCounterProxy(appliedFaultToleranceCount, provider));
 		}
 
 	}
