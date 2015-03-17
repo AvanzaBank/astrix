@@ -25,10 +25,13 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 
 /**
  * @author Elias Lindholm (elilin)
+ * 
+ * @deprecated - This annotation never had any effect and will be removed in future release.
  */
 @Target(value = { ElementType.TYPE})
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
+@Deprecated
 public @interface AstrixServiceComponentName {
 
 	/**
