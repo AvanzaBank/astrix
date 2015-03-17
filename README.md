@@ -18,8 +18,8 @@ Service registration and discovery is done using the service registry. It is an 
 One of the main responsibilities for Astrix is service binding, which is done in three steps:
 
 1. Astrix discovers a provider of a given service, typically using the service-registry
-2. Astrix uses information retrieved from discovery to decide what mechanism to use to bind to the given service provider. In Astrix that binding mechanism is called `ServiceComponent`
-3. Astrix uses the ServiceComponent to bind to the given provider
+2. Astrix uses information retrieved from discovery to decide what mechanism to use to bind to the given service provider. In Astrix that binding mechanism is called `AstrixServiceComponent`
+3. Astrix uses the AstrixServiceComponent to bind to the given provider
 
 It's also possible to locate providers without using the service-registry, for instance using configuration. The service-registry itself is located using the configuration mechanism.
 
