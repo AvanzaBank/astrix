@@ -20,9 +20,21 @@ import java.lang.reflect.Proxy;
 
 public class ProxyUtil {
 	
+	// TODO: rename to ReflectionUtil
+	
 	@SuppressWarnings("unchecked")
 	public static <T> T newProxy(Class<T> type, InvocationHandler handler) {
 		return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, handler);
 	}
+	
+	public static <T> T newInstance(Class<T> type) {
+		try {
+			return type.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new RuntimeException("Failed to instantiate class: " + type.getName(), e);
+		}
+	}
+	
+	
 
 }

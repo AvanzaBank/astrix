@@ -16,6 +16,7 @@
 package com.avanza.astrix.provider.versioning;
 
 
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -23,25 +24,50 @@ package com.avanza.astrix.provider.versioning;
  */
 public abstract class ServiceVersioningContext {
 	
-	private ServiceVersioningContext() {
+	// TODO: rename to ServiceContext
+	
+	private Class<?> serviceConfigClass = null;
+
+	private ServiceVersioningContext(Class<?> serviceConfigClass) {
+		this.serviceConfigClass = serviceConfigClass;
 	}
 	
 	public abstract boolean isVersioned();
+	
+	@SuppressWarnings("unchecked")
+	public <T> Class<T> getServiceConfigClass(Class<T> type) {
+		if (this.serviceConfigClass == null) {
+			throw new IllegalStateException(String.format("Expected service configuration class of type=%s to be defined for service", type.getName()));
+		}
+		if (!type.isAssignableFrom(this.serviceConfigClass)) {
+			throw new IllegalStateException(String.format("Expected service configuration class of type=%s, but actualType=", type.getName(), serviceConfigClass.getName()));
+		} 
+		return (Class<T>) serviceConfigClass;
+	}
 	
 	public abstract int version();
 	
 	public abstract Class<? extends AstrixObjectSerializerConfigurer> getObjectSerializerConfigurerClass();
 	
-	public static ServiceVersioningContext versionedService(AstrixVersioned versioned) {
-		return new VersionedServiceContext(versioned.version(), versioned.objectSerializerConfigurer());
+	public static ServiceVersioningContext versionedService(int version, Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfiguer) {
+		return versionedService(version, objectSerializerConfiguer, null); 
+				
 	}
 	
-	public static ServiceVersioningContext versionedService(int version, Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfiguer) {
-		return new VersionedServiceContext(version, objectSerializerConfiguer);
+	public static ServiceVersioningContext versionedService(
+			int version,
+			Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfigurer,
+			Class<?> serviceConfigClass) {
+		
+		return new VersionedServiceContext(version, objectSerializerConfigurer, serviceConfigClass);
 	}
 	
 	public static ServiceVersioningContext nonVersioned() {
-		return new NonVersionedServiceContext();
+		return nonVersioned(null);
+	}
+	
+	public static ServiceVersioningContext nonVersioned(Class<?> serviceConfig) {
+		return new NonVersionedServiceContext(serviceConfig);
 	}
 	
 	private static class VersionedServiceContext extends ServiceVersioningContext {
@@ -50,7 +76,9 @@ public abstract class ServiceVersioningContext {
 		private Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfiguer;
 		
 		public VersionedServiceContext(int version,
-									   Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfiguer) {
+									   Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfiguer,
+									   Class<?> serviceConfigClass) {
+			super(serviceConfigClass);
 			this.version = version;
 			this.objectSerializerConfiguer = objectSerializerConfiguer;
 		}
@@ -72,6 +100,10 @@ public abstract class ServiceVersioningContext {
 	}
 	
 	private static class NonVersionedServiceContext extends ServiceVersioningContext {
+
+		public NonVersionedServiceContext(Class<?> serviceConfig) {
+			super(serviceConfig);
+		}
 
 		@Override
 		public boolean isVersioned() {

@@ -21,6 +21,7 @@ import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
+import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -72,6 +73,11 @@ public class AstrixSettings implements DynamicConfigSource {
 	public static final String EXPORT_GIGASPACE = "AstrixGsComponent.exportGigaSpace";
 	public static final String GIGA_SPACE_BEAN_NAME = "AstrixGsComponent.gigaSpaceBeanName";
 	public static final String DYNAMIC_CONFIG_FACTORY = "com.avanza.astrix.context.AstrixDynamicConfigFactory";
+	/**
+	 * When local view is disabled every service that is exported using local-view
+	 * ({@link AstrixServiceComponentNames#GS_LOCAL_VIEW}) will use a regular clustered proxy instead.
+	 */
+	public static final String GS_DISABLE_LOCAL_VIEW = "AstrixGsLocalViewComponent.disableLocalView";
 	
 	private final MapConfigSource config = new MapConfigSource();
 	private final String configSourceId;

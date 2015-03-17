@@ -16,14 +16,15 @@
 package com.avanza.astrix.integration.tests;
 
 import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Properties;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -36,9 +37,12 @@ import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
+import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.api.LunchStatistics;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.test.util.Poller;
+import com.avanza.astrix.test.util.Probe;
 
 public class ClusteredProxyLibraryTest {
 	
@@ -114,5 +118,52 @@ public class ClusteredProxyLibraryTest {
 		GigaSpace proxy = astrix.waitForBean(GigaSpace.class, "lunch-space", 10000);
 		assertTrue(proxy.getSpace().isOptimisticLockingEnabled());
 	}
+	
+	
+	@Test
+	public void localViewTest() throws Exception {
+		configurer.setSubsystem("lunch-system");
+		astrix = configurer.configure();
+		this.lunchService = astrix.waitForBean(LunchService.class, 10_000L);
+		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
+		
+		final GigaSpace localView = astrix.waitForBean(GigaSpace.class, "lunch-space-local-view", 10_000L);
+		assertEventually(objectCount(localView, LunchRestaurant.template(), 1));
+	}
 
+	private void assertEventually(Probe probe) throws InterruptedException {
+		new Poller(10000, 25).check(probe);
+	}
+
+	private Probe objectCount(final GigaSpace localView, final Object template, final int expected) {
+		return new Probe() {
+			private int count = 0;
+			private Exception lastException;
+			@Override
+			public boolean isSatisfied() {
+				return count == expected;
+			}
+
+			@Override
+			public void sample() {
+				lastException = null;
+				try {
+					count = localView.count(template);
+				} catch (Exception e) {
+					lastException = e;
+				}
+			}
+
+			@Override
+			public void describeFailureTo(Description description) {
+				if (lastException != null) {
+					lastException.printStackTrace(); // for debug purpose
+					description.appendText("Object count for template: " + template.toString() + "\n expected: " + expected + " \n But last invocation threw exception: " + lastException.toString());
+				}
+				description.appendText("Object count for template: " + template.toString() + "\n expected: " + expected + " \n was: " + count);
+			}
+			
+		};
+	}
+	
 }
