@@ -24,6 +24,7 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Service;
+import com.avanza.astrix.provider.core.ServiceConfig;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 import com.avanza.astrix.provider.versioning.Versioned;
 
@@ -49,5 +50,10 @@ public interface LunchServiceProvider {
 	@AstrixQualifier("lunch-space")
 	@Service(AstrixServiceComponentNames.GS)
 	GigaSpace gigaSpace();
+	
+	@AstrixQualifier("lunch-space-local-view")
+	@Service(AstrixServiceComponentNames.GS_LOCAL_VIEW)
+	@ServiceConfig(LunchLocalViewConfigurer.class)
+	GigaSpace lunchLocalView();
 	
 }

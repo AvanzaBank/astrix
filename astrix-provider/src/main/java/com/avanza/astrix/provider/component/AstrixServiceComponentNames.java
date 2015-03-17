@@ -39,5 +39,11 @@ public class AstrixServiceComponentNames {
 	 * as service transport.
 	 */
 	public static final String GS_REMOTING = "gs-remoting";
+	
+	/**
+	 * Used export local-view GigaSpace as a service. Requires a LocalViewConfigurer
+	 * class to be defined as additional service configuration, see @ServiceConfig
+	 */
+	public static final String GS_LOCAL_VIEW = "gs-local-view";
 
 }

@@ -20,7 +20,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 class AstrixPluginDiscovery {
+	
+	private static Logger log = LoggerFactory.getLogger(AstrixPluginDiscovery.class);
 	
 	static <T> T discoverOnePlugin(Class<T> type) {
 		List<T> plugins = discoverAllPlugins(type);
@@ -37,7 +42,9 @@ class AstrixPluginDiscovery {
 		Iterator<T> plugins = ServiceLoader.load(type).iterator();		
 		List<T> result = new ArrayList<>();
 		while (plugins.hasNext()) {
-			result.add(plugins.next());
+			T plugin = plugins.next();
+			log.debug("Discovered plugin instance, pluginType={} pluginProviderType={}", type.getName(), plugin.getClass().getName());
+			result.add(plugin);
 		}
 		return result; 
 	}

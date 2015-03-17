@@ -21,6 +21,7 @@ import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
+import com.avanza.astrix.provider.core.ServiceConfig;
 import com.avanza.astrix.provider.versioning.Versioned;
 
 public class AstrixPublishedBeanDefinitionMethod {
@@ -68,4 +69,17 @@ public class AstrixPublishedBeanDefinitionMethod {
 	public Class<?> getBeanType() {
 		return method.getReturnType();
 	}
+	
+	/**
+	 * If the underlying element is annotated with @ServiceConfig, then this method returns
+	 * the value of the @ServiceConfig annotation. In all other cases this method returns null.
+	 * @return
+	 */
+	public Class<?> getServiceConfigClass() {
+		if (method.isAnnotationPresent(ServiceConfig.class)) {
+			return method.getAnnotation(ServiceConfig.class).value();
+		}
+		return null;
+	}
+
 }
