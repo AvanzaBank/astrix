@@ -123,7 +123,6 @@ public class AstrixGsRemotingComponent implements AstrixServiceComponent {
 	public <T> AstrixServiceProperties createServiceProperties(Class<T> exportedService) {
 		GigaSpace space = gsBinder.getEmbeddedSpace(astrixSpringContext.getApplicationContext());
 		AstrixServiceProperties serviceProperties = gsBinder.createProperties(space);
-		serviceProperties.setQualifier(null);
 		return serviceProperties;
 	}
 	

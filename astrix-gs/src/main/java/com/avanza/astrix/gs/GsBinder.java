@@ -76,7 +76,6 @@ public class GsBinder implements AstrixConfigAware {
 		result.setApi(GigaSpace.class);
 		result.setProperty(SPACE_NAME_PROPERTY, space.getSpace().getName());
 		result.setProperty(SPACE_URL_PROPERTY, new SpaceUrlBuilder(space).buildSpaceUrl());
-		result.setQualifier(space.getSpace().getName()); // TODO: Is it really necessary to set qualifier at this level??
 		return result;
 	}
 
