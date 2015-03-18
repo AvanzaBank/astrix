@@ -15,6 +15,9 @@
  */
 package com.avanza.astrix.remoting.client;
 
+import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.core.util.ReflectionUtil;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -24,10 +27,17 @@ public class RemoteServiceMethod {
 	
 	private String signature;
 	private Router router;
+	private Class<? extends AstrixRemoteResultReducer> reducer;
 	
 	public RemoteServiceMethod(String signature, Router router) {
 		this.signature = signature;
 		this.router = router;
+	}
+
+	public RemoteServiceMethod(String signature,
+			@SuppressWarnings("rawtypes") Class<? extends AstrixRemoteResultReducer> reducer) {
+		this.signature = signature;
+		this.reducer = reducer;
 	}
 
 	public String getSignature() {
@@ -36,6 +46,14 @@ public class RemoteServiceMethod {
 	
 	public RoutingKey getRoutingKey(Object... args) throws Exception {
 		return this.router.getRoutingKey(args);
+	}
+	
+	public boolean isBroadcast() {
+		return router == null;
+	}
+	
+	public AstrixRemoteResultReducer<?, ?> newReducer() {
+		return ReflectionUtil.newInstance(this.reducer);
 	}
 	
 }

@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
@@ -49,6 +50,7 @@ import com.avanza.astrix.remoting.client.AstrixRemotingProxy;
 import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
+import com.avanza.astrix.remoting.client.IncompatibleRemoteResultReducerException;
 import com.avanza.astrix.remoting.client.RemotingTransportSpi;
 import com.avanza.astrix.remoting.client.Router;
 import com.avanza.astrix.remoting.client.RoutingKey;
@@ -458,6 +460,38 @@ public class AstrixServiceActivatorTest {
 		assertEquals("AstrixRemotingProxy[" + VoidService.class.getName() + "]", testService.toString());
 	}
 	
+	@Test(expected = IncompatibleRemoteResultReducerException.class)
+	public void throwsExceptionOnProxyCreationIfRemoteResultReducerDoesNotHaveAMethodSignatureCompatibleWithServiceMethodSignature() throws Exception {
+		AstrixRemotingProxy.create(BroadcastServiceWithIllegalReducer.class, directTransport(activator), objectSerializer, new NoRoutingStrategy());
+	}
+	
+	@Test(expected = IncompatibleRemoteResultReducerException.class)
+	public void throwsExceptionOnProxyCreationIfRemoteResultReducerDoesNotHaveAMethodSignatureCompatibleWithServiceMethodSignature_2() throws Exception {
+		AstrixRemotingProxy.create(IllegalReducerHelloService.class, directTransport(activator), objectSerializer, new NoRoutingStrategy());
+	}
+	
+	@Test(expected = IllegalStateException.class)
+	public void throwsIllegalStateExceptionIfRoutingStrategyReturnsNull() throws Exception {
+		activator.register(new VoidService() {
+			@Override
+			public void hello(String message) {
+			}
+		}, objectSerializer, VoidService.class);
+		
+		VoidService voidService = AstrixRemotingProxy.create(VoidService.class, directTransport(activator), objectSerializer, new RoutingStrategy() {
+			@Override
+			public Router create(Method serviceMethod) {
+				return new Router() {
+					@Override
+					public RoutingKey getRoutingKey(Object... args) throws Exception {
+						return null;
+					}
+				};
+			}
+		});
+		voidService.hello("foo");
+	}
+	
 	@SuppressWarnings("serial")
 	public static class HelloRequest implements Serializable {
 		private String messsage;
@@ -562,6 +596,11 @@ public class AstrixServiceActivatorTest {
 		void hello(String message);
 	}
 	
+	interface IllegalReducerHelloService {
+		@AstrixBroadcast(reducer = StringToDateReducer.class)
+		String hello(String message);
+	}
+	
 	interface BroadcastVoidService {
 		@AstrixBroadcast
 		void hello(String message);
@@ -584,12 +623,30 @@ public class AstrixServiceActivatorTest {
 		String broadcast(BroadcastRequest request);
 	}
 	
+	interface BroadcastServiceWithIllegalReducer {
+		@AstrixBroadcast(reducer = IllegalBroadcastReducer.class)
+		String broadcast(BroadcastRequest request);
+	}
+	
 	public static class BroadcastReducer implements AstrixRemoteResultReducer<String, String> {
 		@Override
 		public String reduce(List<AstrixRemoteResult<String>> result) {
 			return result.get(0).getResult(); // Only one 'partition'
 		}
-
+	}
+	
+	public static class IllegalBroadcastReducer implements AstrixRemoteResultReducer<Date, Date> {
+		@Override
+		public Date reduce(List<AstrixRemoteResult<Date>> result) {
+			return null; // Never invoked, 
+		}
+	}
+	
+	public static class StringToDateReducer implements AstrixRemoteResultReducer<String, Date> {
+		@Override
+		public String reduce(List<AstrixRemoteResult<Date>> result) {
+			return null; // Never invoked, 
+		}
 	}
 	
 	public static class MyCustomServiceException extends ServiceInvocationException {

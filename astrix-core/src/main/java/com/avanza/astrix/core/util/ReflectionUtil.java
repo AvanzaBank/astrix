@@ -16,6 +16,7 @@
 package com.avanza.astrix.core.util;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 public class ReflectionUtil {
@@ -30,6 +31,14 @@ public class ReflectionUtil {
 			return type.newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException("Failed to instantiate class: " + type.getName(), e);
+		}
+	}
+	
+	public static Method getMethod(Class<? extends Object> type, String name, Class<?> parameterTypes) {
+		try {
+			return type.getMethod(name, parameterTypes);
+		} catch (NoSuchMethodException | SecurityException e) {
+			throw new RuntimeException("Failed to get method from class", e);
 		}
 	}
 	

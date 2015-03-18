@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package lunch.grader.api;
+package com.avanza.astrix.remoting.client;
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public class IncompatibleRemoteResultReducerException extends RuntimeException {
 
-import com.avanza.astrix.core.AstrixBroadcast;
-import com.avanza.astrix.core.AstrixRouting;
+	private static final long serialVersionUID = 1L;
+	
+	public IncompatibleRemoteResultReducerException(String msg) {
+		super(msg);
+	}
 
-public interface LunchRestaurantGrader {
-	
-	void grade(@AstrixRouting String restaurantName, int grade);
-	
-	Double getAvarageGrade(@AstrixRouting String restaurantName);
-	
-	@AstrixBroadcast(reducer = LunchRestaurantGradeReducer.class)
-	LunchRestaurantGrade getHighestGrade();
+
 }

@@ -41,6 +41,7 @@ import com.avanza.astrix.core.AstrixRemoteResultReducer;
 import com.avanza.astrix.core.CorrelationId;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
 import com.avanza.astrix.core.ServiceInvocationException;
+import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.remoting.util.MethodSignatureBuilder;
 /**
  * 
@@ -65,7 +66,11 @@ public class AstrixRemotingProxy implements InvocationHandler {
 		this.objectSerializer = objectSerializer;
 		this.serviceTransport = AstrixServiceTransport;
 		for (Method m : serviceApi.getMethods()) {
-			remoteServiceMethodByMethod.put(m, new RemoteServiceMethod(MethodSignatureBuilder.build(m), routingStrategy.create(m)));
+			if (m.isAnnotationPresent(AstrixBroadcast.class)) {
+				remoteServiceMethodByMethod.put(m, new RemoteServiceMethod(MethodSignatureBuilder.build(m), getRemoteResultReducerClass(m)));
+			} else {
+				remoteServiceMethodByMethod.put(m, new RemoteServiceMethod(MethodSignatureBuilder.build(m), routingStrategy.create(m)));
+			}
 		}
 		if (serviceApi.getSimpleName().startsWith("Observable")) {
 			String packageAndEventualOuterClassName = serviceApi.getName().substring(0, serviceApi.getName().length() - serviceApi.getSimpleName().length());
@@ -83,6 +88,44 @@ public class AstrixRemotingProxy implements InvocationHandler {
 			this.serviceApi = serviceApi.getName();
 			this.isObservableApi = false;
 			this.isAsyncApi = false;
+		}
+	}
+
+	private Class<? extends AstrixRemoteResultReducer<?, ?>> getRemoteResultReducerClass(Method m) {
+		AstrixBroadcast broadcast = m.getAnnotation(AstrixBroadcast.class);
+		Class<? extends AstrixRemoteResultReducer> reducerType = broadcast.reducer();
+		validateRemoteResultReducerReturnType(m, reducerType);
+		validateRemoteResultReducerArgumentType(m, reducerType);
+		return (Class<? extends AstrixRemoteResultReducer<?, ?>>) reducerType;
+	}
+
+	private void validateRemoteResultReducerReturnType(Method m,
+			Class<? extends AstrixRemoteResultReducer> reducerType) {
+		Method reduceMethod = ReflectionUtil.getMethod(reducerType, "reduce", List.class);
+		if (!m.getReturnType().isAssignableFrom(reduceMethod.getReturnType()) && !m.getReturnType().equals(Void.TYPE)) {
+			throw new IncompatibleRemoteResultReducerException(
+					String.format("Return type of AstrixRemoteResultReducer must same as (or subtype) of the one returned by the serivce method. "
+								+ "serviceMethod=%s reducerType=%s"
+							    , m, reducerType)); 
+		}
+	}
+
+	private void validateRemoteResultReducerArgumentType(Method m, 
+														 Class<? extends AstrixRemoteResultReducer> reducerType) {
+		// Lookup the "<T>" type parameter in: "R reduce(List<AstrixRemoteResult<T>> result)";
+		Method reduceMethod = ReflectionUtil.getMethod(reducerType, "reduce", List.class);
+		ParameterizedType listType = (ParameterizedType) reduceMethod.getGenericParameterTypes()[0];
+		ParameterizedType astrixRemoteResultType = (ParameterizedType) listType.getActualTypeArguments()[0];
+		Type astrixRemoteResultTypeParameter = astrixRemoteResultType.getActualTypeArguments()[0];
+		if (!(astrixRemoteResultTypeParameter instanceof Class)) {
+			return;
+		}
+		Class<?> type = (Class<?>) astrixRemoteResultTypeParameter;
+		if (!type.isAssignableFrom(m.getReturnType()) && !m.getReturnType().equals(Void.TYPE)) {
+			throw new IncompatibleRemoteResultReducerException(
+					String.format("Generic argument type of AstrixRemoteResultReducer.reduce(List<AstrixRemoteResult<T>>) must same as of the one returned by the serivce method. "
+							+ "serviceMethod=%s reducerType=%s"
+							, m, reducerType)); 
 		}
 	}
 	
@@ -104,7 +147,6 @@ public class AstrixRemotingProxy implements InvocationHandler {
 		}
 		RemoteServiceMethod serviceMethod = this.remoteServiceMethodByMethod.get(method);
 		
-		RoutingKey routingKey = serviceMethod.getRoutingKey(args);
 		Type returnType = getReturnType(method);
 		AstrixServiceInvocationRequest invocationRequest = new AstrixServiceInvocationRequest();
 		
@@ -116,9 +158,13 @@ public class AstrixRemotingProxy implements InvocationHandler {
 		invocationRequest.setArguments(marshall(args));
 		
 		Observable<?> result;
-		if (routingKey == null) {
-			result = observeProcessBroadcastRequest(returnType, invocationRequest, method);
+		if (serviceMethod.isBroadcast()) {
+			result = observeProcessBroadcastRequest(returnType, invocationRequest, serviceMethod);
 		} else {
+			RoutingKey routingKey = serviceMethod.getRoutingKey(args);
+			if (routingKey == null) {
+				throw new IllegalStateException(String.format("Service method is routed but the defined remotingKey value was null: method=%s", method.toString()));
+			}
 			result = observeProcessRoutedRequest(returnType, invocationRequest, routingKey);
 		}
 		if (isObservableApi) {
@@ -204,14 +250,11 @@ public class AstrixRemotingProxy implements InvocationHandler {
 	}
 
 	private <T> Observable<T> observeProcessBroadcastRequest(
-			final Type returnType, AstrixServiceInvocationRequest request,
-			Method method) throws InstantiationException,
+			final Type returnType, 
+			AstrixServiceInvocationRequest request,
+			RemoteServiceMethod serviceMethod) throws InstantiationException,
 			IllegalAccessException {
-		AstrixBroadcast broadcast = method.getAnnotation(AstrixBroadcast.class);
-		if (broadcast == null) {
-			throw new IllegalStateException(String.format("Method %s uses broadcast but has not defined an reducer using AstrixBroadcast", method.toString()));
-		}
-		final AstrixRemoteResultReducer<T, T> reducer = (AstrixRemoteResultReducer<T, T>) broadcast.reducer().newInstance();
+		final AstrixRemoteResultReducer<T, T> reducer = (AstrixRemoteResultReducer<T, T>) serviceMethod.newReducer();
 		Observable<List<AstrixServiceInvocationResponse>> responesObservable = this.serviceTransport.observeProcessBroadcastRequest(request);
 		if (returnType.equals(Void.TYPE)) {
 			return responesObservable.map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
