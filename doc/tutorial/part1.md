@@ -6,7 +6,7 @@ A typical IOC container like spring is well suited to provide loose coupling bet
 
 However, a problem arise for large systems consisting of hundreds of microservices, typically developed by different teams/individual's. Sharing libraries and clients in such an organization can lead to difficulties in maintenance if care is not taken to clearly define what is part of the public-api, and what is an internal implementation detail. In large systems it's not only important that the different application objects know each other through an interface, but also that different applications don't know how the libraries and clients provided by other teams are assembled.
 
-Whereas a normal IOC-container inverses the responsibility for application assembly and lifecycle management, Astrix inverses the responsibility for api assembly.
+Whereas a normal IOC-container inverses the responsibility for application assembly and lifecycle management, Astrix inverses the responsibility for assembling published api's at runtime.
 
 Astrix provides great integration with spring through the `AstrixFrameworkBean`, but is not limited to running within a spring ApplicationContext. The following diagram illustrates the relationship between the beans managed by the spring ApplicationContext and the astrix-beans managed by Astrix.
 

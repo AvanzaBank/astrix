@@ -23,6 +23,9 @@ import java.lang.annotation.Target;
 
 
 /**
+ * Used to publish a service as part of an api, see
+ * {@link AstrixApiProvider} for more information.
+ * 
  * @author Elias Lindholm (elilin)
  */
 @Target(value = { ElementType.METHOD})

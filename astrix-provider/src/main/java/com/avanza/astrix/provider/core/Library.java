@@ -23,8 +23,11 @@ import java.lang.annotation.Target;
 
 
 /**
- * Used to export a method in a {@link AstrixApiProvider} as a factory
- * for creating a given api type. <p>
+ * Used to publish a library as part of an api, see {@link AstrixApiProvider}
+ * for more information.
+ * 
+ * The method holding this annotation will be used as a factory to create
+ * an instance of the given type at runtime. <p>
  * 
  * @author Elias Lindholm (elilin)
  */
