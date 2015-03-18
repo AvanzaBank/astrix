@@ -13,22 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.core;
-
-import java.util.List;
-
+package com.avanza.astrix.beans.service;
 /**
  * @author Elias Lindholm (elilin)
  */
-public interface AstrixRemoteResultReducer<R, T> {
-	
-	/**
-	 * Reduces the individual responses received from a broadcasted service
-	 * invocation into a single result.
-	 * 
-	 * @param result
-	 * @return
-	 */
-	R reduce(List<AstrixRemoteResult<T>> result);
+public class MissingAstrixServiceComponentException extends RuntimeException {
+
+	private static final long serialVersionUID = 1L;
+
+	public MissingAstrixServiceComponentException(String message) {
+		super(message);
+	}
 
 }

@@ -139,7 +139,7 @@ public class AstrixPlugins {
 
 		public T getOne() {
 			if (providers.isEmpty()) {
-				throw new IllegalArgumentException("No provider registered for type: " + type);
+				throw new IllegalArgumentException(String.format("No provider registered for type=%s. Make sure the classpath contains the jar containing the given plugin.", type));
 			}
 			if (providers.size() != 1) {
 				throw new IllegalArgumentException("Expected one provider for: " + type.getName() + " found: + "+ providers);

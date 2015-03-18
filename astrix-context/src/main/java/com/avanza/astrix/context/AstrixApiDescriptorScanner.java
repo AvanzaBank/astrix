@@ -58,24 +58,25 @@ public class AstrixApiDescriptorScanner implements AstrixApiDescriptors {
 	}
 
 	private List<AstrixApiDescriptor> scanPackage(String basePackage) {
+		log.debug("Scanning package for api-providers: package={}", basePackage);
 		List<AstrixApiDescriptor> descriptors = apiDescriptorsByBasePackage.get(basePackage);
 		if (descriptors != null) {
-			log.debug("Returning cached api-descriptors found on earlier scan types={}", descriptors);
+			log.debug("Returning cached api-providers found on earlier scan types={}", descriptors);
 			return descriptors;
 		}
 		List<Class<? extends Annotation>> allProviderAnnotationTypes = getAllProviderAnnotationTypes();
-		log.debug("Running scan for api-descriptors of types={}", allProviderAnnotationTypes);
-		List<AstrixApiDescriptor> discoveredApiDescriptors = new ArrayList<>();
+		log.debug("Running scan for api-providers of types={}", allProviderAnnotationTypes);
+		List<AstrixApiDescriptor> discoveredApiPRoviders = new ArrayList<>();
 		Reflections reflections = new Reflections(basePackage);
 		for (Class<? extends Annotation> apiAnnotation : allProviderAnnotationTypes) { 
 			for (Class<?> providerClass : reflections.getTypesAnnotatedWith(apiAnnotation)) {
-				AstrixApiDescriptor descriptor = AstrixApiDescriptor.create(providerClass);
-				log.debug("Found api descriptor {}", descriptor);
-				discoveredApiDescriptors.add(descriptor);
+				AstrixApiDescriptor provider = AstrixApiDescriptor.create(providerClass);
+				log.debug("Found api provider {}", provider);
+				discoveredApiPRoviders.add(provider);
 			}
 		}
-		apiDescriptorsByBasePackage.put(basePackage, discoveredApiDescriptors);
-		return discoveredApiDescriptors;
+		apiDescriptorsByBasePackage.put(basePackage, discoveredApiPRoviders);
+		return discoveredApiPRoviders;
 	}
 	
 	void addBasePackage(String basePackage) {

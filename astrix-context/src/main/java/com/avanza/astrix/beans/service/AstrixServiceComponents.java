@@ -34,7 +34,7 @@ public class AstrixServiceComponents {
 	public AstrixServiceComponent getComponent(String name) {
 		AstrixServiceComponent serviceComponent = componentsByName.get(name);
 		if (serviceComponent == null) {
-			throw new IllegalStateException("No AstrixServiceComponent found with name: " + name);
+			throw new MissingAstrixServiceComponentException(String.format("AstrixServiceComponent not found: name=%s. Did you forget to put the jar containing the given AstrixServiceComponent on the classpath?", name));
 		}
 		return serviceComponent;
 	}
