@@ -89,6 +89,12 @@ public class DynamicConfigTest {
 		
 		secondSource.set("foo", "false");
 		assertFalse(booleanProperty.get());
+		
+		firstSource.set("foo", "true");
+		assertTrue(booleanProperty.get());
+		
+		firstSource.set("foo", "MALFORMED");
+		assertTrue(booleanProperty.get());
 	}
 	
 	@Test
