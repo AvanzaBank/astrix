@@ -23,11 +23,8 @@ import com.avanza.astrix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.apiruntime.feeder.InternalLunchFeeder;
-import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
-import com.avanza.astrix.provider.core.AstrixServiceComponentName;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 
-@AstrixServiceComponentName(AstrixServiceComponentNames.GS_REMOTING)
 @AstrixServiceExport({LunchService.class, InternalLunchFeeder.class})
 public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 
