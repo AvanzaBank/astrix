@@ -1,6 +1,6 @@
 The DynamicConfig framework provides core abstractions for configuration property loookup and dynamic update of such properties. It was first designed as a simple facade on top of archaius due to its shortcoming when it comes to unit testing. Archauis provides no way to decouple the different configuration properties required by the application from the actual configuration source, making unit testing of classes consuming dynamic configuration parameters hard. DynamicConfig can be sen as a slf4j counterpart for configuration lookup.
 
-### Example: Usage
+### Example: DynamicConfig setup and usage
 ```java
 // Create DynamicConfig from a single configuration source 
 MapConfigSource configSource = new MapConfigSource();
@@ -31,7 +31,7 @@ assertTrue(fooProp.get());
 ### Configuration chain
 DynamicConfig allows configuration to be read from many different sources. A property is resolved to the first element discovered that can successfully be parsed by the framework. 
  
-### Example: Config resolution
+### Example: Configuration property resolution order
 ```java
 // Create DynamicConfig from two different sources
 MapConfigSource source1 = new MapConfigSource();
