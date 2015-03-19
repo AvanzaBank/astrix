@@ -34,7 +34,7 @@ import com.avanza.astrix.config.DynamicConfig;
 public class AstrixServiceLeaseManager {
 	
 	private final Logger log = LoggerFactory.getLogger(AstrixServiceLeaseManager.class);
-	private final List<LeasedService<?>> leasedServices = new CopyOnWriteArrayList<>();
+	private final List<AstrixServiceBeanInstance<?>> leasedServices = new CopyOnWriteArrayList<>();
 	private final DynamicConfig config;
 	private final ServiceLeaseRenewalThread leaseRenewalThread = new ServiceLeaseRenewalThread();
 	private final ServiceBindThread serviceBindThread = new ServiceBindThread();
@@ -44,14 +44,13 @@ public class AstrixServiceLeaseManager {
 		this.config = config;
 	}
 	
-	public <T> void startManageLease(ManagedAstrixServiceBeanInstance<T> serviceBeanInstance, AstrixServiceProperties currentProperties, AstrixServiceLookup serviceLookup) {
+	public <T> void startManageLease(AstrixServiceBeanInstance<T> serviceBeanInstance) {
 		synchronized (isStarted) {
 			if (!isStarted.get()) {
 				start();
 			}
 		}
-		LeasedService<T> leasedService = new LeasedService<>(serviceBeanInstance, currentProperties, serviceLookup);
-		leasedServices.add(leasedService);
+		leasedServices.add(serviceBeanInstance);
 	}
 	
 	private void start() {
@@ -64,9 +63,9 @@ public class AstrixServiceLeaseManager {
 	public void destroy() {
 		this.leaseRenewalThread.interrupt();
 		this.serviceBindThread.interrupt();
-		for (LeasedService<?> leasedService : this.leasedServices) {
+		for (AstrixServiceBeanInstance<?> leasedService : this.leasedServices) {
 			try {
-				leasedService.release();
+				leasedService.destroy();
 			} catch (Exception e) {
 				log.warn(String.format("Failed to release service bean: %s", leasedService.getBeanKey()), e);
 			}
@@ -83,7 +82,7 @@ public class AstrixServiceLeaseManager {
 		@Override
 		public void run() {
 			while (!interrupted()) {
-				for (LeasedService<?> leasedService : leasedServices) {
+				for (AstrixServiceBeanInstance<?> leasedService : leasedServices) {
 					if (!leasedService.isBound()) {
 						bind(leasedService);
 					}
@@ -97,7 +96,7 @@ public class AstrixServiceLeaseManager {
 			log.info("Terminating thread=" + getName());
 		}
 		
-		private void bind(LeasedService<?> leasedService) {
+		private void bind(AstrixServiceBeanInstance<?> leasedService) {
 			try {
 				log.debug("Attempting to bind service={}", leasedService.getBeanKey());
 				leasedService.bind();
@@ -117,11 +116,11 @@ public class AstrixServiceLeaseManager {
 		@Override
 		public void run() {
 			while (!interrupted()) {
-				for (LeasedService<?> leasedService : leasedServices) {
+				for (AstrixServiceBeanInstance<?> leasedService : leasedServices) {
 					renewLease(leasedService);
 				}
 				try {
-					Thread.sleep(config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 30_000L).get());
+					Thread.sleep(config.getLongProperty(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 30_000L).get());
 				} catch (InterruptedException e) {
 					interrupt();
 				}
@@ -129,9 +128,9 @@ public class AstrixServiceLeaseManager {
 			log.info("Terminating thread=" + getName());
 		}
 		
-		private void renewLease(LeasedService<?> leasedService) {
+		private void renewLease(AstrixServiceBeanInstance<?> leasedService) {
 			try {
-				leasedService.renew();
+				leasedService.renewLease();
 			} catch (Exception e) {
 				log.warn("Failed to renew lease for service: " + leasedService.getBeanKey(), e);
 			}

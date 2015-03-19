@@ -39,6 +39,15 @@ public class AstrixServiceComponents {
 		return serviceComponent;
 	}
 	
+	public <T extends AstrixServiceComponent> T getComponent(Class<T> componentType) {
+		for (AstrixServiceComponent component : componentsByName.values()) {
+			if (component.getClass().equals(componentType)) {
+				return componentType.cast(component);
+			}
+		}
+		throw new MissingAstrixServiceComponentException(String.format("AstrixServiceComponent instance not found: type=%s. Did you forget to put the jar containing the given AstrixServiceComponent on the classpath?", componentType));
+	}
+	
 	public Collection<AstrixServiceComponent> getAll() {
 		return this.componentsByName.values();
 	}

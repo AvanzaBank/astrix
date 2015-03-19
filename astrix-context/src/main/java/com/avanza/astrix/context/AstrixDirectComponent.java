@@ -18,7 +18,9 @@ package com.avanza.astrix.context;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -29,7 +31,6 @@ import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
-import com.avanza.astrix.beans.service.SimpleBoundServiceBeanInstance;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
@@ -43,11 +44,18 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	
 	private final static AtomicLong idGen = new AtomicLong();
 	private final static Map<String, ServiceProvider<?>> providerById = new ConcurrentHashMap<>();
+	
 	private AstrixVersioningPlugin versioningPlugin;
+	private final List<DirectBoundServiceBeanInstance<?>> nonReleasedInstances = new ArrayList<>();
+	
 	
 	@AstrixInject
 	public void setVersioningPlugin(AstrixVersioningPlugin versioningPlugin) {
 		this.versioningPlugin = versioningPlugin;
+	}
+	
+	public List<? extends BoundServiceBeanInstance<?>> getBoundServices() {
+		return this.nonReleasedInstances;
 	}
 	
 	
@@ -59,7 +67,9 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + type);
 		}
 		T provider = type.cast(serviceProvider.getProvider(versioningPlugin, versioningContext));
-		return SimpleBoundServiceBeanInstance.create(provider);
+		DirectBoundServiceBeanInstance<T> directServiceBeanInstance = new DirectBoundServiceBeanInstance<T>(provider);
+		this.nonReleasedInstances.add(directServiceBeanInstance);
+		return directServiceBeanInstance;
 	}
 	
 	@Override
@@ -270,6 +280,26 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	public static <T> String registerAndGetUri(Class<T> api, T provider, ServiceVersioningContext serverVersioningContext) {
 		String id = register(api, provider, serverVersioningContext);
 		return getServiceUri(id);
+	}
+	
+	private class DirectBoundServiceBeanInstance<T> implements BoundServiceBeanInstance<T> {
+
+		private final T instance;
+		
+		public DirectBoundServiceBeanInstance(T instance) {
+			this.instance = instance;
+		}
+
+		@Override
+		public T get() {
+			return instance;
+		}
+
+		@Override
+		public void release() {
+			AstrixDirectComponent.this.nonReleasedInstances.remove(this);
+		}
+		
 	}
 
 }

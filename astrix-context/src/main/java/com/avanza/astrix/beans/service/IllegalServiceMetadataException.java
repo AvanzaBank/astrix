@@ -13,12 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.test.util;
+package com.avanza.astrix.beans.service;
 /**
+ * Thrown when the service-metadata for a published service is not
+ * correct, for instance when required information is missing. 
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface Supplier<T> {
-	T get() throws Exception;
+public class IllegalServiceMetadataException extends RuntimeException {
+
+	private static final long serialVersionUID = 1L;
+	
+	public IllegalServiceMetadataException(String msg) {
+		super(msg);
+	}
+
 }

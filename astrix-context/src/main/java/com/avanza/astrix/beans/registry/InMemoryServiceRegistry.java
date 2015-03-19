@@ -33,36 +33,40 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
  * @author Elias Lindholm (elilin)
  *
  */
-public class InMemoryServiceRegistry implements AstrixServiceRegistry, DynamicConfigSource {
+public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServiceRegistry {
 	
 	private final MapConfigSource configSource = new MapConfigSource();
-	private Map<ServiceKey, AstrixServiceRegistryEntry> servicePropertiesByKey = new ConcurrentHashMap<>();
 	private String id;
 	private String configSourceId;
+	private InMemoryServiceRegistryImpl serviceRegistry = new InMemoryServiceRegistryImpl();
 	
 	public InMemoryServiceRegistry() {
-		this.id = AstrixDirectComponent.register(AstrixServiceRegistry.class, this);
+		this.id = AstrixDirectComponent.register(AstrixServiceRegistry.class, serviceRegistry);
 		this.configSourceId = GlobalConfigSourceRegistry.register(this);
 		this.configSource.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, getServiceUri());
 	}
 	
 	@Override
+	public List<AstrixServiceRegistryEntry> listServices() {
+		return serviceRegistry.listServices();
+	}
+	
+	@Override
 	public <T> AstrixServiceRegistryEntry lookup(String type, String qualifier) {
-		return this.servicePropertiesByKey.get(new ServiceKey(type, qualifier));
+		return serviceRegistry.lookup(type, qualifier);
+	}
+	
+	@Override
+	public <T> void register(AstrixServiceRegistryEntry properties, long lease) {
+		serviceRegistry.register(properties, lease);
 	}
 	
 	public String getConfigSourceId() {
 		return configSourceId;
 	}
 	
-	@Override
-	public <T> void register(AstrixServiceRegistryEntry properties, long lease) {
-		ServiceKey key = new ServiceKey(properties.getServiceBeanType(), properties.getServiceProperties().get(AstrixServiceProperties.QUALIFIER));
-		this.servicePropertiesByKey.put(key, properties);
-	}
-	
 	public void clear() {
-		this.servicePropertiesByKey.clear();
+		this.serviceRegistry.clear();
 	}
 	
 	public String getConfigEntryName() {
@@ -73,11 +77,6 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry, DynamicCo
 		return AstrixServiceComponentNames.DIRECT + ":" + this.id;
 	}
 
-	@Override
-	public List<AstrixServiceRegistryEntry> listServices() {
-		return new ArrayList<>(servicePropertiesByKey.values());
-	}
-	
 	public void set(String settingName, String value) {
 		this.configSource.set(settingName, value);
 	}
@@ -87,7 +86,7 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry, DynamicCo
 	}
 
 	public <T> void registerProvider(Class<T> api, T provider, String subsystem) {
-		AstrixServiceRegistryClientImpl serviceRegistryClient = new AstrixServiceRegistryClientImpl(this, subsystem);
+		AstrixServiceRegistryClientImpl serviceRegistryClient = new AstrixServiceRegistryClientImpl(this.serviceRegistry, subsystem);
 		serviceRegistryClient.register(api, AstrixDirectComponent.registerAndGetProperties(api, provider), 60_000);
 	}
 	
@@ -109,5 +108,33 @@ public class InMemoryServiceRegistry implements AstrixServiceRegistry, DynamicCo
 	@Override
 	public String get(String propertyName, DynamicPropertyListener<String> propertyChangeListener) {
 		return configSource.get(propertyName, propertyChangeListener);
+	}
+	
+	private static class InMemoryServiceRegistryImpl implements AstrixServiceRegistry {
+		
+		private Map<ServiceKey, AstrixServiceRegistryEntry> servicePropertiesByKey = new ConcurrentHashMap<>();
+		
+		@Override
+		public <T> AstrixServiceRegistryEntry lookup(String type, String qualifier) {
+			return this.servicePropertiesByKey.get(new ServiceKey(type, qualifier));
+		}
+		
+		
+		@Override
+		public <T> void register(AstrixServiceRegistryEntry properties, long lease) {
+			ServiceKey key = new ServiceKey(properties.getServiceBeanType(), properties.getServiceProperties().get(AstrixServiceProperties.QUALIFIER));
+			this.servicePropertiesByKey.put(key, properties);
+		}
+		
+		void clear() {
+			this.servicePropertiesByKey.clear();
+		}
+		
+		@Override
+		public List<AstrixServiceRegistryEntry> listServices() {
+			return new ArrayList<>(servicePropertiesByKey.values());
+		}
+		
+		
 	}
 }
