@@ -87,7 +87,7 @@ public class ManagedAstrixServiceBeanInstance<T> implements StatefulAstrixBean, 
 	public void bind(AstrixServiceProperties serviceProperties) {
 		InvocationHandler previousState = this.state;
 		if (serviceProperties == null) {
-			log.info("Service moving to unbound state " + beanKey + ", AstrixBeanId=" + id);
+			log.info("Service moving to unbound state. bean=" + beanKey + " astrixBeanId=" + id);
 			this.state = new Unbound();
 			releaseInstanceIfBound(previousState);
 			return;
@@ -97,7 +97,7 @@ public class ManagedAstrixServiceBeanInstance<T> implements StatefulAstrixBean, 
 			this.state = new IllegalSubsystemState(subsystem, providerSubsystem, beanKey.getBeanType());
 		} else {
 			this.state = create(serviceProperties);
-			log.info("Successfully bound to " + beanKey + ", AstrixBeanId=" + id);
+			log.info("Service successfully bound. bean=" + beanKey + " astrixBeanId=" + id);
 		}
 		notifyBound();
 		releaseInstanceIfBound(previousState);
@@ -156,7 +156,7 @@ public class ManagedAstrixServiceBeanInstance<T> implements StatefulAstrixBean, 
 		try {
 			if (!isBound()) {
 				if (!boundCondition.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
-					throw new RuntimeException("Bean with key=" + beanKey + " was not bound before timeout");
+					throw new RuntimeException("Bean was not bound before timeout. bean=" + beanKey);
 				}
 			}
 		} finally {
