@@ -18,9 +18,6 @@ package com.avanza.astrix.beans.service;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBean;
@@ -34,7 +31,7 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  * @param <T>
  */
 public class AstrixServiceFactory<T> implements AstrixFactoryBean<T> {
-	private final Logger log = LoggerFactory.getLogger(AstrixServiceFactory.class);
+
 	private final AstrixBeanKey<T> beanKey;
 	private final AstrixServiceComponents serviceComponents;
 	private final AstrixServiceLookup serviceLookup;
@@ -58,19 +55,9 @@ public class AstrixServiceFactory<T> implements AstrixFactoryBean<T> {
 
 	@Override
 	public T create(AstrixBeans beans) {
-		ManagedAstrixServiceBeanInstance<T> serviceBeanInstance = ManagedAstrixServiceBeanInstance.create(versioningContext, beanKey, serviceLookup, serviceComponents, config);
-		AstrixServiceProperties serviceProperties = null;
-		try {
-			serviceProperties = serviceLookup.lookup(beanKey);
-			if (serviceProperties == null) {
-				log.warn(String.format("Did not find service using serviceLookup: bean=%s serviceLookup=%s", beanKey, serviceLookup));
-			} else {
-				serviceBeanInstance.bind(serviceProperties);
-			}
-		} catch (Exception e) {
-			log.warn("Failed to bind service bean=" + this.beanKey, e);
-		}
-		leaseManager.startManageLease(serviceBeanInstance, serviceProperties, serviceLookup);
+		AstrixServiceBeanInstance<T> serviceBeanInstance = AstrixServiceBeanInstance.create(versioningContext, beanKey, serviceLookup, serviceComponents, config);
+		serviceBeanInstance.bind();
+		leaseManager.startManageLease(serviceBeanInstance);
 		return beanKey.getBeanType().cast(
 				Proxy.newProxyInstance(beanKey.getBeanType().getClassLoader(), 
 									   new Class[]{beanKey.getBeanType(), StatefulAstrixBean.class}, 

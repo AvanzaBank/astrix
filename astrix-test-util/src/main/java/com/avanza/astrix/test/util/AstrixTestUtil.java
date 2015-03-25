@@ -82,9 +82,9 @@ public class AstrixTestUtil {
 				description.appendText("Expected serviceInovcation to throw exception: ");
 				matcher.describeTo(description);
 				if (lastException != null) {
-					description.appendText("\nBut last serviceInvocation threw exception: " + lastException.toString());
+					description.appendText("\nBut last service invocation threw exception: " + lastException.toString());
 				} else {
-					description.appendText("\nBut last serviceInvocation returnded " + lastResult);
+					description.appendText("\nBut last service invocation returned " + lastResult);
 				}
 			}
 		};

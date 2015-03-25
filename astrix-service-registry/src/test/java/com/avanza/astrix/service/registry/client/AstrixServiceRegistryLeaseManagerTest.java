@@ -55,13 +55,13 @@ public class AstrixServiceRegistryLeaseManagerTest {
 	@Before
 	public void setup() {
 		serviceRegistry = new CorruptableServiceRegistry();
-		TestAstrixConfigurer astrixConfig = new TestAstrixConfigurer();
-		astrixConfig.set(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 1); // No Sleep between attempts
-		astrixConfig.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
-		astrixConfig.registerApiProvider(TestProvider.class);
-		astrixConfig.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfig.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
-		context = astrixConfig.configure();
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 1); // No Sleep between attempts
+		astrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
+		astrixConfigurer.registerApiProvider(TestProvider.class);
+		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
+		astrixConfigurer.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
+		context = astrixConfigurer.configure();
 		serviceRegistryClient = context.getBean(AstrixServiceRegistryClient.class);
 		
 		TestService impl = new TestService() {

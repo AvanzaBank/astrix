@@ -60,7 +60,7 @@ public class AstrixServiceRegistryLookupTest {
 	public void setup() {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
-		configurer.set(AstrixSettings.SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL, 10);
+		configurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 10);
 		configurer.registerApiProvider(GreetingApiProvider.class);
 		configurer.registerApiProvider(InMemoryServiceRegistryLibraryProvider.class);
 		configurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
