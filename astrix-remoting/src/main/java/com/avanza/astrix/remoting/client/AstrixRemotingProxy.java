@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -107,22 +108,21 @@ public class AstrixRemotingProxy implements InvocationHandler {
 		return (Class<? extends AstrixRemoteResultReducer<?, ?>>) reducerType;
 	}
 
-	private void validateRemoteResultReducerReturnType(Method m,
+	private void validateRemoteResultReducerReturnType(Method targetServiceMethod,
 			Class<? extends AstrixRemoteResultReducer> reducerType) {
 		Method reduceMethod = ReflectionUtil.getMethod(reducerType, "reduce", List.class);
-		Class<?> returnType = m.getReturnType();
+		Class<?> returnType = targetServiceMethod.getReturnType();
 		if (returnType.equals(Void.TYPE)) {
 			return;
 		}
-		if (Future.class.isAssignableFrom(returnType)) {
-			ParameterizedType futureType = ParameterizedType.class.cast(m.getGenericReturnType());
-			returnType = (Class<?>) (futureType.getActualTypeArguments()[0]);
+		if (TypeVariable.class.isAssignableFrom(reduceMethod.getGenericReturnType().getClass())) {
+			return;
 		}
 		if (!returnType.isAssignableFrom(reduceMethod.getReturnType())) {
 			throw new IncompatibleRemoteResultReducerException(
 					String.format("Return type of AstrixRemoteResultReducer must be same as (or subtype) of the one returned by the service method. "
 								+ "serviceMethod=%s reducerType=%s"
-							    , m, reducerType)); 
+							    , targetServiceMethod, reducerType)); 
 		}
 	}
 

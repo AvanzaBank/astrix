@@ -641,7 +641,7 @@ public class AstrixServiceActivatorTest {
 	}
 	
 	interface BroadcastService {
-		@AstrixBroadcast(reducer = BroadcastReducer.class)
+		@AstrixBroadcast(reducer = GenericReducer.class)
 		String broadcast(BroadcastRequest request);
 	}
 	
@@ -655,6 +655,15 @@ public class AstrixServiceActivatorTest {
 		public String reduce(List<AstrixRemoteResult<String>> result) {
 			return result.get(0).getResult(); // Only one 'partition'
 		}
+	}
+	
+	public static class GenericReducer<T> implements AstrixRemoteResultReducer<T, T> {
+
+		@Override
+		public T reduce(List<AstrixRemoteResult<T>> result) {
+			return result.get(0).getResult();
+		}
+		
 	}
 	
 	public static class StringToStringReducer implements AstrixRemoteResultReducer<String, String> {
