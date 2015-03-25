@@ -58,53 +58,69 @@ public class AstrixRemotingProxy implements InvocationHandler {
 	private final boolean isObservableApi;
 	private final boolean isAsyncApi;
 	
-	private AstrixRemotingProxy(Class<?> serviceApi,
+	private AstrixRemotingProxy(Class<?> proxiedServiceApi,
 							  AstrixObjectSerializer objectSerializer,
 							  AstrixRemotingTransport AstrixServiceTransport,
 							  RoutingStrategy routingStrategy) {
 		this.apiVersion = objectSerializer.version();
 		this.objectSerializer = objectSerializer;
 		this.serviceTransport = AstrixServiceTransport;
-		for (Method m : serviceApi.getMethods()) {
-			if (m.isAnnotationPresent(AstrixBroadcast.class)) {
-				remoteServiceMethodByMethod.put(m, new RemoteServiceMethod(MethodSignatureBuilder.build(m), getRemoteResultReducerClass(m)));
-			} else {
-				remoteServiceMethodByMethod.put(m, new RemoteServiceMethod(MethodSignatureBuilder.build(m), routingStrategy.create(m)));
-			}
-		}
-		if (serviceApi.getSimpleName().startsWith("Observable")) {
-			String packageAndEventualOuterClassName = serviceApi.getName().substring(0, serviceApi.getName().length() - serviceApi.getSimpleName().length());
-			String serviceSimpleName = serviceApi.getSimpleName().substring("Observable".length());
+		if (proxiedServiceApi.getSimpleName().startsWith("Observable")) {
+			String packageAndEventualOuterClassName = proxiedServiceApi.getName().substring(0, proxiedServiceApi.getName().length() - proxiedServiceApi.getSimpleName().length());
+			String serviceSimpleName = proxiedServiceApi.getSimpleName().substring("Observable".length());
 			String serviceClassName = packageAndEventualOuterClassName + serviceSimpleName;
 			this.serviceApi = serviceClassName; 
 			this.isObservableApi = true;
 			this.isAsyncApi = false;
-		} else if (serviceApi.getSimpleName().endsWith("Async")) {
-			String serviceClassName = serviceApi.getName().substring(0, serviceApi.getName().length() - "Async".length());
+		} else if (proxiedServiceApi.getSimpleName().endsWith("Async")) {
+			String serviceClassName = proxiedServiceApi.getName().substring(0, proxiedServiceApi.getName().length() - "Async".length());
 			this.serviceApi = serviceClassName; 
 			this.isObservableApi = false;
 			this.isAsyncApi = true; 
 		} else {
-			this.serviceApi = serviceApi.getName();
+			this.serviceApi = proxiedServiceApi.getName();
 			this.isObservableApi = false;
 			this.isAsyncApi = false;
 		}
+		/*
+		 * For each of the following services the "targetServiceType" resolves to MyService:
+		 *  - MyService
+		 *  - MyServiceAsync
+		 *  - ObservableMyService
+		 */
+		Class<?> targetServiceType = ReflectionUtil.classForName(this.serviceApi);
+		for (Method m : proxiedServiceApi.getMethods()) {
+			if (m.isAnnotationPresent(AstrixBroadcast.class)) {
+				remoteServiceMethodByMethod.put(m, new RemoteServiceMethod(MethodSignatureBuilder.build(m), getRemoteResultReducerClass(m, targetServiceType)));
+			} else {
+				remoteServiceMethodByMethod.put(m, new RemoteServiceMethod(MethodSignatureBuilder.build(m), routingStrategy.create(m)));
+			}
+		}
 	}
 
-	private Class<? extends AstrixRemoteResultReducer<?, ?>> getRemoteResultReducerClass(Method m) {
-		AstrixBroadcast broadcast = m.getAnnotation(AstrixBroadcast.class);
+	private Class<? extends AstrixRemoteResultReducer<?, ?>> getRemoteResultReducerClass(Method proxyServiceMethod, Class<?> targetServiceType) {
+		Method targetServiceMethod = ReflectionUtil.getMethod(targetServiceType, proxyServiceMethod.getName(), proxyServiceMethod.getParameterTypes());
+		AstrixBroadcast broadcast = targetServiceMethod.getAnnotation(AstrixBroadcast.class);
 		Class<? extends AstrixRemoteResultReducer> reducerType = broadcast.reducer();
-		validateRemoteResultReducerReturnType(m, reducerType);
-		validateRemoteResultReducerArgumentType(m, reducerType);
+		validateRemoteResultReducerReturnType(targetServiceMethod, reducerType);
+		validateRemoteResultReducerArgumentType(targetServiceMethod, reducerType);
 		return (Class<? extends AstrixRemoteResultReducer<?, ?>>) reducerType;
 	}
 
 	private void validateRemoteResultReducerReturnType(Method m,
 			Class<? extends AstrixRemoteResultReducer> reducerType) {
 		Method reduceMethod = ReflectionUtil.getMethod(reducerType, "reduce", List.class);
-		if (!m.getReturnType().isAssignableFrom(reduceMethod.getReturnType()) && !m.getReturnType().equals(Void.TYPE)) {
+		Class<?> returnType = m.getReturnType();
+		if (returnType.equals(Void.TYPE)) {
+			return;
+		}
+		if (Future.class.isAssignableFrom(returnType)) {
+			ParameterizedType futureType = ParameterizedType.class.cast(m.getGenericReturnType());
+			returnType = (Class<?>) (futureType.getActualTypeArguments()[0]);
+		}
+		if (!returnType.isAssignableFrom(reduceMethod.getReturnType())) {
 			throw new IncompatibleRemoteResultReducerException(
-					String.format("Return type of AstrixRemoteResultReducer must same as (or subtype) of the one returned by the serivce method. "
+					String.format("Return type of AstrixRemoteResultReducer must be same as (or subtype) of the one returned by the service method. "
 								+ "serviceMethod=%s reducerType=%s"
 							    , m, reducerType)); 
 		}

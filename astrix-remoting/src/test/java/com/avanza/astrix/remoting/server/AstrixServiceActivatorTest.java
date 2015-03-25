@@ -460,6 +460,22 @@ public class AstrixServiceActivatorTest {
 		assertEquals("AstrixRemotingProxy[" + VoidService.class.getName() + "]", testService.toString());
 	}
 	
+	@Test
+	public void asyncBroadcastedService() throws Exception {
+		activator.register(new BroadcastingGenericReturnTypeService() {
+			@Override
+			public List<HelloResponse> hello(List<HelloRequest> greeting) {
+				return Arrays.asList(new HelloResponse(greeting.get(0).getMesssage()));
+			}
+			
+		}, objectSerializer, BroadcastingGenericReturnTypeService.class);
+		
+		BroadcastingGenericReturnTypeServiceAsync service = AstrixRemotingProxy.create(BroadcastingGenericReturnTypeServiceAsync.class, directTransport(activator), objectSerializer, new NoRoutingStrategy());
+		Future<List<HelloResponse>> resultFuture = service.hello(Arrays.asList(new HelloRequest("foo")));
+		List<HelloResponse> result = resultFuture.get();
+		assertEquals(1, result.size());
+	}
+	
 	@Test(expected = IncompatibleRemoteResultReducerException.class)
 	public void throwsExceptionOnProxyCreationIfRemoteResultReducerDoesNotHaveAMethodSignatureCompatibleWithServiceMethodSignature() throws Exception {
 		AstrixRemotingProxy.create(BroadcastServiceWithIllegalReducer.class, directTransport(activator), objectSerializer, new NoRoutingStrategy());
@@ -587,6 +603,12 @@ public class AstrixServiceActivatorTest {
 		List<HelloResponse> hello(List<HelloRequest> greeting);
 	}
 	
+	interface BroadcastingGenericReturnTypeServiceAsync {
+		@AstrixBroadcast
+		Future<List<HelloResponse>> hello(List<HelloRequest> greeting);
+	}
+
+	
 	interface TestService {
 		HelloResponse hello(HelloRequest message);
 		String hello(HelloRequest message, String greeting);
@@ -624,8 +646,8 @@ public class AstrixServiceActivatorTest {
 	}
 	
 	interface BroadcastServiceWithIllegalReducer {
-		@AstrixBroadcast(reducer = IllegalBroadcastReducer.class)
-		String broadcast(BroadcastRequest request);
+		@AstrixBroadcast(reducer = StringToStringReducer.class)
+		Future<String> broadcast(BroadcastRequest request);
 	}
 	
 	public static class BroadcastReducer implements AstrixRemoteResultReducer<String, String> {
@@ -635,7 +657,14 @@ public class AstrixServiceActivatorTest {
 		}
 	}
 	
-	public static class IllegalBroadcastReducer implements AstrixRemoteResultReducer<Date, Date> {
+	public static class StringToStringReducer implements AstrixRemoteResultReducer<String, String> {
+		@Override
+		public String reduce(List<AstrixRemoteResult<String>> result) {
+			return null; // Never invoked, 
+		}
+	}
+	
+	public static class DateToDateReducer implements AstrixRemoteResultReducer<Date, Date> {
 		@Override
 		public Date reduce(List<AstrixRemoteResult<Date>> result) {
 			return null; // Never invoked, 

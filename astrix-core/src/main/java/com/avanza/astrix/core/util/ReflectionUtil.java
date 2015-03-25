@@ -34,11 +34,19 @@ public class ReflectionUtil {
 		}
 	}
 	
-	public static Method getMethod(Class<? extends Object> type, String name, Class<?> parameterTypes) {
+	public static Method getMethod(Class<? extends Object> type, String name, Class<?>... parameterTypes) {
 		try {
 			return type.getMethod(name, parameterTypes);
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new RuntimeException("Failed to get method from class", e);
+		}
+	}
+	
+	public static Class<?> classForName(String name) {
+		try {
+			return Class.forName(name);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("Failed to load class: " + name, e);
 		}
 	}
 	
