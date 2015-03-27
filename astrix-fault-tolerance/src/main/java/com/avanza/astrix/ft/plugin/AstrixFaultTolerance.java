@@ -26,7 +26,11 @@ import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigAware;
 import com.avanza.astrix.core.util.ReflectionUtil;
+import com.avanza.astrix.ft.Command;
+import com.avanza.astrix.ft.CommandSettings;
 import com.avanza.astrix.ft.FaultToleranceSpecification;
+import com.avanza.astrix.ft.HystrixCommandFacade;
+import com.avanza.astrix.ft.HystrixCommandKeys;
 import com.avanza.astrix.ft.HystrixObservableCommandFacade;
 import com.avanza.astrix.ft.ObservableCommandSettings;
 
@@ -59,9 +63,17 @@ public final class AstrixFaultTolerance implements AstrixConfigAware {
 			return observable;
 		}
 	}
+	
+	public <T> T execute(final Command<T> command, CommandSettings settings) {
+		if (faultToleranceEnabled(settings)) {
+			return HystrixCommandFacade.execute(command, settings);
+		} else {
+			return command.call();
+		}
+	}
 
-	private <T> boolean faultToleranceEnabled(ObservableCommandSettings settings) {
-		DynamicBooleanProperty faultToleranceEnabledForCircuit = config.getBooleanProperty("astrix.faultTolerance." + settings.getCommandKey() + ".enabled", true);
+	private <T> boolean faultToleranceEnabled(HystrixCommandKeys keys) {
+		DynamicBooleanProperty faultToleranceEnabledForCircuit = config.getBooleanProperty("astrix.faultTolerance." + keys.getCommandKey() + ".enabled", true);
 		DynamicBooleanProperty faultToleranceEnabled = config.getBooleanProperty(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
 		boolean enabled = faultToleranceEnabled.get() && faultToleranceEnabledForCircuit.get();
 		return enabled;

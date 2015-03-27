@@ -17,12 +17,15 @@ package com.avanza.astrix.gs.remoting;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.openspaces.core.GigaSpace;
 
 import rx.Observable;
 import rx.Subscriber;
 
+import com.avanza.astrix.ft.Command;
+import com.avanza.astrix.ft.CommandSettings;
 import com.avanza.astrix.ft.ObservableCommandSettings;
 import com.avanza.astrix.ft.plugin.AstrixFaultTolerance;
 import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
@@ -51,8 +54,14 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 	}
 
 	@Override
-	public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
-		final AsyncFuture<AstrixServiceInvocationResponse> response = this.gigaSpace.execute(new AstrixServiceInvocationTask(request), routingKey);
+	public Observable<AstrixServiceInvocationResponse> processRoutedRequest(final AstrixServiceInvocationRequest request, final RoutingKey routingKey) {
+		final AsyncFuture<AstrixServiceInvocationResponse> response = 
+				this.faultTolerance.execute(new Command<AsyncFuture<AstrixServiceInvocationResponse>>() {
+					@Override
+					public AsyncFuture<AstrixServiceInvocationResponse> call() {
+						return gigaSpace.execute(new AstrixServiceInvocationTask(request), routingKey);
+					}
+				}, new CommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
 		Observable<AstrixServiceInvocationResponse> observable = Observable.create(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {
 			@Override
 			public void call(final Subscriber<? super AstrixServiceInvocationResponse> t1) {
@@ -69,25 +78,18 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 				});
 			}
 		});
-		return addFaultTolerance(request, observable);
+		return faultTolerance.observe(observable, getServiceCommandSettings(request));
 	}
 
-	private <T> Observable<T> addFaultTolerance(
-			AstrixServiceInvocationRequest request,
-			Observable<T> observable) {
-		String api = request.getHeader(AstrixServiceInvocationRequestHeaders.SERVICE_API);
-		String spaceName = gigaSpace.getName();
-		String[] subPackagesAndClassName = api.split("[.]");
-		if (subPackagesAndClassName.length > 0) {
-			api = subPackagesAndClassName[subPackagesAndClassName.length - 1]; // Use simple class name without package name
-		}
-		String commandKey = spaceName + "_" + api;
-		return faultTolerance.observe(observable, new ObservableCommandSettings(commandKey, gigaSpace.getName()));
-	}
-	
 	@Override
-	public Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request) {
-		final AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>> responses = gigaSpace.execute(new AstrixDistributedServiceInvocationTask(request));
+	public Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(final AstrixServiceInvocationRequest request) {
+		final AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>> responses = 
+				faultTolerance.execute(new Command<AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>>>() {
+						@Override
+						public AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>> call() {
+							return gigaSpace.execute(new AstrixDistributedServiceInvocationTask(request));
+						}
+					}, new CommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
 		Observable<List<AstrixServiceInvocationResponse>> observable = Observable.create(new Observable.OnSubscribe<List<AstrixServiceInvocationResponse>>() {
 			@Override
 			public void call(final Subscriber<? super List<AstrixServiceInvocationResponse>> subscriber) {
@@ -97,6 +99,10 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 						if (asyncRresult.getException() == null) {
 							List<AstrixServiceInvocationResponse> result = new ArrayList<>();
 							for (AsyncResult<AstrixServiceInvocationResponse> asyncInvocationResponse : asyncRresult.getResult()) {
+								if (asyncInvocationResponse.getException() != null) {
+									subscriber.onError(asyncInvocationResponse.getException());
+									return;
+								}
 								result.add(asyncInvocationResponse.getResult());
 							}
 							subscriber.onNext(result);
@@ -108,7 +114,19 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 				});
 			}
 		});
-		return addFaultTolerance(request, observable);
+		return faultTolerance.observe(observable, getServiceCommandSettings(request));
+	}
+	
+	private ObservableCommandSettings getServiceCommandSettings(AstrixServiceInvocationRequest request) {
+		String api = request.getHeader(AstrixServiceInvocationRequestHeaders.SERVICE_API);
+		String spaceName = gigaSpace.getName();
+		String[] subPackagesAndClassName = api.split("[.]");
+		if (subPackagesAndClassName.length > 0) {
+			api = subPackagesAndClassName[subPackagesAndClassName.length - 1]; // Use simple class name without package name
+		}
+		String commandKey = spaceName + "_" + api;
+		ObservableCommandSettings commandSettings = new ObservableCommandSettings(commandKey, gigaSpace.getName());
+		return commandSettings;
 	}
 
 	public static AstrixRemotingTransport remoteSpace(GigaSpace gigaSpace, AstrixFaultTolerance faultTolerance) {

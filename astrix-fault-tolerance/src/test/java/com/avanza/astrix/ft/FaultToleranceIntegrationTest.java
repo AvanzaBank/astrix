@@ -15,14 +15,20 @@
  */
 package com.avanza.astrix.ft;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import javax.sql.rowset.serial.SerialArray;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -31,8 +37,6 @@ import org.junit.Test;
 
 import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.ft.HystrixAdapter;
-import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.ft.service.SimpleService;
 import com.avanza.astrix.ft.service.SimpleServiceException;
 import com.avanza.astrix.ft.service.SimpleServiceImpl;
@@ -131,9 +135,9 @@ public abstract class FaultToleranceIntegrationTest {
 		}
 	}
 	
-	private void callServiceThrowServiceUnavailable(SimpleService serviceWithFt) {
+	private void callServiceThrowServiceUnavailable(SimpleService serviceWithFt) throws Exception {
 		try {
-			serviceWithFt.throwException(ServiceUnavailableException.class);
+			serviceWithFt.throwException(TestServiceUnavailableException.class);
 		} catch (ServiceUnavailableException e) {
 		}
 	}
@@ -206,10 +210,19 @@ public abstract class FaultToleranceIntegrationTest {
 	@Test
 	public void callerStackIsAddedToExceptionOnServiceUnavailableException() throws Exception {
 		try {
-			testService.throwException(ServiceUnavailableException.class);
+			testService.throwException(TestServiceUnavailableException.class);
 			fail("Expected SimpleServiceException");
 		} catch (ServiceUnavailableException e) {
 			assertThat(Throwables.getStackTraceAsString(e), containsString(FaultToleranceIntegrationTest.class.getName() + ".callerStackIsAddedToException"));
+		}
+	}
+	
+	public static class TestServiceUnavailableException extends ServiceUnavailableException {
+
+		private static final long serialVersionUID = 1L;
+
+		public TestServiceUnavailableException() {
+			super("test-msg");
 		}
 	}
 	

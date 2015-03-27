@@ -18,7 +18,7 @@ package com.avanza.astrix.ft;
 import java.util.Objects;
 
 
-public class ObservableCommandSettings {
+public class ObservableCommandSettings implements HystrixCommandKeys {
 	
 	private final String commandKey;
 	private final String groupKey;
@@ -30,10 +30,12 @@ public class ObservableCommandSettings {
 		this.groupKey = Objects.requireNonNull(groupKey);
 	}
 	
+	@Override
 	public final String getGroupKey() {
 		return groupKey;
 	}
 	
+	@Override
 	public final String getCommandKey() {
 		return commandKey;
 	}

@@ -44,22 +44,31 @@ public class HystrixCommandExecutionSupervisor {
 					List<HystrixEventType> eventsDuringExecution) {
 				System.out.println("Executed command: " + key.name() + ", isolationStrategy=" + isolationStrategy + ", duration: " + duration + ", events: " + eventsDuringExecution);
 			}
+			@Override
+			public void markEvent(HystrixEventType eventType, HystrixCommandKey key) {
+				System.out.println("HystrixEvent command: " + key.name() + " type: " + eventType);
+			}
 		});
+		
+		
+		
 		AstrixConfigurer astrixConfigurer = new AstrixConfigurer();
 		astrixConfigurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, "gs-remoting:jini://*/*/service-registry-space?groups=" + Config.LOOKUP_GROUP_NAME);
 		AstrixContext context = astrixConfigurer.configure();
+
+		
 		LunchService lunchService = context.getBean(LunchService.class);
-		LunchServiceAsync lunchServiceAsync = context.getBean(LunchServiceAsync.class);
 
 		while(true) {
-			if (new Random().nextInt(5) == 1) {
-				lunchService.addLunchRestaurant(new LunchRestaurant(new Random().nextInt() + "", "foo"));
+			try {
+				System.out.println("Checking restaurant count");
+				List<LunchRestaurant> allRestaurants = lunchService.getAllLunchRestaurants();
+				System.out.println("Restaurant Count: " + allRestaurants.size());
+			} catch (Exception e) {
+				System.out.println("Failed to get restaurant count");
+				e.printStackTrace();
 			}
 			Thread.sleep(1000);
-			lunchService.getAllLunchRestaurants();
-			
-			Future<LunchRestaurant> asyncFuture = lunchServiceAsync.getLunchRestaurant("foo");
-			asyncFuture.get();
 		}
 	}
 

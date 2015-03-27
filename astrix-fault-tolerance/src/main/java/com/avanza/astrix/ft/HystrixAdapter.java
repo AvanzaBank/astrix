@@ -29,10 +29,10 @@ import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommand.Setter;
-import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
+import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixThreadPoolProperties;
 
 /**
@@ -81,21 +81,15 @@ public class HystrixAdapter<T> implements InvocationHandler {
 
 	@Override
 	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
-		/*
-		 * IMPROVE: inspect method an use correct isolation strategy:
-		 * 
-		 *   1. Use HystrixObservableCommand with semaphore isolation for non-blocking operations (methods returning Observable's/Futures)
-		 *   2. Use HystrixCommand with thread isolation for all blocking operations (any method NOT returning an Observable/Future)
-		 */
 		HystrixCommand<HystrixResult> command = createHystrixCommand(method, args);
-		AstrixCallStackTrace trace = new AstrixCallStackTrace();
 		HystrixResult result = command.execute();
-		throwExceptionIfExecutionFailed(trace, result);
+		throwExceptionIfExecutionFailed(result);
 		return result.getResult();
 	}
 
-	private void throwExceptionIfExecutionFailed(AstrixCallStackTrace trace, HystrixResult result) throws Throwable {
+	private void throwExceptionIfExecutionFailed(HystrixResult result) throws Throwable {
 		if (result.getException() != null) {
+			AstrixCallStackTrace trace = new AstrixCallStackTrace();
 			appendStackTrace(result.getException(), trace);
 			throw result.getException();
 		}
@@ -146,7 +140,7 @@ public class HystrixAdapter<T> implements InvocationHandler {
 				log.info(String.format("Aborted command execution: cause=%s circuit=%s", cause, this.getCommandKey().name()));
 				if (isFailedExecution()) {
 					// Underlying service threw ServiceUnavailableException
-					return HystrixResult.exception(AstrixUtil.wrapFailedExecutionException(this));
+					return HystrixResult.exception(getFailedExecutionException());
 				}
 				// Timeout or rejected in queue
 				return HystrixResult.exception(new ServiceUnavailableException(Objects.toString(cause)));

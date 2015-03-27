@@ -55,7 +55,7 @@ public class HystrixObservableCommandFacadeTest {
 	
 	@Test
 	public void serviceUnavailableThrownByUnderlyingObservableShouldCountAsFailure() throws Exception {
-		Observable<String> observable = Observable.error(new ServiceUnavailableException());
+		Observable<String> observable = Observable.error(new ServiceUnavailableException(""));
 		Observable<String> ftObservable = HystrixObservableCommandFacade.observe(observable, commandSettings);
 		
 		try {

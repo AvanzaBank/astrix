@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft.service;
-
-
-public interface SimpleService {
-
-	String echo(String s);
+package com.avanza.astrix.ft;
+/**
+ * Holds thye group and command key associated with a HystrixCommand/HystrixObservableCommand.
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public interface HystrixCommandKeys {
 	
-	void sleep(long millis);
+	String getGroupKey();
+	
+	String getCommandKey();
 
-	void throwException(Class<? extends RuntimeException> classType);
 }

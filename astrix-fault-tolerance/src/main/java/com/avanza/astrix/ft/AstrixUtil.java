@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.ft;
 
-import com.avanza.astrix.core.ServiceUnavailableException;
 import com.netflix.hystrix.HystrixCommand;
 
 final class AstrixUtil {
@@ -34,14 +33,6 @@ final class AstrixUtil {
 			return ServiceUnavailableCause.UNAVAILABLE;
 		}
 		return ServiceUnavailableCause.UNKNOWN;
-	}
-	
-	static ServiceUnavailableException wrapFailedExecutionException(HystrixCommand<?> executable) {
-		Throwable failedExecutionException = executable.getFailedExecutionException();
-		if (failedExecutionException instanceof ServiceUnavailableException) {
-			return (ServiceUnavailableException) failedExecutionException;
-		}
-		return new ServiceUnavailableException("Wrapper for exception thrown from invoke(api)", failedExecutionException);
 	}
 
 }

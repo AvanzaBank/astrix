@@ -13,14 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft.service;
+package com.avanza.astrix.ft;
 
-
-public interface SimpleService {
-
-	String echo(String s);
-	
-	void sleep(long millis);
-
-	void throwException(Class<? extends RuntimeException> classType);
+public interface Command<T> {
+	T call();
 }

@@ -63,17 +63,34 @@ public class HystrixObservableCommandFacade<T> {
 			@Override
 			protected Observable<Result<T>> resumeWithFallback() {
 				/* 
-				 * This method will will be invoked in any of this circumstances:
+				 * This method will will be invoked in any of these circumstances:
 				 *  - Underlying observable did not emit event before timeout, "service timeout"
 				 *  - Circuit Breaker rejected subscription to underlying observable, "circuit open"
-				 *  - Bulk Head rejected subscription to underlying observable, "to many outstanding requests"
+				 *  - Bulk Head rejected subscription to underlying observable, "too many outstanding requests"
 				 *  - Underlying observable threw ServiceUnavailableException
 				 *  
 				 *  Either way, just return a ServiceUnavailableException.
 				 * 
 				 */
-				return Observable.just(Result.<T>exception(new ServiceUnavailableException()));
+				return Observable.just(Result.<T>exception(createServiceUnavailableException()));
 			}
+
+			private ServiceUnavailableException createServiceUnavailableException() {
+				if (isResponseRejected()) {
+					return new ServiceUnavailableException("REJECTED_EXECUTION");
+				}
+				if (isResponseTimedOut()) {
+					return new ServiceUnavailableException("TIMEOUT");
+				}
+				if (isResponseShortCircuited()) {
+					return new ServiceUnavailableException("SHORT_CIRCUITED");
+				}
+				if (isFailedExecution() && (getFailedExecutionException() instanceof ServiceUnavailableException)) {
+					return (ServiceUnavailableException) getFailedExecutionException();
+				}
+				return new ServiceUnavailableException("UNKNOWN_CAUSE");
+			}
+			
 		}.observe(); // Eagerly start execution of underlying observable
 		return faultToleranceProtectedObservable.flatMap(new Func1<Result<T>, Observable<T>>() {
 			@Override

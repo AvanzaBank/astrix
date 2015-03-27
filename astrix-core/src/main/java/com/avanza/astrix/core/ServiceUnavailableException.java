@@ -24,6 +24,7 @@ public class ServiceUnavailableException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
+	@Deprecated
 	public ServiceUnavailableException() {
 	}
 
@@ -31,10 +32,12 @@ public class ServiceUnavailableException extends RuntimeException {
 		super(message);
 	}
 
+	@Deprecated
 	public ServiceUnavailableException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
+	@Deprecated
 	public ServiceUnavailableException(Throwable cause) {
 		super(cause);
 	}
