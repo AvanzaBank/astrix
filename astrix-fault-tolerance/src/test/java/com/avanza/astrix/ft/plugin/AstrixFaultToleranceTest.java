@@ -26,11 +26,8 @@ import org.junit.Test;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.MapConfigSource;
-import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.ft.FaultToleranceSpecification;
-import com.avanza.astrix.ft.plugin.AstrixFaultTolerance;
-import com.avanza.astrix.ft.plugin.AstrixFaultTolerancePlugin;
+import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
 import com.avanza.astrix.provider.core.Service;
@@ -45,11 +42,7 @@ public class AstrixFaultToleranceTest {
 		AstrixFaultTolerance faultTolerance = new AstrixFaultTolerance(faultTolerancePlugin);
 		faultTolerance.setConfig(new DynamicConfig(config));
 		
-		Ping pingWithFt = faultTolerance.addFaultTolerance(FaultToleranceSpecification.builder(Ping.class)
-																							.group("foo")
-																							.isolationStrategy(IsolationStrategy.SEMAPHORE)
-																							.build(), 
-																new PingImpl());
+		Ping pingWithFt = faultTolerance.addFaultTolerance(Ping.class, new PingImpl(), new HystrixCommandSettings("fooKey", "foo")); 
 		
 		assertEquals(0, faultTolerancePlugin.appliedFaultToleranceCount.get());
 		assertEquals("foo", pingWithFt.ping("foo"));
@@ -69,11 +62,8 @@ public class AstrixFaultToleranceTest {
 		AstrixFaultTolerance faultTolerance = new AstrixFaultTolerance(faultTolerancePlugin);
 		faultTolerance.setConfig(new DynamicConfig(config));
 		
-		Ping pingWithFt = faultTolerance.addFaultTolerance(FaultToleranceSpecification.builder(Ping.class)
-																							.group("foo")
-																							.isolationStrategy(IsolationStrategy.SEMAPHORE)
-																							.build(), 
-																new PingImpl());
+		Ping pingWithFt = faultTolerance.addFaultTolerance(Ping.class, new PingImpl(), new HystrixCommandSettings("fooKey", "foo"));
+																
 		config.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, "true");
 		assertEquals(0, faultTolerancePlugin.appliedFaultToleranceCount.get());
 		assertEquals("foo", pingWithFt.ping("foo"));
@@ -108,8 +98,9 @@ public class AstrixFaultToleranceTest {
 		private final AtomicInteger appliedFaultToleranceCount = new AtomicInteger();
 		
 		@Override
-		public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec, T provider) {
-			return ReflectionUtil.newProxy(spec.getApi(), new InvocationCounterProxy(appliedFaultToleranceCount, provider));
+		public <T> T addFaultTolerance(Class<T> api, T provider,
+				HystrixCommandSettings settings) {
+			return ReflectionUtil.newProxy(api, new InvocationCounterProxy(appliedFaultToleranceCount, provider));
 		}
 
 	}

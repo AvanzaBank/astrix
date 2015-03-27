@@ -15,6 +15,6 @@
  */
 package com.avanza.astrix.ft;
 
-public interface Command<T> {
+public interface Command<T> extends CheckedCommand<T> {
 	T call();
 }

@@ -15,13 +15,13 @@
  */
 package com.avanza.astrix.ft;
 
-import com.avanza.astrix.context.IsolationStrategy;
+import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 
 public class FaultToleranceSemaphoreIsolationIntegrationTest extends FaultToleranceIntegrationTest {
 
 	@Override
-	protected IsolationStrategy isolationStrategy() {
-		return IsolationStrategy.SEMAPHORE;
+	protected ExecutionIsolationStrategy isolationStrategy() {
+		return ExecutionIsolationStrategy.SEMAPHORE;
 	}
 
 }

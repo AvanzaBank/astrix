@@ -15,10 +15,10 @@
  */
 package com.avanza.astrix.ft.plugin;
 
-import com.avanza.astrix.ft.FaultToleranceSpecification;
+import com.avanza.astrix.ft.HystrixCommandSettings;
 
 public interface AstrixFaultTolerancePlugin {
 	
-	<T> T addFaultTolerance(FaultToleranceSpecification<T> spec, T provider);
+	<T> T addFaultTolerance(Class<T> api, T provider, HystrixCommandSettings settings);
 
 }

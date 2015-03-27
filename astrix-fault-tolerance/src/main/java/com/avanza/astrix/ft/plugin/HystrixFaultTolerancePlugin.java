@@ -15,21 +15,18 @@
  */
 package com.avanza.astrix.ft.plugin;
 
-import java.util.Objects;
-
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.ft.FaultToleranceSpecification;
-import com.avanza.astrix.ft.HystrixAdapter;
+import com.avanza.astrix.ft.HystrixProxyFactory;
+import com.avanza.astrix.ft.HystrixCommandSettings;
 
 
 @MetaInfServices(value = AstrixFaultTolerancePlugin.class)
 public class HystrixFaultTolerancePlugin implements AstrixFaultTolerancePlugin {
 	
 	@Override
-	public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec, T provider) {
-		Objects.requireNonNull(spec);
-		return HystrixAdapter.create(spec, provider);
+	public <T> T addFaultTolerance(Class<T> api, T provider, HystrixCommandSettings settings) {
+		return HystrixProxyFactory.create(api, provider, settings);
 	}
 	
 }

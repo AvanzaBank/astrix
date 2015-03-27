@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.ft;
 
-public enum IsolationStrategy {
-	THREAD, SEMAPHORE;
+public interface CheckedCommand<T> {
+	T call() throws Throwable;
 }

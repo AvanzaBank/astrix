@@ -27,10 +27,9 @@ import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigAware;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.Command;
-import com.avanza.astrix.ft.CommandSettings;
-import com.avanza.astrix.ft.FaultToleranceSpecification;
 import com.avanza.astrix.ft.HystrixCommandFacade;
 import com.avanza.astrix.ft.HystrixCommandKeys;
+import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.ft.HystrixObservableCommandFacade;
 import com.avanza.astrix.ft.ObservableCommandSettings;
 
@@ -49,11 +48,11 @@ public final class AstrixFaultTolerance implements AstrixConfigAware {
 		this.faultTolerancePlugin = faultTolerancePlugin;
 	}
 
-	public <T> T addFaultTolerance(FaultToleranceSpecification<T> spec, T provider) {
-		DynamicBooleanProperty faultToleranceEnabledForCircuit = config.getBooleanProperty("astrix.faultTolerance." + spec.getApi().getName() + ".enabled", true);
+	public <T> T addFaultTolerance(Class<T> api, T provider, HystrixCommandSettings settings) {
+		DynamicBooleanProperty faultToleranceEnabledForCircuit = config.getBooleanProperty("astrix.faultTolerance." + api.getName() + ".enabled", true);
 		DynamicBooleanProperty faultToleranceEnabled = config.getBooleanProperty(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
-		T withFaultTolerance = faultTolerancePlugin.addFaultTolerance(spec, provider);
-		return ReflectionUtil.newProxy(spec.getApi(), new FaultToleranceToggle<>(withFaultTolerance, provider, faultToleranceEnabled, faultToleranceEnabledForCircuit));
+		T withFaultTolerance = faultTolerancePlugin.addFaultTolerance(api, provider, settings);
+		return ReflectionUtil.newProxy(api, new FaultToleranceToggle<>(withFaultTolerance, provider, faultToleranceEnabled, faultToleranceEnabledForCircuit));
 	}
 	
 	public <T> Observable<T> observe(Observable<T> observable, ObservableCommandSettings settings) {
@@ -64,7 +63,7 @@ public final class AstrixFaultTolerance implements AstrixConfigAware {
 		}
 	}
 	
-	public <T> T execute(final Command<T> command, CommandSettings settings) {
+	public <T> T execute(final Command<T> command, HystrixCommandSettings settings) {
 		if (faultToleranceEnabled(settings)) {
 			return HystrixCommandFacade.execute(command, settings);
 		} else {

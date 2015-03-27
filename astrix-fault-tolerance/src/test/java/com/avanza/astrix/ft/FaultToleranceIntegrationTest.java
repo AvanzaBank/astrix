@@ -28,14 +28,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import javax.sql.rowset.serial.SerialArray;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.ft.service.SimpleService;
 import com.avanza.astrix.ft.service.SimpleServiceException;
@@ -43,6 +40,7 @@ import com.avanza.astrix.ft.service.SimpleServiceImpl;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 import com.google.common.base.Throwables;
+import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 
 public abstract class FaultToleranceIntegrationTest {
 
@@ -50,7 +48,7 @@ public abstract class FaultToleranceIntegrationTest {
 	private SimpleService provider = new SimpleServiceImpl();
 	private SimpleService testService;
 	
-	protected abstract IsolationStrategy isolationStrategy();
+	protected abstract ExecutionIsolationStrategy isolationStrategy();
 	
 	protected SimpleService testService() {
 		return testService;
@@ -58,12 +56,12 @@ public abstract class FaultToleranceIntegrationTest {
 
 	@Before
 	public void createService() {
-		testService = HystrixAdapter.create(specRandomGroup(), provider, settingsRandomCommandKey());
+		testService = HystrixProxyFactory.create(api, provider, settingsRandomCommandKeyAndGroup());
 	}
 	
 	@Test
 	public void createWithDefaultSettings() throws Exception {
-		SimpleService create = HystrixAdapter.create(specRandomGroup(), provider);
+		SimpleService create = HystrixProxyFactory.create(api, provider, settingsRandomCommandKeyAndGroup());
 		create.echo("");
 	}
 
@@ -144,12 +142,12 @@ public abstract class FaultToleranceIntegrationTest {
 	
 	@Test
 	public void rejectsWhenPoolIsFull() throws Exception {
-		HystrixCommandSettings settings = settingsRandomCommandKey();
+		HystrixCommandSettings settings = settingsRandomCommandKeyAndGroup();
 		settings.setCoreSize(3);
 		settings.setMaxQueueSize(-1); // sync queue
 		settings.setExecutionIsolationThreadTimeoutInMilliseconds(5000);
 		settings.setSemaphoreMaxConcurrentRequests(3);
-		SimpleService serviceWithFt = HystrixAdapter.create(specRandomGroup(), provider, settings);
+		SimpleService serviceWithFt = HystrixProxyFactory.create(api, provider, settings);
 		ExecutorService pool = Executors.newCachedThreadPool();
 		Collection<R> runners = new ArrayList<R>();
 		for (int i = 0; i < 5; i++) {
@@ -227,15 +225,11 @@ public abstract class FaultToleranceIntegrationTest {
 	}
 	
 	
-	private HystrixCommandSettings settingsRandomCommandKey() {
-		HystrixCommandSettings settings = new HystrixCommandSettings();
-		settings.setCommandKey(randomString());
+	private HystrixCommandSettings settingsRandomCommandKeyAndGroup() {
+		HystrixCommandSettings settings = new HystrixCommandSettings(randomString(), randomString());
 		settings.setMetricsRollingStatisticalWindowInMilliseconds(2000);
+		settings.setExecutionIsolationStrategy(isolationStrategy());
 		return settings;
-	}
-	
-	private FaultToleranceSpecification<SimpleService> specRandomGroup() {
-		return FaultToleranceSpecification.builder(api).group(randomString()).isolationStrategy(isolationStrategy()).build();
 	}
 	
 	private String randomString() {

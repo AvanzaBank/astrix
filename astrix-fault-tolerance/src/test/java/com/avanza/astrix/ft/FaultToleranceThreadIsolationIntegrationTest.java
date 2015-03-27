@@ -15,22 +15,24 @@
  */
 package com.avanza.astrix.ft;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-import com.avanza.astrix.context.IsolationStrategy;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.google.common.base.Throwables;
+import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 
 public class FaultToleranceThreadIsolationIntegrationTest extends FaultToleranceIntegrationTest {
 
 	private static final long SLEEP_FOR_TIMEOUT = 1100l;
 	
+	
 	@Override
-	protected IsolationStrategy isolationStrategy() {
-		return IsolationStrategy.THREAD;
+	protected ExecutionIsolationStrategy isolationStrategy() {
+		return ExecutionIsolationStrategy.THREAD;
 	}
 
 	@Test(expected=ServiceUnavailableException.class)

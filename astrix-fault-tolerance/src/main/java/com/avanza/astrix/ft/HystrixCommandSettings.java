@@ -15,26 +15,38 @@
  */
 package com.avanza.astrix.ft;
 
+import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
+
 /**
  * Contains settings for the Hystrix Command. The initial values of the fields are used as defaults.
  * 
  * @author Kristoffer Erlandsson (krierl)
  */
-// Package private since we only want to override settings in tests currently. Configuration through Archaius otherwise.
-class HystrixCommandSettings {
+public class HystrixCommandSettings implements HystrixCommandKeys {
 
 	private int queueSizeRejectionThreshold = 10;
 	private int coreSize = 10;
 	private int semaphoreMaxConcurrentRequests = 10;
-	private String commandKey = null; // null means use api name as command key
+	private String commandKey;
+	private String groupKey;
 	private int executionIsolationThreadTimeoutInMilliseconds = 1000;
 	private int metricsRollingStatisticalWindowInMilliseconds = 10_000;
 	private int maxQueueSize = 1_000_000;
+	private ExecutionIsolationStrategy executionIsolationStrategy = ExecutionIsolationStrategy.THREAD;
+	
+	public HystrixCommandSettings(String commandKey, String groupKey) {
+		this.commandKey = commandKey;
+		this.groupKey = groupKey;
+	}
 
 	public int getMaxQueueSize() {
 		return maxQueueSize;
 	}
-
+	
+	public String getGroupKey() {
+		return groupKey;
+	}
+	
 	public void setMaxQueueSize(int maxQueueSize) {
 		this.maxQueueSize = maxQueueSize;
 	}
@@ -85,5 +97,13 @@ class HystrixCommandSettings {
 
 	public void setExecutionIsolationThreadTimeoutInMilliseconds(int executionIsolationThreadTimeoutInMilliseconds) {
 		this.executionIsolationThreadTimeoutInMilliseconds = executionIsolationThreadTimeoutInMilliseconds;
+	}
+
+	public void setExecutionIsolationStrategy(ExecutionIsolationStrategy executionIsolationStrategy) {
+		this.executionIsolationStrategy = executionIsolationStrategy;
+	}
+	
+	public ExecutionIsolationStrategy getExecutionIsolationStrategy() {
+		return executionIsolationStrategy;
 	}
 }

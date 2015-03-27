@@ -22,8 +22,7 @@ import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
-import com.avanza.astrix.context.IsolationStrategy;
-import com.avanza.astrix.ft.FaultToleranceSpecification;
+import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.ft.plugin.AstrixFaultTolerance;
 import com.avanza.astrix.gs.ClusteredProxyCache.GigaSpaceInstance;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -51,11 +50,8 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 		}
 		GigaSpaceInstance gigaSpaceInstance = proxyCache.getProxy(serviceProperties);
 		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
-		FaultToleranceSpecification<T> ftSpec = FaultToleranceSpecification.builder(type)
-																	       .isolationStrategy(IsolationStrategy.THREAD)
-																	       .group(spaceName)
-																	       .build();
-		return BoundProxyServiceBeanInstance.create(faultTolerance.addFaultTolerance(ftSpec, type.cast(gigaSpaceInstance.get())), gigaSpaceInstance);
+		HystrixCommandSettings hystrixSettings = new HystrixCommandSettings(spaceName + "_" + GigaSpace.class.getSimpleName(), spaceName);
+		return BoundProxyServiceBeanInstance.create(faultTolerance.addFaultTolerance(type, type.cast(gigaSpaceInstance.get()), hystrixSettings), gigaSpaceInstance);
 	}
 	
 	@Override

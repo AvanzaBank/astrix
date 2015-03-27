@@ -17,7 +17,6 @@ package com.avanza.astrix.gs.remoting;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.openspaces.core.GigaSpace;
 
@@ -25,7 +24,7 @@ import rx.Observable;
 import rx.Subscriber;
 
 import com.avanza.astrix.ft.Command;
-import com.avanza.astrix.ft.CommandSettings;
+import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.ft.ObservableCommandSettings;
 import com.avanza.astrix.ft.plugin.AstrixFaultTolerance;
 import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
@@ -61,7 +60,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 					public AsyncFuture<AstrixServiceInvocationResponse> call() {
 						return gigaSpace.execute(new AstrixServiceInvocationTask(request), routingKey);
 					}
-				}, new CommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
+				}, new HystrixCommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
 		Observable<AstrixServiceInvocationResponse> observable = Observable.create(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {
 			@Override
 			public void call(final Subscriber<? super AstrixServiceInvocationResponse> t1) {
@@ -89,7 +88,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 						public AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>> call() {
 							return gigaSpace.execute(new AstrixDistributedServiceInvocationTask(request));
 						}
-					}, new CommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
+					}, new HystrixCommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
 		Observable<List<AstrixServiceInvocationResponse>> observable = Observable.create(new Observable.OnSubscribe<List<AstrixServiceInvocationResponse>>() {
 			@Override
 			public void call(final Subscriber<? super List<AstrixServiceInvocationResponse>> subscriber) {

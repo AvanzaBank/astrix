@@ -31,38 +31,41 @@ import com.netflix.hystrix.HystrixThreadPoolProperties;
 
 /**
  * @author Elias Lindholm (elilin)
+ * @author Kristoffer Erlandsson (krierl)
  */
 public class HystrixCommandFacade<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(HystrixCommandFacade.class);
 
-	private final Command<T> command;
-	private final CommandSettings settings;
+	private final CheckedCommand<T> command;
+	private final HystrixCommandSettings settings;
 	
-	private HystrixCommandFacade(Command<T> command, CommandSettings settings) {
+	HystrixCommandFacade(CheckedCommand<T> command, HystrixCommandSettings settings) {
 		this.command = command;
 		this.settings = settings;
 	}
 
-	public static <T> T execute(Command<T> command, CommandSettings settings) {
-		return new HystrixCommandFacade<>(command, settings).doExecute();
+	public static <T> T execute(Command<T> command, HystrixCommandSettings settings) {
+		try {
+			return new HystrixCommandFacade<>(command, settings).execute();
+		} catch (Throwable e) {
+			// This is a programming bug, Command<T> cannot throw checked exception
+			throw new RuntimeException(e);
+		}
 	}
 
-	private T doExecute() {
+	protected T execute() throws Throwable {
 		HystrixCommand<HystrixResult<T>> command = createHystrixCommand();
 		HystrixResult<T> result = command.execute();
 		throwExceptionIfExecutionFailed(result);
 		return result.getResult();
 	}
 
-	private void throwExceptionIfExecutionFailed(HystrixResult<T> result) {
+	private void throwExceptionIfExecutionFailed(HystrixResult<T> result) throws Throwable {
 		if (result.getException() != null) {
 			AstrixCallStackTrace trace = new AstrixCallStackTrace();
 			appendStackTrace(result.getException(), trace);
-			if (result.getException() instanceof RuntimeException) {
-				throw (RuntimeException) result.getException();
-			}
-			throw new RuntimeException("Command execution failed: " + result.getException());
+			throw result.getException();
 		}
 	}
 
@@ -81,12 +84,12 @@ public class HystrixCommandFacade<T> {
 			protected HystrixResult<T> run() throws Exception {
 				try {
 					return HystrixResult.success(command.call());
-				} catch (Exception e) {
+				} catch (Throwable e) {
 					return handleException(e);
 				} 
 			}
 
-			private HystrixResult<T> handleException(Exception cause) {
+			private HystrixResult<T> handleException(Throwable cause) {
 				if (cause instanceof ServiceUnavailableException) {
 					// Only ServiceUnavailableExceptions are propagated and counted as failures for the circuit breaker
 					throw (ServiceUnavailableException) cause;
