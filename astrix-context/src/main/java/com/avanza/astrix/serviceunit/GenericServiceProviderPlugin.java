@@ -23,7 +23,7 @@ import java.util.List;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
+import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
 import com.avanza.astrix.beans.service.AstrixServiceLookupFactory;
 import com.avanza.astrix.context.AstrixPublishedBeanDefinitionMethod;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -43,7 +43,7 @@ public class GenericServiceProviderPlugin implements AstrixServiceProviderPlugin
 	private AstrixServiceLookupFactory serviceLookupFactory;
 
 	@Override
-	public List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiDescriptor descriptor) {
+	public List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiProviderClass descriptor) {
 		List<AstrixServiceBeanDefinition> result = new ArrayList<>();
 		for (Method astrixBeanDefinitionMethod : descriptor.getDescriptorClass().getMethods()) {
 			AstrixPublishedBeanDefinitionMethod beanDefinition = AstrixPublishedBeanDefinitionMethod.create(astrixBeanDefinitionMethod);
@@ -58,7 +58,7 @@ public class GenericServiceProviderPlugin implements AstrixServiceProviderPlugin
 	}
 	
 
-	private ServiceVersioningContext createVersioningContext(AstrixApiDescriptor descriptor, AstrixPublishedBeanDefinitionMethod serviceDefinition) {
+	private ServiceVersioningContext createVersioningContext(AstrixApiProviderClass descriptor, AstrixPublishedBeanDefinitionMethod serviceDefinition) {
 		Class<?> declaringApi = descriptor.getDescriptorClass();
 		if (!(declaringApi.isAnnotationPresent(Versioned.class) || serviceDefinition.isVersioned())) {
 			return ServiceVersioningContext.nonVersioned(serviceDefinition.getServiceConfigClass());

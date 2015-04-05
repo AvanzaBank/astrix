@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
+import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
 import com.avanza.astrix.provider.core.AstrixApplication;
 /**
  * 
@@ -30,10 +30,10 @@ public class AstrixApplicationDescriptor {
 
 	private final Class<?> descriptorHolder;
 	private final String defaultServiceComponent;
-	private final Collection<AstrixApiDescriptor> exportsRemoteServicesFor;
+	private final Collection<AstrixApiProviderClass> exportsRemoteServicesFor;
 
 	
-	private AstrixApplicationDescriptor(Class<?> descriptorHolder, String defaultServiceComponent, Collection<AstrixApiDescriptor> exportsRemoteServicesFor) {
+	private AstrixApplicationDescriptor(Class<?> descriptorHolder, String defaultServiceComponent, Collection<AstrixApiProviderClass> exportsRemoteServicesFor) {
 		this.descriptorHolder = descriptorHolder;
 		this.defaultServiceComponent = defaultServiceComponent;
 		this.exportsRemoteServicesFor = exportsRemoteServicesFor;
@@ -48,9 +48,9 @@ public class AstrixApplicationDescriptor {
 		AstrixApplication astrixApplication = applicationDescriptorHolder.getAnnotation(AstrixApplication.class);
 		defaultServiceComponent = getDefaultServiceComponent(astrixApplication, applicationDescriptorHolder);
 		Class<?>[] exportedRemoteServiceEndpointClasses = getExportedRemoteServiceEndpoints(astrixApplication, applicationDescriptorHolder);
-		Set<AstrixApiDescriptor> exportsRemoteServicesForApis = new HashSet<>();
+		Set<AstrixApiProviderClass> exportsRemoteServicesForApis = new HashSet<>();
 		for (Class<?> apiProviderClass : exportedRemoteServiceEndpointClasses) {
-			exportsRemoteServicesForApis.add(AstrixApiDescriptor.create(apiProviderClass));
+			exportsRemoteServicesForApis.add(AstrixApiProviderClass.create(apiProviderClass));
 		}
 		return new AstrixApplicationDescriptor(applicationDescriptorHolder, defaultServiceComponent, exportsRemoteServicesForApis);
 	}
@@ -108,7 +108,7 @@ public class AstrixApplicationDescriptor {
 	 * for. <p>
 	 * @return
 	 */
-	public Collection<AstrixApiDescriptor> exportsRemoteServicesFor() {
+	public Collection<AstrixApiProviderClass> exportsRemoteServicesFor() {
 		return this.exportsRemoteServicesFor;
 	}
 

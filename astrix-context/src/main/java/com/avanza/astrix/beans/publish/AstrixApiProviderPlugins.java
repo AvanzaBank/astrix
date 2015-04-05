@@ -39,7 +39,7 @@ public class AstrixApiProviderPlugins {
 		}
 	}
 	
-	public AstrixApiProviderPlugin getProviderPlugin(AstrixApiDescriptor descriptor) {
+	public AstrixApiProviderPlugin getProviderPlugin(AstrixApiProviderClass descriptor) {
 		for (AstrixApiProviderPlugin plugin : pluginByAnnotationType.values()) {
 			if (descriptor.isAnnotationPresent(plugin.getProviderAnnotationType())) {
 				return plugin;

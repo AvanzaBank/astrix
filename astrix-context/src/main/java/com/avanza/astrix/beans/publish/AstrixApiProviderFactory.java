@@ -23,7 +23,7 @@ import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 
 /**
  * This component is used to create runtime factory representations (AstrixApiProvider) for api's hooked
- * into Astrix. An API is defined by an AstrixApiDescriptor, which in turn uses different annotations for
+ * into Astrix. An API is defined by an AstrixApiProviderClass, which in turn uses different annotations for
  * different types of apis. This class is responsible for interpreting such annotations and create an
  * AstrixApiProvider for the given api. <p>
  * 
@@ -40,7 +40,7 @@ public class AstrixApiProviderFactory {
 		this.apiProviderPlugins = apiProviderPlugins;
 	}
 	
-	public List<AstrixFactoryBean<?>> create(AstrixApiDescriptor descriptor) {
+	public List<AstrixFactoryBean<?>> create(AstrixApiProviderClass descriptor) {
 		AstrixApiProviderPlugin providerFactoryPlugin = getProviderPlugin(descriptor);
 		List<AstrixFactoryBean<?>> factoryBeans = new ArrayList<>();
 		for (AstrixFactoryBean<?> factoryBean : providerFactoryPlugin.createFactoryBeans(descriptor)) {
@@ -49,7 +49,7 @@ public class AstrixApiProviderFactory {
 		return factoryBeans;
 	}
 	
-	private AstrixApiProviderPlugin getProviderPlugin(AstrixApiDescriptor descriptor) {
+	private AstrixApiProviderPlugin getProviderPlugin(AstrixApiProviderClass descriptor) {
 		return this.apiProviderPlugins.getProviderPlugin(descriptor);
 	}
 	

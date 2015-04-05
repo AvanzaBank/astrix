@@ -22,14 +22,14 @@ import java.util.Collection;
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AstrixApiDescriptors {
+public interface AstrixApiProviders {
 
 	/**
-	 * Strategy for locating all AstrixApiDescriptor's available in
+	 * Strategy for locating all AstrixApiProviderClass's available in
 	 * the current runtime. <p>
 	 * 
 	 * @return
 	 */
-	Collection<AstrixApiDescriptor> getAll();
+	Collection<AstrixApiProviderClass> getAll();
 	
 }

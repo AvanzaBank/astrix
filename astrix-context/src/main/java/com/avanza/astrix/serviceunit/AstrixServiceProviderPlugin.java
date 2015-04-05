@@ -18,11 +18,11 @@ package com.avanza.astrix.serviceunit;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
+import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
 
 public interface AstrixServiceProviderPlugin {
 	
-	List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiDescriptor descriptor);
+	List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiProviderClass descriptor);
 	
 	Class<? extends Annotation> getProviderAnnotationType();
 

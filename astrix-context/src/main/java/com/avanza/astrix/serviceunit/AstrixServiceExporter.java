@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
+import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryPlugin;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceComponents;
@@ -69,7 +69,7 @@ public class AstrixServiceExporter {
 
 	public void setServiceDescriptor(AstrixApplicationDescriptor applicationDescriptor) {
 		this.applicationDescriptor = applicationDescriptor;		// TODO: How to inject service descriptor??? 
-		for (AstrixApiDescriptor api : applicationDescriptor.exportsRemoteServicesFor()) {
+		for (AstrixApiProviderClass api : applicationDescriptor.exportsRemoteServicesFor()) {
 			this.serviceBeanDefinitions.addAll(serviceProviderPlugins.getExportedServices(api));
 		}
 	}

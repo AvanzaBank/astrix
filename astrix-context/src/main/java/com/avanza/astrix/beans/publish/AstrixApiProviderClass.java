@@ -22,38 +22,36 @@ import java.util.Objects;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class AstrixApiDescriptor {
+public final class AstrixApiProviderClass {
 	
-	// TODO: Rename to AstrixApiProviderReader or AstrixApiProviderClass
-
-	public static AstrixApiDescriptor create(Class<?> descriptorHolder) {
-		return new AstrixApiDescriptor(descriptorHolder);
+	public static AstrixApiProviderClass create(Class<?> providerClass) {
+		return new AstrixApiProviderClass(providerClass);
 	}
-	private Class<?> descriptorHolder;
+	private Class<?> providerClass;
 
-	private AstrixApiDescriptor(Class<?> annotationHolder) {
-		this.descriptorHolder = annotationHolder;
+	private AstrixApiProviderClass(Class<?> annotationHolder) {
+		this.providerClass = annotationHolder;
 	}
 	
 	public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-		return descriptorHolder.isAnnotationPresent(annotationClass);
+		return providerClass.isAnnotationPresent(annotationClass);
 	}
 
 	public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-		return descriptorHolder.getAnnotation(annotationClass);
+		return providerClass.getAnnotation(annotationClass);
 	}
 	
 	public String getName() {
-		return this.descriptorHolder.getName();
+		return this.providerClass.getName();
 	}
 
 	public Class<?> getDescriptorClass() {
-		return descriptorHolder;
+		return providerClass;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(descriptorHolder);
+		return Objects.hash(providerClass);
 	}
 
 	@Override
@@ -64,8 +62,8 @@ public final class AstrixApiDescriptor {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AstrixApiDescriptor other = (AstrixApiDescriptor) obj;
-		return Objects.equals(descriptorHolder, other.descriptorHolder);
+		AstrixApiProviderClass other = (AstrixApiProviderClass) obj;
+		return Objects.equals(providerClass, other.providerClass);
 	}
 	
 	@Override

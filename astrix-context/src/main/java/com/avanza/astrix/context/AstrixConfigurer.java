@@ -38,8 +38,8 @@ import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.inject.AstrixPlugins;
-import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
-import com.avanza.astrix.beans.publish.AstrixApiDescriptors;
+import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
+import com.avanza.astrix.beans.publish.AstrixApiProviders;
 import com.avanza.astrix.beans.publish.AstrixApiProviderPlugin;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
@@ -55,7 +55,7 @@ public class AstrixConfigurer {
 
 	private static final Logger log = LoggerFactory.getLogger(AstrixConfigurer.class);
 	
-	private AstrixApiDescriptors astrixApiDescriptors;
+	private AstrixApiProviders astrixApiProviders;
 	private final Collection<AstrixFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	private final List<AstrixPlugins.Plugin<?>> plugins = new ArrayList<>();
 	private final AstrixSettings settings = new AstrixSettings() {{
@@ -74,7 +74,7 @@ public class AstrixConfigurer {
 		injector.bind(DynamicConfig.class, config);
 		injector.bind(AstrixContext.class, AstrixContextImpl.class);
 		injector.bind(AstrixFactoryBeanRegistry.class, SimpleAstrixFactoryBeanRegistry.class);
-		injector.bind(AstrixApiDescriptors.class, new FilteredApiDescriptors(getApiDescriptors(astrixPlugins), activeProfiles));
+		injector.bind(AstrixApiProviders.class, new FilteredApiProviders(getApiDescriptors(astrixPlugins), activeProfiles));
 		injector.registerBeanPostProcessor(new InternalBeanPostProcessor(injector.getBean(AstrixBeanFactory.class)));
 		AstrixContextImpl context = injector.getBean(AstrixContextImpl.class);
 		for (AstrixFactoryBean<?> beanFactory : standaloneFactories) {
@@ -114,37 +114,37 @@ public class AstrixConfigurer {
 		}
 	}
 	
-	private static class FilteredApiDescriptors implements AstrixApiDescriptors {
+	private static class FilteredApiProviders implements AstrixApiProviders {
 		
-		private AstrixApiDescriptors apiDescriptors;
+		private AstrixApiProviders apiProviders;
 		private Set<String> activeProfiles;
 		
-		public FilteredApiDescriptors(AstrixApiDescriptors apiDescriptors, Set<String> activeProfiles) {
-			this.apiDescriptors = apiDescriptors;
+		public FilteredApiProviders(AstrixApiProviders apiDescriptors, Set<String> activeProfiles) {
+			this.apiProviders = apiDescriptors;
 			this.activeProfiles = activeProfiles;
 		}
 
 		@Override
-		public Collection<AstrixApiDescriptor> getAll() {
-			List<AstrixApiDescriptor> result = new LinkedList<>();
-			for (AstrixApiDescriptor descriptor : apiDescriptors.getAll()) {
-				if (isActive(descriptor)) {
-					log.debug("Found provider: provider={}", descriptor.getName());
-					result.add(descriptor);
+		public Collection<AstrixApiProviderClass> getAll() {
+			List<AstrixApiProviderClass> result = new LinkedList<>();
+			for (AstrixApiProviderClass providerClass : apiProviders.getAll()) {
+				if (isActive(providerClass)) {
+					log.debug("Found provider: provider={}", providerClass.getName());
+					result.add(providerClass);
 				}
 			}
 			return result;
 		}
 		
-		private boolean isActive(AstrixApiDescriptor descriptor) {
-			if (descriptor.isAnnotationPresent(AstrixIncludedByProfile.class)) {
-				AstrixIncludedByProfile activatedBy = descriptor.getAnnotation(AstrixIncludedByProfile.class);
+		private boolean isActive(AstrixApiProviderClass providerClass) {
+			if (providerClass.isAnnotationPresent(AstrixIncludedByProfile.class)) {
+				AstrixIncludedByProfile activatedBy = providerClass.getAnnotation(AstrixIncludedByProfile.class);
 				if (!this.activeProfiles.contains(activatedBy.value())) {
 					return false;
 				}
 			}
-			if (descriptor.isAnnotationPresent(AstrixExcludedByProfile.class)) {
-				AstrixExcludedByProfile deactivatedBy = descriptor.getAnnotation(AstrixExcludedByProfile.class);
+			if (providerClass.isAnnotationPresent(AstrixExcludedByProfile.class)) {
+				AstrixExcludedByProfile deactivatedBy = providerClass.getAnnotation(AstrixExcludedByProfile.class);
 				if (this.activeProfiles.contains(deactivatedBy.value())) {
 					return false;
 				}
@@ -153,15 +153,15 @@ public class AstrixConfigurer {
 		}
 	}
 
-	private AstrixApiDescriptors getApiDescriptors(AstrixPlugins astrixPlugins) {
-		if (this.astrixApiDescriptors != null) {
-			return astrixApiDescriptors;
+	private AstrixApiProviders getApiDescriptors(AstrixPlugins astrixPlugins) {
+		if (this.astrixApiProviders != null) {
+			return astrixApiProviders;
 		}
 		String basePackage = config.getStringProperty(AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, "").get();
 		if (basePackage.trim().isEmpty()) {
-			return new AstrixApiDescriptorScanner(getAllDescriptorAnnotationsTypes(astrixPlugins), "com.avanza.astrix"); // Always scan com.avanza.astrix package
+			return new AstrixApiProviderClassScanner(getAllDescriptorAnnotationsTypes(astrixPlugins), "com.avanza.astrix"); // Always scan com.avanza.astrix package
 		}
-		return new AstrixApiDescriptorScanner(getAllDescriptorAnnotationsTypes(astrixPlugins), "com.avanza.astrix", basePackage.split(","));
+		return new AstrixApiProviderClassScanner(getAllDescriptorAnnotationsTypes(astrixPlugins), "com.avanza.astrix", basePackage.split(","));
 	}
 	
 	private List<Class<? extends Annotation>> getAllDescriptorAnnotationsTypes(AstrixPlugins astrixPlugins) {
@@ -198,8 +198,8 @@ public class AstrixConfigurer {
 	}
 
 	// package private. Used for internal testing only
-	void setAstrixApiDescriptors(AstrixApiDescriptors astrixApiDescriptors) {
-		this.astrixApiDescriptors = astrixApiDescriptors;
+	void setAstrixApiDescriptors(AstrixApiProviders astrixApiProviders) {
+		this.astrixApiProviders = astrixApiProviders;
 	}
 	
 	// package private. Used for internal testing only

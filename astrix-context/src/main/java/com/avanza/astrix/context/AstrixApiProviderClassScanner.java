@@ -26,56 +26,56 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
-import com.avanza.astrix.beans.publish.AstrixApiDescriptors;
+import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
+import com.avanza.astrix.beans.publish.AstrixApiProviders;
 /**
- * Uses classpath scanning to locate api-descriptors. <p>
+ * Uses classpath scanning to find api-providers. <p>
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixApiDescriptorScanner implements AstrixApiDescriptors {
+public class AstrixApiProviderClassScanner implements AstrixApiProviders {
 
-	private final Logger log = LoggerFactory.getLogger(AstrixApiDescriptorScanner.class);
+	private final Logger log = LoggerFactory.getLogger(AstrixApiProviderClassScanner.class);
 	
-	private static final Map<String, List<AstrixApiDescriptor>> apiDescriptorsByBasePackage = new ConcurrentHashMap<>();
+	private static final Map<String, List<AstrixApiProviderClass>> apiProvidersByBasePackage = new ConcurrentHashMap<>();
 	private final List<String> basePackages = new ArrayList<>();
-	private final List<Class<? extends Annotation>> descriptorAnnotationsToScanFor;
+	private final List<Class<? extends Annotation>> providerAnnotationsToScanFor;
 	
-	public AstrixApiDescriptorScanner(List<Class<? extends Annotation>> descriptorAnnotationsToScanFor, String basePackage, String... otherBasePackages) {
-		this.descriptorAnnotationsToScanFor = descriptorAnnotationsToScanFor;
+	public AstrixApiProviderClassScanner(List<Class<? extends Annotation>> providerAnnotationsToScanFor, String basePackage, String... otherBasePackages) {
+		this.providerAnnotationsToScanFor = providerAnnotationsToScanFor;
 		this.basePackages.add(basePackage);
 		this.basePackages.addAll(Arrays.asList(otherBasePackages));
 	}
 	
 	@Override
-	public List<AstrixApiDescriptor> getAll() {
-		List<AstrixApiDescriptor> result = new ArrayList<>();
+	public List<AstrixApiProviderClass> getAll() {
+		List<AstrixApiProviderClass> result = new ArrayList<>();
 		for (String basePackage : this.basePackages) {
 			result.addAll(scanPackage(basePackage));
 		}
 		return result;
 	}
 
-	private List<AstrixApiDescriptor> scanPackage(String basePackage) {
+	private List<AstrixApiProviderClass> scanPackage(String basePackage) {
 		log.debug("Scanning package for api-providers: package={}", basePackage);
-		List<AstrixApiDescriptor> descriptors = apiDescriptorsByBasePackage.get(basePackage);
-		if (descriptors != null) {
-			log.debug("Returning cached api-providers found on earlier scan types={}", descriptors);
-			return descriptors;
+		List<AstrixApiProviderClass> providerClasses = apiProvidersByBasePackage.get(basePackage);
+		if (providerClasses != null) {
+			log.debug("Returning cached api-providers found on earlier scan types={}", providerClasses);
+			return providerClasses;
 		}
 		List<Class<? extends Annotation>> allProviderAnnotationTypes = getAllProviderAnnotationTypes();
 		log.debug("Running scan for api-providers of types={}", allProviderAnnotationTypes);
-		List<AstrixApiDescriptor> discoveredApiPRoviders = new ArrayList<>();
+		List<AstrixApiProviderClass> discoveredApiPRoviders = new ArrayList<>();
 		Reflections reflections = new Reflections(basePackage);
 		for (Class<? extends Annotation> apiAnnotation : allProviderAnnotationTypes) { 
 			for (Class<?> providerClass : reflections.getTypesAnnotatedWith(apiAnnotation)) {
-				AstrixApiDescriptor provider = AstrixApiDescriptor.create(providerClass);
+				AstrixApiProviderClass provider = AstrixApiProviderClass.create(providerClass);
 				log.debug("Found api provider {}", provider);
 				discoveredApiPRoviders.add(provider);
 			}
 		}
-		apiDescriptorsByBasePackage.put(basePackage, discoveredApiPRoviders);
+		apiProvidersByBasePackage.put(basePackage, discoveredApiPRoviders);
 		return discoveredApiPRoviders;
 	}
 	
@@ -84,7 +84,7 @@ public class AstrixApiDescriptorScanner implements AstrixApiDescriptors {
 	}
 
 	private List<Class<? extends Annotation>> getAllProviderAnnotationTypes() {
-		return descriptorAnnotationsToScanFor;
+		return providerAnnotationsToScanFor;
 	}
 
 }

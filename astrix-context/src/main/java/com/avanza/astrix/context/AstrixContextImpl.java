@@ -22,8 +22,8 @@ import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.inject.AstrixInjector;
-import com.avanza.astrix.beans.publish.AstrixApiDescriptor;
-import com.avanza.astrix.beans.publish.AstrixApiDescriptors;
+import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
+import com.avanza.astrix.beans.publish.AstrixApiProviders;
 import com.avanza.astrix.beans.publish.AstrixApiProviderPlugins;
 import com.avanza.astrix.beans.service.StatefulAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
@@ -49,7 +49,7 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		this.apiProviderPlugins = apiProviderPlugins;
 		this.beanFactory = this.astrixInjector.getBean(AstrixBeanFactory.class); // The bean-factory used for apis managed by astrix
 		this.beanFactoryRegistry = (SimpleAstrixFactoryBeanRegistry) this.astrixInjector.getBean(AstrixFactoryBeanRegistry.class);
-		for (AstrixApiDescriptor descriptor : this.astrixInjector.getBean(AstrixApiDescriptors.class).getAll()) {
+		for (AstrixApiProviderClass descriptor : this.astrixInjector.getBean(AstrixApiProviders.class).getAll()) {
 			for (AstrixFactoryBean<?> factory : this.apiProviderPlugins.getProviderPlugin(descriptor).createFactoryBeans(descriptor)) {
 				this.beanFactoryRegistry.registerFactory(factory);
 			}
