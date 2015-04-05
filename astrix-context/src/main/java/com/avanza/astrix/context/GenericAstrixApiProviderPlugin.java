@@ -56,10 +56,10 @@ public class GenericAstrixApiProviderPlugin implements AstrixApiProviderPlugin {
 	private List<AstrixFactoryBean<?>> getFactoryBeans(AstrixApiProviderClass apiProviderClass) {
 		List<AstrixFactoryBean<?>> result = new ArrayList<>();
 		// Create library factories
-		for (Method astrixBeanDefinitionMethod : apiProviderClass.getDescriptorClass().getMethods()) {
+		for (Method astrixBeanDefinitionMethod : apiProviderClass.getProviderClass().getMethods()) {
 			AstrixPublishedBeanDefinitionMethod beanDefinition = AstrixPublishedBeanDefinitionMethod.create(astrixBeanDefinitionMethod);
 			if (beanDefinition.isLibrary()) {
-				Object libraryProviderInstance = getInstanceProvider(apiProviderClass.getDescriptorClass());
+				Object libraryProviderInstance = getInstanceProvider(apiProviderClass.getProviderClass());
 				result.add(new AstrixLibraryFactory<>(libraryProviderInstance, astrixBeanDefinitionMethod, beanDefinition.getQualifier()));
 				continue;
 			}
@@ -91,9 +91,9 @@ public class GenericAstrixApiProviderPlugin implements AstrixApiProviderPlugin {
 	}
 
 	private Class<?> getDeclaringApi(AstrixApiProviderClass apiProviderClass, Class<?> providedService) {
-		for (Method m : apiProviderClass.getDescriptorClass().getMethods()) {
+		for (Method m : apiProviderClass.getProviderClass().getMethods()) {
 			if (m.isAnnotationPresent(Service.class) && m.getReturnType().equals(providedService)) {
-				return apiProviderClass.getDescriptorClass();
+				return apiProviderClass.getProviderClass();
 			}
 		}
 		throw new IllegalArgumentException(String.format("Descriptor does not provide service. descriptor=%s service=%s", apiProviderClass, providedService.getName()));

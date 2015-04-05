@@ -40,17 +40,17 @@ public class AstrixApiProviderFactory {
 		this.apiProviderPlugins = apiProviderPlugins;
 	}
 	
-	public List<AstrixFactoryBean<?>> create(AstrixApiProviderClass descriptor) {
-		AstrixApiProviderPlugin providerFactoryPlugin = getProviderPlugin(descriptor);
+	public List<AstrixFactoryBean<?>> create(AstrixApiProviderClass apiProviderClass) {
+		AstrixApiProviderPlugin providerFactoryPlugin = getProviderPlugin(apiProviderClass);
 		List<AstrixFactoryBean<?>> factoryBeans = new ArrayList<>();
-		for (AstrixFactoryBean<?> factoryBean : providerFactoryPlugin.createFactoryBeans(descriptor)) {
+		for (AstrixFactoryBean<?> factoryBean : providerFactoryPlugin.createFactoryBeans(apiProviderClass)) {
 			factoryBeans.add(factoryBean);
 		}
 		return factoryBeans;
 	}
 	
-	private AstrixApiProviderPlugin getProviderPlugin(AstrixApiProviderClass descriptor) {
-		return this.apiProviderPlugins.getProviderPlugin(descriptor);
+	private AstrixApiProviderPlugin getProviderPlugin(AstrixApiProviderClass apiProviderClass) {
+		return this.apiProviderPlugins.getProviderPlugin(apiProviderClass);
 	}
 	
 }

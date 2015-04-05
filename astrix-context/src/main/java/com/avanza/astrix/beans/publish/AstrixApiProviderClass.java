@@ -45,7 +45,7 @@ public final class AstrixApiProviderClass {
 		return this.providerClass.getName();
 	}
 
-	public Class<?> getDescriptorClass() {
+	public Class<?> getProviderClass() {
 		return providerClass;
 	}
 

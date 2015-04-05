@@ -43,31 +43,31 @@ public class GenericServiceProviderPlugin implements AstrixServiceProviderPlugin
 	private AstrixServiceLookupFactory serviceLookupFactory;
 
 	@Override
-	public List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiProviderClass descriptor) {
+	public List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiProviderClass apiProvider) {
 		List<AstrixServiceBeanDefinition> result = new ArrayList<>();
-		for (Method astrixBeanDefinitionMethod : descriptor.getDescriptorClass().getMethods()) {
+		for (Method astrixBeanDefinitionMethod : apiProvider.getProviderClass().getMethods()) {
 			AstrixPublishedBeanDefinitionMethod beanDefinition = AstrixPublishedBeanDefinitionMethod.create(astrixBeanDefinitionMethod);
 			if (!beanDefinition.isService()) {
 				continue;
 			}
 			boolean usesServiceRegistry = this.serviceLookupFactory.getLookupStrategy(astrixBeanDefinitionMethod).equals(AstrixServiceRegistryLookup.class);
-			ServiceVersioningContext versioningContext = createVersioningContext(descriptor, beanDefinition);
+			ServiceVersioningContext versioningContext = createVersioningContext(apiProvider, beanDefinition);
 			result.add(new AstrixServiceBeanDefinition(beanDefinition.getBeanKey(), versioningContext, usesServiceRegistry, beanDefinition.getServiceComponentName()));
 		}
 		return result;
 	}
 	
 
-	private ServiceVersioningContext createVersioningContext(AstrixApiProviderClass descriptor, AstrixPublishedBeanDefinitionMethod serviceDefinition) {
-		Class<?> declaringApi = descriptor.getDescriptorClass();
+	private ServiceVersioningContext createVersioningContext(AstrixApiProviderClass apiProvider, AstrixPublishedBeanDefinitionMethod serviceDefinition) {
+		Class<?> declaringApi = apiProvider.getProviderClass();
 		if (!(declaringApi.isAnnotationPresent(Versioned.class) || serviceDefinition.isVersioned())) {
 			return ServiceVersioningContext.nonVersioned(serviceDefinition.getServiceConfigClass());
 		}
-		if (!descriptor.isAnnotationPresent(AstrixObjectSerializerConfig.class)) {
+		if (!apiProvider.isAnnotationPresent(AstrixObjectSerializerConfig.class)) {
 			throw new IllegalArgumentException("Illegal api-provider. Api is versioned but provider does not declare a @AstrixObjectSerializerConfig." +
-					" providedService=" + serviceDefinition.getBeanType().getName() + ", provider=" + descriptor.getName());
+					" providedService=" + serviceDefinition.getBeanType().getName() + ", provider=" + apiProvider.getName());
 		} 
-		AstrixObjectSerializerConfig serializerConfig = descriptor.getAnnotation(AstrixObjectSerializerConfig.class);
+		AstrixObjectSerializerConfig serializerConfig = apiProvider.getAnnotation(AstrixObjectSerializerConfig.class);
 		return ServiceVersioningContext.versionedService(serializerConfig.version(), serializerConfig.objectSerializerConfigurer(), serviceDefinition.getServiceConfigClass());
 	}
 

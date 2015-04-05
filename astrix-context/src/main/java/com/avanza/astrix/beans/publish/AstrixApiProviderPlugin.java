@@ -42,7 +42,7 @@ import com.avanza.astrix.beans.service.AstrixServiceComponent;
  */
 public interface AstrixApiProviderPlugin {
 	
-	List<AstrixFactoryBean<?>> createFactoryBeans(AstrixApiProviderClass descriptor);
+	List<AstrixFactoryBean<?>> createFactoryBeans(AstrixApiProviderClass apiProviderClass);
 	
 	Class<? extends Annotation> getProviderAnnotationType();
 	

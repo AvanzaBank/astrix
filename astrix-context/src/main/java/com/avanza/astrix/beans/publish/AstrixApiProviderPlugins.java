@@ -39,13 +39,13 @@ public class AstrixApiProviderPlugins {
 		}
 	}
 	
-	public AstrixApiProviderPlugin getProviderPlugin(AstrixApiProviderClass descriptor) {
+	public AstrixApiProviderPlugin getProviderPlugin(AstrixApiProviderClass apiProvider) {
 		for (AstrixApiProviderPlugin plugin : pluginByAnnotationType.values()) {
-			if (descriptor.isAnnotationPresent(plugin.getProviderAnnotationType())) {
+			if (apiProvider.isAnnotationPresent(plugin.getProviderAnnotationType())) {
 				return plugin;
 			}
 		}
-		throw new IllegalArgumentException("No plugin registered that can handle descriptor: " + descriptor);
+		throw new IllegalArgumentException("No plugin registered that can handle apiProvider: " + apiProvider);
 	}
 	
 }

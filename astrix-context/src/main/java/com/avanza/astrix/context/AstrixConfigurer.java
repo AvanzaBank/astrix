@@ -74,7 +74,7 @@ public class AstrixConfigurer {
 		injector.bind(DynamicConfig.class, config);
 		injector.bind(AstrixContext.class, AstrixContextImpl.class);
 		injector.bind(AstrixFactoryBeanRegistry.class, SimpleAstrixFactoryBeanRegistry.class);
-		injector.bind(AstrixApiProviders.class, new FilteredApiProviders(getApiDescriptors(astrixPlugins), activeProfiles));
+		injector.bind(AstrixApiProviders.class, new FilteredApiProviders(getApiProviders(astrixPlugins), activeProfiles));
 		injector.registerBeanPostProcessor(new InternalBeanPostProcessor(injector.getBean(AstrixBeanFactory.class)));
 		AstrixContextImpl context = injector.getBean(AstrixContextImpl.class);
 		for (AstrixFactoryBean<?> beanFactory : standaloneFactories) {
@@ -153,7 +153,7 @@ public class AstrixConfigurer {
 		}
 	}
 
-	private AstrixApiProviders getApiDescriptors(AstrixPlugins astrixPlugins) {
+	private AstrixApiProviders getApiProviders(AstrixPlugins astrixPlugins) {
 		if (this.astrixApiProviders != null) {
 			return astrixApiProviders;
 		}
