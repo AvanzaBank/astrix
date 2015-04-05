@@ -53,7 +53,17 @@ public class AstrixSettings implements DynamicConfigSource {
 	
 	
 	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AstrixContext.enforceSubsystemBoundaries";
+	
+	/**
+	 * @deprecated Renamed to {@link AstrixSettings#SERVICE_REGISTRY_URI}
+	 */
+	@Deprecated
 	public static final String ASTRIX_SERVICE_REGISTRY_URI = "AstrixServiceRegistry.serviceUri";
+	
+	/**
+	 * Service Uri used to bind to the service-registry.
+	 */
+	public static final String SERVICE_REGISTRY_URI = "AstrixServiceRegistry.serviceUri";
 	
 	/**
 	 * All services provided will be registered in the service-registry on a regular interval. This Setting defines
