@@ -119,8 +119,8 @@ public class AstrixConfigurer {
 		private AstrixApiProviders apiProviders;
 		private Set<String> activeProfiles;
 		
-		public FilteredApiProviders(AstrixApiProviders apiDescriptors, Set<String> activeProfiles) {
-			this.apiProviders = apiDescriptors;
+		public FilteredApiProviders(AstrixApiProviders apiProviders, Set<String> activeProfiles) {
+			this.apiProviders = apiProviders;
 			this.activeProfiles = activeProfiles;
 		}
 
@@ -159,12 +159,12 @@ public class AstrixConfigurer {
 		}
 		String basePackage = config.getStringProperty(AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, "").get();
 		if (basePackage.trim().isEmpty()) {
-			return new AstrixApiProviderClassScanner(getAllDescriptorAnnotationsTypes(astrixPlugins), "com.avanza.astrix"); // Always scan com.avanza.astrix package
+			return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(astrixPlugins), "com.avanza.astrix"); // Always scan com.avanza.astrix package
 		}
-		return new AstrixApiProviderClassScanner(getAllDescriptorAnnotationsTypes(astrixPlugins), "com.avanza.astrix", basePackage.split(","));
+		return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(astrixPlugins), "com.avanza.astrix", basePackage.split(","));
 	}
 	
-	private List<Class<? extends Annotation>> getAllDescriptorAnnotationsTypes(AstrixPlugins astrixPlugins) {
+	private List<Class<? extends Annotation>> getAllApiProviderAnnotationsTypes(AstrixPlugins astrixPlugins) {
 		List<Class<? extends Annotation>> result = new ArrayList<>();
 		for (AstrixApiProviderPlugin plugin : astrixPlugins.getPlugins(AstrixApiProviderPlugin.class)) {
 			result.add(plugin.getProviderAnnotationType());
@@ -198,7 +198,7 @@ public class AstrixConfigurer {
 	}
 
 	// package private. Used for internal testing only
-	void setAstrixApiDescriptors(AstrixApiProviders astrixApiProviders) {
+	void setAstrixApiProviders(AstrixApiProviders astrixApiProviders) {
 		this.astrixApiProviders = astrixApiProviders;
 	}
 	

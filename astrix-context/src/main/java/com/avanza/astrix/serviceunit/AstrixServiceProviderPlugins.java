@@ -38,19 +38,19 @@ public class AstrixServiceProviderPlugins {
 		}
 	}
 	
-	public List<AstrixServiceBeanDefinition> getExportedServices(AstrixApiProviderClass descriptor) {
-		AstrixServiceProviderPlugin apiProviderPlugin = getProviderPlugin(descriptor);
+	public List<AstrixServiceBeanDefinition> getExportedServices(AstrixApiProviderClass apiProvider) {
+		AstrixServiceProviderPlugin apiProviderPlugin = getProviderPlugin(apiProvider);
 		List<AstrixServiceBeanDefinition> result = new ArrayList<>();
-		result.addAll(apiProviderPlugin.getProvidedServices(descriptor));
+		result.addAll(apiProviderPlugin.getProvidedServices(apiProvider));
 		return result;
 	}
 	
-	private AstrixServiceProviderPlugin getProviderPlugin(AstrixApiProviderClass descriptor) {
+	private AstrixServiceProviderPlugin getProviderPlugin(AstrixApiProviderClass apiProvider) {
 		for (AstrixServiceProviderPlugin plugin : pluginByAnnotationType.values()) {
-			if (descriptor.isAnnotationPresent(plugin.getProviderAnnotationType())) {
+			if (apiProvider.isAnnotationPresent(plugin.getProviderAnnotationType())) {
 				return plugin;
 			}
 		}
-		throw new IllegalArgumentException("No plugin registered that can handle descriptor: " + descriptor);
+		throw new IllegalArgumentException("No plugin registered that can handle apiProvider: " + apiProvider);
 	}
 }

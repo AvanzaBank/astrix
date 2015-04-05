@@ -35,7 +35,7 @@ public class TestAstrixConfigurer {
 	
 	public TestAstrixConfigurer() {
 		configurer = new AstrixConfigurer();
-		configurer.setAstrixApiDescriptors(new AstrixApiProviders() {
+		configurer.setAstrixApiProviders(new AstrixApiProviders() {
 			@Override
 			public Collection<AstrixApiProviderClass> getAll() {
 				return apiProviders;

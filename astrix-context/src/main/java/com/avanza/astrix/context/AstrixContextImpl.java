@@ -49,8 +49,8 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		this.apiProviderPlugins = apiProviderPlugins;
 		this.beanFactory = this.astrixInjector.getBean(AstrixBeanFactory.class); // The bean-factory used for apis managed by astrix
 		this.beanFactoryRegistry = (SimpleAstrixFactoryBeanRegistry) this.astrixInjector.getBean(AstrixFactoryBeanRegistry.class);
-		for (AstrixApiProviderClass descriptor : this.astrixInjector.getBean(AstrixApiProviders.class).getAll()) {
-			for (AstrixFactoryBean<?> factory : this.apiProviderPlugins.getProviderPlugin(descriptor).createFactoryBeans(descriptor)) {
+		for (AstrixApiProviderClass apiProvider : this.astrixInjector.getBean(AstrixApiProviders.class).getAll()) {
+			for (AstrixFactoryBean<?> factory : this.apiProviderPlugins.getProviderPlugin(apiProvider).createFactoryBeans(apiProvider)) {
 				this.beanFactoryRegistry.registerFactory(factory);
 			}
 		}

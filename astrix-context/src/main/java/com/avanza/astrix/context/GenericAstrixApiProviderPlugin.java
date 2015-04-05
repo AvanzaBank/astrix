@@ -96,7 +96,7 @@ public class GenericAstrixApiProviderPlugin implements AstrixApiProviderPlugin {
 				return apiProviderClass.getProviderClass();
 			}
 		}
-		throw new IllegalArgumentException(String.format("Descriptor does not provide service. descriptor=%s service=%s", apiProviderClass, providedService.getName()));
+		throw new IllegalArgumentException(String.format("ApiProvider does not provide service. providerClass=%s service=%s", apiProviderClass, providedService.getName()));
 	}
 
 	private Object getInstanceProvider(Class<?> provider) {

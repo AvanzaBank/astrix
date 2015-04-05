@@ -28,7 +28,7 @@ public interface AstrixVersioningPlugin {
 		public static AstrixVersioningPlugin create() {
 			return new AstrixVersioningPlugin() {
 				@Override
-				public AstrixObjectSerializer create(ServiceVersioningContext AstrixApiDescriptor) {
+				public AstrixObjectSerializer create(ServiceVersioningContext versioningContext) {
 					return new NoVersioningSupport();
 				}
 			};
