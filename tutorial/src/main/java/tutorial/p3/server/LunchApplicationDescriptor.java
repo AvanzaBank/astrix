@@ -21,7 +21,7 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixApplication;
 
 @AstrixApplication(
-	apiDescriptors = {
+	exportsRemoteServicesFor = {
 		LunchServiceProvider.class
 	},
 	component = AstrixServiceComponentNames.GS_REMOTING

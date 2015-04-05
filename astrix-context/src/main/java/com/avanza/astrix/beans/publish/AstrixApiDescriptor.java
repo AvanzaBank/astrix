@@ -23,6 +23,8 @@ import java.util.Objects;
  *
  */
 public final class AstrixApiDescriptor {
+	
+	// TODO: Rename to AstrixApiProviderReader or AstrixApiProviderClass
 
 	public static AstrixApiDescriptor create(Class<?> descriptorHolder) {
 		return new AstrixApiDescriptor(descriptorHolder);

@@ -182,7 +182,7 @@ public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 
 ```java
 @AstrixApplication(
-	apiDescriptors = {
+	exportsRemoteServicesFor = {
 		LunchServiceProvider.class
 	},
 	component = AstrixServiceComponentNames.GS_REMOTING

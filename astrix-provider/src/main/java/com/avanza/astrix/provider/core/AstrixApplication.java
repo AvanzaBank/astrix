@@ -34,13 +34,26 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 public @interface AstrixApplication {
 	
 	/**
-	 * Identifies what services this application provides by pointing to
-	 * a list of AstrixApiProvider's. All defined services (@Service annotated methods)
-	 * will be provided by the current application.
+	 * Defines a list of AstrixApiProviders that this application provides remote service endpoints
+	 * for. All services defined in the given api's (@Service annotated methods) will be
+	 * provided by this application.
 	 * 
 	 * @return
 	 */
-	Class<?>[] apiDescriptors();
+	Class<?>[] exportsRemoteServicesFor() default {};
+	
+	
+	/**
+	 * Defines a list of AstrixApiProviders that this application provides remote service endpoints
+	 * for. All services defined in the given api's (@Service annotated methods) will be
+	 * provided by this application.
+	 * 
+	 * @return
+	 * @deprecated renamed to exportsRemoteServicesFor
+	 */
+	@Deprecated
+	Class<?>[] apiDescriptors() default {};
+	// apiDescriptors
 
 	/**
 	 * Default {@link AstrixServiceComponent} to use when exporting services provided by this application,
@@ -50,5 +63,7 @@ public @interface AstrixApplication {
 	 * @return
 	 */
 	String component();
+	
+	// component
 	
 }

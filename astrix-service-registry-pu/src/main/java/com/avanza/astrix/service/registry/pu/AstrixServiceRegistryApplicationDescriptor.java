@@ -29,7 +29,7 @@ import com.avanza.astrix.provider.core.AstrixApplication;
  *
  */
 @AstrixApplication(
-	apiDescriptors = {
+	exportsRemoteServicesFor = {
 		AstrixServiceRegistryServiceProvider.class
 	},
 	component = AstrixServiceComponentNames.GS_REMOTING

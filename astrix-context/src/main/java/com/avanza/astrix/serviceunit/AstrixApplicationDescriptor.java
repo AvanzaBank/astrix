@@ -30,31 +30,46 @@ public class AstrixApplicationDescriptor {
 
 	private final Class<?> descriptorHolder;
 	private final String component;
-	private final Collection<AstrixApiDescriptor> apiDescriptors;
+	private final Collection<AstrixApiDescriptor> exportsRemoteServicesFor;
 
 	
-	private AstrixApplicationDescriptor(Class<?> descriptorHolder, String component, Collection<AstrixApiDescriptor> apiDescriptors) {
+	private AstrixApplicationDescriptor(Class<?> descriptorHolder, String component, Collection<AstrixApiDescriptor> exportsRemoteServicesFor) {
 		this.descriptorHolder = descriptorHolder;
 		this.component = component;
-		this.apiDescriptors = apiDescriptors;
+		this.exportsRemoteServicesFor = exportsRemoteServicesFor;
 	}
 	
 	public static AstrixApplicationDescriptor create(Class<?> applicationDescriptorHolder) {
 		String component;
-		Class<?>[] apiDescriptorHolders;
-		if (applicationDescriptorHolder.isAnnotationPresent(AstrixApplication.class)) {
-			AstrixApplication astrixApplication = applicationDescriptorHolder.getAnnotation(AstrixApplication.class);
-			component = astrixApplication.component();
-			apiDescriptorHolders = astrixApplication.apiDescriptors();
-		} else {
+		if (!applicationDescriptorHolder.isAnnotationPresent(AstrixApplication.class)) {
 			throw new IllegalArgumentException("Illegal applicationDescriptor. An application" +
 					" descriptor must be annotated with @AstrixApplication. descriptorClass=" + applicationDescriptorHolder.getName());
 		}
-		Set<AstrixApiDescriptor> apiDescriptors = new HashSet<>();
-		for (Class<?> apiDescriptorHolder : apiDescriptorHolders) {
-			apiDescriptors.add(AstrixApiDescriptor.create(apiDescriptorHolder));
+		AstrixApplication astrixApplication = applicationDescriptorHolder.getAnnotation(AstrixApplication.class);
+		component = astrixApplication.component();
+		Class<?>[] exportedRemoteServiceEndpointClasses = getExportedRemoteServiceEndpoints(astrixApplication, applicationDescriptorHolder);
+		Set<AstrixApiDescriptor> exportsRemoteServicesForApis = new HashSet<>();
+		for (Class<?> apiProviderClass : exportedRemoteServiceEndpointClasses) {
+			exportsRemoteServicesForApis.add(AstrixApiDescriptor.create(apiProviderClass));
 		}
-		return new AstrixApplicationDescriptor(applicationDescriptorHolder, component, apiDescriptors);
+		return new AstrixApplicationDescriptor(applicationDescriptorHolder, component, exportsRemoteServicesForApis);
+	}
+
+	private static Class<?>[] getExportedRemoteServiceEndpoints(AstrixApplication astrixApplication, Class<?> applicationDescriptorHolder) {
+		if (astrixApplication.apiDescriptors().length > 0 && 
+				astrixApplication.exportsRemoteServicesFor().length > 0) {
+			throw new IllegalArgumentException("Illegal applicationDescriptor. An application" +
+					" descriptor must not define both a 'apiDescriptors' property and a 'exportsRemoteServicesFor'"
+					+ " property. applicationDescriptorClass=" + applicationDescriptorHolder.getName());
+		}
+		if (astrixApplication.exportsRemoteServicesFor().length > 0) {
+			return astrixApplication.exportsRemoteServicesFor();
+		}
+		if (astrixApplication.apiDescriptors().length > 0) {
+			return astrixApplication.apiDescriptors();
+		}
+		throw new IllegalArgumentException("Illegal applicationDescriptor. An application" +
+				" descriptor must define the 'exportsRemoteServicesFor' property");
 	}
 	
 	@Override
@@ -70,8 +85,13 @@ public class AstrixApplicationDescriptor {
 		return component;
 	}
 
-	public Collection<AstrixApiDescriptor> getApiDescriptors() {
-		return this.apiDescriptors;
+	/**
+	 * Defines what api's that this application should export remote service endpoints
+	 * for. <p>
+	 * @return
+	 */
+	public Collection<AstrixApiDescriptor> exportsRemoteServicesFor() {
+		return this.exportsRemoteServicesFor;
 	}
 
 }

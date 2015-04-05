@@ -23,7 +23,7 @@ import com.avanza.astrix.provider.core.AstrixApplication;
 
 
 @AstrixApplication(
-	apiDescriptors = {
+	exportsRemoteServicesFor = {
 		LunchServiceProvider.class,
 		LunchFeederApiDescriptor.class
 	},

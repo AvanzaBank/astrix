@@ -37,7 +37,7 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 public class AstrixServiceExporter {
 	
 	private AstrixServiceComponents serviceComponents;
-	private AstrixApplicationDescriptor serviceDescriptor;
+	private AstrixApplicationDescriptor applicationDescriptor;
 	private final Collection<AstrixServiceBeanDefinition> serviceBeanDefinitions = new CopyOnWriteArrayList<>();
 	private final AstrixServiceRegistryPlugin serviceRegistryPlugin;
 	private final ConcurrentMap<Class<?>, Object> serviceProviderByType = new ConcurrentHashMap<>();
@@ -67,10 +67,10 @@ public class AstrixServiceExporter {
 		}
 	}
 
-	public void setServiceDescriptor(AstrixApplicationDescriptor serviceDescriptor) {
-		this.serviceDescriptor = serviceDescriptor;		// TODO: How to inject service descriptor??? 
-		for (AstrixApiDescriptor apiDescriptor : serviceDescriptor.getApiDescriptors()) {
-			this.serviceBeanDefinitions.addAll(serviceProviderPlugins.getExportedServices(apiDescriptor));
+	public void setServiceDescriptor(AstrixApplicationDescriptor applicationDescriptor) {
+		this.applicationDescriptor = applicationDescriptor;		// TODO: How to inject service descriptor??? 
+		for (AstrixApiDescriptor api : applicationDescriptor.exportsRemoteServicesFor()) {
+			this.serviceBeanDefinitions.addAll(serviceProviderPlugins.getExportedServices(api));
 		}
 	}
 
@@ -109,7 +109,7 @@ public class AstrixServiceExporter {
 		if (serviceBeanDefinition.getComponentName() != null) {
 			return this.serviceComponents.getComponent(serviceBeanDefinition.getComponentName());
 		}
-		return this.serviceComponents.getComponent(serviceDescriptor.getComponent());
+		return this.serviceComponents.getComponent(applicationDescriptor.getComponent());
 	}
 
 }
