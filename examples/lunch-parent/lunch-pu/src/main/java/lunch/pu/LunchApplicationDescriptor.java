@@ -27,7 +27,7 @@ import com.avanza.astrix.provider.core.AstrixApplication;
 		LunchServiceProvider.class,
 		LunchFeederApiDescriptor.class
 	},
-	component = AstrixServiceComponentNames.GS_REMOTING
+	defaultServiceComponent = AstrixServiceComponentNames.GS_REMOTING
 )
 public class LunchApplicationDescriptor {
 }

@@ -109,7 +109,7 @@ public class AstrixServiceExporter {
 		if (serviceBeanDefinition.getComponentName() != null) {
 			return this.serviceComponents.getComponent(serviceBeanDefinition.getComponentName());
 		}
-		return this.serviceComponents.getComponent(applicationDescriptor.getComponent());
+		return this.serviceComponents.getComponent(applicationDescriptor.getDefaultServiceComponent());
 	}
 
 }
