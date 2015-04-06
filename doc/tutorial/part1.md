@@ -13,9 +13,9 @@ Astrix provides great integration with spring through the `AstrixFrameworkBean`,
 ### ApplicationContext and AstrixContext  
 ![AstrixContext](AstrixIOC.png)
 
-At runtime, every object that is part of an api managed by Astrix is called an astrix-bean, which is similar to a bean in spring. In order for Astrix to be able to create an astrix-bean of a given type, an `ApiProvider` for the given api must exist. Astrix has an extendible `ApiProvider` mechanism, which allows new api "types" to be plugged into Astrix. Two common api types that are supported out of the box are `Library` and `Service`.
+At runtime, every object that is part of an api managed by Astrix is called an `Astrix bean`, which is similar to a bean in spring. In order for Astrix to be able to create a bean of a given type, an `ApiProvider` for the given api must exist. Astrix has an extendible `ApiProvider` mechanism, which allows new api "types" to be plugged into Astrix. Two common api types that are supported out of the box are `Library` and `Service`.
 
-A `Library` consist of a number of public interfaces/classes and associated implementations. Astrix shields a library provider from the consumers of the library by allowing the consumer to "program against interfaces" without ever needing to now what implements the given interfaces, or how the classes that implement the interfaces are assembled.
+A `Library` consist of a number of public interfaces/classes and associated implementations. Astrix protects a library provider from the consumers of the library by allowing the consumer to "program against interfaces" without ever needing to now what implements the given interfaces, or how the classes that implement the interfaces are assembled.
 
 ### A Simple Library 
 The code for this part can be found [here](../../tree/master/tutorial/src/main/java/tutorial/p1). 
@@ -27,7 +27,6 @@ public interface LunchSuggester {
 	String randomLunchRestaurant();
 }
 ```
-
 
 The second step is to implement the library. Its a good practice to put the public api and corresponding implementation into different modules, since a consumer of the api have compile-time dependency to the public api, but only a runtime dependency to the implementation.
 
@@ -48,7 +47,7 @@ public class LunchSuggesterImpl implements LunchSuggester {
 
 }
 ```
-Finally, an `ApiProvider` is created to export the library. An `ApiProvider` is what makes the api available as an astrix-api. The `ApiProvider` is typically located in the same module as the implementing classes.
+Finally, an `ApiProvider` is created to export the library. An `ApiProvider` is what makes the api available as an Astrix-api. The `ApiProvider` is typically located in the same module as the implementing classes.
 
 
 ```java
@@ -56,14 +55,14 @@ Finally, an `ApiProvider` is created to export the library. An `ApiProvider` is 
 public class LunchLibraryProvider {
 	
 	@Library
-	public LunchSuggester lunchUtil(LunchRestaurantFinder restaurantFinder) {
-		return new LunchSuggesterImpl(restaurantFinder);
+	public LunchSuggester lunchUtil() {
+		return new LunchSuggesterImpl();
 	}
 	
 }
 ```
  
-The `@AstrixApiProvider` annotation tells Astrix that this class defines and provides an api. Each method annotated with `@Library` will act as a factory method to create a given api element, which is defined by the return type of the factory method, which is `LunchSuggester` in this example.
+The `@AstrixApiProvider` annotation tells Astrix that this class defines and provides an api. Each method annotated with `@Library` will act as a factory method to create a given bean, which is defined by the return type of the factory method, which is `LunchSuggester` in this example.
 
 ### Consuming the Library
 Consumption of the LunchApi is done by first creating an `AstrixContext` and then use it as a factory, as in the following unit test.
@@ -93,7 +92,7 @@ public class LunchLibraryTest {
 }
 ```
 
-An AstrixContext is created using an AstrixConfigurer. By default, Astrix won't scan the classpath for api-providers. The `AstrixConfigurer.setBasePackage` tells Astrix to scan the "tutorial.t1" package, and all its subpackages for api-providers. In this case Astrix will find that the `LunchLibraryProvider` provides the `LunchSuggester` api, and use it as a factory to create instances of `LunchSuggester`.
+An AstrixContext is created using an AstrixConfigurer. By default, Astrix won't scan the classpath for api-providers outside the "com.avanza.astrix" package. The `AstrixConfigurer.setBasePackage` tells Astrix to scan the "tutorial.t1" package, and all its subpackages for api-providers. In this case Astrix will find that the `LunchLibraryProvider` provides the `LunchSuggester` api, and use it as a factory to create instances of `LunchSuggester`.
 
 ### Injecting Dependencies into a Library
 Astrix can inject other astrix-beans into a library. This allows libraries to aggregate services from many sources without burden the consumer of the api to know exactly what services are required by the given library. Lets extend the lunch-library to illustrate injecting astrix-beans into libraries:
