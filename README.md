@@ -1,6 +1,7 @@
 # Astrix
 Astrix is a framework designed to simplify development and maintenance of microservices. It is used by service providers to publish provided services, and by service consumers to bind to those services. Most applications do both, they provide services as well as consume other services.
 
+
 Some of the features provided:
 - service registration and discovery
 - service binding
