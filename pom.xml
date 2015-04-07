@@ -26,8 +26,8 @@
 	</modules>
 
 	<scm>
-		<connection>scm:git:git@git01.test.aza.se:asterix/asterix.git</connection>
-		<url>http://http://git01.test.aza.se/asterix/asterix/tree/master</url>
+		<connection>scm:git:git@git01.test.aza.se:asterix/astrix.git</connection>
+		<url>http://http://git01.test.aza.se/asterix/astrix/tree/master</url>
 		<tag>HEAD</tag>
 	</scm>
 	<distributionManagement>
