@@ -33,24 +33,12 @@ public class AstrixSettings implements DynamicConfigSource {
 	 * in UNBOUND state.
 	 */
 	public static final String BEAN_BIND_ATTEMPT_INTERVAL = "StatefulAstrixBeanInstance.beanBindAttemptInterval";
-	/**
-	 * @deprecated - replaced by BEAN_BIND_ATTEMPT_INTERVAL
-	 */
-	@Deprecated
-	public static final String BEAN_REBIND_ATTEMPT_INTERVAL = BEAN_BIND_ATTEMPT_INTERVAL;
 
 	/**
 	 * Defines how long the service-lease-manager will wait between consecutive lease renewals
 	 * for a service bean that is in BOUND sate.
 	 */
 	public static final String SERVICE_LEASE_RENEW_INTERVAL = "AstrixServiceLeaseManager.leaseRenewInterval";
-
-	/**
-	 * @deprecated - Renamed to {@link AstrixSettings#SERVICE_LEASE_RENEW_INTERVAL}
-	 */
-	@Deprecated
-	public static final String SERVICE_REGISTRY_MANAGER_LEASE_RENEW_INTERVAL = SERVICE_LEASE_RENEW_INTERVAL;
-	
 	
 	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AstrixContext.enforceSubsystemBoundaries";
 	
