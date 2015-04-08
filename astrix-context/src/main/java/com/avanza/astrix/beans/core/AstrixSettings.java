@@ -70,14 +70,23 @@ public class AstrixSettings implements DynamicConfigSource {
 	public static final String SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL = "AstrixServiceRegistryExporterWorker.retryIntervallMillis";
 	
 	public static final String SERVICE_REGISTRY_LEASE = "AstrixServiceRegistryExporterWorker.serviceLeaseTimeMillis";
+	/**
+	 * @renamed to {@link #API_PROVIDER_SCANNER_BASE_PACKAGE}  
+	 */
+	@Deprecated
 	public static final String API_DESCRIPTOR_SCANNER_BASE_PACKAGE = "AstrixApiDescriptorScanner.basePackage";
+	/**
+	 * Defines the basePackage(s) to scan when searching for ApiProvider's. The given package(s)
+	 * and all subpackages will be scanned.
+	 * 
+	 * The packages should be separated by comma (",").
+	 */
+	public static final String API_PROVIDER_SCANNER_BASE_PACKAGE = "AstrixApiProviderScanner.basePackage";
 	
 	public static final String SUBSYSTEM_NAME = "AstrixContext.subsystem";
 	
 	public static final String ENABLE_FAULT_TOLERANCE = "AstrixContext.enableFaultTolerance";
 	public static final String ENABLE_VERSIONING = "AstrixContext.enableVersioning";
-	@Deprecated
-	public static final String EXPORT_GIGASPACE = "AstrixGsComponent.exportGigaSpace";
 	public static final String GIGA_SPACE_BEAN_NAME = "AstrixGsComponent.gigaSpaceBeanName";
 	public static final String DYNAMIC_CONFIG_FACTORY = "com.avanza.astrix.context.AstrixDynamicConfigFactory";
 	/**

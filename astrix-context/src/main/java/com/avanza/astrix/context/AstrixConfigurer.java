@@ -157,11 +157,15 @@ public class AstrixConfigurer {
 		if (this.astrixApiProviders != null) {
 			return astrixApiProviders;
 		}
-		String basePackage = config.getStringProperty(AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, "").get();
-		if (basePackage.trim().isEmpty()) {
-			return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(astrixPlugins), "com.avanza.astrix"); // Always scan com.avanza.astrix package
+		String basePackage = config.getStringProperty(AstrixSettings.API_PROVIDER_SCANNER_BASE_PACKAGE, "").get();
+		if (!basePackage.trim().isEmpty()) {
+			return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(astrixPlugins), "com.avanza.astrix", basePackage.split(",")); // Always scan com.avanza.astrix package
 		}
-		return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(astrixPlugins), "com.avanza.astrix", basePackage.split(","));
+		basePackage = config.getStringProperty(AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, "").get();
+		if (!basePackage.trim().isEmpty()) {
+			return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(astrixPlugins), "com.avanza.astrix", basePackage.split(","));
+		}
+		return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(astrixPlugins), "com.avanza.astrix"); 
 	}
 	
 	private List<Class<? extends Annotation>> getAllApiProviderAnnotationsTypes(AstrixPlugins astrixPlugins) {
@@ -173,7 +177,7 @@ public class AstrixConfigurer {
 	}
 
 	public void setBasePackage(String basePackage) {
-		 this.settings.set(AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, basePackage);
+		 this.settings.set(AstrixSettings.API_PROVIDER_SCANNER_BASE_PACKAGE, basePackage);
 	}
 	
 	public void enableFaultTolerance(boolean enableFaultTolerance) {
