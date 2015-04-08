@@ -120,6 +120,12 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 				return;
 			}
 			AstrixServiceProperties serviceProperties = serviceLookup.lookup(getBeanKey());
+			if (serviceProperties == null) {
+				log.info(String.format(
+					"Failed to discover service bean. ServiceLookup returned null. bean=%s astrixBeanId=%s", 
+						getBeanKey(), id));
+				return;
+			}
 			bind(serviceProperties);
 		} catch (Exception e) {
 			log.warn(String.format("Failed to bind service bean. bean=%s astrixBeanId=%s", getBeanKey(), id), e);

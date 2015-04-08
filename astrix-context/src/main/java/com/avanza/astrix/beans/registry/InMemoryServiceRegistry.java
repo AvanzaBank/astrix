@@ -81,8 +81,19 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 		this.configSource.set(settingName, value);
 	}
 	
-	public void addConfig(String settingName, long value) {
+	public void set(String settingName, long value) {
 		this.configSource.set(settingName, Long.toString(value));
+	}
+	
+	/**
+	 * 
+	 * @param settingName
+	 * @param value
+	 * @deprecated use {@link InMemoryServiceRegistry#set(String, long)}
+	 */
+	@Deprecated
+	public void addConfig(String settingName, long value) {
+		set(settingName, Long.toString(value));
 	}
 
 	public <T> void registerProvider(Class<T> api, T provider, String subsystem) {

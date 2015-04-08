@@ -83,7 +83,7 @@ public class AstrixIntegrationTest {
 															.configure();
 	
 	private static AstrixSettings config = new AstrixSettings() {{
-		set(ASTRIX_SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
+		set(SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
 		set(SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
 	}};

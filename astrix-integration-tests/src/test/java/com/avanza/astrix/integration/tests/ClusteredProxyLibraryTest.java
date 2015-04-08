@@ -19,8 +19,6 @@ import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lun
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Properties;
-
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -31,6 +29,7 @@ import org.junit.Test;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.service.IllegalSubsystemException;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
@@ -40,33 +39,20 @@ import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.api.LunchStatistics;
-import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 
 public class ClusteredProxyLibraryTest {
 	
-	@ClassRule
-	public static RunningPu serviceRegistrypu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
-															.numberOfPrimaries(1)
-															.numberOfBackups(0)
-															.beanProperties("space", new Properties() {{
-																// Run lease-manager thread every 200 ms.
-																setProperty("space-config.lease_manager.expiration_time_interval", "200");
-															}})
-															.startAsync(true)
-															.configure();
-	
-	private static AstrixSettings config = new AstrixSettings() {{
-		set(ASTRIX_SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
-		set(SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
+	private static InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
+		set(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
 	}};
 	
 	@ClassRule
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
-									  		  .contextProperty("configSourceId", config.getConfigSourceId())
+									  		  .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
 											  .startAsync(true)
 											  .configure();
 	
@@ -89,7 +75,7 @@ public class ClusteredProxyLibraryTest {
 		configurer.enableFaultTolerance(true);
 		configurer.enableVersioning(true);
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1000);
-		configurer.setConfig(DynamicConfig.create(config));
+		configurer.setConfig(DynamicConfig.create(serviceRegistry));
 	}
 	
 	@Test
