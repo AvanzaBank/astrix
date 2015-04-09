@@ -7,3 +7,5 @@
 target
 .metadata/
 .recommenders/
+.idea/
+*.iml
