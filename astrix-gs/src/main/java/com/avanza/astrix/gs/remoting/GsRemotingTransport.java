@@ -23,10 +23,10 @@ import org.openspaces.core.GigaSpace;
 import rx.Observable;
 import rx.Subscriber;
 
+import com.avanza.astrix.ft.AstrixFaultTolerance;
 import com.avanza.astrix.ft.Command;
 import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.ft.ObservableCommandSettings;
-import com.avanza.astrix.ft.plugin.AstrixFaultTolerance;
 import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders;

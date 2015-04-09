@@ -37,5 +37,11 @@ public interface LocalViewDefinition {
 	 * @param size
 	 */
 	void setBatchSize(int size);
+	
+	/**
+	 * See {@link LocalViewSpaceConfigurer#maxDisconnectionDuration(long)}
+	 * @param size
+	 */
+	void setMaxDisconnectionDuration(long maxDisconnectionDuration);
 
 }

@@ -52,6 +52,11 @@ public class RunningPuImpl implements RunningPu {
 	public void close() throws Exception {
 		this.runner.shutdown();
 	}
+	
+	@Override
+	public void start() throws Exception {
+		this.runner.run();
+	}
 
 	@Override
 	public String getLookupGroupName() {

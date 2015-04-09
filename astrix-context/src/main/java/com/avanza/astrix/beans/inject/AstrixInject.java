@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 /**
  * @author Elias Lindholm (elilin)
  */
-@Target(value = { ElementType.METHOD })
+@Target(value = { ElementType.METHOD, ElementType.CONSTRUCTOR })
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
 public @interface AstrixInject {

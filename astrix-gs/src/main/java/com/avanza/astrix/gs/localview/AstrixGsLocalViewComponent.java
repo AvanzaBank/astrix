@@ -34,11 +34,15 @@ import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigAware;
 import com.avanza.astrix.core.util.ReflectionUtil;
+import com.avanza.astrix.ft.AstrixFaultTolerance;
+import com.avanza.astrix.ft.HystrixCommandSettings;
+import com.avanza.astrix.gs.AstrixGigaSpaceProxy;
 import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
 import com.j_spaces.core.IJSpace;
+import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 /**
  * Allows publishing a GigaSpace's local-view.
  * 
@@ -57,6 +61,7 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 	 * we have to use the AstrixInjetor to retrieve AstrixServiceComponents.
 	 */
 	private AstrixInjector injector;
+	private AstrixFaultTolerance faultTolerance;
 	
 	@Override
 	public <T> BoundServiceBeanInstance<T> bind(
@@ -80,9 +85,16 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 		LocalViewSpaceConfigurer gslocalViewSpaceConfigurer = new LocalViewSpaceConfigurer(space);
 		localViewConfigurer.configure(new LocalViewSpaceConfigurerAdapter(gslocalViewSpaceConfigurer));
 		
-		IJSpace localView = gslocalViewSpaceConfigurer.create();
+		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
+		HystrixCommandSettings hystrixSettings = new HystrixCommandSettings(spaceName + "_" + GigaSpace.class.getSimpleName(), spaceName);
+		hystrixSettings.setExecutionIsolationStrategy(ExecutionIsolationStrategy.SEMAPHORE);
+		hystrixSettings.setSemaphoreMaxConcurrentRequests(Integer.MAX_VALUE);
+		
+		IJSpace localViewSpace = gslocalViewSpaceConfigurer.create();
+		GigaSpace localViewGigaSpace = AstrixGigaSpaceProxy.create(new GigaSpaceConfigurer(localViewSpace).create(), faultTolerance, hystrixSettings);
+		
 		BoundLocalViewGigaSpaceBeanInstance localViewGigaSpaceBeanInstance = 
-				new BoundLocalViewGigaSpaceBeanInstance(new GigaSpaceConfigurer(localView).create(), gslocalViewSpaceConfigurer, gsSpaceConfigurer);
+				new BoundLocalViewGigaSpaceBeanInstance(localViewGigaSpace, gslocalViewSpaceConfigurer, gsSpaceConfigurer);
 		return (BoundServiceBeanInstance<T>) localViewGigaSpaceBeanInstance;
 	}
 
@@ -138,10 +150,16 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 		this.injector = injector;
 	}
 
+	@AstrixInject
+	public void setFaultTolerance(AstrixFaultTolerance faultTolerance) {
+		this.faultTolerance = faultTolerance;
+	}
+
 	@Override
 	public void setConfig(DynamicConfig config) {
 		this.disableLocalView = config.getBooleanProperty(AstrixSettings.GS_DISABLE_LOCAL_VIEW, false);
 	}
+	
 	
 	private static class BoundLocalViewGigaSpaceBeanInstance implements BoundServiceBeanInstance<GigaSpace> {
 

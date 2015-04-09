@@ -40,4 +40,9 @@ public class LocalViewSpaceConfigurerAdapter implements LocalViewDefinition {
 		this.localViewSpaceConfigurer.batchSize(size);
 	}
 
+	@Override
+	public void setMaxDisconnectionDuration(long maxDisconnectionDuration) {
+		this.localViewSpaceConfigurer.maxDisconnectionDuration(maxDisconnectionDuration);
+	}
+
 }

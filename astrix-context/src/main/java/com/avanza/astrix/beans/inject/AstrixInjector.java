@@ -234,7 +234,7 @@ public class AstrixInjector {
 
 		private boolean isAnnotationPresent(Constructor<?> constructor, Class<? extends Annotation> annotation) {
 			for (Annotation a : constructor.getAnnotations()) {
-				if (a.getClass().equals(annotation)) {
+				if (annotation.isAssignableFrom(a.getClass())) {
 					return true;
 				}
 			}

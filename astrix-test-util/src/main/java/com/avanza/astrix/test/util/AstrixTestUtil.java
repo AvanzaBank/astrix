@@ -121,11 +121,11 @@ public class AstrixTestUtil {
 		return new TypeSafeMatcher<T>() {
 			@Override
 			public void describeTo(Description description) {
-				description.appendText("Expected " + type.getName() + " to be thrown");
+				description.appendText("Expected exception of type " + type.getName() + " to be thrown");
 			}
 			@Override
 			protected boolean matchesSafely(T item) {
-				return true;
+				return type.isAssignableFrom(item.getClass());
 			}
 		};
 	}

@@ -32,7 +32,6 @@ public class ServiceUnavailableException extends RuntimeException {
 		super(message);
 	}
 
-	@Deprecated
 	public ServiceUnavailableException(String message, Throwable cause) {
 		super(message, cause);
 	}

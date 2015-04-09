@@ -28,7 +28,7 @@ import com.netflix.hystrix.exception.HystrixRuntimeException;
 /**
  * @author Elias Lindholm (elilin)
  */
-public class HystrixObservableCommandFacade<T> {
+class HystrixObservableCommandFacade<T> {
 
 	public static <T> Observable<T> observe(final Observable<T> observable, ObservableCommandSettings settings) {
 		Setter setter = Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(settings.getGroupKey()))

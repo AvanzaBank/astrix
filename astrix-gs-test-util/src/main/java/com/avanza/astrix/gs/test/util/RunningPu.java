@@ -23,5 +23,7 @@ public interface RunningPu extends TestRule, AutoCloseable  {
 	String getLookupGroupName();
 
 	GigaSpace getClusteredGigaSpace();
+
+	void start() throws Exception;
 	
 }

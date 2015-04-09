@@ -24,7 +24,7 @@ import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.context.AstrixVersioningPlugin;
 import com.avanza.astrix.core.AstrixObjectSerializer;
-import com.avanza.astrix.ft.plugin.AstrixFaultTolerance;
+import com.avanza.astrix.ft.AstrixFaultTolerance;
 import com.avanza.astrix.gs.BoundProxyServiceBeanInstance;
 import com.avanza.astrix.gs.ClusteredProxyCache;
 import com.avanza.astrix.gs.ClusteredProxyCache.GigaSpaceInstance;

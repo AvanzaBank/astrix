@@ -22,6 +22,9 @@ import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
@@ -33,7 +36,10 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.service.SimpleService;
 import com.avanza.astrix.ft.service.SimpleServiceException;
 import com.avanza.astrix.ft.service.SimpleServiceImpl;
@@ -47,6 +53,7 @@ public abstract class FaultToleranceIntegrationTest {
 	private Class<SimpleService> api = SimpleService.class;
 	private SimpleService provider = new SimpleServiceImpl();
 	private SimpleService testService;
+	private AstrixFaultTolerance faultTolerance = new AstrixFaultTolerance();
 	
 	protected abstract ExecutionIsolationStrategy isolationStrategy();
 	
@@ -56,12 +63,31 @@ public abstract class FaultToleranceIntegrationTest {
 
 	@Before
 	public void createService() {
-		testService = HystrixProxyFactory.create(api, provider, settingsRandomCommandKeyAndGroup());
+		faultTolerance.setConfig(DynamicConfig.create(new MapConfigSource()));
+		testService = createProxy(api, provider, settingsRandomCommandKeyAndGroup());
 	}
 	
+	private <T> T createProxy(Class<T> type, final T provider, final HystrixCommandSettings settings) {
+		return ReflectionUtil.newProxy(type, new InvocationHandler() {
+			@Override
+			public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
+				return faultTolerance.execute(new CheckedCommand<Object>() {
+					@Override
+					public Object call() throws Throwable {
+						try {
+							return method.invoke(provider, args);
+						} catch (InvocationTargetException e) {
+							throw e.getTargetException();
+						}
+					}
+				}, settings);
+			}
+		});
+	}
+
 	@Test
 	public void createWithDefaultSettings() throws Exception {
-		SimpleService create = HystrixProxyFactory.create(api, provider, settingsRandomCommandKeyAndGroup());
+		SimpleService create = createProxy(api, provider, settingsRandomCommandKeyAndGroup());
 		create.echo("");
 	}
 
@@ -147,7 +173,7 @@ public abstract class FaultToleranceIntegrationTest {
 		settings.setMaxQueueSize(-1); // sync queue
 		settings.setExecutionIsolationThreadTimeoutInMilliseconds(5000);
 		settings.setSemaphoreMaxConcurrentRequests(3);
-		SimpleService serviceWithFt = HystrixProxyFactory.create(api, provider, settings);
+		SimpleService serviceWithFt = createProxy(api, provider, settings);
 		ExecutorService pool = Executors.newCachedThreadPool();
 		Collection<R> runners = new ArrayList<R>();
 		for (int i = 0; i < 5; i++) {

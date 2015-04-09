@@ -33,25 +33,22 @@ import com.netflix.hystrix.HystrixThreadPoolProperties;
  * @author Elias Lindholm (elilin)
  * @author Kristoffer Erlandsson (krierl)
  */
-public class HystrixCommandFacade<T> {
+class HystrixCommandFacade<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(HystrixCommandFacade.class);
 
 	private final CheckedCommand<T> command;
 	private final HystrixCommandSettings settings;
+	private final Setter hystrixConfiguration;
 	
 	HystrixCommandFacade(CheckedCommand<T> command, HystrixCommandSettings settings) {
 		this.command = command;
 		this.settings = settings;
+		this.hystrixConfiguration = createHystrixConfiguration();
 	}
 
-	public static <T> T execute(Command<T> command, HystrixCommandSettings settings) {
-		try {
-			return new HystrixCommandFacade<>(command, settings).execute();
-		} catch (Throwable e) {
-			// This is a programming bug, Command<T> cannot throw checked exception
-			throw new RuntimeException(e);
-		}
+	public static <T> T execute(CheckedCommand<T> command, HystrixCommandSettings settings) throws Throwable {
+		return new HystrixCommandFacade<>(command, settings).execute();
 	}
 
 	protected T execute() throws Throwable {
@@ -78,7 +75,7 @@ public class HystrixCommandFacade<T> {
 	}
 
 	private HystrixCommand<HystrixResult<T>> createHystrixCommand() {
-		return new HystrixCommand<HystrixResult<T>>(createHystrixConfiguration()) {
+		return new HystrixCommand<HystrixResult<T>>(hystrixConfiguration) {
 
 			@Override
 			protected HystrixResult<T> run() throws Exception {
@@ -102,7 +99,7 @@ public class HystrixCommandFacade<T> {
 			protected HystrixResult<T> getFallback() {
 				// getFallback is only invoked when the underlying api threw an ServiceUnavailableException, or the
 				// when the invocation reached timeout. In any case, treat this as service unavailable.
-				ServiceUnavailableCause cause = AstrixUtil.resolveUnavailableCause(this);
+				ServiceUnavailableCause cause = resolveUnavailableCause();
 				log.info(String.format("Aborted command execution: cause=%s circuit=%s", cause, this.getCommandKey().name()));
 				if (isFailedExecution()) {
 					// Underlying service threw ServiceUnavailableException
@@ -111,6 +108,22 @@ public class HystrixCommandFacade<T> {
 				// Timeout or rejected in queue
 				return HystrixResult.exception(new ServiceUnavailableException(Objects.toString(cause)));
 			}
+			
+			private ServiceUnavailableCause resolveUnavailableCause() {
+				if (isResponseRejected()) {
+					return ServiceUnavailableCause.REJECTED_EXECUTION;
+				}
+				if (isResponseTimedOut()) {
+					return ServiceUnavailableCause.TIMEOUT;
+				}
+				if (isResponseShortCircuited()) {
+					return ServiceUnavailableCause.SHORT_CIRCUITED;
+				}
+				if (isFailedExecution()) {
+					return ServiceUnavailableCause.UNAVAILABLE;
+				}
+				return ServiceUnavailableCause.UNKNOWN;
+			}
 
 		};
 	}
@@ -118,6 +131,8 @@ public class HystrixCommandFacade<T> {
 	private Setter createHystrixConfiguration() {
 		HystrixCommandProperties.Setter commandPropertiesDefault =
 				HystrixCommandProperties.Setter()
+						.withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests())
+						.withExecutionIsolationStrategy(settings.getExecutionIsolationStrategy())
 						.withExecutionTimeoutInMilliseconds(settings.getExecutionIsolationThreadTimeoutInMilliseconds());
 						
 		// MaxQueueSize must be set to a non negative value in order for QueueSizeRejectionThreshold to have any effect.
