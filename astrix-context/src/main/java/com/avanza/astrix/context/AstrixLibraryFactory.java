@@ -22,10 +22,10 @@ import java.util.List;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
-import com.avanza.astrix.beans.factory.AstrixFactoryBean;
+import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 
-public class AstrixLibraryFactory<T> implements AstrixFactoryBean<T> {
+public class AstrixLibraryFactory<T> implements StandardFactoryBean<T> {
 
 	private Object factoryInstance;
 	private Method factoryMethod;

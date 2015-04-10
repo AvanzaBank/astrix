@@ -72,6 +72,11 @@ public class ServiceExporter {
 			this.serviceBeanDefinitions.addAll(serviceProviderPlugins.getExportedServices(api));
 		}
 	}
+	
+	public void exportService(ServiceBeanDefinition definition) {
+		this.serviceBeanDefinitions.add(definition);
+	}
+	
 
 	public void exportProvidedServices() {
 		for (ServiceBeanDefinition serviceBeanDefintion : serviceBeanDefinitions) {
@@ -81,9 +86,9 @@ public class ServiceExporter {
 			if (serviceComponent.requiresProviderInstance()) {
 				provider = getProvider(serviceBeanDefintion);
 			}
-			exportService(serviceBeanDefintion.getBeanType(), provider, versioningContext, serviceComponent);
+			exportService(serviceBeanDefintion.getBeanType(), provider, versioningContext, serviceComponent); 
 			if (serviceBeanDefintion.usesServiceRegistry()) {
-				serviceRegistryExporter.addExportedService(serviceBeanDefintion.getBeanKey(), serviceComponent);
+				serviceRegistryExporter.addExportedService(serviceBeanDefintion, serviceComponent);
 			}
 		}
 	}

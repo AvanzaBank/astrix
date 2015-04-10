@@ -23,10 +23,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
@@ -47,6 +49,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	
 	private AstrixVersioningPlugin versioningPlugin;
 	private final List<DirectBoundServiceBeanInstance<?>> nonReleasedInstances = new ArrayList<>();
+	private final ConcurrentMap<AstrixBeanKey<?>, String> idByExportedBean = new ConcurrentHashMap<>();
 	
 	
 	@AstrixInject
@@ -237,12 +240,13 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 
 	@Override
 	public <T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext) {
-		throw new UnsupportedOperationException();
+		String id = register(providedApi, provider);
+		this.idByExportedBean.put(AstrixBeanKey.create(providedApi), id);
 	}
 	
 	@Override
 	public boolean requiresProviderInstance() {
-		throw new UnsupportedOperationException();
+		return true;
 	}
 	
 	@Override
@@ -252,7 +256,8 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 
 	@Override
 	public <T> AstrixServiceProperties createServiceProperties(Class<T> exportedService) {
-		throw new UnsupportedOperationException();
+		String id = this.idByExportedBean.get(AstrixBeanKey.create(exportedService));
+		return getServiceProperties(id);
 	}
 
 	public static <T> String registerAndGetUri(Class<T> api, T provider) {

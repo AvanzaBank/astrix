@@ -225,7 +225,7 @@ public class AstrixBeanFactoryTest {
 	
 	
 	
-	static abstract class SimpleAstrixFactoryBean<T> implements AstrixFactoryBean<T> {
+	static abstract class SimpleAstrixFactoryBean<T> implements StandardFactoryBean<T> {
 
 		private AstrixBeanKey<T> key;
 		int creationCount = 0;

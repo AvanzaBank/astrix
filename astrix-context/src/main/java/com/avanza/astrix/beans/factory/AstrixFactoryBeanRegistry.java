@@ -29,7 +29,7 @@ public interface AstrixFactoryBeanRegistry {
 	 * @throws MissingBeanProviderException this registry doesn't contain a factory for the requested bean
 	 * @return
 	 */
-	<T> AstrixFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey);
+	<T> StandardFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey);
 	
 	/**
 	 * Invoked before requesting a factory from the registry. Allows the registry

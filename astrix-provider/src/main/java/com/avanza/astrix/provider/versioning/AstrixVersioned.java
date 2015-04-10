@@ -30,6 +30,8 @@ import java.lang.annotation.Target;
 @Documented
 public @interface AstrixVersioned {
 	
+	// TODO: remove this abstraction?
+	
 	int version();
 	
 	Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfigurer();

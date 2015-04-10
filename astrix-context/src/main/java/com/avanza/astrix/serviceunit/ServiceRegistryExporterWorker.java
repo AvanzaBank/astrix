@@ -27,7 +27,8 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
+import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicLongProperty;
@@ -41,14 +42,17 @@ import com.avanza.astrix.core.ServiceUnavailableException;
  */
 public class ServiceRegistryExporterWorker extends Thread implements AstrixPublishedBeansAware {
 	
-	private List<ServiceRegistryExportedService> exportedServices = new CopyOnWriteArrayList<>();
-	private AstrixServiceRegistryClient serviceRegistryClient;
+	private final List<ServiceRegistryExportedService> exportedServices = new CopyOnWriteArrayList<>();
+	private ServiceRegistryExporterClient serviceRegistryProviderClient;
 	private final Logger log = LoggerFactory.getLogger(ServiceRegistryExporterWorker.class);
 	private final DynamicLongProperty exportIntervallMillis;		  
 	private final DynamicLongProperty serviceLeaseTimeMillis;
 	private final DynamicLongProperty retryIntervallMillis;
+	private final DynamicConfig config;
+	private final Timer timer = new Timer();
 
 	public ServiceRegistryExporterWorker(DynamicConfig config) {
+		this.config = config;
 		this.exportIntervallMillis = AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL.getFrom(config);
 		this.retryIntervallMillis = AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL.getFrom(config);
 		this.serviceLeaseTimeMillis = AstrixSettings.SERVICE_REGISTRY_LEASE.getFrom(config);
@@ -66,7 +70,11 @@ public class ServiceRegistryExporterWorker extends Thread implements AstrixPubli
 	public void destroy() {
 		interrupt();
 	}
-
+	
+	public void triggerServiceExport() {
+		this.timer.wakeup();
+	}
+	
 	@Override
 	public void run() {
 		while (!interrupted()) {
@@ -81,26 +89,27 @@ public class ServiceRegistryExporterWorker extends Thread implements AstrixPubli
 				log.info(String.format("Failed to export services to registry. Sleeping %s millis until next attempt.", sleepTimeUntilNextAttempt), e);
 			} 
 			try {
-				sleep(sleepTimeUntilNextAttempt);
+				this.timer.sleep(sleepTimeUntilNextAttempt);
 			} catch (InterruptedException e) {
 				interrupt();
 			}
 		}
+		log.info("ServiceRegistryExporterWorker is interrupted, won't publish to service registry anymore.");
 	}
 
 	private void exportProvidedServcies() {
 		for (ServiceRegistryExportedService exportedService : exportedServices) {
 			AstrixServiceProperties serviceProperties = exportedService.exportServiceProperties();
-			serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());
+			serviceRegistryProviderClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());
 			log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			if (exportedService.exportsAsyncApi()) {
 				serviceProperties = exportedService.exportAsyncServiceProperties();
-				serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());
+				serviceRegistryProviderClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());
 				log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			}
 		}
 	}
-	
+
 	public void addServiceBuilder(
 			ServiceRegistryExportedService serviceRegistryExportedService) {
 		this.exportedServices.add(serviceRegistryExportedService);
@@ -108,7 +117,27 @@ public class ServiceRegistryExporterWorker extends Thread implements AstrixPubli
 
 	@Override
 	public void setAstrixBeans(AstrixPublishedBeans beans) {
-		this.serviceRegistryClient = beans.getBean(AstrixBeanKey.create(AstrixServiceRegistryClient.class));
+		String subsystem = AstrixSettings.SUBSYSTEM_NAME.getFrom(config).get();
+		String applicationInstanceId = AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(config).get();
+		AstrixServiceRegistry serviceRegistry= beans.getBean(AstrixBeanKey.create(AstrixServiceRegistry.class));
+		this.serviceRegistryProviderClient = new ServiceRegistryExporterClient(serviceRegistry, subsystem, applicationInstanceId);
+	}
+	
+	private static class Timer {
+		
+		private final Object monitor = new Object();
+		
+		void sleep(long time) throws InterruptedException {
+			synchronized (monitor) {
+				monitor.wait(time);
+			}
+		}
+		
+		void wakeup() {
+			synchronized (monitor) {
+				monitor.notifyAll();
+			}
+		}
 	}
 	
 

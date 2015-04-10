@@ -17,8 +17,9 @@ package com.avanza.astrix.context;
 
 import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.factory.AstrixFactoryBean;
+import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
+import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
@@ -49,20 +50,25 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		this.beanFactory = this.astrixInjector.getBean(AstrixBeanFactory.class); // The bean-factory used for apis managed by astrix
 		this.beanFactoryRegistry = (SimpleAstrixFactoryBeanRegistry) this.astrixInjector.getBean(AstrixFactoryBeanRegistry.class);
 		for (AstrixApiProviderClass apiProvider : this.astrixInjector.getBean(AstrixApiProviders.class).getAll()) {
-			for (AstrixFactoryBean<?> factory : this.apiProviderPlugins.getProviderPlugin(apiProvider).createFactoryBeans(apiProvider)) {
+			for (FactoryBean<?> factory : this.apiProviderPlugins.getProviderPlugin(apiProvider).createFactoryBeans(apiProvider)) {
 				this.beanFactoryRegistry.registerFactory(factory);
 			}
 		}
 	}
 	
 	
-	<T> void registerBeanFactory(AstrixFactoryBean<T> beanFactory) {
+	<T> void registerBeanFactory(StandardFactoryBean<T> beanFactory) {
 		this.beanFactoryRegistry.registerFactory(beanFactory);
 	}
 	
 	@Override
 	public void destroy() {
 		this.astrixInjector.destroy();
+	}
+
+	@Override
+	public void close() throws Exception {
+		destroy();
 	}
 	
 	@Override

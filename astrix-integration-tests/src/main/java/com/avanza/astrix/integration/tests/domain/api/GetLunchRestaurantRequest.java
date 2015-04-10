@@ -23,6 +23,13 @@ public class GetLunchRestaurantRequest implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private String name;
+	
+	public GetLunchRestaurantRequest(String name) {
+		this.name = name;
+	}
+	
+	public GetLunchRestaurantRequest() {
+	}
 
 	@SpaceRouting
 	public String getName() {

@@ -20,5 +20,9 @@
 		</property>
 	</bean>
 	<bean name="serviceRegistryImpl"
-		class="com.avanza.astrix.service.registry.pu.AstrixServiceRegistryImpl" />
+		class="com.avanza.astrix.beans.registry.AstrixServiceRegistryImpl" >
+		<constructor-arg ref="serviceRegistryEntryRepository"/>
+	</bean>
+	<bean name="serviceRegistryEntryRepository"
+		class="com.avanza.astrix.service.registry.pu.SpaceServiceRegistryEntryRepository" />
 </beans>

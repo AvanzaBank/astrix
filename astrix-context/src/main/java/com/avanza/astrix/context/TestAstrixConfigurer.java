@@ -23,7 +23,7 @@ import java.util.Set;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
-import com.avanza.astrix.beans.factory.AstrixFactoryBean;
+import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
 import com.avanza.astrix.beans.publish.AstrixApiProviders;
 import com.avanza.astrix.config.LongSetting;
@@ -33,7 +33,7 @@ public class TestAstrixConfigurer {
 	
 	private AstrixConfigurer configurer;
 	private final Set<AstrixApiProviderClass> apiProviders = new HashSet<>();
-	private final Collection<AstrixFactoryBean<?>> standaloneFactories = new LinkedList<>();
+	private final Collection<StandardFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	
 	public TestAstrixConfigurer() {
 		configurer = new AstrixConfigurer();
@@ -49,7 +49,7 @@ public class TestAstrixConfigurer {
 	}
 
 	public AstrixContext configure() {
-		for (AstrixFactoryBean<?> factoryBean : standaloneFactories) {
+		for (StandardFactoryBean<?> factoryBean : standaloneFactories) {
 			configurer.addFactoryBean(factoryBean);
 		}
 		return (AstrixContextImpl) configurer.configure();
@@ -124,7 +124,7 @@ public class TestAstrixConfigurer {
 		this.configurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
 	}
 	
-	private static class StandaloneFactoryBean<T> implements AstrixFactoryBean<T> {
+	private static class StandaloneFactoryBean<T> implements StandardFactoryBean<T> {
 		private AstrixBeanKey<T> type;
 		private T instance;
 
@@ -145,8 +145,9 @@ public class TestAstrixConfigurer {
 		
 	}
 
-	public void enableVersioning(boolean enableVersioning) {
+	public TestAstrixConfigurer enableVersioning(boolean enableVersioning) {
 		this.configurer.enableVersioning(enableVersioning);
+		return this;
 	}
 
 	public void removeSetting(String name) {

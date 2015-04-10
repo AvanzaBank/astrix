@@ -66,4 +66,12 @@ public class AstrixServiceRegistryEntry {
 		return result;
 	}
 	
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		result.append("serviceProperties=").append(this.serviceProperties);
+		result.append(", serviceMetadata=").append(this.serviceMetadata);
+		return result.toString();
+	}
+	
 }

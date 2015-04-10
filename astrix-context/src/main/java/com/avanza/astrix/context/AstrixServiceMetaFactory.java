@@ -16,6 +16,7 @@
 package com.avanza.astrix.context;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.service.AstrixServiceComponents;
 import com.avanza.astrix.beans.service.AstrixServiceFactory;
@@ -34,8 +35,11 @@ public final class AstrixServiceMetaFactory implements AstrixConfigAware {
 	private AstrixServiceLeaseManager leaseManager;
 	private DynamicConfig config;
 
-	public <T> AstrixServiceFactory<T> createServiceFactory(ServiceVersioningContext versioningContext, AstrixServiceLookup serviceLookup, AstrixBeanKey<T> serviceBean) {
-		return new AstrixServiceFactory<>(versioningContext, serviceBean, serviceLookup, serviceComponents, leaseManager, config);
+	public <T> FactoryBean<T> createServiceFactory(ServiceVersioningContext versioningContext, AstrixServiceLookup serviceLookup, AstrixBeanKey<T> beanKey, AstrixPublishedBeanDefinitionMethod beanDefinition) {
+		if (beanDefinition.isDynamicQualified()) {
+			return AstrixServiceFactory.dynamic(versioningContext, beanKey.getBeanType(), serviceLookup, serviceComponents, leaseManager, config);
+		}
+		return AstrixServiceFactory.standard(versioningContext, beanKey, serviceLookup, serviceComponents, leaseManager, config);
 	}
 	
 	public Class<?> loadInterfaceIfExists(String interfaceName) {

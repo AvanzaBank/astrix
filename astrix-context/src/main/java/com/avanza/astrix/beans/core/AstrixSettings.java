@@ -106,6 +106,17 @@ public class AstrixSettings implements DynamicConfigSource, MutableConfigSource 
 	 */
 	public static final BooleanSetting GS_DISABLE_LOCAL_VIEW = BooleanSetting.create("AstrixGsLocalViewComponent.disableLocalView", false);
 	
+	
+	public static final StringSetting APPLICATION_NAME = StringSetting.create("astrix.application.name", null);
+	public static final StringSetting APPLICATION_TAG =  StringSetting.create("astrix.application.tag", null);
+	public static final StringSetting APPLICATION_INSTANCE_ID =  StringSetting.create("astrix.application.instanceid", null);
+	public static final StringSetting INITIAL_SERVICE_STATE = StringSetting.create("astrix.application.initialServiceState", null);
+
+	/**
+	 * Service component used to export ServiceAdministrator api.
+	 */
+	public static final StringSetting SERVICE_ADMINISTRATOR_COMPONENT = StringSetting.create("astrix.service.administrator.component", AstrixServiceComponentNames.GS_REMOTING);
+	
 	private final MapConfigSource config = new MapConfigSource();
 	private final String configSourceId;
 	

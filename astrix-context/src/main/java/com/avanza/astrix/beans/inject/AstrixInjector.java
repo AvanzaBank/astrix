@@ -33,7 +33,7 @@ import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
-import com.avanza.astrix.beans.factory.AstrixFactoryBean;
+import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 /**
@@ -71,7 +71,7 @@ public class AstrixInjector {
 
 	public class InjectingBeanFactoryRegistry implements AstrixFactoryBeanRegistry {
 		
-		private final ConcurrentMap<AstrixBeanKey<?>, AstrixFactoryBean<?>> providerByBeanKey = new ConcurrentHashMap<>();
+		private final ConcurrentMap<AstrixBeanKey<?>, StandardFactoryBean<?>> providerByBeanKey = new ConcurrentHashMap<>();
 		private final ConcurrentMap<AstrixBeanKey<?>, AstrixBeanKey<?>> beanBindings = new ConcurrentHashMap<>();
 		private final AstrixPlugins plugins;
 		
@@ -80,11 +80,11 @@ public class AstrixInjector {
 		}
 
 		@Override
-		public <T> AstrixFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey) {
+		public <T> StandardFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey) {
 			if (beanKey.getBeanType().isAssignableFrom(AstrixInjector.class)) {
 				return new AlreadyInstantiatedFactoryBean<>(beanKey, beanKey.getBeanType().cast(AstrixInjector.this));
 			}
-			AstrixFactoryBean<T> factory = (AstrixFactoryBean<T>) providerByBeanKey.get(beanKey);
+			StandardFactoryBean<T> factory = (StandardFactoryBean<T>) providerByBeanKey.get(beanKey);
 			if (factory != null) {
 				return factory;
 			}
@@ -133,7 +133,7 @@ public class AstrixInjector {
 		}
 	}
 	
-	private static class AlreadyInstantiatedFactoryBean<T> implements AstrixFactoryBean<T> {
+	private static class AlreadyInstantiatedFactoryBean<T> implements StandardFactoryBean<T> {
 
 		private AstrixBeanKey<T> beanKey;
 		private T instance;
@@ -155,7 +155,7 @@ public class AstrixInjector {
 		
 	}
 	
-	private static class AstrixClassConstructorFactoryBean<T> implements AstrixFactoryBean<T> {
+	private static class AstrixClassConstructorFactoryBean<T> implements StandardFactoryBean<T> {
 		
 		private AstrixBeanKey<T> beanKey;
 		private Class<? extends T> beanImplClass;
@@ -256,7 +256,7 @@ public class AstrixInjector {
 		}
 	}
 	
-	private static class AstrixPluginFactoryBean<T> implements AstrixFactoryBean<T> {
+	private static class AstrixPluginFactoryBean<T> implements StandardFactoryBean<T> {
 		
 		private AstrixBeanKey<T> beanKey;
 		private AstrixPlugins plugins;

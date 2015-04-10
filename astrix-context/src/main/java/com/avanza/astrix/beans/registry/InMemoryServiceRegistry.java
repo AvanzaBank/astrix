@@ -42,7 +42,8 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	private final MapConfigSource configSource = new MapConfigSource();
 	private String id;
 	private String configSourceId;
-	private InMemoryServiceRegistryImpl serviceRegistry = new InMemoryServiceRegistryImpl();
+	private InMemoryServiceRegistryRepo repo = new InMemoryServiceRegistryRepo();
+	private AstrixServiceRegistry serviceRegistry = new AstrixServiceRegistryImpl(repo);
 	
 	public InMemoryServiceRegistry() {
 		this.id = AstrixDirectComponent.register(AstrixServiceRegistry.class, serviceRegistry);
@@ -65,12 +66,22 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 		serviceRegistry.register(properties, lease);
 	}
 	
+	@Override
+	public <T> void deregister(AstrixServiceRegistryEntry properties) {
+		serviceRegistry.deregister(properties);
+	}
+	
+	@Override
+	public List<AstrixServiceRegistryEntry> listServices(String type, String qualifier) {
+		return this.serviceRegistry.listServices(type, qualifier);
+	}
+	
 	public String getConfigSourceId() {
 		return configSourceId;
 	}
 	
 	public void clear() {
-		this.serviceRegistry.clear();
+		this.repo.clear();
 	}
 
 	/**
@@ -112,7 +123,8 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	
 	
 	public <T> void registerProvider(Class<T> api, T provider, String subsystem) {
-		AstrixServiceRegistryClientImpl serviceRegistryClient = new AstrixServiceRegistryClientImpl(this.serviceRegistry, subsystem);
+		// TODO: remove this method?
+		ServiceRegistryExporterClient serviceRegistryClient = new ServiceRegistryExporterClient(this.serviceRegistry, subsystem, api.getName());
 		serviceRegistryClient.register(api, AstrixDirectComponent.registerAndGetProperties(api, provider), 60_000);
 	}
 	
@@ -136,31 +148,50 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 		return configSource.get(propertyName, propertyChangeListener);
 	}
 	
-	private static class InMemoryServiceRegistryImpl implements AstrixServiceRegistry {
+	private static class InMemoryServiceRegistryRepo implements ServiceRegistryEntryRepository {
 		
-		private Map<ServiceKey, AstrixServiceRegistryEntry> servicePropertiesByKey = new ConcurrentHashMap<>();
-		
+		private Map<ServiceProviderKey, AstrixServiceRegistryEntry> servicePropertiesByApplicationInstanceId = new ConcurrentHashMap<>();
+
 		@Override
-		public <T> AstrixServiceRegistryEntry lookup(String type, String qualifier) {
-			return this.servicePropertiesByKey.get(new ServiceKey(type, qualifier));
+		public List<AstrixServiceRegistryEntry> findAll() {
+			return new ArrayList<>(servicePropertiesByApplicationInstanceId.values());
 		}
 		
+		@Override
+		public List<AstrixServiceRegistryEntry> findByServiceKey(ServiceKey serviceKey) {
+			List<AstrixServiceRegistryEntry> result = new ArrayList<>();
+			for (AstrixServiceRegistryEntry entry : this.servicePropertiesByApplicationInstanceId.values()) {
+				if (serviceKey.equals(getServiceKey(entry))) {
+					result.add(entry);
+				}
+			}
+			return result;
+		}
 		
 		@Override
-		public <T> void register(AstrixServiceRegistryEntry properties, long lease) {
-			ServiceKey key = new ServiceKey(properties.getServiceBeanType(), properties.getServiceProperties().get(AstrixServiceProperties.QUALIFIER));
-			this.servicePropertiesByKey.put(key, properties);
+		public void insertOrUpdate(AstrixServiceRegistryEntry entry, long lease) {
+			this.servicePropertiesByApplicationInstanceId.put(getServiceProviderKey(entry), entry);
+		}
+		
+		@Override
+		public void remove(ServiceProviderKey serviceProviderKey) {
+			this.servicePropertiesByApplicationInstanceId.remove(serviceProviderKey);
+		}
+		
+		private ServiceProviderKey getServiceProviderKey(AstrixServiceRegistryEntry properties) {
+			String appInstanceId = properties.getServiceProperties().get(AstrixServiceProperties.APPLICATION_INSTANCE_ID);
+			return ServiceProviderKey.create(getServiceKey(properties), appInstanceId);
+		}
+		
+		private ServiceKey getServiceKey(AstrixServiceRegistryEntry properties) {
+			String api = properties.getServiceBeanType();
+			String qualifier = properties.getServiceProperties().get(AstrixServiceProperties.QUALIFIER);
+			return new ServiceKey(api, qualifier);
 		}
 		
 		void clear() {
-			this.servicePropertiesByKey.clear();
+			this.servicePropertiesByApplicationInstanceId.clear();
 		}
-		
-		@Override
-		public List<AstrixServiceRegistryEntry> listServices() {
-			return new ArrayList<>(servicePropertiesByKey.values());
-		}
-		
 		
 	}
 }

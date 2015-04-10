@@ -22,5 +22,9 @@ public class MultipleBeanFactoryException extends RuntimeException {
 	public MultipleBeanFactoryException(AstrixBeanKey<?> beanKey) {
 		super("Multiple factories for bean: " + beanKey);
 	}
+	
+	public MultipleBeanFactoryException(Class<?> type) {
+		super("Multiple factories for bean type: " + type);
+	}
 
 }

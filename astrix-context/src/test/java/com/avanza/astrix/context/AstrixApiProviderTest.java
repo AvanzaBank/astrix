@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
+import com.avanza.astrix.provider.core.AstrixDynamicQualifier;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
@@ -132,6 +133,24 @@ public class AstrixApiProviderTest {
 		InternalPingService internalPingService = context.getBean(InternalPingService.class);
 		assertEquals("foo", pingService.ping("foo"));
 		assertEquals("bar", internalPingService.ping("bar"));
+	}
+	
+	@Test
+	public void supportsDynamicQualifiedServices() throws Exception {
+		String pingServiceUri = AstrixDirectComponent.registerAndGetUri(PingService.class, 
+																		new PingServiceImpl());
+		
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(DynamicPingServiceProvider.class);
+		astrixConfigurer.set("pingServiceUri", pingServiceUri);
+		AstrixContext context = astrixConfigurer.configure();
+		
+		PingService pingService1 = context.getBean(PingService.class, "foo");
+		PingService pingService2 = context.getBean(PingService.class, "bar");
+		
+		assertEquals("foo", pingService1.ping("foo"));
+		assertEquals("foo", pingService2.ping("foo"));
+		
 	}
 	
 	public interface PingLib {
@@ -269,6 +288,15 @@ public class AstrixApiProviderTest {
 	}
 	
 	public static class DummyObjectSerializerConfigurer implements AstrixObjectSerializerConfigurer {
+	}
+	
+	@AstrixApiProvider
+	public interface DynamicPingServiceProvider {
+
+		@AstrixConfigLookup("pingServiceUri")
+		@AstrixDynamicQualifier
+		@Service
+		PingService pingService();
 	}
 
 }

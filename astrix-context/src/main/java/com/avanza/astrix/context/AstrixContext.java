@@ -20,7 +20,7 @@ package com.avanza.astrix.context;
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AstrixContext extends Astrix {
+public interface AstrixContext extends Astrix, AutoCloseable {
 
 	void destroy();
 

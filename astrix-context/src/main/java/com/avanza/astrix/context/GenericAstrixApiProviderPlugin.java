@@ -23,7 +23,7 @@ import java.util.List;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.factory.AstrixFactoryBean;
+import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
@@ -49,12 +49,12 @@ public class GenericAstrixApiProviderPlugin implements AstrixApiProviderPlugin {
 	private AstrixServiceLookupFactory serviceLookupFactory;
 	
 	@Override
-	public List<AstrixFactoryBean<?>> createFactoryBeans(AstrixApiProviderClass apiProviderClass) {
+	public List<FactoryBean<?>> createFactoryBeans(AstrixApiProviderClass apiProviderClass) {
 		return getFactoryBeans(apiProviderClass);
 	}
 
-	private List<AstrixFactoryBean<?>> getFactoryBeans(AstrixApiProviderClass apiProviderClass) {
-		List<AstrixFactoryBean<?>> result = new ArrayList<>();
+	private List<FactoryBean<?>> getFactoryBeans(AstrixApiProviderClass apiProviderClass) {
+		List<FactoryBean<?>> result = new ArrayList<>();
 		// Create library factories
 		for (Method astrixBeanDefinitionMethod : apiProviderClass.getProviderClass().getMethods()) {
 			AstrixPublishedBeanDefinitionMethod beanDefinition = AstrixPublishedBeanDefinitionMethod.create(astrixBeanDefinitionMethod);
@@ -66,10 +66,10 @@ public class GenericAstrixApiProviderPlugin implements AstrixApiProviderPlugin {
 			if (beanDefinition.isService()) {
 				ServiceVersioningContext versioningContext = createVersioningContext(apiProviderClass, beanDefinition);
 				AstrixServiceLookup serviceLookup = serviceLookupFactory.createServiceLookup(astrixBeanDefinitionMethod);
-				result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, beanDefinition.getBeanKey()));
+				result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, beanDefinition.getBeanKey(), beanDefinition));
 				Class<?> asyncInterface = serviceMetaFactory.loadInterfaceIfExists(beanDefinition.getBeanType().getName() + "Async");
 				if (asyncInterface != null) {
-					result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, AstrixBeanKey.create(asyncInterface, beanDefinition.getQualifier())));
+					result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, AstrixBeanKey.create(asyncInterface, beanDefinition.getQualifier()), beanDefinition));
 				}
 				continue;
 			}

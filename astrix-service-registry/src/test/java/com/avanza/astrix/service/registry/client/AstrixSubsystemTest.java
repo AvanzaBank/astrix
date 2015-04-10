@@ -23,6 +23,7 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
+import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.beans.service.IllegalSubsystemException;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
@@ -54,7 +55,7 @@ public class AstrixSubsystemTest {
 		AstrixContext contextB = configurerB.configure();
 
 		// Publish non versioned service in contextB
-		AstrixServiceRegistryClient serviceRegistryClientB = contextB.getBean(AstrixServiceRegistryClient.class);
+		ServiceRegistryExporterClient serviceRegistryClientB = new ServiceRegistryExporterClient(serviceRegistry, "B", "FooInstanceId");
 		serviceRegistryClientB.register(GreetingService.class, AstrixDirectComponent.registerAndGetProperties(GreetingService.class, new GreetingServiceImpl("hello")), 1000);
 		
 		GreetingService greetingServiceB = contextB.getBean(GreetingService.class);
@@ -86,7 +87,7 @@ public class AstrixSubsystemTest {
 		AstrixContext contextB = configurerB.configure();
 
 		// Publish non versioned service in contextB
-		AstrixServiceRegistryClient serviceRegistryClientB = contextB.getBean(AstrixServiceRegistryClient.class);
+		ServiceRegistryExporterClient serviceRegistryClientB = new ServiceRegistryExporterClient(serviceRegistry, "B", "FooInstanceId");
 		serviceRegistryClientB.register(GreetingService.class, AstrixDirectComponent.registerAndGetProperties(GreetingService.class, new GreetingServiceImpl("hello")), 1000);
 		
 		GreetingService greetingServiceB = contextB.getBean(GreetingService.class);

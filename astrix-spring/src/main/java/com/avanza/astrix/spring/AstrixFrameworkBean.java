@@ -21,9 +21,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.PreDestroy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -36,11 +39,19 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.core.Ordered;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixContextImpl;
+import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
+import com.avanza.astrix.serviceunit.ServiceAdministrator;
+import com.avanza.astrix.serviceunit.ServiceAdministratorImpl;
+import com.avanza.astrix.serviceunit.ServiceAdministratorVersioningConfigurer;
+import com.avanza.astrix.serviceunit.ServiceBeanDefinition;
 import com.avanza.astrix.serviceunit.ServiceExporter;
 import com.avanza.astrix.serviceunit.ServiceRegistryExporter;
 
@@ -51,6 +62,8 @@ import com.avanza.astrix.serviceunit.ServiceRegistryExporter;
 public class AstrixFrameworkBean implements BeanFactoryPostProcessor, ApplicationContextAware, ApplicationListener<ApplicationContextEvent>, Ordered {
 	
 	/*
+	 * A NOTE ON THE IMPLEMENTATION NOTE: This comment is outdated...
+	 * 
 	 * IMPLEMENTATION NOTE - Astrix startup
 	 * 
 	 * The startup procedure goes as follows:
@@ -62,17 +75,18 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	 *    
 	 * 2. BeanPostProcessor (BPP)
 	 *  - The BPP will investigate each spring-bean in the current application and search
-	 *    for @AstrixServiceExport annotated classes and register those with the ServiceExporter
+	 *    for @AstrixServiceExport annotated classes and register those with the ServiceRegistryExporterClient
 	 *    
 	 * 3. ApplicationListener<ContexRefreshedEvent>
 	 *  - After each spring-bean have bean created and fully initialized this class will receive a call-back
-	 *    and start exporting services using the ServiceExporter.
+	 *    and start exporting services using the ServiceRegistryExporterClient.
 	 *    
 	 * 
 	 * Note that this class (AstrixFrameworkBean) is the only class in the framework that will recieve spring-lifecylce events.
 	 * 
 	 */
 	
+	private static final Logger log = LoggerFactory.getLogger(AstrixFrameworkBean.class);
 	private List<Class<?>> consumedAstrixBeans = new ArrayList<>();
 	private String subsystem;
 	private Map<String, String> settings = new HashMap<>();
@@ -80,6 +94,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	private AstrixContextImpl astrixContext;
 	private volatile boolean serviceExporterStarted = false;
 	private ApplicationContext applicationContext;
+	private final AstrixConfigurer configurer = new AstrixConfigurer();
 	
 	public AstrixFrameworkBean() {
 	}
@@ -170,7 +185,6 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	}
 	
 	private AstrixContextImpl createAsterixContext(DynamicConfig optionalConfig) {
-		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setSettings(this.settings);
 		if (optionalConfig != null) {
 			configurer.setConfig(optionalConfig);
@@ -205,10 +219,35 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		if (applicationDescriptor == null) {
 			return; // current application exports no services
 		}
+		String applicationInstanceId = setupApplicationInstanceId();
 		ServiceExporter serviceExporter = astrixContext.getInstance(ServiceExporter.class);
+		
+		serviceExporter.addServiceProvider(astrixContext.getInstance(ServiceAdministratorImpl.class));
+		ServiceVersioningContext versioningContext = ServiceVersioningContext.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
+		ServiceBeanDefinition serviceAdminDefintion = new ServiceBeanDefinition(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
+																			    versioningContext, 
+																			    true, // isVersioned  
+																			    true, // alwaysActive
+																			    AstrixSettings.SERVICE_ADMINISTRATOR_COMPONENT.getFrom(this.astrixContext.getConfig()).get());
+		serviceExporter.exportService(serviceAdminDefintion);
+		
 		serviceExporter.setServiceDescriptor(applicationDescriptor); // TODO This is a hack. Avoid setting serviceDescriptor explicitly here
 		serviceExporter.exportProvidedServices();
 		astrixContext.getInstance(ServiceRegistryExporter.class).startPublishServices();
+	}
+	
+
+	private String setupApplicationInstanceId() {
+		String applicationInstanceId = AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(this.astrixContext.getConfig()).get();
+		if (applicationInstanceId == null) {
+			applicationInstanceId = this.applicationDescriptor.toString();
+			configurer.set(AstrixSettings.APPLICATION_INSTANCE_ID, this.applicationDescriptor.toString());
+			log.info("No applicationInstanceId set, using name of ApplicationDescriptor as applicationInstanceId: {}", applicationInstanceId);
+			Objects.requireNonNull(AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(this.astrixContext.getConfig()).get());
+		} else {
+			log.info("Current applicationInstanceId={}", applicationInstanceId);
+		}
+		return applicationInstanceId;
 	}
 
 	public void setConsumedAstrixBeans(Class<?>... consumedAstrixBeans) {

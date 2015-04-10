@@ -102,7 +102,7 @@ public class AstrixBeanFactory {
 				throw new AstrixCircularDependency(constructionStack);
 			}
 			constructionStack.add(beanKey);
-			AstrixFactoryBean<? extends T> factoryBean = registry.getFactoryBean(beanKey);
+			StandardFactoryBean<? extends T> factoryBean = registry.getFactoryBean(beanKey);
 			AstrixBeanInstance<? extends T> instance = createBeanInstance(factoryBean);
 			for (AstrixBeanPostProcessor beanPostProcessor : beanPostProcessors) {
 				beanPostProcessor.postProcess(instance.get(), this);
@@ -111,7 +111,7 @@ public class AstrixBeanFactory {
 			return instance;
 		}
 
-		private <T> AstrixBeanInstance<T> createBeanInstance(AstrixFactoryBean<T> factoryBean) {
+		private <T> AstrixBeanInstance<T> createBeanInstance(StandardFactoryBean<T> factoryBean) {
 			return AstrixBeanInstance.create(this, factoryBean);
 		}
 		

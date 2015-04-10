@@ -17,14 +17,18 @@ package com.avanza.astrix.beans.factory;
 
 
 /**
- * Strategy used by {@link AstrixBeanFactory} to create a given bean
- * in the factory.
+ * FactoryBean strategy used by {@link AstrixBeanFactory} to create a bean
+ * in the factory. The bean created by this factory is locked to a single
+ * {@link AstrixBeanKey}, as opposed to the beans created by {@link DynamicFactoryBean}
+ * which can create arbitrary beans of a given type. 
  * 
  * @author Elias Lindholm (elilin)
  *
  * @param <T>
  */
-public interface AstrixFactoryBean<T> {
+public interface StandardFactoryBean<T> extends FactoryBean<T> {
+	
+	// Rename to PredefinedKeyFactoryBean?
 	
 	/**
 	 * Creates the bean. Dependencies

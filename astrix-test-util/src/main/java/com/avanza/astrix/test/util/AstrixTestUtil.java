@@ -130,6 +130,17 @@ public class AstrixTestUtil {
 		};
 	}
 	
+	public static void closeSafe(AutoCloseable autoClosable) {
+		if (autoClosable == null) {
+			return;
+		}
+		try {
+			autoClosable.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static class MapBuilder {
 		private HashMap<String, Integer> result = new HashMap<>();
 		public MapBuilder() { }

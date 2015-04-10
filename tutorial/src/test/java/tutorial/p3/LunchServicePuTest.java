@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.log4j.BasicConfigurator;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -47,10 +48,14 @@ public class LunchServicePuTest {
 		astrix.destroy();
 	}
 	
+	static {
+		BasicConfigurator.configure();
+	}
+	
 	@Test
 	public void testName() throws Exception {
 		AstrixConfigurer astrixConfigurer = new AstrixConfigurer();
-		astrixConfigurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
 		astrixConfigurer.setBasePackage("tutorial.p3");
 		astrix = astrixConfigurer.configure();

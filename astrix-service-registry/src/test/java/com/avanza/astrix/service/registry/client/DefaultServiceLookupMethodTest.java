@@ -20,8 +20,12 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
+import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
+import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -32,23 +36,26 @@ import com.avanza.astrix.provider.core.Service;
 public class DefaultServiceLookupMethodTest {
 	
 	private static final long UNUSED_LEASE = 10_000L;
-	private AstrixServiceRegistryClient serviceRegistryClient;
 	private AstrixContext context;
+	private InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 	
 	@Before
 	public void setup() {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.registerApiProvider(GreetingApiProviderNoLookupDefined.class);
-		configurer.registerApiProvider(InMemoryServiceRegistryLibraryProvider.class);
 		configurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
+		configurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
+		configurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		context = configurer.configure();
-		serviceRegistryClient = context.getBean(AstrixServiceRegistryClient.class);
 	}
 	
 	@Test
 	public void lookupService_serviceAvailableInRegistry_ServiceIsImmediatlyBound() throws Exception {
 		final String objectId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		
+		ServiceRegistryExporterClient serviceRegistryClient = new ServiceRegistryExporterClient(serviceRegistry, "B", "FooInstanceId");
 		serviceRegistryClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
+		
 		
 		GreetingService greetingService = context.getBean(GreetingService.class);
 		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), greetingService.hello("kalle"));

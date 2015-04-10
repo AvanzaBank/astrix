@@ -27,10 +27,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
+import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -45,9 +45,9 @@ import com.avanza.astrix.test.util.Supplier;
 public class AstrixServiceRegistryLookupTest {
 	
 	private static final long UNUSED_LEASE = 10_000L;
-	private AstrixServiceRegistryClient serviceRegistryClient;
+	private ServiceRegistryExporterClient serviceRegistryExporterClient;
 	private AstrixContext context;
-	private InMemoryServiceRegistry fakeServiceRegistry;
+	private InMemoryServiceRegistry fakeServiceRegistry = new InMemoryServiceRegistry();
 	
 	static {
 	// 	TODO: remove debugging information
@@ -61,18 +61,18 @@ public class AstrixServiceRegistryLookupTest {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		configurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 10);
+		configurer.set(AstrixSettings.SERVICE_REGISTRY_URI, fakeServiceRegistry.getServiceUri());
 		configurer.registerApiProvider(GreetingApiProvider.class);
-		configurer.registerApiProvider(InMemoryServiceRegistryLibraryProvider.class);
 		configurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
+		configurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		context = configurer.configure();
-		fakeServiceRegistry = (InMemoryServiceRegistry) context.getBean(AstrixServiceRegistry.class);
-		serviceRegistryClient = context.getBean(AstrixServiceRegistryClient.class);
+		serviceRegistryExporterClient = new ServiceRegistryExporterClient(fakeServiceRegistry, "foo", "bar");
 	}
 	
 	@Test
 	public void lookupService_serviceAvailableInRegistry_ServiceIsImmediatlyBound() throws Exception {
 		final String objectId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
-		serviceRegistryClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
+		serviceRegistryExporterClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
 		
 		GreetingService greetingService = context.getBean(GreetingService.class);
 		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), greetingService.hello("kalle"));
@@ -90,7 +90,7 @@ public class AstrixServiceRegistryLookupTest {
 		} catch (ServiceUnavailableException e) {
 		}
 
-		serviceRegistryClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
+		serviceRegistryExporterClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
 			public String get() {

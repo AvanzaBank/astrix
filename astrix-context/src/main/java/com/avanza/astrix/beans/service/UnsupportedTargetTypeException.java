@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package com.avanza.astrix.beans.service;
+
+import com.avanza.astrix.core.IllegalServiceMetadataException;
+
 /**
  * 
  * @author Elias Lindholm (elilin)

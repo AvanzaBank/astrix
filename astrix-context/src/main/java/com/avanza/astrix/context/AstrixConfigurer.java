@@ -33,9 +33,9 @@ import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
-import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
+import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.inject.AstrixPlugins;
 import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
@@ -43,12 +43,10 @@ import com.avanza.astrix.beans.publish.AstrixApiProviderPlugin;
 import com.avanza.astrix.beans.publish.AstrixApiProviders;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
-import com.avanza.astrix.config.BooleanSetting;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
-import com.avanza.astrix.config.StringSetting;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
 
@@ -60,7 +58,7 @@ public class AstrixConfigurer {
 	private static final Logger log = LoggerFactory.getLogger(AstrixConfigurer.class);
 	
 	private AstrixApiProviders astrixApiProviders;
-	private final Collection<AstrixFactoryBean<?>> standaloneFactories = new LinkedList<>();
+	private final Collection<StandardFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	private final List<AstrixPlugins.Plugin<?>> plugins = new ArrayList<>();
 	private final AstrixSettings settings = new AstrixSettings();
 	
@@ -79,7 +77,7 @@ public class AstrixConfigurer {
 		injector.bind(AstrixApiProviders.class, new FilteredApiProviders(getApiProviders(astrixPlugins), activeProfiles));
 		injector.registerBeanPostProcessor(new InternalBeanPostProcessor(injector.getBean(AstrixBeanFactory.class)));
 		AstrixContextImpl context = injector.getBean(AstrixContextImpl.class);
-		for (AstrixFactoryBean<?> beanFactory : standaloneFactories) {
+		for (StandardFactoryBean<?> beanFactory : standaloneFactories) {
 			log.debug("Registering standalone factory: bean={}", beanFactory.getBeanKey());
 			context.registerBeanFactory(beanFactory);
 		}
@@ -209,40 +207,48 @@ public class AstrixConfigurer {
 	}
 	
 	// package private. Used for internal testing only
-	<T> void registerPlugin(Class<T> c, T provider) {
+	<T> AstrixConfigurer registerPlugin(Class<T> c, T provider) {
 		plugins.add(new AstrixPlugins.Plugin<>(c, Arrays.asList(provider)));
+		return this;
 	}
 
-	public void set(String settingName, long value) {
+	public AstrixConfigurer set(String settingName, long value) {
 		this.settings.set(settingName, value);
-	}
-
-	public void set(String settingName, boolean value) {
-		this.settings.set(settingName, value);
-	}
-
-	public void set(String settingName, String value) {
-		this.settings.set(settingName, value);
+		return this;
 	}
 	
-	public final <T> void set(Setting<T> setting, T value) {
-		this.settings.set(setting, value);
+	public AstrixConfigurer set(String settingName, boolean value) {
+		this.settings.set(settingName, value);
+		return this;
+	}
+
+	public AstrixConfigurer set(String settingName, String value) {
+		this.settings.set(settingName, value);
+		return this;
 	}
 	
-	public final <T> void set(LongSetting setting, long value) {
+	public final <T> AstrixConfigurer set(Setting<T> setting, T value) {
 		this.settings.set(setting, value);
+		return this;
+	}
+	
+	public final <T> AstrixConfigurer set(LongSetting setting, long value) {
+		this.settings.set(setting, value);
+		return this;
 	}
 	
 	public void setSettings(Map<String, String> settings) {
 		this.settings.setAll(settings);
 	}
 	
-	public void setConfig(DynamicConfig config) {
+	public AstrixConfigurer setConfig(DynamicConfig config) {
 		this.customConfig = config;
+		return this;
 	}
 	
-	public void setAstrixSettings(AstrixSettings settings) {
+	public AstrixConfigurer setAstrixSettings(AstrixSettings settings) {
 		this.settings.setAll(settings);
+		return this;
 	}
 	
 	/**
@@ -256,7 +262,7 @@ public class AstrixConfigurer {
 		this.settings.set(AstrixSettings.SUBSYSTEM_NAME, subsystem);
 	}
 
-	public void addFactoryBean(AstrixFactoryBean<?> factoryBean) {
+	public void addFactoryBean(StandardFactoryBean<?> factoryBean) {
 		this.standaloneFactories.add(factoryBean);
 	}
 

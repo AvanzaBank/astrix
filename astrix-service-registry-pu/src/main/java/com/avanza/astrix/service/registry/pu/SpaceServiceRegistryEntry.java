@@ -19,8 +19,12 @@ import java.io.Serializable;
 import java.util.Map;
 
 import com.avanza.astrix.beans.registry.ServiceKey;
+import com.avanza.astrix.beans.registry.ServiceProviderKey;
 import com.gigaspaces.annotation.pojo.SpaceId;
+import com.gigaspaces.annotation.pojo.SpaceIndex;
+import com.gigaspaces.annotation.pojo.SpaceProperty;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
+import com.gigaspaces.metadata.index.SpaceIndexType;
 
 public class SpaceServiceRegistryEntry implements Serializable {
 
@@ -28,6 +32,7 @@ public class SpaceServiceRegistryEntry implements Serializable {
 	private Map<String, String> serviceProperties;
 	private Map<String, String> serviceMetadata;
 	private ServiceKey serviceKey;
+	private ServiceProviderKey serviceProviderKey;
 	private String apiType;
 
 	public Map<String, String> getProperties() {
@@ -39,6 +44,18 @@ public class SpaceServiceRegistryEntry implements Serializable {
 	}
 
 	@SpaceId(autoGenerate = false)
+	public ServiceProviderKey getServiceProviderKey() {
+		return serviceProviderKey;
+	}
+	
+	public void setServiceProviderKey(ServiceProviderKey serviceProviderKey) {
+		this.serviceProviderKey = serviceProviderKey;
+	}
+	
+
+	// TODO: Use index? It will speedup reads, but slowdown writes. The number of SpaceServiceRegistryEntry is not expected to be that high, may
+	// Its best to avoid an index?
+//	@SpaceIndex(type = SpaceIndexType.BASIC)
 	public ServiceKey getServiceKey() {
 		return serviceKey;
 	}

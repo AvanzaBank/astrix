@@ -19,8 +19,24 @@ import java.lang.reflect.Type;
 
 public interface AstrixObjectSerializer {
 	
+	/**
+	 * Deserializes a serialized object. 
+	 * 
+	 * @param element
+	 * @param type
+	 * @param version - the version of the serialized form of the object
+	 * @return
+	 */
 	<T> T deserialize(Object element, Type type, int version);
 
+	
+	/**
+	 * Serializes a given object to the serialized form of a given version.
+	 * 
+	 * @param element
+	 * @param version - the version of the serialized data format to serialize the object to.
+	 * @return
+	 */
 	Object serialize(Object element, int version);
 	
 	int version();

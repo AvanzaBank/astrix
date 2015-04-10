@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.beans.registry;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
@@ -27,11 +29,9 @@ import com.avanza.astrix.beans.service.AstrixServiceProperties;
 public class AstrixServiceRegistryClientImpl implements AstrixServiceRegistryClient {
 	
 	private final AstrixServiceRegistry serviceRegistry;
-	private final String subsystem;
 
-	public AstrixServiceRegistryClientImpl(AstrixServiceRegistry serviceRegistry, String subsystem) {
+	public AstrixServiceRegistryClientImpl(AstrixServiceRegistry serviceRegistry) {
 		this.serviceRegistry = Objects.requireNonNull(serviceRegistry);
-		this.subsystem = Objects.requireNonNull(subsystem);
 	}
 
 	@Override
@@ -49,12 +49,13 @@ public class AstrixServiceRegistryClientImpl implements AstrixServiceRegistryCli
 	}
 
 	@Override
-	public <T> void register(Class<T> type, AstrixServiceProperties properties, long lease) {
-		properties.setProperty(AstrixServiceProperties.SUBSYSTEM, this.subsystem);
-		AstrixServiceRegistryEntry entry = new AstrixServiceRegistryEntry();
-		entry.setServiceProperties(properties.getProperties());
-		entry.setServiceBeanType(type.getName());
-		this.serviceRegistry.register(entry, lease);
+	public <T> List<AstrixServiceProperties> list(AstrixBeanKey<T> beanKey) {
+		List<AstrixServiceRegistryEntry> registeresServices = serviceRegistry.listServices(beanKey.getBeanType().getName(), beanKey.getQualifier());
+		List<AstrixServiceProperties> result = new ArrayList<>(registeresServices.size());
+		for (AstrixServiceRegistryEntry entry : registeresServices) {
+			result.add(new AstrixServiceProperties(entry.getServiceProperties()));
+		}
+		return result;
 	}
 
 }

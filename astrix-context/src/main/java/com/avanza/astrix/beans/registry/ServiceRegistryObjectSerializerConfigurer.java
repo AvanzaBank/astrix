@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.beans.registry;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
@@ -26,7 +26,7 @@ public class ServiceRegistryObjectSerializerConfigurer implements Jackson1Object
 
 	@Override
 	public List<? extends AstrixJsonApiMigration> apiMigrations() {
-		return Collections.emptyList();
+		return Arrays.asList(new ServiceRegistryV1ApiMigration());
 	}
 	
 	@Override

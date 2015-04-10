@@ -18,6 +18,7 @@ package com.avanza.astrix.context;
 import java.lang.reflect.Method;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.provider.core.AstrixDynamicQualifier;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
@@ -45,6 +46,10 @@ public class AstrixPublishedBeanDefinitionMethod {
 			return method.getAnnotation(AstrixQualifier.class).value();
 		}
 		return null;
+	}
+	
+	public boolean isDynamicQualified() {
+		return method.isAnnotationPresent(AstrixDynamicQualifier.class);
 	}
 
 	public boolean isService() {

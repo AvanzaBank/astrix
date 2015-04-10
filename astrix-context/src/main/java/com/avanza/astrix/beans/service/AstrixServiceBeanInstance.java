@@ -32,6 +32,7 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
@@ -122,8 +123,8 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 			AstrixServiceProperties serviceProperties = serviceLookup.lookup(getBeanKey());
 			if (serviceProperties == null) {
 				log.info(String.format(
-					"Failed to discover service bean. ServiceLookup returned null. bean=%s astrixBeanId=%s", 
-						getBeanKey(), id));
+					"Failed to discover service bean. ServiceLookup (%s) returned null. bean=%s astrixBeanId=%s", 
+						serviceLookup.toString(), getBeanKey(), id));
 				return;
 			}
 			bind(serviceProperties);

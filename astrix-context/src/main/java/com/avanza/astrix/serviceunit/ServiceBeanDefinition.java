@@ -27,20 +27,43 @@ public class ServiceBeanDefinition {
 	private AstrixBeanKey<?> beanKey;
 	private String componentName;
 	private boolean usesServiceRegistry;
+	private boolean alwaysActive;
 	private ServiceVersioningContext versioningContext;
 	
-
 	public ServiceBeanDefinition(AstrixBeanKey<?> beanKey,
-									   ServiceVersioningContext versioningContext,
-									   boolean usesServiceRegistry,
-									   String componentName) {
-		super();
+								 ServiceVersioningContext versioningContext,
+							     boolean usesServiceRegistry,
+								 String componentName) {
 		this.beanKey = beanKey;
 		this.versioningContext = versioningContext;
 		this.usesServiceRegistry = usesServiceRegistry;
+		this.alwaysActive = false;
+		this.componentName = componentName;
+	}
+	
+	public ServiceBeanDefinition(AstrixBeanKey<?> beanKey,
+			 ServiceVersioningContext versioningContext,
+		     boolean usesServiceRegistry,
+		     boolean alwaysActive,
+			 String componentName) {
+		this.beanKey = beanKey;
+		this.versioningContext = versioningContext;
+		this.usesServiceRegistry = usesServiceRegistry;
+		this.alwaysActive = alwaysActive;
 		this.componentName = componentName;
 	}
 
+	/**
+	 * Determines whether the given service will be in ACTIVE state, event when the current
+	 * application is in INACTIVE state, typically used to allow exporting system-services in
+	 * inactive state.
+	 * 
+	 * @return
+	 */
+	public boolean isAlwaysActive() {
+		return alwaysActive;
+	}
+	
 	public AstrixBeanKey<?> getBeanKey() {
 		return this.beanKey;
 	}

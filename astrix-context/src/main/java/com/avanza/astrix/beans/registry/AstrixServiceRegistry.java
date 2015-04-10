@@ -19,14 +19,21 @@ import java.util.List;
 
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixRouting;
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public interface AstrixServiceRegistry {
 	
 	<T> AstrixServiceRegistryEntry lookup(@AstrixRouting String type, String qualifier);
 	
 	<T> void register(AstrixServiceRegistryEntry properties, long lease);
 	
+	<T> void deregister(AstrixServiceRegistryEntry properties);
+	
 	@AstrixBroadcast
 	List<AstrixServiceRegistryEntry> listServices();
 	
+	List<AstrixServiceRegistryEntry> listServices(@AstrixRouting String type, String qualifier);	
 }

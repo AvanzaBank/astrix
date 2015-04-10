@@ -18,26 +18,27 @@ package com.avanza.astrix.service.registry.client;
 import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationResult;
 import static org.junit.Assert.fail;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.BasicConfigurator;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
+import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
-import com.avanza.astrix.provider.core.AstrixConfigLookup;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
@@ -47,22 +48,26 @@ import com.avanza.astrix.test.util.Supplier;
 
 public class AstrixServiceRegistryLeaseManagerTest {
 
-	private AstrixServiceRegistryClient serviceRegistryClient;
+	private ServiceRegistryExporterClient serviceRegistryExporterClient;
 	private AstrixContext context;
-	private CorruptableServiceRegistry serviceRegistry;
+	private CorruptableServiceRegistry serviceRegistry = new CorruptableServiceRegistry();
 	private TestService testService;
+	
+	static {
+		BasicConfigurator.configure();
+	}
 	
 	@Before
 	public void setup() {
-		serviceRegistry = new CorruptableServiceRegistry();
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 1); // No Sleep between attempts
-		astrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
+		astrixConfigurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 100); // No Sleep between attempts
+		astrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixConfigurer.registerApiProvider(TestProvider.class);
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		astrixConfigurer.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		context = astrixConfigurer.configure();
-		serviceRegistryClient = context.getBean(AstrixServiceRegistryClient.class);
+		serviceRegistryExporterClient = new ServiceRegistryExporterClient(serviceRegistry, "foo", "bar");
 		
 		TestService impl = new TestService() {
 			@Override
@@ -71,7 +76,7 @@ public class AstrixServiceRegistryLeaseManagerTest {
 			}
 		};
 		String id = AstrixDirectComponent.register(TestService.class, impl);
-		serviceRegistryClient.register(TestService.class, AstrixDirectComponent.getServiceProperties(id), -1);
+		serviceRegistryExporterClient.register(TestService.class, AstrixDirectComponent.getServiceProperties(id), -1);
 
 		testService = context.getBean(TestService.class);
 	}
@@ -88,13 +93,14 @@ public class AstrixServiceRegistryLeaseManagerTest {
 		
 		// Simulate failure in service registry invocation
 		serviceRegistry.exceptionsToThrow = new CountDownLatch(2);
+		
 		boolean exceptionsThrown = serviceRegistry.exceptionsToThrow.await(1, TimeUnit.SECONDS);
 		if (!exceptionsThrown) {
-			fail("Expected lease manager to invoke service registry at least two times");
+			fail("Expected lease manager to invoke service registry at least two times: " + serviceRegistry.exceptionsToThrow.getCount());
 		}
 		
 		// Service registry available again. Register new provider for 
-		// TestService and verify that client is rebound to new provider 
+		// TestService and verify that client binds to new provider 
 		TestService impl = new TestService() {
 			@Override
 			public String call() {
@@ -102,7 +108,7 @@ public class AstrixServiceRegistryLeaseManagerTest {
 			}
 		};
 		String id = AstrixDirectComponent.register(TestService.class, impl);
-		serviceRegistryClient.register(TestService.class, AstrixDirectComponent.getServiceProperties(id), -1);
+		serviceRegistryExporterClient.register(TestService.class, AstrixDirectComponent.getServiceProperties(id), -1);
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
 			public String get() {
@@ -122,6 +128,13 @@ public class AstrixServiceRegistryLeaseManagerTest {
 		public <T> AstrixServiceRegistryEntry lookup(String type, String qualifier) {
 			throwIfCorrupt();
 			return super.lookup(type, qualifier);
+		}
+		
+		@Override
+		public List<AstrixServiceRegistryEntry> listServices(String type,
+				String qualifier) {
+			throwIfCorrupt();
+			return super.listServices(type, qualifier);
 		}
 		
 		@Override

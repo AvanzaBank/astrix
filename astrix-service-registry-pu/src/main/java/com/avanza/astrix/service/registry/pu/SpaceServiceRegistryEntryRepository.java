@@ -24,40 +24,30 @@ import java.util.Map;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 import com.avanza.astrix.beans.registry.ServiceKey;
+import com.avanza.astrix.beans.registry.ServiceProviderKey;
+import com.avanza.astrix.beans.registry.ServiceRegistryEntryRepository;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
-import com.avanza.astrix.provider.core.AstrixServiceExport;
 
-@AstrixServiceExport(AstrixServiceRegistry.class)
-public class AstrixServiceRegistryImpl implements AstrixServiceRegistry {
+public class SpaceServiceRegistryEntryRepository implements ServiceRegistryEntryRepository {
 	
 	private final GigaSpace gigaSpace;
 	
 	@Autowired
-	public AstrixServiceRegistryImpl(GigaSpace gigaSpace) {
+	public SpaceServiceRegistryEntryRepository(GigaSpace gigaSpace) {
 		this.gigaSpace = gigaSpace;
 	}
 
 	@Override
-	public <T> AstrixServiceRegistryEntry lookup(String type, String qualifier) {
-		SpaceServiceRegistryEntry entry = gigaSpace.readById(SpaceServiceRegistryEntry.class, new ServiceKey(type, qualifier));
-		if (entry == null) {
-			return null;
-		}
-		AstrixServiceRegistryEntry result = new AstrixServiceRegistryEntry();
-		result.setServiceBeanType(type);
-		result.setServiceProperties(entry.getProperties());
-		result.setServiceMetadata(result.getServiceMetadata());
-		return result;
-	}
-
-	@Override
-	public <T> void register(AstrixServiceRegistryEntry entry, long lease) {
+	public void insertOrUpdate(AstrixServiceRegistryEntry entry, long lease) {
 		SpaceServiceRegistryEntry spaceEntry = new SpaceServiceRegistryEntry();
 		spaceEntry.setApiType(entry.getServiceBeanType());
-		spaceEntry.setServiceKey(new ServiceKey(entry.getServiceBeanType(), entry.getServiceProperties().get(AstrixServiceProperties.QUALIFIER)));
+		ServiceKey serviceKey = new ServiceKey(entry.getServiceBeanType(), entry.getServiceProperties().get(AstrixServiceProperties.QUALIFIER));
+		spaceEntry.setServiceKey(serviceKey);
+		String applicationInstanceId = entry.getServiceProperties().get(AstrixServiceProperties.APPLICATION_INSTANCE_ID);
+		ServiceProviderKey serviceProviderKey = ServiceProviderKey.create(serviceKey, applicationInstanceId);
+		spaceEntry.setServiceProviderKey(serviceProviderKey);
 		spaceEntry.setProperties(entry.getServiceProperties());
 		Map<String, String> metadata = new HashMap<>();
 		Date now = new Date();
@@ -68,7 +58,7 @@ public class AstrixServiceRegistryImpl implements AstrixServiceRegistry {
 	}
 
 	@Override
-	public List<AstrixServiceRegistryEntry> listServices() {
+	public List<AstrixServiceRegistryEntry> findAll() {
 		SpaceServiceRegistryEntry[] entries = gigaSpace.readMultiple(SpaceServiceRegistryEntry.template());
 		List<AstrixServiceRegistryEntry> result = new ArrayList<>();
 		for (SpaceServiceRegistryEntry spaceEntry : entries) {
@@ -80,5 +70,27 @@ public class AstrixServiceRegistryImpl implements AstrixServiceRegistry {
 		}
 		return result;
 	}
+	
+	@Override
+	public List<AstrixServiceRegistryEntry> findByServiceKey(ServiceKey serviceKey) {
+		SpaceServiceRegistryEntry template = SpaceServiceRegistryEntry.template();
+		template.setServiceKey(serviceKey);
+		SpaceServiceRegistryEntry[] entries = gigaSpace.readMultiple(template);
+		List<AstrixServiceRegistryEntry> result = new ArrayList<>(entries.length);
+		for (SpaceServiceRegistryEntry spaceEntry : entries) {
+			AstrixServiceRegistryEntry entry = new AstrixServiceRegistryEntry();
+			entry.setServiceBeanType(spaceEntry.getApiType());
+			entry.setServiceProperties(spaceEntry.getProperties());
+			entry.setServiceMetadata(spaceEntry.getServiceMetadata());
+			result.add(entry);
+		}
+		return result;
+	}
+
+	@Override
+	public void remove(ServiceProviderKey serviceProviderKey) {
+		gigaSpace.takeById(SpaceServiceRegistryEntry.class, serviceProviderKey);
+	}
+
 
 }

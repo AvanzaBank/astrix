@@ -27,18 +27,25 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class SimpleAstrixFactoryBeanRegistry implements AstrixFactoryBeanRegistry {
 	
-	private final ConcurrentMap<AstrixBeanKey<?>, AstrixFactoryBean<?>> factoryByBeanKey = new ConcurrentHashMap<>();
+	private final ConcurrentMap<AstrixBeanKey<?>, StandardFactoryBean<?>> factoryByBeanKey = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Class<?>, DynamicFactoryBean<?>> dynamicFactoryByBeanType = new ConcurrentHashMap<>();
 
+	
 	/* (non-Javadoc)
 	 * @see com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry#getFactoryBean(com.avanza.astrix.beans.factory.AstrixBeanKey)
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> AstrixFactoryBean<T> getFactoryBean(AstrixBeanKey<T>  beanKey) {
-		if (!hasBeanFactoryFor(beanKey)) {
-			throw new MissingBeanProviderException(beanKey);
+	public <T> StandardFactoryBean<T> getFactoryBean(AstrixBeanKey<T>  beanKey) {
+		StandardFactoryBean<T> factoryBean = (StandardFactoryBean<T>) this.factoryByBeanKey.get(beanKey);
+		if (factoryBean != null) {
+			return factoryBean;
 		}
-		return (AstrixFactoryBean<T>) this.factoryByBeanKey.get(beanKey);
+		DynamicFactoryBean<T> dynamicFactoryBean = (DynamicFactoryBean<T>) this.dynamicFactoryByBeanType.get(beanKey.getBeanType());
+		if (dynamicFactoryBean != null) {
+			return new SynthesizedFactoryBean<T>(dynamicFactoryBean, beanKey);
+		}
+		throw new MissingBeanProviderException(beanKey);
 	}
 	
 	@Override
@@ -52,20 +59,57 @@ public class SimpleAstrixFactoryBeanRegistry implements AstrixFactoryBeanRegistr
 		return result;
 	}
 	
-	public <T> void registerFactory(AstrixFactoryBean<T> factory) {
-		AstrixFactoryBean<?> duplicateFactory = factoryByBeanKey.putIfAbsent(factory.getBeanKey(), factory);
+	public <T> void registerFactory(FactoryBean<T> factory) {
+		if (factory instanceof DynamicFactoryBean) {
+			registerFactory((DynamicFactoryBean<T>) factory);
+			return;
+		}
+		if (factory instanceof StandardFactoryBean) {
+			registerFactory((StandardFactoryBean<T>) factory);
+			return;
+		}
+		throw new IllegalArgumentException("Unknown FactoryBean type: " + factory);
+	}
+	
+	
+	public <T> void registerFactory(StandardFactoryBean<T> factory) {
+		StandardFactoryBean<?> duplicateFactory = factoryByBeanKey.putIfAbsent(factory.getBeanKey(), factory);
 		if (duplicateFactory != null) {
 			throw new MultipleBeanFactoryException(factory.getBeanKey());
 		}
 	}
-
-	private boolean hasBeanFactoryFor(AstrixBeanKey<? extends Object> beanKey) {
-		return this.factoryByBeanKey.containsKey(beanKey);
+	
+	public <T> void registerFactory(DynamicFactoryBean<T> dynamicFactoryBean) {
+		DynamicFactoryBean<?> duplicateFactory = dynamicFactoryByBeanType.putIfAbsent(dynamicFactoryBean.getType(), dynamicFactoryBean);
+		if (duplicateFactory != null) {
+			throw new MultipleBeanFactoryException(dynamicFactoryBean.getType());
+		}
 	}
 
 	@Override
 	public <T> AstrixBeanKey<? extends T> resolveBean(AstrixBeanKey<T> beanKey) {
 		return beanKey;
 	}
+	
+	private static class SynthesizedFactoryBean<T> implements StandardFactoryBean<T> {
+		private final DynamicFactoryBean<T> factory;
+		private final AstrixBeanKey<T> key;
+		
+		public SynthesizedFactoryBean(DynamicFactoryBean<T> factory,
+				AstrixBeanKey<T> key) {
+			this.factory = factory;
+			this.key = key;
+		}
+		@Override
+		public T create(AstrixBeans beans) {
+			return factory.create(key);
+		}
+		@Override
+		public AstrixBeanKey<T> getBeanKey() {
+			return key;
+		}
+	}
+
+	
 	
 }

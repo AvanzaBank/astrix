@@ -16,27 +16,32 @@
 package com.avanza.astrix.serviceunit;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.registry.ServiceState;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 
 class ServiceRegistryExportedService {
 	
-	private AstrixBeanKey<?> exportedService;
-	private Class<?> asyncService;
-	private AstrixServiceComponent serviceComponent;
+	private final Class<?> asyncService;
+	private final AstrixServiceComponent serviceComponent;
+	private volatile String serviceState;
+	private final ServiceBeanDefinition serviceBeanDefinition;
 	
-	public ServiceRegistryExportedService(AstrixServiceComponent serviceComponent, AstrixBeanKey<?> exportedServiceBeanKey) {
-		if (!serviceComponent.canBindType(exportedServiceBeanKey.getBeanType())) {
-			throw new UnsupportedTargetTypeException(serviceComponent.getName(), exportedServiceBeanKey.getBeanType());
+	public ServiceRegistryExportedService(AstrixServiceComponent serviceComponent, ServiceBeanDefinition serviceBeanDefinition, String serviceState) {
+		this.serviceBeanDefinition = serviceBeanDefinition;
+		this.serviceState = serviceState;
+		if (!serviceComponent.canBindType(serviceBeanDefinition.getBeanType())) {
+			throw new UnsupportedTargetTypeException(serviceComponent.getName(), serviceBeanDefinition.getBeanType());
 		}
 		this.serviceComponent = serviceComponent;
-		this.exportedService = exportedServiceBeanKey;
 		if (serviceComponent.supportsAsyncApis()) {
-			this.asyncService = loadInterfaceIfExists(exportedServiceBeanKey.getBeanType().getName() + "Async");
+			this.asyncService = loadInterfaceIfExists(serviceBeanDefinition.getBeanType().getName() + "Async");
+		} else {
+			this.asyncService = null;
 		}
 	}
-
+	
 	private Class<?> loadInterfaceIfExists(String interfaceName) {
 		try {
 			Class<?> c = Class.forName(interfaceName);
@@ -54,17 +59,26 @@ class ServiceRegistryExportedService {
 	}
 
 	public AstrixServiceProperties exportServiceProperties() {
-		AstrixServiceProperties serviceProperties = serviceComponent.createServiceProperties(exportedService.getBeanType());
-		serviceProperties.setApi(exportedService.getBeanType());
-		serviceProperties.setQualifier(exportedService.getQualifier());
+		AstrixServiceProperties serviceProperties = serviceComponent.createServiceProperties(serviceBeanDefinition.getBeanType());
+		serviceProperties.getProperties().put(AstrixServiceProperties.SERVICE_STATE, getServiceState());
+		serviceProperties.setApi(serviceBeanDefinition.getBeanKey().getBeanType());
+		serviceProperties.setQualifier(serviceBeanDefinition.getBeanKey().getQualifier());
 		serviceProperties.setComponent(serviceComponent.getName());
 		return serviceProperties;
 	}
-	
+
 	public AstrixServiceProperties exportAsyncServiceProperties() {
 		AstrixServiceProperties serviceProperties = exportServiceProperties();
 		serviceProperties.setApi(asyncService);
 		return serviceProperties;
+	}
+	
+	private String getServiceState() {
+		return serviceBeanDefinition.isAlwaysActive() ? ServiceState.ACTIVE : serviceState;
+	}
+
+	public void setState(String serviceState) {
+		this.serviceState = serviceState;
 	}
 
 }

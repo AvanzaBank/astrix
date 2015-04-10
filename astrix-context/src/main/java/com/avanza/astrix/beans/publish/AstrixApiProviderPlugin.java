@@ -18,12 +18,12 @@ package com.avanza.astrix.beans.publish;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import com.avanza.astrix.beans.factory.AstrixFactoryBean;
+import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 
 
 /**
- * An AstrixApiProviderPlugin is responsible for creating AstrixFactoryBean for
+ * An AstrixApiProviderPlugin is responsible for creating StandardFactoryBean for
  * all parts of a given "type" of api. By "type" in this context, we don't mean the
  * different api's that are hooked into Astrix for consumption, but rather a mechanism
  * for an api-provider to publish the different part's of the api, thereby allowing it
@@ -42,7 +42,7 @@ import com.avanza.astrix.beans.service.AstrixServiceComponent;
  */
 public interface AstrixApiProviderPlugin {
 	
-	List<AstrixFactoryBean<?>> createFactoryBeans(AstrixApiProviderClass apiProviderClass);
+	List<FactoryBean<?>> createFactoryBeans(AstrixApiProviderClass apiProviderClass);
 	
 	Class<? extends Annotation> getProviderAnnotationType();
 	

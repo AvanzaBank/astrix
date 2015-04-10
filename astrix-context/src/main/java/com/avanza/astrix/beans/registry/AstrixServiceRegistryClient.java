@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.beans.registry;
 
+import java.util.List;
+
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 
@@ -22,10 +24,12 @@ import com.avanza.astrix.beans.service.AstrixServiceProperties;
 
 public interface AstrixServiceRegistryClient {
 	
+	// TODO: remove this interface?
+	
 	<T> AstrixServiceProperties lookup(Class<T> type);
 	
 	<T> AstrixServiceProperties lookup(AstrixBeanKey<T> beanKey);
-	
-	<T> void register(Class<T> type, AstrixServiceProperties properties, long lease);
+
+	<T> List<AstrixServiceProperties> list(AstrixBeanKey<T> beanKey);
 	
 }

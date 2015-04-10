@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.service;
+package com.avanza.astrix.provider.core;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+
 /**
- * Thrown when the service-metadata for a published service is not
- * correct, for instance when required information is missing. 
- * 
  * @author Elias Lindholm (elilin)
- *
  */
-public class IllegalServiceMetadataException extends RuntimeException {
-
-	private static final long serialVersionUID = 1L;
-	
-	public IllegalServiceMetadataException(String msg) {
-		super(msg);
-	}
-
+@Target(value = ElementType.METHOD)
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface AstrixDynamicQualifier {
 }

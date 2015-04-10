@@ -38,7 +38,7 @@ public class AstrixBeanInstance<T> {
 		dependencies = transitiveDependencies;
 	}
 	
-	static <T> AstrixBeanInstance<T> create(AstrixBeans factoryBeanContext, AstrixFactoryBean<T> factory) {
+	static <T> AstrixBeanInstance<T> create(AstrixBeans factoryBeanContext, StandardFactoryBean<T> factory) {
 		TransitiveDependencyCollector dependencyCollectingContext = new TransitiveDependencyCollector(factoryBeanContext);
 		T instance = factory.create(dependencyCollectingContext);
 		return new AstrixBeanInstance<T>(factory.getBeanKey(), instance, dependencyCollectingContext.getTransitiveDependencies());

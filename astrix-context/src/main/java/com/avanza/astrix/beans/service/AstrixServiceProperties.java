@@ -33,6 +33,8 @@ public final class AstrixServiceProperties implements Serializable {
 	public static final String API = "_api";
 	public static final String COMPONENT = "_component";
 	public static final String SUBSYSTEM = "_subsystem";
+	public static final String APPLICATION_INSTANCE_ID = "_applicationInstanceId";
+	public static final String SERVICE_STATE = "_serviceState"; 
 	
 	private final Map<String, String> properties = new HashMap<>();
 	

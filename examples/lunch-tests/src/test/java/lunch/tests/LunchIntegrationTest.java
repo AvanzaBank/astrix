@@ -19,7 +19,6 @@ import static org.junit.Assert.assertNotNull;
 import lunch.api.LunchRestaurant;
 import lunch.api.LunchService;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.ClassRule;
@@ -41,8 +40,6 @@ public class LunchIntegrationTest {
 												   .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
 												   .configure();
 	static {
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.INFO);
 		Logger.getLogger("com.avanza").setLevel(Level.DEBUG);
 	}
 	

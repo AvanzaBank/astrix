@@ -51,5 +51,5 @@ public final class DynamicStringProperty implements DynamicProperty<String> {
 		this.value = value;
 		this.listener.propertyChanged(value);
 	}
-
+	
 }

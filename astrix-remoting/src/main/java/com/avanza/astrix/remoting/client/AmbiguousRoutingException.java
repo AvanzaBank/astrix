@@ -15,12 +15,14 @@
  */
 package com.avanza.astrix.remoting.client;
 
+import com.avanza.astrix.core.IllegalServiceMetadataException;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AmbiguousRoutingException extends RuntimeException {
+public class AmbiguousRoutingException extends IllegalServiceMetadataException {
 
 	private static final long serialVersionUID = 1L;
 

@@ -21,19 +21,25 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.inject.AstrixInjector;
+import com.avanza.astrix.beans.registry.ServiceState;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.context.AstrixConfigAware;
 
-public class ServiceRegistryExporter {
+public class ServiceRegistryExporter implements AstrixConfigAware {
 	
 	private static final Logger log = LoggerFactory.getLogger(ServiceRegistryExporter.class);
 	private final List<ServiceRegistryExportedService> exportedServices = new CopyOnWriteArrayList<>();
 	private AstrixInjector injector;
+	private DynamicConfig config;
 	
-	public <T> void addExportedService(AstrixBeanKey<T> beanKey, AstrixServiceComponent serviceComponent) {
-		exportedServices.add(new ServiceRegistryExportedService(serviceComponent, beanKey));
+	public <T> void addExportedService(ServiceBeanDefinition serviceBeanDefinition, AstrixServiceComponent serviceComponent) {
+		String serviceState = "INACTIVE".equals(AstrixSettings.INITIAL_SERVICE_STATE.getFrom(config).get()) ? ServiceState.INACTIVE : ServiceState.ACTIVE;
+		exportedServices.add(new ServiceRegistryExportedService(serviceComponent, serviceBeanDefinition, serviceState));
 	}
 	
 	@AstrixInject
@@ -41,16 +47,32 @@ public class ServiceRegistryExporter {
 		this.injector = injector;
 	}
 	
+	@Override
+	public void setConfig(DynamicConfig config) {
+		this.config = config;
+	}
+	
 	public void startPublishServices() {
 		if (exportedServices.isEmpty()) {
 			log.info("No ServiceExporters configured. No services will be published to service registry.");
 			return;
 		}
-		ServiceRegistryExporterWorker exporterWorker = injector.getBean(ServiceRegistryExporterWorker.class); 
+		ServiceRegistryExporterWorker exporterWorker = getExporterWorker(); 
 		for (ServiceRegistryExportedService serviceProperties : this.exportedServices) {
 			exporterWorker.addServiceBuilder(serviceProperties);
 		}
 		exporterWorker.startServiceExporter();
 	}
 	
+	public void setServiceState(String serviceState) {
+		for (ServiceRegistryExportedService serviceProperties : this.exportedServices) {
+			serviceProperties.setState(serviceState);
+		}
+		getExporterWorker().triggerServiceExport();
+	}
+	
+	private ServiceRegistryExporterWorker getExporterWorker() {
+		return injector.getBean(ServiceRegistryExporterWorker.class);
+	}
+
 }

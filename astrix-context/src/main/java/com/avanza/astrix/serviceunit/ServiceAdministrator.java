@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.client;
+package com.avanza.astrix.serviceunit;
 
-import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
-import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
-import com.avanza.astrix.provider.core.AstrixApiProvider;
-import com.avanza.astrix.provider.core.Library;
+import com.avanza.astrix.beans.registry.ServiceState;
+import com.avanza.astrix.core.AstrixBroadcast;
 
-@AstrixApiProvider
-public class InMemoryServiceRegistryLibraryProvider {
-	@Library
-	public AstrixServiceRegistry create() {
-		return new InMemoryServiceRegistry();
-	}
+public interface ServiceAdministrator {
+
+	/**
+	 * Sets the serviceState for all services provided by the target
+	 * application to a given state, see {@link ServiceState}.
+	 * 
+	 * @param serviceState
+	 */
+	@AstrixBroadcast
+	void setServiceState(String serviceState);
+	
 }
