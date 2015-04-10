@@ -22,7 +22,7 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceBeanDefinition {
+public class ServiceBeanDefinition {
 	
 	private AstrixBeanKey<?> beanKey;
 	private String componentName;
@@ -30,7 +30,7 @@ public class AstrixServiceBeanDefinition {
 	private ServiceVersioningContext versioningContext;
 	
 
-	public AstrixServiceBeanDefinition(AstrixBeanKey<?> beanKey,
+	public ServiceBeanDefinition(AstrixBeanKey<?> beanKey,
 									   ServiceVersioningContext versioningContext,
 									   boolean usesServiceRegistry,
 									   String componentName) {

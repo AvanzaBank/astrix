@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.server;
+package com.avanza.astrix.serviceunit;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -39,23 +39,23 @@ import com.avanza.astrix.core.ServiceUnavailableException;
  * @author Elias Lindholm (elilin)
  * 
  */
-public class AstrixServiceRegistryExporterWorker extends Thread implements AstrixPublishedBeansAware {
+public class ServiceRegistryExporterWorker extends Thread implements AstrixPublishedBeansAware {
 	
-	private List<AstrixServicePropertiesBuilderHolder> serviceBuilders = new CopyOnWriteArrayList<>();
+	private List<ServiceRegistryExportedService> exportedServices = new CopyOnWriteArrayList<>();
 	private AstrixServiceRegistryClient serviceRegistryClient;
-	private final Logger log = LoggerFactory.getLogger(AstrixServiceRegistryExporterWorker.class);
+	private final Logger log = LoggerFactory.getLogger(ServiceRegistryExporterWorker.class);
 	private final DynamicLongProperty exportIntervallMillis;		  
 	private final DynamicLongProperty serviceLeaseTimeMillis;
 	private final DynamicLongProperty retryIntervallMillis;
 
-	public AstrixServiceRegistryExporterWorker(DynamicConfig config) {
+	public ServiceRegistryExporterWorker(DynamicConfig config) {
 		this.exportIntervallMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 30_000L);
 		this.retryIntervallMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 5_000L);
 		this.serviceLeaseTimeMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
 	}
 	
 	public void startServiceExporter() {
-		if (serviceBuilders.isEmpty()) {
+		if (exportedServices.isEmpty()) {
 			log.info("No ServiceExporters configured. No services will be published to service registry");
 			return;
 		}
@@ -89,12 +89,12 @@ public class AstrixServiceRegistryExporterWorker extends Thread implements Astri
 	}
 
 	private void exportProvidedServcies() {
-		for (AstrixServicePropertiesBuilderHolder serviceBuilder : serviceBuilders) {
-			AstrixServiceProperties serviceProperties = serviceBuilder.exportServiceProperties();
+		for (ServiceRegistryExportedService exportedService : exportedServices) {
+			AstrixServiceProperties serviceProperties = exportedService.exportServiceProperties();
 			serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());
 			log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
-			if (serviceBuilder.exportsAsyncApi()) {
-				serviceProperties = serviceBuilder.exportAsyncServiceProperties();
+			if (exportedService.exportsAsyncApi()) {
+				serviceProperties = exportedService.exportAsyncServiceProperties();
 				serviceRegistryClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());
 				log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			}
@@ -102,8 +102,8 @@ public class AstrixServiceRegistryExporterWorker extends Thread implements Astri
 	}
 	
 	public void addServiceBuilder(
-			AstrixServicePropertiesBuilderHolder astrixServicePropertiesBuilderHolder) {
-		this.serviceBuilders.add(astrixServicePropertiesBuilderHolder);
+			ServiceRegistryExportedService serviceRegistryExportedService) {
+		this.exportedServices.add(serviceRegistryExportedService);
 	}
 
 	@Override

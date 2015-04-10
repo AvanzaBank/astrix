@@ -13,31 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.server;
+package com.avanza.astrix.serviceunit;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.kohsuke.MetaInfServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.inject.AstrixInjector;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryPlugin;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 
-@MetaInfServices(AstrixServiceRegistryPlugin.class)
-public class AstrixServiceRegistryPluginImpl implements AstrixServiceRegistryPlugin {
+public class ServiceRegistryExporter {
 	
-	private static final Logger log = LoggerFactory.getLogger(AstrixServiceRegistryPluginImpl.class);
-	private final List<AstrixServicePropertiesBuilderHolder> serviceBuilders = new CopyOnWriteArrayList<>();
+	private static final Logger log = LoggerFactory.getLogger(ServiceRegistryExporter.class);
+	private final List<ServiceRegistryExportedService> exportedServices = new CopyOnWriteArrayList<>();
 	private AstrixInjector injector;
 	
-	@Override
-	public <T> void addProvider(AstrixBeanKey<T> beanKey, AstrixServiceComponent serviceComponent) {
-		serviceBuilders.add(new AstrixServicePropertiesBuilderHolder(serviceComponent, beanKey));
+	public <T> void addExportedService(AstrixBeanKey<T> beanKey, AstrixServiceComponent serviceComponent) {
+		exportedServices.add(new ServiceRegistryExportedService(serviceComponent, beanKey));
 	}
 	
 	@AstrixInject
@@ -45,14 +41,13 @@ public class AstrixServiceRegistryPluginImpl implements AstrixServiceRegistryPlu
 		this.injector = injector;
 	}
 	
-	@Override
 	public void startPublishServices() {
-		if (serviceBuilders.isEmpty()) {
+		if (exportedServices.isEmpty()) {
 			log.info("No ServiceExporters configured. No services will be published to service registry.");
 			return;
 		}
-		AstrixServiceRegistryExporterWorker exporterWorker = injector.getBean(AstrixServiceRegistryExporterWorker.class); 
-		for (AstrixServicePropertiesBuilderHolder serviceProperties : this.serviceBuilders) {
+		ServiceRegistryExporterWorker exporterWorker = injector.getBean(ServiceRegistryExporterWorker.class); 
+		for (ServiceRegistryExportedService serviceProperties : this.exportedServices) {
 			exporterWorker.addServiceBuilder(serviceProperties);
 		}
 		exporterWorker.startServiceExporter();

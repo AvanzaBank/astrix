@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.registry;
+package com.avanza.astrix.serviceunit;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.service.AstrixServiceComponent;
+import java.lang.annotation.Annotation;
+import java.util.List;
 
+import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
 
-public interface AstrixServiceRegistryPlugin {
-
-	<T> void addProvider(AstrixBeanKey<T> beanKey, AstrixServiceComponent serviceComponent);
+public interface ServiceProviderPlugin {
 	
-	void startPublishServices();
+	List<ServiceBeanDefinition> getProvidedServices(AstrixApiProviderClass descriptor);
+	
+	Class<? extends Annotation> getProviderAnnotationType();
 
 }

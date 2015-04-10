@@ -24,29 +24,29 @@ import java.util.concurrent.ConcurrentMap;
 
 import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
 
-public class AstrixServiceProviderPlugins {
+public class ServiceProviderPlugins {
 	
-	private final ConcurrentMap<Class<? extends Annotation>, AstrixServiceProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Class<? extends Annotation>, ServiceProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	
-	public AstrixServiceProviderPlugins(Collection<AstrixServiceProviderPlugin> apiProviderPlugins) {
-		for (AstrixServiceProviderPlugin plugin : apiProviderPlugins) {
-			AstrixServiceProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
+	public ServiceProviderPlugins(Collection<ServiceProviderPlugin> apiProviderPlugins) {
+		for (ServiceProviderPlugin plugin : apiProviderPlugins) {
+			ServiceProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
-				throw new IllegalArgumentException(String.format("Multiple AstrixServiceProviderPlugin's found for providerAnnotationType=%s. p1=%s p2=%s", 
+				throw new IllegalArgumentException(String.format("Multiple ServiceProviderPlugin's found for providerAnnotationType=%s. p1=%s p2=%s", 
 						plugin.getProviderAnnotationType().getName(), plugin.getClass().getName(), previous.getClass().getName()));
 			}
 		}
 	}
 	
-	public List<AstrixServiceBeanDefinition> getExportedServices(AstrixApiProviderClass apiProvider) {
-		AstrixServiceProviderPlugin apiProviderPlugin = getProviderPlugin(apiProvider);
-		List<AstrixServiceBeanDefinition> result = new ArrayList<>();
+	public List<ServiceBeanDefinition> getExportedServices(AstrixApiProviderClass apiProvider) {
+		ServiceProviderPlugin apiProviderPlugin = getProviderPlugin(apiProvider);
+		List<ServiceBeanDefinition> result = new ArrayList<>();
 		result.addAll(apiProviderPlugin.getProvidedServices(apiProvider));
 		return result;
 	}
 	
-	private AstrixServiceProviderPlugin getProviderPlugin(AstrixApiProviderClass apiProvider) {
-		for (AstrixServiceProviderPlugin plugin : pluginByAnnotationType.values()) {
+	private ServiceProviderPlugin getProviderPlugin(AstrixApiProviderClass apiProvider) {
+		for (ServiceProviderPlugin plugin : pluginByAnnotationType.values()) {
 			if (apiProvider.isAnnotationPresent(plugin.getProviderAnnotationType())) {
 				return plugin;
 			}

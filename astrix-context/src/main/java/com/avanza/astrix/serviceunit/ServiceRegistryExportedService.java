@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.service.registry.server;
+package com.avanza.astrix.serviceunit;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 
-class AstrixServicePropertiesBuilderHolder {
+class ServiceRegistryExportedService {
 	
 	private AstrixBeanKey<?> exportedService;
 	private Class<?> asyncService;
 	private AstrixServiceComponent serviceComponent;
 	
-	public AstrixServicePropertiesBuilderHolder(AstrixServiceComponent serviceComponent, AstrixBeanKey<?> exportedServiceBeanKey) {
+	public ServiceRegistryExportedService(AstrixServiceComponent serviceComponent, AstrixBeanKey<?> exportedServiceBeanKey) {
 		this.serviceComponent = serviceComponent;
 		this.exportedService = exportedServiceBeanKey;
 		if (serviceComponent.supportsAsyncApis()) {

@@ -59,7 +59,7 @@ public class AstrixSettings implements DynamicConfigSource {
 	 * 
 	 * Defaults to 30 seconds (30 000 ms)
 	 */
-	public static final String SERVICE_REGISTRY_EXPORT_INTERVAL = "AstrixServiceRegistryExporterWorker.exportIntervalMillis";
+	public static final String SERVICE_REGISTRY_EXPORT_INTERVAL = "ServiceRegistryExporterWorker.exportIntervalMillis";
 	
 	/**
 	 * When registration in the service registry fails, there is an option to wait a shorter time then the regular time 
@@ -67,9 +67,9 @@ public class AstrixSettings implements DynamicConfigSource {
 	 * 
 	 * Defaults to 5 seconds (5 000 ms)
 	 */
-	public static final String SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL = "AstrixServiceRegistryExporterWorker.retryIntervallMillis";
+	public static final String SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL = "ServiceRegistryExporterWorker.retryIntervallMillis";
 	
-	public static final String SERVICE_REGISTRY_LEASE = "AstrixServiceRegistryExporterWorker.serviceLeaseTimeMillis";
+	public static final String SERVICE_REGISTRY_LEASE = "ServiceRegistryExporterWorker.serviceLeaseTimeMillis";
 	/**
 	 * @renamed to {@link #API_PROVIDER_SCANNER_BASE_PACKAGE}  
 	 */

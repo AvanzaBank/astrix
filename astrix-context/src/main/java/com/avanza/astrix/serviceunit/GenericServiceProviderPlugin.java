@@ -37,14 +37,14 @@ import com.avanza.astrix.provider.versioning.Versioned;
  * @author Elias Lindholm
  *
  */
-@MetaInfServices(AstrixServiceProviderPlugin.class)
-public class GenericServiceProviderPlugin implements AstrixServiceProviderPlugin {
+@MetaInfServices(ServiceProviderPlugin.class)
+public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	
 	private AstrixServiceLookupFactory serviceLookupFactory;
 
 	@Override
-	public List<AstrixServiceBeanDefinition> getProvidedServices(AstrixApiProviderClass apiProvider) {
-		List<AstrixServiceBeanDefinition> result = new ArrayList<>();
+	public List<ServiceBeanDefinition> getProvidedServices(AstrixApiProviderClass apiProvider) {
+		List<ServiceBeanDefinition> result = new ArrayList<>();
 		for (Method astrixBeanDefinitionMethod : apiProvider.getProviderClass().getMethods()) {
 			AstrixPublishedBeanDefinitionMethod beanDefinition = AstrixPublishedBeanDefinitionMethod.create(astrixBeanDefinitionMethod);
 			if (!beanDefinition.isService()) {
@@ -52,7 +52,7 @@ public class GenericServiceProviderPlugin implements AstrixServiceProviderPlugin
 			}
 			boolean usesServiceRegistry = this.serviceLookupFactory.getLookupStrategy(astrixBeanDefinitionMethod).equals(AstrixServiceRegistryLookup.class);
 			ServiceVersioningContext versioningContext = createVersioningContext(apiProvider, beanDefinition);
-			result.add(new AstrixServiceBeanDefinition(beanDefinition.getBeanKey(), versioningContext, usesServiceRegistry, beanDefinition.getServiceComponentName()));
+			result.add(new ServiceBeanDefinition(beanDefinition.getBeanKey(), versioningContext, usesServiceRegistry, beanDefinition.getServiceComponentName()));
 		}
 		return result;
 	}

@@ -21,7 +21,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryPlugin;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceComponents;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
@@ -34,20 +33,20 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceExporter {
+public class ServiceExporter {
 	
 	private AstrixServiceComponents serviceComponents;
 	private AstrixApplicationDescriptor applicationDescriptor;
-	private final Collection<AstrixServiceBeanDefinition> serviceBeanDefinitions = new CopyOnWriteArrayList<>();
-	private final AstrixServiceRegistryPlugin serviceRegistryPlugin;
+	private final Collection<ServiceBeanDefinition> serviceBeanDefinitions = new CopyOnWriteArrayList<>();
+	private final ServiceRegistryExporter serviceRegistryExporter;
 	private final ConcurrentMap<Class<?>, Object> serviceProviderByType = new ConcurrentHashMap<>();
-	private final AstrixServiceProviderPlugins serviceProviderPlugins;
+	private final ServiceProviderPlugins serviceProviderPlugins;
 	
 	
 	
-	public AstrixServiceExporter(AstrixServiceComponents serviceComponents, AstrixServiceRegistryPlugin serviceRegistryPlugin, AstrixServiceProviderPlugins serviceProviderPlugins) {
+	public ServiceExporter(AstrixServiceComponents serviceComponents, ServiceRegistryExporter serviceRegistryExporter, ServiceProviderPlugins serviceProviderPlugins) {
 		this.serviceComponents = serviceComponents;
-		this.serviceRegistryPlugin = serviceRegistryPlugin;
+		this.serviceRegistryExporter = serviceRegistryExporter;
 		this.serviceProviderPlugins = serviceProviderPlugins;
 	}
 
@@ -75,7 +74,7 @@ public class AstrixServiceExporter {
 	}
 
 	public void exportProvidedServices() {
-		for (AstrixServiceBeanDefinition serviceBeanDefintion : serviceBeanDefinitions) {
+		for (ServiceBeanDefinition serviceBeanDefintion : serviceBeanDefinitions) {
 			ServiceVersioningContext versioningContext = serviceBeanDefintion.getVersioningContext();
 			AstrixServiceComponent serviceComponent = getServiceComponent(serviceBeanDefintion);
 			Object provider = null;
@@ -84,12 +83,12 @@ public class AstrixServiceExporter {
 			}
 			exportService(serviceBeanDefintion.getBeanType(), provider, versioningContext, serviceComponent);
 			if (serviceBeanDefintion.usesServiceRegistry()) {
-				serviceRegistryPlugin.addProvider(serviceBeanDefintion.getBeanKey(), serviceComponent);
+				serviceRegistryExporter.addExportedService(serviceBeanDefintion.getBeanKey(), serviceComponent);
 			}
 		}
 	}
 
-	private Object getProvider(AstrixServiceBeanDefinition serviceBeanDefintion) {
+	private Object getProvider(ServiceBeanDefinition serviceBeanDefintion) {
 		Object provider = serviceProviderByType.get(serviceBeanDefintion.getBeanKey().getBeanType());
 		if (provider == null) {
 			throw new IllegalStateException(String.format(
@@ -105,7 +104,7 @@ public class AstrixServiceExporter {
 		serviceComponent.exportService(providedApi, providedApi.cast(provider), versioningContext);
 	}
 
-	private AstrixServiceComponent getServiceComponent(AstrixServiceBeanDefinition serviceBeanDefinition) {
+	private AstrixServiceComponent getServiceComponent(ServiceBeanDefinition serviceBeanDefinition) {
 		if (serviceBeanDefinition.getComponentName() != null) {
 			return this.serviceComponents.getComponent(serviceBeanDefinition.getComponentName());
 		}

@@ -36,14 +36,13 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.core.Ordered;
 
-import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryPlugin;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
-import com.avanza.astrix.serviceunit.AstrixServiceExporter;
+import com.avanza.astrix.serviceunit.ServiceExporter;
+import com.avanza.astrix.serviceunit.ServiceRegistryExporter;
 
 /**
  * 
@@ -63,11 +62,11 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	 *    
 	 * 2. BeanPostProcessor (BPP)
 	 *  - The BPP will investigate each spring-bean in the current application and search
-	 *    for @AstrixServiceExport annotated classes and register those with the AstrixServiceExporter
+	 *    for @AstrixServiceExport annotated classes and register those with the ServiceExporter
 	 *    
 	 * 3. ApplicationListener<ContexRefreshedEvent>
 	 *  - After each spring-bean have bean created and fully initialized this class will receive a call-back
-	 *    and start exporting services using the AstrixServiceExporter.
+	 *    and start exporting services using the ServiceExporter.
 	 *    
 	 * 
 	 * Note that this class (AstrixFrameworkBean) is the only class in the framework that will recieve spring-lifecylce events.
@@ -206,10 +205,10 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		if (applicationDescriptor == null) {
 			return; // current application exports no services
 		}
-		AstrixServiceExporter serviceExporter = astrixContext.getInstance(AstrixServiceExporter.class);
+		ServiceExporter serviceExporter = astrixContext.getInstance(ServiceExporter.class);
 		serviceExporter.setServiceDescriptor(applicationDescriptor); // TODO This is a hack. Avoid setting serviceDescriptor explicitly here
 		serviceExporter.exportProvidedServices();
-		astrixContext.getPlugin(AstrixServiceRegistryPlugin.class).startPublishServices();
+		astrixContext.getInstance(ServiceRegistryExporter.class).startPublishServices();
 	}
 
 	public void setConsumedAstrixBeans(Class<?>... consumedAstrixBeans) {
