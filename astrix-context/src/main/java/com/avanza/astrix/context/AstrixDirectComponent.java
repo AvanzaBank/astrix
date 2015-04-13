@@ -81,6 +81,11 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	public String getName() {
 		return AstrixServiceComponentNames.DIRECT;
 	}
+	
+	@Override
+	public boolean canBindType(Class<?> type) {
+		return true;
+	}
 
 	public static <T> String register(Class<T> type, T provider) {
 		String id = String.valueOf(idGen.incrementAndGet());

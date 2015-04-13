@@ -73,6 +73,11 @@ public class AstrixGsRemotingComponent implements AstrixServiceComponent {
 	}
 	
 	@Override
+	public boolean canBindType(Class<?> type) {
+		return true;
+	}
+	
+	@Override
 	public <T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext) {
 		AstrixObjectSerializer objectSerializer = versioningPlugin.create(versioningContext); 
 		this.serviceActivator.register(provider, objectSerializer, providedApi);

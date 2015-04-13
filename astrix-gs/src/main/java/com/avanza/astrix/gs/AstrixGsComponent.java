@@ -22,6 +22,7 @@ import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
+import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 import com.avanza.astrix.ft.AstrixFaultTolerance;
 import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.gs.ClusteredProxyCache.GigaSpaceInstance;
@@ -46,7 +47,7 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 	@Override
 	public <T> BoundServiceBeanInstance<T> bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
 		if (!GigaSpace.class.isAssignableFrom(type)) {
-			throw new IllegalStateException("Programming error, attempted to create: " + type);
+			throw new UnsupportedTargetTypeException(getName(), type);
 		}
 		GigaSpaceInstance gigaSpaceInstance = proxyCache.getProxy(serviceProperties);
 		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
@@ -66,6 +67,10 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 		return AstrixServiceComponentNames.GS;
 	}
 	
+	@Override
+	public boolean canBindType(Class<?> type) {
+		return GigaSpace.class.equals(type);
+	}
 
 	@Override
 	public <T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext) {

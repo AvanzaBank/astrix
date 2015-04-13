@@ -18,6 +18,7 @@ package com.avanza.astrix.serviceunit;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 
 class ServiceRegistryExportedService {
 	
@@ -26,6 +27,9 @@ class ServiceRegistryExportedService {
 	private AstrixServiceComponent serviceComponent;
 	
 	public ServiceRegistryExportedService(AstrixServiceComponent serviceComponent, AstrixBeanKey<?> exportedServiceBeanKey) {
+		if (!serviceComponent.canBindType(exportedServiceBeanKey.getBeanType())) {
+			throw new UnsupportedTargetTypeException(serviceComponent.getName(), exportedServiceBeanKey.getBeanType());
+		}
 		this.serviceComponent = serviceComponent;
 		this.exportedService = exportedServiceBeanKey;
 		if (serviceComponent.supportsAsyncApis()) {

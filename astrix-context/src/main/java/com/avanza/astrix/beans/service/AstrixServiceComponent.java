@@ -40,6 +40,18 @@ public interface AstrixServiceComponent {
 	 * @return
 	 */
 	String getName();
+	
+	/**
+	 * Defines whether this AstrixServiceComponent can be used to bind a bean of a given type.
+	 * 
+	 * If this AstrixServiceComponent can be used to bind the given type, then {@link #createServiceProperties(Class)}
+	 * should create AstrixServiceProperties that can be passed to {@link #bind(ServiceVersioningContext, Class, AstrixServiceProperties)}
+	 * to bind to an instance of the given type.
+	 * 
+	 * @param type
+	 * @return
+	 */
+	boolean canBindType(Class<?> type);
 
 	<T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext);
 	

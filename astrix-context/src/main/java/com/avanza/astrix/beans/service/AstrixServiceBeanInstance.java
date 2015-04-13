@@ -238,6 +238,9 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 			} 
 			try {
 				AstrixServiceComponent serviceComponent = getServiceComponent(serviceProperties);
+				if (!serviceComponent.canBindType(beanKey.getBeanType())) {
+					throw new UnsupportedTargetTypeException(serviceComponent.getName(), beanKey.getBeanType());
+				}
 				BoundServiceBeanInstance<T> boundInstance = serviceComponent.bind(versioningContext, beanKey.getBeanType(), serviceProperties);
 				setState(new Bound(boundInstance));
 				currentProperties = serviceProperties;

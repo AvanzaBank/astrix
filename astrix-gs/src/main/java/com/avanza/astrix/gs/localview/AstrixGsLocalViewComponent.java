@@ -30,6 +30,7 @@ import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceComponents;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
+import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigAware;
@@ -69,7 +70,7 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 			Class<T> type,
 			AstrixServiceProperties serviceProperties) {
 		if (!GigaSpace.class.isAssignableFrom(type)) {
-			throw new IllegalStateException("Programming error, attempted to create: " + type);
+			throw new UnsupportedTargetTypeException(getName(), type);
 		}
 		if (disableLocalView.get()) {
 			log.info("LocalView is disabled. Creating reqular proxy");
@@ -106,7 +107,7 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 	@Override
 	public <T> AstrixServiceProperties createServiceProperties(Class<T> type) {
 		if (!type.equals(GigaSpace.class)) {
-			throw new IllegalArgumentException("Can't export: " + type);
+			throw new UnsupportedTargetTypeException(getName(), type);
 		}
 		GigaSpace space = gsBinder.getEmbeddedSpace(astrixSpringContext.getApplicationContext());
 		AstrixServiceProperties properties = gsBinder.createProperties(space);
@@ -116,6 +117,11 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 	@Override
 	public String getName() {
 		return AstrixServiceComponentNames.GS_LOCAL_VIEW;
+	}
+	
+	@Override
+	public boolean canBindType(Class<?> type) {
+		return GigaSpace.class.equals(type);
 	}
 
 	@Override
