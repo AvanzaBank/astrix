@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.context;
 
-import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixFactoryBean;
@@ -23,8 +22,8 @@ import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
-import com.avanza.astrix.beans.publish.AstrixApiProviders;
 import com.avanza.astrix.beans.publish.AstrixApiProviderPlugins;
+import com.avanza.astrix.beans.publish.AstrixApiProviders;
 import com.avanza.astrix.beans.service.StatefulAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
 /**
@@ -119,8 +118,4 @@ public class AstrixContextImpl implements Astrix, AstrixContext {
 		return dynamicConfig;
 	}
 	
-	String getCurrentSubsystem() {
-		return this.dynamicConfig.getStringProperty(AstrixSettings.SUBSYSTEM_NAME, null).get();
-	}
-
 }

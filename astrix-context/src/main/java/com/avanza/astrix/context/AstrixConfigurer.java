@@ -39,8 +39,8 @@ import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.inject.AstrixPlugins;
 import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
-import com.avanza.astrix.beans.publish.AstrixApiProviders;
 import com.avanza.astrix.beans.publish.AstrixApiProviderPlugin;
+import com.avanza.astrix.beans.publish.AstrixApiProviders;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
 import com.avanza.astrix.config.DynamicConfig;
@@ -58,9 +58,7 @@ public class AstrixConfigurer {
 	private AstrixApiProviders astrixApiProviders;
 	private final Collection<AstrixFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	private final List<AstrixPlugins.Plugin<?>> plugins = new ArrayList<>();
-	private final AstrixSettings settings = new AstrixSettings() {{
-		set(SUBSYSTEM_NAME, "default");
-	}};
+	private final AstrixSettings settings = new AstrixSettings();
 	
 	private DynamicConfig customConfig = null;
 	private final DynamicConfig wellKnownConfigSources = DynamicConfig.create(settings, PropertiesConfigSource.optionalClasspathPropertiesFile(CLASSPATH_OVERRIDE_SETTINGS));

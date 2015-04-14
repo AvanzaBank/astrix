@@ -79,7 +79,7 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 		this.versioningContext = Objects.requireNonNull(versioningContext);
 		this.beanKey = Objects.requireNonNull(beanKey);
 		this.serviceComponents = Objects.requireNonNull(serviceComponents);
-		this.subsystem = Objects.requireNonNull(config.getStringProperty(AstrixSettings.SUBSYSTEM_NAME, null).get());
+		this.subsystem = config.getStringProperty(AstrixSettings.SUBSYSTEM_NAME, AstrixSettings.DEFAULT_SUBSYSTEM_NAME).get();
 		this.enforceSubsystemBoundaries = config.getBooleanProperty(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
 		this.currentState = new Unbound();
 		log.info(String.format("Start managing service bean. currentState=%s bean=%s astrixBeanId=%s", currentState.name(), beanKey, id));
@@ -232,6 +232,9 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 				return;
 			}
 			String providerSubsystem = serviceProperties.getProperty(AstrixServiceProperties.SUBSYSTEM);
+			if (providerSubsystem == null) {
+				providerSubsystem = AstrixSettings.DEFAULT_SUBSYSTEM_NAME;
+			}
 			if (!isAllowedToInvokeService(providerSubsystem)) {
 				setState(new IllegalSubsystemState(subsystem, providerSubsystem, beanKey.getBeanType()));
 				return;

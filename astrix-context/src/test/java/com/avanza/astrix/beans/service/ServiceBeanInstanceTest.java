@@ -72,7 +72,7 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
-		astrixConfigurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 
 		astrixContext = astrixConfigurer.configure();
 		
@@ -96,7 +96,7 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
-		astrixConfigurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 		
 		
@@ -123,7 +123,7 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.setSubsystem("consumerSubsystem");
 		astrixConfigurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 5);
 		astrixConfigurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
-		astrixConfigurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 		
 		AstrixDirectComponent directComponent = astrixContext.getInstance(AstrixServiceComponents.class).getComponent(AstrixDirectComponent.class);
@@ -154,7 +154,7 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 5);
-		astrixConfigurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 		
 		AstrixDirectComponent directComponent = astrixContext.getInstance(AstrixServiceComponents.class).getComponent(AstrixDirectComponent.class);
@@ -188,7 +188,7 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.setSubsystem("consumerSubsystem");
 		astrixConfigurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 5);
 		astrixConfigurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
-		astrixConfigurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixContext = astrixConfigurer.configure();
 		
 		final Ping ping = astrixContext.getBean(Ping.class);
@@ -229,10 +229,26 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.setSubsystem("anotherSubsystem");
 		astrixConfigurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
-		astrixConfigurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixContext astrixContext = astrixConfigurer.configure();
 		
 		astrixContext.getBean(Ping.class).ping("foo");
+	}
+	
+	@Test
+	public void serviceBeanInstanceUsesDefaultSubsystemNameWhenNoSubsystemIsSetInServiceProperties() throws Exception {
+		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
+		
+		String serviceUri = AstrixDirectComponent.registerAndGetUri(Ping.class, new PingImpl());
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(PingApiProviderUsingConfigLookup.class);
+		astrixConfigurer.setSubsystem("default");
+		astrixConfigurer.set("pingUri", serviceUri);
+		astrixConfigurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		AstrixContext astrixContext = astrixConfigurer.configure();
+		
+		assertEquals("foo", astrixContext.getBean(Ping.class).ping("foo"));
 	}
 	
 	@Test
@@ -246,7 +262,7 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.setSubsystem("anotherSubsystem");
 		astrixConfigurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
-		astrixConfigurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 
 		astrixContext = astrixConfigurer.configure();
 		
@@ -275,7 +291,7 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
-		astrixConfigurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixContext = astrixConfigurer.configure();
 		
 		astrixContext.getBean(Ping.class).ping("foo");

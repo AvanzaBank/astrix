@@ -94,6 +94,7 @@ public class AstrixSettings implements DynamicConfigSource {
 	 * ({@link AstrixServiceComponentNames#GS_LOCAL_VIEW}) will use a regular clustered proxy instead.
 	 */
 	public static final String GS_DISABLE_LOCAL_VIEW = "AstrixGsLocalViewComponent.disableLocalView";
+	public static final String DEFAULT_SUBSYSTEM_NAME = "default";
 	
 	private final MapConfigSource config = new MapConfigSource();
 	private final String configSourceId;
