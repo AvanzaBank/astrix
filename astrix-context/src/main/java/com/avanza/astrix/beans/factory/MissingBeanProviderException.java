@@ -16,6 +16,7 @@
 package com.avanza.astrix.beans.factory;
 
 
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -25,9 +26,9 @@ public class MissingBeanProviderException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 	private AstrixBeanKey<? extends Object> beanType;
-
+	
 	public MissingBeanProviderException(AstrixBeanKey<? extends Object> beanType) {
-		super("No provider found for bean: " + beanType);
+		super(String.format("No provider found for bean: %s. Do you have an ApiProvider on the classpath that exports the given bean?", beanType));
 		this.beanType = beanType;
 	}
 	
