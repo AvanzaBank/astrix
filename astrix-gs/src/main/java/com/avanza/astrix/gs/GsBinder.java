@@ -59,6 +59,9 @@ public class GsBinder implements AstrixConfigAware {
 				}
 			}
 		}
+		if (result == null) {
+			throw new IllegalStateException("Failed to find an embedded space in applicationContext");
+		}
 		return result;
 	}
 
