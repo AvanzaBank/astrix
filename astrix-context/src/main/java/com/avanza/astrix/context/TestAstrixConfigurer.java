@@ -26,6 +26,8 @@ import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBean;
 import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
 import com.avanza.astrix.beans.publish.AstrixApiProviders;
+import com.avanza.astrix.config.LongSetting;
+import com.avanza.astrix.config.Setting;
 
 public class TestAstrixConfigurer {
 	
@@ -100,9 +102,17 @@ public class TestAstrixConfigurer {
 	public void set(String name, String value) {
 		configurer.set(name, value);
 	}
-	
+
 	public void set(String name, boolean value) {
 		configurer.set(name, value);
+	}
+
+	public final <T> void set(Setting<T> setting, T value) {
+		this.configurer.set(setting, value);
+	}
+	
+	public final void set(LongSetting setting, long value) {
+		this.configurer.set(setting, value);
 	}
 	
 	/*

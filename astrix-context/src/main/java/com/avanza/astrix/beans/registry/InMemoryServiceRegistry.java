@@ -25,6 +25,7 @@ import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
+import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -43,7 +44,7 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	public InMemoryServiceRegistry() {
 		this.id = AstrixDirectComponent.register(AstrixServiceRegistry.class, serviceRegistry);
 		this.configSourceId = GlobalConfigSourceRegistry.register(this);
-		this.configSource.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, getServiceUri());
+		this.configSource.set(AstrixSettings.SERVICE_REGISTRY_URI, getServiceUri());
 	}
 	
 	@Override
@@ -68,9 +69,15 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	public void clear() {
 		this.serviceRegistry.clear();
 	}
-	
+
+	/**
+	 * 
+	 * @return
+	 * @deprecated replaced by {@link AstrixSettings#SERVICE_REGISTRY_URI}
+	 */
+	@Deprecated
 	public String getConfigEntryName() {
-		return AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI;
+		return AstrixSettings.SERVICE_REGISTRY_URI_PROPERTY_NAME;
 	}
 	
 	public String getServiceUri() {
@@ -85,17 +92,10 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 		this.configSource.set(settingName, Long.toString(value));
 	}
 	
-	/**
-	 * 
-	 * @param settingName
-	 * @param value
-	 * @deprecated use {@link InMemoryServiceRegistry#set(String, long)}
-	 */
-	@Deprecated
-	public void addConfig(String settingName, long value) {
-		set(settingName, Long.toString(value));
+	public void set(LongSetting settingName, long value) {
+		this.configSource.set(settingName.name(), Long.toString(value));
 	}
-
+	
 	public <T> void registerProvider(Class<T> api, T provider, String subsystem) {
 		AstrixServiceRegistryClientImpl serviceRegistryClient = new AstrixServiceRegistryClientImpl(this.serviceRegistry, subsystem);
 		serviceRegistryClient.register(api, AstrixDirectComponent.registerAndGetProperties(api, provider), 60_000);

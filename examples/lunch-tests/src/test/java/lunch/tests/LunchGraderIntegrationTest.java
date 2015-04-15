@@ -37,7 +37,7 @@ import com.avanza.astrix.test.util.Probe;
 public class LunchGraderIntegrationTest {
 	
 	public static InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
-		addConfig(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 200);
+		set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 200);
 	}};
 	
 	@ClassRule

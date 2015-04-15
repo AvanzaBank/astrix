@@ -71,7 +71,7 @@ public final class AstrixFaultTolerance implements AstrixConfigAware {
 
 	private <T> boolean faultToleranceEnabled(HystrixCommandKeys keys) {
 		DynamicBooleanProperty faultToleranceEnabledForCircuit = config.getBooleanProperty("astrix.faultTolerance." + keys.getCommandKey() + ".enabled", true);
-		DynamicBooleanProperty faultToleranceEnabled = config.getBooleanProperty(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
+		DynamicBooleanProperty faultToleranceEnabled = AstrixSettings.ENABLE_FAULT_TOLERANCE.getFrom(config);
 		boolean enabled = faultToleranceEnabled.get() && faultToleranceEnabledForCircuit.get();
 		return enabled;
 	}

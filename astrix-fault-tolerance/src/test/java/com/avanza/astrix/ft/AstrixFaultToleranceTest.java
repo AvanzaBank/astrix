@@ -58,7 +58,7 @@ public class AstrixFaultToleranceTest {
 		}, hystrixCommandSettings));
 		assertEquals(1, fakeFaultToleranceImpl.appliedFaultToleranceCount.get());
 
-		config.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, "false");
+		config.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
 		
 		assertEquals("foo", faultTolerance.execute(new Command<String>() {
 			@Override
@@ -74,7 +74,7 @@ public class AstrixFaultToleranceTest {
 	public void itShouldBePossibleToDisableFaultToleranceAtRuntimeForAGivenCircuit() throws Exception {
 		HystrixCommandSettings hystrixCommandSettings = new HystrixCommandSettings("fooKey", "foo");
 																
-		config.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, "true");
+		config.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
 		assertEquals(0, fakeFaultToleranceImpl.appliedFaultToleranceCount.get());
 		assertEquals("foo", faultTolerance.execute(new Command<String>() {
 			@Override

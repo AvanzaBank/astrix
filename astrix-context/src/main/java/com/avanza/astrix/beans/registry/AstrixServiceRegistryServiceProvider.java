@@ -37,7 +37,7 @@ import com.avanza.astrix.provider.versioning.Versioned;
 @AstrixApiProvider
 public interface AstrixServiceRegistryServiceProvider {
 	
-	@AstrixConfigLookup(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI)
+	@AstrixConfigLookup(AstrixSettings.SERVICE_REGISTRY_URI_PROPERTY_NAME)
 	@Versioned
 	@Service
 	AstrixServiceRegistry serviceRegistry();

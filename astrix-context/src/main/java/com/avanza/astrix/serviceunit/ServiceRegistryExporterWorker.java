@@ -49,9 +49,9 @@ public class ServiceRegistryExporterWorker extends Thread implements AstrixPubli
 	private final DynamicLongProperty retryIntervallMillis;
 
 	public ServiceRegistryExporterWorker(DynamicConfig config) {
-		this.exportIntervallMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 30_000L);
-		this.retryIntervallMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 5_000L);
-		this.serviceLeaseTimeMillis = config.getLongProperty(AstrixSettings.SERVICE_REGISTRY_LEASE, 120_000L);
+		this.exportIntervallMillis = AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL.getFrom(config);
+		this.retryIntervallMillis = AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL.getFrom(config);
+		this.serviceLeaseTimeMillis = AstrixSettings.SERVICE_REGISTRY_LEASE.getFrom(config);
 	}
 	
 	public void startServiceExporter() {

@@ -40,7 +40,7 @@ public class AstrixGigaSpaceProxyTest {
 	public void setup() {
 		faultTolerance = new AstrixFaultTolerance();
 		MapConfigSource config = new MapConfigSource();
-		config.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, "false");
+		config.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
 		faultTolerance.setConfig(DynamicConfig.create(config));
 	}
 	

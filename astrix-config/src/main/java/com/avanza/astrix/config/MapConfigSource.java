@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.config;
+	package com.avanza.astrix.config;
 
 import java.util.List;
 import java.util.Map;
@@ -40,6 +40,15 @@ public class MapConfigSource extends AbstractDynamicConfigSource {
 	
 	public void set(String propertyName, String value) {
 		getProperty(propertyName).set(value);
+	}
+	
+	public <T> void set(Setting<T> property, T value) {
+		String stringRepresentation = value != null ? value.toString() : null;
+		getProperty(property.name()).set(stringRepresentation);
+	}
+	
+	public <T> void set(LongSetting property, long value) {
+		getProperty(property.name()).set(Long.toString(value));
 	}
 
 	private ListenableStringProperty getProperty(String propertyName) {

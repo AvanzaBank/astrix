@@ -43,8 +43,12 @@ import com.avanza.astrix.beans.publish.AstrixApiProviderPlugin;
 import com.avanza.astrix.beans.publish.AstrixApiProviders;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
+import com.avanza.astrix.config.BooleanSetting;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.PropertiesConfigSource;
+import com.avanza.astrix.config.Setting;
+import com.avanza.astrix.config.StringSetting;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
 
@@ -95,7 +99,7 @@ public class AstrixConfigurer {
 		if (customConfig != null) {
 			return DynamicConfig.merged(customConfig, wellKnownConfigSources);
 		}
-		String dynamicConfigFactoryClass = wellKnownConfigSources.getStringProperty(AstrixSettings.DYNAMIC_CONFIG_FACTORY, null).get();
+		String dynamicConfigFactoryClass = AstrixSettings.DYNAMIC_CONFIG_FACTORY.getFrom(wellKnownConfigSources).get();
 		if (dynamicConfigFactoryClass != null) {
 			AstrixDynamicConfigFactory dynamicConfigFactory = initFactory(dynamicConfigFactoryClass);
 			DynamicConfig config = dynamicConfigFactory.create();
@@ -155,11 +159,11 @@ public class AstrixConfigurer {
 		if (this.astrixApiProviders != null) {
 			return astrixApiProviders;
 		}
-		String basePackage = config.getStringProperty(AstrixSettings.API_PROVIDER_SCANNER_BASE_PACKAGE, "").get();
+		String basePackage = AstrixSettings.API_PROVIDER_SCANNER_BASE_PACKAGE.getFrom(config).get();
 		if (!basePackage.trim().isEmpty()) {
 			return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(astrixPlugins), "com.avanza.astrix", basePackage.split(",")); // Always scan com.avanza.astrix package
 		}
-		basePackage = config.getStringProperty(AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE, "").get();
+		basePackage = AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE.getFrom(config).get();
 		if (!basePackage.trim().isEmpty()) {
 			return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(astrixPlugins), "com.avanza.astrix", basePackage.split(","));
 		}
@@ -187,7 +191,7 @@ public class AstrixConfigurer {
 	}
 	
 	private void configureVersioning(AstrixPlugins plugins) {
-		if (config.getBooleanProperty(AstrixSettings.ENABLE_VERSIONING, true).get()) {
+		if (AstrixSettings.ENABLE_VERSIONING.getFrom(config).get()) {
 			discoverOnePlugin(plugins, AstrixVersioningPlugin.class);
 		} else {
 			plugins.registerPlugin(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Default.create());
@@ -212,13 +216,21 @@ public class AstrixConfigurer {
 	public void set(String settingName, long value) {
 		this.settings.set(settingName, value);
 	}
-	
+
 	public void set(String settingName, boolean value) {
 		this.settings.set(settingName, value);
 	}
-	
+
 	public void set(String settingName, String value) {
 		this.settings.set(settingName, value);
+	}
+	
+	public final <T> void set(Setting<T> setting, T value) {
+		this.settings.set(setting, value);
+	}
+	
+	public final <T> void set(LongSetting setting, long value) {
+		this.settings.set(setting, value);
 	}
 	
 	public void setSettings(Map<String, String> settings) {

@@ -88,7 +88,7 @@ public class AstrixServiceLeaseManager {
 					}
 				}
 				try {
-					Thread.sleep(config.getLongProperty(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10_000L).get());
+					Thread.sleep(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL.getFrom(config).get());
 				} catch (InterruptedException e) {
 					interrupt();
 				}
@@ -120,7 +120,7 @@ public class AstrixServiceLeaseManager {
 					renewLease(leasedService);
 				}
 				try {
-					Thread.sleep(config.getLongProperty(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 30_000L).get());
+					Thread.sleep(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL.getFrom(config).get());
 				} catch (InterruptedException e) {
 					interrupt();
 				}

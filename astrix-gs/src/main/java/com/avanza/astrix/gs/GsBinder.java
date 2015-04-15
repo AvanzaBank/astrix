@@ -43,7 +43,7 @@ public class GsBinder implements AstrixConfigAware {
 	private DynamicConfig config;
 	
 	public GigaSpace getEmbeddedSpace(ApplicationContext applicationContext) {
-		String optionalGigaSpaceBeanName = config.getStringProperty(AstrixSettings.GIGA_SPACE_BEAN_NAME, null).get();
+		String optionalGigaSpaceBeanName = AstrixSettings.GIGA_SPACE_BEAN_NAME.getFrom(config).get();
 		if (optionalGigaSpaceBeanName  != null) {
 			return applicationContext.getBean(optionalGigaSpaceBeanName, GigaSpace.class);
 		}

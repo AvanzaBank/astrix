@@ -21,6 +21,7 @@ import com.avanza.astrix.config.BooleanSetting;
 import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
+import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.StringSetting;
@@ -35,26 +36,30 @@ public class AstrixSettings implements DynamicConfigSource {
 	 * Defines how long to wait between consecutive bind attempts when a service bean is
 	 * in UNBOUND state.
 	 */
-	public static final String BEAN_BIND_ATTEMPT_INTERVAL = "StatefulAstrixBeanInstance.beanBindAttemptInterval";
+	public static final LongSetting BEAN_BIND_ATTEMPT_INTERVAL = LongSetting.create("StatefulAstrixBeanInstance.beanBindAttemptInterval", 10_000L);
 
 	/**
 	 * Defines how long the service-lease-manager will wait between consecutive lease renewals
 	 * for a service bean that is in BOUND sate.
 	 */
-	public static final String SERVICE_LEASE_RENEW_INTERVAL = "AstrixServiceLeaseManager.leaseRenewInterval";
+	public static final LongSetting SERVICE_LEASE_RENEW_INTERVAL = LongSetting.create("AstrixServiceLeaseManager.leaseRenewInterval", 30_000L);
 	
-	public static final String ENFORCE_SUBSYSTEM_BOUNDARIES = "AstrixContext.enforceSubsystemBoundaries";
+	public static final BooleanSetting ENFORCE_SUBSYSTEM_BOUNDARIES = BooleanSetting.create("AstrixContext.enforceSubsystemBoundaries", true);
+	
+	public static final String SERVICE_REGISTRY_URI_PROPERTY_NAME = "AstrixServiceRegistry.serviceUri";
+	
+	/**
+	 * Service Uri used to bind to the service-registry.
+	 */
+	public static final StringSetting SERVICE_REGISTRY_URI = StringSetting.create(SERVICE_REGISTRY_URI_PROPERTY_NAME, null);
+	
 	
 	/**
 	 * @deprecated Renamed to {@link AstrixSettings#SERVICE_REGISTRY_URI}
 	 */
 	@Deprecated
-	public static final String ASTRIX_SERVICE_REGISTRY_URI = "AstrixServiceRegistry.serviceUri";
+	public static final StringSetting ASTRIX_SERVICE_REGISTRY_URI = SERVICE_REGISTRY_URI;
 	
-	/**
-	 * Service Uri used to bind to the service-registry.
-	 */
-	public static final String SERVICE_REGISTRY_URI = "AstrixServiceRegistry.serviceUri";
 	
 	/**
 	 * All services provided will be registered in the service-registry on a regular interval. This Setting defines
@@ -62,7 +67,7 @@ public class AstrixSettings implements DynamicConfigSource {
 	 * 
 	 * Defaults to 30 seconds (30 000 ms)
 	 */
-	public static final String SERVICE_REGISTRY_EXPORT_INTERVAL = "ServiceRegistryExporterWorker.exportIntervalMillis";
+	public static final LongSetting SERVICE_REGISTRY_EXPORT_INTERVAL = LongSetting.create("ServiceRegistryExporterWorker.exportIntervalMillis", 30_000L);
 	
 	/**
 	 * When registration in the service registry fails, there is an option to wait a shorter time then the regular time 
@@ -70,28 +75,30 @@ public class AstrixSettings implements DynamicConfigSource {
 	 * 
 	 * Defaults to 5 seconds (5 000 ms)
 	 */
-	public static final String SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL = "ServiceRegistryExporterWorker.retryIntervallMillis";
+	public static final LongSetting SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL = LongSetting.create("ServiceRegistryExporterWorker.retryIntervallMillis", 5_000);
 	
-	public static final String SERVICE_REGISTRY_LEASE = "ServiceRegistryExporterWorker.serviceLeaseTimeMillis";
-	/**
-	 * @renamed to {@link #API_PROVIDER_SCANNER_BASE_PACKAGE}  
-	 */
-	@Deprecated
-	public static final String API_DESCRIPTOR_SCANNER_BASE_PACKAGE = "AstrixApiDescriptorScanner.basePackage";
+	public static final LongSetting SERVICE_REGISTRY_LEASE = LongSetting.create("ServiceRegistryExporterWorker.serviceLeaseTimeMillis", 120_000L);
+
 	/**
 	 * Defines the basePackage(s) to scan when searching for ApiProvider's. The given package(s)
 	 * and all subpackages will be scanned.
 	 * 
 	 * The packages should be separated by comma (",").
 	 */
-	public static final String API_PROVIDER_SCANNER_BASE_PACKAGE = "AstrixApiProviderScanner.basePackage";
+	public static final StringSetting API_PROVIDER_SCANNER_BASE_PACKAGE = StringSetting.create("AstrixApiProviderScanner.basePackage", "");
+	
+	/**
+	 * @renamed to {@link #API_PROVIDER_SCANNER_BASE_PACKAGE}  
+	 */
+	@Deprecated
+	public static final StringSetting API_DESCRIPTOR_SCANNER_BASE_PACKAGE = StringSetting.create("AstrixApiDescriptorScanner.basePackage", "");
 	
 	public static final StringSetting SUBSYSTEM_NAME = StringSetting.create("AstrixContext.subsystem", "default");
 	
-	public static final String ENABLE_FAULT_TOLERANCE = "AstrixContext.enableFaultTolerance";
-	public static final String ENABLE_VERSIONING = "AstrixContext.enableVersioning";
-	public static final String GIGA_SPACE_BEAN_NAME = "AstrixGsComponent.gigaSpaceBeanName";
-	public static final String DYNAMIC_CONFIG_FACTORY = "com.avanza.astrix.context.AstrixDynamicConfigFactory";
+	public static final BooleanSetting ENABLE_FAULT_TOLERANCE = BooleanSetting.create("AstrixContext.enableFaultTolerance", true);
+	public static final BooleanSetting ENABLE_VERSIONING = BooleanSetting.create("AstrixContext.enableVersioning", true);
+	public static final StringSetting GIGA_SPACE_BEAN_NAME = StringSetting.create("AstrixGsComponent.gigaSpaceBeanName", null);
+	public static final StringSetting DYNAMIC_CONFIG_FACTORY = StringSetting.create("com.avanza.astrix.context.AstrixDynamicConfigFactory", null);
 	/**
 	 * When local view is disabled every service that is exported using local-view
 	 * ({@link AstrixServiceComponentNames#GS_LOCAL_VIEW}) will use a regular clustered proxy instead.
