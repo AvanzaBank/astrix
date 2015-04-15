@@ -19,6 +19,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.openspaces.core.GigaSpace;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
@@ -50,7 +52,7 @@ public class GsBinder implements AstrixConfigAware {
 
 	private GigaSpace findEmbeddedSpace(ApplicationContext applicationContext) {
 		GigaSpace result = null;
-		for (GigaSpace gigaSpace : applicationContext.getBeansOfType(GigaSpace.class).values()) {
+		for (GigaSpace gigaSpace : BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, GigaSpace.class).values()) {
 			if (isEmbedded(gigaSpace)) {
 				if (result != null) {
 					throw new IllegalStateException("Multiple embedded spaces defined in applicationContext");
