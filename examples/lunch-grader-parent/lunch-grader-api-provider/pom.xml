@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.avanza.astrix</groupId>
     <artifactId>lunch-grader-parent</artifactId>
-	<version>0.19.0</version>
+	<version>0.19.1-SNAPSHOT</version>
   </parent>
   <artifactId>lunch-grader-api-provider</artifactId>
   	<dependencies>
