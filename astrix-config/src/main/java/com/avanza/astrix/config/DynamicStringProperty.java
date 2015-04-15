@@ -22,7 +22,7 @@ import java.util.Objects;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class DynamicStringProperty {
+public final class DynamicStringProperty implements DynamicProperty<String> {
 	
 	private static final DynamicPropertyListener<String> NO_LISTENER = new DynamicPropertyListener<String>() {
 		@Override

@@ -233,7 +233,7 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 			}
 			String providerSubsystem = serviceProperties.getProperty(AstrixServiceProperties.SUBSYSTEM);
 			if (providerSubsystem == null) {
-				providerSubsystem = AstrixSettings.SUBSYSTEM_NAME.defaultValue().get();
+				providerSubsystem = AstrixSettings.SUBSYSTEM_NAME.defaultValue();
 			}
 			if (!isAllowedToInvokeService(providerSubsystem)) {
 				setState(new IllegalSubsystemState(subsystem, providerSubsystem, beanKey.getBeanType()));

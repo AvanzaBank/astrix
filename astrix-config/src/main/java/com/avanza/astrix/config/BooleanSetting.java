@@ -17,7 +17,7 @@ package com.avanza.astrix.config;
 
 import java.util.Objects;
 
-public class BooleanSetting implements Setting<DynamicBooleanProperty> {
+public class BooleanSetting implements Setting<Boolean> {
 	
 	private final String name;
 	private final boolean defaultValue;
@@ -41,9 +41,8 @@ public class BooleanSetting implements Setting<DynamicBooleanProperty> {
 		return name;
 	}
 	
-	@Override
-	public DynamicBooleanProperty defaultValue() {
-		return new DynamicBooleanProperty(defaultValue);
+	public boolean defaultValue() {
+		return defaultValue;
 	}
 	
 

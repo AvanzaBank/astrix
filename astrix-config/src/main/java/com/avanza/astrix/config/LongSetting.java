@@ -20,7 +20,7 @@ package com.avanza.astrix.config;
  * @author Elias Lindholm (elilin)
  *
  */
-public class LongSetting implements Setting<DynamicLongProperty> {
+public class LongSetting implements Setting<Long> {
 	
 	private final String name;
 	private final long defaultValue;
@@ -44,9 +44,8 @@ public class LongSetting implements Setting<DynamicLongProperty> {
 		return name;
 	}
 	
-	@Override
-	public DynamicLongProperty defaultValue() {
-		return new DynamicLongProperty(defaultValue);
+	public long defaultValue() {
+		return defaultValue;
 	}
 
 

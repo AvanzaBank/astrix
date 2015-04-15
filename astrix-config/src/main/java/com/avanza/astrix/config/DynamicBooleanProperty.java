@@ -19,7 +19,7 @@ package com.avanza.astrix.config;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class DynamicBooleanProperty {
+public final class DynamicBooleanProperty implements DynamicProperty<Boolean> {
 	
 	private volatile boolean value;
 	

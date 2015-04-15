@@ -14,27 +14,6 @@
  * limitations under the License.
  */
 package com.avanza.astrix.config;
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public class DynamicLongProperty implements DynamicProperty<Long> {
-	
-	private volatile long value;
-	
-	public DynamicLongProperty() {
-	}
-	
-	public DynamicLongProperty(long initialValue) {
-		this.value = initialValue;
-	}
-	
-	public long get() {
-		return value;
-	}
-	
-	public void set(long value) {
-		this.value = value;
-	}
+
+public interface DynamicProperty<T> {
 }

@@ -20,7 +20,6 @@ import java.util.Map;
 import com.avanza.astrix.config.BooleanSetting;
 import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
-import com.avanza.astrix.config.DynamicStringProperty;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.Setting;
@@ -122,10 +121,14 @@ public class AstrixSettings implements DynamicConfigSource {
 		this.config.set(settingName, value);
 	}
 	
-	public final void set(Setting<DynamicStringProperty> setting, String value) {
-		this.config.set(setting.name(), value);
+	public final <T> void set(Setting<T> setting, T value) {
+		String valueAsString = value != null ? value.toString() : null;
+		this.config.set(setting.name(), valueAsString);
 	}
-
+	
+	public final <T extends Number> void set(Setting<T> setting, int value) {
+		this.config.set(setting.name(), Integer.toString(value));
+	}
 	
 	public final void remove(String settingName) {
 		this.config.set(settingName, null);

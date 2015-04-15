@@ -24,8 +24,6 @@ public interface Setting<T> {
 	
 	String name();
 	
-	T getFrom(DynamicConfig config);
+	DynamicProperty<T> getFrom(DynamicConfig config);
 	
-	T defaultValue();
-
 }

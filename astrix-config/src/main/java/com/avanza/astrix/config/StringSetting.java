@@ -22,7 +22,7 @@ import java.util.Objects;
  * @author Elias Lindholm (elilin)
  *
  */
-public class StringSetting implements Setting<DynamicStringProperty> {
+public class StringSetting implements Setting<String> {
 	
 	private final String name;
 	private final String defaultValue;
@@ -46,9 +46,8 @@ public class StringSetting implements Setting<DynamicStringProperty> {
 		return name;
 	}
 	
-	@Override
-	public DynamicStringProperty defaultValue() {
-		return new DynamicStringProperty(defaultValue);
+	public String defaultValue() {
+		return defaultValue;
 	}
 
 }
