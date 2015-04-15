@@ -17,10 +17,14 @@ package com.avanza.astrix.beans.core;
 
 import java.util.Map;
 
+import com.avanza.astrix.config.BooleanSetting;
 import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
+import com.avanza.astrix.config.DynamicStringProperty;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
+import com.avanza.astrix.config.Setting;
+import com.avanza.astrix.config.StringSetting;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 /**
  * 
@@ -83,7 +87,7 @@ public class AstrixSettings implements DynamicConfigSource {
 	 */
 	public static final String API_PROVIDER_SCANNER_BASE_PACKAGE = "AstrixApiProviderScanner.basePackage";
 	
-	public static final String SUBSYSTEM_NAME = "AstrixContext.subsystem";
+	public static final StringSetting SUBSYSTEM_NAME = StringSetting.create("AstrixContext.subsystem", "default");
 	
 	public static final String ENABLE_FAULT_TOLERANCE = "AstrixContext.enableFaultTolerance";
 	public static final String ENABLE_VERSIONING = "AstrixContext.enableVersioning";
@@ -93,8 +97,7 @@ public class AstrixSettings implements DynamicConfigSource {
 	 * When local view is disabled every service that is exported using local-view
 	 * ({@link AstrixServiceComponentNames#GS_LOCAL_VIEW}) will use a regular clustered proxy instead.
 	 */
-	public static final String GS_DISABLE_LOCAL_VIEW = "AstrixGsLocalViewComponent.disableLocalView";
-	public static final String DEFAULT_SUBSYSTEM_NAME = "default";
+	public static final BooleanSetting GS_DISABLE_LOCAL_VIEW = BooleanSetting.create("AstrixGsLocalViewComponent.disableLocalView", false);
 	
 	private final MapConfigSource config = new MapConfigSource();
 	private final String configSourceId;
@@ -118,6 +121,11 @@ public class AstrixSettings implements DynamicConfigSource {
 	public final void set(String settingName, String value) {
 		this.config.set(settingName, value);
 	}
+	
+	public final void set(Setting<DynamicStringProperty> setting, String value) {
+		this.config.set(setting.name(), value);
+	}
+
 	
 	public final void remove(String settingName) {
 		this.config.set(settingName, null);

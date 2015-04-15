@@ -163,9 +163,8 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 
 	@Override
 	public void setConfig(DynamicConfig config) {
-		this.disableLocalView = config.getBooleanProperty(AstrixSettings.GS_DISABLE_LOCAL_VIEW, false);
+		this.disableLocalView = AstrixSettings.GS_DISABLE_LOCAL_VIEW.getFrom(config);
 	}
-	
 	
 	private static class BoundLocalViewGigaSpaceBeanInstance implements BoundServiceBeanInstance<GigaSpace> {
 

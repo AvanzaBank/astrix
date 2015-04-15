@@ -28,7 +28,8 @@ public class AstrixServiceRegistryLibraryProvider implements AstrixConfigAware {
 
 	@Library
 	public AstrixServiceRegistryClient createClient(AstrixServiceRegistry serviceRegistry) {
-		return new AstrixServiceRegistryClientImpl(serviceRegistry, config.getStringProperty(AstrixSettings.SUBSYSTEM_NAME, AstrixSettings.DEFAULT_SUBSYSTEM_NAME).get());
+		String subsystem = AstrixSettings.SUBSYSTEM_NAME.getFrom(config).get();
+		return new AstrixServiceRegistryClientImpl(serviceRegistry, subsystem);
 	}
 	
 	@Override
