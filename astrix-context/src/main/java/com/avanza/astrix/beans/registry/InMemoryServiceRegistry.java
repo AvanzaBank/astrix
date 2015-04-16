@@ -22,11 +22,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.config.BooleanSetting;
 import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.MapConfigSource;
+import com.avanza.astrix.config.MutableConfigSource;
+import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 /**
@@ -34,7 +37,7 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
  * @author Elias Lindholm (elilin)
  *
  */
-public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServiceRegistry {
+public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServiceRegistry, MutableConfigSource {
 	
 	private final MapConfigSource configSource = new MapConfigSource();
 	private String id;
@@ -92,9 +95,21 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 		this.configSource.set(settingName, Long.toString(value));
 	}
 	
-	public void set(LongSetting settingName, long value) {
-		this.configSource.set(settingName.name(), Long.toString(value));
+	@Override
+	public <T> void set(Setting<T> setting, T value) {
+		this.configSource.set(setting, value);
 	}
+	
+	@Override
+	public void set(BooleanSetting setting, boolean value) {
+		this.configSource.set(setting, value);
+	}
+	
+	@Override
+	public void set(LongSetting setting, long value) {
+		this.configSource.set(setting, value);
+	}
+	
 	
 	public <T> void registerProvider(Class<T> api, T provider, String subsystem) {
 		AstrixServiceRegistryClientImpl serviceRegistryClient = new AstrixServiceRegistryClientImpl(this.serviceRegistry, subsystem);

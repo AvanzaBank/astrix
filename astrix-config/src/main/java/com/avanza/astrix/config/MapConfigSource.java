@@ -27,7 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Elias Lindholm (elilin)
  *
  */
-public class MapConfigSource extends AbstractDynamicConfigSource {
+public class MapConfigSource extends AbstractDynamicConfigSource implements MutableConfigSource {
 	
 	private final ConcurrentMap<String, ListenableStringProperty> propertyValues = new ConcurrentHashMap<>();
 	
@@ -42,13 +42,20 @@ public class MapConfigSource extends AbstractDynamicConfigSource {
 		getProperty(propertyName).set(value);
 	}
 	
-	public <T> void set(Setting<T> property, T value) {
+	@Override
+	public <T> void set(Setting<T> setting, T value) {
 		String stringRepresentation = value != null ? value.toString() : null;
-		getProperty(property.name()).set(stringRepresentation);
+		getProperty(setting.name()).set(stringRepresentation);
 	}
 	
-	public <T> void set(LongSetting property, long value) {
-		getProperty(property.name()).set(Long.toString(value));
+	@Override
+	public void set(LongSetting setting, long value) {
+		getProperty(setting.name()).set(Long.toString(value));
+	}
+	
+	@Override
+	public void set(BooleanSetting setting, boolean value) {
+		getProperty(setting.name()).set(Boolean.toString(value));
 	}
 
 	private ListenableStringProperty getProperty(String propertyName) {

@@ -23,6 +23,7 @@ import com.avanza.astrix.config.DynamicPropertyListener;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.MapConfigSource;
+import com.avanza.astrix.config.MutableConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.StringSetting;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -31,7 +32,7 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixSettings implements DynamicConfigSource {
+public class AstrixSettings implements DynamicConfigSource, MutableConfigSource {
 	/**
 	 * Defines how long to wait between consecutive bind attempts when a service bean is
 	 * in UNBOUND state.
@@ -128,13 +129,19 @@ public class AstrixSettings implements DynamicConfigSource {
 		this.config.set(settingName, value);
 	}
 	
+	@Override
 	public final <T> void set(Setting<T> setting, T value) {
-		String valueAsString = value != null ? value.toString() : null;
-		this.config.set(setting.name(), valueAsString);
+		this.config.set(setting, value);
 	}
 	
-	public final <T extends Number> void set(Setting<T> setting, int value) {
-		this.config.set(setting.name(), Integer.toString(value));
+	@Override
+	public final void set(LongSetting setting, long value) {
+		this.config.set(setting, value);
+	}
+	
+	@Override
+	public final void set(BooleanSetting setting, boolean value) {
+		this.config.set(setting, value);
 	}
 	
 	public final void remove(String settingName) {
