@@ -16,6 +16,8 @@
 package com.avanza.astrix.beans.service;
 
 import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationException;
+import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationResult;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -41,6 +43,7 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
+import com.avanza.astrix.test.util.AstrixTestUtil;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 import com.avanza.astrix.test.util.Supplier;
@@ -84,6 +87,40 @@ public class ServiceBeanInstanceTest {
 		
 		// Bean should be bound
 		astrixContext.waitForBean(Ping.class, 100);
+	}
+	
+	@Test
+	public void whenServiceNotAvailableOnFirstBindAttemptTheServiceBeanShouldReattemptToBindLater() throws Exception {
+		String serviceId = AstrixDirectComponent.register(Ping.class, new PingImpl());
+		
+		TestAstrixConfigurer config = new TestAstrixConfigurer();
+		config.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
+		config.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
+		config.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
+		config.set("pingUri", AstrixDirectComponent.getServiceUri(serviceId));
+		config.registerApiProvider(PingApiProviderUsingConfigLookup.class);
+		AstrixContext context = config.configure();
+		
+		// Unregister to simulate service that is available in config, but provider not available.
+		AstrixDirectComponent.unregister(serviceId);
+		
+		final Ping ping = context.getBean(Ping.class);
+		try {
+			ping.ping("foo");
+			fail("Bean should not be bound");
+		} catch (ServiceUnavailableException e) {
+			// expected
+		}
+		
+		AstrixDirectComponent.register(Ping.class, new PingImpl(), serviceId);
+
+		assertEventually(serviceInvocationResult(new Supplier<String>() {
+			@Override
+			public String get() throws Exception {
+				return ping.ping("foo");
+			}
+		}, equalTo("foo")));
+		
 	}
 	
 	@Test
