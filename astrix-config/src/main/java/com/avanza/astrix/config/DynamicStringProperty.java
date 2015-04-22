@@ -52,4 +52,9 @@ public final class DynamicStringProperty implements DynamicProperty<String> {
 		this.listener.propertyChanged(value);
 	}
 	
+	@Override
+	public String toString() {
+		return this.value;
+	}
+	
 }

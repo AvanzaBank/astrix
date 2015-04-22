@@ -37,4 +37,9 @@ public class DynamicLongProperty implements DynamicProperty<Long> {
 	public void set(long value) {
 		this.value = value;
 	}
+	
+	@Override
+	public String toString() {
+		return Long.toString(value);
+	}
 }

@@ -37,4 +37,9 @@ public final class DynamicBooleanProperty implements DynamicProperty<Boolean> {
 	public void set(boolean value) {
 		this.value = value;
 	}
+	
+	@Override
+	public String toString() {
+		return Boolean.toString(value);
+	}
 }
