@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -51,8 +50,6 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 	
 	private final AstrixBeanKey<T> beanKey;
 	private final AstrixServiceComponents serviceComponents;
-	private final String subsystem;
-	private final DynamicBooleanProperty enforceSubsystemBoundaries;
 	private final ServiceVersioningContext versioningContext;
 	/*
 	 * Monitor used to signal state changes. (waitForBean)
@@ -61,7 +58,7 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 	private final Condition boundCondition = boundStateLock.newCondition();
 	
 	
-	private final AstrixServiceLookup serviceLookup;
+	private final ServiceLookup serviceLookup;
 	
 	/*
 	 * Guards the state of this service bean instance.
@@ -73,22 +70,20 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 
 	private AstrixServiceBeanInstance(ServiceVersioningContext versioningContext, 
 								AstrixBeanKey<T> beanKey, 
-								AstrixServiceLookup serviceLookup, 
+								ServiceLookup serviceLookup, 
 								AstrixServiceComponents serviceComponents, 
 								DynamicConfig config) {
 		this.serviceLookup = serviceLookup;
 		this.versioningContext = Objects.requireNonNull(versioningContext);
 		this.beanKey = Objects.requireNonNull(beanKey);
 		this.serviceComponents = Objects.requireNonNull(serviceComponents);
-		this.subsystem = AstrixSettings.SUBSYSTEM_NAME.getFrom(config).get();
-		this.enforceSubsystemBoundaries = AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES.getFrom(config);
 		this.currentState = new Unbound();
 		log.info(String.format("Start managing service bean. currentState=%s bean=%s astrixBeanId=%s", currentState.name(), beanKey, id));
 	}
 	
 	public static <T> AstrixServiceBeanInstance<T> create(ServiceVersioningContext versioningContext, 
 								AstrixBeanKey<T> beanKey, 
-								AstrixServiceLookup serviceLookup, 
+								ServiceLookup serviceLookup, 
 								AstrixServiceComponents serviceComponents, 
 								DynamicConfig config) {
 		return new AstrixServiceBeanInstance<T>(versioningContext, beanKey, serviceLookup, serviceComponents, config);
@@ -97,7 +92,7 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 	public void renewLease() {
 		beanStateLock.lock();
 		try {
-			AstrixServiceProperties serviceProperties = serviceLookup.lookup(getBeanKey());
+			AstrixServiceProperties serviceProperties = serviceLookup.lookup();
 			if (serviceHasChanged(serviceProperties)) {
 				bind(serviceProperties);
 			} else {
@@ -120,11 +115,11 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 			if (isBound()) {
 				return;
 			}
-			AstrixServiceProperties serviceProperties = serviceLookup.lookup(getBeanKey());
+			AstrixServiceProperties serviceProperties = serviceLookup.lookup();
 			if (serviceProperties == null) {
 				log.info(String.format(
-					"Failed to discover service bean. ServiceLookup (%s) returned null. bean=%s astrixBeanId=%s", 
-						serviceLookup.toString(), getBeanKey(), id));
+					"Failed to discover service bean. %s returned null. bean=%s astrixBeanId=%s", 
+						serviceLookup.description(), getBeanKey(), id));
 				return;
 			}
 			bind(serviceProperties);
@@ -162,17 +157,6 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 		} finally {
 			boundStateLock.unlock();
 		}
-	}
-	
-	
-	private boolean isAllowedToInvokeService(String providerSubsystem) {
-		if (versioningContext.isVersioned()) {
-			return true;
-		}
-		if (!enforceSubsystemBoundaries.get()) {
-			return true;
-		}
-		return this.subsystem.equals(providerSubsystem);
 	}
 	
 	private AstrixServiceComponent getServiceComponent(AstrixServiceProperties serviceProperties) {
@@ -236,10 +220,6 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 			if (providerSubsystem == null) {
 				providerSubsystem = AstrixSettings.SUBSYSTEM_NAME.defaultValue();
 			}
-			if (!isAllowedToInvokeService(providerSubsystem)) {
-				setState(new IllegalSubsystemState(subsystem, providerSubsystem, beanKey.getBeanType()));
-				return;
-			} 
 			try {
 				AstrixServiceComponent serviceComponent = getServiceComponent(serviceProperties);
 				if (!serviceComponent.canBindType(beanKey.getBeanType())) {
@@ -281,34 +261,6 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 		protected abstract String name();
 		
 		protected abstract void releaseInstance();
-		
-	}
-	
-	private class IllegalSubsystemState extends BeanState {
-		
-		private String currentSubsystem;
-		private String providerSubsystem;
-		private Class<?> beanType;
-
-		public IllegalSubsystemState(String currentSubsystem, String providerSubsystem, Class<?> beanType) {
-			this.currentSubsystem = currentSubsystem;
-			this.providerSubsystem = providerSubsystem;
-			this.beanType = beanType;
-		}
-
-		@Override
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			throw new IllegalSubsystemException(currentSubsystem, providerSubsystem, beanType);
-		}
-		
-		@Override
-		protected void releaseInstance() {
-		}
-		
-		@Override
-		protected String name() {
-			return "IllegalSubsystemState";
-		}
 		
 	}
 	

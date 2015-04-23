@@ -58,7 +58,7 @@ public class AstrixServiceRegistryApiTest {
 		configurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		configurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		context = configurer.configure();
-		serviceRegistryExporterClient = new ServiceRegistryExporterClient(serviceRegistry, "foo", "bar");
+		serviceRegistryExporterClient = new ServiceRegistryExporterClient(serviceRegistry, "default", "bar");
 	}
 	
 	@Test

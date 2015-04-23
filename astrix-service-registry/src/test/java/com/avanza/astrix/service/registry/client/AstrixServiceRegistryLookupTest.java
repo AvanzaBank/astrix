@@ -49,13 +49,6 @@ public class AstrixServiceRegistryLookupTest {
 	private AstrixContext context;
 	private InMemoryServiceRegistry fakeServiceRegistry = new InMemoryServiceRegistry();
 	
-	static {
-	// 	TODO: remove debugging information
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.WARN);
-		Logger.getLogger("com.avanza.astrix").setLevel(Level.DEBUG);
-	}
-	
 	@Before
 	public void setup() {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
@@ -66,7 +59,7 @@ public class AstrixServiceRegistryLookupTest {
 		configurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		configurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		context = configurer.configure();
-		serviceRegistryExporterClient = new ServiceRegistryExporterClient(fakeServiceRegistry, "foo", "bar");
+		serviceRegistryExporterClient = new ServiceRegistryExporterClient(fakeServiceRegistry, "default", "bar");
 	}
 	
 	@Test
@@ -77,7 +70,6 @@ public class AstrixServiceRegistryLookupTest {
 		GreetingService greetingService = context.getBean(GreetingService.class);
 		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), greetingService.hello("kalle"));
 	}
-	
 	
 	@Test
 	public void lookupService_ServiceAvailableInRegistryButItsNotPossibleToBindToIt_ServiceIsBoundWhenServiceBecamesAvailable() throws Exception {

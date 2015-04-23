@@ -45,6 +45,7 @@ public class SimpleAstrixFactoryBeanRegistry implements AstrixFactoryBeanRegistr
 		if (dynamicFactoryBean != null) {
 			return new SynthesizedFactoryBean<T>(dynamicFactoryBean, beanKey);
 		}
+		System.out.println(factoryByBeanKey + " " + beanKey);
 		throw new MissingBeanProviderException(beanKey);
 	}
 	

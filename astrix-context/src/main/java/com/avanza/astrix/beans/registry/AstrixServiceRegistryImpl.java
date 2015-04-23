@@ -17,14 +17,20 @@ package com.avanza.astrix.beans.registry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 
 @AstrixServiceExport(AstrixServiceRegistry.class)
 public class AstrixServiceRegistryImpl implements AstrixServiceRegistry {
 	
+	private final Logger log = LoggerFactory.getLogger(AstrixServiceRegistryImpl.class);
 	private final ServiceRegistryEntryRepository serviceRegistryEntryRepo;
 	private final AtomicLong serviceCounter = new AtomicLong();
 	
@@ -33,24 +39,31 @@ public class AstrixServiceRegistryImpl implements AstrixServiceRegistry {
 	}
 	
 	@Override
-	public <T> AstrixServiceRegistryEntry lookup(String type, String qualifier) {
+	public <T> AstrixServiceRegistryEntry lookup(String type, String qualifier, ServiceConsumerProperties serviceConsumerProperties) {
 		List<AstrixServiceRegistryEntry> entries = serviceRegistryEntryRepo.findByServiceKey(new ServiceKey(type, qualifier));
 		if (entries.isEmpty()) {
 			return null;
 		}
-		List<AstrixServiceRegistryEntry> activeServices = getActiveServices(entries);
+		List<AstrixServiceRegistryEntry> activeServices = getServiceProvidersForConsumer(entries, serviceConsumerProperties);
 		if (activeServices.isEmpty()) {
 			return null;
 		}
 		return activeServices.get((int) (serviceCounter.incrementAndGet() % activeServices.size()));
 	}
 
-	private List<AstrixServiceRegistryEntry> getActiveServices(List<AstrixServiceRegistryEntry> entries) {
+	private List<AstrixServiceRegistryEntry> getServiceProvidersForConsumer(List<AstrixServiceRegistryEntry> entries, ServiceConsumerProperties serviceConsumer) {
 		List<AstrixServiceRegistryEntry> activeServices = new ArrayList<>(entries.size());
+		String consumerZone = serviceConsumer.getProperty(ServiceConsumerProperties.CONSUMER_ZONE);
 		for (AstrixServiceRegistryEntry entry : entries) {
-			if (!ServiceState.INACTIVE.equals(entry.getServiceProperties().get(AstrixServiceProperties.SERVICE_STATE))) {
+			if ("true".equals(entry.getServiceProperties().get(AstrixServiceProperties.PUBLISHED))) {
 				activeServices.add(entry);
+				continue;
 			}
+			if (!Objects.equals(consumerZone, entry.getServiceProperties().get(AstrixServiceProperties.SERVICE_ZONE))) {
+				log.debug("Discarding service-provider={}, consumer={}", entry.getServiceProperties(), serviceConsumer);
+				continue;
+			}
+			activeServices.add(entry);
 		}
 		return activeServices;
 	}

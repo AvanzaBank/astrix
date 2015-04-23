@@ -23,9 +23,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Test;
@@ -52,13 +49,6 @@ public class ServiceBeanInstanceTest {
 	
 	private AstrixContext astrixContext;
 
-	static {
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.WARN);
-		Logger.getLogger(AstrixServiceBeanInstance.class).setLevel(Level.DEBUG);
-		Logger.getLogger(AstrixServiceLeaseManager.class).setLevel(Level.DEBUG);
-	}
-	
 	@After
 	public void destroy() {
 		if (astrixContext != null) {
@@ -148,38 +138,6 @@ public class ServiceBeanInstanceTest {
 		assertEquals("All bound beans should be release when context is destroyed", 0, directComponent.getBoundServices().size());
 	}
 	
-	@Test
-	public void boundServiceInstancesShouldBeReleasedWhenMovingFromBoundStateToIllegalSubsystemState() throws Exception {
-		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
-		serviceRegistry.registerProvider(Ping.class, new PingImpl(), "consumerSubsystem");
-		
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.registerApiProvider(PingApiProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
-		astrixConfigurer.setSubsystem("consumerSubsystem");
-		astrixConfigurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 5);
-		astrixConfigurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
-		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
-		
-		AstrixDirectComponent directComponent = astrixContext.getInstance(AstrixServiceComponents.class).getComponent(AstrixDirectComponent.class);
-
-		final Ping ping = astrixContext.getBean(Ping.class);
-		ping.ping("foo");
-		
-		assertEquals(2, directComponent.getBoundServices().size());
-		
-		serviceRegistry.registerProvider(Ping.class, new PingImpl(), "anotherSubsystem");
-		assertEventually(serviceInvocationException(new Supplier<String>() {
-			@Override
-			public String get() throws Exception {
-				return ping.ping("foo");
-			}
-		}, CoreMatchers.any(IllegalSubsystemException.class)));
-		
-		assertEquals(1, directComponent.getBoundServices().size());
-	}
 	
 	@Test
 	public void boundServiceInstancesShouldBeReleasedWhenMovingToUnboundState() throws Exception {
@@ -213,63 +171,9 @@ public class ServiceBeanInstanceTest {
 	}
 	
 	
-	@Test
-	public void transitionsToUnboundStateFromIllegalSubsystemStateWhenServiceIsRemoved() throws Exception {
-		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
-		serviceRegistry.registerProvider(Ping.class, new PingImpl(), "consumerSubsystem");
-		
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.registerApiProvider(PingApiProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
-		astrixConfigurer.setSubsystem("consumerSubsystem");
-		astrixConfigurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 5);
-		astrixConfigurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
-		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		astrixContext = astrixConfigurer.configure();
-		
-		final Ping ping = astrixContext.getBean(Ping.class);
-		ping.ping("foo");
-		
-		serviceRegistry.registerProvider(Ping.class, new PingImpl(), "anotherSubsystem");
-		assertEventually(serviceInvocationException(new Supplier<String>() {
-			@Override
-			public String get() throws Exception {
-				return ping.ping("foo");
-			}
-		}, CoreMatchers.any(IllegalSubsystemException.class)));
-		
-		serviceRegistry.clear();
-		
-		assertEventually(serviceInvocationException(new Supplier<String>() {
-			@Override
-			public String get() throws Exception {
-				return ping.ping("foo");
-			}
-		}, CoreMatchers.any(ServiceUnavailableException.class)));
-		
-	}
-
 	private void assertEventually(Probe serviceInvocationException)
 			throws InterruptedException {
 		new Poller(100, 1).check(serviceInvocationException);
-	}
-	
-	@Test(expected = IllegalSubsystemException.class)
-	public void serviceBeanThrowsIllegalSubsystemException_WhenConsumingUnversionedServiceThatBelongsToAnotherSubsystem() throws Exception {
-		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
-		serviceRegistry.registerProvider(Ping.class, new PingImpl(), "pingServiceSubsystem");
-		
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.registerApiProvider(PingApiProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
-		astrixConfigurer.setSubsystem("anotherSubsystem");
-		astrixConfigurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
-		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		AstrixContext astrixContext = astrixConfigurer.configure();
-		
-		astrixContext.getBean(Ping.class).ping("foo");
 	}
 	
 	@Test
@@ -286,31 +190,6 @@ public class ServiceBeanInstanceTest {
 		AstrixContext astrixContext = astrixConfigurer.configure();
 		
 		assertEquals("foo", astrixContext.getBean(Ping.class).ping("foo"));
-	}
-	
-	@Test
-	public void serviceBeanIsConsideredBoundWhenMovedToIllegalSubsystemState() throws Exception {
-		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
-		
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
-		astrixConfigurer.registerApiProvider(PingApiProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
-		astrixConfigurer.setSubsystem("anotherSubsystem");
-		astrixConfigurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, true);
-		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-
-		astrixContext = astrixConfigurer.configure();
-		
-		// Get bean in unbound state
-		astrixContext.getBean(Ping.class);
-		
-		// Register provider belonging to another subsystem
-		serviceRegistry.registerProvider(Ping.class, new PingImpl(), "pingServiceSubsystem");
-		
-		// Bean should be bound
-		astrixContext.waitForBean(Ping.class, 100);
 	}
 	
 	@Test(expected = MyException.class)

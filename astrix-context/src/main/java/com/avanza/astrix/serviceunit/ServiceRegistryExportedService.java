@@ -15,8 +15,6 @@
  */
 package com.avanza.astrix.serviceunit;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.registry.ServiceState;
 import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
@@ -25,12 +23,12 @@ class ServiceRegistryExportedService {
 	
 	private final Class<?> asyncService;
 	private final AstrixServiceComponent serviceComponent;
-	private volatile String serviceState;
+	private volatile boolean publishServices;
 	private final ServiceBeanDefinition serviceBeanDefinition;
 	
-	public ServiceRegistryExportedService(AstrixServiceComponent serviceComponent, ServiceBeanDefinition serviceBeanDefinition, String serviceState) {
+	public ServiceRegistryExportedService(AstrixServiceComponent serviceComponent, ServiceBeanDefinition serviceBeanDefinition, boolean publishServices) {
 		this.serviceBeanDefinition = serviceBeanDefinition;
-		this.serviceState = serviceState;
+		this.publishServices = publishServices;
 		if (!serviceComponent.canBindType(serviceBeanDefinition.getBeanType())) {
 			throw new UnsupportedTargetTypeException(serviceComponent.getName(), serviceBeanDefinition.getBeanType());
 		}
@@ -60,11 +58,25 @@ class ServiceRegistryExportedService {
 
 	public AstrixServiceProperties exportServiceProperties() {
 		AstrixServiceProperties serviceProperties = serviceComponent.createServiceProperties(serviceBeanDefinition.getBeanType());
-		serviceProperties.getProperties().put(AstrixServiceProperties.SERVICE_STATE, getServiceState());
+		serviceProperties.getProperties().put(AstrixServiceProperties.PUBLISHED, Boolean.toString(isPublished()));
 		serviceProperties.setApi(serviceBeanDefinition.getBeanKey().getBeanType());
 		serviceProperties.setQualifier(serviceBeanDefinition.getBeanKey().getQualifier());
 		serviceProperties.setComponent(serviceComponent.getName());
 		return serviceProperties;
+	}
+
+	private boolean isPublished() {
+		if (serviceBeanDefinition.isAlwaysActive()) {
+			return true;
+		}
+		if (!publishServices) {
+			return false;
+		}
+		return serviceBeanDefinition.getVersioningContext().isVersioned();
+	}
+	
+	public void setPublishServices(boolean published) {
+		this.publishServices = published;
 	}
 
 	public AstrixServiceProperties exportAsyncServiceProperties() {
@@ -73,12 +85,4 @@ class ServiceRegistryExportedService {
 		return serviceProperties;
 	}
 	
-	private String getServiceState() {
-		return serviceBeanDefinition.isAlwaysActive() ? ServiceState.ACTIVE : serviceState;
-	}
-
-	public void setState(String serviceState) {
-		this.serviceState = serviceState;
-	}
-
 }

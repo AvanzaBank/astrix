@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 import com.avanza.astrix.config.BooleanSetting;
 import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
@@ -30,6 +31,7 @@ import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.MutableConfigSource;
 import com.avanza.astrix.config.Setting;
+import com.avanza.astrix.config.StringSetting;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 /**
@@ -57,8 +59,8 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	}
 	
 	@Override
-	public <T> AstrixServiceRegistryEntry lookup(String type, String qualifier) {
-		return serviceRegistry.lookup(type, qualifier);
+	public <T> AstrixServiceRegistryEntry lookup(String type, String qualifier, ServiceConsumerProperties consumerProperties) {
+		return serviceRegistry.lookup(type, qualifier, consumerProperties);
 	}
 	
 	@Override
@@ -125,7 +127,8 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	public <T> void registerProvider(Class<T> api, T provider, String subsystem) {
 		// TODO: remove this method?
 		ServiceRegistryExporterClient serviceRegistryClient = new ServiceRegistryExporterClient(this.serviceRegistry, subsystem, api.getName());
-		serviceRegistryClient.register(api, AstrixDirectComponent.registerAndGetProperties(api, provider), 60_000);
+		AstrixServiceProperties servicePRoperties = AstrixDirectComponent.registerAndGetProperties(api, provider);
+		serviceRegistryClient.register(api, servicePRoperties, 60_000);
 	}
 	
 	/**
@@ -142,7 +145,7 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	public String get(String propertyName) {
 		return configSource.get(propertyName);
 	}
-
+	
 	@Override
 	public String get(String propertyName, DynamicPropertyListener<String> propertyChangeListener) {
 		return configSource.get(propertyName, propertyChangeListener);

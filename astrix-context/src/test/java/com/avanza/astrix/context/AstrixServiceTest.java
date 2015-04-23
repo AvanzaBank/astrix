@@ -22,7 +22,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,10 +40,6 @@ public class AstrixServiceTest {
 	private static final String GREETING_SERVICE_URI = "greetingServiceUri";
 	private AstrixContextImpl context;
 	TestAstrixConfigurer configurer = new TestAstrixConfigurer();
-	
-	static {
-		BasicConfigurator.configure();
-	}
 	
 	@Before
 	public void setup() {

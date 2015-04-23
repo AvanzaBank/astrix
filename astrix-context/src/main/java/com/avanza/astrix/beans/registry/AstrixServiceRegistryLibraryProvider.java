@@ -15,15 +15,34 @@
  */
 package com.avanza.astrix.beans.registry;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.service.ServiceConsumerProperties;
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.context.AstrixConfigAware;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 
 @AstrixApiProvider
-public class AstrixServiceRegistryLibraryProvider {
+public class AstrixServiceRegistryLibraryProvider implements AstrixConfigAware {
+
+	private DynamicConfig config;
 
 	@Library
 	public AstrixServiceRegistryClient createClient(AstrixServiceRegistry serviceRegistry) {
-		return new AstrixServiceRegistryClient(serviceRegistry);
+		ServiceConsumerProperties serviceConsumerProperties = new ServiceConsumerProperties();
+		String subsystem = AstrixSettings.SUBSYSTEM_NAME.getFrom(config).get();
+		String applicationTag = AstrixSettings.APPLICATION_TAG.getFrom(config).get();
+		String zone = subsystem;
+		if (applicationTag != null) {
+			zone = subsystem + "#" + applicationTag;
+		}
+		serviceConsumerProperties.setProperty(ServiceConsumerProperties.CONSUMER_ZONE, zone);
+		return new AstrixServiceRegistryClient(serviceRegistry, serviceConsumerProperties);
+	}
+
+	@Override
+	public void setConfig(DynamicConfig config) {
+		this.config = config;
 	}
 	
 }

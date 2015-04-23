@@ -24,7 +24,7 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
-import com.avanza.astrix.beans.service.AstrixServiceLookupFactory;
+import com.avanza.astrix.beans.service.AstrixServiceLookupMetaFactory;
 import com.avanza.astrix.context.AstrixPublishedBeanDefinitionMethod;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
@@ -40,7 +40,7 @@ import com.avanza.astrix.provider.versioning.Versioned;
 @MetaInfServices(ServiceProviderPlugin.class)
 public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	
-	private AstrixServiceLookupFactory serviceLookupFactory;
+	private AstrixServiceLookupMetaFactory serviceLookupFactory;
 
 	@Override
 	public List<ServiceBeanDefinition> getProvidedServices(AstrixApiProviderClass apiProvider) {
@@ -77,7 +77,7 @@ public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	}
 	
 	@AstrixInject
-	public void setServiceLookupFactory(AstrixServiceLookupFactory serviceLookupFactory) {
+	public void setServiceLookupFactory(AstrixServiceLookupMetaFactory serviceLookupFactory) {
 		this.serviceLookupFactory = serviceLookupFactory;
 	}
 	

@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
@@ -53,7 +54,8 @@ public class LunchGraderIntegrationTest {
 		serviceRegistry.registerProvider(LunchService.class, lunchMock, "lunch-system");
 		
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		configurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		configurer.setSubsystem("lunch-system");
 		AstrixContext astrix = configurer.configure();
 		final LunchRestaurantGrader grader = astrix.waitForBean(LunchRestaurantGrader.class, 5_000);
 		

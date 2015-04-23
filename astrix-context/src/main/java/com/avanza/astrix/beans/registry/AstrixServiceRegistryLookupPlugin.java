@@ -20,24 +20,20 @@ import org.kohsuke.MetaInfServices;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
-import com.avanza.astrix.beans.service.AstrixServiceLookupPlugin;
+import com.avanza.astrix.beans.service.AstrixServiceLookupMetaFactoryPlugin;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceConsumerProperties;
+import com.avanza.astrix.beans.service.ServiceLookup;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-@MetaInfServices(AstrixServiceLookupPlugin.class)
-public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupPlugin<AstrixServiceRegistryLookup>, AstrixPublishedBeansAware {
+@MetaInfServices(AstrixServiceLookupMetaFactoryPlugin.class)
+public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupMetaFactoryPlugin<AstrixServiceRegistryLookup>, AstrixPublishedBeansAware {
 
 	private AstrixPublishedBeans beans;
-
-	@Override
-	public AstrixServiceProperties lookup(AstrixBeanKey<?> beanKey, AstrixServiceRegistryLookup lookupAnnotation) {
-		AstrixServiceRegistryClient serviceRegistryClient = beans.getBean(AstrixBeanKey.create(AstrixServiceRegistryClient.class, null));
-		return serviceRegistryClient.lookup(beanKey);
-	}
 
 	@Override
 	public Class<AstrixServiceRegistryLookup> getLookupAnnotationType() {
@@ -47,6 +43,43 @@ public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupPlu
 	@Override
 	public void setAstrixBeans(AstrixPublishedBeans beans) {
 		this.beans = beans;
+	}
+
+	@Override
+	public ServiceLookup create(AstrixBeanKey<?> key, AstrixServiceRegistryLookup lookupAnnotation) {
+		return new ServiceRegistryLookup(key, beans);
+	}
+	
+	private static class ServiceRegistryLookup implements ServiceLookup {
+	
+		/*
+		 * IMPLEMENTATION NOTE:
+		 * 
+		 * This class requires an AstrixServiceRegistryClient. Since we can't make sure that
+		 * a service-factory for AstrixServiceRegistryClient is registered in the bean factory
+		 * (behind the AstrixPublishedBeansAware interface) before an instance of ServiceRegistryLookup
+		 * is created, we have to inject the AstrixPublishedBeans here and query it for an instance
+		 * on each invocation.
+		 */
+		private AstrixPublishedBeans beans;
+		private AstrixBeanKey<?> beanKey;
+
+		public ServiceRegistryLookup(AstrixBeanKey<?> key,
+				AstrixPublishedBeans beans) {
+			this.beanKey = key;
+			this.beans = beans;
+		}
+		
+		@Override
+		public String description() {
+			return "ServiceRegistry";
+		}
+
+		@Override
+		public AstrixServiceProperties lookup() {
+			return beans.getBean(AstrixBeanKey.create(AstrixServiceRegistryClient.class, null)).lookup(beanKey);
+		}
+		
 	}
 
 }

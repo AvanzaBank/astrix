@@ -53,13 +53,13 @@ public class ServiceRegistryV1ApiMigration implements AstrixJsonApiMigration {
 			
 			// ServiceState was introduced to allow multiple servers providing same service. 
 			// We assume old servers are not run concurrently and hence alwasy assume them to be active
-			ObjectNode.class.cast(json.get("serviceProperties")).put(AstrixServiceProperties.SERVICE_STATE, ServiceState.ACTIVE);
+//			ObjectNode.class.cast(json.get("serviceProperties")).put(AstrixServiceProperties., ServiceState.ACTIVE);
 		}
 
 		@Override
 		public void downgrade(ObjectNode json) {
 			ObjectNode.class.cast(json.get("serviceProperties")).remove(AstrixServiceProperties.APPLICATION_INSTANCE_ID);
-			ObjectNode.class.cast(json.get("serviceProperties")).remove(AstrixServiceProperties.SERVICE_STATE);
+//			ObjectNode.class.cast(json.get("serviceProperties")).remove(AstrixServiceProperties.SERVICE_STATE);
 		}
 	}
 

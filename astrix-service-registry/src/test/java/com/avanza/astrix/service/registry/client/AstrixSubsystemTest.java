@@ -23,7 +23,7 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
-import com.avanza.astrix.beans.service.IllegalSubsystemException;
+import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -35,40 +35,8 @@ import com.avanza.astrix.provider.versioning.Versioned;
 
 public class AstrixSubsystemTest {
 	
-	@Test(expected = IllegalSubsystemException.class)
-	public void itsNotAllowedToInvokeNonVersionedServicesInOtherSubsystems() throws Exception {
-		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
-		// Simulate two different subsystems using to AstrixContextImpl's
-		TestAstrixConfigurer configurerA = new TestAstrixConfigurer();
-		configurerA.setSubsystem("A");
-		configurerA.registerApiProvider(GreetingServiceProvider.class);
-		configurerA.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
-		configurerA.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		AstrixContext contextA = configurerA.configure();
-		
-		TestAstrixConfigurer configurerB = new TestAstrixConfigurer();
-		configurerB.setSubsystem("B");
-		configurerB.registerApiProvider(GreetingServiceProvider.class);
-		configurerB.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
-		configurerB.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		AstrixContext contextB = configurerB.configure();
-
-		// Publish non versioned service in contextB
-		ServiceRegistryExporterClient serviceRegistryClientB = new ServiceRegistryExporterClient(serviceRegistry, "B", "FooInstanceId");
-		serviceRegistryClientB.register(GreetingService.class, AstrixDirectComponent.registerAndGetProperties(GreetingService.class, new GreetingServiceImpl("hello")), 1000);
-		
-		GreetingService greetingServiceB = contextB.getBean(GreetingService.class);
-		
-		assertNotNull("Its allowed to invoce service provided in same subsystem", greetingServiceB.hello("foo"));
-		
-		GreetingService greetingServiceA = contextA.getBean(GreetingService.class);
-		
-		// It should not be allowed to invoke this service since its in subsystem A
-		greetingServiceA.hello("bar");
-	}
-	
 	@Test
-	public void itsAllowedToInvokeVersionedServicesInOtherSubsystems() throws Exception {
+	public void itsAllowedToInvokePublishedServicesInOtherSubsystems() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		// Simulate two different subsystems using to AstrixContextImpl's
 		TestAstrixConfigurer configurerA = new TestAstrixConfigurer();
@@ -87,7 +55,9 @@ public class AstrixSubsystemTest {
 
 		// Publish non versioned service in contextB
 		ServiceRegistryExporterClient serviceRegistryClientB = new ServiceRegistryExporterClient(serviceRegistry, "B", "FooInstanceId");
-		serviceRegistryClientB.register(GreetingService.class, AstrixDirectComponent.registerAndGetProperties(GreetingService.class, new GreetingServiceImpl("hello")), 1000);
+		AstrixServiceProperties serviceProperties = AstrixDirectComponent.registerAndGetProperties(GreetingService.class, new GreetingServiceImpl("hello"));
+		serviceProperties.setProperty(AstrixServiceProperties.PUBLISHED, "true");
+		serviceRegistryClientB.register(GreetingService.class, serviceProperties, 1000);
 		
 		GreetingService greetingServiceB = contextB.getBean(GreetingService.class);
 		

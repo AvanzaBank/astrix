@@ -17,6 +17,7 @@ package com.avanza.astrix.beans.registry;
 
 import java.util.List;
 
+import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixRouting;
 /**
@@ -26,12 +27,15 @@ import com.avanza.astrix.core.AstrixRouting;
  */
 public interface AstrixServiceRegistry {
 	
-	<T> AstrixServiceRegistryEntry lookup(@AstrixRouting String type, String qualifier);
+	// TODO: versioning: Add empty service-consumer-properties for old clients?
+	<T> AstrixServiceRegistryEntry lookup(@AstrixRouting String type, String qualifier, ServiceConsumerProperties serviceConsumerProperties);
 	
 	<T> void register(AstrixServiceRegistryEntry properties, long lease);
 	
 	<T> void deregister(AstrixServiceRegistryEntry properties);
 	
+	
+	// Administration methods, move to another service interface?
 	@AstrixBroadcast
 	List<AstrixServiceRegistryEntry> listServices();
 	

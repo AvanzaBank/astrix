@@ -20,9 +20,9 @@ import java.util.Objects;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
-import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.factory.DynamicFactoryBean;
 import com.avanza.astrix.beans.factory.FactoryBean;
+import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
@@ -35,27 +35,28 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 public class AstrixServiceFactory<T> implements DynamicFactoryBean<T> {
 
 	private final AstrixServiceComponents serviceComponents;
-	private final AstrixServiceLookup serviceLookup;
+	private final ServiceLookupFactory<?> serviceLookupFactory;
 	private final AstrixServiceLeaseManager leaseManager;
 	private final ServiceVersioningContext versioningContext;
 	private final DynamicConfig config;
 	private final Class<T> type;
 
 	public AstrixServiceFactory(ServiceVersioningContext versioningContext, 
-								AstrixServiceLookup serviceLookup, 
+								ServiceLookupFactory<?> serviceLookup, 
 								AstrixServiceComponents serviceComponents, 
 								AstrixServiceLeaseManager leaseManager,
 								DynamicConfig config,
 								Class<T> type) {
 		this.config = config;
 		this.versioningContext = Objects.requireNonNull(versioningContext);
-		this.serviceLookup = Objects.requireNonNull(serviceLookup);
+		this.serviceLookupFactory = Objects.requireNonNull(serviceLookup);
 		this.serviceComponents = Objects.requireNonNull(serviceComponents);
 		this.leaseManager = Objects.requireNonNull(leaseManager);
 		this.type = Objects.requireNonNull(type);
 	}
 
 	public T create(AstrixBeanKey<T> beanKey) {
+		ServiceLookup serviceLookup = serviceLookupFactory.create(beanKey);
 		AstrixServiceBeanInstance<T> serviceBeanInstance = AstrixServiceBeanInstance.create(versioningContext, beanKey, serviceLookup, serviceComponents, config);
 		serviceBeanInstance.bind();
 		leaseManager.startManageLease(serviceBeanInstance);
@@ -72,7 +73,7 @@ public class AstrixServiceFactory<T> implements DynamicFactoryBean<T> {
 
 	public static <T> FactoryBean<T> dynamic(ServiceVersioningContext versioningContext, 
 													Class<T> beanType, 
-													AstrixServiceLookup serviceLookup, 
+													ServiceLookupFactory<?> serviceLookup, 
 													AstrixServiceComponents serviceComponents, 
 													AstrixServiceLeaseManager leaseManager,
 													DynamicConfig config) {
@@ -81,7 +82,7 @@ public class AstrixServiceFactory<T> implements DynamicFactoryBean<T> {
 	
 	public static <T> FactoryBean<T> standard(ServiceVersioningContext versioningContext, 
 													AstrixBeanKey<T> beanType, 
-													AstrixServiceLookup serviceLookup, 
+													ServiceLookupFactory<?> serviceLookup, 
 													AstrixServiceComponents serviceComponents, 
 													AstrixServiceLeaseManager leaseManager,
 													DynamicConfig config) {

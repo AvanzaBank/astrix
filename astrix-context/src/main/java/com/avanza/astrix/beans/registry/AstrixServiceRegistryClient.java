@@ -21,6 +21,7 @@ import java.util.Objects;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -29,13 +30,15 @@ import com.avanza.astrix.beans.service.AstrixServiceProperties;
 public class AstrixServiceRegistryClient {
 	
 	private final AstrixServiceRegistry serviceRegistry;
+	private final ServiceConsumerProperties consumerProperties;
 
-	public AstrixServiceRegistryClient(AstrixServiceRegistry serviceRegistry) {
+	public AstrixServiceRegistryClient(AstrixServiceRegistry serviceRegistry, ServiceConsumerProperties serviceConsumerProperties) {
+		this.consumerProperties = Objects.requireNonNull(serviceConsumerProperties);
 		this.serviceRegistry = Objects.requireNonNull(serviceRegistry);
 	}
 
 	public <T> AstrixServiceProperties lookup(AstrixBeanKey<T> beanKey) {
-		AstrixServiceRegistryEntry entry = serviceRegistry.lookup(beanKey.getBeanType().getName(), beanKey.getQualifier());
+		AstrixServiceRegistryEntry entry = serviceRegistry.lookup(beanKey.getBeanType().getName(), beanKey.getQualifier(), consumerProperties);
 		if (entry == null) {
 			return null;
 		}

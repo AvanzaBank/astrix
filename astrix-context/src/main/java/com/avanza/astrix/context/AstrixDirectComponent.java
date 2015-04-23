@@ -34,6 +34,7 @@ import com.avanza.astrix.beans.service.AstrixServiceComponent;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 /**
@@ -121,6 +122,12 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 		AstrixServiceProperties serviceProperties = new AstrixServiceProperties();
 		serviceProperties.setProperty("providerId", id);
 		serviceProperties.setComponent(AstrixServiceComponentNames.DIRECT);
+		ServiceProvider<?> serviceProvider = providerById.get(id);
+		if (serviceProvider == null) {
+			return serviceProperties; // TODO: Throw exception when no service-provider found. Requires rewrite of two unit-tests.
+		}
+		serviceProperties.setApi(serviceProvider.getType());
+		serviceProperties.setProperty(AstrixServiceProperties.PUBLISHED, "true"); 
 		return serviceProperties;
 	}
 	

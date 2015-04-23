@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.BasicConfigurator;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,9 +30,9 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
+import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixDirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -53,10 +52,6 @@ public class AstrixServiceRegistryLeaseManagerTest {
 	private CorruptableServiceRegistry serviceRegistry = new CorruptableServiceRegistry();
 	private TestService testService;
 	
-	static {
-		BasicConfigurator.configure();
-	}
-	
 	@Before
 	public void setup() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
@@ -67,7 +62,7 @@ public class AstrixServiceRegistryLeaseManagerTest {
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		astrixConfigurer.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		context = astrixConfigurer.configure();
-		serviceRegistryExporterClient = new ServiceRegistryExporterClient(serviceRegistry, "foo", "bar");
+		serviceRegistryExporterClient = new ServiceRegistryExporterClient(serviceRegistry, "default", "bar");
 		
 		TestService impl = new TestService() {
 			@Override
@@ -125,9 +120,9 @@ public class AstrixServiceRegistryLeaseManagerTest {
 		private volatile CountDownLatch exceptionsToThrow = new CountDownLatch(0);
 		
 		@Override
-		public <T> AstrixServiceRegistryEntry lookup(String type, String qualifier) {
+		public <T> AstrixServiceRegistryEntry lookup(String type, String qualifier, ServiceConsumerProperties serviceConsumerProperties) {
 			throwIfCorrupt();
-			return super.lookup(type, qualifier);
+			return super.lookup(type, qualifier, serviceConsumerProperties);
 		}
 		
 		@Override

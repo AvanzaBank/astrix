@@ -17,7 +17,6 @@ package com.avanza.astrix.integration.tests;
 
 import java.io.IOException;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -29,7 +28,6 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 public class LunchGraderPuRunner {
 	
 	public static void main(String[] args) throws IOException {
-		BasicConfigurator.configure();
 		Logger.getRootLogger().setLevel(Level.INFO);
 		System.setProperty("com.gs.jini_lus.groups", "lunch-grader-pu");
 		AstrixSettings settings = new AstrixSettings();

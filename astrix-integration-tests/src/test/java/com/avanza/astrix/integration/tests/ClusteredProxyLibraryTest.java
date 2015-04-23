@@ -19,9 +19,6 @@ import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lun
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -30,10 +27,10 @@ import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
-import com.avanza.astrix.beans.service.IllegalSubsystemException;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
@@ -61,12 +58,6 @@ public class ClusteredProxyLibraryTest {
 	private AstrixConfigurer configurer = new AstrixConfigurer();
 	private AstrixContext astrix;
 	
-	static {
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.WARN);
-		Logger.getLogger("com.avanza.astrix").setLevel(Level.DEBUG);
-	}
-	
 	@Before
 	public void setup() throws Exception {
 		GigaSpace proxy = lunchPu.getClusteredGigaSpace();
@@ -89,7 +80,7 @@ public class ClusteredProxyLibraryTest {
 		assertEquals(1, astrix.getBean(LunchStatistics.class).getRestaurantCount());
 	}
 	
-	@Test(expected = IllegalSubsystemException.class)
+	@Test(expected = ServiceUnavailableException.class)
 	public void aClusteredProxyIsNotConsumableFromAnotherSubsystem() throws Exception {
 		configurer.setSubsystem("another-subsystem");
 		astrix = configurer.configure();

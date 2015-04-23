@@ -27,9 +27,6 @@ import java.util.Properties;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -42,11 +39,11 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
-import com.avanza.astrix.beans.service.IllegalSubsystemException;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
+import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.common.Ping;
@@ -54,7 +51,6 @@ import com.avanza.astrix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.api.LunchServiceAsync;
-import com.avanza.astrix.integration.tests.domain.api.LunchStatistics;
 import com.avanza.astrix.integration.tests.domain.api.LunchUtil;
 import com.avanza.astrix.integration.tests.domain.apiruntime.feeder.InternalLunchFeeder;
 import com.avanza.astrix.integration.tests.domain.pu.LunchApplicationDescriptor;
@@ -119,12 +115,6 @@ public class AstrixIntegrationTest {
 
 	private AstrixServiceRegistry serviceRegistry;
 
-	static {
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.WARN);
-		Logger.getLogger("com.avanza.astrix").setLevel(Level.DEBUG);
-	}
-	
 	@Before
 	public void setup() throws Exception {
 		GigaSpace proxy = lunchPu.getClusteredGigaSpace();
@@ -152,7 +142,6 @@ public class AstrixIntegrationTest {
 		astrix.waitForBean(LunchServiceAsync.class, 5000);
 		astrix.waitForBean(PublicLunchFeeder.class, 5000);
 		astrix.waitForBean(AstrixServiceRegistry.class, 5000);
-		astrix.waitForBean(LunchStatistics.class, 5000);
 		astrix.waitForBean(Ping.class, "lunch-ping", 5000);
 	}
 	
@@ -241,11 +230,11 @@ public class AstrixIntegrationTest {
 	public void leasesServices() throws Exception {
 		AstrixServiceProperties properties = new AstrixServiceProperties();
 		properties.setApi(FooService.class);
-		ServiceRegistryExporterClient exporterClient = new ServiceRegistryExporterClient(serviceRegistry, "foo-subsystem", "foo-app-instance-id");
+		ServiceRegistryExporterClient exporterClient = new ServiceRegistryExporterClient(serviceRegistry, "test-sub-system" , "foo-app-instance-id");
 		exporterClient.register(FooService.class, properties, 1000);
 		
 		AstrixServiceProperties props = serviceRegistryClient.lookup(AstrixBeanKey.create(FooService.class));
-		assertNotNull("Expected properties to exists after registreation", props);
+		assertNotNull("Expected properties to exists after registration", props);
 		
 		assertEventually(AstrixTestUtil.serviceInvocationResult(new Supplier<Object>() {
 			public Object get() {
@@ -260,8 +249,8 @@ public class AstrixIntegrationTest {
 		assertEquals(LunchApplicationDescriptor.class.getName(), serviceProperties.getProperties().get(AstrixServiceProperties.APPLICATION_INSTANCE_ID));
 	}
 	
-	@Test(expected = IllegalSubsystemException.class)
-	public void itsNotAllowedToCreateServicesBeansThatBindsToServicesInOtherSubSystems() throws Exception {
+	@Test(expected = ServiceUnavailableException.class)
+	public void itsNotPossibleToBindToNonPublishedServiceBeansProvidedByOtherSubsystems() throws Exception {
 		astrix.getBean(InternalLunchFeeder.class).addLunchRestaurant(lunchRestaurant().build());;
 	}
 	

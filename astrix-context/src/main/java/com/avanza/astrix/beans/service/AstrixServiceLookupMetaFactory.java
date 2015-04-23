@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 
 /**
@@ -28,36 +29,36 @@ import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceLookupFactory {
+public class AstrixServiceLookupMetaFactory {
 	
-	private final ConcurrentMap<Class<?>, AstrixServiceLookupPlugin<?>> lookupStrategyByAnnotationType = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Class<?>, AstrixServiceLookupMetaFactoryPlugin<?>> lookupStrategyByAnnotationType = new ConcurrentHashMap<>();
 	
-	public AstrixServiceLookupFactory(List<AstrixServiceLookupPlugin<?>> serviceLookupPlugins) {
-		for (AstrixServiceLookupPlugin<?> lookupPlugin : serviceLookupPlugins) {
+	public AstrixServiceLookupMetaFactory(List<AstrixServiceLookupMetaFactoryPlugin<?>> serviceLookupPlugins) {
+		for (AstrixServiceLookupMetaFactoryPlugin<?> lookupPlugin : serviceLookupPlugins) {
 			this.lookupStrategyByAnnotationType.put(lookupPlugin.getLookupAnnotationType(), lookupPlugin);
 		}
 	}
 	
-
-	public AstrixServiceLookup createServiceLookup(AnnotatedElement annotatedElement) {
-		AstrixServiceLookupPlugin<?> servcieLookupPlugin = getServiceLookupPlugin(annotatedElement);
+	public ServiceLookupFactory<?> createServiceLookup(AstrixBeanKey<?> beanKey, AnnotatedElement annotatedElement) {
+		AstrixServiceLookupMetaFactoryPlugin<?> servcieLookupPlugin = getServiceLookupPlugin(annotatedElement);
 		if (servcieLookupPlugin != null) {
-			return create(annotatedElement, servcieLookupPlugin);
+			return create(beanKey, annotatedElement, servcieLookupPlugin);
 		}
 		throw new IllegalArgumentException("Can't identify what lookup-strategy to use to locate services exported using annotated element: " + annotatedElement);
 	}
 	
-	private <T extends Annotation> AstrixServiceLookup create(AnnotatedElement annotatedElement, AstrixServiceLookupPlugin<T> lookupPlugin) {
-		return AstrixServiceLookup.create(lookupPlugin, annotatedElement.getAnnotation(lookupPlugin.getLookupAnnotationType()));
+	private <T extends Annotation> ServiceLookupFactory<?> create(AstrixBeanKey<?> beanKey, AnnotatedElement annotatedElement, AstrixServiceLookupMetaFactoryPlugin<T> lookupPlugin) {
+		T annotation = annotatedElement.getAnnotation(lookupPlugin.getLookupAnnotationType());
+		return new ServiceLookupFactory<>(lookupPlugin, annotation);
 	}
 	
-	private AstrixServiceLookupPlugin<?> getServiceLookupPlugin(AnnotatedElement annotatedElement) {
+	private AstrixServiceLookupMetaFactoryPlugin<?> getServiceLookupPlugin(AnnotatedElement annotatedElement) {
 		Class<?> lookupStrategy = getLookupStrategy(annotatedElement);
 		return lookupStrategyByAnnotationType.get(lookupStrategy);
 	}
 	
 	public Class<?> getLookupStrategy(AnnotatedElement annotatedElement) {
-		for (AstrixServiceLookupPlugin<?> lookupPlugin : lookupStrategyByAnnotationType.values()) {
+		for (AstrixServiceLookupMetaFactoryPlugin<?> lookupPlugin : lookupStrategyByAnnotationType.values()) {
 			if (annotatedElement.isAnnotationPresent(lookupPlugin.getLookupAnnotationType())) {
 				return lookupPlugin.getLookupAnnotationType();
 			}

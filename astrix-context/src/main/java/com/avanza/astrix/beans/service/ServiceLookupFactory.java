@@ -13,17 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.registry;
+package com.avanza.astrix.beans.service;
+
+import java.lang.annotation.Annotation;
+
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
+ * @param <T>
  */
-public final class ServiceState {
-
-	// TODO: convert to enum?
+public final class ServiceLookupFactory<T extends Annotation> {
 	
-	public static final String ACTIVE = "ACTIVE";
-	public static final String INACTIVE = "INACTIVE";
+	private final AstrixServiceLookupMetaFactoryPlugin<T> factory;
+	private final T annotation;
+	
+	public ServiceLookupFactory(AstrixServiceLookupMetaFactoryPlugin<T> factory, T annotation) {
+		this.factory = factory;
+		this.annotation = annotation;
+	}
+
+	public ServiceLookup create(AstrixBeanKey<?> beanKey) {
+		return factory.create(beanKey, annotation);
+	}
+	
 
 }

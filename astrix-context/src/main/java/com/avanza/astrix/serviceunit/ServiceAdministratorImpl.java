@@ -16,7 +16,6 @@
 package com.avanza.astrix.serviceunit;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.registry.ServiceState;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 
 @AstrixServiceExport(ServiceAdministrator.class)
@@ -24,18 +23,14 @@ public class ServiceAdministratorImpl implements ServiceAdministrator {
 
 	private ServiceRegistryExporter serviceRegistryExporter;
 	
-	@Override
-	public void setServiceState(String serviceState) {
-		if (serviceState.equals(ServiceState.ACTIVE) || serviceState.equals(ServiceState.INACTIVE)) {
-			this.serviceRegistryExporter.setServiceState(serviceState);
-		} else {
-			throw new IllegalArgumentException("Unknown service state: " + serviceState);
-		}
-	}
-	
 	@AstrixInject
 	public void setServiceRegistryExporter(ServiceRegistryExporter serviceRegistryExporter) {
 		this.serviceRegistryExporter = serviceRegistryExporter;
+	}
+
+	@Override
+	public void setPublishServices(boolean published) {
+		this.serviceRegistryExporter.setPublished(published);
 	}
 
 }

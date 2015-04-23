@@ -56,31 +56,4 @@ public class ServiceRegistryV1ApiMigrationTest {
 		assertEquals("my-instance-id", deserializedToV2.getServiceProperties().get(AstrixServiceProperties.APPLICATION_INSTANCE_ID));
 	}
 	
-	@Test
-	public void setsServiceStateToActiveForClientsUsingVersion1() throws Exception {
-		AstrixContextImpl context = (AstrixContextImpl) new TestAstrixConfigurer().enableVersioning(true).configure();
-		AstrixVersioningPlugin versioningPlugin = context.getPlugin(AstrixVersioningPlugin.class);
-		AstrixObjectSerializer objectSerializer = versioningPlugin.create(ServiceVersioningContext.versionedService(2, ServiceRegistryObjectSerializerConfigurer.class));
-
-		
-		AstrixServiceRegistryEntry v1Entry = new AstrixServiceRegistryEntry();
-		v1Entry.getServiceProperties().put(AstrixServiceProperties.QUALIFIER, "my-qualifier");
-		v1Entry.getServiceProperties().put(AstrixServiceProperties.API, "foo.MyService");
-		
-		Object serializedV1 = objectSerializer.serialize(v1Entry, 1); //
-		
-		AstrixServiceRegistryEntry deserializedToV2 = objectSerializer.deserialize(serializedV1, AstrixServiceRegistryEntry.class, 1);
-		assertEquals(ServiceState.ACTIVE, deserializedToV2.getServiceProperties().get(AstrixServiceProperties.SERVICE_STATE));
-		
-		AstrixServiceRegistryEntry v2Entry = new AstrixServiceRegistryEntry();
-		v2Entry.getServiceProperties().put(AstrixServiceProperties.QUALIFIER, "my-qualifier");
-		v2Entry.getServiceProperties().put(AstrixServiceProperties.API, "foo.MyService");
-		v2Entry.getServiceProperties().put(AstrixServiceProperties.SERVICE_STATE, ServiceState.INACTIVE);
-
-		Object serializedV2 = objectSerializer.serialize(v2Entry, 2); //
-		
-		deserializedToV2 = objectSerializer.deserialize(serializedV2, AstrixServiceRegistryEntry.class, 2);
-		assertEquals(ServiceState.INACTIVE, deserializedToV2.getServiceProperties().get(AstrixServiceProperties.SERVICE_STATE));
-	}
-
 }

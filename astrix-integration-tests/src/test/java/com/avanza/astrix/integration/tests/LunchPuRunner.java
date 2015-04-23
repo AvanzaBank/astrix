@@ -17,10 +17,8 @@ package com.avanza.astrix.integration.tests;
 
 import java.io.IOException;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.RootLogger;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.gs.test.util.PartitionedPu;
@@ -30,7 +28,6 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 public class LunchPuRunner {
 	
 	public static void main(String[] args) throws IOException {
-		BasicConfigurator.configure();
 		Logger.getRootLogger().setLevel(Level.INFO);
 		System.setProperty("com.gs.jini_lus.groups", "lunch-pu");
 		AstrixSettings settings = new AstrixSettings();

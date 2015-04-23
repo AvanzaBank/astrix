@@ -15,11 +15,12 @@
  */
 package com.avanza.astrix.beans.registry;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
@@ -71,7 +72,7 @@ public class AstrixServiceRegistryTest {
 	}
 	
 	@Test
-	public void doesNotBindToInactiveProviders() throws Exception {
+	public void doesNotBindToNonPublishedProvidersInOtherZones() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
@@ -83,9 +84,10 @@ public class AstrixServiceRegistryTest {
 		clientContext = astrixConfigurer.configure();
 		
 		
-		ServiceRegistryExporterClient server1serviceRegistryClient = new ServiceRegistryExporterClient(serviceRegistry, "default", "server-1");
+		ServiceRegistryExporterClient server1serviceRegistryClient = new ServiceRegistryExporterClient(serviceRegistry, "my-subsystem", "server-1");
 		AstrixServiceProperties service1Properties = AstrixDirectComponent.registerAndGetProperties(Ping.class, new PingImpl("1"));
-		service1Properties.setProperty(AstrixServiceProperties.SERVICE_STATE, ServiceState.INACTIVE);
+		service1Properties.setProperty(AstrixServiceProperties.PUBLISHED, "false");
+		service1Properties.setProperty(AstrixServiceProperties.SERVICE_ZONE, "foo-zone");
 		server1serviceRegistryClient.register(Ping.class, service1Properties, Integer.MAX_VALUE);
 		
 		AstrixServiceRegistryClient serviceRegistryClient = clientContext.getBean(AstrixServiceRegistryClient.class);
@@ -102,8 +104,33 @@ public class AstrixServiceRegistryTest {
 	}
 	
 	@Test
+	public void bindsToNonPublishedProvidersInSameZone() throws Exception {
+		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
+		
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.setSubsystem("my-subsystem");
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
+		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
+		astrixConfigurer.registerApiProvider(PingApiProvider.class);
+		clientContext = astrixConfigurer.configure();
+		
+		
+		ServiceRegistryExporterClient server1serviceRegistryClient = new ServiceRegistryExporterClient(serviceRegistry, "my-subsystem", "server-1");
+		AstrixServiceProperties service1Properties = AstrixDirectComponent.registerAndGetProperties(Ping.class, new PingImpl("1"));
+		service1Properties.setProperty(AstrixServiceProperties.PUBLISHED, "false");
+		server1serviceRegistryClient.register(Ping.class, service1Properties, Integer.MAX_VALUE);
+		
+		AstrixServiceRegistryClient serviceRegistryClient = clientContext.getBean(AstrixServiceRegistryClient.class);
+		List<AstrixServiceProperties> providers = serviceRegistryClient.list(AstrixBeanKey.create(Ping.class));
+		assertEquals(1, providers.size());
+
+		Ping ping = clientContext.getBean(Ping.class);
+		assertNotNull(ping.ping());
+	}
+	
+	@Test
 	public void usesRoundRobinToDistributeConsumers() throws Exception {
-		BasicConfigurator.configure();
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();

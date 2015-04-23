@@ -15,18 +15,18 @@
  */
 package com.avanza.astrix.serviceunit;
 
-import com.avanza.astrix.beans.registry.ServiceState;
 import com.avanza.astrix.core.AstrixBroadcast;
 
 public interface ServiceAdministrator {
 
 	/**
-	 * Sets the serviceState for all services provided by the target
-	 * application to a given state, see {@link ServiceState}.
+	 * Sets whether service provided by the target application
+	 * should publish its versioned services. When services are
+	 * published they can be consumed from other subsystems. 
 	 * 
 	 * @param serviceState
 	 */
 	@AstrixBroadcast
-	void setServiceState(String serviceState);
+	void setPublishServices(boolean published);
 	
 }

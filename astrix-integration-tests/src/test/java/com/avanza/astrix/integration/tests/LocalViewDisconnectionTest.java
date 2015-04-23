@@ -17,9 +17,6 @@ package com.avanza.astrix.integration.tests;
 
 import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.Before;
@@ -52,12 +49,6 @@ public class LocalViewDisconnectionTest {
 	private AstrixConfigurer configurer = new AstrixConfigurer();
 	private AstrixContext astrix;
 	private RunningPu lunchPu;
-	
-	static {
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.WARN);
-		Logger.getLogger("com.avanza.astrix").setLevel(Level.DEBUG);
-	}
 	
 	@Before
 	public void setup() throws Exception {

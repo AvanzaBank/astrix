@@ -15,11 +15,13 @@
  */
 package com.avanza.astrix.beans.service;
 
-public class IllegalSubsystemException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;
-
-	public IllegalSubsystemException(String currentSubsystem, String beanProviderSubsystem, Class<?> beanType) {
-		super(String.format("Its not allowed to inoke beanType=%s in providerSubsystem=%s, currentSubsystem=%s", beanType.getName(), beanProviderSubsystem, currentSubsystem));
-	}
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public interface ServiceLookup {
+	AstrixServiceProperties lookup();
+	String description();
 }

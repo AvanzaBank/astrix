@@ -119,8 +119,13 @@ public class ServiceRegistryExporterWorker extends Thread implements AstrixPubli
 	public void setAstrixBeans(AstrixPublishedBeans beans) {
 		String subsystem = AstrixSettings.SUBSYSTEM_NAME.getFrom(config).get();
 		String applicationInstanceId = AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(config).get();
+		String applicationTag = AstrixSettings.APPLICATION_TAG.getFrom(config).get();
+		String zone = subsystem;
+		if (applicationTag != null) {
+			zone = subsystem + "#"  + applicationTag;
+		}
 		AstrixServiceRegistry serviceRegistry= beans.getBean(AstrixBeanKey.create(AstrixServiceRegistry.class));
-		this.serviceRegistryProviderClient = new ServiceRegistryExporterClient(serviceRegistry, subsystem, applicationInstanceId);
+		this.serviceRegistryProviderClient = new ServiceRegistryExporterClient(serviceRegistry, subsystem, applicationInstanceId, zone);
 	}
 	
 	private static class Timer {

@@ -28,8 +28,9 @@ import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
 import com.avanza.astrix.beans.publish.AstrixApiProviderPlugin;
-import com.avanza.astrix.beans.service.AstrixServiceLookup;
-import com.avanza.astrix.beans.service.AstrixServiceLookupFactory;
+import com.avanza.astrix.beans.service.AstrixServiceLookupMetaFactory;
+import com.avanza.astrix.beans.service.ServiceLookup;
+import com.avanza.astrix.beans.service.ServiceLookupFactory;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
@@ -46,7 +47,7 @@ public class GenericAstrixApiProviderPlugin implements AstrixApiProviderPlugin {
 	
 	private AstrixInjector injector;
 	private AstrixServiceMetaFactory serviceMetaFactory;
-	private AstrixServiceLookupFactory serviceLookupFactory;
+	private AstrixServiceLookupMetaFactory serviceLookupMetaFactory;
 	
 	@Override
 	public List<FactoryBean<?>> createFactoryBeans(AstrixApiProviderClass apiProviderClass) {
@@ -65,11 +66,11 @@ public class GenericAstrixApiProviderPlugin implements AstrixApiProviderPlugin {
 			}
 			if (beanDefinition.isService()) {
 				ServiceVersioningContext versioningContext = createVersioningContext(apiProviderClass, beanDefinition);
-				AstrixServiceLookup serviceLookup = serviceLookupFactory.createServiceLookup(astrixBeanDefinitionMethod);
-				result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, beanDefinition.getBeanKey(), beanDefinition));
+				ServiceLookupFactory<?> serviceLookupFactory = serviceLookupMetaFactory.createServiceLookup(beanDefinition.getBeanKey(), astrixBeanDefinitionMethod);
+				result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookupFactory, beanDefinition.getBeanKey(), beanDefinition));
 				Class<?> asyncInterface = serviceMetaFactory.loadInterfaceIfExists(beanDefinition.getBeanType().getName() + "Async");
 				if (asyncInterface != null) {
-					result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookup, AstrixBeanKey.create(asyncInterface, beanDefinition.getQualifier()), beanDefinition));
+					result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookupFactory, AstrixBeanKey.create(asyncInterface, beanDefinition.getQualifier()), beanDefinition));
 				}
 				continue;
 			}
@@ -114,8 +115,8 @@ public class GenericAstrixApiProviderPlugin implements AstrixApiProviderPlugin {
 	}
 	
 	@AstrixInject
-	public void setServiceLookupFactory(AstrixServiceLookupFactory serviceLookupFactory) {
-		this.serviceLookupFactory = serviceLookupFactory;
+	public void setServiceLookupFactory(AstrixServiceLookupMetaFactory serviceLookupFactory) {
+		this.serviceLookupMetaFactory = serviceLookupFactory;
 	}
 	
 	@AstrixInject

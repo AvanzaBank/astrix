@@ -37,8 +37,14 @@ public class ServiceRegistryExporterClient {
 	private final AstrixServiceRegistry serviceRegistry;
 	private final String subsystem;
 	private final String applicationInstanceId;
-
+	private final String zone;
+	
 	public ServiceRegistryExporterClient(AstrixServiceRegistry serviceRegistry, String subsystem, String applicationInstanceId) {
+		this(serviceRegistry, subsystem, applicationInstanceId, subsystem);
+	}
+	
+	public ServiceRegistryExporterClient(AstrixServiceRegistry serviceRegistry, String subsystem, String applicationInstanceId, String zone) {
+		this.zone = zone;
 		this.serviceRegistry = Objects.requireNonNull(serviceRegistry);
 		this.subsystem = Objects.requireNonNull(subsystem);
 		this.applicationInstanceId = Objects.requireNonNull(applicationInstanceId);
@@ -47,6 +53,7 @@ public class ServiceRegistryExporterClient {
 	public <T> void register(Class<T> type, AstrixServiceProperties properties, long lease) {
 		properties.setProperty(AstrixServiceProperties.SUBSYSTEM, this.subsystem);
 		properties.setProperty(AstrixServiceProperties.APPLICATION_INSTANCE_ID, this.applicationInstanceId);
+		properties.setProperty(AstrixServiceProperties.SERVICE_ZONE, zone);
 		AstrixServiceRegistryEntry entry = new AstrixServiceRegistryEntry();
 		entry.setServiceProperties(properties.getProperties());
 		entry.setServiceBeanType(type.getName());
