@@ -15,21 +15,40 @@
  */
 package com.avanza.astrix.beans.registry;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.service.AstrixServiceProperties;
-
-
-
-public interface AstrixServiceRegistryClient {
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public class AstrixServiceRegistryClient {
 	
-	// TODO: remove this interface?
-	
-	<T> AstrixServiceProperties lookup(Class<T> type);
-	
-	<T> AstrixServiceProperties lookup(AstrixBeanKey<T> beanKey);
+	private final AstrixServiceRegistry serviceRegistry;
 
-	<T> List<AstrixServiceProperties> list(AstrixBeanKey<T> beanKey);
-	
+	public AstrixServiceRegistryClient(AstrixServiceRegistry serviceRegistry) {
+		this.serviceRegistry = Objects.requireNonNull(serviceRegistry);
+	}
+
+	public <T> AstrixServiceProperties lookup(AstrixBeanKey<T> beanKey) {
+		AstrixServiceRegistryEntry entry = serviceRegistry.lookup(beanKey.getBeanType().getName(), beanKey.getQualifier());
+		if (entry == null) {
+			return null;
+		}
+		return new AstrixServiceProperties(entry.getServiceProperties());
+	}
+
+	public <T> List<AstrixServiceProperties> list(AstrixBeanKey<T> beanKey) {
+		List<AstrixServiceRegistryEntry> registeresServices = serviceRegistry.listServices(beanKey.getBeanType().getName(), beanKey.getQualifier());
+		List<AstrixServiceProperties> result = new ArrayList<>(registeresServices.size());
+		for (AstrixServiceRegistryEntry entry : registeresServices) {
+			result.add(new AstrixServiceProperties(entry.getServiceProperties()));
+		}
+		return result;
+	}
+
 }

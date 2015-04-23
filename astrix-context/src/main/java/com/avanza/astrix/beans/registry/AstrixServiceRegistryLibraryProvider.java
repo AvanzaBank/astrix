@@ -23,7 +23,7 @@ public class AstrixServiceRegistryLibraryProvider {
 
 	@Library
 	public AstrixServiceRegistryClient createClient(AstrixServiceRegistry serviceRegistry) {
-		return new AstrixServiceRegistryClientImpl(serviceRegistry);
+		return new AstrixServiceRegistryClient(serviceRegistry);
 	}
 	
 }

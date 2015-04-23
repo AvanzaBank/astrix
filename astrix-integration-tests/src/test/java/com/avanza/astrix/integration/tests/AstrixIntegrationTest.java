@@ -47,7 +47,6 @@ import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
-import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.common.Ping;
@@ -57,7 +56,6 @@ import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.api.LunchServiceAsync;
 import com.avanza.astrix.integration.tests.domain.api.LunchStatistics;
 import com.avanza.astrix.integration.tests.domain.api.LunchUtil;
-import com.avanza.astrix.integration.tests.domain.apiruntime.LunchServiceProvider;
 import com.avanza.astrix.integration.tests.domain.apiruntime.feeder.InternalLunchFeeder;
 import com.avanza.astrix.integration.tests.domain.pu.LunchApplicationDescriptor;
 import com.avanza.astrix.integration.tests.domain2.api.LunchRestaurantGrader;
@@ -246,12 +244,12 @@ public class AstrixIntegrationTest {
 		ServiceRegistryExporterClient exporterClient = new ServiceRegistryExporterClient(serviceRegistry, "foo-subsystem", "foo-app-instance-id");
 		exporterClient.register(FooService.class, properties, 1000);
 		
-		AstrixServiceProperties props = serviceRegistryClient.lookup(FooService.class);
+		AstrixServiceProperties props = serviceRegistryClient.lookup(AstrixBeanKey.create(FooService.class));
 		assertNotNull("Expected properties to exists after registreation", props);
 		
 		assertEventually(AstrixTestUtil.serviceInvocationResult(new Supplier<Object>() {
 			public Object get() {
-				return serviceRegistryClient.lookup(FooService.class);
+				return serviceRegistryClient.lookup(AstrixBeanKey.create(FooService.class));
 			};
 		}, is(nullValue())));
 	}

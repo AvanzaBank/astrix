@@ -126,7 +126,7 @@ public class AstrixServiceRegistryTest {
 		int server1ConsumerCount = 0;
 		int server2ConsumerCount = 0;
 		for (int i = 0; i < 10; i++) {
-			AstrixServiceProperties props = serviceRegistryClient.lookup(Ping.class);
+			AstrixServiceProperties props = serviceRegistryClient.lookup(AstrixBeanKey.create(Ping.class));
 			if ("server-1".equals(props.getProperty(AstrixServiceProperties.APPLICATION_INSTANCE_ID))) {
 				server1ConsumerCount++;
 			}
