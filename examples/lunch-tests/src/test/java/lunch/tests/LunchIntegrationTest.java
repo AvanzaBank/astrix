@@ -47,7 +47,7 @@ public class LunchIntegrationTest {
 	public void testName() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 500);
-		configurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		configurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixContext astrix = configurer.configure();
 		LunchService lunchService = astrix.waitForBean(LunchService.class, 15_000);
 		

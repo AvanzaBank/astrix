@@ -130,7 +130,7 @@ public class AstrixSettings implements DynamicConfigSource, MutableConfigSource 
 	}
 	
 	public final void setServiceRegistryUri(String serviceRegistryUri) {
-		set(ASTRIX_SERVICE_REGISTRY_URI, serviceRegistryUri);
+		set(SERVICE_REGISTRY_URI, serviceRegistryUri);
 	}
 
 	public final void set(String settingName, long value) {

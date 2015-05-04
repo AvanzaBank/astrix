@@ -53,7 +53,7 @@ public class HystrixCommandExecutionSupervisor {
 		
 		
 		AstrixConfigurer astrixConfigurer = new AstrixConfigurer();
-		astrixConfigurer.set(AstrixSettings.ASTRIX_SERVICE_REGISTRY_URI, "gs-remoting:jini://*/*/service-registry-space?groups=" + Config.LOOKUP_GROUP_NAME);
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, "gs-remoting:jini://*/*/service-registry-space?groups=" + Config.LOOKUP_GROUP_NAME);
 		AstrixContext context = astrixConfigurer.configure();
 
 		
