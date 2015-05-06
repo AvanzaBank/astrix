@@ -1,5 +1,5 @@
 # Astrix
-Astrix is a framework designed to simplify development and maintenance of microservices. At Avanza we use Astrix to run hundereds of microservices collaborating to provide the services required by the backend for the Avanza web site and our mobile applications.
+Astrix is a framework designed to simplify development and maintenance of microservices. At Avanza we use Astrix to run hundereds of microservices collaborating to provide the services required by the backend applications for the Avanza web site and our mobile applications.
 
 Some of the features provided by Astrix are:
 
@@ -8,7 +8,7 @@ Some of the features provided by Astrix are:
 * service versioning
 * fault tolerance
 
-The design philosophy behind Astrix aligns well with the characteristics of microservices described by James Lewis and Martin Fowler (http://martinfowler.com/articles/microservices.html). However it's worth pointing out where the characteristics between a microservice developed using Astrix, and other microservice approaches differ:
+The design philosophy behind Astrix aligns well with the characteristics of microservices described by James Lewis and Martin Fowler (http://martinfowler.com/articles/microservices.html). However, it's worth pointing out where the characteristics between a microservice developed using Astrix, and other microservice approaches differ:
 
 * Selected centralized governance (as opposed to fully decentralized governance)
 * Transport mechanism agnostic service consumers
@@ -16,10 +16,10 @@ The design philosophy behind Astrix aligns well with the characteristics of micr
 ## Selected centralized governance
 Microservices are a broad field and Astrix is designed to emphasize certain characteristics of microservices, whereas other characterisitcs are intentionally ignored. Most notably Astrix does not emphasize an organization where different microservices are developed using completely different technology stacks. Quite opposite Astrix assumes a standardization using the jvm as the platform for running microservices. But, apart from standardizing on the jvm, microservice providers are free to use a technology stack most suitable for their needs. Most notably each microservice could choose a data-store suitable for their needs, and a programming language of their choice, as long as it runs on the jvm and can run java code.
 
-At Avanza we have choosen to standardize on a single language (Java), a single application framework (GigaSpaces, which in turn is built on top of Spring), and a single service framework (Astrix). This is actually quite restricting compared to common view of microservices which often favor a decentralized governance.
+At Avanza we have choosen to standardize on a single language (Java), a single application framework (GigaSpaces, which in turn is built on top of Spring), and a single service framework (Astrix). This is actually quite restricting compared to the common view of microservices which often favor a decentralized governance.
 
 ## Transport mechanism agnostic service consumers
-Although microservices are not by any mean tied to a given protocol, the common approach to microservices is to export "REST"-style services over http. This means that consumers of a service are tied to use http to access a given service, which is a severe limitation in testing scenarios. Service consumers using Astrix are completely decoupled from the transport mechanism used by a given service provider, which allows simple stubbing of consumed services allowing each microservice to be tested in isolation, without any special spring configuration files to stub out service dependencies. A typical microservice developed using Astrix can be started in-memory using the same spring configuration as in a production environment, but where the services consumed by the given application are completely stubbed out using in-memory mocks. The magic that allows this simple stubbing is provided by the service-registry and the dynamic service-binding mechanism provided by Astrix.
+Although microservices are not by any mean tied to a given protocol, the most common approach to microservices is to export "REST"-style services over http. This means that consumers of a service are tied to use http to access a given service, which is a severe limitation in testing scenarios. Service consumers using Astrix are completely decoupled from the transport mechanism used by a given service provider, which allows simple stubbing of consumed services allowing each microservice to be tested in isolation, without any special spring configuration files to stub out service dependencies. A typical microservice developed using Astrix can be started in-memory using the same spring configuration as in a production environment, but where the services consumed by the given application are completely stubbed out using in-memory mocks. The magic that allows this simple stubbing is provided by the service-registry and the dynamic service-binding mechanism provided by Astrix.
 
 
 ## Service Registry
