@@ -175,13 +175,13 @@ public class AstrixRemotingProxy implements InvocationHandler {
 		
 		Observable<?> result;
 		if (serviceMethod.isBroadcast()) {
-			result = observeProcessBroadcastRequest(returnType, invocationRequest, serviceMethod);
+			result = submitBroadcastRequest(returnType, invocationRequest, serviceMethod);
 		} else {
 			RoutingKey routingKey = serviceMethod.getRoutingKey(args);
 			if (routingKey == null) {
 				throw new IllegalStateException(String.format("Service method is routed but the defined remotingKey value was null: method=%s", method.toString()));
 			}
-			result = observeProcessRoutedRequest(returnType, invocationRequest, routingKey);
+			result = submitRoutedRequest(returnType, invocationRequest, routingKey);
 		}
 		if (isObservableApi) {
 			return result;
@@ -265,13 +265,13 @@ public class AstrixRemotingProxy implements InvocationHandler {
 		return this.serviceApi;
 	}
 
-	private <T> Observable<T> observeProcessBroadcastRequest(
+	private <T> Observable<T> submitBroadcastRequest(
 			final Type returnType, 
 			AstrixServiceInvocationRequest request,
 			RemoteServiceMethod serviceMethod) throws InstantiationException,
 			IllegalAccessException {
 		final AstrixRemoteResultReducer<T, T> reducer = (AstrixRemoteResultReducer<T, T>) serviceMethod.newReducer();
-		Observable<List<AstrixServiceInvocationResponse>> responesObservable = this.serviceTransport.observeProcessBroadcastRequest(request);
+		Observable<List<AstrixServiceInvocationResponse>> responesObservable = this.serviceTransport.processBroadcastRequest(request);
 		if (returnType.equals(Void.TYPE)) {
 			return responesObservable.map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
 				@Override
@@ -293,10 +293,10 @@ public class AstrixRemotingProxy implements InvocationHandler {
 		});
 	}
 
-	private Observable<Object> observeProcessRoutedRequest(
+	private Observable<Object> submitRoutedRequest(
 			final Type returnType, AstrixServiceInvocationRequest request,
 			RoutingKey routingKey) {
-		Observable<AstrixServiceInvocationResponse> response = this.serviceTransport.observeProcessRoutedRequest(request, routingKey);
+		Observable<AstrixServiceInvocationResponse> response = this.serviceTransport.processRoutedRequest(request, routingKey);
 		return response.map(new Func1<AstrixServiceInvocationResponse, Object>() {
 			@Override
 			public Object call(AstrixServiceInvocationResponse t1) {

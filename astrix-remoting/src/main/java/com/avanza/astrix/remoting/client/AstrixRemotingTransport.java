@@ -35,11 +35,11 @@ public class AstrixRemotingTransport {
 		return new AstrixRemotingTransport(impl);
 	}
 
-	public Observable<AstrixServiceInvocationResponse> observeProcessRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
+	public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
 		return impl.processRoutedRequest(request, routingKey);
 	}
 	
-	public Observable<List<AstrixServiceInvocationResponse>> observeProcessBroadcastRequest(AstrixServiceInvocationRequest request) {
+	public Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request) {
 		return impl.processBroadcastRequest(request);
 	}
 	
