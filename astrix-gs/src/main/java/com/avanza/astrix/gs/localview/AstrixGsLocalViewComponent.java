@@ -87,7 +87,12 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 		localViewConfigurer.configure(new LocalViewSpaceConfigurerAdapter(gslocalViewSpaceConfigurer));
 		
 		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
-		HystrixCommandSettings hystrixSettings = new HystrixCommandSettings(spaceName + "_" + GigaSpace.class.getSimpleName(), spaceName);
+		String commandKey = spaceName + "_" + GigaSpace.class.getSimpleName();
+		String qualifier = serviceProperties.getProperty(AstrixServiceProperties.QUALIFIER);
+		if (qualifier != null) {
+			commandKey = commandKey + "-" + qualifier;
+		}
+		HystrixCommandSettings hystrixSettings = new HystrixCommandSettings(commandKey, spaceName);
 		hystrixSettings.setExecutionIsolationStrategy(ExecutionIsolationStrategy.SEMAPHORE);
 		hystrixSettings.setSemaphoreMaxConcurrentRequests(Integer.MAX_VALUE);
 		
