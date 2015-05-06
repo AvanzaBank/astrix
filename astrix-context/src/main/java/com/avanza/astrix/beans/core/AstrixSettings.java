@@ -110,8 +110,7 @@ public class AstrixSettings implements DynamicConfigSource, MutableConfigSource 
 	public static final StringSetting APPLICATION_NAME = StringSetting.create("astrix.application.name", null);
 	public static final StringSetting APPLICATION_TAG =  StringSetting.create("astrix.application.tag", null);
 	public static final StringSetting APPLICATION_INSTANCE_ID =  StringSetting.create("astrix.application.instanceid", null);
-//	public static final StringSetting INITIAL_SERVICE_STATE = StringSetting.create("astrix.application.initialServiceState", null);
-	public static final BooleanSetting PUBLISH_SERVICES = BooleanSetting.create("astrix.application.publisheServices", true);
+	public static final BooleanSetting PUBLISH_SERVICES = BooleanSetting.create("astrix.application.publishServices", true);
 
 	/**
 	 * Service component used to export ServiceAdministrator api.
