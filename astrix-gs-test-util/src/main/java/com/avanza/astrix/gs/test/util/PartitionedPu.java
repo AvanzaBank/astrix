@@ -84,7 +84,9 @@ public final class PartitionedPu implements PuRunner {
 		for (Map.Entry<String, Properties> beanProperties : beanProperies.entrySet()) {
 			beanLevelProperties.setBeanProperties(beanProperties.getKey(), beanProperties.getValue());
 		}
-//		beanLevelProperties.getBeanProperties("space").put("lookup-groups", getLookupGroupName());
+		// TODO: set lookup-group on space-bean name instead of using system-property in RunningPuImpl
+//		beanLevelProperties.getBeanProperties("space").put("gs.space.url.arg.groups", getLookupGroupName()); 
+		beanLevelProperties.getBeanProperties("space").put("gs.space.url.arg.timeout", "10");
 		return beanLevelProperties;
 	}
 	

@@ -40,6 +40,7 @@ import rx.Subscriber;
 import com.avanza.astrix.context.JavaSerializationSerializer;
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.core.AstrixPartitionBy;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.AstrixRemoteResultReducer;
 import com.avanza.astrix.core.CorrelationId;
@@ -113,8 +114,8 @@ public class AstrixRemotingTest {
 		assertEquals("reply-kalle", reply.getGreeting());
 	}
 	
-	private static AstrixRemotingTransport directTransport(AstrixServiceActivator activator) {
-		return AstrixRemotingTransport.create(new PartitionedDirectTransport(Arrays.asList(activator)));
+	private static AstrixRemotingTransport directTransport(AstrixServiceActivator... partitions) {
+		return AstrixRemotingTransport.create(new PartitionedDirectTransport(Arrays.asList(partitions)));
 	}
 	
 	@Test
@@ -210,6 +211,65 @@ public class AstrixRemotingTest {
 			e.printStackTrace();
 			fail("Excpected exception of type MyCustomServiceException, but was: " + e);
 		}
+	}
+	
+
+	@Test
+	public void broadcastRequest() throws Exception {
+		AstrixServiceActivator partition2 = new AstrixServiceActivator();
+		PingService impl = new PingService() {
+			@Override
+			public List<String> ping(String msg) {
+				return Arrays.asList(msg);
+			}
+		};
+		partition1.register(impl, objectSerializer, PingService.class);
+		partition2.register(impl, objectSerializer, PingService.class);
+
+		PingService broadcastService = AstrixRemotingProxy.create(PingService.class, directTransport(partition1, partition2), objectSerializer, new NoRoutingStrategy());
+		List<String> replys = broadcastService.ping("foo");
+		assertEquals(2, replys.size());
+		assertEquals("foo", replys.get(0));
+		assertEquals("foo", replys.get(1));
+	}
+	
+//	@Test
+	public void partitionedBroadcastRequest() throws Exception {
+		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		CalculatorService eventPartitionCalculator = new CalculatorService() {
+			@Override
+			public int squareSum(int... nums) {
+				int squareSum = 0;
+				for (int num : nums) {
+					if (num % 2 != 0) {
+						throw new AssertionError("Even Partition should only receive even numbers, but received: " + num);
+					}
+					squareSum += num * num;
+				}
+				return squareSum;
+			}
+		};
+		CalculatorService oddPartitionCalculator = new CalculatorService() {
+			@Override
+			public int squareSum(int... nums) {
+				int squareSum = 0;
+				for (int num : nums) {
+					if (num % 2 != 1) {
+						throw new AssertionError("Odd Partition hould only receive odd numbers, but received: " + num);
+					}
+					squareSum += num * num;
+				}
+				return squareSum;
+			}
+		};
+		
+		evenPartition.register(eventPartitionCalculator, objectSerializer, CalculatorService.class);
+		oddPartition.register(oddPartitionCalculator, objectSerializer, CalculatorService.class);
+
+		CalculatorService calculatorService = AstrixRemotingProxy.create(CalculatorService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		int squareSum = calculatorService.squareSum(1, 2, 3, 4, 5);
+		assertEquals(1 + 4 + 9 + 16 + 25, squareSum);
 	}
 
 	
@@ -603,6 +663,28 @@ public class AstrixRemotingTest {
 		List<HelloResponse> hello(List<HelloRequest> greeting);
 	}
 	
+	interface PingService {
+		@AstrixBroadcast
+		List<String> ping(String msg);
+	}
+	
+	
+	interface CalculatorService {
+		int squareSum(@AstrixPartitionBy(reducer = SummingReducer.class) int... nums);
+	}
+	
+	public static class SummingReducer implements AstrixRemoteResultReducer<Integer, Integer> {
+		@Override
+		public Integer reduce(List<AstrixRemoteResult<Integer>> results) {
+			int sum = 0;
+			for (AstrixRemoteResult<Integer> result : results) {
+				sum += result.getResult();
+			}
+			return sum;
+		}
+		
+	}
+	
 	interface BroadcastingGenericReturnTypeServiceAsync {
 		@AstrixBroadcast
 		Future<List<HelloResponse>> hello(List<HelloRequest> greeting);
@@ -744,6 +826,7 @@ public class AstrixRemotingTest {
 				}
 			});
 		}
+		
 	}
 	
 }
