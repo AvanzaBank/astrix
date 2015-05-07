@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.integration.tests.domain.pu;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,15 @@ public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 			throw new IllegalArgumentException("Illegal restaurant: " + r.getName());
 		}
 		return this.repo.getByName(r.getName());
+	}
+	
+	@Override
+	public List<LunchRestaurant> getLunchRestaurants(String... restaurantNames) {
+		List<LunchRestaurant> result = new ArrayList<>();
+		for (String restaurantName : restaurantNames) {
+			result.add(this.repo.getByName(restaurantName));
+		}
+		return result;
 	}
 
 }

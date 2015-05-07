@@ -36,6 +36,8 @@ import com.avanza.astrix.remoting.client.RoutingKey;
 import com.gigaspaces.async.AsyncFuture;
 import com.gigaspaces.async.AsyncFutureListener;
 import com.gigaspaces.async.AsyncResult;
+import com.gigaspaces.internal.client.spaceproxy.SpaceProxyImpl;
+import com.j_spaces.core.IJSpace;
 /**
  * RemotingTransport implementation based on GigaSpaces task execution. <p> 
  * 
@@ -131,5 +133,14 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 	public static AstrixRemotingTransport remoteSpace(GigaSpace gigaSpace, AstrixFaultTolerance faultTolerance) {
 		return AstrixRemotingTransport.create(new GsRemotingTransport(gigaSpace, faultTolerance));
 	}
-	
+
+	@Override
+	public int partitionCount() {
+		IJSpace space = this.gigaSpace.getSpace();
+		if (space instanceof SpaceProxyImpl) {
+			return SpaceProxyImpl.class.cast(space).getSpaceClusterInfo().getNumberOfPartitions();
+		}
+		// TODO: What if partition count can't be decided? Propagate cluster-info via service-registry?
+		return 0;
+	} 
 }

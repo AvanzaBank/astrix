@@ -15,7 +15,10 @@
  */
 package com.avanza.astrix.integration.tests.domain.api;
 
+import java.util.List;
+
 import com.avanza.astrix.core.AstrixBroadcast;
+import com.avanza.astrix.core.AstrixPartitionedRouting;
 
 
 
@@ -27,4 +30,6 @@ public interface LunchService {
 	void addLunchRestaurant(LunchRestaurant restaurant);
 	
 	LunchRestaurant getLunchRestaurant(GetLunchRestaurantRequest request); 
+
+	List<LunchRestaurant> getLunchRestaurants(@AstrixPartitionedRouting String... restaurantNames);
 }

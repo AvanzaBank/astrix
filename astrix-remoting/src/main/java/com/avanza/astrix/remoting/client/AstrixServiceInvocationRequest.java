@@ -52,5 +52,13 @@ public class AstrixServiceInvocationRequest implements Serializable {
 		return "Invocation Request. headers=" + this.headers.toString() + ", arguments=" + Arrays.toString(arguments);
 	}
 
+	public Map<String, String> getHeaders() {
+		return this.headers;
+	}
+
+	public void setAllHeaders(Map<String, String> headers) {
+		this.headers.putAll(headers);
+	}
+
 	
 }

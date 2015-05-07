@@ -42,6 +42,10 @@ public class AstrixRemotingTransport {
 	public Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request) {
 		return impl.processBroadcastRequest(request);
 	}
+
+	public int partitionCount() {
+		return this.impl.partitionCount();
+	}
 	
 
 }

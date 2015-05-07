@@ -20,26 +20,40 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.ArrayList;
 import java.util.Collection;
 
 
 /**
  * Indicates that a remote invocation request should be
- * partitioned on a given argument (The argument must be a subclass
- * of {@link Collection}). 
+ * partitioned and routed on a given argument. The argument must be a subclass
+ * of {@link Collection}, or an array type.
  * 
  * The request will be partitioned by splitting the request
- * into one request against each server partition (provided that
- * there are keys in the target Collection routed to the given partition).
+ * into one request against each server partition containing only
+ * the arguments in the target collection that are routed to the
+ * given server partition.
  * 
  * @author Elias Lindholm (elilin)
  */
 @Target(value={ElementType.PARAMETER})
 @Retention(value=RetentionPolicy.RUNTIME)
 @Documented
-public @interface AstrixPartitionBy {
-	
+public @interface AstrixPartitionedRouting {
+	/**
+	 * AstrixRemoteResultReducer to use to reduce the response from each server partition
+	 * into a return value. <p>
+	 */
 	@SuppressWarnings("rawtypes")
 	Class<? extends AstrixRemoteResultReducer> reducer() default DefaultAstrixRemoteRestultReducer.class;
+
+	/**
+	 * Factory used to create instances of the partitioned argument Collection. Default to ArrayList.
+	 * If ArrayList is not a compatible type for the given argument then this property must be
+	 * set to a Class that is compatible with the partitioned argument container. The Class must
+	 * have a zero argument constructor.
+	 */
+	@SuppressWarnings("rawtypes")
+	Class<? extends Collection> collectionFactory() default ArrayList.class;
 	
 }

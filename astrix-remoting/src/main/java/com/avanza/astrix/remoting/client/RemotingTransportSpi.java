@@ -30,4 +30,5 @@ import rx.Observable;
 public interface RemotingTransportSpi {
 	Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey);
 	Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request);
+	int partitionCount();
 }

@@ -15,7 +15,9 @@
  */
 package com.avanza.astrix.remoting.server;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -25,13 +27,18 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.BasicConfigurator;
 import org.junit.Test;
 
 import rx.Observable;
@@ -40,7 +47,7 @@ import rx.Subscriber;
 import com.avanza.astrix.context.JavaSerializationSerializer;
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixObjectSerializer;
-import com.avanza.astrix.core.AstrixPartitionBy;
+import com.avanza.astrix.core.AstrixPartitionedRouting;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.AstrixRemoteResultReducer;
 import com.avanza.astrix.core.CorrelationId;
@@ -76,7 +83,6 @@ public class AstrixRemotingTest {
 					public RoutingKey getRoutingKey(Object... args) throws Exception {
 						return null; // Broadcast
 					}
-					
 				};
 			}
 			return new Router() {
@@ -87,7 +93,6 @@ public class AstrixRemotingTest {
 				
 			};
 		}
-		
 	}
 	
 	@Test
@@ -97,13 +102,10 @@ public class AstrixRemotingTest {
 			public HelloResponse hello(HelloRequest message) {
 				return new HelloResponse("reply-" + message.getMesssage());
 			}
-
 			@Override
 			public String hello(HelloRequest message, String greeting) {
 				return "overload-" + message.getMesssage();
 			}
-			
-			
 		};
 		partition1.register(impl, objectSerializer, TestService.class);
 		
@@ -233,13 +235,13 @@ public class AstrixRemotingTest {
 		assertEquals("foo", replys.get(1));
 	}
 	
-//	@Test
-	public void partitionedBroadcastRequest() throws Exception {
+	@Test
+	public void partitionedRequest() throws Exception {
 		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
 		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
-		CalculatorService eventPartitionCalculator = new CalculatorService() {
+		CalculatorListService eventPartitionCalculator = new CalculatorListService() {
 			@Override
-			public int squareSum(int... nums) {
+			public Integer squareSum(Collection<Integer> nums) {
 				int squareSum = 0;
 				for (int num : nums) {
 					if (num % 2 != 0) {
@@ -250,9 +252,9 @@ public class AstrixRemotingTest {
 				return squareSum;
 			}
 		};
-		CalculatorService oddPartitionCalculator = new CalculatorService() {
+		CalculatorListService oddPartitionCalculator = new CalculatorListService() {
 			@Override
-			public int squareSum(int... nums) {
+			public Integer squareSum(Collection<Integer> nums) {
 				int squareSum = 0;
 				for (int num : nums) {
 					if (num % 2 != 1) {
@@ -264,15 +266,67 @@ public class AstrixRemotingTest {
 			}
 		};
 		
-		evenPartition.register(eventPartitionCalculator, objectSerializer, CalculatorService.class);
-		oddPartition.register(oddPartitionCalculator, objectSerializer, CalculatorService.class);
+		evenPartition.register(eventPartitionCalculator, objectSerializer, CalculatorListService.class);
+		oddPartition.register(oddPartitionCalculator, objectSerializer, CalculatorListService.class);
 
-		CalculatorService calculatorService = AstrixRemotingProxy.create(CalculatorService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
-		int squareSum = calculatorService.squareSum(1, 2, 3, 4, 5);
+		CalculatorListService calculatorService = AstrixRemotingProxy.create(CalculatorListService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		int squareSum = calculatorService.squareSum(Arrays.asList(1, 2, 3, 4, 5));
 		assertEquals(1 + 4 + 9 + 16 + 25, squareSum);
 	}
-
 	
+	@Test
+	public void partitionedRequest_GenericArrayArgument() throws Exception {
+		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		PartitionedPingService eventPartitionPing = new PartitionedPingServiceImpl();
+		PartitionedPingService oddPartitionPing = new PartitionedPingServiceImpl();
+		
+		evenPartition.register(eventPartitionPing, objectSerializer, PartitionedPingService.class);
+		oddPartition.register(oddPartitionPing, objectSerializer, PartitionedPingService.class);
+
+		PartitionedPingService partitionedPing = AstrixRemotingProxy.create(PartitionedPingService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		assertThat(partitionedPing.ping(new double[]{1d, 2d, 3d}), containsInAnyOrder(1d, 2d, 3d));
+		assertThat(partitionedPing.ping(new int[]{1, 2, 3}), containsInAnyOrder(1, 2, 3));
+		assertThat(partitionedPing.ping(new float[]{1f, 2f, 3f}), containsInAnyOrder(1f, 2f, 3f));
+		assertThat(partitionedPing.ping(new short[]{1, 2, 3}), containsInAnyOrder(new Short[]{1, 2, 3}));
+		assertThat(partitionedPing.ping(new long[]{1L, 2L, 3L}), containsInAnyOrder(1L, 2L, 3L));
+		assertThat(partitionedPing.ping(new String[]{"1", "2", "3"}), containsInAnyOrder("1", "2", "3"));
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void partitionedService_IncompatibleCollectionType_throwsException() throws Exception {
+		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixRemotingProxy.create(InvalidCollectionTypePartitionedService.class, directTransport(evenPartition), objectSerializer, new NoRoutingStrategy());
+	}
+	
+	@Test(expected = IncompatibleRemoteResultReducerException.class)
+	public void partitionedService_IncompatibleReducer_throwsException() throws Exception {
+		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixRemotingProxy.create(InvalidReducerPartitionedService.class, directTransport(evenPartition), objectSerializer, new NoRoutingStrategy());
+	}
+	
+	@Test
+	public void partitionedService_NonListCollection() throws Exception {
+		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		PartitionedServiceUsingSet sevenPartitionService = new PartitionedServiceUsingSet() {
+			@Override
+			public Set<Integer> ping(Set<Integer> nums) {
+				return nums;
+			}
+		};
+		
+		evenPartition.register(sevenPartitionService, objectSerializer, PartitionedServiceUsingSet.class);
+
+		PartitionedServiceUsingSet calculatorService = AstrixRemotingProxy.create(PartitionedServiceUsingSet.class, 
+				directTransport(evenPartition), objectSerializer, new NoRoutingStrategy());
+		assertEquals(setOf(1,2,3), calculatorService.ping(setOf(1,2,3)));
+	}
+	
+	private static <T> Set<T> setOf(@SuppressWarnings("unchecked") T... values) {
+		return new HashSet<T>(Arrays.asList(values));
+	}
+
+
 	@Test
 	public void broadcastRequest_throwsException() throws Exception {
 		try {
@@ -668,9 +722,105 @@ public class AstrixRemotingTest {
 		List<String> ping(String msg);
 	}
 	
+	interface CalculatorListService {
+		Integer squareSum(@AstrixPartitionedRouting(reducer = SummingReducer.class) Collection<Integer> nums);
+	}
 	
-	interface CalculatorService {
-		int squareSum(@AstrixPartitionBy(reducer = SummingReducer.class) int... nums);
+	interface PartitionedPingService {
+		List<Short> ping(@AstrixPartitionedRouting short... nums);
+		List<Integer> ping(@AstrixPartitionedRouting int... nums);
+		List<Long> ping(@AstrixPartitionedRouting long... nums);
+		List<Double> ping(@AstrixPartitionedRouting double... nums);
+		List<Float> ping(@AstrixPartitionedRouting float... nums);
+		List<Boolean> ping(@AstrixPartitionedRouting boolean... nums);
+		List<String> ping(@AstrixPartitionedRouting String... nums);
+	}
+	
+	interface InvalidCollectionTypePartitionedService {
+		int squareSum(@AstrixPartitionedRouting Set<Integer> nums);
+	}
+	
+	interface InvalidReducerPartitionedService {
+		int squareSum(@AstrixPartitionedRouting(collectionFactory = HashSet.class) Set<Integer> nums);
+	}
+	
+	interface PartitionedServiceUsingSet {
+		Set<Integer> ping(@AstrixPartitionedRouting(reducer = SetReducer.class, collectionFactory = HashSet.class) Set<Integer> nums);
+	}
+	
+	public static class SetReducer<T> implements AstrixRemoteResultReducer<Set<T>, Set<T>> {
+		@Override
+		public Set<T> reduce(List<AstrixRemoteResult<Set<T>>> results) {
+			Set<T> result = new HashSet<>();
+			for (AstrixRemoteResult<Set<T>> remoteResult : results) {
+				result.addAll(remoteResult.getResult());
+			}
+			return result;
+		}
+
+	}
+	
+	public static class PartitionedPingServiceImpl implements PartitionedPingService {
+		@Override
+		public List<Short> ping(short... nums) {
+			List<Short> result = new ArrayList<>();
+			for (short s : nums) {
+				result.add(s);
+			}
+			return result;
+		}
+		@Override
+		public List<Integer> ping(int... nums) {
+			List<Integer> result = new ArrayList<>();
+			for (int s : nums) {
+				result.add(s);
+			}
+			return result;
+		}
+		@Override
+		public List<Long> ping(long... nums) {
+			List<Long> result = new ArrayList<>();
+			for (long s : nums) {
+				result.add(s);
+			}
+			return result;
+		}
+
+		@Override
+		public List<Double> ping(double... nums) {
+			List<Double> result = new ArrayList<>();
+			for (double s : nums) {
+				result.add(s);
+			}
+			return result;
+		}
+
+		@Override
+		public List<Float> ping(float... nums) {
+			List<Float> result = new ArrayList<>();
+			for (float s : nums) {
+				result.add(s);
+			}
+			return result;
+		}
+
+		@Override
+		public List<Boolean> ping(boolean... nums) {
+			List<Boolean> result = new ArrayList<>();
+			for (boolean s : nums) {
+				result.add(s);
+			}
+			return result;
+		}
+
+		@Override
+		public List<String> ping(String... nums) {
+			List<String> result = new ArrayList<>();
+			for (String s : nums) {
+				result.add(s);
+			}
+			return result;
+		}
 	}
 	
 	public static class SummingReducer implements AstrixRemoteResultReducer<Integer, Integer> {
@@ -825,6 +975,11 @@ public class AstrixRemotingTest {
 					t1.onCompleted();
 				}
 			});
+		}
+
+		@Override
+		public int partitionCount() {
+			return this.partitions.size();
 		}
 		
 	}

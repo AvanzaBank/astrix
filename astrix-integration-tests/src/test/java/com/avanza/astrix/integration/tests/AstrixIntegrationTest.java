@@ -16,6 +16,7 @@
 package com.avanza.astrix.integration.tests;
 
 import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
@@ -23,10 +24,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -162,6 +166,18 @@ public class AstrixIntegrationTest {
 	}
 	
 	@Test
+	public void partitionedRemotingRequest() throws Exception {
+		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
+		lunchService.addLunchRestaurant(lunchRestaurant().withName("McDonalds").build());
+		lunchService.addLunchRestaurant(lunchRestaurant().withName("Max Burger").build());
+		
+		List<LunchRestaurant> r = lunchService.getLunchRestaurants("McDonalds", "Max Burger");
+		assertEquals(2, r.size());
+		assertThat(r, hasItem(restaurantWithName("McDonalds")));
+		assertThat(r, hasItem(restaurantWithName("Max Burger")));
+	}
+	
+	@Test
 	public void requestToQualifiedService() throws Exception {
 		assertEquals("hi", lunchPing.ping("hi"));
 	}
@@ -252,6 +268,20 @@ public class AstrixIntegrationTest {
 	@Test(expected = ServiceUnavailableException.class)
 	public void itsNotPossibleToBindToNonPublishedServiceBeansProvidedByOtherSubsystems() throws Exception {
 		astrix.getBean(InternalLunchFeeder.class).addLunchRestaurant(lunchRestaurant().build());;
+	}
+
+	private TypeSafeMatcher<LunchRestaurant> restaurantWithName(final String restaurantName) {
+		return new TypeSafeMatcher<LunchRestaurant>() {
+			@Override
+			public void describeTo(Description description) {
+				description.appendText("LunchRestaurant with name: " + restaurantName);
+			}
+
+			@Override
+			protected boolean matchesSafely(LunchRestaurant item) {
+				return item.getName().equals(restaurantName);
+			}
+		};
 	}
 	
 	private void assertEventually(Probe probe) throws InterruptedException {
