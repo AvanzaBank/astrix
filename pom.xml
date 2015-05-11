@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.avanza.astrix</groupId>
 	<artifactId>astrix-parent</artifactId>
-	<version>0.20.1-SNAPSHOT</version>
+	<version>0.21.0</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>astrix-core</module>
@@ -28,7 +28,7 @@
 	<scm>
 		<connection>scm:git:git@git01.test.aza.se:asterix/astrix.git</connection>
 		<url>http://http://git01.test.aza.se/asterix/astrix/tree/master</url>
-		<tag>HEAD</tag>
+		<tag>astrix-parent-0.21.0</tag>
 	</scm>
 	<distributionManagement>
 		<repository>
