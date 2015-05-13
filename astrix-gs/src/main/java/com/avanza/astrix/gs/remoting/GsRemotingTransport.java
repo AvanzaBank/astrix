@@ -36,6 +36,7 @@ import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.client.RemotingTransportSpi;
 import com.avanza.astrix.remoting.client.RoutedServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.RoutingKey;
+import com.avanza.astrix.remoting.util.GsUtil;
 import com.gigaspaces.async.AsyncFuture;
 import com.gigaspaces.async.AsyncFutureListener;
 import com.gigaspaces.async.AsyncResult;
@@ -66,26 +67,33 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 						return gigaSpace.execute(new AstrixServiceInvocationTask(request), routingKey);
 					}
 				}, new HystrixCommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
-		return faultTolerance.observe(toObservable(response), getServiceCommandSettings(request));
+		return faultTolerance.observe(GsUtil.toObservable(response), getServiceCommandSettings(request));
 	}
+	
 
-	private <T> Observable<T> toObservable(final AsyncFuture<T> response) {
-		return Observable.create(new Observable.OnSubscribe<T>() {
-			@Override
-			public void call(final Subscriber<? super T> t1) {
-				response.setListener(new AsyncFutureListener<T>() {
+	@Override
+	public Observable<AstrixServiceInvocationResponse> processRoutedRequests(final Collection<RoutedServiceInvocationRequest> requests) {
+		if (requests.isEmpty()) {
+			return Observable.empty();
+		}
+		final List<AsyncFuture<AstrixServiceInvocationResponse>> responses = 
+				this.faultTolerance.execute(new Command<List<AsyncFuture<AstrixServiceInvocationResponse>>>() {
 					@Override
-					public void onResult(AsyncResult<T> result) {
-						if (result.getException() == null) {
-							t1.onNext(result.getResult());
-							t1.onCompleted();
-						} else {
-							t1.onError(result.getException());
+					public List<AsyncFuture<AstrixServiceInvocationResponse>> call() {
+						List<AsyncFuture<AstrixServiceInvocationResponse>> submittedInvocations = new LinkedList<>();
+						for (RoutedServiceInvocationRequest request : requests) {
+							submittedInvocations.add(gigaSpace.execute(new AstrixServiceInvocationTask(request.getRequest()), request.getRoutingkey()));
 						}
+						return submittedInvocations;
 					}
-				});
-			}
-		});
+				}, new HystrixCommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
+		Observable<AstrixServiceInvocationResponse> result = Observable.empty();
+		for (AsyncFuture<AstrixServiceInvocationResponse> response : responses) {
+			result = result.mergeWith(GsUtil.toObservable(response));
+		}
+		ObservableCommandSettings commandSettings = getServiceCommandSettings(requests.iterator().next().getRequest());
+		return faultTolerance.observe(result, commandSettings);
+
 	}
 
 	@Override
@@ -148,28 +156,4 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 		}
 		throw new IllegalStateException("Cant decide cluster topology on clustered proxy: " + this.gigaSpace.getName());
 	}
-
-	@Override
-	public Observable<AstrixServiceInvocationResponse> processRoutedRequests(final Collection<RoutedServiceInvocationRequest> requests) {
-		if (requests.isEmpty()) {
-			return Observable.empty();
-		}
-		final List<AsyncFuture<AstrixServiceInvocationResponse>> responses = 
-				this.faultTolerance.execute(new Command<List<AsyncFuture<AstrixServiceInvocationResponse>>>() {
-					@Override
-					public List<AsyncFuture<AstrixServiceInvocationResponse>> call() {
-						List<AsyncFuture<AstrixServiceInvocationResponse>> submittedInvocations = new LinkedList<>();
-						for (RoutedServiceInvocationRequest request : requests) {
-							submittedInvocations.add(gigaSpace.execute(new AstrixServiceInvocationTask(request.getRequest()), request.getRoutingkey()));
-						}
-						return submittedInvocations;
-					}
-				}, new HystrixCommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
-		Observable<AstrixServiceInvocationResponse> result = Observable.empty();
-		for (AsyncFuture<AstrixServiceInvocationResponse> response : responses) {
-			result = result.mergeWith(toObservable(response));
-		}
-		return faultTolerance.observe(result, getServiceCommandSettings(requests.iterator().next().getRequest()));
-
-	} 
 }

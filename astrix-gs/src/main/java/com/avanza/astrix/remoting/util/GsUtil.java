@@ -20,9 +20,16 @@ import java.util.List;
 
 import org.openspaces.remoting.SpaceRemotingResult;
 
+import rx.Observable;
+import rx.Observable.OnSubscribe;
+import rx.Subscriber;
+
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
 import com.avanza.astrix.core.ServiceInvocationException;
+import com.gigaspaces.async.AsyncFuture;
+import com.gigaspaces.async.AsyncFutureListener;
+import com.gigaspaces.async.AsyncResult;
 
 /**
  * @author joasah
@@ -47,6 +54,25 @@ public class GsUtil {
 		} else {
 			return new RemoteServiceInvocationException("Remote service threw exception: " + exception.getMessage(), exception.getClass().getName(), ServiceInvocationException.UNDEFINED_CORRELATION_ID);
 		}
+	}
+
+	public static <T> Observable<T> toObservable(final AsyncFuture<T> response) {
+		return Observable.create(new Observable.OnSubscribe<T>() {
+			@Override
+			public void call(final Subscriber<? super T> t1) {
+				response.setListener(new AsyncFutureListener<T>() {
+					@Override
+					public void onResult(AsyncResult<T> result) {
+						if (result.getException() == null) {
+							t1.onNext(result.getResult());
+							t1.onCompleted();
+						} else {
+							t1.onError(result.getException());
+						}
+					}
+				});
+			}
+		});
 	}
 	
 }
