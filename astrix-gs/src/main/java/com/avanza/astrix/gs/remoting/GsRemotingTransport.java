@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.gs.remoting;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.List;
 import org.openspaces.core.GigaSpace;
 
 import rx.Observable;
-import rx.Subscriber;
+import rx.functions.Func1;
 
 import com.avanza.astrix.ft.AstrixFaultTolerance;
 import com.avanza.astrix.ft.Command;
@@ -38,7 +37,6 @@ import com.avanza.astrix.remoting.client.RoutedServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.RoutingKey;
 import com.avanza.astrix.remoting.util.GsUtil;
 import com.gigaspaces.async.AsyncFuture;
-import com.gigaspaces.async.AsyncFutureListener;
 import com.gigaspaces.async.AsyncResult;
 import com.gigaspaces.internal.client.spaceproxy.SpaceProxyImpl;
 import com.j_spaces.core.IJSpace;
@@ -95,9 +93,9 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 		return faultTolerance.observe(result, commandSettings);
 
 	}
-
+	
 	@Override
-	public Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(final AstrixServiceInvocationRequest request) {
+	public Observable<AstrixServiceInvocationResponse> processBroadcastRequest(final AstrixServiceInvocationRequest request) {
 		final AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>> responses = 
 				faultTolerance.execute(new Command<AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>>>() {
 						@Override
@@ -105,33 +103,13 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 							return gigaSpace.execute(new AstrixDistributedServiceInvocationTask(request));
 						}
 					}, new HystrixCommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
-		Observable<List<AstrixServiceInvocationResponse>> observable = Observable.create(new Observable.OnSubscribe<List<AstrixServiceInvocationResponse>>() {
-			@Override
-			public void call(final Subscriber<? super List<AstrixServiceInvocationResponse>> subscriber) {
-				responses.setListener(new AsyncFutureListener<List<AsyncResult<AstrixServiceInvocationResponse>>>() {
-					@Override
-					public void onResult(AsyncResult<List<AsyncResult<AstrixServiceInvocationResponse>>> asyncRresult) {
-						if (asyncRresult.getException() == null) {
-							List<AstrixServiceInvocationResponse> result = new ArrayList<>();
-							for (AsyncResult<AstrixServiceInvocationResponse> asyncInvocationResponse : asyncRresult.getResult()) {
-								if (asyncInvocationResponse.getException() != null) {
-									subscriber.onError(asyncInvocationResponse.getException());
-									return;
-								}
-								result.add(asyncInvocationResponse.getResult());
-							}
-							subscriber.onNext(result);
-							subscriber.onCompleted();
-						} else {
-							subscriber.onError(asyncRresult.getException());
-						}
-					}
-				});
-			}
-		});
+		Observable<List<AsyncResult<AstrixServiceInvocationResponse>>> r = GsUtil.toObservable(responses);
+		Func1<List<AsyncResult<AstrixServiceInvocationResponse>>, Observable<AstrixServiceInvocationResponse>> listToObservable = 
+				GsUtil.asyncResultListToObservable();
+		Observable<AstrixServiceInvocationResponse> observable = r.flatMap(listToObservable);
 		return faultTolerance.observe(observable, getServiceCommandSettings(request));
 	}
-	
+
 	private ObservableCommandSettings getServiceCommandSettings(AstrixServiceInvocationRequest request) {
 		String api = request.getHeader(AstrixServiceInvocationRequestHeaders.SERVICE_API);
 		String spaceName = gigaSpace.getName();

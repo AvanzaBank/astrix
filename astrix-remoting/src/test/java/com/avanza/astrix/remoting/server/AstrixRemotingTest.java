@@ -964,18 +964,21 @@ public class AstrixRemotingTest {
 		}
 
 		@Override
-		public Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request) {
+		public Observable<AstrixServiceInvocationResponse> processBroadcastRequest(AstrixServiceInvocationRequest request) {
 			final List<AstrixServiceInvocationResponse> responses = new ArrayList<>();
 			for (AstrixServiceActivator partition : partitions) {
 				responses.add(partition.invokeService(request));
 			}
-			return Observable.create(new Observable.OnSubscribe<List<AstrixServiceInvocationResponse>>() {
+			return Observable.create(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {
 				@Override
-				public void call(Subscriber<? super List<AstrixServiceInvocationResponse>> t1) {
-					t1.onNext(responses);
+				public void call(Subscriber<? super AstrixServiceInvocationResponse> t1) {
+					for (AstrixServiceInvocationResponse r : responses) {
+						t1.onNext(r);
+					}
 					t1.onCompleted();
 				}
 			});
+			
 		}
 
 		@Override

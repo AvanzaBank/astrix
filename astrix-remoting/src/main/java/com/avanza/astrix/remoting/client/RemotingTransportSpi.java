@@ -16,7 +16,6 @@
 package com.avanza.astrix.remoting.client;
 
 import java.util.Collection;
-import java.util.List;
 
 import rx.Observable;
 /**
@@ -29,8 +28,27 @@ import rx.Observable;
  *
  */
 public interface RemotingTransportSpi {
+	/**
+	 * Returns an Observable that will emit one item for the response from the given invocation request.
+	 * @param request
+	 * @param routingKey
+	 * @return
+	 */
 	Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey);
+	
+	/**
+	 * Returns an Observable that will emit one item for the response for each routed invocation request.
+	 * @param requests
+	 * @return
+	 */
 	Observable<AstrixServiceInvocationResponse> processRoutedRequests(Collection<RoutedServiceInvocationRequest> requests);
-	Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request);
+	/**
+	 * Returns an Observable that will emit one item for the response for the invocation of each member in
+	 * the entire cluster.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	Observable<AstrixServiceInvocationResponse> processBroadcastRequest(AstrixServiceInvocationRequest request);
 	int partitionCount();
 }

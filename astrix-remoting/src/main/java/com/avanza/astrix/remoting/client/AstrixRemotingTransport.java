@@ -48,7 +48,7 @@ public class AstrixRemotingTransport {
 		return result;
 	}
 	
-	public Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request) {
+	public Observable<AstrixServiceInvocationResponse> processBroadcastRequest(AstrixServiceInvocationRequest request) {
 		return impl.processBroadcastRequest(request);
 	}
 

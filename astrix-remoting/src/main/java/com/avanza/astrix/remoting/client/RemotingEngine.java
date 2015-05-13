@@ -85,7 +85,7 @@ public final class RemotingEngine {
 		return this.serviceTransport.processRoutedRequests(requests);
 	}
 
-	final Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request) {
+	final Observable<AstrixServiceInvocationResponse> processBroadcastRequest(AstrixServiceInvocationRequest request) {
 		return this.serviceTransport.processBroadcastRequest(request);
 	}
 

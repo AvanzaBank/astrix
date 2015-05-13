@@ -23,6 +23,7 @@ import org.openspaces.remoting.SpaceRemotingResult;
 import rx.Observable;
 import rx.Observable.OnSubscribe;
 import rx.Subscriber;
+import rx.functions.Func1;
 
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
@@ -73,6 +74,26 @@ public class GsUtil {
 				});
 			}
 		});
+	}
+
+	public static <T> Func1<List<AsyncResult<T>>, Observable<T>> asyncResultListToObservable() {
+		return new Func1<List<AsyncResult<T>>, Observable<T>>() {
+			@Override
+			public Observable<T> call(final List<AsyncResult<T>> asyncRresults) {
+				return Observable.create(new OnSubscribe<T>() {
+					@Override
+					public void call(Subscriber<? super T> subscriber) {
+						for (AsyncResult<T> asyncInvocationResponse : asyncRresults) {
+							if (asyncInvocationResponse.getException() != null) {
+								subscriber.onError(asyncInvocationResponse.getException());
+								return;
+							}
+							subscriber.onNext(asyncInvocationResponse.getResult());
+						}
+						subscriber.onCompleted();
+					}
+				});
+			}};
 	}
 	
 }
