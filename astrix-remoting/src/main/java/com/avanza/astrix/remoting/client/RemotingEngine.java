@@ -77,12 +77,15 @@ public final class RemotingEngine {
 		return new RemoteServiceInvocationException(response.getExceptionMsg(), response.getThrownExceptionType(), CorrelationId.valueOf(response.getCorrelationId()));
 	}
 	
-	protected final Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
+	final Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
 		return this.serviceTransport.processRoutedRequest(request, routingKey);
 	}
 	
+	final Observable<AstrixServiceInvocationResponse> processRoutedRequests(List<RoutedServiceInvocationRequest> requests) {
+		return this.serviceTransport.processRoutedRequests(requests);
+	}
 
-	protected final Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request) {
+	final Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request) {
 		return this.serviceTransport.processBroadcastRequest(request);
 	}
 

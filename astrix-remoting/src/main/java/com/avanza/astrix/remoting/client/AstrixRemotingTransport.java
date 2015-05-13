@@ -39,6 +39,15 @@ public class AstrixRemotingTransport {
 		return impl.processRoutedRequest(request, routingKey);
 	}
 	
+	public Observable<AstrixServiceInvocationResponse> processRoutedRequests(List<RoutedServiceInvocationRequest> requests) {
+		// TODO: Introduce method corresponding to this one in RemotingTransportSpi
+		Observable<AstrixServiceInvocationResponse> result = Observable.empty();
+		for (RoutedServiceInvocationRequest request : requests) {
+			result = result.mergeWith(processRoutedRequest(request.getRequest(), request.getRoutingkey()));
+		}
+		return result;
+	}
+	
 	public Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request) {
 		return impl.processBroadcastRequest(request);
 	}

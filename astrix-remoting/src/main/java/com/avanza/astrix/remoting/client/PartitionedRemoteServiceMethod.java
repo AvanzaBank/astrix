@@ -104,10 +104,8 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		 * 3. Execute requests
 		 */
 		ServiceInvocationPartitioner serviceInvocationPartitioner = new ServiceInvocationPartitioner();
-		Observable<AstrixServiceInvocationResponse> serviceInvocationResponses = Observable.empty();
-		for (RoutedServiceInvocationReqeust serivceInvocationReqeuest : serviceInvocationPartitioner.partitionInvocationRequest(args)) {
-			serviceInvocationResponses = serviceInvocationResponses.mergeWith(serivceInvocationReqeuest.submitRequest(invocationRequest, args));
-		}
+		List<RoutedServiceInvocationRequest> partitionInvocationRequest = serviceInvocationPartitioner.partitionInvocationRequest(invocationRequest, args);
+		Observable<AstrixServiceInvocationResponse> serviceInvocationResponses = remotingEngine.processRoutedRequests(partitionInvocationRequest);
 		return reduce(serviceInvocationResponses);
 	}
 
@@ -136,11 +134,11 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		return partitionedArgumentContainerType.newInstance();
 	}
 
-	private class RoutedServiceInvocationReqeust {
+	private class RoutedServiceInvocationRequestBuilder {
 		private final ContainerBuilder routingKeys;
 		private final RoutingKey targetPartitionRoutingKey;
 
-		public RoutedServiceInvocationReqeust(ContainerBuilder keys, int targetPartition) {
+		public RoutedServiceInvocationRequestBuilder(ContainerBuilder keys, int targetPartition) {
 			this.routingKeys = keys;
 			this.targetPartitionRoutingKey = RoutingKey.create(targetPartition);
 		}
@@ -149,52 +147,54 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 			this.routingKeys.add(requestedKey);
 		}
 		
-		public Observable<AstrixServiceInvocationResponse> submitRequest(AstrixServiceInvocationRequest invocationRequest, Object[] unpartitionedArguments) {
+		private RoutedServiceInvocationRequest createInvocationRequest(
+				AstrixServiceInvocationRequest invocationRequest,
+				Object[] unpartitionedArguments) {
 			AstrixServiceInvocationRequest partitionedRequest = new AstrixServiceInvocationRequest();
 			partitionedRequest.setAllHeaders(invocationRequest.getHeaders());
 			Object[] requestForPartition = Arrays.copyOf(unpartitionedArguments, unpartitionedArguments.length);
 			requestForPartition[partitionedArgumentIndex] = this.routingKeys.buildTarget();
 			partitionedRequest.setArguments(remotingEngine.marshall(requestForPartition));
-			return remotingEngine.processRoutedRequest(partitionedRequest, targetPartitionRoutingKey);
+			return new RoutedServiceInvocationRequest(partitionedRequest, targetPartitionRoutingKey);
 		}
 	}
 	
 	private class ServiceInvocationPartitioner {
-		private final RoutedServiceInvocationReqeust[] requests;
+		private final RoutedServiceInvocationRequestBuilder[] requests;
 		
 		public ServiceInvocationPartitioner() {
-			this.requests = new RoutedServiceInvocationReqeust[remotingEngine.partitionCount()];
+			this.requests = new RoutedServiceInvocationRequestBuilder[remotingEngine.partitionCount()];
 		}
 
-		public Iterable<RoutedServiceInvocationReqeust> partitionInvocationRequest(Object[] args) {
+		public List<RoutedServiceInvocationRequest> partitionInvocationRequest(AstrixServiceInvocationRequest invocationRequest, Object[] args) {
 			partitionedArgumentContainerType.iterateContainer(getContainerInstance(args), new Consumer() {
 				@Override
 				public void accept(Object element) {
 					addRoutingKey(element);
 				}
 			});
-			List<RoutedServiceInvocationReqeust> result = new LinkedList<>();
-			for (RoutedServiceInvocationReqeust routedInvocationReqeust : requests) {
-				if (routedInvocationReqeust != null) {
-					result.add(routedInvocationReqeust);
+			List<RoutedServiceInvocationRequest> result = new LinkedList<>();
+			for (RoutedServiceInvocationRequestBuilder routedInvocationReqeustBuilder : requests) {
+				if (routedInvocationReqeustBuilder != null) {
+					result.add(routedInvocationReqeustBuilder.createInvocationRequest(invocationRequest, args));
 				}
 			}
 			return result;
 		}
-
+		
 		private Object getContainerInstance(Object[] args) {
 			return args[partitionedArgumentIndex];
 		}
 
 		public void addRoutingKey(Object requestedKey) {
 			int targetPartition = requestedKey.hashCode() % requests.length;
-			RoutedServiceInvocationReqeust invocationRequestForPartition = this.requests[targetPartition];
-			if (invocationRequestForPartition == null) {
-				invocationRequestForPartition = new RoutedServiceInvocationReqeust(newCollectionInstance(), targetPartition);
-				this.requests[targetPartition] = invocationRequestForPartition;
+			RoutedServiceInvocationRequestBuilder invocationRequestBuilderForPartition = this.requests[targetPartition];
+			if (invocationRequestBuilderForPartition == null) {
+				invocationRequestBuilderForPartition = new RoutedServiceInvocationRequestBuilder(newCollectionInstance(), targetPartition);
+				this.requests[targetPartition] = invocationRequestBuilderForPartition;
 				
 			}
-			invocationRequestForPartition.addKey(requestedKey);
+			invocationRequestBuilderForPartition.addKey(requestedKey);
 		}
 
 	}
