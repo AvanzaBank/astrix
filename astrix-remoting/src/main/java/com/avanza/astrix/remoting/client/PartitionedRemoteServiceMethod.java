@@ -39,48 +39,50 @@ import com.avanza.astrix.core.util.ReflectionUtil;
  */
 public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 
-	private final int partitionByIndex;
+	private final int partitionedArgumentIndex;
 	private final String methodSignature;
 	private final RemotingEngine remotingEngine;
 	private final Type targetReturnType;
-	private final PartitionContext partitionContext;
+	private final Class<? extends AstrixRemoteResultReducer<?,?>> reducerType;
+	private final ContainerType partitionedArgumentContainerType;
 
-	public PartitionedRemoteServiceMethod(int partitionedByArgumentIndex,
+	public PartitionedRemoteServiceMethod(int partitionedArgumentIndex,
 										  Method proxiedMethod,
 										  String methodSignature, 
 										  RemotingEngine remotingEngine,
 										  Type targetReturnType) {
-		this.partitionByIndex = partitionedByArgumentIndex;
+		this.partitionedArgumentIndex = partitionedArgumentIndex;
 		this.methodSignature = methodSignature;
 		this.remotingEngine = remotingEngine;
 		this.targetReturnType = targetReturnType;
-		this.partitionContext = createPartitionContext(partitionedByArgumentIndex, proxiedMethod);
+		AstrixPartitionedRouting partitionedRouting = getPartitionedRoutingAnnotation(proxiedMethod, partitionedArgumentIndex);
+		this.reducerType = getReducer(partitionedRouting, proxiedMethod);
+		this.partitionedArgumentContainerType = getPartititonedArgumentContainerType(proxiedMethod, partitionedRouting);
 	}
 
-	private PartitionContext createPartitionContext(int partitionedByArgumentIndex, Method proxiedMethod) {
-		AstrixPartitionedRouting partitionBy = getPartitionByAnnotation(proxiedMethod, partitionedByArgumentIndex);
-		Class<?> partitionedArgumentType = proxiedMethod.getParameterTypes()[partitionedByArgumentIndex];
+	private ContainerType getPartititonedArgumentContainerType(Method proxiedMethod, AstrixPartitionedRouting partitionBy) {
+		Class<?> partitionedArgumentType = proxiedMethod.getParameterTypes()[partitionedArgumentIndex];
 		if (partitionedArgumentType.isArray()) {
-			return new PartitionContext(getReducer(partitionBy, proxiedMethod), new ArrayPartitionedArgumentType(partitionedArgumentType.getComponentType()));
+			return new ArrayContainerType(partitionedArgumentType.getComponentType());
 		}
-		Class<? extends Collection> collectionFactory = partitionBy.collectionFactory();
-		if (!proxiedMethod.getParameterTypes()[partitionedByArgumentIndex].isAssignableFrom(collectionFactory)) {
+		Class<? extends Collection<?>> collectionFactory = (Class<? extends Collection<?>>) partitionBy.collectionFactory();
+		if (!proxiedMethod.getParameterTypes()[partitionedArgumentIndex].isAssignableFrom(collectionFactory)) {
 			throw new IllegalArgumentException(String.format("Collection class supplied by @AstrixPartitionedRouting is not "
 											 + "compatible with argument type, argumentType=%s classType=%s", 
-											 proxiedMethod.getParameterTypes()[partitionedByArgumentIndex].getName(),
+											 proxiedMethod.getParameterTypes()[partitionedArgumentIndex].getName(),
 											 collectionFactory));
 		}
-		return new PartitionContext(getReducer(partitionBy, proxiedMethod), new JavaCollectionPartitionedArgumentType(collectionFactory));
+		return new CollectionContainerType(collectionFactory);
 	}
 
-	private Class<? extends AstrixRemoteResultReducer> getReducer(
+	private Class<? extends AstrixRemoteResultReducer<?, ?>> getReducer(
 			AstrixPartitionedRouting partitionBy, Method targetServiceMethod) {
-		Class<? extends AstrixRemoteResultReducer> reducerType = partitionBy.reducer();
+		Class<? extends AstrixRemoteResultReducer<?,?>> reducerType = (Class<? extends AstrixRemoteResultReducer<?, ?>>) partitionBy.reducer();
 		RemotingProxyUtil.validateRemoteResultReducer(targetServiceMethod, reducerType);
 		return reducerType;
 	}
 
-	private static AstrixPartitionedRouting getPartitionByAnnotation(Method proxiedMethod, int partitionedByArgumentIndex) {
+	private static AstrixPartitionedRouting getPartitionedRoutingAnnotation(Method proxiedMethod, int partitionedByArgumentIndex) {
 		for (Annotation a : proxiedMethod.getParameterAnnotations()[partitionedByArgumentIndex]) {
 			if (a instanceof AstrixPartitionedRouting) {
 				return AstrixPartitionedRouting.class.cast(a);
@@ -101,16 +103,16 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		 * 2. Marshall arguments
 		 * 3. Execute requests
 		 */
-		PartitionedRequestsBuilder requestsBuilder = new PartitionedRequestsBuilder(this.remotingEngine.partitionCount());
-		Observable<AstrixServiceInvocationResponse> responses = Observable.empty();
-		for (PartitionedRequest partitionRequest : requestsBuilder.partitionRequest(args)) {
-			responses = responses.mergeWith(partitionRequest.submitRequest(invocationRequest, args));
+		ServiceInvocationPartitioner serviceInvocationPartitioner = new ServiceInvocationPartitioner();
+		Observable<AstrixServiceInvocationResponse> serviceInvocationResponses = Observable.empty();
+		for (RoutedServiceInvocationReqeust serivceInvocationReqeuest : serviceInvocationPartitioner.partitionInvocationRequest(args)) {
+			serviceInvocationResponses = serviceInvocationResponses.mergeWith(serivceInvocationReqeuest.submitRequest(invocationRequest, args));
 		}
-		return reduce(responses);
+		return reduce(serviceInvocationResponses);
 	}
 
 	private <T> Observable<T> reduce(Observable<AstrixServiceInvocationResponse> responses) {
-		final AstrixRemoteResultReducer<T, T> reducer = this.partitionContext.newRemoteResultReducer();
+		final AstrixRemoteResultReducer<T, T> reducer = newRemoteResultReducer();
 		return responses.toList().map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
 			@Override
 			public T call(List<AstrixServiceInvocationResponse> t1) {
@@ -125,150 +127,134 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		
 	}
 
-	private class PartitionedRequest {
-		private final CollectionBuilder keys;
+	@SuppressWarnings("unchecked")
+	private <T> AstrixRemoteResultReducer<T, T> newRemoteResultReducer() {
+		return (AstrixRemoteResultReducer<T, T>) ReflectionUtil.newInstance(this.reducerType);
+	}
+
+	private ContainerBuilder newCollectionInstance() {
+		return partitionedArgumentContainerType.newInstance();
+	}
+
+	private class RoutedServiceInvocationReqeust {
+		private final ContainerBuilder routingKeys;
 		private final RoutingKey targetPartitionRoutingKey;
 
-		public PartitionedRequest(CollectionBuilder keys, int targetPartition) {
-			this.keys = keys;
+		public RoutedServiceInvocationReqeust(ContainerBuilder keys, int targetPartition) {
+			this.routingKeys = keys;
 			this.targetPartitionRoutingKey = RoutingKey.create(targetPartition);
 		}
 
 		public void addKey(Object requestedKey) {
-			this.keys.add(requestedKey);
+			this.routingKeys.add(requestedKey);
 		}
 		
 		public Observable<AstrixServiceInvocationResponse> submitRequest(AstrixServiceInvocationRequest invocationRequest, Object[] unpartitionedArguments) {
 			AstrixServiceInvocationRequest partitionedRequest = new AstrixServiceInvocationRequest();
 			partitionedRequest.setAllHeaders(invocationRequest.getHeaders());
 			Object[] requestForPartition = Arrays.copyOf(unpartitionedArguments, unpartitionedArguments.length);
-			requestForPartition[partitionByIndex] = this.keys.buildTarget();
+			requestForPartition[partitionedArgumentIndex] = this.routingKeys.buildTarget();
 			partitionedRequest.setArguments(remotingEngine.marshall(requestForPartition));
 			return remotingEngine.processRoutedRequest(partitionedRequest, targetPartitionRoutingKey);
 		}
 	}
 	
-	private class PartitionedRequestsBuilder {
-		private final PartitionedRequest[] requests;
+	private class ServiceInvocationPartitioner {
+		private final RoutedServiceInvocationReqeust[] requests;
 		
-		public PartitionedRequestsBuilder(int partitionCount) {
-			this.requests = new PartitionedRequest[partitionCount];
+		public ServiceInvocationPartitioner() {
+			this.requests = new RoutedServiceInvocationReqeust[remotingEngine.partitionCount()];
 		}
 
-		public Iterable<PartitionedRequest> partitionRequest(Object[] args) {
-			partitionContext.consumeAll(args[partitionByIndex], new Consumer() {
+		public Iterable<RoutedServiceInvocationReqeust> partitionInvocationRequest(Object[] args) {
+			partitionedArgumentContainerType.iterateContainer(getContainerInstance(args), new Consumer() {
 				@Override
-				public void accept(Object requestedKey) {
-					addKey(requestedKey);
+				public void accept(Object element) {
+					addRoutingKey(element);
 				}
 			});
-			List<PartitionedRequest> result = new LinkedList<>();
-			for (PartitionedRequest request : requests) {
-				if (request != null) {
-					result.add(request);
+			List<RoutedServiceInvocationReqeust> result = new LinkedList<>();
+			for (RoutedServiceInvocationReqeust routedInvocationReqeust : requests) {
+				if (routedInvocationReqeust != null) {
+					result.add(routedInvocationReqeust);
 				}
 			}
 			return result;
 		}
 
-		public void addKey(Object requestedKey) {
+		private Object getContainerInstance(Object[] args) {
+			return args[partitionedArgumentIndex];
+		}
+
+		public void addRoutingKey(Object requestedKey) {
 			int targetPartition = requestedKey.hashCode() % requests.length;
-			PartitionedRequest partitionRequest = this.requests[targetPartition];
-			if (partitionRequest == null) {
-				partitionRequest = new PartitionedRequest(newCollectionInstance(), targetPartition);
-				this.requests[targetPartition] = partitionRequest;
+			RoutedServiceInvocationReqeust invocationRequestForPartition = this.requests[targetPartition];
+			if (invocationRequestForPartition == null) {
+				invocationRequestForPartition = new RoutedServiceInvocationReqeust(newCollectionInstance(), targetPartition);
+				this.requests[targetPartition] = invocationRequestForPartition;
 				
 			}
-			partitionRequest.addKey(requestedKey);
+			invocationRequestForPartition.addKey(requestedKey);
 		}
 
-		private CollectionBuilder newCollectionInstance() {
-			return partitionContext.newCollectionInstance();
-		}
 	}
 	
-	private static class PartitionContext {
-
-		private final Class<? extends AstrixRemoteResultReducer> remoteResultReducerFactory;
-		private final PartitionedArgumentType partitionedArgumentType;
-		
-		public PartitionContext(Class<? extends AstrixRemoteResultReducer> reducerFactory, PartitionedArgumentType partitionedArgumentType) {
-			this.remoteResultReducerFactory = reducerFactory;
-			this.partitionedArgumentType = partitionedArgumentType;
-		}
-		
-		public void consumeAll(Object object, Consumer consumer) {
-			this.partitionedArgumentType.consumeAll(object, consumer);
-		}
-
-		@SuppressWarnings("unchecked")
-		public <T> AstrixRemoteResultReducer<T, T> newRemoteResultReducer() {
-			return ReflectionUtil.newInstance(remoteResultReducerFactory);
-		}
-
-		private CollectionBuilder newCollectionInstance() {
-			return partitionedArgumentType.newInstance();
-		}
-	}
-	
-	private interface PartitionedArgumentType {
-		CollectionBuilder newInstance();
-		<E> void consumeAll(Object argument, Consumer consumer);
+	private interface ContainerType {
+		ContainerBuilder newInstance();
+		<E> void iterateContainer(Object container, Consumer consumer);
 	}
 	
 	interface Consumer {
 		void accept(Object element);
 	}
 	
-	
-	private static class JavaCollectionPartitionedArgumentType implements PartitionedArgumentType {
-		private final Class<? extends Collection> collectionFactory;
+	private static class CollectionContainerType implements ContainerType {
+		private final Class<? extends Collection<?>> collectionFactory;
 		
-		public JavaCollectionPartitionedArgumentType(Class<? extends Collection> collectionFactory) {
+		public CollectionContainerType(Class<? extends Collection<?>> collectionFactory) {
 			this.collectionFactory = collectionFactory;
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
-		public CollectionBuilder newInstance() {
-			return new JavaCollectionBuilder(ReflectionUtil.newInstance(this.collectionFactory));
+		public ContainerBuilder newInstance() {
+			return new CollectionContainerBuilder((Collection<? super Object>) ReflectionUtil.newInstance(this.collectionFactory));
 		}
 
 		@Override
-		public void consumeAll(Object argument, Consumer consumer) {
-			for (Object element : (Collection) argument) {
+		public void iterateContainer(Object container, Consumer consumer) {
+			for (Object element : (Collection<? extends Object>) container) {
 				consumer.accept(element);
 			}
 		}
 	}
 	
-	private static class ArrayPartitionedArgumentType implements PartitionedArgumentType {
+	private static class ArrayContainerType implements ContainerType {
 		
-		private Class<?> elementType;
+		private final Class<?> elementType;
 		
-		public ArrayPartitionedArgumentType(Class<?> elementType) {
+		public ArrayContainerType(Class<?> elementType) {
 			this.elementType = elementType;
 		}
 
 		@Override
-		public CollectionBuilder newInstance() {
-			return new ArrayCollectionBuilder(elementType);
+		public ContainerBuilder newInstance() {
+			return new ArrayContainerBuilder(elementType);
 		}
 
 		@Override
-		public void consumeAll(Object argument, Consumer consumer) {
-			for (int i = 0; i < Array.getLength(argument); i++) {
-				consumer.accept(Array.get(argument, i));
+		public void iterateContainer(Object container, Consumer consumer) {
+			for (int i = 0; i < Array.getLength(container); i++) {
+				consumer.accept(Array.get(container, i));
 			}
 		}
 	}
 	
-	private static class ArrayCollectionBuilder extends CollectionBuilder {
+	private static class ArrayContainerBuilder extends ContainerBuilder {
 		
 		private final Class<?> elementType;
 		private final List<Object> elements = new ArrayList<>();
 		
-		public ArrayCollectionBuilder(Class<?> elementType) {
+		public ArrayContainerBuilder(Class<?> elementType) {
 			this.elementType = elementType;
 		}
 		
@@ -279,7 +265,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		
 		@Override
 		Object buildTarget() {
-			Object array = initArray(elements.size());
+			Object array = Array.newInstance(elementType, elements.size());
 			int nextIndex = 0;
 			for (Object element : elements) {
 				Array.set(array, nextIndex, element);
@@ -287,23 +273,19 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 			}
 			return array;
 		}
-		
-		protected Object initArray(int size) {
-			return Array.newInstance(elementType, size);
-		}
 	}
 	
-	private static abstract class CollectionBuilder {
+	private static abstract class ContainerBuilder {
 		
 		abstract void add(Object element);
 		
 		abstract Object buildTarget();
 	}
 	
-	private static class JavaCollectionBuilder extends CollectionBuilder {
-		private Collection<Object> collection;
+	private static class CollectionContainerBuilder extends ContainerBuilder {
+		private Collection<? super Object> collection;
 
-		public JavaCollectionBuilder(Collection<Object> collection) {
+		public CollectionContainerBuilder(Collection<? super Object> collection) {
 			this.collection = collection;
 		}
 		

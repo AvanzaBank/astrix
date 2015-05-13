@@ -737,7 +737,7 @@ public class AstrixRemotingTest {
 	}
 	
 	interface InvalidCollectionTypePartitionedService {
-		int squareSum(@AstrixPartitionedRouting Set<Integer> nums);
+		Integer squareSum(@AstrixPartitionedRouting(reducer = SummingReducer.class) Set<Integer> nums);
 	}
 	
 	interface InvalidReducerPartitionedService {
