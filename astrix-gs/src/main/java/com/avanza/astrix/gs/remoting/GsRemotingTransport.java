@@ -16,6 +16,8 @@
 package com.avanza.astrix.gs.remoting;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.openspaces.core.GigaSpace;
@@ -32,6 +34,7 @@ import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.client.RemotingTransportSpi;
+import com.avanza.astrix.remoting.client.RoutedServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.RoutingKey;
 import com.gigaspaces.async.AsyncFuture;
 import com.gigaspaces.async.AsyncFutureListener;
@@ -63,12 +66,16 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 						return gigaSpace.execute(new AstrixServiceInvocationTask(request), routingKey);
 					}
 				}, new HystrixCommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
-		Observable<AstrixServiceInvocationResponse> observable = Observable.create(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {
+		return faultTolerance.observe(toObservable(response), getServiceCommandSettings(request));
+	}
+
+	private <T> Observable<T> toObservable(final AsyncFuture<T> response) {
+		return Observable.create(new Observable.OnSubscribe<T>() {
 			@Override
-			public void call(final Subscriber<? super AstrixServiceInvocationResponse> t1) {
-				response.setListener(new AsyncFutureListener<AstrixServiceInvocationResponse>() {
+			public void call(final Subscriber<? super T> t1) {
+				response.setListener(new AsyncFutureListener<T>() {
 					@Override
-					public void onResult(AsyncResult<AstrixServiceInvocationResponse> result) {
+					public void onResult(AsyncResult<T> result) {
 						if (result.getException() == null) {
 							t1.onNext(result.getResult());
 							t1.onCompleted();
@@ -79,7 +86,6 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 				});
 			}
 		});
-		return faultTolerance.observe(observable, getServiceCommandSettings(request));
 	}
 
 	@Override
@@ -140,7 +146,30 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 		if (space instanceof SpaceProxyImpl) {
 			return SpaceProxyImpl.class.cast(space).getSpaceClusterInfo().getNumberOfPartitions();
 		}
-		// TODO: What if partition count can't be decided? Propagate cluster-info via service-registry?
-		return 0;
+		throw new IllegalStateException("Cant decide cluster topology on clustered proxy: " + this.gigaSpace.getName());
+	}
+
+	@Override
+	public Observable<AstrixServiceInvocationResponse> processRoutedRequests(final Collection<RoutedServiceInvocationRequest> requests) {
+		if (requests.isEmpty()) {
+			return Observable.empty();
+		}
+		final List<AsyncFuture<AstrixServiceInvocationResponse>> responses = 
+				this.faultTolerance.execute(new Command<List<AsyncFuture<AstrixServiceInvocationResponse>>>() {
+					@Override
+					public List<AsyncFuture<AstrixServiceInvocationResponse>> call() {
+						List<AsyncFuture<AstrixServiceInvocationResponse>> submittedInvocations = new LinkedList<>();
+						for (RoutedServiceInvocationRequest request : requests) {
+							submittedInvocations.add(gigaSpace.execute(new AstrixServiceInvocationTask(request.getRequest()), request.getRoutingkey()));
+						}
+						return submittedInvocations;
+					}
+				}, new HystrixCommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
+		Observable<AstrixServiceInvocationResponse> result = Observable.empty();
+		for (AsyncFuture<AstrixServiceInvocationResponse> response : responses) {
+			result = result.mergeWith(toObservable(response));
+		}
+		return faultTolerance.observe(result, getServiceCommandSettings(requests.iterator().next().getRequest()));
+
 	} 
 }

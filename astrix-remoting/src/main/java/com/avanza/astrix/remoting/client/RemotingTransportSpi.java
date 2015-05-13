@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.remoting.client;
 
+import java.util.Collection;
 import java.util.List;
 
 import rx.Observable;
@@ -22,13 +23,14 @@ import rx.Observable;
  * SPI for implementing a RemotingTransport. <p>
  * 
  * A RemotingTransportSpi is repsonsible for sending a ServiceInvocationRequest to a remote endpoint
- * and receive a repoy from the ServiceInvocationRequest.
+ * and receive a reply from the ServiceInvocationRequest.
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public interface RemotingTransportSpi {
 	Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey);
+	Observable<AstrixServiceInvocationResponse> processRoutedRequests(Collection<RoutedServiceInvocationRequest> requests);
 	Observable<List<AstrixServiceInvocationResponse>> processBroadcastRequest(AstrixServiceInvocationRequest request);
 	int partitionCount();
 }

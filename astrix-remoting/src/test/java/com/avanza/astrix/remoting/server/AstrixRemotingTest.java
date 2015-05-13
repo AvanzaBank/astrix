@@ -60,6 +60,7 @@ import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.client.IncompatibleRemoteResultReducerException;
 import com.avanza.astrix.remoting.client.RemotingTransportSpi;
+import com.avanza.astrix.remoting.client.RoutedServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.Router;
 import com.avanza.astrix.remoting.client.RoutingKey;
 import com.avanza.astrix.remoting.client.RoutingStrategy;
@@ -980,6 +981,15 @@ public class AstrixRemotingTest {
 		@Override
 		public int partitionCount() {
 			return this.partitions.size();
+		}
+
+		@Override
+		public Observable<AstrixServiceInvocationResponse> processRoutedRequests(Collection<RoutedServiceInvocationRequest> requests) {
+			Observable<AstrixServiceInvocationResponse> result = Observable.empty();
+			for (RoutedServiceInvocationRequest request : requests) {
+				result = result.mergeWith(processRoutedRequest(request.getRequest(), request.getRoutingkey()));
+			}
+			return result;
 		}
 		
 	}
