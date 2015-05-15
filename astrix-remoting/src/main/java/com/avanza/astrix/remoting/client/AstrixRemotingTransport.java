@@ -35,21 +35,16 @@ public class AstrixRemotingTransport {
 		return new AstrixRemotingTransport(impl);
 	}
 
-	public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
-		return impl.processRoutedRequest(request, routingKey);
+	public Observable<AstrixServiceInvocationResponse> submitRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
+		return impl.submitRoutedRequest(request, routingKey);
 	}
 	
-	public Observable<AstrixServiceInvocationResponse> processRoutedRequests(List<RoutedServiceInvocationRequest> requests) {
-		// TODO: Introduce method corresponding to this one in RemotingTransportSpi
-		Observable<AstrixServiceInvocationResponse> result = Observable.empty();
-		for (RoutedServiceInvocationRequest request : requests) {
-			result = result.mergeWith(processRoutedRequest(request.getRequest(), request.getRoutingkey()));
-		}
-		return result;
+	public Observable<AstrixServiceInvocationResponse> submitRoutedRequests(List<RoutedServiceInvocationRequest> requests) {
+		return impl.submitRoutedRequests(requests);
 	}
 	
-	public Observable<AstrixServiceInvocationResponse> processBroadcastRequest(AstrixServiceInvocationRequest request) {
-		return impl.processBroadcastRequest(request);
+	public Observable<AstrixServiceInvocationResponse> submitBroadcastRequest(AstrixServiceInvocationRequest request) {
+		return impl.submitBroadcastRequest(request);
 	}
 
 	public int partitionCount() {

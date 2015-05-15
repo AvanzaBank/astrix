@@ -21,34 +21,44 @@ import rx.Observable;
 /**
  * SPI for implementing a RemotingTransport. <p>
  * 
- * A RemotingTransportSpi is repsonsible for sending a ServiceInvocationRequest to a remote endpoint
- * and receive a reply from the ServiceInvocationRequest.
+ * A RemotingTransportSpi is responsible for interacting with remote service endpoints. That is, 
+ * it can send remote service invocation request to the remote endpoint, and retrieve the corresponding
+ * response.
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public interface RemotingTransportSpi {
-	/**
-	 * Returns an Observable that will emit one item for the response from the given invocation request.
-	 * @param request
-	 * @param routingKey
-	 * @return
-	 */
-	Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey);
 	
 	/**
-	 * Returns an Observable that will emit one item for the response for each routed invocation request.
-	 * @param requests
-	 * @return
+	 * Send a single routed invocation request to the target cluster member.
+	 *  
+	 * @param request
+	 * @param routingKey
+	 * @return an Observable that will emit one item for the response from the given invocation request.
 	 */
-	Observable<AstrixServiceInvocationResponse> processRoutedRequests(Collection<RoutedServiceInvocationRequest> requests);
+	Observable<AstrixServiceInvocationResponse> submitRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey);
+	
 	/**
-	 * Returns an Observable that will emit one item for the response for the invocation of each member in
-	 * the entire cluster.
+	 * Sends each service invocation to the associate target cluster member.
+	 * 
+	 * @param requests
+	 * @return an Observable that will emit one item for the response for each routed invocation request.
+	 */
+	Observable<AstrixServiceInvocationResponse> submitRoutedRequests(Collection<RoutedServiceInvocationRequest> requests);
+	
+	/**
+	 * Sends a service invocation request to each member in the cluster. 
 	 * 
 	 * @param request
-	 * @return
+	 * @return an Observable that will emit one item for the response for the invocation of each member in
+	 * the entire cluster.
 	 */
-	Observable<AstrixServiceInvocationResponse> processBroadcastRequest(AstrixServiceInvocationRequest request);
+	Observable<AstrixServiceInvocationResponse> submitBroadcastRequest(AstrixServiceInvocationRequest request);
+	
+	/**
+	 * 
+	 * @return the number of members in the target cluster.
+	 */
 	int partitionCount();
 }

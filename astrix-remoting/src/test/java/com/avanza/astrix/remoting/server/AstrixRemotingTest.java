@@ -948,7 +948,7 @@ public class AstrixRemotingTest {
 		}
 
 		@Override
-		public Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey){
+		public Observable<AstrixServiceInvocationResponse> submitRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey){
 			final AstrixServiceInvocationResponse response = getActivator(routingKey).invokeService(request);
 			return Observable.create(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {
 				@Override
@@ -964,7 +964,7 @@ public class AstrixRemotingTest {
 		}
 
 		@Override
-		public Observable<AstrixServiceInvocationResponse> processBroadcastRequest(AstrixServiceInvocationRequest request) {
+		public Observable<AstrixServiceInvocationResponse> submitBroadcastRequest(AstrixServiceInvocationRequest request) {
 			final List<AstrixServiceInvocationResponse> responses = new ArrayList<>();
 			for (AstrixServiceActivator partition : partitions) {
 				responses.add(partition.invokeService(request));
@@ -987,10 +987,10 @@ public class AstrixRemotingTest {
 		}
 
 		@Override
-		public Observable<AstrixServiceInvocationResponse> processRoutedRequests(Collection<RoutedServiceInvocationRequest> requests) {
+		public Observable<AstrixServiceInvocationResponse> submitRoutedRequests(Collection<RoutedServiceInvocationRequest> requests) {
 			Observable<AstrixServiceInvocationResponse> result = Observable.empty();
 			for (RoutedServiceInvocationRequest request : requests) {
-				result = result.mergeWith(processRoutedRequest(request.getRequest(), request.getRoutingkey()));
+				result = result.mergeWith(submitRoutedRequest(request.getRequest(), request.getRoutingkey()));
 			}
 			return result;
 		}

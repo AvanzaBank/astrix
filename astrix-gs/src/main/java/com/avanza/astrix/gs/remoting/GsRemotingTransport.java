@@ -57,7 +57,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 	}
 
 	@Override
-	public Observable<AstrixServiceInvocationResponse> processRoutedRequest(final AstrixServiceInvocationRequest request, final RoutingKey routingKey) {
+	public Observable<AstrixServiceInvocationResponse> submitRoutedRequest(final AstrixServiceInvocationRequest request, final RoutingKey routingKey) {
 		final AsyncFuture<AstrixServiceInvocationResponse> response = 
 				this.faultTolerance.execute(new Command<AsyncFuture<AstrixServiceInvocationResponse>>() {
 					@Override
@@ -70,7 +70,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 	
 
 	@Override
-	public Observable<AstrixServiceInvocationResponse> processRoutedRequests(final Collection<RoutedServiceInvocationRequest> requests) {
+	public Observable<AstrixServiceInvocationResponse> submitRoutedRequests(final Collection<RoutedServiceInvocationRequest> requests) {
 		if (requests.isEmpty()) {
 			return Observable.empty();
 		}
@@ -95,7 +95,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 	}
 	
 	@Override
-	public Observable<AstrixServiceInvocationResponse> processBroadcastRequest(final AstrixServiceInvocationRequest request) {
+	public Observable<AstrixServiceInvocationResponse> submitBroadcastRequest(final AstrixServiceInvocationRequest request) {
 		final AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>> responses = 
 				faultTolerance.execute(new Command<AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>>>() {
 						@Override
@@ -106,8 +106,8 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 		Observable<List<AsyncResult<AstrixServiceInvocationResponse>>> r = GsUtil.toObservable(responses);
 		Func1<List<AsyncResult<AstrixServiceInvocationResponse>>, Observable<AstrixServiceInvocationResponse>> listToObservable = 
 				GsUtil.asyncResultListToObservable();
-		Observable<AstrixServiceInvocationResponse> observable = r.flatMap(listToObservable);
-		return faultTolerance.observe(observable, getServiceCommandSettings(request));
+		Observable<AstrixServiceInvocationResponse> responseStream = r.flatMap(listToObservable);
+		return faultTolerance.observe(responseStream, getServiceCommandSettings(request));
 	}
 
 	private ObservableCommandSettings getServiceCommandSettings(AstrixServiceInvocationRequest request) {

@@ -77,16 +77,16 @@ public final class RemotingEngine {
 		return new RemoteServiceInvocationException(response.getExceptionMsg(), response.getThrownExceptionType(), CorrelationId.valueOf(response.getCorrelationId()));
 	}
 	
-	final Observable<AstrixServiceInvocationResponse> processRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
-		return this.serviceTransport.processRoutedRequest(request, routingKey);
+	final Observable<AstrixServiceInvocationResponse> submitRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {
+		return this.serviceTransport.submitRoutedRequest(request, routingKey);
 	}
 	
-	final Observable<AstrixServiceInvocationResponse> processRoutedRequests(List<RoutedServiceInvocationRequest> requests) {
-		return this.serviceTransport.processRoutedRequests(requests);
+	final Observable<AstrixServiceInvocationResponse> submitRoutedRequests(List<RoutedServiceInvocationRequest> requests) {
+		return this.serviceTransport.submitRoutedRequests(requests);
 	}
 
-	final Observable<AstrixServiceInvocationResponse> processBroadcastRequest(AstrixServiceInvocationRequest request) {
-		return this.serviceTransport.processBroadcastRequest(request);
+	final Observable<AstrixServiceInvocationResponse> submitBroadcastRequest(AstrixServiceInvocationRequest request) {
+		return this.serviceTransport.submitBroadcastRequest(request);
 	}
 
 	public int partitionCount() {

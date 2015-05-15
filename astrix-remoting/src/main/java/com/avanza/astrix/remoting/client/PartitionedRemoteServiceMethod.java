@@ -105,7 +105,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		 */
 		ServiceInvocationPartitioner serviceInvocationPartitioner = new ServiceInvocationPartitioner();
 		List<RoutedServiceInvocationRequest> partitionInvocationRequest = serviceInvocationPartitioner.partitionInvocationRequest(invocationRequest, args);
-		Observable<AstrixServiceInvocationResponse> serviceInvocationResponses = remotingEngine.processRoutedRequests(partitionInvocationRequest);
+		Observable<AstrixServiceInvocationResponse> serviceInvocationResponses = remotingEngine.submitRoutedRequests(partitionInvocationRequest);
 		return reduce(serviceInvocationResponses);
 	}
 

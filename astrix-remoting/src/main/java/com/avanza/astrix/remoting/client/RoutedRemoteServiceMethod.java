@@ -57,7 +57,7 @@ public class RoutedRemoteServiceMethod implements RemoteServiceMethod {
 	
 	protected Observable<Object> submitRoutedRequest(AstrixServiceInvocationRequest request,
 			RoutingKey routingKey) {
-		Observable<AstrixServiceInvocationResponse> response = remotingEngine.processRoutedRequest(
+		Observable<AstrixServiceInvocationResponse> response = remotingEngine.submitRoutedRequest(
 				request, routingKey);
 		return response.map(new Func1<AstrixServiceInvocationResponse, Object>() {
 			@Override
