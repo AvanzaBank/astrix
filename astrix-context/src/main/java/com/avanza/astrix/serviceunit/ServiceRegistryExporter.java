@@ -51,6 +51,10 @@ public class ServiceRegistryExporter implements AstrixConfigAware {
 	}
 	
 	public void startPublishServices() {
+		if (!AstrixSettings.RUN_SERVICE_REGISTRY_EXPORTER.getFrom(config).get()) {
+			log.info("ServiceRegistryExporterWorker explicitly disabled. No services will be published to service registry");
+			return;
+		}
 		if (exportedServices.isEmpty()) {
 			log.info("No ServiceExporters configured. No services will be published to service registry.");
 			return;

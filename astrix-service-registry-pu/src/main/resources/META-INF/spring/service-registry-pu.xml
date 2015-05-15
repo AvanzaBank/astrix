@@ -15,7 +15,7 @@
 			value="com.avanza.astrix.service.registry.pu.AstrixServiceRegistryApplicationDescriptor" />
 		<property name="settings">
 			<map>
-				<entry key="AstrixGsComponent.exportGigaSpace" value="false"/>
+				<entry key="AstrixContext.runServiceRegistryExporterWorker" value="false"/>
 			</map>
 		</property>
 	</bean>

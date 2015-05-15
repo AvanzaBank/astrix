@@ -199,7 +199,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	@Override
 	public void onApplicationEvent(ApplicationContextEvent event) {
 		if (event instanceof ContextRefreshedEvent && !serviceExporterStarted) {
-			// Application initialization complete. Export asterix-services.
+			// Application initialization complete. Export astrix-services.
 			exportAllProvidedServices();
 			serviceExporterStarted = true;
 		} else if (event instanceof ContextClosedEvent || event instanceof ContextStoppedEvent) {

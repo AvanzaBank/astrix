@@ -49,11 +49,14 @@ public class AstrixSettings implements DynamicConfigSource, MutableConfigSource 
 	
 	public static final String SERVICE_REGISTRY_URI_PROPERTY_NAME = "AstrixServiceRegistry.serviceUri";
 	
+
 	/**
 	 * Service Uri used to bind to the service-registry.
 	 */
 	public static final StringSetting SERVICE_REGISTRY_URI = StringSetting.create(SERVICE_REGISTRY_URI_PROPERTY_NAME, null);
 	
+	public static final BooleanSetting RUN_SERVICE_REGISTRY_EXPORTER = BooleanSetting.create("AstrixContext.runServiceRegistryExporterWorker", true);
+
 	
 	/**
 	 * @deprecated Renamed to {@link AstrixSettings#SERVICE_REGISTRY_URI}
