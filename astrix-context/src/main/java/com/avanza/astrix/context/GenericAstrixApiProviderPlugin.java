@@ -20,17 +20,19 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.jackson.map.BeanDescription;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.FactoryBean;
+import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
 import com.avanza.astrix.beans.publish.AstrixApiProviderPlugin;
 import com.avanza.astrix.beans.service.AstrixServiceLookupMetaFactory;
-import com.avanza.astrix.beans.service.ServiceLookup;
 import com.avanza.astrix.beans.service.ServiceLookupFactory;
+import com.avanza.astrix.ft.FaultToleranceProxyFactory;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
@@ -48,6 +50,7 @@ public class GenericAstrixApiProviderPlugin implements AstrixApiProviderPlugin {
 	private AstrixInjector injector;
 	private AstrixServiceMetaFactory serviceMetaFactory;
 	private AstrixServiceLookupMetaFactory serviceLookupMetaFactory;
+	private FaultToleranceProxyFactory faultToleranceFactory;
 	
 	@Override
 	public List<FactoryBean<?>> createFactoryBeans(AstrixApiProviderClass apiProviderClass) {
@@ -61,7 +64,11 @@ public class GenericAstrixApiProviderPlugin implements AstrixApiProviderPlugin {
 			AstrixPublishedBeanDefinitionMethod beanDefinition = AstrixPublishedBeanDefinitionMethod.create(astrixBeanDefinitionMethod);
 			if (beanDefinition.isLibrary()) {
 				Object libraryProviderInstance = getInstanceProvider(apiProviderClass.getProviderClass());
-				result.add(new AstrixLibraryFactory<>(libraryProviderInstance, astrixBeanDefinitionMethod, beanDefinition.getQualifier()));
+				StandardFactoryBean<Object> libraryFactory = new AstrixLibraryFactory<>(libraryProviderInstance, astrixBeanDefinitionMethod, beanDefinition.getQualifier());
+				if (beanDefinition.applyFtProxy()) {
+					libraryFactory = new AstrixFtProxiedFactory<Object>(libraryFactory, faultToleranceFactory, beanDefinition.getFtSettings());
+				}
+				result.add(libraryFactory);
 				continue;
 			}
 			if (beanDefinition.isService()) {
@@ -122,6 +129,11 @@ public class GenericAstrixApiProviderPlugin implements AstrixApiProviderPlugin {
 	@AstrixInject
 	public void setServiceMetaFactory(AstrixServiceMetaFactory serviceMetaFactory) {
 		this.serviceMetaFactory = serviceMetaFactory;
+	}
+	
+	@AstrixInject
+	public void setFaultToleranceFactory(FaultToleranceProxyFactory faultToleranceFactory) {
+		this.faultToleranceFactory = faultToleranceFactory;
 	}
 
 }

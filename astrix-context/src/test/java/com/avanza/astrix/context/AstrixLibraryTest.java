@@ -15,11 +15,9 @@
  */
 package com.avanza.astrix.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.PreDestroy;
 
@@ -27,6 +25,9 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.factory.AstrixCircularDependency;
 import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.core.AstrixFaultToleranceProxy;
+import com.avanza.astrix.ft.FaultToleranceProxyProvider;
+import com.avanza.astrix.ft.HystrixCommandKeys;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 
@@ -110,6 +111,53 @@ public class AstrixLibraryTest {
 		assertNotSame(helloBean1, helloBean2);
 	}
 	
+	@Test
+	public void appliesFaultToleranceProxyToAstrixFaultToleranceProxyAnnotatedLibraries() throws Exception {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(MyLibraryProviderWithFaultTolerance.class);
+		final AtomicReference<Object> lastAppliedFaultTolerance = new AtomicReference<>(); 
+		final AtomicReference<HystrixCommandKeys> lastAppliedFaultToleranceSettings = new AtomicReference<>();
+		astrixConfigurer.registerPlugin(FaultToleranceProxyProvider.class, new FaultToleranceProxyProvider() {
+			@Override
+			public <T> T addFaultToleranceProxy(Class<T> type, T rawProvider, HystrixCommandKeys commandKeys) {
+				lastAppliedFaultTolerance.set(rawProvider);
+				lastAppliedFaultToleranceSettings.set(commandKeys);
+				return rawProvider;
+			}
+		});
+		AstrixContext context = astrixConfigurer.configure();
+		
+		HelloBean helloBean= context.getBean(HelloBean.class);
+		
+		assertEquals("hello: bar", helloBean.hello("bar"));
+		assertSame("HelloBean should be decorated with fault tolerance proxy", helloBean, lastAppliedFaultTolerance.get());
+		assertEquals("hello-bean-key", lastAppliedFaultToleranceSettings.get().getCommandKey());
+		assertEquals("hello-bean-group", lastAppliedFaultToleranceSettings.get().getGroupKey());
+	}
+	
+	@Test
+	public void doesNotApplyFaultToleranceProxyToNonAstrixFaultToleranceProxyAnnotatedLibraries() throws Exception {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(MyLibraryProvider.class); // No Fault tolerance
+		final AtomicReference<Object> lastAppliedFaultTolerance = new AtomicReference<>(); 
+		final AtomicReference<HystrixCommandKeys> lastAppliedFaultToleranceSettings = new AtomicReference<>();
+		astrixConfigurer.registerPlugin(FaultToleranceProxyProvider.class, new FaultToleranceProxyProvider() {
+			@Override
+			public <T> T addFaultToleranceProxy(Class<T> type, T rawProvider, HystrixCommandKeys commandKeys) {
+				lastAppliedFaultTolerance.set(rawProvider);
+				lastAppliedFaultToleranceSettings.set(commandKeys);
+				return rawProvider;
+			}
+		});
+		AstrixContext context = astrixConfigurer.configure();
+		
+		HelloBean helloBean= context.getBean(HelloBean.class);
+		
+		assertEquals("hello: bar", helloBean.hello("bar"));
+		assertNull(lastAppliedFaultTolerance.get());
+		assertNull(lastAppliedFaultToleranceSettings.get());
+	}
+	
 	public static class IllegalDependendClass {
 		@AstrixInject
 		public void setVersioningPlugin() {
@@ -136,6 +184,16 @@ public class AstrixLibraryTest {
 		
 		@Library
 		public HelloBeanImpl create() {
+			return new HelloBeanImpl();
+		}
+	}
+	
+	@AstrixApiProvider
+	public static class MyLibraryProviderWithFaultTolerance {
+		
+		@AstrixFaultToleranceProxy(commandKey = "hello-bean-key", groupKey = "hello-bean-group")
+		@Library
+		public HelloBean create() {
 			return new HelloBeanImpl();
 		}
 	}

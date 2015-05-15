@@ -18,6 +18,8 @@ package com.avanza.astrix.context;
 import java.lang.reflect.Method;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.core.AstrixFaultToleranceProxy;
+import com.avanza.astrix.ft.HystrixCommandKeys;
 import com.avanza.astrix.provider.core.AstrixDynamicQualifier;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;
@@ -85,6 +87,33 @@ public class AstrixPublishedBeanDefinitionMethod {
 			return method.getAnnotation(ServiceConfig.class).value();
 		}
 		return null;
+	}
+
+	/**
+	 * If true, then a fault tolerance proxy should be applies to a library bean. 
+	 * @return
+	 */
+	public boolean applyFtProxy() {
+		return method.isAnnotationPresent(AstrixFaultToleranceProxy.class);
+	}
+	
+	/**
+	 * Returns hystrix settings used for fault tolerance proxy applied
+	 * to a library bean, see {@link #applyFtProxy()}
+	 * @return
+	 */
+	public HystrixCommandKeys getFtSettings() {
+		final AstrixFaultToleranceProxy ftSettings = method.getAnnotation(AstrixFaultToleranceProxy.class);
+		return new HystrixCommandKeys() {
+			@Override
+			public String getGroupKey() {
+				return ftSettings.groupKey();
+			}
+			@Override
+			public String getCommandKey() {
+				return ftSettings.commandKey();
+			}
+		};
 	}
 
 }

@@ -15,15 +15,12 @@
  */
 package com.avanza.astrix.ft;
 /**
- * Holds thye group and command key associated with a HystrixCommand/HystrixObservableCommand.
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface HystrixCommandKeys {
+public interface FaultToleranceProxyProvider {
 	
-	String getGroupKey();
-	
-	String getCommandKey();
+	public <T> T addFaultToleranceProxy(Class<T> type, T rawProvider, HystrixCommandKeys commandKeys);
 
 }
