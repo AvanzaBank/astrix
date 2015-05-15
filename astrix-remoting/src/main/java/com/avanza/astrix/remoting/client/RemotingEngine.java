@@ -42,7 +42,8 @@ public final class RemotingEngine {
 
 	protected final <T> AstrixRemoteResult<T> toRemoteResult(AstrixServiceInvocationResponse response, Type returnType) {
 		if (response.hasThrownException()) {
-			return AstrixRemoteResult.failure(createClientSideException(response, apiVersion));
+			CorrelationId correlationId = CorrelationId.valueOf(response.getCorrelationId());
+			return AstrixRemoteResult.failure(createClientSideException(response, apiVersion), correlationId);
 		}
 		if (returnType.equals(Void.TYPE)) {
 			return AstrixRemoteResult.voidResult();
@@ -72,9 +73,9 @@ public final class RemotingEngine {
 			ServiceInvocationException exception = objectSerializer.deserialize(response.getException(), 
 																		ServiceInvocationException.class, 
 																		version);
-			return exception.reCreateOnClientSide(CorrelationId.valueOf(response.getCorrelationId()));
-		}
-		return new RemoteServiceInvocationException(response.getExceptionMsg(), response.getThrownExceptionType(), CorrelationId.valueOf(response.getCorrelationId()));
+			return exception;
+		} 
+		return  new RemoteServiceInvocationException(response.getExceptionMsg(), response.getThrownExceptionType(), null);			
 	}
 	
 	final Observable<AstrixServiceInvocationResponse> submitRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {

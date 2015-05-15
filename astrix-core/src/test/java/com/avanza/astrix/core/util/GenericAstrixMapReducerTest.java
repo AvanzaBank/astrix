@@ -49,7 +49,7 @@ public class GenericAstrixMapReducerTest {
 		GenericAstrixMapReducer<String, Integer> reducer = new GenericAstrixMapReducer<>();
 		reducer.reduce(Arrays.asList(
 				AstrixRemoteResult.successful(newMap("a", 1).build()),
-				AstrixRemoteResult.<Map<String, Integer>>failure(new MyRuntimeException())));
+				AstrixRemoteResult.<Map<String, Integer>>failure(new MyRuntimeException(), CorrelationId.undefined())));
 	}
 	
 	public static AstrixTestUtil.MapBuilder newMap(String key, Integer value) {

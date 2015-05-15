@@ -22,23 +22,25 @@ public final class AstrixRemoteResult<T> {
 	
 	private final T result;
 	private final ServiceInvocationException exception;
+	private final CorrelationId correlationId;
 
-	private AstrixRemoteResult(T result, ServiceInvocationException exception) {
+	private AstrixRemoteResult(T result, ServiceInvocationException exception, CorrelationId correlationId) {
 		this.result = result;
 		this.exception = exception;
+		this.correlationId = correlationId;
 	}
 	
 	public static <T> AstrixRemoteResult<T> successful(T result) {
-		return new AstrixRemoteResult<>(result, null);
+		return new AstrixRemoteResult<>(result, null, null);
 	}
 	
-	public static <T> AstrixRemoteResult<T> failure(ServiceInvocationException exception) {
-		return new AstrixRemoteResult<>(null, exception);
+	public static <T> AstrixRemoteResult<T> failure(ServiceInvocationException exception, CorrelationId correlationId) {
+		return new AstrixRemoteResult<>(null, exception, correlationId);
 	}
 	
 	public T getResult() {
 		if (hasThrownException()) {
-			exception.reThrow();
+			exception.reThrow(correlationId);
 		}
 		return result;
 	}
@@ -48,7 +50,7 @@ public final class AstrixRemoteResult<T> {
 	}
 
 	public static <T> AstrixRemoteResult<T> voidResult() {
-		return new AstrixRemoteResult<>(null, null);
+		return new AstrixRemoteResult<>(null, null, null);
 	}
 
 	@Override

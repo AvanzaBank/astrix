@@ -34,5 +34,6 @@ public class MissingServiceException extends ServiceInvocationException {
 	public ServiceInvocationException reCreateOnClientSide(CorrelationId correlationId) {
 		return new MissingServiceException(getMessage(), correlationId);
 	}
+	
 
 }

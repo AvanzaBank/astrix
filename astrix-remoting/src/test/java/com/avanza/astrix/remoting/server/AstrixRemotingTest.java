@@ -925,16 +925,16 @@ public class AstrixRemotingTest {
 		private static final long serialVersionUID = 1L;
 		
 		public MyCustomServiceException() {
-			super(UNDEFINED_CORRELATION_ID, "my-custom-message");
+			super("my-custom-message");
 		}
 
-		public MyCustomServiceException(String msg, CorrelationId correlationId) {
-			super(correlationId, msg);
+		public MyCustomServiceException(String msg) {
+			super(msg);
 		}
 		
 		@Override
-		public ServiceInvocationException reCreateOnClientSide(CorrelationId correlationId) {
-			return new MyCustomServiceException(getMessage(), correlationId);
+		public ServiceInvocationException recreateOnClientSide() {
+			return new MyCustomServiceException(getMessage());
 		}
 		
 	}

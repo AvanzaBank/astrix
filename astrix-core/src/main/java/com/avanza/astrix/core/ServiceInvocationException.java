@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.core;
 
-import java.util.Objects;
+
 
 /**
  * Thrown on the client side when the server side service invocation ended with an exception.<p>
@@ -33,28 +33,71 @@ import java.util.Objects;
  *
  */
 public abstract class ServiceInvocationException extends RuntimeException {
-
 	
+	@Deprecated
 	public static final CorrelationId UNDEFINED_CORRELATION_ID = CorrelationId.undefined();
 	@Deprecated
 	public static final CorrelationId UNDEFINED_CORRELACTION_ID = UNDEFINED_CORRELATION_ID;
 	
 	private static final long serialVersionUID = 1L;
-	private final CorrelationId correlationId;
+	private volatile CorrelationId correlationId;
+	private volatile boolean malformed = false;
 	
+	public ServiceInvocationException(String msg) {
+		super(msg);
+		this.correlationId = null;
+	}
+	
+	public ServiceInvocationException() {
+		this.correlationId = null;
+	}
+	
+	/**
+	 * @param correlationId
+	 * @deprecated Use no argument constructor.
+	 */
+	@Deprecated
 	public ServiceInvocationException(CorrelationId correlationId) {
-		this.correlationId = Objects.requireNonNull(correlationId);
+		this.correlationId = null;
 	}
 
+	/**
+	 * 
+	 * @param correlationId
+	 * @param msg
+	 * @deprecated Use {@link ServiceInvocationException#ServiceInvocationException(String)}
+	 */
+	@Deprecated
 	public ServiceInvocationException(CorrelationId correlationId, String msg) {
 		super(msg);
-		this.correlationId = Objects.requireNonNull(correlationId);
+		this.correlationId = null;
+	}
+	
+	@Override
+	public String getMessage() {
+		/*
+		 * Append correlationId to message. Note that correlation
+		 * id will only be set when the exception is thrown using
+		 * reThrow(CorrelationId)
+		 * 
+		 */
+		String message = super.getMessage();
+		if (malformed) {
+			return message + " correlationId=" + this.correlationId + " WARNING: THIS EXCEPTION DOES NOT OVERIDE recreateOnClientSide. THEREFORE THE STACK CONTAINING SERVICE INVOCATION CANT BE RESTORED"; 
+		}
+		if (this.correlationId != null) {
+			return message + " correlationId=" + this.correlationId;
+		}
+		return message;
 	}
 	
 	public final CorrelationId getCorrelationId() {
 		return correlationId;
 	}
 	
+	private final void setCorrelationId(CorrelationId correlationId) {
+		this.correlationId = correlationId;
+	}
 	
 	/**
 	 * Invoked on the client-side to create a new instance of this exception with a proper
@@ -64,16 +107,41 @@ public abstract class ServiceInvocationException extends RuntimeException {
 	 * 
 	 * @param correlationId
 	 * @return
+	 * @deprecated - Migrate this method by overriding {@link #recreateOnClientSide()} (no argument) and
+	 * stop overriding this method. This method will be removed in the future and {@link #recreateOnClientSide()} will 
+	 * become abstract.
+	 * 
+	 * replaced by {@link #recreateOnClientSide()}
 	 */
-	// TODO: rename to recreateOnClientSide (with lowercase c)
-	public abstract ServiceInvocationException reCreateOnClientSide(CorrelationId correlationId);
+	@Deprecated
+	public ServiceInvocationException reCreateOnClientSide(CorrelationId correlationId) {
+		return null;
+	}
 	
+	/**
+	 * Invoked on the client-side to create a new instance of this exception with a proper
+	 * stack-trace containing the actual point of the service call.
+	 * 
+	 * This method should be overridden by all subclasses. It will become abstract in a future release.
+	 * 
+	 * @return
+	 */
+	protected ServiceInvocationException recreateOnClientSide() {
+		// TODO: make this method abstract and remove malformed property
+		return reCreateOnClientSide(null);
+	}
 
 	/*
-	 * Recreates exception and throws it.
+	 * Recreates exception, sets the correlationId just in time, and throws the exception.
 	 */
-	void reThrow() {
-		throw reCreateOnClientSide(correlationId);
+	void reThrow(CorrelationId correlationId) {
+		 ServiceInvocationException serviceInvocationException = recreateOnClientSide();
+		 if (serviceInvocationException == null) {
+			 serviceInvocationException = this; 
+			 serviceInvocationException.malformed = true;
+		 }
+		 serviceInvocationException.setCorrelationId(correlationId);
+		 throw serviceInvocationException;
 	}
 
 }
