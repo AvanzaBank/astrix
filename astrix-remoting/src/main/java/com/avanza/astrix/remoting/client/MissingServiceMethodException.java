@@ -15,11 +15,11 @@
  */
 package com.avanza.astrix.remoting.client;
 
-public class AstrixMissingServiceMethodException extends RuntimeException {
+public class MissingServiceMethodException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 	
-	public AstrixMissingServiceMethodException(String message) {
+	public MissingServiceMethodException(String message) {
 		super(message);
 	}
 }

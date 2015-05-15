@@ -30,11 +30,11 @@ public final class RemotingEngine {
 	
 	// TODO: find suitable name for this abstraction
 	
-	private final AstrixRemotingTransport serviceTransport;
+	private final RemotingTransport serviceTransport;
 	private final AstrixObjectSerializer objectSerializer;
 	private final int apiVersion;
 	
-	public RemotingEngine(AstrixRemotingTransport serviceTransport, AstrixObjectSerializer objectSerializer, int apiVersion) {
+	public RemotingEngine(RemotingTransport serviceTransport, AstrixObjectSerializer objectSerializer, int apiVersion) {
 		this.serviceTransport = serviceTransport;
 		this.objectSerializer = objectSerializer;
 		this.apiVersion = apiVersion;

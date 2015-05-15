@@ -32,7 +32,7 @@ import com.avanza.astrix.core.util.ReflectionUtil;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixRemotingProxy implements InvocationHandler {
+public class RemotingProxy implements InvocationHandler {
 	
 	private final int apiVersion;
 	private final String serviceApi;
@@ -41,15 +41,15 @@ public class AstrixRemotingProxy implements InvocationHandler {
 	private final boolean isAsyncApi;
 	private final RemoteServiceMethodFactory remoteServiceMethodFactory;
 
-	public static <T> T create(Class<T> service, AstrixRemotingTransport transport, AstrixObjectSerializer objectSerializer, RoutingStrategy routingStrategy) {
-		AstrixRemotingProxy handler = new AstrixRemotingProxy(service, objectSerializer, transport, routingStrategy);
-		T serviceProxy = (T) Proxy.newProxyInstance(AstrixRemotingProxy.class.getClassLoader(), new Class[]{service}, handler);
+	public static <T> T create(Class<T> service, RemotingTransport transport, AstrixObjectSerializer objectSerializer, RoutingStrategy routingStrategy) {
+		RemotingProxy handler = new RemotingProxy(service, objectSerializer, transport, routingStrategy);
+		T serviceProxy = (T) Proxy.newProxyInstance(RemotingProxy.class.getClassLoader(), new Class[]{service}, handler);
 		return serviceProxy;
 	}
 	
-	private AstrixRemotingProxy(Class<?> proxiedServiceApi,
+	private RemotingProxy(Class<?> proxiedServiceApi,
 							    AstrixObjectSerializer objectSerializer,
-							    AstrixRemotingTransport AstrixServiceTransport,
+							    RemotingTransport AstrixServiceTransport,
 							    RoutingStrategy routingStrategy) {
 		this.apiVersion = objectSerializer.version();
 		RemotingEngine remotingEngine = new RemotingEngine(AstrixServiceTransport, objectSerializer, apiVersion);
@@ -87,7 +87,7 @@ public class AstrixRemotingProxy implements InvocationHandler {
 
 	@Override
 	public String toString() {
-		return "AstrixRemotingProxy[" + this.serviceApi + "]";
+		return "RemotingProxy[" + this.serviceApi + "]";
 	}
 	
 	@Override

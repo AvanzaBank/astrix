@@ -23,16 +23,16 @@ import rx.Observable;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixRemotingTransport {
+public class RemotingTransport {
 	
 	private final RemotingTransportSpi impl;
 	
-	AstrixRemotingTransport(RemotingTransportSpi impl) {
+	RemotingTransport(RemotingTransportSpi impl) {
 		this.impl = impl;
 	}
 
-	public static AstrixRemotingTransport create(RemotingTransportSpi impl) {
-		return new AstrixRemotingTransport(impl);
+	public static RemotingTransport create(RemotingTransportSpi impl) {
+		return new RemotingTransport(impl);
 	}
 
 	public Observable<AstrixServiceInvocationResponse> submitRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {

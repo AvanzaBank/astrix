@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.ServiceInvocationException;
-import com.avanza.astrix.remoting.client.AstrixMissingServiceException;
-import com.avanza.astrix.remoting.client.AstrixMissingServiceMethodException;
+import com.avanza.astrix.remoting.client.MissingServiceException;
+import com.avanza.astrix.remoting.client.MissingServiceMethodException;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.util.MethodSignatureBuilder;
@@ -90,7 +90,7 @@ public class AstrixServiceActivator {
 			String serviceMethodSignature = request.getHeader("serviceMethodSignature");
 			Method serviceMethod = methodBySignature.get(serviceMethodSignature);
 			if (serviceMethod == null) {
-				throw new AstrixMissingServiceMethodException(String.format("Missing service method: service=%s method=%s", serviceApi, serviceMethodSignature));
+				throw new MissingServiceMethodException(String.format("Missing service method: service=%s method=%s", serviceApi, serviceMethodSignature));
 			}
 			Object[] arguments = unmarshal(request.getArguments(), serviceMethod.getGenericParameterTypes(), version);
 			Object result = serviceMethod.invoke(service, arguments);
@@ -131,7 +131,7 @@ public class AstrixServiceActivator {
 		String serviceApi = request.getHeader("serviceApi");
 		publishedService = this.serviceByType.get(serviceApi);
 		if (publishedService == null) {
-			throw new AstrixMissingServiceException("No such service: " + serviceApi);
+			throw new MissingServiceException("No such service: " + serviceApi);
 		}
 		return publishedService.invoke(request, version, serviceApi);
 	}

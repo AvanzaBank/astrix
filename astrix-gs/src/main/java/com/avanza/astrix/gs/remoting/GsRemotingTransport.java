@@ -28,7 +28,7 @@ import com.avanza.astrix.ft.AstrixFaultTolerance;
 import com.avanza.astrix.ft.Command;
 import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.ft.ObservableCommandSettings;
-import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
+import com.avanza.astrix.remoting.client.RemotingTransport;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
@@ -122,8 +122,8 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 		return commandSettings;
 	}
 
-	public static AstrixRemotingTransport remoteSpace(GigaSpace gigaSpace, AstrixFaultTolerance faultTolerance) {
-		return AstrixRemotingTransport.create(new GsRemotingTransport(gigaSpace, faultTolerance));
+	public static RemotingTransport remoteSpace(GigaSpace gigaSpace, AstrixFaultTolerance faultTolerance) {
+		return RemotingTransport.create(new GsRemotingTransport(gigaSpace, faultTolerance));
 	}
 
 	@Override

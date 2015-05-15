@@ -18,11 +18,11 @@ package com.avanza.astrix.core;
 import java.util.Objects;
 
 /**
- * Thrown on the client side when the server side service invocation ended with an exception.
+ * Thrown on the client side when the server side service invocation ended with an exception.<p>
  * 
  * This is different from a {@link ServiceUnavailableException} which is thrown when the service
  * invocation never returned a response at all, either because timeout was reached or because
- * the fault-tolerance layer rejected the operation.
+ * the fault-tolerance layer rejected the operation.<p>
  * 
  * If the service-api's throws exceptions as part of an api, then such exceptions should subclass
  * this exception to propagate correctly to the client. All exceptions thrown of other types than

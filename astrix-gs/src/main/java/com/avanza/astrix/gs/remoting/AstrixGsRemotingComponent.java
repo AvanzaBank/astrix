@@ -31,8 +31,8 @@ import com.avanza.astrix.gs.ClusteredProxyCache.GigaSpaceInstance;
 import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
-import com.avanza.astrix.remoting.client.AstrixRemotingProxy;
-import com.avanza.astrix.remoting.client.AstrixRemotingTransport;
+import com.avanza.astrix.remoting.client.RemotingProxy;
+import com.avanza.astrix.remoting.client.RemotingTransport;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 import com.avanza.astrix.spring.AstrixSpringContext;
 /**
@@ -56,9 +56,9 @@ public class AstrixGsRemotingComponent implements AstrixServiceComponent {
 		AstrixObjectSerializer objectSerializer = versioningPlugin.create(versioningContext);
 		
 		GigaSpaceInstance proxyInstance = proxyCache.getProxy(serviceProperties);
-		AstrixRemotingTransport remotingTransport = GsRemotingTransport.remoteSpace(proxyInstance.get(), faultTolerance);
+		RemotingTransport remotingTransport = GsRemotingTransport.remoteSpace(proxyInstance.get(), faultTolerance);
 		
-		T proxy = AstrixRemotingProxy.create(api, remotingTransport, objectSerializer, new GsRoutingStrategy());
+		T proxy = RemotingProxy.create(api, remotingTransport, objectSerializer, new GsRoutingStrategy());
 		return BoundProxyServiceBeanInstance.create(proxy, proxyInstance);
 	}
 	
