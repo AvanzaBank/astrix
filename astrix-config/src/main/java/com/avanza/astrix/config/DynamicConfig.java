@@ -129,6 +129,23 @@ public final class DynamicConfig {
 		});
 	}
 	
+	public DynamicIntProperty getIntProperty(final String name, final int defaultValue) {
+		return this.configCache.getInstance("int." + name, new ObjectFactory<DynamicIntProperty>() {
+			@Override
+			public DynamicIntProperty create() throws Exception {
+				final DynamicIntProperty result = new DynamicIntProperty();
+				final DynamicPropertyChain<Integer> chain = createPropertyChain(name, Integer.valueOf(defaultValue), new DynamicPropertyChainListener<Integer>() {
+					@Override
+					public void propertyChanged(Integer newValue) {
+						result.set(newValue.intValue());
+					}
+				}, new PropertyParser.IntParser());
+				result.set(chain.get());
+				return result;
+			}
+		});
+	}
+	
 	private <T> DynamicPropertyChain<T> createPropertyChain(String name, T defaultValue, DynamicPropertyChainListener<T> dynamicPropertyListener, PropertyParser<T> propertyParser) {
 		DynamicPropertyChain<T> chain = DynamicPropertyChain.createWithDefaultValue(defaultValue, dynamicPropertyListener, propertyParser);
 		for (DynamicConfigSource configSource : configSources) {
@@ -150,5 +167,5 @@ public final class DynamicConfig {
 	public String toString() {
 		return this.configSources.toString();
 	}
-	
+
 }

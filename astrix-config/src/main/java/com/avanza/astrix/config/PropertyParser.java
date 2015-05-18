@@ -46,4 +46,11 @@ interface PropertyParser<T> {
 			return Long.parseLong(value);
 		}
 	}
+	
+	class IntParser implements PropertyParser<Integer> {
+		@Override
+		public Integer parse(String value) {
+			return Integer.parseInt(value);
+		}
+	}
 }

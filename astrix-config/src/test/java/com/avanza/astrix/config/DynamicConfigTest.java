@@ -75,6 +75,17 @@ public class DynamicConfigTest {
 	}
 	
 	@Test
+	public void intProperty() throws Exception {
+		DynamicIntProperty intProperty = dynamicConfig.getIntProperty("foo", 0);
+		
+		secondSource.set("foo", "2");
+		assertEquals(2, intProperty.get());
+		
+		firstSource.set("foo", "1");
+		assertEquals(1, intProperty.get());
+	}
+	
+	@Test
 	public void unparsableBooleanPropertiesAreIgnored() throws Exception {
 		DynamicBooleanProperty booleanProperty = dynamicConfig.getBooleanProperty("foo", false);
 		
@@ -95,6 +106,20 @@ public class DynamicConfigTest {
 		
 		firstSource.set("foo", "MALFORMED");
 		assertTrue(booleanProperty.get());
+	}
+	
+	@Test
+	public void unparsableIntPropertiesAreIgnored() throws Exception {
+		DynamicIntProperty intProperty = dynamicConfig.getIntProperty("foo", 0);
+		
+		secondSource.set("foo", "2d");
+		assertEquals(0, intProperty.get());
+		
+		secondSource.set("foo", "1");
+		assertEquals(1, intProperty.get());
+		
+		firstSource.set("foo", "1s");
+		assertEquals(1, intProperty.get());
 	}
 	
 	@Test
