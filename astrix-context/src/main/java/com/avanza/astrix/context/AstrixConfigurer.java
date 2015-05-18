@@ -47,6 +47,7 @@ import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
+import com.avanza.astrix.config.SystemPropertiesConfigSource;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
 /**
@@ -68,7 +69,7 @@ public class AstrixConfigurer {
 	private final AstrixSettings settings = new AstrixSettings();
 	
 	private DynamicConfig customConfig = null;
-	private final DynamicConfig wellKnownConfigSources = DynamicConfig.create(settings, PropertiesConfigSource.optionalClasspathPropertiesFile(CLASSPATH_OVERRIDE_SETTINGS));
+	private final DynamicConfig wellKnownConfigSources = DynamicConfig.create(new SystemPropertiesConfigSource(), settings, PropertiesConfigSource.optionalClasspathPropertiesFile(CLASSPATH_OVERRIDE_SETTINGS));
 	private final Set<String> activeProfiles = new HashSet<>();
 	private DynamicConfig config;
 	

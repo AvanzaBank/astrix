@@ -52,10 +52,6 @@ public class AstrixSpringContext {
 		return applicationContext;
 	}
 	
-	public AstrixInjector getAstrixInjector() {
-		return astrixInjector;
-	}
-
 	public <T> T getInstance(
 			Class<T> type) {
 		return astrixInjector.getBean(type);

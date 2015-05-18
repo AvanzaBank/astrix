@@ -16,13 +16,10 @@
 package com.avanza.astrix.dashboard.web;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistryAdministrator;
 import com.avanza.astrix.spring.AstrixFrameworkBean;
 
@@ -35,11 +32,6 @@ public class AstrixDashboardConfig {
 		result.setConsumedAstrixBeans(Arrays.<Class<?>>asList(
 			AstrixServiceRegistryAdministrator.class
 		));
-		result.setSettings(new HashMap<String, String>() {{
-			put(AstrixSettings.SERVICE_REGISTRY_URI.name(), AstrixServiceComponentNames.GS_REMOTING + 
-					":jini://*/*/service-registry-space?locators=testgssystem01.test.aza.se,testgssystem02.test.aza.se"); 
-//					":jini://*/*/service-registry-space?groups=astrix-demo-apps");
-		}});
 		return result;
 	}
 	
