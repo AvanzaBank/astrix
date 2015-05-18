@@ -20,24 +20,24 @@ import org.kohsuke.MetaInfServices;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
-import com.avanza.astrix.beans.service.ServiceLookupMetaFactoryPlugin;
+import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
-import com.avanza.astrix.beans.service.ServiceLookup;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
+import com.avanza.astrix.beans.service.ServiceDiscovery;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryDiscovery;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-@MetaInfServices(ServiceLookupMetaFactoryPlugin.class)
-public class AstrixServiceRegistryLookupPlugin implements ServiceLookupMetaFactoryPlugin<AstrixServiceRegistryLookup>, AstrixPublishedBeansAware {
+@MetaInfServices(ServiceDiscoveryMetaFactoryPlugin.class)
+public class ServiceRegistryDiscoveryPlugin implements ServiceDiscoveryMetaFactoryPlugin<AstrixServiceRegistryDiscovery>, AstrixPublishedBeansAware {
 
 	private AstrixPublishedBeans beans;
 
 	@Override
-	public Class<AstrixServiceRegistryLookup> getLookupAnnotationType() {
-		return AstrixServiceRegistryLookup.class;
+	public Class<AstrixServiceRegistryDiscovery> getDiscoveryAnnotationType() {
+		return AstrixServiceRegistryDiscovery.class;
 	}
 
 	@Override
@@ -46,25 +46,25 @@ public class AstrixServiceRegistryLookupPlugin implements ServiceLookupMetaFacto
 	}
 
 	@Override
-	public ServiceLookup create(AstrixBeanKey<?> key, AstrixServiceRegistryLookup lookupAnnotation) {
-		return new ServiceRegistryLookup(key, beans);
+	public ServiceDiscovery create(AstrixBeanKey<?> key, AstrixServiceRegistryDiscovery lookupAnnotation) {
+		return new ServiceRegistryDiscovery(key, beans);
 	}
 	
-	private static class ServiceRegistryLookup implements ServiceLookup {
+	private static class ServiceRegistryDiscovery implements ServiceDiscovery {
 	
 		/*
 		 * IMPLEMENTATION NOTE:
 		 * 
 		 * This class requires an ServiceRegistryClient. Since we can't make sure that
 		 * a service-factory for ServiceRegistryClient is registered in the bean factory
-		 * (behind the AstrixPublishedBeansAware interface) before an instance of ServiceRegistryLookup
+		 * (behind the AstrixPublishedBeansAware interface) before an instance of ServiceRegistryDiscovery
 		 * is created, we have to inject the AstrixPublishedBeans here and query it for an instance
 		 * on each invocation.
 		 */
 		private AstrixPublishedBeans beans;
 		private AstrixBeanKey<?> beanKey;
 
-		public ServiceRegistryLookup(AstrixBeanKey<?> key,
+		public ServiceRegistryDiscovery(AstrixBeanKey<?> key,
 				AstrixPublishedBeans beans) {
 			this.beanKey = key;
 			this.beans = beans;
@@ -76,7 +76,7 @@ public class AstrixServiceRegistryLookupPlugin implements ServiceLookupMetaFacto
 		}
 
 		@Override
-		public ServiceProperties lookup() {
+		public ServiceProperties run() {
 			return beans.getBean(AstrixBeanKey.create(ServiceRegistryClient.class, null)).lookup(beanKey);
 		}
 		

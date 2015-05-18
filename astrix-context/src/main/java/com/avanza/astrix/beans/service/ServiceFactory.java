@@ -34,29 +34,29 @@ import com.avanza.astrix.config.DynamicConfig;
 public class ServiceFactory<T> implements DynamicFactoryBean<T> {
 
 	private final ServiceComponents serviceComponents;
-	private final ServiceLookupFactory<?> serviceLookupFactory;
+	private final ServiceDiscoveryFactory<?> serviceDiscoveryFactory;
 	private final ServiceLeaseManager leaseManager;
 	private final ServiceContext versioningContext;
 	private final DynamicConfig config;
 	private final Class<T> type;
 
 	public ServiceFactory(ServiceContext versioningContext, 
-								ServiceLookupFactory<?> serviceLookup, 
+								ServiceDiscoveryFactory<?> serviceDiscoveryFactory, 
 								ServiceComponents serviceComponents, 
 								ServiceLeaseManager leaseManager,
 								DynamicConfig config,
 								Class<T> type) {
 		this.config = config;
 		this.versioningContext = Objects.requireNonNull(versioningContext);
-		this.serviceLookupFactory = Objects.requireNonNull(serviceLookup);
+		this.serviceDiscoveryFactory = Objects.requireNonNull(serviceDiscoveryFactory);
 		this.serviceComponents = Objects.requireNonNull(serviceComponents);
 		this.leaseManager = Objects.requireNonNull(leaseManager);
 		this.type = Objects.requireNonNull(type);
 	}
 
 	public T create(AstrixBeanKey<T> beanKey) {
-		ServiceLookup serviceLookup = serviceLookupFactory.create(beanKey);
-		ServiceBeanInstance<T> serviceBeanInstance = ServiceBeanInstance.create(versioningContext, beanKey, serviceLookup, serviceComponents, config);
+		ServiceDiscovery serviceDiscovery = serviceDiscoveryFactory.create(beanKey);
+		ServiceBeanInstance<T> serviceBeanInstance = ServiceBeanInstance.create(versioningContext, beanKey, serviceDiscovery, serviceComponents, config);
 		serviceBeanInstance.bind();
 		leaseManager.startManageLease(serviceBeanInstance);
 		return beanKey.getBeanType().cast(
@@ -70,22 +70,22 @@ public class ServiceFactory<T> implements DynamicFactoryBean<T> {
 		return type;
 	}
 
-	public static <T> FactoryBean<T> dynamic(ServiceContext versioningContext, 
+	public static <T> FactoryBean<T> dynamic(ServiceContext serviceContext, 
 													Class<T> beanType, 
-													ServiceLookupFactory<?> serviceLookup, 
+													ServiceDiscoveryFactory<?> serviceDiscovery, 
 													ServiceComponents serviceComponents, 
 													ServiceLeaseManager leaseManager,
 													DynamicConfig config) {
-		return new ServiceFactory<T>(versioningContext, serviceLookup, serviceComponents, leaseManager, config, beanType);
+		return new ServiceFactory<T>(serviceContext, serviceDiscovery, serviceComponents, leaseManager, config, beanType);
 	}
 	
-	public static <T> FactoryBean<T> standard(ServiceContext versioningContext, 
+	public static <T> FactoryBean<T> standard(ServiceContext serviceContext, 
 													AstrixBeanKey<T> beanType, 
-													ServiceLookupFactory<?> serviceLookup, 
+													ServiceDiscoveryFactory<?> serviceDiscoveryFactory, 
 													ServiceComponents serviceComponents, 
 													ServiceLeaseManager leaseManager,
 													DynamicConfig config) {
-		ServiceFactory<T> serviceFactory = new ServiceFactory<T>(versioningContext, serviceLookup, serviceComponents, leaseManager, config, beanType.getBeanType());
+		ServiceFactory<T> serviceFactory = new ServiceFactory<T>(serviceContext, serviceDiscoveryFactory, serviceComponents, leaseManager, config, beanType.getBeanType());
 		return new FactoryBeanAdapter<T>(serviceFactory, beanType);
 	}
 	

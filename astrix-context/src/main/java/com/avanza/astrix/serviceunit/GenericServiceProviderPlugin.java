@@ -24,11 +24,11 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
-import com.avanza.astrix.beans.service.ServiceLookupMetaFactory;
+import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
 import com.avanza.astrix.beans.service.ServiceContext;
 import com.avanza.astrix.context.AstrixPublishedBeanDefinitionMethod;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
+import com.avanza.astrix.provider.core.AstrixServiceRegistryDiscovery;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 import com.avanza.astrix.provider.versioning.Versioned;
 
@@ -40,7 +40,7 @@ import com.avanza.astrix.provider.versioning.Versioned;
 @MetaInfServices(ServiceProviderPlugin.class)
 public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	
-	private ServiceLookupMetaFactory serviceLookupFactory;
+	private ServiceDiscoveryMetaFactory serviceLookupFactory;
 
 	@Override
 	public List<ServiceBeanDefinition> getProvidedServices(ApiProviderClass apiProvider) {
@@ -50,7 +50,7 @@ public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 			if (!beanDefinition.isService()) {
 				continue;
 			}
-			boolean usesServiceRegistry = this.serviceLookupFactory.getLookupStrategy(astrixBeanDefinitionMethod).equals(AstrixServiceRegistryLookup.class);
+			boolean usesServiceRegistry = this.serviceLookupFactory.getLookupStrategy(astrixBeanDefinitionMethod).equals(AstrixServiceRegistryDiscovery.class);
 			ServiceContext versioningContext = createVersioningContext(apiProvider, beanDefinition);
 			result.add(new ServiceBeanDefinition(beanDefinition.getBeanKey(), versioningContext, usesServiceRegistry, beanDefinition.getServiceComponentName()));
 		}
@@ -77,7 +77,7 @@ public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	}
 	
 	@AstrixInject
-	public void setServiceLookupFactory(ServiceLookupMetaFactory serviceLookupFactory) {
+	public void setServiceLookupFactory(ServiceDiscoveryMetaFactory serviceLookupFactory) {
 		this.serviceLookupFactory = serviceLookupFactory;
 	}
 	

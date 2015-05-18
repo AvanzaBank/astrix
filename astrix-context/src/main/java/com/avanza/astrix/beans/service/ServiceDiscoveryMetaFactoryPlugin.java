@@ -15,13 +15,14 @@
  */
 package com.avanza.astrix.beans.service;
 
+import java.lang.annotation.Annotation;
 
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface ServiceLookup {
-	ServiceProperties lookup();
-	String description();
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+
+public interface ServiceDiscoveryMetaFactoryPlugin<T extends Annotation> {
+	
+	ServiceDiscovery create(AstrixBeanKey<?> beanKey, T lookupAnnotation); 
+	
+	Class<T> getDiscoveryAnnotationType();
+	
 }

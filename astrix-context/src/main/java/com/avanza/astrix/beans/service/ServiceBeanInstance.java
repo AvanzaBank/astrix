@@ -57,7 +57,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	private final Condition boundCondition = boundStateLock.newCondition();
 	
 	
-	private final ServiceLookup serviceLookup;
+	private final ServiceDiscovery serviceDiscovery;
 	
 	/*
 	 * Guards the state of this service bean instance.
@@ -69,10 +69,10 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 
 	private ServiceBeanInstance(ServiceContext versioningContext, 
 								AstrixBeanKey<T> beanKey, 
-								ServiceLookup serviceLookup, 
+								ServiceDiscovery serviceDiscovery, 
 								ServiceComponents serviceComponents, 
 								DynamicConfig config) {
-		this.serviceLookup = serviceLookup;
+		this.serviceDiscovery = serviceDiscovery;
 		this.versioningContext = Objects.requireNonNull(versioningContext);
 		this.beanKey = Objects.requireNonNull(beanKey);
 		this.serviceComponents = Objects.requireNonNull(serviceComponents);
@@ -82,16 +82,16 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	
 	public static <T> ServiceBeanInstance<T> create(ServiceContext versioningContext, 
 								AstrixBeanKey<T> beanKey, 
-								ServiceLookup serviceLookup, 
+								ServiceDiscovery serviceDiscovery, 
 								ServiceComponents serviceComponents, 
 								DynamicConfig config) {
-		return new ServiceBeanInstance<T>(versioningContext, beanKey, serviceLookup, serviceComponents, config);
+		return new ServiceBeanInstance<T>(versioningContext, beanKey, serviceDiscovery, serviceComponents, config);
 	}
 	
 	public void renewLease() {
 		beanStateLock.lock();
 		try {
-			ServiceProperties serviceProperties = serviceLookup.lookup();
+			ServiceProperties serviceProperties = serviceDiscovery.run();
 			if (serviceHasChanged(serviceProperties)) {
 				bind(serviceProperties);
 			} else {
@@ -114,11 +114,11 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 			if (isBound()) {
 				return;
 			}
-			ServiceProperties serviceProperties = serviceLookup.lookup();
+			ServiceProperties serviceProperties = serviceDiscovery.run();
 			if (serviceProperties == null) {
 				log.info(String.format(
 					"Failed to discover service using %s. bean=%s astrixBeanId=%s", 
-						serviceLookup.description(), getBeanKey(), id));
+						serviceDiscovery.description(), getBeanKey(), id));
 				return;
 			}
 			bind(serviceProperties);

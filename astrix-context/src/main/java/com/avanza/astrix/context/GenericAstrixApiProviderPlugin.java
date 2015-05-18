@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.jackson.map.BeanDescription;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
@@ -30,9 +29,9 @@ import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
-import com.avanza.astrix.beans.service.ServiceLookupMetaFactory;
 import com.avanza.astrix.beans.service.ServiceContext;
-import com.avanza.astrix.beans.service.ServiceLookupFactory;
+import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
+import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
 import com.avanza.astrix.ft.FaultToleranceProxyFactory;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
@@ -49,7 +48,7 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 	
 	private AstrixInjector injector;
 	private AstrixServiceMetaFactory serviceMetaFactory;
-	private ServiceLookupMetaFactory serviceLookupMetaFactory;
+	private ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory;
 	private FaultToleranceProxyFactory faultToleranceFactory;
 	
 	@Override
@@ -72,12 +71,12 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 				continue;
 			}
 			if (beanDefinition.isService()) {
-				ServiceContext versioningContext = createVersioningContext(apiProviderClass, beanDefinition);
-				ServiceLookupFactory<?> serviceLookupFactory = serviceLookupMetaFactory.createServiceLookup(beanDefinition.getBeanKey(), astrixBeanDefinitionMethod);
-				result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookupFactory, beanDefinition.getBeanKey(), beanDefinition));
+				ServiceContext serviceContext = createServiceContext(apiProviderClass, beanDefinition);
+				ServiceDiscoveryFactory<?> serviceDiscoveryFactory = serviceDiscoveryMetaFactory.createServiceDiscoveryFactory(beanDefinition.getBeanKey(), astrixBeanDefinitionMethod);
+				result.add(serviceMetaFactory.createServiceFactory(serviceContext, serviceDiscoveryFactory, beanDefinition.getBeanKey(), beanDefinition));
 				Class<?> asyncInterface = serviceMetaFactory.loadInterfaceIfExists(beanDefinition.getBeanType().getName() + "Async");
 				if (asyncInterface != null) {
-					result.add(serviceMetaFactory.createServiceFactory(versioningContext, serviceLookupFactory, AstrixBeanKey.create(asyncInterface, beanDefinition.getQualifier()), beanDefinition));
+					result.add(serviceMetaFactory.createServiceFactory(serviceContext, serviceDiscoveryFactory, AstrixBeanKey.create(asyncInterface, beanDefinition.getQualifier()), beanDefinition));
 				}
 				continue;
 			}
@@ -85,7 +84,7 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 		return result;
 	}
 	
-	private ServiceContext createVersioningContext(ApiProviderClass apiProviderClass, AstrixPublishedBeanDefinitionMethod serviceDefinition) {
+	private ServiceContext createServiceContext(ApiProviderClass apiProviderClass, AstrixPublishedBeanDefinitionMethod serviceDefinition) {
 		Class<?> declaringApi = getDeclaringApi(apiProviderClass, serviceDefinition.getBeanType());
 		if (!(declaringApi.isAnnotationPresent(Versioned.class) || serviceDefinition.isVersioned())) {
 			return ServiceContext.nonVersioned(serviceDefinition.getServiceConfigClass());
@@ -122,8 +121,8 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 	}
 	
 	@AstrixInject
-	public void setServiceLookupFactory(ServiceLookupMetaFactory serviceLookupFactory) {
-		this.serviceLookupMetaFactory = serviceLookupFactory;
+	public void setServiceLookupFactory(ServiceDiscoveryMetaFactory serviceLookupFactory) {
+		this.serviceDiscoveryMetaFactory = serviceLookupFactory;
 	}
 	
 	@AstrixInject
