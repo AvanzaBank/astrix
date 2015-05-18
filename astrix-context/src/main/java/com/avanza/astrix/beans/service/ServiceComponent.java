@@ -27,11 +27,20 @@ package com.avanza.astrix.beans.service;
  */
 public interface ServiceComponent {
 	
-	<T> BoundServiceBeanInstance<T> bind(Class<T> type, ServiceContext serviceContext, ServiceProperties serviceProperties);
+	<T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties);
 	
 	ServiceProperties createServiceProperties(String serviceUri);
 	
-	<T> ServiceProperties createServiceProperties(Class<T> exportedService);
+	/**
+	 * Creates {@link ServiceProperties} for a given exportedService. 
+	 * 
+	 * Before this method is inoked, the {@link #exportService(Class, Object, ServiceDefinition)} method
+	 * will be invoked with the same exported {@link ServiceDefinition}
+	 * 
+	 * @param exportedServiceDefinition {@link ServiceDefinition} for the service to create {@link ServiceProperties} for.
+	 * @return
+	 */
+	<T> ServiceProperties createServiceProperties(ServiceDefinition<T> exportedServiceDefinition);
 	
 	/**
 	 * The name of this component.
@@ -44,7 +53,7 @@ public interface ServiceComponent {
 	 * Defines whether this ServiceComponent can be used to bind a bean of a given type.
 	 * 
 	 * If this ServiceComponent can be used to bind the given type, then {@link #createServiceProperties(Class)}
-	 * should create ServiceProperties that can be passed to {@link #bind(Class, ServiceContext, ServiceProperties)}
+	 * should create ServiceProperties that can be passed to {@link #bind(Class, ServiceDefinition, ServiceProperties)}
 	 * to bind to an instance of the given type.
 	 * 
 	 * @param type
@@ -52,7 +61,17 @@ public interface ServiceComponent {
 	 */
 	boolean canBindType(Class<?> type);
 
-	<T> void exportService(Class<T> providedApi, T provider, ServiceContext serviceContext);
+	/**
+	 * Exports a given service on the server side. After a service is exported it should be possible to
+	 * call {@link #createServiceProperties(ServiceDefinition)} to receive ServiceProperties for the
+	 * ServiceDefinition, and later to call {@link #bind(ServiceDefinition, ServiceProperties)} to
+	 * get a proxy that can invoke the passied in provider.
+	 * 
+	 * @param providedApi
+	 * @param provider - The target provider instance
+	 * @param serviceDefinition - {@link ServiceDefinition} for service to be exported
+	 */
+	<T> void exportService(Class<T> providedApi, T provider, ServiceDefinition<T> serviceDefinition);
 	
 	/**
 	 * Whether the api supports an async version based on the following naming

@@ -48,6 +48,7 @@ import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.SystemPropertiesConfigSource;
+import com.avanza.astrix.context.versioning.AstrixVersioningPlugin;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;

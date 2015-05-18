@@ -16,38 +16,40 @@
 package com.avanza.astrix.serviceunit;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.service.ServiceContext;
+import com.avanza.astrix.beans.service.ServiceDefinition;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class ServiceBeanDefinition {
+public class ExportedServiceBeanDefinition {
+
+	// TODO: Make this class generic
 	
 	private AstrixBeanKey<?> beanKey;
 	private String componentName;
 	private boolean usesServiceRegistry;
 	private boolean alwaysActive;
-	private ServiceContext versioningContext;
+	private ServiceDefinition<?> serviceDefinition;
 	
-	public ServiceBeanDefinition(AstrixBeanKey<?> beanKey,
-								 ServiceContext versioningContext,
+	public ExportedServiceBeanDefinition(AstrixBeanKey<?> beanKey,
+								 ServiceDefinition<?> serviceDefinition,
 							     boolean usesServiceRegistry,
 								 String componentName) {
 		this.beanKey = beanKey;
-		this.versioningContext = versioningContext;
+		this.serviceDefinition = serviceDefinition;
 		this.usesServiceRegistry = usesServiceRegistry;
 		this.alwaysActive = false;
 		this.componentName = componentName;
 	}
 	
-	public ServiceBeanDefinition(AstrixBeanKey<?> beanKey,
-			 ServiceContext versioningContext,
+	public ExportedServiceBeanDefinition(AstrixBeanKey<?> beanKey,
+			 ServiceDefinition<?> serviceDefinition,
 		     boolean usesServiceRegistry,
 		     boolean alwaysActive,
 			 String componentName) {
 		this.beanKey = beanKey;
-		this.versioningContext = versioningContext;
+		this.serviceDefinition = serviceDefinition;
 		this.usesServiceRegistry = usesServiceRegistry;
 		this.alwaysActive = alwaysActive;
 		this.componentName = componentName;
@@ -72,8 +74,8 @@ public class ServiceBeanDefinition {
 		return componentName;
 	}
 
-	public ServiceContext getVersioningContext() {
-		return versioningContext;
+	public ServiceDefinition<?> getServiceDefinition() {
+		return serviceDefinition;
 	}
 
 	public Class<?> getBeanType() {

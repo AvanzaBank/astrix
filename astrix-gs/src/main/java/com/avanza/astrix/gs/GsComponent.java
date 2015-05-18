@@ -20,7 +20,7 @@ import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.service.ServiceComponent;
-import com.avanza.astrix.beans.service.ServiceContext;
+import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
@@ -45,14 +45,15 @@ public class GsComponent implements ServiceComponent {
 	
 	
 	@Override
-	public <T> BoundServiceBeanInstance<T> bind(Class<T> type, ServiceContext versioningContext, ServiceProperties serviceProperties) {
-		if (!GigaSpace.class.isAssignableFrom(type)) {
-			throw new UnsupportedTargetTypeException(getName(), type);
+	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
+		Class<T> targetType = serviceDefinition.getServiceType();
+		if (!GigaSpace.class.isAssignableFrom(targetType)) {
+			throw new UnsupportedTargetTypeException(getName(), targetType);
 		}
 		GigaSpaceInstance gigaSpaceInstance = proxyCache.getProxy(serviceProperties);
 		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
 		HystrixCommandSettings hystrixSettings = new HystrixCommandSettings(spaceName + "_" + GigaSpace.class.getSimpleName(), spaceName);
-		T proxyWithFaultTolerance = type.cast(AstrixGigaSpaceProxy.create(gigaSpaceInstance.get(), faultTolerance, hystrixSettings));
+		T proxyWithFaultTolerance = targetType.cast(AstrixGigaSpaceProxy.create(gigaSpaceInstance.get(), faultTolerance, hystrixSettings));
 		return BoundProxyServiceBeanInstance.create(proxyWithFaultTolerance, gigaSpaceInstance);
 	}
 	
@@ -73,7 +74,7 @@ public class GsComponent implements ServiceComponent {
 	}
 
 	@Override
-	public <T> void exportService(Class<T> providedApi, T provider, ServiceContext versioningContext) {
+	public <T> void exportService(Class<T> providedApi, T provider, ServiceDefinition<T> versioningContext) {
 		// Intentionally empty
 	}
 	
@@ -88,9 +89,9 @@ public class GsComponent implements ServiceComponent {
 	}
 
 	@Override
-	public <T> ServiceProperties createServiceProperties(Class<T> type) {
-		if (!type.equals(GigaSpace.class)) {
-			throw new IllegalArgumentException("Can't export: " + type);
+	public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> definition) {
+		if (!definition.getServiceType().equals(GigaSpace.class)) {
+			throw new IllegalArgumentException("Can't export: " + definition.getServiceType());
 		}
 		GigaSpace space = gsBinder.getEmbeddedSpace(astrixSpringContext.getApplicationContext());
 		return gsBinder.createProperties(space);

@@ -24,9 +24,9 @@ class ServiceRegistryExportedService {
 	private final Class<?> asyncService;
 	private final ServiceComponent serviceComponent;
 	private volatile boolean publishServices;
-	private final ServiceBeanDefinition serviceBeanDefinition;
+	private final ExportedServiceBeanDefinition serviceBeanDefinition;
 	
-	public ServiceRegistryExportedService(ServiceComponent serviceComponent, ServiceBeanDefinition serviceBeanDefinition, boolean publishServices) {
+	public ServiceRegistryExportedService(ServiceComponent serviceComponent, ExportedServiceBeanDefinition serviceBeanDefinition, boolean publishServices) {
 		this.serviceBeanDefinition = serviceBeanDefinition;
 		this.publishServices = publishServices;
 		if (!serviceComponent.canBindType(serviceBeanDefinition.getBeanType())) {
@@ -57,7 +57,7 @@ class ServiceRegistryExportedService {
 	}
 
 	public ServiceProperties exportServiceProperties() {
-		ServiceProperties serviceProperties = serviceComponent.createServiceProperties(serviceBeanDefinition.getBeanType());
+		ServiceProperties serviceProperties = serviceComponent.createServiceProperties(serviceBeanDefinition.getServiceDefinition());
 		serviceProperties.getProperties().put(ServiceProperties.PUBLISHED, Boolean.toString(isPublished()));
 		serviceProperties.setApi(serviceBeanDefinition.getBeanKey().getBeanType());
 		serviceProperties.setQualifier(serviceBeanDefinition.getBeanKey().getQualifier());
@@ -72,7 +72,7 @@ class ServiceRegistryExportedService {
 		if (!publishServices) {
 			return false;
 		}
-		return serviceBeanDefinition.getVersioningContext().isVersioned();
+		return serviceBeanDefinition.getServiceDefinition().isVersioned();
 	}
 	
 	public void setPublishServices(boolean published) {

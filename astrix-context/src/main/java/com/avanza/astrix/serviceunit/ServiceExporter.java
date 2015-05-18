@@ -23,7 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceComponents;
-import com.avanza.astrix.beans.service.ServiceContext;
+import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 
 /**
@@ -37,7 +37,7 @@ public class ServiceExporter {
 	
 	private ServiceComponents serviceComponents;
 	private AstrixApplicationDescriptor applicationDescriptor;
-	private final Collection<ServiceBeanDefinition> serviceBeanDefinitions = new CopyOnWriteArrayList<>();
+	private final Collection<ExportedServiceBeanDefinition> serviceBeanDefinitions = new CopyOnWriteArrayList<>();
 	private final ServiceRegistryExporter serviceRegistryExporter;
 	private final ConcurrentMap<Class<?>, Object> serviceProviderByType = new ConcurrentHashMap<>();
 	private final ServiceProviderPlugins serviceProviderPlugins;
@@ -73,14 +73,14 @@ public class ServiceExporter {
 		}
 	}
 	
-	public void exportService(ServiceBeanDefinition definition) {
+	public void exportService(ExportedServiceBeanDefinition definition) {
 		this.serviceBeanDefinitions.add(definition);
 	}
 	
 
 	public void exportProvidedServices() {
-		for (ServiceBeanDefinition serviceBeanDefintion : serviceBeanDefinitions) {
-			ServiceContext versioningContext = serviceBeanDefintion.getVersioningContext();
+		for (ExportedServiceBeanDefinition serviceBeanDefintion : serviceBeanDefinitions) {
+			ServiceDefinition versioningContext = serviceBeanDefintion.getServiceDefinition();
 			ServiceComponent serviceComponent = getServiceComponent(serviceBeanDefintion);
 			Object provider = null;
 			if (serviceComponent.requiresProviderInstance()) {
@@ -93,7 +93,7 @@ public class ServiceExporter {
 		}
 	}
 
-	private Object getProvider(ServiceBeanDefinition serviceBeanDefintion) {
+	private Object getProvider(ExportedServiceBeanDefinition serviceBeanDefintion) {
 		Object provider = serviceProviderByType.get(serviceBeanDefintion.getBeanKey().getBeanType());
 		if (provider == null) {
 			throw new IllegalStateException(String.format(
@@ -105,11 +105,11 @@ public class ServiceExporter {
 		return provider;
 	}
 	
-	private <T> void exportService(Class<T> providedApi, Object provider, ServiceContext versioningContext, ServiceComponent serviceComponent) {
+	private <T> void exportService(Class<T> providedApi, Object provider, ServiceDefinition versioningContext, ServiceComponent serviceComponent) {
 		serviceComponent.exportService(providedApi, providedApi.cast(provider), versioningContext);
 	}
 
-	private ServiceComponent getServiceComponent(ServiceBeanDefinition serviceBeanDefinition) {
+	private ServiceComponent getServiceComponent(ExportedServiceBeanDefinition serviceBeanDefinition) {
 		if (serviceBeanDefinition.getComponentName() != null) {
 			return this.serviceComponents.getComponent(serviceBeanDefinition.getComponentName());
 		}

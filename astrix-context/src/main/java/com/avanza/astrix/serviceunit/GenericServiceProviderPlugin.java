@@ -22,11 +22,13 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
+import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
+import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
-import com.avanza.astrix.beans.service.ServiceContext;
-import com.avanza.astrix.context.AstrixPublishedBeanDefinitionMethod;
+import com.avanza.astrix.context.AstrixBeanDefinitionMethod;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryDiscovery;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
@@ -43,32 +45,38 @@ public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	private ServiceDiscoveryMetaFactory serviceLookupFactory;
 
 	@Override
-	public List<ServiceBeanDefinition> getProvidedServices(ApiProviderClass apiProvider) {
-		List<ServiceBeanDefinition> result = new ArrayList<>();
+	public List<ExportedServiceBeanDefinition> getExportedServices(ApiProviderClass apiProvider) {
+		List<ExportedServiceBeanDefinition> result = new ArrayList<>();
 		for (Method astrixBeanDefinitionMethod : apiProvider.getProviderClass().getMethods()) {
-			AstrixPublishedBeanDefinitionMethod beanDefinition = AstrixPublishedBeanDefinitionMethod.create(astrixBeanDefinitionMethod);
+			AstrixBeanDefinitionMethod beanDefinition = AstrixBeanDefinitionMethod.create(astrixBeanDefinitionMethod);
 			if (!beanDefinition.isService()) {
 				continue;
 			}
 			boolean usesServiceRegistry = this.serviceLookupFactory.getLookupStrategy(astrixBeanDefinitionMethod).equals(AstrixServiceRegistryDiscovery.class);
-			ServiceContext versioningContext = createVersioningContext(apiProvider, beanDefinition);
-			result.add(new ServiceBeanDefinition(beanDefinition.getBeanKey(), versioningContext, usesServiceRegistry, beanDefinition.getServiceComponentName()));
+			ServiceDefinition<?> serviceDefinition = createServiceDefinition(apiProvider, beanDefinition, beanDefinition.getBeanKey());
+			result.add(new ExportedServiceBeanDefinition(beanDefinition.getBeanKey(), serviceDefinition, usesServiceRegistry, beanDefinition.getServiceComponentName()));
 		}
 		return result;
 	}
 	
 
-	private ServiceContext createVersioningContext(ApiProviderClass apiProvider, AstrixPublishedBeanDefinitionMethod serviceDefinition) {
+	private <T> ServiceDefinition<T> createServiceDefinition(ApiProviderClass apiProvider, AstrixBeanDefinitionMethod serviceDefinitionMethod, AstrixBeanKey<T> beanKey) {
 		Class<?> declaringApi = apiProvider.getProviderClass();
-		if (!(declaringApi.isAnnotationPresent(Versioned.class) || serviceDefinition.isVersioned())) {
-			return ServiceContext.nonVersioned(serviceDefinition.getServiceConfigClass());
+		if (!(declaringApi.isAnnotationPresent(Versioned.class) || serviceDefinitionMethod.isVersioned())) {
+			return new ServiceDefinition<>(beanKey, 
+											serviceDefinitionMethod.getServiceConfigClass(), 
+											ObjectSerializerDefinition.nonVersioned(), 
+											serviceDefinitionMethod.isDynamicQualified());
 		}
 		if (!apiProvider.isAnnotationPresent(AstrixObjectSerializerConfig.class)) {
 			throw new IllegalArgumentException("Illegal api-provider. Api is versioned but provider does not declare a @AstrixObjectSerializerConfig." +
-					" providedService=" + serviceDefinition.getBeanType().getName() + ", provider=" + apiProvider.getName());
+					" providedService=" + serviceDefinitionMethod.getBeanType().getName() + ", provider=" + apiProvider.getName());
 		} 
 		AstrixObjectSerializerConfig serializerConfig = apiProvider.getAnnotation(AstrixObjectSerializerConfig.class);
-		return ServiceContext.versionedService(serializerConfig.version(), serializerConfig.objectSerializerConfigurer(), serviceDefinition.getServiceConfigClass());
+		return new ServiceDefinition<>(beanKey, 
+									  serviceDefinitionMethod.getServiceConfigClass(), 
+									  ObjectSerializerDefinition.versionedService(serializerConfig.version(), serializerConfig.objectSerializerConfigurer()),
+									  serviceDefinitionMethod.isDynamicQualified());
 	}
 
 	@Override

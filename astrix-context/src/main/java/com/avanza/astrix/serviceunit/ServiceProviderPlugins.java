@@ -38,10 +38,10 @@ public class ServiceProviderPlugins {
 		}
 	}
 	
-	public List<ServiceBeanDefinition> getExportedServices(ApiProviderClass apiProvider) {
+	public List<ExportedServiceBeanDefinition> getExportedServices(ApiProviderClass apiProvider) {
 		ServiceProviderPlugin apiProviderPlugin = getProviderPlugin(apiProvider);
-		List<ServiceBeanDefinition> result = new ArrayList<>();
-		result.addAll(apiProviderPlugin.getProvidedServices(apiProvider));
+		List<ExportedServiceBeanDefinition> result = new ArrayList<>();
+		result.addAll(apiProviderPlugin.getExportedServices(apiProvider));
 		return result;
 	}
 	

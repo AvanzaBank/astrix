@@ -16,15 +16,17 @@
 package com.avanza.astrix.context;
 
 
-import com.avanza.astrix.beans.service.ServiceContext;
+import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
+import com.avanza.astrix.context.versioning.AstrixVersioningPlugin;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 
 public class JavaSerializationVersioningPlugin implements AstrixVersioningPlugin {
-
+	
 	@Override
-	public AstrixObjectSerializer create(ServiceContext versioningContext) {
-		if (versioningContext.isVersioned()) {
-			return new JavaSerializationSerializer(versioningContext.version());
+	public AstrixObjectSerializer create(
+			ObjectSerializerDefinition serializerDefinition) {
+		if (serializerDefinition.isVersioned()) {
+			return new JavaSerializationSerializer(serializerDefinition.version());
 		}
 		return new AstrixObjectSerializer.NoVersioningSupport();
 	}

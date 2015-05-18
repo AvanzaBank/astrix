@@ -31,9 +31,11 @@ import org.kohsuke.MetaInfServices;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
+import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.beans.service.ServiceComponent;
-import com.avanza.astrix.beans.service.ServiceContext;
+import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.context.versioning.AstrixVersioningPlugin;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 /**
@@ -63,13 +65,13 @@ public class DirectComponent implements ServiceComponent {
 	
 	
 	@Override
-	public <T> BoundServiceBeanInstance<T> bind(Class<T> type, ServiceContext versioningContext, ServiceProperties serviceProperties) {
+	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
 		String providerName = serviceProperties.getProperty("providerId");
 		ServiceProvider<?> serviceProvider = providerById.get(providerName);
 		if (serviceProvider == null) {
-			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + type);
+			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + serviceDefinition.getServiceType());
 		}
-		T provider = type.cast(serviceProvider.getProvider(versioningPlugin, versioningContext));
+		T provider = serviceDefinition.getServiceType().cast(serviceProvider.getProvider(versioningPlugin, serviceDefinition.getObjectSerializerDefinition()));
 		DirectBoundServiceBeanInstance<T> directServiceBeanInstance = new DirectBoundServiceBeanInstance<T>(provider);
 		this.nonReleasedInstances.add(directServiceBeanInstance);
 		return directServiceBeanInstance;
@@ -106,9 +108,9 @@ public class DirectComponent implements ServiceComponent {
 	}
 	
 	
-	private static <T> String register(Class<T> type, T provider, ServiceContext serverVersioningContext) {
+	private static <T> String register(Class<T> type, T provider, ObjectSerializerDefinition serverSerializerDefinition) {
 		String id = String.valueOf(idGen.incrementAndGet());
-		providerById.put(id, new VersioningAwareServiceProvider<>(id, type, provider, serverVersioningContext));
+		providerById.put(id, new VersioningAwareServiceProvider<>(id, type, provider, serverSerializerDefinition));
 		return id;
 	}
 	
@@ -143,30 +145,30 @@ public class DirectComponent implements ServiceComponent {
 		if (provider == null) {
 			throw new IllegalArgumentException("No provider registered with id: " + id);
 		}
-		return provider.getProvider(AstrixVersioningPlugin.Default.create(), ServiceContext.nonVersioned());
+		return provider.getProvider(AstrixVersioningPlugin.Default.create(), ObjectSerializerDefinition.nonVersioned());
 	}
 	
 	static class ServiceProvider<T> {
 		
-		private String id;
+		private String directId;
 		private Class<T> type;
 		private T provider;
 		
-		public ServiceProvider(String id, Class<T> type, T provider) {
-			this.id = id;
+		public ServiceProvider(String directId, Class<T> type, T provider) {
+			this.directId = directId;
 			this.type = type;
 			this.provider = provider;
 		}
 		
 		public String getId() {
-			return id;
+			return directId;
 		}
 		
 		public Class<T> getType() {
 			return type;
 		}
 		
-		public T getProvider(AstrixVersioningPlugin astrixVersioningPlugin, ServiceContext clientVersioningContext) {
+		public T getProvider(AstrixVersioningPlugin astrixVersioningPlugin, ObjectSerializerDefinition clientSerializerDefinition) {
 			return provider;
 		}
 	}
@@ -175,23 +177,23 @@ public class DirectComponent implements ServiceComponent {
 		
 		private Class<T> type;
 		private T provider;
-		private ServiceContext serverVersioningContext;
+		private ObjectSerializerDefinition serverSerializerDefinition;
 		
-		public VersioningAwareServiceProvider(String id, Class<T> type, T provider, ServiceContext serverVersioningContext) {
+		public VersioningAwareServiceProvider(String id, Class<T> type, T provider, ObjectSerializerDefinition serverSerializerDefinition) {
 			super(id, type, provider);
 			this.type = type;
 			this.provider = provider;
-			this.serverVersioningContext = serverVersioningContext;
+			this.serverSerializerDefinition = serverSerializerDefinition;
 		}
 		
 		@Override
-		public T getProvider(AstrixVersioningPlugin astrixVersioningPlugin, ServiceContext clientVersioningContext) {
-			if (serverVersioningContext.isVersioned() || clientVersioningContext.isVersioned()) {
+		public T getProvider(AstrixVersioningPlugin astrixVersioningPlugin, ObjectSerializerDefinition serializerDefinition) {
+			if (serverSerializerDefinition.isVersioned() || serializerDefinition.isVersioned()) {
 				VersionedServiceProviderProxy serializationHandlingProxy = 
 						new VersionedServiceProviderProxy(provider, 
-														  clientVersioningContext.version(), 
-														  astrixVersioningPlugin.create(clientVersioningContext), 
-														  astrixVersioningPlugin.create(serverVersioningContext));
+														  serializerDefinition.version(), 
+														  astrixVersioningPlugin.create(serializerDefinition), 
+														  astrixVersioningPlugin.create(serverSerializerDefinition));
 				return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[]{type}, serializationHandlingProxy);
 			}
 			return provider;
@@ -245,9 +247,9 @@ public class DirectComponent implements ServiceComponent {
 	}
 
 	@Override
-	public <T> void exportService(Class<T> providedApi, T provider, ServiceContext versioningContext) {
+	public <T> void exportService(Class<T> providedApi, T provider, ServiceDefinition<T> serviceDefinition) {
 		String id = register(providedApi, provider);
-		this.idByExportedBean.put(AstrixBeanKey.create(providedApi), id);
+		this.idByExportedBean.put(serviceDefinition.getBeanKey(), id);
 	}
 	
 	@Override
@@ -261,8 +263,8 @@ public class DirectComponent implements ServiceComponent {
 	}
 
 	@Override
-	public <T> ServiceProperties createServiceProperties(Class<T> exportedService) {
-		String id = this.idByExportedBean.get(AstrixBeanKey.create(exportedService));
+	public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> exportedService) {
+		String id = this.idByExportedBean.get(exportedService.getBeanKey());
 		return getServiceProperties(id);
 	}
 
@@ -272,7 +274,7 @@ public class DirectComponent implements ServiceComponent {
 	}
 	
 	/**
-	 * Registers a a provider for a given api and associates it with the given ServiceContext. <p>
+	 * Registers a a provider for a given api and associates it with the given ServiceDefinition. <p>
 	 * 
 	 * Using this method activates serialization/deserialization of service argument/return types. <p>
 	 * 
@@ -280,21 +282,21 @@ public class DirectComponent implements ServiceComponent {
 	 * 	pingService.ping("my-arg")
 	 * 
 	 *
-	 * 1. Using the ServiceContext provided by the api (using @AstrixVersioned) the service arguments will
+	 * 1. Using the ServiceDefinition provided by the api (using @AstrixVersioned) the service arguments will
 	 *    be serialized.
-	 * 2. All arguments will then be deserialized using the serverVersioningContext passed as to this method during registration of the provider
+	 * 2. All arguments will then be deserialized using the serverServiceDefinition passed as to this method during registration of the provider
 	 * 3. The service is invoked with the arguments returned from step 2.
-	 * 4. The return type will be serialized using the serverVersioningContext
-	 * 5. The return type will be deserialized using the ServiceContext provided by the api.
+	 * 4. The return type will be serialized using the serverServiceDefinition
+	 * 5. The return type will be deserialized using the ServiceDefinition provided by the api.
 	 * 6. The value is returned.
 	 * 
 	 * @param api
 	 * @param provider
-	 * @param serverVersioningContext
+	 * @param serverSerializerDefinition
 	 * @return
 	 */
-	public static <T> String registerAndGetUri(Class<T> api, T provider, ServiceContext serverVersioningContext) {
-		String id = register(api, provider, serverVersioningContext);
+	public static <T> String registerAndGetUri(Class<T> api, T provider, ObjectSerializerDefinition serverSerializerDefinition) {
+		String id = register(api, provider, serverSerializerDefinition);
 		return getServiceUri(id);
 	}
 	

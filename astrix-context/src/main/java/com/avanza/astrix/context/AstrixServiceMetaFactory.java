@@ -15,14 +15,13 @@
  */
 package com.avanza.astrix.context;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.service.ServiceComponents;
+import com.avanza.astrix.beans.service.ServiceDefinition;
+import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
 import com.avanza.astrix.beans.service.ServiceFactory;
 import com.avanza.astrix.beans.service.ServiceLeaseManager;
-import com.avanza.astrix.beans.service.ServiceContext;
-import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
 import com.avanza.astrix.config.DynamicConfig;
 /**
  * 
@@ -35,11 +34,11 @@ public final class AstrixServiceMetaFactory implements AstrixConfigAware {
 	private ServiceLeaseManager leaseManager;
 	private DynamicConfig config;
 
-	public <T> FactoryBean<T> createServiceFactory(ServiceContext serviceContext, ServiceDiscoveryFactory<?> serviceDiscoveryFactory, AstrixBeanKey<T> beanKey, AstrixPublishedBeanDefinitionMethod beanDefinition) {
-		if (beanDefinition.isDynamicQualified()) {
-			return ServiceFactory.dynamic(serviceContext, beanKey.getBeanType(), serviceDiscoveryFactory, serviceComponents, leaseManager, config);
+	public <T> FactoryBean<T> createServiceFactory(ServiceDefinition<T> serviceDefinition, ServiceDiscoveryFactory<?> serviceDiscoveryFactory) {
+		if (serviceDefinition.isDynamicQualified()) {
+			return ServiceFactory.dynamic(serviceDefinition, serviceDiscoveryFactory, serviceComponents, leaseManager, config);
 		}
-		return ServiceFactory.standard(serviceContext, beanKey, serviceDiscoveryFactory, serviceComponents, leaseManager, config);
+		return ServiceFactory.standard(serviceDefinition, serviceDefinition.getBeanKey(), serviceDiscoveryFactory, serviceComponents, leaseManager, config);
 	}
 	
 	public Class<?> loadInterfaceIfExists(String interfaceName) {

@@ -41,7 +41,8 @@ import org.springframework.core.Ordered;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.service.ServiceContext;
+import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
+import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixConfigurer;
@@ -50,7 +51,7 @@ import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
 import com.avanza.astrix.serviceunit.ServiceAdministrator;
 import com.avanza.astrix.serviceunit.ServiceAdministratorImpl;
 import com.avanza.astrix.serviceunit.ServiceAdministratorVersioningConfigurer;
-import com.avanza.astrix.serviceunit.ServiceBeanDefinition;
+import com.avanza.astrix.serviceunit.ExportedServiceBeanDefinition;
 import com.avanza.astrix.serviceunit.ServiceExporter;
 import com.avanza.astrix.serviceunit.ServiceRegistryExporter;
 
@@ -222,9 +223,11 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		ServiceExporter serviceExporter = astrixContext.getInstance(ServiceExporter.class);
 		
 		serviceExporter.addServiceProvider(astrixContext.getInstance(ServiceAdministratorImpl.class));
-		ServiceContext versioningContext = ServiceContext.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
-		ServiceBeanDefinition serviceAdminDefintion = new ServiceBeanDefinition(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
-																			    versioningContext, 
+		// TODO 
+		ObjectSerializerDefinition serializer = ObjectSerializerDefinition.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
+		ServiceDefinition<ServiceAdministrator> serviceDefinition = new ServiceDefinition<>(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), serializer, true);
+		ExportedServiceBeanDefinition serviceAdminDefintion = new ExportedServiceBeanDefinition(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
+																			    serviceDefinition, 
 																			    true, // isVersioned  
 																			    true, // alwaysActive
 																			    AstrixSettings.SERVICE_ADMINISTRATOR_COMPONENT.getFrom(this.astrixContext.getConfig()).get());

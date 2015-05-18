@@ -17,7 +17,7 @@ package com.avanza.astrix.context.versioning;
 
 import java.lang.reflect.Type;
 
-import com.avanza.astrix.beans.service.ServiceContext;
+import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.versioning.JsonObjectMapper;
@@ -29,9 +29,9 @@ public class VersionJacksonAstrixObjectSerializer implements AstrixObjectSeriali
 	private JsonObjectMapper objectMapper;
 	private int version;
 
-	public VersionJacksonAstrixObjectSerializer(ServiceContext versioningContext) {
-		Class<? extends AstrixObjectSerializerConfigurer> serializerBuilder = versioningContext.getObjectSerializerConfigurerClass();
-		this.version = versioningContext.version();
+	public VersionJacksonAstrixObjectSerializer(ObjectSerializerDefinition serializerDefinition) {
+		Class<? extends AstrixObjectSerializerConfigurer> serializerBuilder = serializerDefinition.getObjectSerializerConfigurerClass();
+		this.version = serializerDefinition.version();
 		try {
 			this.objectMapper = buildObjectMapper(Jackson1ObjectSerializerConfigurer.class.cast(serializerBuilder.newInstance()));
 		} catch (Exception e) {

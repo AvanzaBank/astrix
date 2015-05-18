@@ -49,7 +49,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	
 	private final AstrixBeanKey<T> beanKey;
 	private final ServiceComponents serviceComponents;
-	private final ServiceContext versioningContext;
+	private final ServiceDefinition<T> serviceDefinition;
 	/*
 	 * Monitor used to signal state changes. (waitForBean)
 	 */
@@ -67,25 +67,25 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	private volatile ServiceProperties currentProperties;
 	private volatile BeanState currentState;
 
-	private ServiceBeanInstance(ServiceContext versioningContext, 
+	private ServiceBeanInstance(ServiceDefinition<T> serviceDefinition, 
 								AstrixBeanKey<T> beanKey, 
 								ServiceDiscovery serviceDiscovery, 
 								ServiceComponents serviceComponents, 
 								DynamicConfig config) {
 		this.serviceDiscovery = serviceDiscovery;
-		this.versioningContext = Objects.requireNonNull(versioningContext);
+		this.serviceDefinition = Objects.requireNonNull(serviceDefinition);
 		this.beanKey = Objects.requireNonNull(beanKey);
 		this.serviceComponents = Objects.requireNonNull(serviceComponents);
 		this.currentState = new Unbound();
 		log.info(String.format("Start managing service bean. currentState=%s bean=%s astrixBeanId=%s", currentState.name(), beanKey, id));
 	}
 	
-	public static <T> ServiceBeanInstance<T> create(ServiceContext versioningContext, 
-								AstrixBeanKey<T> beanKey, 
-								ServiceDiscovery serviceDiscovery, 
-								ServiceComponents serviceComponents, 
-								DynamicConfig config) {
-		return new ServiceBeanInstance<T>(versioningContext, beanKey, serviceDiscovery, serviceComponents, config);
+	public static <T> ServiceBeanInstance<T> create(ServiceDefinition<T> serviceDefinition, 
+													AstrixBeanKey<T> beanKey, 
+													ServiceDiscovery serviceDiscovery, 
+													ServiceComponents serviceComponents, 
+													DynamicConfig config) {
+		return new ServiceBeanInstance<T>(serviceDefinition, beanKey, serviceDiscovery, serviceComponents, config);
 	}
 	
 	public void renewLease() {
@@ -224,7 +224,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 				if (!serviceComponent.canBindType(beanKey.getBeanType())) {
 					throw new UnsupportedTargetTypeException(serviceComponent.getName(), beanKey.getBeanType());
 				}
-				BoundServiceBeanInstance<T> boundInstance = serviceComponent.bind(beanKey.getBeanType(), versioningContext, serviceProperties);
+				BoundServiceBeanInstance<T> boundInstance = serviceComponent.bind(serviceDefinition, serviceProperties);
 				setState(new Bound(boundInstance));
 				currentProperties = serviceProperties;
 			} catch (IllegalServiceMetadataException e) {

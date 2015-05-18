@@ -27,11 +27,11 @@ import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.core.ServiceConfig;
 import com.avanza.astrix.provider.versioning.Versioned;
 
-public class AstrixPublishedBeanDefinitionMethod {
+public class AstrixBeanDefinitionMethod {
 	
-	private Method method;
+	private final Method method;
 	
-	private AstrixPublishedBeanDefinitionMethod(Method method) {
+	private AstrixBeanDefinitionMethod(Method method) {
 		this.method = method;
 	}
 
@@ -69,8 +69,8 @@ public class AstrixPublishedBeanDefinitionMethod {
 		return method.isAnnotationPresent(Versioned.class);
 	}
 
-	public static AstrixPublishedBeanDefinitionMethod create(Method astrixBeanDefinition) {
-		return new AstrixPublishedBeanDefinitionMethod(astrixBeanDefinition);
+	public static AstrixBeanDefinitionMethod create(Method astrixBeanDefinition) {
+		return new AstrixBeanDefinitionMethod(astrixBeanDefinition);
 	}
 
 	public Class<?> getBeanType() {

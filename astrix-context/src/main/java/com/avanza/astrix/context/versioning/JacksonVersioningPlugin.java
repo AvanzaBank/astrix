@@ -17,16 +17,15 @@ package com.avanza.astrix.context.versioning;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.beans.service.ServiceContext;
-import com.avanza.astrix.context.AstrixVersioningPlugin;
+import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 
 @MetaInfServices(AstrixVersioningPlugin.class)
 public class JacksonVersioningPlugin implements AstrixVersioningPlugin {
 	@Override
-	public AstrixObjectSerializer create(ServiceContext versioningContext) {
-		if (versioningContext.isVersioned()) {
-			return new VersionJacksonAstrixObjectSerializer(versioningContext);
+	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
+		if (serializerDefinition.isVersioned()) {
+			return new VersionJacksonAstrixObjectSerializer(serializerDefinition);
 		}
 		return new AstrixObjectSerializer.NoVersioningSupport();
 	}

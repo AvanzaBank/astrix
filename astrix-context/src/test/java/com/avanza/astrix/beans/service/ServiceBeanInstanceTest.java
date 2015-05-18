@@ -266,7 +266,7 @@ public class ServiceBeanInstanceTest {
 	static class FakeComponent extends DirectComponent {
 		
 		@Override
-		public <T> BoundServiceBeanInstance<T> bind(Class<T> type, ServiceContext versioningContext, ServiceProperties serviceProperties) {
+		public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> versioningContext, ServiceProperties serviceProperties) {
 			throw new IllegalServiceMetadataException("Illegal metadata");
 		}
 		
