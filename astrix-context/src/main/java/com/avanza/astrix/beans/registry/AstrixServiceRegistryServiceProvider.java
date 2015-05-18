@@ -17,7 +17,7 @@ package com.avanza.astrix.beans.registry;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
-import com.avanza.astrix.provider.core.AstrixConfigLookup;
+import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 import com.avanza.astrix.provider.versioning.Versioned;
@@ -37,7 +37,7 @@ import com.avanza.astrix.provider.versioning.Versioned;
 @AstrixApiProvider
 public interface AstrixServiceRegistryServiceProvider {
 	
-	@AstrixConfigLookup(AstrixSettings.SERVICE_REGISTRY_URI_PROPERTY_NAME)
+	@AstrixConfigDiscovery(AstrixSettings.SERVICE_REGISTRY_URI_PROPERTY_NAME)
 	@Versioned
 	@Service
 	AstrixServiceRegistry serviceRegistry();

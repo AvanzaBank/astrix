@@ -21,7 +21,7 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.service.ServiceContext;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
-import com.avanza.astrix.provider.core.AstrixConfigLookup;
+import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.AstrixDynamicQualifier;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;
@@ -226,12 +226,12 @@ public class AstrixApiProviderTest {
 	@AstrixApiProvider
 	public interface PingAndReversePingServiceProvider {
 
-		@AstrixConfigLookup("pingServiceUri")
+		@AstrixConfigDiscovery("pingServiceUri")
 		@AstrixQualifier("ping")
 		@Service
 		PingService pingLib();
 
-		@AstrixConfigLookup("reversePingServiceUri")
+		@AstrixConfigDiscovery("reversePingServiceUri")
 		@AstrixQualifier("reverse-ping")
 		@Service
 		PingService reversePingLib();
@@ -244,7 +244,7 @@ public class AstrixApiProviderTest {
 			return new PingLibImpl();
 		}
 		
-		@AstrixConfigLookup("pingServiceUri")
+		@AstrixConfigDiscovery("pingServiceUri")
 		@Service
 		public PingService pingService() {
 			return null;
@@ -259,13 +259,13 @@ public class AstrixApiProviderTest {
 	public interface VersionedPingServiceProvider {
 		
 		@Versioned
-		@AstrixConfigLookup("pingServiceUri")
+		@AstrixConfigDiscovery("pingServiceUri")
 		@Service
 		PingService pingService();
 	}
 
 	public interface InternalPingServiceApi {
-		@AstrixConfigLookup("internalPingServiceUri")
+		@AstrixConfigDiscovery("internalPingServiceUri")
 		@Service
 		InternalPingService internalPingService();
 	}
@@ -278,11 +278,11 @@ public class AstrixApiProviderTest {
 	public interface PublicAndInternalPingServiceProvider {
 		
 		@Versioned
-		@AstrixConfigLookup("pingServiceUri")
+		@AstrixConfigDiscovery("pingServiceUri")
 		@Service
 		PingService pingService();
 		
-		@AstrixConfigLookup("internalPingServiceUri")
+		@AstrixConfigDiscovery("internalPingServiceUri")
 		@Service
 		InternalPingService internalPingService();
 	}
@@ -293,7 +293,7 @@ public class AstrixApiProviderTest {
 	@AstrixApiProvider
 	public interface DynamicPingServiceProvider {
 
-		@AstrixConfigLookup("pingServiceUri")
+		@AstrixConfigDiscovery("pingServiceUri")
 		@AstrixDynamicQualifier
 		@Service
 		PingService pingService();

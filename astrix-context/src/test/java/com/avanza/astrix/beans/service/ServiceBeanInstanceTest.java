@@ -38,7 +38,7 @@ import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
-import com.avanza.astrix.provider.core.AstrixConfigLookup;
+import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
@@ -289,7 +289,7 @@ public class ServiceBeanInstanceTest {
 	
 	@AstrixApiProvider
 	public interface PingApiProviderUsingConfigLookup {
-		@AstrixConfigLookup("pingUri")
+		@AstrixConfigDiscovery("pingUri")
 		@Service
 		Ping ping();
 	}

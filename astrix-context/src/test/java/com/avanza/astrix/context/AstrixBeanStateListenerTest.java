@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.provider.core.AstrixConfigLookup;
+import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
 
@@ -93,7 +93,7 @@ public class AstrixBeanStateListenerTest {
 	@com.avanza.astrix.provider.core.AstrixApiProvider
 	public interface MyServiceProvider {
 		
-		@AstrixConfigLookup("myService")
+		@AstrixConfigDiscovery("myService")
 		@Service
 		MyService myServcie();
 	}

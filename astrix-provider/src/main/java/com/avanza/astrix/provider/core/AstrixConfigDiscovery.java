@@ -23,14 +23,21 @@ import java.lang.annotation.Target;
 
 
 /**
- * @author Elias Lindholm (elilin)
+ * Annotating a service bean definition with this annotation indicates
+ * that providers of the given service should be discovered using the configuration
+ * rather than the default behavior of using the service registry. <p>
  * 
- * @deprecated - replaced by {@link AstrixConfigDiscovery}
+ * @author Elias Lindholm (elilin)
  */
 @Target(value = { ElementType.TYPE, ElementType.METHOD })
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
-@Deprecated
-public @interface AstrixConfigLookup {
+public @interface AstrixConfigDiscovery {
+	/**
+	 * Name of the configuration entry to lookup when discovering a provider. <p> 
+	 * 
+	 * The configuration entry stored under the given name should be
+	 * a valid serviceUri locating a provider of the defined service. <p>
+	 */
 	String value();
 }
