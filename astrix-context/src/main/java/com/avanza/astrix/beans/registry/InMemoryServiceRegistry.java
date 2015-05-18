@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 import com.avanza.astrix.config.BooleanSetting;
 import com.avanza.astrix.config.DynamicConfigSource;
@@ -127,7 +127,7 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	public <T> void registerProvider(Class<T> api, T provider, String subsystem) {
 		// TODO: remove this method?
 		ServiceRegistryExporterClient serviceRegistryClient = new ServiceRegistryExporterClient(this.serviceRegistry, subsystem, api.getName());
-		AstrixServiceProperties servicePRoperties = AstrixDirectComponent.registerAndGetProperties(api, provider);
+		ServiceProperties servicePRoperties = AstrixDirectComponent.registerAndGetProperties(api, provider);
 		serviceRegistryClient.register(api, servicePRoperties, 60_000);
 	}
 	
@@ -182,13 +182,13 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 		}
 		
 		private ServiceProviderKey getServiceProviderKey(AstrixServiceRegistryEntry properties) {
-			String appInstanceId = properties.getServiceProperties().get(AstrixServiceProperties.APPLICATION_INSTANCE_ID);
+			String appInstanceId = properties.getServiceProperties().get(ServiceProperties.APPLICATION_INSTANCE_ID);
 			return ServiceProviderKey.create(getServiceKey(properties), appInstanceId);
 		}
 		
 		private ServiceKey getServiceKey(AstrixServiceRegistryEntry properties) {
 			String api = properties.getServiceBeanType();
-			String qualifier = properties.getServiceProperties().get(AstrixServiceProperties.QUALIFIER);
+			String qualifier = properties.getServiceProperties().get(ServiceProperties.QUALIFIER);
 			return new ServiceKey(api, qualifier);
 		}
 		

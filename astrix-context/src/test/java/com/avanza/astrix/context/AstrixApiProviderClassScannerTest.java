@@ -26,7 +26,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
+import com.avanza.astrix.beans.publish.ApiProviderClass;
 
 
 
@@ -34,15 +34,15 @@ public class AstrixApiProviderClassScannerTest {
 	
 	@Test
 	public void scansDefinedPackagesForDefinedAnnotations() throws Exception {
-		List<AstrixApiProviderClass> apiDescriptors = new AstrixApiProviderClassScanner(asList(DummyDescriptor.class), "com.avanza.astrix.context").getAll();
+		List<ApiProviderClass> apiDescriptors = new AstrixApiProviderClassScanner(asList(DummyDescriptor.class), "com.avanza.astrix.context").getAll();
 		assertEquals(2, apiDescriptors.size());
-		Assert.assertThat(apiDescriptors, hasItem(equalTo(AstrixApiProviderClass.create(DescriptorA.class))));
-		Assert.assertThat(apiDescriptors, hasItem(equalTo(AstrixApiProviderClass.create(DescriptorB.class))));
+		Assert.assertThat(apiDescriptors, hasItem(equalTo(ApiProviderClass.create(DescriptorA.class))));
+		Assert.assertThat(apiDescriptors, hasItem(equalTo(ApiProviderClass.create(DescriptorB.class))));
 	}
 	
 	@Test
 	public void doesNotFinedDescriptorsOutsideDefinedPackge() throws Exception {
-		List<AstrixApiProviderClass> apiDescriptors = new AstrixApiProviderClassScanner(asList(DummyDescriptor.class), "com.avanza.astrix.context.foo.bar").getAll();
+		List<ApiProviderClass> apiDescriptors = new AstrixApiProviderClassScanner(asList(DummyDescriptor.class), "com.avanza.astrix.context.foo.bar").getAll();
 		assertEquals(0, apiDescriptors.size());
 	}
 

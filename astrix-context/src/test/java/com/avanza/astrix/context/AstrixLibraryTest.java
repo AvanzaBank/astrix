@@ -23,7 +23,7 @@ import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
-import com.avanza.astrix.beans.factory.AstrixCircularDependency;
+import com.avanza.astrix.beans.factory.CircularDependency;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.ft.FaultToleranceProxyProvider;
@@ -54,7 +54,7 @@ public class AstrixLibraryTest {
 		assertEquals("hello: kalle", libraryBean.hello("kalle"));
 	}
 	
-	@Test(expected = AstrixCircularDependency.class)
+	@Test(expected = CircularDependency.class)
 	public void detectsCircularDependenciesAmongLibraries() throws Exception {
 		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
 		AstrixConfigurer.registerApiProvider(CircularApiA.class);

@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.MapConfigSource;
 
@@ -33,7 +33,7 @@ public class GsBinderTest {
 	public void parsesASpaceUrl() throws Exception {
 		GsBinder gsBinder = new GsBinder();
 		gsBinder.setConfig(DynamicConfig.create(config));
-		AstrixServiceProperties serviceProperties = gsBinder.createServiceProperties("jini://*/*/service-registry-space?locators=testgssystem01.test.aza.se,testgssystem02.test.aza.se");
+		ServiceProperties serviceProperties = gsBinder.createServiceProperties("jini://*/*/service-registry-space?locators=testgssystem01.test.aza.se,testgssystem02.test.aza.se");
 		assertEquals("service-registry-space", serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY));
 		assertEquals("service-registry-space", serviceProperties.getQualifier());
 		assertEquals("jini://*/*/service-registry-space?locators=testgssystem01.test.aza.se,testgssystem02.test.aza.se", serviceProperties.getProperty(GsBinder.SPACE_URL_PROPERTY));

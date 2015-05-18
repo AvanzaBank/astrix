@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
+import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.provider.core.AstrixApplication;
 /**
  * 
@@ -30,10 +30,10 @@ public class AstrixApplicationDescriptor {
 
 	private final Class<?> descriptorHolder;
 	private final String defaultServiceComponent;
-	private final Collection<AstrixApiProviderClass> exportsRemoteServicesFor;
+	private final Collection<ApiProviderClass> exportsRemoteServicesFor;
 
 	
-	private AstrixApplicationDescriptor(Class<?> descriptorHolder, String defaultServiceComponent, Collection<AstrixApiProviderClass> exportsRemoteServicesFor) {
+	private AstrixApplicationDescriptor(Class<?> descriptorHolder, String defaultServiceComponent, Collection<ApiProviderClass> exportsRemoteServicesFor) {
 		this.descriptorHolder = descriptorHolder;
 		this.defaultServiceComponent = defaultServiceComponent;
 		this.exportsRemoteServicesFor = exportsRemoteServicesFor;
@@ -48,9 +48,9 @@ public class AstrixApplicationDescriptor {
 		AstrixApplication astrixApplication = applicationDescriptorHolder.getAnnotation(AstrixApplication.class);
 		defaultServiceComponent = getDefaultServiceComponent(astrixApplication, applicationDescriptorHolder);
 		Class<?>[] exportedRemoteServiceEndpointClasses = getExportedRemoteServiceEndpoints(astrixApplication, applicationDescriptorHolder);
-		Set<AstrixApiProviderClass> exportsRemoteServicesForApis = new HashSet<>();
+		Set<ApiProviderClass> exportsRemoteServicesForApis = new HashSet<>();
 		for (Class<?> apiProviderClass : exportedRemoteServiceEndpointClasses) {
-			exportsRemoteServicesForApis.add(AstrixApiProviderClass.create(apiProviderClass));
+			exportsRemoteServicesForApis.add(ApiProviderClass.create(apiProviderClass));
 		}
 		return new AstrixApplicationDescriptor(applicationDescriptorHolder, defaultServiceComponent, exportsRemoteServicesForApis);
 	}
@@ -96,7 +96,7 @@ public class AstrixApplicationDescriptor {
 	}
 
 	/**
-	 * Default AstrixServiceComponent used for services exported to service registry.
+	 * Default ServiceComponent used for services exported to service registry.
 	 * @return
 	 */
 	public String getDefaultServiceComponent() {
@@ -108,7 +108,7 @@ public class AstrixApplicationDescriptor {
 	 * for. <p>
 	 * @return
 	 */
-	public Collection<AstrixApiProviderClass> exportsRemoteServicesFor() {
+	public Collection<ApiProviderClass> exportsRemoteServicesFor() {
 		return this.exportsRemoteServicesFor;
 	}
 

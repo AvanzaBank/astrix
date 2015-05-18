@@ -13,16 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.service;
+package com.avanza.astrix.beans.publish;
+
+import java.util.Collection;
+
 /**
+ * 
  * @author Elias Lindholm (elilin)
+ *
  */
-public class MissingAstrixServiceComponentException extends RuntimeException {
+public interface ApiProviders {
 
-	private static final long serialVersionUID = 1L;
-
-	public MissingAstrixServiceComponentException(String message) {
-		super(message);
-	}
-
+	/**
+	 * Strategy for locating all ApiProviderClass's available in
+	 * the current runtime. <p>
+	 * 
+	 * @return
+	 */
+	Collection<ApiProviderClass> getAll();
+	
 }

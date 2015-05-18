@@ -33,7 +33,6 @@ import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 /**
  * 
@@ -41,16 +40,16 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  *
  * @param <T>
  */
-public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHandler {
+public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHandler {
 	
-	private static final Logger log = LoggerFactory.getLogger(AstrixServiceBeanInstance.class);
+	private static final Logger log = LoggerFactory.getLogger(ServiceBeanInstance.class);
 
 	private static final AtomicInteger nextId = new AtomicInteger(0);
 	private final String id = Integer.toString(nextId.incrementAndGet()); // Used for debugging to distinguish between many context's started within same jvm.
 	
 	private final AstrixBeanKey<T> beanKey;
-	private final AstrixServiceComponents serviceComponents;
-	private final ServiceVersioningContext versioningContext;
+	private final ServiceComponents serviceComponents;
+	private final ServiceContext versioningContext;
 	/*
 	 * Monitor used to signal state changes. (waitForBean)
 	 */
@@ -65,13 +64,13 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 	 */
 	private final Lock beanStateLock = new ReentrantLock();
 	
-	private volatile AstrixServiceProperties currentProperties;
+	private volatile ServiceProperties currentProperties;
 	private volatile BeanState currentState;
 
-	private AstrixServiceBeanInstance(ServiceVersioningContext versioningContext, 
+	private ServiceBeanInstance(ServiceContext versioningContext, 
 								AstrixBeanKey<T> beanKey, 
 								ServiceLookup serviceLookup, 
-								AstrixServiceComponents serviceComponents, 
+								ServiceComponents serviceComponents, 
 								DynamicConfig config) {
 		this.serviceLookup = serviceLookup;
 		this.versioningContext = Objects.requireNonNull(versioningContext);
@@ -81,18 +80,18 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 		log.info(String.format("Start managing service bean. currentState=%s bean=%s astrixBeanId=%s", currentState.name(), beanKey, id));
 	}
 	
-	public static <T> AstrixServiceBeanInstance<T> create(ServiceVersioningContext versioningContext, 
+	public static <T> ServiceBeanInstance<T> create(ServiceContext versioningContext, 
 								AstrixBeanKey<T> beanKey, 
 								ServiceLookup serviceLookup, 
-								AstrixServiceComponents serviceComponents, 
+								ServiceComponents serviceComponents, 
 								DynamicConfig config) {
-		return new AstrixServiceBeanInstance<T>(versioningContext, beanKey, serviceLookup, serviceComponents, config);
+		return new ServiceBeanInstance<T>(versioningContext, beanKey, serviceLookup, serviceComponents, config);
 	}
 	
 	public void renewLease() {
 		beanStateLock.lock();
 		try {
-			AstrixServiceProperties serviceProperties = serviceLookup.lookup();
+			ServiceProperties serviceProperties = serviceLookup.lookup();
 			if (serviceHasChanged(serviceProperties)) {
 				bind(serviceProperties);
 			} else {
@@ -105,7 +104,7 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 		}
 	}
 	
-	private boolean serviceHasChanged(AstrixServiceProperties serviceProperties) {
+	private boolean serviceHasChanged(ServiceProperties serviceProperties) {
 		return !Objects.equals(currentProperties, serviceProperties);
 	}
 	
@@ -115,7 +114,7 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 			if (isBound()) {
 				return;
 			}
-			AstrixServiceProperties serviceProperties = serviceLookup.lookup();
+			ServiceProperties serviceProperties = serviceLookup.lookup();
 			if (serviceProperties == null) {
 				log.info(String.format(
 					"Failed to discover service using %s. bean=%s astrixBeanId=%s", 
@@ -136,7 +135,7 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 	 * 
 	 * Throws exception if bind attempt fails.
 	 */
-	private void bind(AstrixServiceProperties serviceProperties) {
+	private void bind(ServiceProperties serviceProperties) {
 		this.currentState.bindTo(serviceProperties);
 	}
 	
@@ -159,7 +158,7 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 		}
 	}
 	
-	private AstrixServiceComponent getServiceComponent(AstrixServiceProperties serviceProperties) {
+	private ServiceComponent getServiceComponent(ServiceProperties serviceProperties) {
 		String componentName = serviceProperties.getComponent();
 		if (componentName == null) {
 			throw new IllegalArgumentException("Expected a componentName to be set on serviceProperties: " + serviceProperties);
@@ -211,21 +210,21 @@ public class AstrixServiceBeanInstance<T> implements StatefulAstrixBean, Invocat
 	
 	private abstract class BeanState implements InvocationHandler {
 
-		protected void bindTo(AstrixServiceProperties serviceProperties) {
+		protected void bindTo(ServiceProperties serviceProperties) {
 			if (serviceProperties == null) {
 				transitionToUnboundState();
 				return;
 			}
-			String providerSubsystem = serviceProperties.getProperty(AstrixServiceProperties.SUBSYSTEM);
+			String providerSubsystem = serviceProperties.getProperty(ServiceProperties.SUBSYSTEM);
 			if (providerSubsystem == null) {
 				providerSubsystem = AstrixSettings.SUBSYSTEM_NAME.defaultValue();
 			}
 			try {
-				AstrixServiceComponent serviceComponent = getServiceComponent(serviceProperties);
+				ServiceComponent serviceComponent = getServiceComponent(serviceProperties);
 				if (!serviceComponent.canBindType(beanKey.getBeanType())) {
 					throw new UnsupportedTargetTypeException(serviceComponent.getName(), beanKey.getBeanType());
 				}
-				BoundServiceBeanInstance<T> boundInstance = serviceComponent.bind(versioningContext, beanKey.getBeanType(), serviceProperties);
+				BoundServiceBeanInstance<T> boundInstance = serviceComponent.bind(beanKey.getBeanType(), versioningContext, serviceProperties);
 				setState(new Bound(boundInstance));
 				currentProperties = serviceProperties;
 			} catch (IllegalServiceMetadataException e) {

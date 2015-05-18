@@ -21,34 +21,34 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class AstrixServiceComponents {
+public class ServiceComponents {
 
-	private final Map<String, AstrixServiceComponent> componentsByName = new ConcurrentHashMap<>();
+	private final Map<String, ServiceComponent> componentsByName = new ConcurrentHashMap<>();
 	
-	public AstrixServiceComponents(List<AstrixServiceComponent> serviceComponents) {
-		for (AstrixServiceComponent serviceComponent : serviceComponents) {
+	public ServiceComponents(List<ServiceComponent> serviceComponents) {
+		for (ServiceComponent serviceComponent : serviceComponents) {
 			componentsByName.put(serviceComponent.getName(), serviceComponent);
 		}
 	}
 	
-	public AstrixServiceComponent getComponent(String name) {
-		AstrixServiceComponent serviceComponent = componentsByName.get(name);
+	public ServiceComponent getComponent(String name) {
+		ServiceComponent serviceComponent = componentsByName.get(name);
 		if (serviceComponent == null) {
-			throw new MissingAstrixServiceComponentException(String.format("AstrixServiceComponent not found: name=%s. Did you forget to put the jar containing the given AstrixServiceComponent on the classpath?", name));
+			throw new MissingServiceComponentException(String.format("ServiceComponent not found: name=%s. Did you forget to put the jar containing the given ServiceComponent on the classpath?", name));
 		}
 		return serviceComponent;
 	}
 	
-	public <T extends AstrixServiceComponent> T getComponent(Class<T> componentType) {
-		for (AstrixServiceComponent component : componentsByName.values()) {
+	public <T extends ServiceComponent> T getComponent(Class<T> componentType) {
+		for (ServiceComponent component : componentsByName.values()) {
 			if (component.getClass().equals(componentType)) {
 				return componentType.cast(component);
 			}
 		}
-		throw new MissingAstrixServiceComponentException(String.format("AstrixServiceComponent instance not found: type=%s. Did you forget to put the jar containing the given AstrixServiceComponent on the classpath?", componentType));
+		throw new MissingServiceComponentException(String.format("ServiceComponent instance not found: type=%s. Did you forget to put the jar containing the given ServiceComponent on the classpath?", componentType));
 	}
 	
-	public Collection<AstrixServiceComponent> getAll() {
+	public Collection<ServiceComponent> getAll() {
 		return this.componentsByName.values();
 	}
 

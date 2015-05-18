@@ -24,22 +24,22 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
-import com.avanza.astrix.beans.publish.AstrixApiProviders;
+import com.avanza.astrix.beans.publish.ApiProviderClass;
+import com.avanza.astrix.beans.publish.ApiProviders;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.Setting;
 
 public class TestAstrixConfigurer {
 	
 	private AstrixConfigurer configurer;
-	private final Set<AstrixApiProviderClass> apiProviders = new HashSet<>();
+	private final Set<ApiProviderClass> apiProviders = new HashSet<>();
 	private final Collection<StandardFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	
 	public TestAstrixConfigurer() {
 		configurer = new AstrixConfigurer();
-		configurer.setAstrixApiProviders(new AstrixApiProviders() {
+		configurer.setAstrixApiProviders(new ApiProviders() {
 			@Override
-			public Collection<AstrixApiProviderClass> getAll() {
+			public Collection<ApiProviderClass> getAll() {
 				return apiProviders;
 			}
 		});
@@ -74,7 +74,7 @@ public class TestAstrixConfigurer {
 	 */
 	public void registerApiProvider(Class<?>... providers) {
 		for (Class<?> provider : providers) {
-			apiProviders.add(AstrixApiProviderClass.create(provider));
+			apiProviders.add(ApiProviderClass.create(provider));
 		}
 	}
 

@@ -26,9 +26,10 @@ import org.slf4j.LoggerFactory;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.inject.AstrixInjector;
-import com.avanza.astrix.beans.service.AstrixServiceComponent;
-import com.avanza.astrix.beans.service.AstrixServiceComponents;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceComponent;
+import com.avanza.astrix.beans.service.ServiceComponents;
+import com.avanza.astrix.beans.service.ServiceContext;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 import com.avanza.astrix.config.DynamicBooleanProperty;
@@ -40,7 +41,6 @@ import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.gs.AstrixGigaSpaceProxy;
 import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
 import com.j_spaces.core.IJSpace;
 import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
@@ -50,32 +50,32 @@ import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
  * @author Elias Lindholm (elilin)
  *
  */
-@MetaInfServices(AstrixServiceComponent.class)
-public class AstrixGsLocalViewComponent implements AstrixServiceComponent, AstrixConfigAware {
+@MetaInfServices(ServiceComponent.class)
+public class AstrixGsLocalViewComponent implements ServiceComponent, AstrixConfigAware {
 
 	private static Logger log = LoggerFactory.getLogger(AstrixGsLocalViewComponent.class);
 	private GsBinder gsBinder;
 	private AstrixSpringContext astrixSpringContext;
 	private DynamicBooleanProperty disableLocalView;
 	/*
-	 * To avoid circular dependency between AstrixGsLocalViewComponent and AstrixServiceComponents
-	 * we have to use the AstrixInjetor to retrieve AstrixServiceComponents.
+	 * To avoid circular dependency between AstrixGsLocalViewComponent and ServiceComponents
+	 * we have to use the AstrixInjetor to retrieve ServiceComponents.
 	 */
 	private AstrixInjector injector;
 	private AstrixFaultTolerance faultTolerance;
 	
 	@Override
 	public <T> BoundServiceBeanInstance<T> bind(
-			ServiceVersioningContext versioningContext, 
-			Class<T> type,
-			AstrixServiceProperties serviceProperties) {
+			Class<T> type, 
+			ServiceContext versioningContext,
+			ServiceProperties serviceProperties) {
 		if (!GigaSpace.class.isAssignableFrom(type)) {
 			throw new UnsupportedTargetTypeException(getName(), type);
 		}
 		if (disableLocalView.get()) {
 			log.info("LocalView is disabled. Creating reqular proxy");
-			AstrixServiceComponent gsComponent = injector.getBean(AstrixServiceComponents.class).getComponent(AstrixServiceComponentNames.GS);
-			return gsComponent.bind(versioningContext, type, serviceProperties);
+			ServiceComponent gsComponent = injector.getBean(ServiceComponents.class).getComponent(AstrixServiceComponentNames.GS);
+			return gsComponent.bind(type, versioningContext, serviceProperties);
 		}
 		// TODO: protect creation of localView with fault-tolerance?
 		Class<LocalViewConfigurer> serviceConfigClass = versioningContext.getServiceConfigClass(LocalViewConfigurer.class);	
@@ -88,7 +88,7 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 		
 		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
 		String commandKey = spaceName + "_" + GigaSpace.class.getSimpleName();
-		String qualifier = serviceProperties.getProperty(AstrixServiceProperties.QUALIFIER);
+		String qualifier = serviceProperties.getProperty(ServiceProperties.QUALIFIER);
 		if (qualifier != null) {
 			commandKey = commandKey + "-" + qualifier;
 		}
@@ -105,17 +105,17 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 	}
 
 	@Override
-	public AstrixServiceProperties createServiceProperties(String serviceUri) {
+	public ServiceProperties createServiceProperties(String serviceUri) {
 		return gsBinder.createServiceProperties(serviceUri);
 	}
 
 	@Override
-	public <T> AstrixServiceProperties createServiceProperties(Class<T> type) {
+	public <T> ServiceProperties createServiceProperties(Class<T> type) {
 		if (!type.equals(GigaSpace.class)) {
 			throw new UnsupportedTargetTypeException(getName(), type);
 		}
 		GigaSpace space = gsBinder.getEmbeddedSpace(astrixSpringContext.getApplicationContext());
-		AstrixServiceProperties properties = gsBinder.createProperties(space);
+		ServiceProperties properties = gsBinder.createProperties(space);
 		return properties;
 	}
 
@@ -132,7 +132,7 @@ public class AstrixGsLocalViewComponent implements AstrixServiceComponent, Astri
 	@Override
 	public <T> void exportService(Class<T> providedApi, 
 								  T provider, 
-								  ServiceVersioningContext versioningContext) {
+								  ServiceContext versioningContext) {
 		// Intentionally empty
 	}
 	

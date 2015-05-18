@@ -25,7 +25,7 @@ import java.util.Objects;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class AstrixServiceProperties implements Serializable {
+public final class ServiceProperties implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -39,11 +39,11 @@ public final class AstrixServiceProperties implements Serializable {
 	
 	private final Map<String, String> properties = new HashMap<>();
 	
-	public AstrixServiceProperties(Map<String, String> serviceProperties) {
+	public ServiceProperties(Map<String, String> serviceProperties) {
 		this.properties.putAll(serviceProperties);
 	}
 	
-	public AstrixServiceProperties() {
+	public ServiceProperties() {
 	}
 
 	public String getProperty(String name) {
@@ -105,7 +105,7 @@ public final class AstrixServiceProperties implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AstrixServiceProperties other = (AstrixServiceProperties) obj;
+		ServiceProperties other = (ServiceProperties) obj;
 		return Objects.equals(this.properties, other.properties);
 	}
 

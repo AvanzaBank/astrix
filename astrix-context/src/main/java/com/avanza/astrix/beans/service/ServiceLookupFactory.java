@@ -26,10 +26,10 @@ import com.avanza.astrix.beans.factory.AstrixBeanKey;
  */
 public final class ServiceLookupFactory<T extends Annotation> {
 	
-	private final AstrixServiceLookupMetaFactoryPlugin<T> factory;
+	private final ServiceLookupMetaFactoryPlugin<T> factory;
 	private final T annotation;
 	
-	public ServiceLookupFactory(AstrixServiceLookupMetaFactoryPlugin<T> factory, T annotation) {
+	public ServiceLookupFactory(ServiceLookupMetaFactoryPlugin<T> factory, T annotation) {
 		this.factory = factory;
 		this.annotation = annotation;
 	}

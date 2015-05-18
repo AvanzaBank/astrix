@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.avanza.astrix.beans.core.KeyLock;
 import com.avanza.astrix.beans.factory.ObjectCache;
 import com.avanza.astrix.beans.factory.ObjectCache.ObjectFactory;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.j_spaces.core.IJSpace;
 /**
  * Manages lifecycle for each clustered-proxy created by Astrix.
@@ -54,7 +54,7 @@ public class ClusteredProxyCache {
 	 * @param serviceProperties
 	 * @return
 	 */
-	public GigaSpaceInstance getProxy(final AstrixServiceProperties serviceProperties) {
+	public GigaSpaceInstance getProxy(final ServiceProperties serviceProperties) {
 		final String spaceUrl = serviceProperties.getProperty(GsBinder.SPACE_URL_PROPERTY);
 		proxyByUrlLock.lock(spaceUrl);
 		try {

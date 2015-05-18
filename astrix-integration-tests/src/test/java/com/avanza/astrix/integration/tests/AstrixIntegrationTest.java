@@ -40,9 +40,9 @@ import org.openspaces.core.GigaSpace;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
+import com.avanza.astrix.beans.registry.ServiceRegistryClient;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
@@ -113,7 +113,7 @@ public class AstrixIntegrationTest {
 	private LunchServiceAsync asyncLunchService;
 	private PublicLunchFeeder publicLunchFeeder;
 	private AstrixContext astrix;
-	private AstrixServiceRegistryClient serviceRegistryClient;
+	private ServiceRegistryClient serviceRegistryClient;
 
 	private Ping lunchPing;
 
@@ -136,7 +136,7 @@ public class AstrixIntegrationTest {
 		this.lunchRestaurantGrader = astrix.getBean(LunchRestaurantGrader.class);
 		this.asyncLunchService = astrix.getBean(LunchServiceAsync.class);
 		this.publicLunchFeeder = astrix.getBean(PublicLunchFeeder.class);
-		this.serviceRegistryClient = astrix.getBean(AstrixServiceRegistryClient.class);
+		this.serviceRegistryClient = astrix.getBean(ServiceRegistryClient.class);
 		this.serviceRegistry = astrix.getBean(AstrixServiceRegistry.class);
 		this.lunchPing = astrix.getBean(Ping.class, "lunch-ping");
 		astrix.waitForBean(LunchService.class, 5000);
@@ -244,12 +244,12 @@ public class AstrixIntegrationTest {
 
 	@Test
 	public void leasesServices() throws Exception {
-		AstrixServiceProperties properties = new AstrixServiceProperties();
+		ServiceProperties properties = new ServiceProperties();
 		properties.setApi(FooService.class);
 		ServiceRegistryExporterClient exporterClient = new ServiceRegistryExporterClient(serviceRegistry, "test-sub-system" , "foo-app-instance-id");
 		exporterClient.register(FooService.class, properties, 1000);
 		
-		AstrixServiceProperties props = serviceRegistryClient.lookup(AstrixBeanKey.create(FooService.class));
+		ServiceProperties props = serviceRegistryClient.lookup(AstrixBeanKey.create(FooService.class));
 		assertNotNull("Expected properties to exists after registration", props);
 		
 		assertEventually(AstrixTestUtil.serviceInvocationResult(new Supplier<Object>() {
@@ -261,8 +261,8 @@ public class AstrixIntegrationTest {
 	
 	@Test
 	public void usesSpaceApplicationDescriptorNameAsdefaultApplicationInstanceIdForProcessingUnits() throws Exception {
-		AstrixServiceProperties serviceProperties = serviceRegistryClient.lookup(AstrixBeanKey.create(LunchService.class));
-		assertEquals(LunchApplicationDescriptor.class.getName(), serviceProperties.getProperties().get(AstrixServiceProperties.APPLICATION_INSTANCE_ID));
+		ServiceProperties serviceProperties = serviceRegistryClient.lookup(AstrixBeanKey.create(LunchService.class));
+		assertEquals(LunchApplicationDescriptor.class.getName(), serviceProperties.getProperties().get(ServiceProperties.APPLICATION_INSTANCE_ID));
 	}
 	
 	@Test(expected = ServiceUnavailableException.class)

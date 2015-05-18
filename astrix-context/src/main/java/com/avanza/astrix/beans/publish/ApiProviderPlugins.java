@@ -25,22 +25,22 @@ import java.util.concurrent.ConcurrentMap;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixApiProviderPlugins {
+public class ApiProviderPlugins {
 	
-	private final ConcurrentMap<Class<? extends Annotation>, AstrixApiProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Class<? extends Annotation>, ApiProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	
-	public AstrixApiProviderPlugins(Collection<AstrixApiProviderPlugin> apiProviderPlugins) {
-		for (AstrixApiProviderPlugin plugin : apiProviderPlugins) {
-			AstrixApiProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
+	public ApiProviderPlugins(Collection<ApiProviderPlugin> apiProviderPlugins) {
+		for (ApiProviderPlugin plugin : apiProviderPlugins) {
+			ApiProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
-				throw new IllegalArgumentException(String.format("Multiple AstrixApiProviderPlugin's found for providerAnnotationType=%s. p1=%s p2=%s", 
+				throw new IllegalArgumentException(String.format("Multiple ApiProviderPlugin's found for providerAnnotationType=%s. p1=%s p2=%s", 
 						plugin.getProviderAnnotationType().getName(), plugin.getClass().getName(), previous.getClass().getName()));
 			}
 		}
 	}
 	
-	public AstrixApiProviderPlugin getProviderPlugin(AstrixApiProviderClass apiProvider) {
-		for (AstrixApiProviderPlugin plugin : pluginByAnnotationType.values()) {
+	public ApiProviderPlugin getProviderPlugin(ApiProviderClass apiProvider) {
+		for (ApiProviderPlugin plugin : pluginByAnnotationType.values()) {
 			if (apiProvider.isAnnotationPresent(plugin.getProviderAnnotationType())) {
 				return plugin;
 			}

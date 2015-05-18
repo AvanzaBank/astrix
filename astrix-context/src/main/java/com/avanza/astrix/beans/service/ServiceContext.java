@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.provider.versioning;
+package com.avanza.astrix.beans.service;
+
+import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
 
 
 
 /**
+ * Holds static information about a given service, i.e information defined
+ * in the ApiProvider as part of the service definition. 
  * 
+ * This is different from the dynamic information stored in 
+ * the service registry which is represented by {@link ServiceProperties}.
+ *  
  * @author Elias Lindholm (elilin)
  *
  */
-public abstract class ServiceVersioningContext {
-	
-	// TODO: rename to ServiceContext
+public abstract class ServiceContext {
 	
 	private Class<?> serviceConfigClass = null;
 
-	private ServiceVersioningContext(Class<?> serviceConfigClass) {
+	private ServiceContext(Class<?> serviceConfigClass) {
 		this.serviceConfigClass = serviceConfigClass;
 	}
 	
@@ -49,12 +54,11 @@ public abstract class ServiceVersioningContext {
 	
 	public abstract Class<? extends AstrixObjectSerializerConfigurer> getObjectSerializerConfigurerClass();
 	
-	public static ServiceVersioningContext versionedService(int version, Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfiguer) {
+	public static ServiceContext versionedService(int version, Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfiguer) {
 		return versionedService(version, objectSerializerConfiguer, null); 
-				
 	}
 	
-	public static ServiceVersioningContext versionedService(
+	public static ServiceContext versionedService(
 			int version,
 			Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfigurer,
 			Class<?> serviceConfigClass) {
@@ -62,15 +66,15 @@ public abstract class ServiceVersioningContext {
 		return new VersionedServiceContext(version, objectSerializerConfigurer, serviceConfigClass);
 	}
 	
-	public static ServiceVersioningContext nonVersioned() {
+	public static ServiceContext nonVersioned() {
 		return nonVersioned(null);
 	}
 	
-	public static ServiceVersioningContext nonVersioned(Class<?> serviceConfig) {
+	public static ServiceContext nonVersioned(Class<?> serviceConfig) {
 		return new NonVersionedServiceContext(serviceConfig);
 	}
 	
-	private static class VersionedServiceContext extends ServiceVersioningContext {
+	private static class VersionedServiceContext extends ServiceContext {
 		
 		private int version;
 		private Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfiguer;
@@ -99,7 +103,7 @@ public abstract class ServiceVersioningContext {
 		}
 	}
 	
-	private static class NonVersionedServiceContext extends ServiceVersioningContext {
+	private static class NonVersionedServiceContext extends ServiceContext {
 
 		public NonVersionedServiceContext(Class<?> serviceConfig) {
 			super(serviceConfig);

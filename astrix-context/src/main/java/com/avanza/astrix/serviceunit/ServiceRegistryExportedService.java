@@ -15,18 +15,18 @@
  */
 package com.avanza.astrix.serviceunit;
 
-import com.avanza.astrix.beans.service.AstrixServiceComponent;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceComponent;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 
 class ServiceRegistryExportedService {
 	
 	private final Class<?> asyncService;
-	private final AstrixServiceComponent serviceComponent;
+	private final ServiceComponent serviceComponent;
 	private volatile boolean publishServices;
 	private final ServiceBeanDefinition serviceBeanDefinition;
 	
-	public ServiceRegistryExportedService(AstrixServiceComponent serviceComponent, ServiceBeanDefinition serviceBeanDefinition, boolean publishServices) {
+	public ServiceRegistryExportedService(ServiceComponent serviceComponent, ServiceBeanDefinition serviceBeanDefinition, boolean publishServices) {
 		this.serviceBeanDefinition = serviceBeanDefinition;
 		this.publishServices = publishServices;
 		if (!serviceComponent.canBindType(serviceBeanDefinition.getBeanType())) {
@@ -56,9 +56,9 @@ class ServiceRegistryExportedService {
 		return this.asyncService != null;
 	}
 
-	public AstrixServiceProperties exportServiceProperties() {
-		AstrixServiceProperties serviceProperties = serviceComponent.createServiceProperties(serviceBeanDefinition.getBeanType());
-		serviceProperties.getProperties().put(AstrixServiceProperties.PUBLISHED, Boolean.toString(isPublished()));
+	public ServiceProperties exportServiceProperties() {
+		ServiceProperties serviceProperties = serviceComponent.createServiceProperties(serviceBeanDefinition.getBeanType());
+		serviceProperties.getProperties().put(ServiceProperties.PUBLISHED, Boolean.toString(isPublished()));
 		serviceProperties.setApi(serviceBeanDefinition.getBeanKey().getBeanType());
 		serviceProperties.setQualifier(serviceBeanDefinition.getBeanKey().getQualifier());
 		serviceProperties.setComponent(serviceComponent.getName());
@@ -79,8 +79,8 @@ class ServiceRegistryExportedService {
 		this.publishServices = published;
 	}
 
-	public AstrixServiceProperties exportAsyncServiceProperties() {
-		AstrixServiceProperties serviceProperties = exportServiceProperties();
+	public ServiceProperties exportAsyncServiceProperties() {
+		ServiceProperties serviceProperties = exportServiceProperties();
 		serviceProperties.setApi(asyncService);
 		return serviceProperties;
 	}

@@ -20,8 +20,8 @@ import org.kohsuke.MetaInfServices;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
-import com.avanza.astrix.beans.service.AstrixServiceLookupMetaFactoryPlugin;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceLookupMetaFactoryPlugin;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 import com.avanza.astrix.beans.service.ServiceLookup;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
@@ -30,8 +30,8 @@ import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
  * @author Elias Lindholm (elilin)
  *
  */
-@MetaInfServices(AstrixServiceLookupMetaFactoryPlugin.class)
-public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupMetaFactoryPlugin<AstrixServiceRegistryLookup>, AstrixPublishedBeansAware {
+@MetaInfServices(ServiceLookupMetaFactoryPlugin.class)
+public class AstrixServiceRegistryLookupPlugin implements ServiceLookupMetaFactoryPlugin<AstrixServiceRegistryLookup>, AstrixPublishedBeansAware {
 
 	private AstrixPublishedBeans beans;
 
@@ -55,8 +55,8 @@ public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupMet
 		/*
 		 * IMPLEMENTATION NOTE:
 		 * 
-		 * This class requires an AstrixServiceRegistryClient. Since we can't make sure that
-		 * a service-factory for AstrixServiceRegistryClient is registered in the bean factory
+		 * This class requires an ServiceRegistryClient. Since we can't make sure that
+		 * a service-factory for ServiceRegistryClient is registered in the bean factory
 		 * (behind the AstrixPublishedBeansAware interface) before an instance of ServiceRegistryLookup
 		 * is created, we have to inject the AstrixPublishedBeans here and query it for an instance
 		 * on each invocation.
@@ -76,8 +76,8 @@ public class AstrixServiceRegistryLookupPlugin implements AstrixServiceLookupMet
 		}
 
 		@Override
-		public AstrixServiceProperties lookup() {
-			return beans.getBean(AstrixBeanKey.create(AstrixServiceRegistryClient.class, null)).lookup(beanKey);
+		public ServiceProperties lookup() {
+			return beans.getBean(AstrixBeanKey.create(ServiceRegistryClient.class, null)).lookup(beanKey);
 		}
 		
 	}

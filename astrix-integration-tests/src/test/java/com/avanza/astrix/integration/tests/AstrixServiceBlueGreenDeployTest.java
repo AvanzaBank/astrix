@@ -36,10 +36,10 @@ import org.springframework.core.env.MapPropertySource;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryClient;
+import com.avanza.astrix.beans.registry.ServiceRegistryClient;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.ConfigSource;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
@@ -185,7 +185,7 @@ public class AstrixServiceBlueGreenDeployTest {
 		List<AstrixServiceRegistryEntry> providers = this.serviceRegistry.listServices(FeederService.class.getName(), null);
 		assertEquals(1, providers.size());
 		AstrixServiceRegistryEntry providerProperties = providers.get(0);
-		assertEquals(ACCOUNT_PERFORMANCE_SUBSYSTEM + "#1", providerProperties.getServiceProperties().get(AstrixServiceProperties.SERVICE_ZONE));
+		assertEquals(ACCOUNT_PERFORMANCE_SUBSYSTEM + "#1", providerProperties.getServiceProperties().get(ServiceProperties.SERVICE_ZONE));
 	}
 	
 
@@ -212,8 +212,8 @@ public class AstrixServiceBlueGreenDeployTest {
 				feeder1clientContext.waitForBean(ServiceAdministrator.class, "server-1", 1000L);
 		serviceInstance1Administrator.setPublishServices(false);
 		
-		AstrixServiceRegistryClient serviceRegistryClient = feeder1clientContext.getBean(AstrixServiceRegistryClient.class);
-		List<AstrixServiceProperties> serviceProperties = serviceRegistryClient.list(AstrixBeanKey.create(AccountPerformance.class));
+		ServiceRegistryClient serviceRegistryClient = feeder1clientContext.getBean(ServiceRegistryClient.class);
+		List<ServiceProperties> serviceProperties = serviceRegistryClient.list(AstrixBeanKey.create(AccountPerformance.class));
 		assertEquals(2, serviceProperties.size());
 //		
 		// Verify traffic eventually moves to instance-2
@@ -251,11 +251,11 @@ public class AstrixServiceBlueGreenDeployTest {
 
 			@Override
 			public void sample() {
-				AstrixServiceRegistryClient serviceRegistryClient = feeder1clientContext.getBean(AstrixServiceRegistryClient.class);
-				List<AstrixServiceProperties> servicePropertyList = serviceRegistryClient.list(AstrixBeanKey.create(AccountPerformance.class));
+				ServiceRegistryClient serviceRegistryClient = feeder1clientContext.getBean(ServiceRegistryClient.class);
+				List<ServiceProperties> servicePropertyList = serviceRegistryClient.list(AstrixBeanKey.create(AccountPerformance.class));
 				assertEquals("registered service count" + servicePropertyList, 1, servicePropertyList.size());
-				AstrixServiceProperties serviceProperties = servicePropertyList.get(0);
-				currentServiceState = Boolean.valueOf(serviceProperties.getProperties().get(AstrixServiceProperties.PUBLISHED));
+				ServiceProperties serviceProperties = servicePropertyList.get(0);
+				currentServiceState = Boolean.valueOf(serviceProperties.getProperties().get(ServiceProperties.PUBLISHED));
 			}
 			
 			@Override

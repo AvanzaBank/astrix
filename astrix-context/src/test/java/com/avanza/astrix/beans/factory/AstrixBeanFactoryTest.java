@@ -24,7 +24,7 @@ import org.junit.Test;
 public class AstrixBeanFactoryTest {
 	
 	
-	@Test(expected = AstrixCircularDependency.class)
+	@Test(expected = CircularDependency.class)
 	public void detectsCircularDependencies1() throws Exception {
 		/*    __________________
 		 *   |                  |
@@ -62,7 +62,7 @@ public class AstrixBeanFactoryTest {
 		beanFactory.getBean(beanKey(Ping.class));
 	}
 	
-	@Test(expected = AstrixCircularDependency.class)
+	@Test(expected = CircularDependency.class)
 	public void detectsCircularDependencies2() throws Exception {
 		/*             _________
 		 *            |         |

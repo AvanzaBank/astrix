@@ -19,10 +19,10 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.service.AstrixServiceComponent;
-import com.avanza.astrix.beans.service.AstrixServiceComponents;
-import com.avanza.astrix.beans.service.AstrixServiceLookupMetaFactoryPlugin;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceComponent;
+import com.avanza.astrix.beans.service.ServiceComponents;
+import com.avanza.astrix.beans.service.ServiceLookupMetaFactoryPlugin;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.ServiceLookup;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
@@ -31,10 +31,10 @@ import com.avanza.astrix.provider.core.AstrixConfigLookup;
  * @author Elias Lindholm (elilin)
  *
  */
-@MetaInfServices(AstrixServiceLookupMetaFactoryPlugin.class)
-public class AstrixConfigServiceLookupPlugin implements AstrixServiceLookupMetaFactoryPlugin<AstrixConfigLookup>, AstrixConfigAware {
+@MetaInfServices(ServiceLookupMetaFactoryPlugin.class)
+public class AstrixConfigServiceLookupPlugin implements ServiceLookupMetaFactoryPlugin<AstrixConfigLookup>, AstrixConfigAware {
 
-	private AstrixServiceComponents serviceComponents;
+	private ServiceComponents serviceComponents;
 	private DynamicConfig config;
 	
 	@Override
@@ -53,18 +53,18 @@ public class AstrixConfigServiceLookupPlugin implements AstrixServiceLookupMetaF
 	}
 	
 	@AstrixInject
-	public void setServiceComponents(AstrixServiceComponents serviceComponents) {
+	public void setServiceComponents(ServiceComponents serviceComponents) {
 		this.serviceComponents = serviceComponents;
 	}
 
 	private static class ConfigLookup implements ServiceLookup {
 
-		private AstrixServiceComponents serviceComponents;
+		private ServiceComponents serviceComponents;
 		private DynamicConfig config;
 		private String configEntryName;
 		
 		
-		public ConfigLookup(AstrixServiceComponents serviceComponents,
+		public ConfigLookup(ServiceComponents serviceComponents,
 				DynamicConfig config, String configEntryName) {
 			super();
 			this.serviceComponents = serviceComponents;
@@ -73,7 +73,7 @@ public class AstrixConfigServiceLookupPlugin implements AstrixServiceLookupMetaF
 		}
 
 		@Override
-		public AstrixServiceProperties lookup() {
+		public ServiceProperties lookup() {
 			String serviceUri = config.getStringProperty(configEntryName, null).get();
 			if (serviceUri == null) {
 				return null;
@@ -86,16 +86,16 @@ public class AstrixConfigServiceLookupPlugin implements AstrixServiceLookupMetaF
 			return "ConfigLookup[" + configEntryName + "]";
 		}
 		
-		private AstrixServiceProperties buildServiceProperties(String serviceUriIncludingComponent) {
+		private ServiceProperties buildServiceProperties(String serviceUriIncludingComponent) {
 			String component = serviceUriIncludingComponent.substring(0, serviceUriIncludingComponent.indexOf(":"));
 			String serviceUri = serviceUriIncludingComponent.substring(serviceUriIncludingComponent.indexOf(":") + 1);
-			AstrixServiceComponent serviceComponent = getServiceComponent(component);
-			AstrixServiceProperties serviceProperties = serviceComponent.createServiceProperties(serviceUri);
+			ServiceComponent serviceComponent = getServiceComponent(component);
+			ServiceProperties serviceProperties = serviceComponent.createServiceProperties(serviceUri);
 			serviceProperties.setComponent(serviceComponent.getName());
 			return serviceProperties;
 		}
 		
-		private AstrixServiceComponent getServiceComponent(String componentName) {
+		private ServiceComponent getServiceComponent(String componentName) {
 			return serviceComponents.getComponent(componentName);
 		}
 

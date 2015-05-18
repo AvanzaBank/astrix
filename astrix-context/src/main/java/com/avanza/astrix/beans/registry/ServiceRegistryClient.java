@@ -20,36 +20,36 @@ import java.util.List;
 import java.util.Objects;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixServiceRegistryClient {
+public class ServiceRegistryClient {
 	
 	private final AstrixServiceRegistry serviceRegistry;
 	private final ServiceConsumerProperties consumerProperties;
 
-	public AstrixServiceRegistryClient(AstrixServiceRegistry serviceRegistry, ServiceConsumerProperties serviceConsumerProperties) {
+	public ServiceRegistryClient(AstrixServiceRegistry serviceRegistry, ServiceConsumerProperties serviceConsumerProperties) {
 		this.consumerProperties = Objects.requireNonNull(serviceConsumerProperties);
 		this.serviceRegistry = Objects.requireNonNull(serviceRegistry);
 	}
 
-	public <T> AstrixServiceProperties lookup(AstrixBeanKey<T> beanKey) {
+	public <T> ServiceProperties lookup(AstrixBeanKey<T> beanKey) {
 		AstrixServiceRegistryEntry entry = serviceRegistry.lookup(beanKey.getBeanType().getName(), beanKey.getQualifier(), consumerProperties);
 		if (entry == null) {
 			return null;
 		}
-		return new AstrixServiceProperties(entry.getServiceProperties());
+		return new ServiceProperties(entry.getServiceProperties());
 	}
 
-	public <T> List<AstrixServiceProperties> list(AstrixBeanKey<T> beanKey) {
+	public <T> List<ServiceProperties> list(AstrixBeanKey<T> beanKey) {
 		List<AstrixServiceRegistryEntry> registeresServices = serviceRegistry.listServices(beanKey.getBeanType().getName(), beanKey.getQualifier());
-		List<AstrixServiceProperties> result = new ArrayList<>(registeresServices.size());
+		List<ServiceProperties> result = new ArrayList<>(registeresServices.size());
 		for (AstrixServiceRegistryEntry entry : registeresServices) {
-			result.add(new AstrixServiceProperties(entry.getServiceProperties()));
+			result.add(new ServiceProperties(entry.getServiceProperties()));
 		}
 		return result;
 	}

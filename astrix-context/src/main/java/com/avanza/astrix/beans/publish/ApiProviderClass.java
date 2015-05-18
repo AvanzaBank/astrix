@@ -22,14 +22,14 @@ import java.util.Objects;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class AstrixApiProviderClass {
+public final class ApiProviderClass {
 	
-	public static AstrixApiProviderClass create(Class<?> providerClass) {
-		return new AstrixApiProviderClass(providerClass);
+	public static ApiProviderClass create(Class<?> providerClass) {
+		return new ApiProviderClass(providerClass);
 	}
 	private Class<?> providerClass;
 
-	private AstrixApiProviderClass(Class<?> annotationHolder) {
+	private ApiProviderClass(Class<?> annotationHolder) {
 		this.providerClass = annotationHolder;
 	}
 	
@@ -62,7 +62,7 @@ public final class AstrixApiProviderClass {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AstrixApiProviderClass other = (AstrixApiProviderClass) obj;
+		ApiProviderClass other = (ApiProviderClass) obj;
 		return Objects.equals(providerClass, other.providerClass);
 	}
 	

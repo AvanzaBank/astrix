@@ -22,9 +22,9 @@ import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.inject.AstrixInjector;
-import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
-import com.avanza.astrix.beans.publish.AstrixApiProviderPlugins;
-import com.avanza.astrix.beans.publish.AstrixApiProviders;
+import com.avanza.astrix.beans.publish.ApiProviderClass;
+import com.avanza.astrix.beans.publish.ApiProviderPlugins;
+import com.avanza.astrix.beans.publish.ApiProviders;
 import com.avanza.astrix.beans.service.StatefulAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
 /**
@@ -37,19 +37,19 @@ import com.avanza.astrix.config.DynamicConfig;
 public class AstrixContextImpl implements Astrix, AstrixContext {
 	
 	private final SimpleAstrixFactoryBeanRegistry beanFactoryRegistry;
-	private final AstrixApiProviderPlugins apiProviderPlugins;
+	private final ApiProviderPlugins apiProviderPlugins;
 	private final AstrixBeanFactory beanFactory;
 	private final DynamicConfig dynamicConfig;
 	private final AstrixInjector astrixInjector;
 	
 	
-	public AstrixContextImpl(DynamicConfig dynamicConfig, AstrixInjector injector, AstrixApiProviderPlugins apiProviderPlugins) {
+	public AstrixContextImpl(DynamicConfig dynamicConfig, AstrixInjector injector, ApiProviderPlugins apiProviderPlugins) {
 		this.dynamicConfig = dynamicConfig;
 		this.astrixInjector = injector;
 		this.apiProviderPlugins = apiProviderPlugins;
 		this.beanFactory = this.astrixInjector.getBean(AstrixBeanFactory.class); // The bean-factory used for apis managed by astrix
 		this.beanFactoryRegistry = (SimpleAstrixFactoryBeanRegistry) this.astrixInjector.getBean(AstrixFactoryBeanRegistry.class);
-		for (AstrixApiProviderClass apiProvider : this.astrixInjector.getBean(AstrixApiProviders.class).getAll()) {
+		for (ApiProviderClass apiProvider : this.astrixInjector.getBean(ApiProviders.class).getAll()) {
 			for (FactoryBean<?> factory : this.apiProviderPlugins.getProviderPlugin(apiProvider).createFactoryBeans(apiProvider)) {
 				this.beanFactoryRegistry.registerFactory(factory);
 			}

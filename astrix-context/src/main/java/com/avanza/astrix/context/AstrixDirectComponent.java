@@ -30,20 +30,20 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.service.AstrixServiceComponent;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceComponent;
+import com.avanza.astrix.beans.service.ServiceContext;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-@MetaInfServices(AstrixServiceComponent.class)
-public class AstrixDirectComponent implements AstrixServiceComponent {
+@MetaInfServices(ServiceComponent.class)
+public class AstrixDirectComponent implements ServiceComponent {
 	
 	private final static AtomicLong idGen = new AtomicLong();
 	private final static Map<String, ServiceProvider<?>> providerById = new ConcurrentHashMap<>();
@@ -64,7 +64,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	
 	
 	@Override
-	public <T> BoundServiceBeanInstance<T> bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
+	public <T> BoundServiceBeanInstance<T> bind(Class<T> type, ServiceContext versioningContext, ServiceProperties serviceProperties) {
 		String providerName = serviceProperties.getProperty("providerId");
 		ServiceProvider<?> serviceProvider = providerById.get(providerName);
 		if (serviceProvider == null) {
@@ -77,7 +77,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	}
 	
 	@Override
-	public AstrixServiceProperties createServiceProperties(String componentSpecificUri) {
+	public ServiceProperties createServiceProperties(String componentSpecificUri) {
 		return getServiceProperties(componentSpecificUri);
 	}
 
@@ -107,19 +107,19 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	}
 	
 	
-	private static <T> String register(Class<T> type, T provider, ServiceVersioningContext serverVersioningContext) {
+	private static <T> String register(Class<T> type, T provider, ServiceContext serverVersioningContext) {
 		String id = String.valueOf(idGen.incrementAndGet());
 		providerById.put(id, new VersioningAwareServiceProvider<>(id, type, provider, serverVersioningContext));
 		return id;
 	}
 	
-	public static <T> AstrixServiceProperties registerAndGetProperties(Class<T> type, T provider) {
+	public static <T> ServiceProperties registerAndGetProperties(Class<T> type, T provider) {
 		String id = register(type, provider);
 		return getServiceProperties(id);
 	}
 	
-	public static AstrixServiceProperties getServiceProperties(String id) {
-		AstrixServiceProperties serviceProperties = new AstrixServiceProperties();
+	public static ServiceProperties getServiceProperties(String id) {
+		ServiceProperties serviceProperties = new ServiceProperties();
 		serviceProperties.setProperty("providerId", id);
 		serviceProperties.setComponent(AstrixServiceComponentNames.DIRECT);
 		ServiceProvider<?> serviceProvider = providerById.get(id);
@@ -127,7 +127,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 			return serviceProperties; // TODO: Throw exception when no service-provider found. Requires rewrite of two unit-tests.
 		}
 		serviceProperties.setApi(serviceProvider.getType());
-		serviceProperties.setProperty(AstrixServiceProperties.PUBLISHED, "true"); 
+		serviceProperties.setProperty(ServiceProperties.PUBLISHED, "true"); 
 		return serviceProperties;
 	}
 	
@@ -144,7 +144,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 		if (provider == null) {
 			throw new IllegalArgumentException("No provider registered with id: " + id);
 		}
-		return provider.getProvider(AstrixVersioningPlugin.Default.create(), ServiceVersioningContext.nonVersioned());
+		return provider.getProvider(AstrixVersioningPlugin.Default.create(), ServiceContext.nonVersioned());
 	}
 	
 	static class ServiceProvider<T> {
@@ -167,7 +167,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 			return type;
 		}
 		
-		public T getProvider(AstrixVersioningPlugin astrixVersioningPlugin, ServiceVersioningContext clientVersioningContext) {
+		public T getProvider(AstrixVersioningPlugin astrixVersioningPlugin, ServiceContext clientVersioningContext) {
 			return provider;
 		}
 	}
@@ -176,9 +176,9 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 		
 		private Class<T> type;
 		private T provider;
-		private ServiceVersioningContext serverVersioningContext;
+		private ServiceContext serverVersioningContext;
 		
-		public VersioningAwareServiceProvider(String id, Class<T> type, T provider, ServiceVersioningContext serverVersioningContext) {
+		public VersioningAwareServiceProvider(String id, Class<T> type, T provider, ServiceContext serverVersioningContext) {
 			super(id, type, provider);
 			this.type = type;
 			this.provider = provider;
@@ -186,7 +186,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 		}
 		
 		@Override
-		public T getProvider(AstrixVersioningPlugin astrixVersioningPlugin, ServiceVersioningContext clientVersioningContext) {
+		public T getProvider(AstrixVersioningPlugin astrixVersioningPlugin, ServiceContext clientVersioningContext) {
 			if (serverVersioningContext.isVersioned() || clientVersioningContext.isVersioned()) {
 				VersionedServiceProviderProxy serializationHandlingProxy = 
 						new VersionedServiceProviderProxy(provider, 
@@ -246,7 +246,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	}
 
 	@Override
-	public <T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext) {
+	public <T> void exportService(Class<T> providedApi, T provider, ServiceContext versioningContext) {
 		String id = register(providedApi, provider);
 		this.idByExportedBean.put(AstrixBeanKey.create(providedApi), id);
 	}
@@ -262,7 +262,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	}
 
 	@Override
-	public <T> AstrixServiceProperties createServiceProperties(Class<T> exportedService) {
+	public <T> ServiceProperties createServiceProperties(Class<T> exportedService) {
 		String id = this.idByExportedBean.get(AstrixBeanKey.create(exportedService));
 		return getServiceProperties(id);
 	}
@@ -273,7 +273,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	}
 	
 	/**
-	 * Registers a a provider for a given api and associates it with the given ServiceVersioningContext. <p>
+	 * Registers a a provider for a given api and associates it with the given ServiceContext. <p>
 	 * 
 	 * Using this method activates serialization/deserialization of service argument/return types. <p>
 	 * 
@@ -281,12 +281,12 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	 * 	pingService.ping("my-arg")
 	 * 
 	 *
-	 * 1. Using the ServiceVersioningContext provided by the api (using @AstrixVersioned) the service arguments will
+	 * 1. Using the ServiceContext provided by the api (using @AstrixVersioned) the service arguments will
 	 *    be serialized.
 	 * 2. All arguments will then be deserialized using the serverVersioningContext passed as to this method during registration of the provider
 	 * 3. The service is invoked with the arguments returned from step 2.
 	 * 4. The return type will be serialized using the serverVersioningContext
-	 * 5. The return type will be deserialized using the ServiceVersioningContext provided by the api.
+	 * 5. The return type will be deserialized using the ServiceContext provided by the api.
 	 * 6. The value is returned.
 	 * 
 	 * @param api
@@ -294,7 +294,7 @@ public class AstrixDirectComponent implements AstrixServiceComponent {
 	 * @param serverVersioningContext
 	 * @return
 	 */
-	public static <T> String registerAndGetUri(Class<T> api, T provider, ServiceVersioningContext serverVersioningContext) {
+	public static <T> String registerAndGetUri(Class<T> api, T provider, ServiceContext serverVersioningContext) {
 		String id = register(api, provider, serverVersioningContext);
 		return getServiceUri(id);
 	}

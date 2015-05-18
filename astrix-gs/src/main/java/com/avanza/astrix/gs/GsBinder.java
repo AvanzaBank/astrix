@@ -24,7 +24,7 @@ import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigAware;
 import com.j_spaces.core.client.SpaceURL;
@@ -76,21 +76,21 @@ public class GsBinder implements AstrixConfigAware {
 		}
 	}
 	
-	public AstrixServiceProperties createProperties(GigaSpace space) {
-		AstrixServiceProperties result = new AstrixServiceProperties();
+	public ServiceProperties createProperties(GigaSpace space) {
+		ServiceProperties result = new ServiceProperties();
 		result.setApi(GigaSpace.class);
 		result.setProperty(SPACE_NAME_PROPERTY, space.getSpace().getName());
 		result.setProperty(SPACE_URL_PROPERTY, new SpaceUrlBuilder(space).buildSpaceUrl());
 		return result;
 	}
 
-	public AstrixServiceProperties createServiceProperties(String spaceUrl) {
+	public ServiceProperties createServiceProperties(String spaceUrl) {
 		Matcher spaceUrlMatcher = SPACE_URL_PATTERN.matcher(spaceUrl);
 		if (!spaceUrlMatcher.find()) {
 			throw new IllegalArgumentException("Invalid spaceUrl: " + spaceUrl);
 		}
 		String spaceName = spaceUrlMatcher.group(1);
-		AstrixServiceProperties result = new AstrixServiceProperties();
+		ServiceProperties result = new ServiceProperties();
 		result.setApi(GigaSpace.class);
 		result.setProperty(SPACE_NAME_PROPERTY, spaceName);
 		result.setProperty(SPACE_URL_PROPERTY, spaceUrl);

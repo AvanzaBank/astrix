@@ -23,13 +23,13 @@ import java.util.List;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
-import com.avanza.astrix.beans.service.AstrixServiceLookupMetaFactory;
+import com.avanza.astrix.beans.publish.ApiProviderClass;
+import com.avanza.astrix.beans.service.ServiceLookupMetaFactory;
+import com.avanza.astrix.beans.service.ServiceContext;
 import com.avanza.astrix.context.AstrixPublishedBeanDefinitionMethod;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryLookup;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.provider.versioning.Versioned;
 
 /**
@@ -40,10 +40,10 @@ import com.avanza.astrix.provider.versioning.Versioned;
 @MetaInfServices(ServiceProviderPlugin.class)
 public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	
-	private AstrixServiceLookupMetaFactory serviceLookupFactory;
+	private ServiceLookupMetaFactory serviceLookupFactory;
 
 	@Override
-	public List<ServiceBeanDefinition> getProvidedServices(AstrixApiProviderClass apiProvider) {
+	public List<ServiceBeanDefinition> getProvidedServices(ApiProviderClass apiProvider) {
 		List<ServiceBeanDefinition> result = new ArrayList<>();
 		for (Method astrixBeanDefinitionMethod : apiProvider.getProviderClass().getMethods()) {
 			AstrixPublishedBeanDefinitionMethod beanDefinition = AstrixPublishedBeanDefinitionMethod.create(astrixBeanDefinitionMethod);
@@ -51,24 +51,24 @@ public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 				continue;
 			}
 			boolean usesServiceRegistry = this.serviceLookupFactory.getLookupStrategy(astrixBeanDefinitionMethod).equals(AstrixServiceRegistryLookup.class);
-			ServiceVersioningContext versioningContext = createVersioningContext(apiProvider, beanDefinition);
+			ServiceContext versioningContext = createVersioningContext(apiProvider, beanDefinition);
 			result.add(new ServiceBeanDefinition(beanDefinition.getBeanKey(), versioningContext, usesServiceRegistry, beanDefinition.getServiceComponentName()));
 		}
 		return result;
 	}
 	
 
-	private ServiceVersioningContext createVersioningContext(AstrixApiProviderClass apiProvider, AstrixPublishedBeanDefinitionMethod serviceDefinition) {
+	private ServiceContext createVersioningContext(ApiProviderClass apiProvider, AstrixPublishedBeanDefinitionMethod serviceDefinition) {
 		Class<?> declaringApi = apiProvider.getProviderClass();
 		if (!(declaringApi.isAnnotationPresent(Versioned.class) || serviceDefinition.isVersioned())) {
-			return ServiceVersioningContext.nonVersioned(serviceDefinition.getServiceConfigClass());
+			return ServiceContext.nonVersioned(serviceDefinition.getServiceConfigClass());
 		}
 		if (!apiProvider.isAnnotationPresent(AstrixObjectSerializerConfig.class)) {
 			throw new IllegalArgumentException("Illegal api-provider. Api is versioned but provider does not declare a @AstrixObjectSerializerConfig." +
 					" providedService=" + serviceDefinition.getBeanType().getName() + ", provider=" + apiProvider.getName());
 		} 
 		AstrixObjectSerializerConfig serializerConfig = apiProvider.getAnnotation(AstrixObjectSerializerConfig.class);
-		return ServiceVersioningContext.versionedService(serializerConfig.version(), serializerConfig.objectSerializerConfigurer(), serviceDefinition.getServiceConfigClass());
+		return ServiceContext.versionedService(serializerConfig.version(), serializerConfig.objectSerializerConfigurer(), serviceDefinition.getServiceConfigClass());
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	}
 	
 	@AstrixInject
-	public void setServiceLookupFactory(AstrixServiceLookupMetaFactory serviceLookupFactory) {
+	public void setServiceLookupFactory(ServiceLookupMetaFactory serviceLookupFactory) {
 		this.serviceLookupFactory = serviceLookupFactory;
 	}
 	

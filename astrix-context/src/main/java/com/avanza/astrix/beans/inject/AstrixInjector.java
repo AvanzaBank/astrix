@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,8 +32,8 @@ import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
-import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
+import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 /**
  * 

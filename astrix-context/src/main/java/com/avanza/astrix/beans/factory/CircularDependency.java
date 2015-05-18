@@ -13,23 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.publish;
+package com.avanza.astrix.beans.factory;
 
-import java.util.Collection;
+import java.util.Stack;
+
+
 
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AstrixApiProviders {
+public class CircularDependency extends RuntimeException {
 
-	/**
-	 * Strategy for locating all AstrixApiProviderClass's available in
-	 * the current runtime. <p>
-	 * 
-	 * @return
-	 */
-	Collection<AstrixApiProviderClass> getAll();
-	
+	private static final long serialVersionUID = 1L;
+
+	public CircularDependency(Stack<AstrixBeanKey<?>> trace) {
+		super("Circular dependency detected, dependency tree:\n" + createTrace(trace));
+	}
+
+	private static String createTrace(Stack<AstrixBeanKey<?>> trace) {
+		StringBuilder result = new StringBuilder();
+		StringBuilder indent = new StringBuilder();
+		for (AstrixBeanKey<?> key : trace) {
+			result.append(indent.toString()).append(key).append("\n");
+			indent.append("  ");
+		}
+		return result.toString();
+	}
+
 }

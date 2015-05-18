@@ -99,7 +99,7 @@ public class AstrixBeanFactory {
 		
 		private <T> AstrixBeanInstance<? extends T> doCreateBean(final AstrixBeanKey<T> beanKey) {
 			if (constructionStack.contains(beanKey)) {
-				throw new AstrixCircularDependency(constructionStack);
+				throw new CircularDependency(constructionStack);
 			}
 			constructionStack.add(beanKey);
 			StandardFactoryBean<? extends T> factoryBean = registry.getFactoryBean(beanKey);

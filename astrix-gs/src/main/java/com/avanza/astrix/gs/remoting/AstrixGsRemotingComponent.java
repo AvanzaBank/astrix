@@ -19,8 +19,9 @@ import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.service.AstrixServiceComponent;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceComponent;
+import com.avanza.astrix.beans.service.ServiceContext;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.context.AstrixVersioningPlugin;
 import com.avanza.astrix.core.AstrixObjectSerializer;
@@ -30,7 +31,6 @@ import com.avanza.astrix.gs.ClusteredProxyCache;
 import com.avanza.astrix.gs.ClusteredProxyCache.GigaSpaceInstance;
 import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.remoting.client.RemotingProxy;
 import com.avanza.astrix.remoting.client.RemotingTransport;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
@@ -41,8 +41,8 @@ import com.avanza.astrix.spring.AstrixSpringContext;
  * @author Elias Lindholm
  *
  */
-@MetaInfServices(AstrixServiceComponent.class)
-public class AstrixGsRemotingComponent implements AstrixServiceComponent {
+@MetaInfServices(ServiceComponent.class)
+public class AstrixGsRemotingComponent implements ServiceComponent {
 
 	private GsBinder gsBinder;
 	private AstrixFaultTolerance faultTolerance;
@@ -52,7 +52,7 @@ public class AstrixGsRemotingComponent implements AstrixServiceComponent {
 	private ClusteredProxyCache proxyCache;
 	
 	@Override
-	public <T> BoundServiceBeanInstance<T> bind(ServiceVersioningContext versioningContext, Class<T> api, AstrixServiceProperties serviceProperties) {
+	public <T> BoundServiceBeanInstance<T> bind(Class<T> api, ServiceContext versioningContext, ServiceProperties serviceProperties) {
 		AstrixObjectSerializer objectSerializer = versioningPlugin.create(versioningContext);
 		
 		GigaSpaceInstance proxyInstance = proxyCache.getProxy(serviceProperties);
@@ -63,7 +63,7 @@ public class AstrixGsRemotingComponent implements AstrixServiceComponent {
 	}
 	
 	@Override
-	public AstrixServiceProperties createServiceProperties(String serviceUri) {
+	public ServiceProperties createServiceProperties(String serviceUri) {
 		return gsBinder.createServiceProperties(serviceUri);
 	}
 	
@@ -78,7 +78,7 @@ public class AstrixGsRemotingComponent implements AstrixServiceComponent {
 	}
 	
 	@Override
-	public <T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext) {
+	public <T> void exportService(Class<T> providedApi, T provider, ServiceContext versioningContext) {
 		AstrixObjectSerializer objectSerializer = versioningPlugin.create(versioningContext); 
 		this.serviceActivator.register(provider, objectSerializer, providedApi);
 	}
@@ -125,9 +125,9 @@ public class AstrixGsRemotingComponent implements AstrixServiceComponent {
 	}
 
 	@Override
-	public <T> AstrixServiceProperties createServiceProperties(Class<T> exportedService) {
+	public <T> ServiceProperties createServiceProperties(Class<T> exportedService) {
 		GigaSpace space = gsBinder.getEmbeddedSpace(astrixSpringContext.getApplicationContext());
-		AstrixServiceProperties serviceProperties = gsBinder.createProperties(space);
+		ServiceProperties serviceProperties = gsBinder.createProperties(space);
 		return serviceProperties;
 	}
 	

@@ -22,6 +22,6 @@ package com.avanza.astrix.beans.service;
  *
  */
 public interface ServiceLookup {
-	AstrixServiceProperties lookup();
+	ServiceProperties lookup();
 	String description();
 }

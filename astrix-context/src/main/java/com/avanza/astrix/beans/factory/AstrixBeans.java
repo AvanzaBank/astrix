@@ -24,7 +24,7 @@ import java.util.Set;
  * 
  * If the instance isn't created before it will be created when first
  * requested. The AstrixBeanFactory will detect circular dependencies
- * and throw a {@link AstrixCircularDependency} if two beans depend
+ * and throw a {@link CircularDependency} if two beans depend
  * on each other.
  * 
  * @author Elias Lindholm (elilin)

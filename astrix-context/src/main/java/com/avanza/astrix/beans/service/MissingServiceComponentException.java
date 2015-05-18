@@ -13,33 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.factory;
-
-import java.util.Stack;
-
-
-
+package com.avanza.astrix.beans.service;
 /**
- * 
  * @author Elias Lindholm (elilin)
- *
  */
-public class AstrixCircularDependency extends RuntimeException {
+public class MissingServiceComponentException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	public AstrixCircularDependency(Stack<AstrixBeanKey<?>> trace) {
-		super("Circular dependency detected, dependency tree:\n" + createTrace(trace));
-	}
-
-	private static String createTrace(Stack<AstrixBeanKey<?>> trace) {
-		StringBuilder result = new StringBuilder();
-		StringBuilder indent = new StringBuilder();
-		for (AstrixBeanKey<?> key : trace) {
-			result.append(indent.toString()).append(key).append("\n");
-			indent.append("  ");
-		}
-		return result.toString();
+	public MissingServiceComponentException(String message) {
+		super(message);
 	}
 
 }

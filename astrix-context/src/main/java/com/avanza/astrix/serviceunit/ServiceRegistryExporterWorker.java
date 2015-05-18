@@ -29,7 +29,7 @@ import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicLongProperty;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -99,7 +99,7 @@ public class ServiceRegistryExporterWorker extends Thread implements AstrixPubli
 
 	private void exportProvidedServcies() {
 		for (ServiceRegistryExportedService exportedService : exportedServices) {
-			AstrixServiceProperties serviceProperties = exportedService.exportServiceProperties();
+			ServiceProperties serviceProperties = exportedService.exportServiceProperties();
 			serviceRegistryProviderClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());
 			log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 			if (exportedService.exportsAsyncApi()) {

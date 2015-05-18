@@ -24,7 +24,6 @@ import com.avanza.astrix.beans.factory.DynamicFactoryBean;
 import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 /**
  * 
@@ -32,19 +31,19 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  *
  * @param <T>
  */
-public class AstrixServiceFactory<T> implements DynamicFactoryBean<T> {
+public class ServiceFactory<T> implements DynamicFactoryBean<T> {
 
-	private final AstrixServiceComponents serviceComponents;
+	private final ServiceComponents serviceComponents;
 	private final ServiceLookupFactory<?> serviceLookupFactory;
-	private final AstrixServiceLeaseManager leaseManager;
-	private final ServiceVersioningContext versioningContext;
+	private final ServiceLeaseManager leaseManager;
+	private final ServiceContext versioningContext;
 	private final DynamicConfig config;
 	private final Class<T> type;
 
-	public AstrixServiceFactory(ServiceVersioningContext versioningContext, 
+	public ServiceFactory(ServiceContext versioningContext, 
 								ServiceLookupFactory<?> serviceLookup, 
-								AstrixServiceComponents serviceComponents, 
-								AstrixServiceLeaseManager leaseManager,
+								ServiceComponents serviceComponents, 
+								ServiceLeaseManager leaseManager,
 								DynamicConfig config,
 								Class<T> type) {
 		this.config = config;
@@ -57,7 +56,7 @@ public class AstrixServiceFactory<T> implements DynamicFactoryBean<T> {
 
 	public T create(AstrixBeanKey<T> beanKey) {
 		ServiceLookup serviceLookup = serviceLookupFactory.create(beanKey);
-		AstrixServiceBeanInstance<T> serviceBeanInstance = AstrixServiceBeanInstance.create(versioningContext, beanKey, serviceLookup, serviceComponents, config);
+		ServiceBeanInstance<T> serviceBeanInstance = ServiceBeanInstance.create(versioningContext, beanKey, serviceLookup, serviceComponents, config);
 		serviceBeanInstance.bind();
 		leaseManager.startManageLease(serviceBeanInstance);
 		return beanKey.getBeanType().cast(
@@ -71,31 +70,31 @@ public class AstrixServiceFactory<T> implements DynamicFactoryBean<T> {
 		return type;
 	}
 
-	public static <T> FactoryBean<T> dynamic(ServiceVersioningContext versioningContext, 
+	public static <T> FactoryBean<T> dynamic(ServiceContext versioningContext, 
 													Class<T> beanType, 
 													ServiceLookupFactory<?> serviceLookup, 
-													AstrixServiceComponents serviceComponents, 
-													AstrixServiceLeaseManager leaseManager,
+													ServiceComponents serviceComponents, 
+													ServiceLeaseManager leaseManager,
 													DynamicConfig config) {
-		return new AstrixServiceFactory<T>(versioningContext, serviceLookup, serviceComponents, leaseManager, config, beanType);
+		return new ServiceFactory<T>(versioningContext, serviceLookup, serviceComponents, leaseManager, config, beanType);
 	}
 	
-	public static <T> FactoryBean<T> standard(ServiceVersioningContext versioningContext, 
+	public static <T> FactoryBean<T> standard(ServiceContext versioningContext, 
 													AstrixBeanKey<T> beanType, 
 													ServiceLookupFactory<?> serviceLookup, 
-													AstrixServiceComponents serviceComponents, 
-													AstrixServiceLeaseManager leaseManager,
+													ServiceComponents serviceComponents, 
+													ServiceLeaseManager leaseManager,
 													DynamicConfig config) {
-		AstrixServiceFactory<T> serviceFactory = new AstrixServiceFactory<T>(versioningContext, serviceLookup, serviceComponents, leaseManager, config, beanType.getBeanType());
+		ServiceFactory<T> serviceFactory = new ServiceFactory<T>(versioningContext, serviceLookup, serviceComponents, leaseManager, config, beanType.getBeanType());
 		return new FactoryBeanAdapter<T>(serviceFactory, beanType);
 	}
 	
 	private static class FactoryBeanAdapter<T> implements StandardFactoryBean<T> {
 
-		private AstrixServiceFactory<T> serviceFactory;
+		private ServiceFactory<T> serviceFactory;
 		private AstrixBeanKey<T> beanKey;
 		
-		public FactoryBeanAdapter(AstrixServiceFactory<T> serviceFactory,
+		public FactoryBeanAdapter(ServiceFactory<T> serviceFactory,
 				AstrixBeanKey<T> beanKey) {
 			this.serviceFactory = serviceFactory;
 			this.beanKey = beanKey;

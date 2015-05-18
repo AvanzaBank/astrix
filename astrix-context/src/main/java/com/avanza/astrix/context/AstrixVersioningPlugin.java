@@ -15,20 +15,20 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.beans.service.ServiceContext;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixObjectSerializer.NoVersioningSupport;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 
 public interface AstrixVersioningPlugin {
 	
-	public AstrixObjectSerializer create(ServiceVersioningContext versioningContext);
+	public AstrixObjectSerializer create(ServiceContext versioningContext);
 	
 	public static class Default {
 		public static AstrixVersioningPlugin create() {
 			return new AstrixVersioningPlugin() {
 				@Override
-				public AstrixObjectSerializer create(ServiceVersioningContext versioningContext) {
+				public AstrixObjectSerializer create(ServiceContext versioningContext) {
 					return new NoVersioningSupport();
 				}
 			};

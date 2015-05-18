@@ -17,7 +17,7 @@ package com.avanza.astrix.beans.registry;
 
 import org.codehaus.jackson.node.ObjectNode;
 
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
 import com.avanza.astrix.provider.versioning.AstrixJsonMessageMigration;
 
@@ -49,17 +49,17 @@ public class ServiceRegistryV1ApiMigration implements AstrixJsonApiMigration {
 			String qualifier = json.get("serviceProperties").get("_qualifier").getTextValue();
 			String api = json.get("serviceProperties").get("_api").getTextValue();
 			String applicationInstanceId = api + "_" + qualifier; 
-			ObjectNode.class.cast(json.get("serviceProperties")).put(AstrixServiceProperties.APPLICATION_INSTANCE_ID, applicationInstanceId);
+			ObjectNode.class.cast(json.get("serviceProperties")).put(ServiceProperties.APPLICATION_INSTANCE_ID, applicationInstanceId);
 			
 			// ServiceState was introduced to allow multiple servers providing same service. 
 			// We assume old servers are not run concurrently and hence alwasy assume them to be active
-//			ObjectNode.class.cast(json.get("serviceProperties")).put(AstrixServiceProperties., ServiceState.ACTIVE);
+//			ObjectNode.class.cast(json.get("serviceProperties")).put(ServiceProperties., ServiceState.ACTIVE);
 		}
 
 		@Override
 		public void downgrade(ObjectNode json) {
-			ObjectNode.class.cast(json.get("serviceProperties")).remove(AstrixServiceProperties.APPLICATION_INSTANCE_ID);
-//			ObjectNode.class.cast(json.get("serviceProperties")).remove(AstrixServiceProperties.SERVICE_STATE);
+			ObjectNode.class.cast(json.get("serviceProperties")).remove(ServiceProperties.APPLICATION_INSTANCE_ID);
+//			ObjectNode.class.cast(json.get("serviceProperties")).remove(ServiceProperties.SERVICE_STATE);
 		}
 	}
 

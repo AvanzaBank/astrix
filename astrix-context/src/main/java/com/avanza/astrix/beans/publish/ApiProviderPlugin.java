@@ -19,30 +19,26 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 import com.avanza.astrix.beans.factory.FactoryBean;
-import com.avanza.astrix.beans.service.AstrixServiceComponent;
+import com.avanza.astrix.context.GenericAstrixApiProviderPlugin;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
 
 
 /**
- * An AstrixApiProviderPlugin is responsible for creating StandardFactoryBean for
+ * An ApiProviderPlugin is responsible for creating a {@link FactoryBean} for
  * all parts of a given "type" of api. By "type" in this context, we don't mean the
  * different api's that are hooked into Astrix for consumption, but rather a mechanism
  * for an api-provider to publish the different part's of the api, thereby allowing it
- * to be consumed using Astrix.
+ * to be consumed using Astrix.<p>
  * 
- * For instance, one type of api is "library", which is handled by the {@link AstrixLibraryProviderPlugin}. It
- * allows api-providers to export api's that require "a lot" of wiring on the client side by annotating
- * a class with @AstrixServiceProvider an export different api-elements by annotating factory methods
- * for different api elements with @AstrixExport. 
- * 
- * Another type of api is a "service" api, which binds to services using an {@link AstrixServiceComponent}.
- * This typically also requires a server side component to respond to the service-invocation-request.
+ * Astrix comes with the {@link GenericAstrixApiProviderPlugin} which handles api-providers
+ * annotated with {@link AstrixApiProvider}, see {@link AstrixApiProvider} for more information.<p> 
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AstrixApiProviderPlugin {
+public interface ApiProviderPlugin {
 	
-	List<FactoryBean<?>> createFactoryBeans(AstrixApiProviderClass apiProviderClass);
+	List<FactoryBean<?>> createFactoryBeans(ApiProviderClass apiProviderClass);
 	
 	Class<? extends Annotation> getProviderAnnotationType();
 	

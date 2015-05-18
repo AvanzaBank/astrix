@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.service.ServiceContext;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
 import com.avanza.astrix.provider.core.AstrixDynamicQualifier;
@@ -27,7 +28,6 @@ import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.provider.versioning.Versioned;
 
 
@@ -99,7 +99,7 @@ public class AstrixApiProviderTest {
 	public void versionedApi() throws Exception {
 		String pingServiceUri = AstrixDirectComponent.registerAndGetUri(PingService.class, 
 																		new PingServiceImpl(), 
-																		ServiceVersioningContext.versionedService(1, DummyObjectSerializerConfigurer.class));
+																		ServiceContext.versionedService(1, DummyObjectSerializerConfigurer.class));
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerPlugin(AstrixVersioningPlugin.class, new JavaSerializationVersioningPlugin());
@@ -116,10 +116,10 @@ public class AstrixApiProviderTest {
 	public void apiWithVersionedAnNonVersionedService() throws Exception {
 		String pingServiceUri = AstrixDirectComponent.registerAndGetUri(PingService.class, 
 																		new PingServiceImpl(), 
-																		ServiceVersioningContext.versionedService(1, DummyObjectSerializerConfigurer.class));
+																		ServiceContext.versionedService(1, DummyObjectSerializerConfigurer.class));
 		String internalPingServiceUri = AstrixDirectComponent.registerAndGetUri(InternalPingService.class, 
 																		new InternalPingServiceImpl(), 
-																		ServiceVersioningContext.nonVersioned());
+																		ServiceContext.nonVersioned());
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerPlugin(AstrixVersioningPlugin.class, new JavaSerializationVersioningPlugin());

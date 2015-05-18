@@ -28,7 +28,7 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 import com.avanza.astrix.beans.registry.ServiceKey;
 import com.avanza.astrix.beans.registry.ServiceProviderKey;
 import com.avanza.astrix.beans.registry.ServiceRegistryEntryRepository;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 
 public class SpaceServiceRegistryEntryRepository implements ServiceRegistryEntryRepository {
 	
@@ -43,9 +43,9 @@ public class SpaceServiceRegistryEntryRepository implements ServiceRegistryEntry
 	public void insertOrUpdate(AstrixServiceRegistryEntry entry, long lease) {
 		SpaceServiceRegistryEntry spaceEntry = new SpaceServiceRegistryEntry();
 		spaceEntry.setApiType(entry.getServiceBeanType());
-		ServiceKey serviceKey = new ServiceKey(entry.getServiceBeanType(), entry.getServiceProperties().get(AstrixServiceProperties.QUALIFIER));
+		ServiceKey serviceKey = new ServiceKey(entry.getServiceBeanType(), entry.getServiceProperties().get(ServiceProperties.QUALIFIER));
 		spaceEntry.setServiceKey(serviceKey);
-		String applicationInstanceId = entry.getServiceProperties().get(AstrixServiceProperties.APPLICATION_INSTANCE_ID);
+		String applicationInstanceId = entry.getServiceProperties().get(ServiceProperties.APPLICATION_INSTANCE_ID);
 		ServiceProviderKey serviceProviderKey = ServiceProviderKey.create(serviceKey, applicationInstanceId);
 		spaceEntry.setServiceProviderKey(serviceProviderKey);
 		spaceEntry.setProperties(entry.getServiceProperties());

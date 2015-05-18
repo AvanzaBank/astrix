@@ -20,11 +20,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
-import com.avanza.astrix.beans.service.AstrixServiceComponent;
-import com.avanza.astrix.beans.service.AstrixServiceComponents;
+import com.avanza.astrix.beans.publish.ApiProviderClass;
+import com.avanza.astrix.beans.service.ServiceComponent;
+import com.avanza.astrix.beans.service.ServiceComponents;
+import com.avanza.astrix.beans.service.ServiceContext;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 /**
  * Server side component used to export all services provided by a given server as defined by
@@ -35,7 +35,7 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  */
 public class ServiceExporter {
 	
-	private AstrixServiceComponents serviceComponents;
+	private ServiceComponents serviceComponents;
 	private AstrixApplicationDescriptor applicationDescriptor;
 	private final Collection<ServiceBeanDefinition> serviceBeanDefinitions = new CopyOnWriteArrayList<>();
 	private final ServiceRegistryExporter serviceRegistryExporter;
@@ -44,7 +44,7 @@ public class ServiceExporter {
 	
 	
 	
-	public ServiceExporter(AstrixServiceComponents serviceComponents, ServiceRegistryExporter serviceRegistryExporter, ServiceProviderPlugins serviceProviderPlugins) {
+	public ServiceExporter(ServiceComponents serviceComponents, ServiceRegistryExporter serviceRegistryExporter, ServiceProviderPlugins serviceProviderPlugins) {
 		this.serviceComponents = serviceComponents;
 		this.serviceRegistryExporter = serviceRegistryExporter;
 		this.serviceProviderPlugins = serviceProviderPlugins;
@@ -68,7 +68,7 @@ public class ServiceExporter {
 
 	public void setServiceDescriptor(AstrixApplicationDescriptor applicationDescriptor) {
 		this.applicationDescriptor = applicationDescriptor;		// TODO: How to inject service descriptor??? 
-		for (AstrixApiProviderClass api : applicationDescriptor.exportsRemoteServicesFor()) {
+		for (ApiProviderClass api : applicationDescriptor.exportsRemoteServicesFor()) {
 			this.serviceBeanDefinitions.addAll(serviceProviderPlugins.getExportedServices(api));
 		}
 	}
@@ -80,8 +80,8 @@ public class ServiceExporter {
 
 	public void exportProvidedServices() {
 		for (ServiceBeanDefinition serviceBeanDefintion : serviceBeanDefinitions) {
-			ServiceVersioningContext versioningContext = serviceBeanDefintion.getVersioningContext();
-			AstrixServiceComponent serviceComponent = getServiceComponent(serviceBeanDefintion);
+			ServiceContext versioningContext = serviceBeanDefintion.getVersioningContext();
+			ServiceComponent serviceComponent = getServiceComponent(serviceBeanDefintion);
 			Object provider = null;
 			if (serviceComponent.requiresProviderInstance()) {
 				provider = getProvider(serviceBeanDefintion);
@@ -105,11 +105,11 @@ public class ServiceExporter {
 		return provider;
 	}
 	
-	private <T> void exportService(Class<T> providedApi, Object provider, ServiceVersioningContext versioningContext, AstrixServiceComponent serviceComponent) {
+	private <T> void exportService(Class<T> providedApi, Object provider, ServiceContext versioningContext, ServiceComponent serviceComponent) {
 		serviceComponent.exportService(providedApi, providedApi.cast(provider), versioningContext);
 	}
 
-	private AstrixServiceComponent getServiceComponent(ServiceBeanDefinition serviceBeanDefinition) {
+	private ServiceComponent getServiceComponent(ServiceBeanDefinition serviceBeanDefinition) {
 		if (serviceBeanDefinition.getComponentName() != null) {
 			return this.serviceComponents.getComponent(serviceBeanDefinition.getComponentName());
 		}

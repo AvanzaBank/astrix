@@ -40,7 +40,6 @@ import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigLookup;
 import com.avanza.astrix.provider.core.Service;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 import com.avanza.astrix.test.util.Supplier;
@@ -130,7 +129,7 @@ public class ServiceBeanInstanceTest {
 		Ping ping = astrixContext.getBean(Ping.class);
 		assertEquals("foo", ping.ping("foo"));
 
-		AstrixDirectComponent directComponent = astrixContext.getInstance(AstrixServiceComponents.class).getComponent(AstrixDirectComponent.class);
+		AstrixDirectComponent directComponent = astrixContext.getInstance(ServiceComponents.class).getComponent(AstrixDirectComponent.class);
 		assertEquals(2, directComponent.getBoundServices().size());
 		assertThat("Expected at least one service to be bound after pingBean is bound", directComponent.getBoundServices().size(), greaterThanOrEqualTo(1));
 		
@@ -152,7 +151,7 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 		
-		AstrixDirectComponent directComponent = astrixContext.getInstance(AstrixServiceComponents.class).getComponent(AstrixDirectComponent.class);
+		AstrixDirectComponent directComponent = astrixContext.getInstance(ServiceComponents.class).getComponent(AstrixDirectComponent.class);
 
 		final Ping ping = astrixContext.getBean(Ping.class);
 		ping.ping("foo");
@@ -235,7 +234,7 @@ public class ServiceBeanInstanceTest {
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApiProviderUsingConfigLookup.class);
-		astrixConfigurer.registerPlugin(AstrixServiceComponent.class, new FakeComponent());
+		astrixConfigurer.registerPlugin(ServiceComponent.class, new FakeComponent());
 		astrixConfigurer.set("pingUri", "test:");
 		astrixContext = astrixConfigurer.configure();
 
@@ -252,7 +251,7 @@ public class ServiceBeanInstanceTest {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
 		astrixConfigurer.registerApiProvider(PingApiProviderUsingConfigLookup.class);
-		astrixConfigurer.registerPlugin(AstrixServiceComponent.class, new FakeComponent());
+		astrixConfigurer.registerPlugin(ServiceComponent.class, new FakeComponent());
 		AstrixContext astrixContext = astrixConfigurer.configure();
 
 		// Get bean, will be unbound
@@ -267,7 +266,7 @@ public class ServiceBeanInstanceTest {
 	static class FakeComponent extends AstrixDirectComponent {
 		
 		@Override
-		public <T> BoundServiceBeanInstance<T> bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
+		public <T> BoundServiceBeanInstance<T> bind(Class<T> type, ServiceContext versioningContext, ServiceProperties serviceProperties) {
 			throw new IllegalServiceMetadataException("Illegal metadata");
 		}
 		

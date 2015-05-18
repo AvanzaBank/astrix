@@ -16,7 +16,7 @@
 package com.avanza.astrix.serviceunit;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
+import com.avanza.astrix.beans.service.ServiceContext;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -28,10 +28,10 @@ public class ServiceBeanDefinition {
 	private String componentName;
 	private boolean usesServiceRegistry;
 	private boolean alwaysActive;
-	private ServiceVersioningContext versioningContext;
+	private ServiceContext versioningContext;
 	
 	public ServiceBeanDefinition(AstrixBeanKey<?> beanKey,
-								 ServiceVersioningContext versioningContext,
+								 ServiceContext versioningContext,
 							     boolean usesServiceRegistry,
 								 String componentName) {
 		this.beanKey = beanKey;
@@ -42,7 +42,7 @@ public class ServiceBeanDefinition {
 	}
 	
 	public ServiceBeanDefinition(AstrixBeanKey<?> beanKey,
-			 ServiceVersioningContext versioningContext,
+			 ServiceContext versioningContext,
 		     boolean usesServiceRegistry,
 		     boolean alwaysActive,
 			 String componentName) {
@@ -72,7 +72,7 @@ public class ServiceBeanDefinition {
 		return componentName;
 	}
 
-	public ServiceVersioningContext getVersioningContext() {
+	public ServiceContext getVersioningContext() {
 		return versioningContext;
 	}
 

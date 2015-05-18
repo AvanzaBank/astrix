@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.service.registry.client.AstrixServiceRegistryAdministrator;
 
 @RestController
@@ -60,14 +60,14 @@ public class ServiceRegistryController {
 		List<AstrixServiceRegistryEntry> services = serviceRegistryAdmin.listServices();
 		List<ServiceDataSummary> result = new ArrayList<>();
 		for (AstrixServiceRegistryEntry entry : services) {
-			AstrixServiceProperties serviceProperties = new AstrixServiceProperties(entry.getServiceProperties());
+			ServiceProperties serviceProperties = new ServiceProperties(entry.getServiceProperties());
 			ServiceDataSummary s = new ServiceDataSummary();
 			if (serviceProperties.getQualifier() != null) {
-				s.setApiKey(serviceProperties.getProperty(AstrixServiceProperties.API) + ":" + serviceProperties.getQualifier());
+				s.setApiKey(serviceProperties.getProperty(ServiceProperties.API) + ":" + serviceProperties.getQualifier());
 			} else {
-				s.setApiKey(serviceProperties.getProperty(AstrixServiceProperties.API) + ":-");
+				s.setApiKey(serviceProperties.getProperty(ServiceProperties.API) + ":-");
 			}
-			s.setSubsystem(serviceProperties.getProperty(AstrixServiceProperties.SUBSYSTEM));
+			s.setSubsystem(serviceProperties.getProperty(ServiceProperties.SUBSYSTEM));
 			StringBuilder serviceUriBuilder = new StringBuilder();
 			serviceUriBuilder.append(serviceProperties.getComponent()).append(":");
 			boolean prependAmpersand = false;

@@ -17,7 +17,7 @@ package com.avanza.astrix.beans.registry;
 
 import java.util.Objects;
 
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -28,7 +28,7 @@ public class ServiceRegistryExporterClient {
 	/*
 	 * DESIGN NOTE:
 	 * 
-	 * AstrixServiceRegistryClient (used by consumers to lookup services) and ServiceRegistryExporterClient
+	 * ServiceRegistryClient (used by consumers to lookup services) and ServiceRegistryExporterClient
 	 * (used by servers to register provided services) are split into two interfaces. The main reason
 	 * is to allow plugins in Astrix to override the AstrixSettings.APPLICATION_INSTANCE_ID, which can only
 	 * be overridden until an instance of ServiceRegistryExporterClient is created for the first time.
@@ -50,10 +50,10 @@ public class ServiceRegistryExporterClient {
 		this.applicationInstanceId = Objects.requireNonNull(applicationInstanceId);
 	}
 
-	public <T> void register(Class<T> type, AstrixServiceProperties properties, long lease) {
-		properties.setProperty(AstrixServiceProperties.SUBSYSTEM, this.subsystem);
-		properties.setProperty(AstrixServiceProperties.APPLICATION_INSTANCE_ID, this.applicationInstanceId);
-		properties.setProperty(AstrixServiceProperties.SERVICE_ZONE, zone);
+	public <T> void register(Class<T> type, ServiceProperties properties, long lease) {
+		properties.setProperty(ServiceProperties.SUBSYSTEM, this.subsystem);
+		properties.setProperty(ServiceProperties.APPLICATION_INSTANCE_ID, this.applicationInstanceId);
+		properties.setProperty(ServiceProperties.SERVICE_ZONE, zone);
 		AstrixServiceRegistryEntry entry = new AstrixServiceRegistryEntry();
 		entry.setServiceProperties(properties.getProperties());
 		entry.setServiceBeanType(type.getName());

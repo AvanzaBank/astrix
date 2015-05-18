@@ -18,12 +18,12 @@ package com.avanza.astrix.context;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.service.AstrixServiceComponents;
-import com.avanza.astrix.beans.service.AstrixServiceFactory;
-import com.avanza.astrix.beans.service.AstrixServiceLeaseManager;
+import com.avanza.astrix.beans.service.ServiceComponents;
+import com.avanza.astrix.beans.service.ServiceFactory;
+import com.avanza.astrix.beans.service.ServiceLeaseManager;
+import com.avanza.astrix.beans.service.ServiceContext;
 import com.avanza.astrix.beans.service.ServiceLookupFactory;
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -31,15 +31,15 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  */
 public final class AstrixServiceMetaFactory implements AstrixConfigAware {
 
-	private AstrixServiceComponents serviceComponents;
-	private AstrixServiceLeaseManager leaseManager;
+	private ServiceComponents serviceComponents;
+	private ServiceLeaseManager leaseManager;
 	private DynamicConfig config;
 
-	public <T> FactoryBean<T> createServiceFactory(ServiceVersioningContext versioningContext, ServiceLookupFactory<?> serviceLookup, AstrixBeanKey<T> beanKey, AstrixPublishedBeanDefinitionMethod beanDefinition) {
+	public <T> FactoryBean<T> createServiceFactory(ServiceContext versioningContext, ServiceLookupFactory<?> serviceLookup, AstrixBeanKey<T> beanKey, AstrixPublishedBeanDefinitionMethod beanDefinition) {
 		if (beanDefinition.isDynamicQualified()) {
-			return AstrixServiceFactory.dynamic(versioningContext, beanKey.getBeanType(), serviceLookup, serviceComponents, leaseManager, config);
+			return ServiceFactory.dynamic(versioningContext, beanKey.getBeanType(), serviceLookup, serviceComponents, leaseManager, config);
 		}
-		return AstrixServiceFactory.standard(versioningContext, beanKey, serviceLookup, serviceComponents, leaseManager, config);
+		return ServiceFactory.standard(versioningContext, beanKey, serviceLookup, serviceComponents, leaseManager, config);
 	}
 	
 	public Class<?> loadInterfaceIfExists(String interfaceName) {
@@ -55,12 +55,12 @@ public final class AstrixServiceMetaFactory implements AstrixConfigAware {
 	}
 
 	@AstrixInject
-	public void setServiceComponents(AstrixServiceComponents serviceComponents) {
+	public void setServiceComponents(ServiceComponents serviceComponents) {
 		this.serviceComponents = serviceComponents;
 	}
 	
 	@AstrixInject
-	public void setLeaseManager(AstrixServiceLeaseManager leaseManager) {
+	public void setLeaseManager(ServiceLeaseManager leaseManager) {
 		this.leaseManager = leaseManager;
 	}
 	

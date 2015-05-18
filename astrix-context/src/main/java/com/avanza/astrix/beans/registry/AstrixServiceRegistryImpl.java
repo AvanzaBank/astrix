@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 
@@ -55,11 +55,11 @@ public class AstrixServiceRegistryImpl implements AstrixServiceRegistry {
 		List<AstrixServiceRegistryEntry> activeServices = new ArrayList<>(entries.size());
 		String consumerZone = serviceConsumer.getProperty(ServiceConsumerProperties.CONSUMER_ZONE);
 		for (AstrixServiceRegistryEntry entry : entries) {
-			if ("true".equals(entry.getServiceProperties().get(AstrixServiceProperties.PUBLISHED))) {
+			if ("true".equals(entry.getServiceProperties().get(ServiceProperties.PUBLISHED))) {
 				activeServices.add(entry);
 				continue;
 			}
-			if (!Objects.equals(consumerZone, entry.getServiceProperties().get(AstrixServiceProperties.SERVICE_ZONE))) {
+			if (!Objects.equals(consumerZone, entry.getServiceProperties().get(ServiceProperties.SERVICE_ZONE))) {
 				log.debug("Discarding service-provider={}, consumer={}", entry.getServiceProperties(), serviceConsumer);
 				continue;
 			}
@@ -79,9 +79,9 @@ public class AstrixServiceRegistryImpl implements AstrixServiceRegistry {
 	}
 	
 	private ServiceProviderKey getServiceProviderKey(AstrixServiceRegistryEntry properties) {
-		String appInstanceId = properties.getServiceProperties().get(AstrixServiceProperties.APPLICATION_INSTANCE_ID);
+		String appInstanceId = properties.getServiceProperties().get(ServiceProperties.APPLICATION_INSTANCE_ID);
 		String api = properties.getServiceBeanType();
-		String qualifier = properties.getServiceProperties().get(AstrixServiceProperties.QUALIFIER);
+		String qualifier = properties.getServiceProperties().get(ServiceProperties.QUALIFIER);
 		ServiceProviderKey serviceProviderKey = ServiceProviderKey.create(new ServiceKey(api, qualifier), appInstanceId);
 		return serviceProviderKey;
 	}

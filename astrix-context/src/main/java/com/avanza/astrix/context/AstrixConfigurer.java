@@ -38,9 +38,9 @@ import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.inject.AstrixPlugins;
-import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
-import com.avanza.astrix.beans.publish.AstrixApiProviderPlugin;
-import com.avanza.astrix.beans.publish.AstrixApiProviders;
+import com.avanza.astrix.beans.publish.ApiProviderClass;
+import com.avanza.astrix.beans.publish.ApiProviderPlugin;
+import com.avanza.astrix.beans.publish.ApiProviders;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
 import com.avanza.astrix.config.DynamicConfig;
@@ -57,7 +57,7 @@ public class AstrixConfigurer {
 
 	private static final Logger log = LoggerFactory.getLogger(AstrixConfigurer.class);
 	
-	private AstrixApiProviders astrixApiProviders;
+	private ApiProviders astrixApiProviders;
 	private final Collection<StandardFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	private final List<AstrixPlugins.Plugin<?>> plugins = new ArrayList<>();
 	private final AstrixSettings settings = new AstrixSettings();
@@ -74,7 +74,7 @@ public class AstrixConfigurer {
 		injector.bind(DynamicConfig.class, config);
 		injector.bind(AstrixContext.class, AstrixContextImpl.class);
 		injector.bind(AstrixFactoryBeanRegistry.class, SimpleAstrixFactoryBeanRegistry.class);
-		injector.bind(AstrixApiProviders.class, new FilteredApiProviders(getApiProviders(astrixPlugins), activeProfiles));
+		injector.bind(ApiProviders.class, new FilteredApiProviders(getApiProviders(astrixPlugins), activeProfiles));
 		injector.registerBeanPostProcessor(new InternalBeanPostProcessor(injector.getBean(AstrixBeanFactory.class)));
 		AstrixContextImpl context = injector.getBean(AstrixContextImpl.class);
 		for (StandardFactoryBean<?> beanFactory : standaloneFactories) {
@@ -114,20 +114,20 @@ public class AstrixConfigurer {
 		}
 	}
 	
-	private static class FilteredApiProviders implements AstrixApiProviders {
+	private static class FilteredApiProviders implements ApiProviders {
 		
-		private AstrixApiProviders apiProviders;
+		private ApiProviders apiProviders;
 		private Set<String> activeProfiles;
 		
-		public FilteredApiProviders(AstrixApiProviders apiProviders, Set<String> activeProfiles) {
+		public FilteredApiProviders(ApiProviders apiProviders, Set<String> activeProfiles) {
 			this.apiProviders = apiProviders;
 			this.activeProfiles = activeProfiles;
 		}
 
 		@Override
-		public Collection<AstrixApiProviderClass> getAll() {
-			List<AstrixApiProviderClass> result = new LinkedList<>();
-			for (AstrixApiProviderClass providerClass : apiProviders.getAll()) {
+		public Collection<ApiProviderClass> getAll() {
+			List<ApiProviderClass> result = new LinkedList<>();
+			for (ApiProviderClass providerClass : apiProviders.getAll()) {
 				if (isActive(providerClass)) {
 					log.debug("Found provider: provider={}", providerClass.getName());
 					result.add(providerClass);
@@ -136,7 +136,7 @@ public class AstrixConfigurer {
 			return result;
 		}
 		
-		private boolean isActive(AstrixApiProviderClass providerClass) {
+		private boolean isActive(ApiProviderClass providerClass) {
 			if (providerClass.isAnnotationPresent(AstrixIncludedByProfile.class)) {
 				AstrixIncludedByProfile activatedBy = providerClass.getAnnotation(AstrixIncludedByProfile.class);
 				if (!this.activeProfiles.contains(activatedBy.value())) {
@@ -155,7 +155,7 @@ public class AstrixConfigurer {
 		}
 	}
 
-	private AstrixApiProviders getApiProviders(AstrixPlugins astrixPlugins) {
+	private ApiProviders getApiProviders(AstrixPlugins astrixPlugins) {
 		if (this.astrixApiProviders != null) {
 			return astrixApiProviders;
 		}
@@ -172,7 +172,7 @@ public class AstrixConfigurer {
 	
 	private List<Class<? extends Annotation>> getAllApiProviderAnnotationsTypes(AstrixPlugins astrixPlugins) {
 		List<Class<? extends Annotation>> result = new ArrayList<>();
-		for (AstrixApiProviderPlugin plugin : astrixPlugins.getPlugins(AstrixApiProviderPlugin.class)) {
+		for (ApiProviderPlugin plugin : astrixPlugins.getPlugins(ApiProviderPlugin.class)) {
 			result.add(plugin.getProviderAnnotationType());
 		}
 		return result;
@@ -204,7 +204,7 @@ public class AstrixConfigurer {
 	}
 
 	// package private. Used for internal testing only
-	void setAstrixApiProviders(AstrixApiProviders astrixApiProviders) {
+	void setAstrixApiProviders(ApiProviders astrixApiProviders) {
 		this.astrixApiProviders = astrixApiProviders;
 	}
 	

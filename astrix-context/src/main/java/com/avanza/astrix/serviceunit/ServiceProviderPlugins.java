@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
+import com.avanza.astrix.beans.publish.ApiProviderClass;
 
 public class ServiceProviderPlugins {
 	
@@ -38,14 +38,14 @@ public class ServiceProviderPlugins {
 		}
 	}
 	
-	public List<ServiceBeanDefinition> getExportedServices(AstrixApiProviderClass apiProvider) {
+	public List<ServiceBeanDefinition> getExportedServices(ApiProviderClass apiProvider) {
 		ServiceProviderPlugin apiProviderPlugin = getProviderPlugin(apiProvider);
 		List<ServiceBeanDefinition> result = new ArrayList<>();
 		result.addAll(apiProviderPlugin.getProvidedServices(apiProvider));
 		return result;
 	}
 	
-	private ServiceProviderPlugin getProviderPlugin(AstrixApiProviderClass apiProvider) {
+	private ServiceProviderPlugin getProviderPlugin(ApiProviderClass apiProvider) {
 		for (ServiceProviderPlugin plugin : pluginByAnnotationType.values()) {
 			if (apiProvider.isAnnotationPresent(plugin.getProviderAnnotationType())) {
 				return plugin;

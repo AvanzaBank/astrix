@@ -28,7 +28,7 @@ public class AstrixServiceRegistryLibraryProvider implements AstrixConfigAware {
 	private DynamicConfig config;
 
 	@Library
-	public AstrixServiceRegistryClient createClient(AstrixServiceRegistry serviceRegistry) {
+	public ServiceRegistryClient createClient(AstrixServiceRegistry serviceRegistry) {
 		ServiceConsumerProperties serviceConsumerProperties = new ServiceConsumerProperties();
 		String subsystem = AstrixSettings.SUBSYSTEM_NAME.getFrom(config).get();
 		String applicationTag = AstrixSettings.APPLICATION_TAG.getFrom(config).get();
@@ -37,7 +37,7 @@ public class AstrixServiceRegistryLibraryProvider implements AstrixConfigAware {
 			zone = subsystem + "#" + applicationTag;
 		}
 		serviceConsumerProperties.setProperty(ServiceConsumerProperties.CONSUMER_ZONE, zone);
-		return new AstrixServiceRegistryClient(serviceRegistry, serviceConsumerProperties);
+		return new ServiceRegistryClient(serviceRegistry, serviceConsumerProperties);
 	}
 
 	@Override

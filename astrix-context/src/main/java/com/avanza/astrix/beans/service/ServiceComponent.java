@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.beans.service;
 
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 
 
 /**
@@ -26,13 +25,13 @@ import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
  * @author Elias Lindholm (elilin)
  *
  */
-public interface AstrixServiceComponent {
+public interface ServiceComponent {
 	
-	<T> BoundServiceBeanInstance<T> bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties);
+	<T> BoundServiceBeanInstance<T> bind(Class<T> type, ServiceContext serviceContext, ServiceProperties serviceProperties);
 	
-	AstrixServiceProperties createServiceProperties(String serviceUri);
+	ServiceProperties createServiceProperties(String serviceUri);
 	
-	<T> AstrixServiceProperties createServiceProperties(Class<T> exportedService);
+	<T> ServiceProperties createServiceProperties(Class<T> exportedService);
 	
 	/**
 	 * The name of this component.
@@ -42,10 +41,10 @@ public interface AstrixServiceComponent {
 	String getName();
 	
 	/**
-	 * Defines whether this AstrixServiceComponent can be used to bind a bean of a given type.
+	 * Defines whether this ServiceComponent can be used to bind a bean of a given type.
 	 * 
-	 * If this AstrixServiceComponent can be used to bind the given type, then {@link #createServiceProperties(Class)}
-	 * should create AstrixServiceProperties that can be passed to {@link #bind(ServiceVersioningContext, Class, AstrixServiceProperties)}
+	 * If this ServiceComponent can be used to bind the given type, then {@link #createServiceProperties(Class)}
+	 * should create ServiceProperties that can be passed to {@link #bind(Class, ServiceContext, ServiceProperties)}
 	 * to bind to an instance of the given type.
 	 * 
 	 * @param type
@@ -53,7 +52,7 @@ public interface AstrixServiceComponent {
 	 */
 	boolean canBindType(Class<?> type);
 
-	<T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext);
+	<T> void exportService(Class<T> providedApi, T provider, ServiceContext serviceContext);
 	
 	/**
 	 * Whether the api supports an async version based on the following naming
@@ -72,7 +71,7 @@ public interface AstrixServiceComponent {
 	boolean supportsAsyncApis();
 	
 	/**
-	 * Defines whether an instance implementing a provided api is required when invoking AstrixServiceComponent.exportService.
+	 * Defines whether an instance implementing a provided api is required when invoking ServiceComponent.exportService.
 	 * 
 	 * If true, Astrix will identify an instance that implements the given api and pass it to the exportService method and
 	 * never pass null. If this property is false then null will be passed to exportService.

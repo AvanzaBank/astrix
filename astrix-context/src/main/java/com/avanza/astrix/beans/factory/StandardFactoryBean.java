@@ -37,7 +37,7 @@ public interface StandardFactoryBean<T> extends FactoryBean<T> {
 	 * will trigger creation (or returned a cached instance)
 	 * of the requested bean in the given {@link AstrixBeanFactory}. 
 	 * 
-	 * @throws AstrixCircularDependency
+	 * @throws CircularDependency
 	 * 			if requesting a bean from the passed in {@link AstrixBeans} that is	currently 
 	 * 	        being created and in turn triggered creation of the bean associated with this
 	 *          factory.

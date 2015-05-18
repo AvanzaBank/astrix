@@ -19,15 +19,15 @@ import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.service.AstrixServiceComponent;
-import com.avanza.astrix.beans.service.AstrixServiceProperties;
+import com.avanza.astrix.beans.service.ServiceComponent;
+import com.avanza.astrix.beans.service.ServiceContext;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 import com.avanza.astrix.ft.AstrixFaultTolerance;
 import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.gs.ClusteredProxyCache.GigaSpaceInstance;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
 /**
  * Service component allowing GigaSpace clustered proxy to be used as a service. 
@@ -35,8 +35,8 @@ import com.avanza.astrix.spring.AstrixSpringContext;
  * @author Elias Lindholm
  *
  */
-@MetaInfServices(AstrixServiceComponent.class)
-public class AstrixGsComponent implements AstrixServiceComponent {
+@MetaInfServices(ServiceComponent.class)
+public class AstrixGsComponent implements ServiceComponent {
 
 	private GsBinder gsBinder;
 	private AstrixFaultTolerance faultTolerance;
@@ -45,7 +45,7 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 	
 	
 	@Override
-	public <T> BoundServiceBeanInstance<T> bind(ServiceVersioningContext versioningContext, Class<T> type, AstrixServiceProperties serviceProperties) {
+	public <T> BoundServiceBeanInstance<T> bind(Class<T> type, ServiceContext versioningContext, ServiceProperties serviceProperties) {
 		if (!GigaSpace.class.isAssignableFrom(type)) {
 			throw new UnsupportedTargetTypeException(getName(), type);
 		}
@@ -57,7 +57,7 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 	}
 	
 	@Override
-	public AstrixServiceProperties createServiceProperties(String serviceUri) {
+	public ServiceProperties createServiceProperties(String serviceUri) {
 		return gsBinder.createServiceProperties(serviceUri);
 	}
 
@@ -73,7 +73,7 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 	}
 
 	@Override
-	public <T> void exportService(Class<T> providedApi, T provider, ServiceVersioningContext versioningContext) {
+	public <T> void exportService(Class<T> providedApi, T provider, ServiceContext versioningContext) {
 		// Intentionally empty
 	}
 	
@@ -88,7 +88,7 @@ public class AstrixGsComponent implements AstrixServiceComponent {
 	}
 
 	@Override
-	public <T> AstrixServiceProperties createServiceProperties(Class<T> type) {
+	public <T> ServiceProperties createServiceProperties(Class<T> type) {
 		if (!type.equals(GigaSpace.class)) {
 			throw new IllegalArgumentException("Can't export: " + type);
 		}

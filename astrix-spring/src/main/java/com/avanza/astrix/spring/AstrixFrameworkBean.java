@@ -41,12 +41,12 @@ import org.springframework.core.Ordered;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.service.ServiceContext;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
-import com.avanza.astrix.provider.versioning.ServiceVersioningContext;
 import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
 import com.avanza.astrix.serviceunit.ServiceAdministrator;
 import com.avanza.astrix.serviceunit.ServiceAdministratorImpl;
@@ -223,7 +223,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		ServiceExporter serviceExporter = astrixContext.getInstance(ServiceExporter.class);
 		
 		serviceExporter.addServiceProvider(astrixContext.getInstance(ServiceAdministratorImpl.class));
-		ServiceVersioningContext versioningContext = ServiceVersioningContext.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
+		ServiceContext versioningContext = ServiceContext.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
 		ServiceBeanDefinition serviceAdminDefintion = new ServiceBeanDefinition(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
 																			    versioningContext, 
 																			    true, // isVersioned  

@@ -26,19 +26,19 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.beans.publish.AstrixApiProviderClass;
-import com.avanza.astrix.beans.publish.AstrixApiProviders;
+import com.avanza.astrix.beans.publish.ApiProviderClass;
+import com.avanza.astrix.beans.publish.ApiProviders;
 /**
  * Uses classpath scanning to find api-providers. <p>
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixApiProviderClassScanner implements AstrixApiProviders {
+public class AstrixApiProviderClassScanner implements ApiProviders {
 
 	private final Logger log = LoggerFactory.getLogger(AstrixApiProviderClassScanner.class);
 	
-	private static final Map<String, List<AstrixApiProviderClass>> apiProvidersByBasePackage = new ConcurrentHashMap<>();
+	private static final Map<String, List<ApiProviderClass>> apiProvidersByBasePackage = new ConcurrentHashMap<>();
 	private final List<String> basePackages = new ArrayList<>();
 	private final List<Class<? extends Annotation>> providerAnnotationsToScanFor;
 	
@@ -49,28 +49,28 @@ public class AstrixApiProviderClassScanner implements AstrixApiProviders {
 	}
 	
 	@Override
-	public List<AstrixApiProviderClass> getAll() {
-		List<AstrixApiProviderClass> result = new ArrayList<>();
+	public List<ApiProviderClass> getAll() {
+		List<ApiProviderClass> result = new ArrayList<>();
 		for (String basePackage : this.basePackages) {
 			result.addAll(scanPackage(basePackage));
 		}
 		return result;
 	}
 
-	private List<AstrixApiProviderClass> scanPackage(String basePackage) {
+	private List<ApiProviderClass> scanPackage(String basePackage) {
 		log.debug("Scanning package for api-providers: package={}", basePackage);
-		List<AstrixApiProviderClass> providerClasses = apiProvidersByBasePackage.get(basePackage);
+		List<ApiProviderClass> providerClasses = apiProvidersByBasePackage.get(basePackage);
 		if (providerClasses != null) {
 			log.debug("Returning cached api-providers found on earlier scan types={}", providerClasses);
 			return providerClasses;
 		}
 		List<Class<? extends Annotation>> allProviderAnnotationTypes = getAllProviderAnnotationTypes();
 		log.debug("Running scan for api-providers of types={}", allProviderAnnotationTypes);
-		List<AstrixApiProviderClass> discoveredApiPRoviders = new ArrayList<>();
+		List<ApiProviderClass> discoveredApiPRoviders = new ArrayList<>();
 		Reflections reflections = new Reflections(basePackage);
 		for (Class<? extends Annotation> apiAnnotation : allProviderAnnotationTypes) { 
 			for (Class<?> providerClass : reflections.getTypesAnnotatedWith(apiAnnotation)) {
-				AstrixApiProviderClass provider = AstrixApiProviderClass.create(providerClass);
+				ApiProviderClass provider = ApiProviderClass.create(providerClass);
 				log.debug("Found api provider {}", provider);
 				discoveredApiPRoviders.add(provider);
 			}
