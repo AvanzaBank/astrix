@@ -18,15 +18,19 @@ package com.avanza.astrix.context;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 
 /**
- * Creates and caches instances of Astrix beans. An Astrix bean is a type that is
- * hooked into Astrix, for instance by defining an {@link AstrixApiProvider}. Astrix-beans
- * are typically intended to be reused in many different contexts (typically different applications). <p>
- *  
- * All instances created in the same AstrixContext will be cached and
- * not destroyed until the {@link #destroy()} method is invoked. Asking for
- * the same Astrix beans multiple times will return the same instance.
+ * An AstrixContext is a factory to create instances of Astrix beans. An Astrix
+ * bean is a type in an API that is published using Astrix, most often by
+ * defining an {@link AstrixApiProvider}. <p>  
  * 
- * Astrix beans are created on demand the first time they are requested.
+ * A typical application only creates one AstrixContext, either by using an 
+ * {@link AstrixConfigurer} or by registering an AstrixFrameworkBean 
+ * in a spring application. <p>
+ *  
+ * All instances created by the same AstrixContext will be cached and
+ * not destroyed until the {@link #destroy()} method is invoked. Asking for
+ * the same Astrix beans multiple times will return the same instance. <p>
+ * 
+ * Astrix beans are created on demand the first time they are requested. <p>
  * 
  * @author Elias Lindholm (elilin)
  *
@@ -34,8 +38,12 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 public interface AstrixContext extends Astrix, AutoCloseable {
 
 	/**
-	 * Destroys this AstrixContext. All resources held by the
-	 * AstrixContext will be released. 
+	 * Destroys this AstrixContext.<p>
+	 * 
+	 * All resources held by the AstrixContext will be released. After
+	 * destroying an AstrixContext all beans that are created
+	 * by this AstrixContext should be considered destroyed as well. 
+	 * The behavior when invoking such beans after destroy are undefined.
 	 */
 	void destroy();
 
