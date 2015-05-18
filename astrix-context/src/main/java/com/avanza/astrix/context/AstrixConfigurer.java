@@ -49,7 +49,12 @@ import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
-
+/**
+ * Used to configure and create an {@link AstrixContext}. <p>
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
 public class AstrixConfigurer {
 
 

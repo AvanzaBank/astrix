@@ -15,6 +15,10 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.provider.core.AstrixQualifier;
+import com.avanza.astrix.provider.core.Service;
+
 
 /**
  * 
@@ -24,17 +28,48 @@ package com.avanza.astrix.context;
 public interface Astrix {
 
 	/**
-	 * Looks up a bean in the bean registry. <p>
+	 * Lookup an unqualified bean of a given type in the bean registry. <p>
+	 * 
+	 * This will trigger instantiation of the given bean, if it has not bean requested before.
 	 * 
 	 * @param beanType
 	 * @return
 	 */
 	<T> T getBean(Class<T> beanType);
 
+	/**
+	 * Same as {@link #getBean(Class)}, but will lookup a qualified bean, see {@link AstrixQualifier}.
+	 * 
+	 * @param beanType
+	 * @param qualifier
+	 * @return
+	 */
 	<T> T getBean(Class<T> beanType, String qualifier);
 
+	/**
+	 * Same as {@link #getBean(Class)}, but will also block until all transitive service beans
+	 * are bound, see {@link Service}. 
+	 * 
+	 * @param beanType
+	 * @param timeoutMillis
+	 * @return
+	 * @throws InterruptedException
+	 * @throws {@link ServiceUnavailableException} - if all transitive dependencies was not bound before timeout.
+	 */
 	<T> T waitForBean(Class<T> beanType, long timeoutMillis) throws InterruptedException;
 
+	/**
+	 * 
+	 * Same as {@link #getBean(Class, String)}, but will also block until all transitive service beans
+	 * are bound, see {@link Service}.
+	 * 
+	 * @param beanType
+	 * @param qualifier
+	 * @param timeoutMillis
+	 * @return
+	 * @throws InterruptedException
+	 * @throws {@link ServiceUnavailableException} - if all transitive dependencies was not bound before timeout.
+	 */
 	<T> T waitForBean(Class<T> beanType, String qualifier,long timeoutMillis) throws InterruptedException;
 
 }

@@ -23,14 +23,14 @@ import java.lang.annotation.Target;
 
 
 /**
- * Used to identify an ApiProvider for a given api. 
+ * Used to identify an ApiProvider.<p> 
  * 
  * An ApiProvider is used to define all Astrix-beans that is part of a given api, and
- * to provide information about how to bind to an instance of a each bean in the api at runtime. 
+ * to provide information about how to bind to an instance of a each bean in the api at runtime.<p> 
  * 
  * Astrix defines two distinct types of beans: "libraries" and "services". Simply put, a "service"
  * can be seen as a bean that uses some kind of remote-service-invocation mechanism to invoke a provider of
- * a given bean-type, whereas a "library" uses simple in-memory method calls.
+ * a given bean-type, whereas a "library" uses simple in-memory method calls.<p>
  * 
  * A more formal distinction between a "library" and a "service" is how they are bound at runtime. 
  * For libraries, the class holding this annotation should define a factory method for each exported library bean in
@@ -67,7 +67,7 @@ import java.lang.annotation.Target;
  * For instance, if a new provider for a given service is registered in the service registry, then
  * Astrix transparently re-binds the corresponding astrix-bean to the new provider. The new provider
  * might be using another transport mechanism (as defined by the corresponding AstrixServiceComponent), allowing
- * transport mechanism to change at runtime. 
+ * transport mechanism to change at runtime.<p>
  * 
  * Example of a service provider exporting two services that are located using the service registry:
  * 

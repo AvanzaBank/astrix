@@ -23,11 +23,27 @@ import java.lang.annotation.Target;
 
 
 /**
+ * Annotations used to qualify an Astrix-bean. This annotation may be used to set a qualifier for
+ * a bean definition in an ApiProvider, see {@link AstrixApiProvider}, or to inject qualified beans into a library. <p>
+ * 
+ * Astrix beans are identified by type and qualifier. When an Astrix bean
+ * is defined without a qualifier it is consider "unqualified". Unqualified
+ * beans can be retrieved from a AstrixContext using the unqualified getBean(Class<T>)
+ * method, whereas qualified beans can be retrieved using the getBean(Class<T>, String)
+ * method. <p> 
+ * 
+ * By qualifying Astrix beans one can hook more than one bean of 
+ * a given type into Astrix. For instance one might export a MetricsService
+ * interface from each server by using different qualifiers for each server. <p>
+ * 
  * @author Elias Lindholm (elilin)
  */
 @Target(value = { ElementType.PARAMETER, ElementType.METHOD})
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
 public @interface AstrixQualifier {
+	/**
+	 * The name of the qualifier for the target bean.
+	 */
 	String value();
 }
