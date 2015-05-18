@@ -34,7 +34,7 @@ import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.AstrixDirectComponent;
+import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -70,8 +70,8 @@ public class AstrixServiceRegistryLeaseManagerTest {
 				return "1";
 			}
 		};
-		String id = AstrixDirectComponent.register(TestService.class, impl);
-		serviceRegistryExporterClient.register(TestService.class, AstrixDirectComponent.getServiceProperties(id), -1);
+		String id = DirectComponent.register(TestService.class, impl);
+		serviceRegistryExporterClient.register(TestService.class, DirectComponent.getServiceProperties(id), -1);
 
 		testService = context.getBean(TestService.class);
 	}
@@ -102,8 +102,8 @@ public class AstrixServiceRegistryLeaseManagerTest {
 				return "2";
 			}
 		};
-		String id = AstrixDirectComponent.register(TestService.class, impl);
-		serviceRegistryExporterClient.register(TestService.class, AstrixDirectComponent.getServiceProperties(id), -1);
+		String id = DirectComponent.register(TestService.class, impl);
+		serviceRegistryExporterClient.register(TestService.class, DirectComponent.getServiceProperties(id), -1);
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
 			public String get() {

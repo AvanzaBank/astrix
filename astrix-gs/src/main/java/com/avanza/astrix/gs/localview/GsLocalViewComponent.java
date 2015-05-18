@@ -51,14 +51,14 @@ import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
  *
  */
 @MetaInfServices(ServiceComponent.class)
-public class AstrixGsLocalViewComponent implements ServiceComponent, AstrixConfigAware {
+public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware {
 
-	private static Logger log = LoggerFactory.getLogger(AstrixGsLocalViewComponent.class);
+	private static Logger log = LoggerFactory.getLogger(GsLocalViewComponent.class);
 	private GsBinder gsBinder;
 	private AstrixSpringContext astrixSpringContext;
 	private DynamicBooleanProperty disableLocalView;
 	/*
-	 * To avoid circular dependency between AstrixGsLocalViewComponent and ServiceComponents
+	 * To avoid circular dependency between GsLocalViewComponent and ServiceComponents
 	 * we have to use the AstrixInjetor to retrieve ServiceComponents.
 	 */
 	private AstrixInjector injector;

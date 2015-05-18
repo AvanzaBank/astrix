@@ -42,7 +42,7 @@ import com.avanza.astrix.spring.AstrixSpringContext;
  *
  */
 @MetaInfServices(ServiceComponent.class)
-public class AstrixGsRemotingComponent implements ServiceComponent {
+public class GsRemotingComponent implements ServiceComponent {
 
 	private GsBinder gsBinder;
 	private AstrixFaultTolerance faultTolerance;

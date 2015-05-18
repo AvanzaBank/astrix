@@ -27,7 +27,7 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.AstrixDirectComponent;
+import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -57,11 +57,11 @@ public class AstrixServiceRegistryTest {
 		
 		
 		ServiceRegistryExporterClient server1serviceRegistryClient = new ServiceRegistryExporterClient(serviceRegistry, "default", "server-1");
-		server1serviceRegistryClient.register(Ping.class, AstrixDirectComponent.registerAndGetProperties(Ping.class, new PingImpl("1")), Integer.MAX_VALUE);
+		server1serviceRegistryClient.register(Ping.class, DirectComponent.registerAndGetProperties(Ping.class, new PingImpl("1")), Integer.MAX_VALUE);
 		
 		
 		ServiceRegistryExporterClient server2serviceRegistryClient = new ServiceRegistryExporterClient(serviceRegistry, "default", "server-2");
-		server2serviceRegistryClient.register(Ping.class, AstrixDirectComponent.registerAndGetProperties(Ping.class, new PingImpl("2")), Integer.MAX_VALUE);
+		server2serviceRegistryClient.register(Ping.class, DirectComponent.registerAndGetProperties(Ping.class, new PingImpl("2")), Integer.MAX_VALUE);
 		
 		
 		Ping ping1 = clientContext.getBean(Ping.class);
@@ -85,7 +85,7 @@ public class AstrixServiceRegistryTest {
 		
 		
 		ServiceRegistryExporterClient server1serviceRegistryClient = new ServiceRegistryExporterClient(serviceRegistry, "my-subsystem", "server-1");
-		ServiceProperties service1Properties = AstrixDirectComponent.registerAndGetProperties(Ping.class, new PingImpl("1"));
+		ServiceProperties service1Properties = DirectComponent.registerAndGetProperties(Ping.class, new PingImpl("1"));
 		service1Properties.setProperty(ServiceProperties.PUBLISHED, "false");
 		service1Properties.setProperty(ServiceProperties.SERVICE_ZONE, "foo-zone");
 		server1serviceRegistryClient.register(Ping.class, service1Properties, Integer.MAX_VALUE);
@@ -117,7 +117,7 @@ public class AstrixServiceRegistryTest {
 		
 		
 		ServiceRegistryExporterClient server1serviceRegistryClient = new ServiceRegistryExporterClient(serviceRegistry, "my-subsystem", "server-1");
-		ServiceProperties service1Properties = AstrixDirectComponent.registerAndGetProperties(Ping.class, new PingImpl("1"));
+		ServiceProperties service1Properties = DirectComponent.registerAndGetProperties(Ping.class, new PingImpl("1"));
 		service1Properties.setProperty(ServiceProperties.PUBLISHED, "false");
 		server1serviceRegistryClient.register(Ping.class, service1Properties, Integer.MAX_VALUE);
 		
@@ -142,11 +142,11 @@ public class AstrixServiceRegistryTest {
 		
 		
 		ServiceRegistryExporterClient server1serviceRegistryClient = new ServiceRegistryExporterClient(serviceRegistry, "default", "server-1");
-		ServiceProperties service1Properties = AstrixDirectComponent.registerAndGetProperties(Ping.class, new PingImpl("1"));
+		ServiceProperties service1Properties = DirectComponent.registerAndGetProperties(Ping.class, new PingImpl("1"));
 		server1serviceRegistryClient.register(Ping.class, service1Properties, Integer.MAX_VALUE);
 		
 		ServiceRegistryExporterClient server2serviceRegistryClient = new ServiceRegistryExporterClient(serviceRegistry, "default", "server-2");
-		ServiceProperties service2Properties = AstrixDirectComponent.registerAndGetProperties(Ping.class, new PingImpl("1"));
+		ServiceProperties service2Properties = DirectComponent.registerAndGetProperties(Ping.class, new PingImpl("1"));
 		server2serviceRegistryClient.register(Ping.class, service2Properties, Integer.MAX_VALUE);
 		
 		ServiceRegistryClient serviceRegistryClient = clientContext.getBean(ServiceRegistryClient.class);

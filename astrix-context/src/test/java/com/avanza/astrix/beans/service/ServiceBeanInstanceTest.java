@@ -33,7 +33,7 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.AstrixContextImpl;
-import com.avanza.astrix.context.AstrixDirectComponent;
+import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -80,18 +80,18 @@ public class ServiceBeanInstanceTest {
 	
 	@Test
 	public void whenServiceNotAvailableOnFirstBindAttemptTheServiceBeanShouldReattemptToBindLater() throws Exception {
-		String serviceId = AstrixDirectComponent.register(Ping.class, new PingImpl());
+		String serviceId = DirectComponent.register(Ping.class, new PingImpl());
 		
 		TestAstrixConfigurer config = new TestAstrixConfigurer();
 		config.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		config.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		config.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
-		config.set("pingUri", AstrixDirectComponent.getServiceUri(serviceId));
+		config.set("pingUri", DirectComponent.getServiceUri(serviceId));
 		config.registerApiProvider(PingApiProviderUsingConfigLookup.class);
 		AstrixContext context = config.configure();
 		
 		// Unregister to simulate service that is available in config, but provider not available.
-		AstrixDirectComponent.unregister(serviceId);
+		DirectComponent.unregister(serviceId);
 		
 		final Ping ping = context.getBean(Ping.class);
 		try {
@@ -101,7 +101,7 @@ public class ServiceBeanInstanceTest {
 			// expected
 		}
 		
-		AstrixDirectComponent.register(Ping.class, new PingImpl(), serviceId);
+		DirectComponent.register(Ping.class, new PingImpl(), serviceId);
 
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
@@ -129,7 +129,7 @@ public class ServiceBeanInstanceTest {
 		Ping ping = astrixContext.getBean(Ping.class);
 		assertEquals("foo", ping.ping("foo"));
 
-		AstrixDirectComponent directComponent = astrixContext.getInstance(ServiceComponents.class).getComponent(AstrixDirectComponent.class);
+		DirectComponent directComponent = astrixContext.getInstance(ServiceComponents.class).getComponent(DirectComponent.class);
 		assertEquals(2, directComponent.getBoundServices().size());
 		assertThat("Expected at least one service to be bound after pingBean is bound", directComponent.getBoundServices().size(), greaterThanOrEqualTo(1));
 		
@@ -151,7 +151,7 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 		
-		AstrixDirectComponent directComponent = astrixContext.getInstance(ServiceComponents.class).getComponent(AstrixDirectComponent.class);
+		DirectComponent directComponent = astrixContext.getInstance(ServiceComponents.class).getComponent(DirectComponent.class);
 
 		final Ping ping = astrixContext.getBean(Ping.class);
 		ping.ping("foo");
@@ -179,7 +179,7 @@ public class ServiceBeanInstanceTest {
 	public void serviceBeanInstanceUsesDefaultSubsystemNameWhenNoSubsystemIsSetInServiceProperties() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
-		String serviceUri = AstrixDirectComponent.registerAndGetUri(Ping.class, new PingImpl());
+		String serviceUri = DirectComponent.registerAndGetUri(Ping.class, new PingImpl());
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApiProviderUsingConfigLookup.class);
 		astrixConfigurer.setSubsystem("default");
@@ -263,7 +263,7 @@ public class ServiceBeanInstanceTest {
 		astrixContext.waitForBean(Ping.class, 100);
 	}
 	
-	static class FakeComponent extends AstrixDirectComponent {
+	static class FakeComponent extends DirectComponent {
 		
 		@Override
 		public <T> BoundServiceBeanInstance<T> bind(Class<T> type, ServiceContext versioningContext, ServiceProperties serviceProperties) {

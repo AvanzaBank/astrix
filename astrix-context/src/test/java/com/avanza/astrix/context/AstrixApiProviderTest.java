@@ -68,8 +68,8 @@ public class AstrixApiProviderTest {
 	@Test
 	public void servicesCanBeQualifiedToDistinguishProviders() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.set("pingServiceUri", AstrixDirectComponent.registerAndGetUri(PingService.class, new PingServiceImpl()));
-		astrixConfigurer.set("reversePingServiceUri", AstrixDirectComponent.registerAndGetUri(PingService.class, new ReversePingServiceImpl()));
+		astrixConfigurer.set("pingServiceUri", DirectComponent.registerAndGetUri(PingService.class, new PingServiceImpl()));
+		astrixConfigurer.set("reversePingServiceUri", DirectComponent.registerAndGetUri(PingService.class, new ReversePingServiceImpl()));
 		astrixConfigurer.registerApiProvider(PingAndReversePingServiceProvider.class);
 		AstrixContext context = astrixConfigurer.configure();
 		
@@ -81,7 +81,7 @@ public class AstrixApiProviderTest {
 	
 	@Test
 	public void apiWithOneLibraryAndOneService() throws Exception {
-		String pingServiceUri = AstrixDirectComponent.registerAndGetUri(PingService.class, new PingServiceImpl());
+		String pingServiceUri = DirectComponent.registerAndGetUri(PingService.class, new PingServiceImpl());
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingServiceAndLibraryProvider.class);
 		astrixConfigurer.set("pingServiceUri", pingServiceUri);
@@ -97,7 +97,7 @@ public class AstrixApiProviderTest {
 	
 	@Test
 	public void versionedApi() throws Exception {
-		String pingServiceUri = AstrixDirectComponent.registerAndGetUri(PingService.class, 
+		String pingServiceUri = DirectComponent.registerAndGetUri(PingService.class, 
 																		new PingServiceImpl(), 
 																		ServiceContext.versionedService(1, DummyObjectSerializerConfigurer.class));
 		
@@ -114,10 +114,10 @@ public class AstrixApiProviderTest {
 	
 	@Test
 	public void apiWithVersionedAnNonVersionedService() throws Exception {
-		String pingServiceUri = AstrixDirectComponent.registerAndGetUri(PingService.class, 
+		String pingServiceUri = DirectComponent.registerAndGetUri(PingService.class, 
 																		new PingServiceImpl(), 
 																		ServiceContext.versionedService(1, DummyObjectSerializerConfigurer.class));
-		String internalPingServiceUri = AstrixDirectComponent.registerAndGetUri(InternalPingService.class, 
+		String internalPingServiceUri = DirectComponent.registerAndGetUri(InternalPingService.class, 
 																		new InternalPingServiceImpl(), 
 																		ServiceContext.nonVersioned());
 		
@@ -137,7 +137,7 @@ public class AstrixApiProviderTest {
 	
 	@Test
 	public void supportsDynamicQualifiedServices() throws Exception {
-		String pingServiceUri = AstrixDirectComponent.registerAndGetUri(PingService.class, 
+		String pingServiceUri = DirectComponent.registerAndGetUri(PingService.class, 
 																		new PingServiceImpl());
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();

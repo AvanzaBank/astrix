@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.provider.component;
 /**
- * Contains well-known AstrixServiceComponent implementations. <p>
+ * Contains well-known ServiceComponent implementations. <p>
  * @author Elias Lindholm (elilin)
  *
  */

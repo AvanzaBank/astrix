@@ -30,7 +30,7 @@ import tutorial.p2.provider.LunchServiceProvider;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.AstrixDirectComponent;
+import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
 
@@ -70,7 +70,7 @@ public class AstrixBeanStateManagementTest {
 		LunchRestaurantFinder restaurantFinder = Mockito.mock(LunchRestaurantFinder.class);
 
 		// Register mock instance in direct-component
-		String serviceUri = AstrixDirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinder);
+		String serviceUri = DirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinder);
 		// Add restaurantFinderUri entry to configuration pointing to the mock
 		configurer.set("restaurantFinderUri", serviceUri);
 		

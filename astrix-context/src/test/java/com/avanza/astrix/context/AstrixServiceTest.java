@@ -56,7 +56,7 @@ public class AstrixServiceTest {
 	
 	@Test
 	public void lookupService_lookupSuccessful_ServiceIsImmediatlyBound() throws Exception {
-		configurer.set(GREETING_SERVICE_URI, AstrixDirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hello: ")));
+		configurer.set(GREETING_SERVICE_URI, DirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hello: ")));
 		
 		GreetingService greetingService = context.getBean(GreetingService.class);
 		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), greetingService.hello("kalle"));
@@ -73,7 +73,7 @@ public class AstrixServiceTest {
 		} catch (ServiceUnavailableException e) {
 		}
 
-		configurer.set(GREETING_SERVICE_URI, AstrixDirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hello: ")));
+		configurer.set(GREETING_SERVICE_URI, DirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hello: ")));
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
 			public String get() {
@@ -84,12 +84,12 @@ public class AstrixServiceTest {
 	
 	@Test
 	public void serviceIsBoundToNewProviderWhenServiceIsMoved() throws Exception {
-		configurer.set(GREETING_SERVICE_URI, AstrixDirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hello: ")));
+		configurer.set(GREETING_SERVICE_URI, DirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hello: ")));
 		
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		assertEquals("hello: kalle", dummyService.hello("kalle"));
 		
-		configurer.set(GREETING_SERVICE_URI, AstrixDirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hej: ")));
+		configurer.set(GREETING_SERVICE_URI, DirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hej: ")));
 		
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
@@ -101,7 +101,7 @@ public class AstrixServiceTest {
 	
 	@Test
 	public void whenServiceIsRemovedFromSourceOfLookupItShouldStartThrowingServiceUnavailable() throws Exception {
-		configurer.set(GREETING_SERVICE_URI, AstrixDirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hello: ")));
+		configurer.set(GREETING_SERVICE_URI, DirectComponent.registerAndGetUri(GreetingService.class, new GreetingServiceImpl("hello: ")));
 		
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		assertEquals("hello: kalle", dummyService.hello("kalle"));

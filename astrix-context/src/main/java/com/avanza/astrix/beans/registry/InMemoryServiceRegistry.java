@@ -32,7 +32,7 @@ import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.MutableConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.StringSetting;
-import com.avanza.astrix.context.AstrixDirectComponent;
+import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 /**
  * 
@@ -48,7 +48,7 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	private AstrixServiceRegistry serviceRegistry = new AstrixServiceRegistryImpl(repo);
 	
 	public InMemoryServiceRegistry() {
-		this.id = AstrixDirectComponent.register(AstrixServiceRegistry.class, serviceRegistry);
+		this.id = DirectComponent.register(AstrixServiceRegistry.class, serviceRegistry);
 		this.configSourceId = GlobalConfigSourceRegistry.register(this);
 		this.configSource.set(AstrixSettings.SERVICE_REGISTRY_URI, getServiceUri());
 	}
@@ -127,7 +127,7 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	public <T> void registerProvider(Class<T> api, T provider, String subsystem) {
 		// TODO: remove this method?
 		ServiceRegistryExporterClient serviceRegistryClient = new ServiceRegistryExporterClient(this.serviceRegistry, subsystem, api.getName());
-		ServiceProperties servicePRoperties = AstrixDirectComponent.registerAndGetProperties(api, provider);
+		ServiceProperties servicePRoperties = DirectComponent.registerAndGetProperties(api, provider);
 		serviceRegistryClient.register(api, servicePRoperties, 60_000);
 	}
 	

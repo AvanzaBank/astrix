@@ -29,7 +29,7 @@ import tutorial.p2.provider.LunchLibraryProvider;
 import tutorial.p2.provider.LunchServiceProvider;
 
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.AstrixDirectComponent;
+import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 
 public class LunchLibraryTest {
@@ -44,7 +44,7 @@ public class LunchLibraryTest {
 	@Test
 	public void astrixDirectComponentAllowsBindingToObjectsInSameProcess() throws Exception {
 		LunchRestaurantFinder restaurantFinderStub = Mockito.mock(LunchRestaurantFinder.class);
-		String serviceUri = AstrixDirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinderStub);
+		String serviceUri = DirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinderStub);
 
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.set("restaurantFinderUri", serviceUri);

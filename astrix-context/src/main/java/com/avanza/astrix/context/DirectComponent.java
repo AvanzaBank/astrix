@@ -30,12 +30,11 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceContext;
 import com.avanza.astrix.beans.service.ServiceProperties;
-import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.core.AstrixObjectSerializer;
-import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 /**
  * 
@@ -43,7 +42,7 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
  *
  */
 @MetaInfServices(ServiceComponent.class)
-public class AstrixDirectComponent implements ServiceComponent {
+public class DirectComponent implements ServiceComponent {
 	
 	private final static AtomicLong idGen = new AtomicLong();
 	private final static Map<String, ServiceProvider<?>> providerById = new ConcurrentHashMap<>();
@@ -314,7 +313,7 @@ public class AstrixDirectComponent implements ServiceComponent {
 
 		@Override
 		public void release() {
-			AstrixDirectComponent.this.nonReleasedInstances.remove(this);
+			DirectComponent.this.nonReleasedInstances.remove(this);
 		}
 		
 	}

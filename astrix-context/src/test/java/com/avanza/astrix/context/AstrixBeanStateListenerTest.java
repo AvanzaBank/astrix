@@ -32,7 +32,7 @@ public class AstrixBeanStateListenerTest {
 	
 	@Test
 	public void waitForBean_beanIsLibrary_waitsUntilAllTransitiveDependenciesAreBeBound() throws Exception {
-		String myServiceId = AstrixDirectComponent.register(MyService.class, new MyServiceImpl());
+		String myServiceId = DirectComponent.register(MyService.class, new MyServiceImpl());
 		testAstrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
 		testAstrixConfigurer.registerApiProvider(MyLibraryProvider.class);
 		testAstrixConfigurer.registerApiProvider(MyServiceProvider.class);
@@ -48,7 +48,7 @@ public class AstrixBeanStateListenerTest {
 		}
 		
 		// Make myService available in configuration => Allows bean to be bound
-		testAstrixConfigurer.set("myService", AstrixDirectComponent.getServiceUri(myServiceId));
+		testAstrixConfigurer.set("myService", DirectComponent.getServiceUri(myServiceId));
 		
 		astrix.waitForBean(MyClient.class, 1000);
 		assertEquals("hello: kalle", myClient.hello("kalle"));

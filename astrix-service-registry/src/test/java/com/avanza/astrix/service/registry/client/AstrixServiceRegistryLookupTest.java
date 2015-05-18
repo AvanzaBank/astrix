@@ -32,7 +32,7 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.AstrixDirectComponent;
+import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -64,8 +64,8 @@ public class AstrixServiceRegistryLookupTest {
 	
 	@Test
 	public void lookupService_serviceAvailableInRegistry_ServiceIsImmediatlyBound() throws Exception {
-		final String objectId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
-		serviceRegistryExporterClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
+		final String objectId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		serviceRegistryExporterClient.register(GreetingService.class, DirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
 		
 		GreetingService greetingService = context.getBean(GreetingService.class);
 		assertEquals(new GreetingServiceImpl("hello: ").hello("kalle"), greetingService.hello("kalle"));
@@ -73,7 +73,7 @@ public class AstrixServiceRegistryLookupTest {
 	
 	@Test
 	public void lookupService_ServiceAvailableInRegistryButItsNotPossibleToBindToIt_ServiceIsBoundWhenServiceBecamesAvailable() throws Exception {
-		final String objectId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		final String objectId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		
 		try {
@@ -82,7 +82,7 @@ public class AstrixServiceRegistryLookupTest {
 		} catch (ServiceUnavailableException e) {
 		}
 
-		serviceRegistryExporterClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
+		serviceRegistryExporterClient.register(GreetingService.class, DirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
 			public String get() {

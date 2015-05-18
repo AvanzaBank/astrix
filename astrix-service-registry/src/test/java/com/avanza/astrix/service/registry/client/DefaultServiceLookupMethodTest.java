@@ -26,7 +26,7 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.AstrixDirectComponent;
+import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
@@ -50,10 +50,10 @@ public class DefaultServiceLookupMethodTest {
 	
 	@Test
 	public void lookupService_serviceAvailableInRegistry_ServiceIsImmediatlyBound() throws Exception {
-		final String objectId = AstrixDirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		final String objectId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		
 		ServiceRegistryExporterClient serviceRegistryClient = new ServiceRegistryExporterClient(serviceRegistry, "default", "FooInstanceId");
-		serviceRegistryClient.register(GreetingService.class, AstrixDirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
+		serviceRegistryClient.register(GreetingService.class, DirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
 		
 		
 		GreetingService greetingService = context.getBean(GreetingService.class);
