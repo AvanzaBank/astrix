@@ -54,8 +54,8 @@ public @interface AstrixApplication {
 	Class<?>[] apiDescriptors() default {};
 
 	/**
-	 * Default {@link AstrixServiceComponent} to use when exporting services provided by this application,
-	 * see {@link AstrixServiceComponentNames} for well known AstrixServiceComponent's.
+	 * Default {@link ServiceComponent} to use when exporting services provided by this application,
+	 * see {@link AstrixServiceComponentNames} for well known ServiceComponent's.
 	 * 
 	 * This might be overriden on a per service basis by setting the {@link Service#value()} property
 	 * on a given service.
@@ -65,8 +65,8 @@ public @interface AstrixApplication {
 	String defaultServiceComponent() default "";
 	
 	/**
-	 * Default {@link AstrixServiceComponent} to use when exporting services provided by this application,
-	 * see {@link AstrixServiceComponentNames} for well known AstrixServiceComponent's.
+	 * Default {@link ServiceComponent} to use when exporting services provided by this application,
+	 * see {@link AstrixServiceComponentNames} for well known ServiceComponent's.
 	 * 
 	 * This might be overriden on a per service basis by setting the {@link Service#value()} property
 	 * on a given service.

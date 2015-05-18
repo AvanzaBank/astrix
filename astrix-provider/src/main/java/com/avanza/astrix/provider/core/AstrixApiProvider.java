@@ -42,8 +42,8 @@ import java.lang.annotation.Target;
  * <li> That the method should be used as a factory to bind to a provider of the given bean type
  * </ol>
  * 
- * The other type of bean is "service". For services Astrix uses an AstrixServiceComponent to bind to a provider
- * of the given bean type. The AstrixServiceComponent is an extension point to create custom service transports.
+ * The other type of bean is "service". For services Astrix uses an ServiceComponent to bind to a provider
+ * of the given bean type. The ServiceComponent is an extension point to create custom service transports.
  * A service is defined by annotating a method with @Service indicating:
  * 
  * <ol>
@@ -56,9 +56,9 @@ import java.lang.annotation.Target;
  * 
  * <ol>
  * <li> Use the defined lookup mechanism to retrieve runtime service information. The information retrieved
- * from lookup contains information about (a.) what AstrixServiceComponent to use to bind to the provider and
- * (b.) all service properties required by the AstrixServiceComponent to bind to a provider.
- * <li> Use the service-properties and AstrixServiceComponent retrieved from lookup to bind to a provider.
+ * from lookup contains information about (a.) what ServiceComponent to use to bind to the provider and
+ * (b.) all service properties required by the ServiceComponent to bind to a provider.
+ * <li> Use the service-properties and ServiceComponent retrieved from lookup to bind to a provider.
  * </ol>
  * 
  * Libraries are sometimes referred to as "statically bound Astrix beans" reflecting that 
@@ -66,7 +66,7 @@ import java.lang.annotation.Target;
  * as "dynamically bound Astrix beans", reflecting that they can be re-bind to a new provider at runtime. 
  * For instance, if a new provider for a given service is registered in the service registry, then
  * Astrix transparently re-binds the corresponding astrix-bean to the new provider. The new provider
- * might be using another transport mechanism (as defined by the corresponding AstrixServiceComponent), allowing
+ * might be using another transport mechanism (as defined by the corresponding ServiceComponent), allowing
  * transport mechanism to change at runtime.<p>
  * 
  * Example of a service provider exporting two services that are located using the service registry:
