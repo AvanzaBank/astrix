@@ -48,6 +48,7 @@ import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.SystemPropertiesConfigSource;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
 /**
@@ -73,6 +74,11 @@ public class AstrixConfigurer {
 	private final Set<String> activeProfiles = new HashSet<>();
 	private DynamicConfig config;
 	
+	/**
+	 * Creates an AstrixContext instance using the current configuration. <p>
+	 * 
+	 * @return
+	 */
 	public AstrixContext configure() {
 		config = createDynamicConfig();
 		AstrixPlugins astrixPlugins = getPlugins();
@@ -169,10 +175,6 @@ public class AstrixConfigurer {
 		if (!basePackage.trim().isEmpty()) {
 			return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(astrixPlugins), "com.avanza.astrix", basePackage.split(",")); // Always scan com.avanza.astrix package
 		}
-		basePackage = AstrixSettings.API_DESCRIPTOR_SCANNER_BASE_PACKAGE.getFrom(config).get();
-		if (!basePackage.trim().isEmpty()) {
-			return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(astrixPlugins), "com.avanza.astrix", basePackage.split(","));
-		}
 		return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(astrixPlugins), "com.avanza.astrix"); 
 	}
 	
@@ -184,6 +186,11 @@ public class AstrixConfigurer {
 		return result;
 	}
 
+	/**
+	 * Sets the base-package used when scanning for {@link AstrixApiProvider}'s.<p> 
+	 * 
+	 * @param basePackage
+	 */
 	public void setBasePackage(String basePackage) {
 		 this.settings.set(AstrixSettings.API_PROVIDER_SCANNER_BASE_PACKAGE, basePackage);
 	}
@@ -254,11 +261,6 @@ public class AstrixConfigurer {
 		return this;
 	}
 	
-	public AstrixConfigurer setAstrixSettings(AstrixSettings settings) {
-		this.settings.setAll(settings);
-		return this;
-	}
-	
 	/**
 	 * Optional property that identifies what subsystem the current context belongs to. Its only
 	 * allowed to invoke non-versioned services within the same subsystem. Attempting
@@ -270,7 +272,7 @@ public class AstrixConfigurer {
 		this.settings.set(AstrixSettings.SUBSYSTEM_NAME, subsystem);
 	}
 
-	public void addFactoryBean(StandardFactoryBean<?> factoryBean) {
+	void addFactoryBean(StandardFactoryBean<?> factoryBean) {
 		this.standaloneFactories.add(factoryBean);
 	}
 
@@ -278,6 +280,16 @@ public class AstrixConfigurer {
 		this.settings.remove(name);
 	}
 
+	/**
+	 * Activates a given Astrix profile.
+	 * 
+	 * Astrix profiles are used to include/exclude {@link AstrixApiProvider}'s at runtime by annotating them
+	 * with {@link AstrixIncludedByProfile} and/or {@link AstrixExcludedByProfile}, typically to
+	 * replace a given {@link AstrixApiProvider} in testing scenarios.<p>
+	 * 
+	 * 
+	 * @param profile
+	 */
 	public void activateProfile(String profile) {
 		this.activeProfiles.add(profile);
 	}

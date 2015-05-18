@@ -91,12 +91,6 @@ public class AstrixSettings implements DynamicConfigSource, MutableConfigSource 
 	 */
 	public static final StringSetting API_PROVIDER_SCANNER_BASE_PACKAGE = StringSetting.create("AstrixApiProviderScanner.basePackage", "");
 	
-	/**
-	 * @renamed to {@link #API_PROVIDER_SCANNER_BASE_PACKAGE}  
-	 */
-	@Deprecated
-	public static final StringSetting API_DESCRIPTOR_SCANNER_BASE_PACKAGE = StringSetting.create("AstrixApiDescriptorScanner.basePackage", "");
-	
 	public static final StringSetting SUBSYSTEM_NAME = StringSetting.create("AstrixContext.subsystem", "default");
 	
 	public static final BooleanSetting ENABLE_FAULT_TOLERANCE = BooleanSetting.create("AstrixContext.enableFaultTolerance", true);
