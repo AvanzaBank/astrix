@@ -43,10 +43,9 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.service.ServiceContext;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.AstrixContextImpl;
-import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
 import com.avanza.astrix.serviceunit.ServiceAdministrator;
 import com.avanza.astrix.serviceunit.ServiceAdministratorImpl;
@@ -91,7 +90,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	private String subsystem;
 	private Map<String, String> settings = new HashMap<>();
 	private AstrixApplicationDescriptor applicationDescriptor;
-	private AstrixContextImpl astrixContext;
+	private AstrixApplicationContext astrixContext;
 	private volatile boolean serviceExporterStarted = false;
 	private ApplicationContext applicationContext;
 	private final AstrixConfigurer configurer = new AstrixConfigurer();
@@ -184,7 +183,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		throw new IllegalArgumentException("Multiple DynamicConfig instances found in ApplicationContext");
 	}
 	
-	private AstrixContextImpl createAsterixContext(DynamicConfig optionalConfig) {
+	private AstrixApplicationContext createAsterixContext(DynamicConfig optionalConfig) {
 		configurer.setSettings(this.settings);
 		if (optionalConfig != null) {
 			configurer.setConfig(optionalConfig);
@@ -192,7 +191,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		if (this.subsystem != null) {
 			configurer.setSubsystem(this.subsystem);
 		}
-		AstrixContextImpl astrixContext = (AstrixContextImpl) configurer.configure();
+		AstrixApplicationContext astrixContext = (AstrixApplicationContext) configurer.configure();
 		return astrixContext;
 	}
 

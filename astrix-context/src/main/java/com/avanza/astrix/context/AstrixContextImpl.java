@@ -34,7 +34,7 @@ import com.avanza.astrix.config.DynamicConfig;
  * 
  * @author Elias Lindholm (elilin)
  */
-public class AstrixContextImpl implements Astrix, AstrixContext {
+final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	
 	private final SimpleAstrixFactoryBeanRegistry beanFactoryRegistry;
 	private final ApiProviderPlugins apiProviderPlugins;

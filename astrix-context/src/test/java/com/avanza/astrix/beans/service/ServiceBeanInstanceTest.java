@@ -31,8 +31,8 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
+import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.AstrixContextImpl;
 import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
@@ -123,7 +123,7 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
+		AstrixApplicationContext astrixContext = (AstrixApplicationContext) astrixConfigurer.configure();
 		
 		
 		Ping ping = astrixContext.getBean(Ping.class);
@@ -149,7 +149,7 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 5);
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
+		AstrixApplicationContext astrixContext = (AstrixApplicationContext) astrixConfigurer.configure();
 		
 		DirectComponent directComponent = astrixContext.getInstance(ServiceComponents.class).getComponent(DirectComponent.class);
 

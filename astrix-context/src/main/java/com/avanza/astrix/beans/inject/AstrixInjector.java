@@ -200,6 +200,7 @@ public class AstrixInjector {
 				}
 			}
 			try {
+				factory.setAccessible(true);
 				return factory.newInstance(args);
 			} catch (Exception e) {
 				throw new RuntimeException("Failed to instantiate bean using constructor: " + factory.getName(), e);
