@@ -58,8 +58,8 @@ public class GsComponent implements ServiceComponent {
 	}
 	
 	@Override
-	public ServiceProperties createServiceProperties(String serviceUri) {
-		return gsBinder.createServiceProperties(serviceUri);
+	public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
+		return gsBinder.createServiceProperties(serviceProviderUri);
 	}
 
 

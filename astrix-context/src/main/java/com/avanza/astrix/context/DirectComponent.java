@@ -78,8 +78,8 @@ public class DirectComponent implements ServiceComponent {
 	}
 	
 	@Override
-	public ServiceProperties createServiceProperties(String componentSpecificUri) {
-		return getServiceProperties(componentSpecificUri);
+	public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
+		return getServiceProperties(serviceProviderUri);
 	}
 
 	@Override

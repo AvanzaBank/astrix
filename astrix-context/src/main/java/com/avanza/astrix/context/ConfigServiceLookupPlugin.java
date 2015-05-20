@@ -88,11 +88,11 @@ public class ConfigServiceLookupPlugin implements ServiceDiscoveryMetaFactoryPlu
 			return "ConfigDiscovery[" + configEntryName + "]";
 		}
 		
-		private ServiceProperties buildServiceProperties(String serviceUriIncludingComponent) {
-			String component = serviceUriIncludingComponent.substring(0, serviceUriIncludingComponent.indexOf(":"));
-			String serviceUri = serviceUriIncludingComponent.substring(serviceUriIncludingComponent.indexOf(":") + 1);
+		private ServiceProperties buildServiceProperties(String serviceUri) {
+			String component = serviceUri.substring(0, serviceUri.indexOf(":"));
+			String serviceProviderUri = serviceUri.substring(serviceUri.indexOf(":") + 1);
 			ServiceComponent serviceComponent = getServiceComponent(component);
-			ServiceProperties serviceProperties = serviceComponent.createServiceProperties(serviceUri);
+			ServiceProperties serviceProperties = serviceComponent.parseServiceProviderUri(serviceProviderUri);
 			serviceProperties.setComponent(serviceComponent.getName());
 			return serviceProperties;
 		}

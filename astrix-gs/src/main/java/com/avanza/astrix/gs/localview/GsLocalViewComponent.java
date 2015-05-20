@@ -105,8 +105,8 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	}
 
 	@Override
-	public ServiceProperties createServiceProperties(String serviceUri) {
-		return gsBinder.createServiceProperties(serviceUri);
+	public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
+		return gsBinder.createServiceProperties(serviceProviderUri);
 	}
 
 	@Override

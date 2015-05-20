@@ -26,10 +26,22 @@ package com.avanza.astrix.beans.service;
  *
  */
 public interface ServiceComponent {
-	
+	/**
+	 * Creates an bound service-instance for a given service definition.
+	 * 
+	 * @param serviceDefinition
+	 * @param serviceProperties
+	 * @return
+	 */
 	<T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties);
 	
-	ServiceProperties createServiceProperties(String serviceUri);
+	/**
+	 * Parses a given servicePropertiesUri.
+	 * 
+	 * @param serviceProviderUri
+	 * @return
+	 */
+	ServiceProperties parseServiceProviderUri(String serviceProviderUri);
 	
 	/**
 	 * Creates {@link ServiceProperties} for a given exportedService. 
@@ -52,7 +64,7 @@ public interface ServiceComponent {
 	/**
 	 * Defines whether this ServiceComponent can be used to bind a bean of a given type.
 	 * 
-	 * If this ServiceComponent can be used to bind the given type, then {@link #createServiceProperties(Class)}
+	 * If this ServiceComponent can be used to bind the given type, then {@link #parseServiceProviderUri(Class)}
 	 * should create ServiceProperties that can be passed to {@link #bind(Class, ServiceDefinition, ServiceProperties)}
 	 * to bind to an instance of the given type.
 	 * 
