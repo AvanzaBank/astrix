@@ -191,17 +191,21 @@ public class AstrixConfigurer {
 	 * Sets the base-package used when scanning for {@link AstrixApiProvider}'s.<p> 
 	 * 
 	 * @param basePackage
+	 * @return 
 	 */
-	public void setBasePackage(String basePackage) {
+	public AstrixConfigurer setBasePackage(String basePackage) {
 		 this.settings.set(AstrixSettings.API_PROVIDER_SCANNER_BASE_PACKAGE, basePackage);
+		 return this;
 	}
 	
-	public void enableFaultTolerance(boolean enableFaultTolerance) {
+	public AstrixConfigurer enableFaultTolerance(boolean enableFaultTolerance) {
 		this.settings.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, enableFaultTolerance);
+		return this;
 	}
 	
-	public void enableVersioning(boolean enableVersioning) {
+	public AstrixConfigurer enableVersioning(boolean enableVersioning) {
 		this.settings.set(AstrixSettings.ENABLE_VERSIONING, enableVersioning);
+		return this;
 	}
 	
 	private void configureVersioning(AstrixPlugins plugins) {
@@ -253,8 +257,9 @@ public class AstrixConfigurer {
 		return this;
 	}
 	
-	public void setSettings(Map<String, String> settings) {
+	public AstrixConfigurer setSettings(Map<String, String> settings) {
 		this.settings.setAll(settings);
+		return this;
 	}
 	
 	public AstrixConfigurer setConfig(DynamicConfig config) {
@@ -268,9 +273,11 @@ public class AstrixConfigurer {
 	 * to invoke a non-versioned service in another subsystem will throw an IllegalSubsystemException. <p>
 	 * 
 	 * @param string
+	 * @return 
 	 */
-	public void setSubsystem(String subsystem) {
+	public AstrixConfigurer setSubsystem(String subsystem) {
 		this.settings.set(AstrixSettings.SUBSYSTEM_NAME, subsystem);
+		return this;
 	}
 
 	void addFactoryBean(StandardFactoryBean<?> factoryBean) {
@@ -290,9 +297,11 @@ public class AstrixConfigurer {
 	 * 
 	 * 
 	 * @param profile
+	 * @return 
 	 */
-	public void activateProfile(String profile) {
+	public AstrixConfigurer activateProfile(String profile) {
 		this.activeProfiles.add(profile);
+		return this;
 	}
 	
 	public static  class InternalBeanPostProcessor implements AstrixBeanPostProcessor {
