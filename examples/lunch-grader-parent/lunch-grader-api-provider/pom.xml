@@ -19,7 +19,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${astrix.groupId}</groupId>
-			<artifactId>astrix-provider</artifactId>
+			<artifactId>astrix-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>${astrix.groupId}</groupId>

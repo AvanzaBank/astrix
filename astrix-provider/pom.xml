@@ -6,4 +6,11 @@
 		<version>MASTER-SNAPSHOT</version>
 	</parent>
 	<artifactId>astrix-provider</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>astrix-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 </project>

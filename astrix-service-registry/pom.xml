@@ -9,7 +9,7 @@
   <dependencies>
 	<dependency>
 		<groupId>${project.groupId}</groupId>
-		<artifactId>astrix-provider</artifactId>
+		<artifactId>astrix-core</artifactId>
 		<version>${project.version}</version>
 	</dependency>
 	<dependency>
