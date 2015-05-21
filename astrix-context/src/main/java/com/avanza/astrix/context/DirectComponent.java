@@ -37,6 +37,7 @@ import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.context.versioning.AstrixVersioningPlugin;
 import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 /**
  * 
@@ -228,7 +229,7 @@ public class DirectComponent implements ServiceComponent {
 				}
 				marshalledAndUnmarshalledArgs[i] = deserialized;
 			}
-			Object result = method.invoke(provider, marshalledAndUnmarshalledArgs);
+			Object result = ReflectionUtil.invokeMethod(method, provider, marshalledAndUnmarshalledArgs);
 			// simulate server serialization before sending response over network
 			Object serialized = serverSerializer.serialize(result, clientVersion);
 			// simulate client deserialization after receiving response from server.

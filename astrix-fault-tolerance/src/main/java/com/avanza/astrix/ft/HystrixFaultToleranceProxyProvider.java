@@ -16,7 +16,6 @@
 package com.avanza.astrix.ft;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.kohsuke.MetaInfServices;
@@ -63,11 +62,7 @@ public class HystrixFaultToleranceProxyProvider implements FaultToleranceProxyPr
 			return faultTolerance.execute(new CheckedCommand<Object>() {
 				@Override
 				public Object call() throws Throwable {
-					try {
-						return method.invoke(provider, args);
-					} catch (InvocationTargetException e) {
-						throw e.getTargetException();
-					}
+					return ReflectionUtil.invokeMethod(method, provider, args);
 				}
 			}, settings);
 		}

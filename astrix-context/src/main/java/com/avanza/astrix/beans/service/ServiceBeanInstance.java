@@ -33,6 +33,7 @@ import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.core.util.ReflectionUtil;
 
 /**
  * 
@@ -273,12 +274,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			try {
-				return method.invoke(serviceBeanInstance.get(), args);
-			} catch (InvocationTargetException e) {
-				log.debug("Service invocation threw exception", e);
-				throw e.getTargetException();
-			}
+			return ReflectionUtil.invokeMethod(method, serviceBeanInstance.get(), args);
 		}
 		
 		@Override

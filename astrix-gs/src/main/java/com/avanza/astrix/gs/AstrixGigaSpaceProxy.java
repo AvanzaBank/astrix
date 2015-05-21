@@ -16,7 +16,6 @@
 package com.avanza.astrix.gs;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.openspaces.core.GigaSpace;
@@ -59,12 +58,9 @@ public class AstrixGigaSpaceProxy implements InvocationHandler {
 			@Override
 			public Object call() throws Throwable {
 				try {
-					return method.invoke(gigaSpace, args);
-				} catch (InvocationTargetException e) {
-					if (e.getTargetException() instanceof SpaceCacheException) {
-						throw new ServiceUnavailableException("SpaceCacheNotAvailable", e.getTargetException());
-					}
-					throw e.getTargetException();
+					return ReflectionUtil.invokeMethod(method, gigaSpace, args);
+				} catch (SpaceCacheException e) {
+					throw new ServiceUnavailableException("SpaceCacheNotAvailable", e);
 				}
 			}
 		}, settings);

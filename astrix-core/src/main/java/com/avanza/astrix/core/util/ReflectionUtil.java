@@ -16,6 +16,7 @@
 package com.avanza.astrix.core.util;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
@@ -24,6 +25,24 @@ public class ReflectionUtil {
 	@SuppressWarnings("unchecked")
 	public static <T> T newProxy(Class<T> type, InvocationHandler handler) {
 		return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, handler);
+	}
+	
+	/**
+	 * Reflectively invokes the given Method. InvocationTargetExcpetion's thrown
+	 * will be unfolded.
+	 * 
+	 * @param method
+	 * @param target
+	 * @param args
+	 * @return
+	 * @throws Throwable
+	 */
+	public static Object invokeMethod(Method method, Object target, Object[] args) throws Throwable {
+		try {
+			return method.invoke(target, args);
+		} catch (InvocationTargetException e) {
+			throw e.getCause();
+		}
 	}
 	
 	public static <T> T newInstance(Class<T> type) {
@@ -49,7 +68,5 @@ public class ReflectionUtil {
 			throw new RuntimeException("Failed to load class: " + name, e);
 		}
 	}
-	
-	
 
 }

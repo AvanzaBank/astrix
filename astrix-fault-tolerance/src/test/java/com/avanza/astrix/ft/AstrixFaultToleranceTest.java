@@ -15,10 +15,8 @@
  */
 package com.avanza.astrix.ft;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Before;
@@ -128,7 +126,7 @@ public class AstrixFaultToleranceTest {
 		return currentConcurrentExecutionCount;
 	}
 	
-	interface Ping {
+	public interface Ping {
 		String ping(String msg);
 	}
 	
@@ -168,21 +166,4 @@ public class AstrixFaultToleranceTest {
 
 	}
 	
-	static class InvocationCounterProxy implements InvocationHandler {
-
-		private final AtomicInteger totalInvocationCount;
-		private final Object target;
-
-		public InvocationCounterProxy(AtomicInteger totalInvocationCount, Object target) {
-			this.totalInvocationCount = totalInvocationCount;
-			this.target = target;
-		}
-
-		@Override
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			this.totalInvocationCount.incrementAndGet();
-			return method.invoke(target, args);
-		}
-	}
-
 }
