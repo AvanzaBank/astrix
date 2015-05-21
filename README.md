@@ -35,8 +35,8 @@ Service registration and discovery is done using the service registry. It is an 
 One of the core features provided by Astrix is service binding, which is done in three steps:
 
 1. Astrix discovers a provider of a given service, typically using the service-registry
-2. Astrix uses information retrieved from discovery to decide what mechanism to use to bind to the given service provider. In Astrix that binding mechanism is called `AstrixServiceComponent`
-3. Astrix uses the AstrixServiceComponent to bind to the given provider
+2. Astrix uses information retrieved from discovery to decide what mechanism to use to bind to the given service provider. In Astrix that binding mechanism is called `ServiceComponent`
+3. Astrix uses the `ServiceComponent` to bind to the given provider
 
 It's also possible to locate providers without using the service-registry, for instance using configuration. The service-registry itself is located using the configuration mechanism.
 
@@ -47,7 +47,7 @@ A key goal of Astrix is to support independent release cycles of different micro
 
 #### Versioning framework design
 1. The service implementation only knows the latest version of the data-format
-2. The service-provider implement ”migrations” for each change in data-foramt which upgrade/downgrade a message from one version to the next
+2. The service-provider implement ”migrations” for each change in data-format which upgrade/downgrade a message from one version to the next
 3. Astrix uses the migrations in all message-exchanges (service invocations) to upgrade an incoming requests to the latest version before invoking the actual service implementation, and downgrade the response received from the service implementation before sending them back to the client.
 
 ### Fault tolerance
