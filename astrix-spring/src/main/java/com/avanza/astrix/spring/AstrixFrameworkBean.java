@@ -44,6 +44,7 @@ import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.context.Astrix;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
@@ -111,6 +112,26 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		beanFactory.addBeanPostProcessor(astrixContext.getInstance(AstrixBeanPostProcessor.class));
 	}
 
+	/**
+	 * All consumedAstrixBeans will be created (see {@link Astrix#getBean(Class)} and registered in the spring ApplicationContext at
+	 * startup. All consumedAstrixBeans will be available as autowiring candidates for other beans in the current spring ApplicationContext.<p>
+	 * 
+	 * Its also possible to wire consumedAstrixBeans by reference. Each consumed Astrix-bean will be registered under the fully qualified
+	 * class name of the given Astrix bean.<p>
+	 * 
+	 * <pre>
+	 * Example:
+	 * 
+	 * setConsumedAstrixBeans(asList(se.avanza.customer.CustomerService.class));
+	 * 
+	 * Creates and registers an Astrix bean of type CustomerService in the current ApplicationContext. The name
+	 * of the CustomerService bean in the spring ApplicationContext will be "se.avanza.customer.CustomerService", which
+	 * can be used in a ApplicationContext-xml file to explicitly wire an instance of CustomerService into another
+	 * spring bean.
+	 * </pre>
+	 * 
+	 * @param consumedAstrixBeans
+	 */
 	public void setConsumedAstrixBeans(List<Class<? extends Object>> consumedAstrixBeans) {
 		this.consumedAstrixBeans = consumedAstrixBeans;
 	}
