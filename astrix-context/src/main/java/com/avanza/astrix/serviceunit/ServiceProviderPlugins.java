@@ -51,6 +51,12 @@ public class ServiceProviderPlugins {
 				return plugin;
 			}
 		}
-		throw new IllegalArgumentException("No plugin registered that can handle apiProvider: " + apiProvider);
+		throw new IllegalArgumentException("No plugin registered that can handle ApiProvider class: " + apiProvider + ".\n"
+										 + "Some possible causes: \n"
+										 + "1. You forgot annotate the ApiProvider class with an ApiProvider annotation, most commonly @AstrixApiProvider\n"
+										 + "2. The given class is not an ApiProvider but rather a service interface. In that case you sould\n"
+										 + "   update your applicationDescriptor's exportsRemoteServicesFor attribute (@AstrixApplication.exportsRemoteServicesFor) \n"
+										 + "   to point to the ApiProvider rather than the service interface\n"
+										 + "3. You don't have the Plugin that handles your ApiProvider on the classpath");
 	}
 }
