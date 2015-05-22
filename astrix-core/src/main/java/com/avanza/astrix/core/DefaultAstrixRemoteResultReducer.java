@@ -18,7 +18,10 @@ package com.avanza.astrix.core;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultAstrixRemoteRestultReducer<T> implements AstrixRemoteResultReducer<List<T>, List<T>> {
+/**
+ *
+ */
+public class DefaultAstrixRemoteResultReducer<T> implements AstrixRemoteResultReducer<List<T>, List<T>> {
 
 	@Override
 	public List<T> reduce(List<AstrixRemoteResult<List<T>>> results) {
