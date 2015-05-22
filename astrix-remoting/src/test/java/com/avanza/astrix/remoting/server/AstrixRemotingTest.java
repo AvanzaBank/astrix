@@ -294,6 +294,20 @@ public class AstrixRemotingTest {
 		assertThat(partitionedPing.ping(new String[]{"1", "2", "3"}), containsInAnyOrder("1", "2", "3"));
 	}
 	
+	@Test
+	public void partitionedRequest_voidReturnType() throws Exception {
+		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		PartitionedPingService eventPartitionPing = new PartitionedPingServiceImpl();
+		PartitionedPingService oddPartitionPing = new PartitionedPingServiceImpl();
+		
+		evenPartition.register(eventPartitionPing, objectSerializer, PartitionedPingService.class);
+		oddPartition.register(oddPartitionPing, objectSerializer, PartitionedPingService.class);
+
+		PartitionedPingService partitionedPing = RemotingProxy.create(PartitionedPingService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		partitionedPing.pingVoid(new String[]{"1", "2", "3"});
+	}
+	
 	@Test(expected = IllegalArgumentException.class)
 	public void partitionedService_IncompatibleCollectionType_throwsException() throws Exception {
 		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
@@ -735,6 +749,7 @@ public class AstrixRemotingTest {
 		List<Float> ping(@AstrixPartitionedRouting float... nums);
 		List<Boolean> ping(@AstrixPartitionedRouting boolean... nums);
 		List<String> ping(@AstrixPartitionedRouting String... nums);
+		void pingVoid(@AstrixPartitionedRouting String... nums);
 	}
 	
 	interface InvalidCollectionTypePartitionedService {
@@ -762,6 +777,7 @@ public class AstrixRemotingTest {
 	}
 	
 	public static class PartitionedPingServiceImpl implements PartitionedPingService {
+		
 		@Override
 		public List<Short> ping(short... nums) {
 			List<Short> result = new ArrayList<>();
@@ -821,6 +837,10 @@ public class AstrixRemotingTest {
 				result.add(s);
 			}
 			return result;
+		}
+		@Override
+		public void pingVoid(String... nums) {
+			
 		}
 	}
 	

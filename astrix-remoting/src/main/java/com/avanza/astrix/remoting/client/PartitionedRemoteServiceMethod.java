@@ -110,6 +110,14 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 	}
 
 	private <T> Observable<T> reduce(Observable<AstrixServiceInvocationResponse> responses) {
+		if (targetReturnType.equals(Void.TYPE)) {
+			return responses.toList().map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
+				@Override
+				public T call(List<AstrixServiceInvocationResponse> t1) {
+					return null;
+				}
+			});
+		}
 		final AstrixRemoteResultReducer<T, T> reducer = newRemoteResultReducer();
 		return responses.toList().map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
 			@Override
