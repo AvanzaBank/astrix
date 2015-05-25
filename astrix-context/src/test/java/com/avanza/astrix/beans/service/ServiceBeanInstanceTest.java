@@ -37,12 +37,12 @@ import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
-import com.avanza.astrix.test.util.Supplier;
 
 public class ServiceBeanInstanceTest {
 	
@@ -105,7 +105,7 @@ public class ServiceBeanInstanceTest {
 
 		assertEventually(serviceInvocationResult(new Supplier<String>() {
 			@Override
-			public String get() throws Exception {
+			public String get() {
 				return ping.ping("foo");
 			}
 		}, equalTo("foo")));
@@ -161,7 +161,7 @@ public class ServiceBeanInstanceTest {
 		serviceRegistry.clear();
 		assertEventually(serviceInvocationException(new Supplier<String>() {
 			@Override
-			public String get() throws Exception {
+			public String get() {
 				return ping.ping("foo");
 			}
 		}, CoreMatchers.any(ServiceUnavailableException.class)));
@@ -196,7 +196,7 @@ public class ServiceBeanInstanceTest {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		serviceRegistry.registerProvider(Ping.class, new Ping() {
 			@Override
-			public String ping(String msg) throws MyException {
+			public String ping(String msg) {
 				throw new MyException();
 			}
 			
@@ -277,7 +277,7 @@ public class ServiceBeanInstanceTest {
 	}
 	
 	
-	static class MyException extends Exception {
+	static class MyException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 	}
 	
@@ -295,7 +295,7 @@ public class ServiceBeanInstanceTest {
 	}
 	
 	public interface Ping {
-		String ping(String msg) throws Exception;
+		String ping(String msg);
 	}
 	
 	public static class PingImpl implements Ping {

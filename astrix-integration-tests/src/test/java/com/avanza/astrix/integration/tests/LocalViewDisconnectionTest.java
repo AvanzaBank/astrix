@@ -29,6 +29,7 @@ import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
@@ -36,7 +37,6 @@ import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.test.util.AstrixTestUtil;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
-import com.avanza.astrix.test.util.Supplier;
 
 public class LocalViewDisconnectionTest {
 	
@@ -79,7 +79,7 @@ public class LocalViewDisconnectionTest {
 		assertEventually(AstrixTestUtil.serviceInvocationException(
 				new Supplier<Integer>() {
 					@Override
-					public Integer get() throws Exception {
+					public Integer get() {
 						return localView.count(LunchRestaurant.template());
 					}
 				}, AstrixTestUtil.isExceptionOfType(ServiceUnavailableException.class)));

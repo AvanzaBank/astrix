@@ -48,6 +48,7 @@ import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.common.Ping;
@@ -64,7 +65,6 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.test.util.AstrixTestUtil;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
-import com.avanza.astrix.test.util.Supplier;
 /**
  * 
  * @author Elias Lindholm (elilin)

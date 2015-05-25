@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.test.util;
+package com.avanza.astrix.core.function;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public interface Supplier<T> {
-	T get() throws Exception;
+	T get();
 }

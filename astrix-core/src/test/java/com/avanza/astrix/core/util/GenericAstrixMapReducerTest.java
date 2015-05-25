@@ -18,6 +18,7 @@ package com.avanza.astrix.core.util;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
@@ -25,7 +26,6 @@ import org.junit.Test;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.CorrelationId;
 import com.avanza.astrix.core.ServiceInvocationException;
-import com.avanza.astrix.test.util.AstrixTestUtil;
 
 
 public class GenericAstrixMapReducerTest {
@@ -52,8 +52,8 @@ public class GenericAstrixMapReducerTest {
 				AstrixRemoteResult.<Map<String, Integer>>failure(new MyRuntimeException(), CorrelationId.undefined())));
 	}
 	
-	public static AstrixTestUtil.MapBuilder newMap(String key, Integer value) {
-		return new AstrixTestUtil.MapBuilder(key, value);
+	public static MapBuilder newMap(String key, Integer value) {
+		return new MapBuilder(key, value);
 	}
 	
 	private static final class MyRuntimeException extends ServiceInvocationException {
@@ -71,4 +71,18 @@ public class GenericAstrixMapReducerTest {
 		}
 	}
 	
+	public static class MapBuilder {
+		private HashMap<String, Integer> result = new HashMap<>();
+		public MapBuilder() { }
+		public MapBuilder(String key, Integer value) { 
+			with(key, value);
+		}
+		public MapBuilder with(String key, Integer value) {
+			result.put(key, value);
+			return this;
+		}
+		public Map<String, Integer> build() {
+			return result;
+		}
+	}
 }
