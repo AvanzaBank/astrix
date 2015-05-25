@@ -16,6 +16,7 @@
 package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.publish.ApiProvider;
 
 
 
@@ -37,23 +38,34 @@ public final class ServiceDefinition<T> {
 	private final ObjectSerializerDefinition objectSerializerDefinition;
 	private final AstrixBeanKey<T> beanKey;
 	private final boolean dynamicQualified;
+	private final ApiProvider definingApi;
 	
-	public ServiceDefinition(AstrixBeanKey<T> beanKey, ObjectSerializerDefinition serializerDefinition, boolean dynamicQualified) {
+	public ServiceDefinition(ApiProvider definingApi, AstrixBeanKey<T> beanKey, ObjectSerializerDefinition serializerDefinition, boolean dynamicQualified) {
+		this.definingApi = definingApi;
 		this.beanKey = beanKey;
 		this.objectSerializerDefinition = serializerDefinition;
 		this.dynamicQualified = dynamicQualified;
 		this.serviceConfigClass = null;
 	}
 
-	public ServiceDefinition(AstrixBeanKey<T> beanKey, Class<?> serviceConfigClass, ObjectSerializerDefinition objectSerializerDefinition, boolean dynamicQualified) {
+	private ServiceDefinition(ApiProvider definingApi, AstrixBeanKey<T> beanKey, Class<?> serviceConfigClass, ObjectSerializerDefinition objectSerializerDefinition, boolean dynamicQualified) {
+		this.definingApi = definingApi;
 		this.beanKey = beanKey;
 		this.serviceConfigClass = serviceConfigClass;
 		this.objectSerializerDefinition = objectSerializerDefinition;
 		this.dynamicQualified = dynamicQualified;
 	}
+
+	public static <T> ServiceDefinition<T> create(ApiProvider definingApi,
+												  AstrixBeanKey<T> beanKey,
+												  Class<?> serviceConfigClass,
+												  ObjectSerializerDefinition serializerDefinition,
+												  boolean dynamicQualified) {
+		return new ServiceDefinition<>(definingApi, beanKey, serviceConfigClass, serializerDefinition, dynamicQualified);
+	}
 	
 	public <E> ServiceDefinition<E> asyncDefinition(Class<E> asyncInterface) {
-		return new ServiceDefinition<>(AstrixBeanKey.create(asyncInterface, beanKey.getQualifier()), serviceConfigClass, objectSerializerDefinition, this.dynamicQualified);
+		return new ServiceDefinition<>(definingApi, AstrixBeanKey.create(asyncInterface, beanKey.getQualifier()), serviceConfigClass, objectSerializerDefinition, this.dynamicQualified);
 	}
 	
 	public boolean isDynamicQualified() {
@@ -62,6 +74,10 @@ public final class ServiceDefinition<T> {
 	
 	public Class<T> getServiceType() {
 		return this.beanKey.getBeanType();
+	}
+	
+	public ApiProvider getDefiningApi() {
+		return definingApi;
 	}
 
 	public boolean isVersioned() {
@@ -85,13 +101,6 @@ public final class ServiceDefinition<T> {
 	
 	public ObjectSerializerDefinition getObjectSerializerDefinition() {
 		return this.objectSerializerDefinition;
-	}
-
-	public static <T> ServiceDefinition<T> create(AstrixBeanKey<T> beanKey,
-												  Class<?> serviceConfigClass,
-												  ObjectSerializerDefinition serializerDefinition,
-												  boolean dynamicQualified) {
-		return new ServiceDefinition<>(beanKey, serviceConfigClass, serializerDefinition, dynamicQualified);
 	}
 
 	public AstrixBeanKey<T> getBeanKey() {

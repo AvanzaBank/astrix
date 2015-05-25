@@ -24,6 +24,7 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinition;
@@ -63,17 +64,19 @@ public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	private <T> ServiceDefinition<T> createServiceDefinition(ApiProviderClass apiProvider, AstrixBeanDefinitionMethod serviceDefinitionMethod, AstrixBeanKey<T> beanKey) {
 		Class<?> declaringApi = apiProvider.getProviderClass();
 		if (!(declaringApi.isAnnotationPresent(Versioned.class) || serviceDefinitionMethod.isVersioned())) {
-			return new ServiceDefinition<>(beanKey, 
+			return ServiceDefinition.create(ApiProvider.create(apiProvider.getName()), 
+											beanKey, 
 											serviceDefinitionMethod.getServiceConfigClass(), 
 											ObjectSerializerDefinition.nonVersioned(), 
 											serviceDefinitionMethod.isDynamicQualified());
 		}
 		if (!apiProvider.isAnnotationPresent(AstrixObjectSerializerConfig.class)) {
 			throw new IllegalArgumentException("Illegal api-provider. Api is versioned but provider does not declare a @AstrixObjectSerializerConfig." +
-					" providedService=" + serviceDefinitionMethod.getBeanType().getName() + ", provider=" + apiProvider.getName());
+					" providedService=" + serviceDefinitionMethod.getBeanType().getName() + ", provider=" + apiProvider.getProviderClassName());
 		} 
 		AstrixObjectSerializerConfig serializerConfig = apiProvider.getAnnotation(AstrixObjectSerializerConfig.class);
-		return new ServiceDefinition<>(beanKey, 
+		return ServiceDefinition.create(ApiProvider.create(apiProvider.getName()),
+									  beanKey, 
 									  serviceDefinitionMethod.getServiceConfigClass(), 
 									  ObjectSerializerDefinition.versionedService(serializerConfig.version(), serializerConfig.objectSerializerConfigurer()),
 									  serviceDefinitionMethod.isDynamicQualified());

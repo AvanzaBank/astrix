@@ -142,7 +142,7 @@ public class AstrixConfigurer {
 			List<ApiProviderClass> result = new LinkedList<>();
 			for (ApiProviderClass providerClass : apiProviders.getAll()) {
 				if (isActive(providerClass)) {
-					log.debug("Found provider: provider={}", providerClass.getName());
+					log.debug("Found provider: provider={}", providerClass.getProviderClassName());
 					result.add(providerClass);
 				}
 			}
@@ -153,14 +153,14 @@ public class AstrixConfigurer {
 			if (providerClass.isAnnotationPresent(AstrixIncludedByProfile.class)) {
 				AstrixIncludedByProfile activatedBy = providerClass.getAnnotation(AstrixIncludedByProfile.class);
 				if (!this.activeProfiles.contains(activatedBy.value())) {
-					log.debug("Rejecting provider, required profile not active. profile={} provider={}", activatedBy.value(), providerClass.getName());
+					log.debug("Rejecting provider, required profile not active. profile={} provider={}", activatedBy.value(), providerClass.getProviderClassName());
 					return false;
 				}
 			}
 			if (providerClass.isAnnotationPresent(AstrixExcludedByProfile.class)) {
 				AstrixExcludedByProfile deactivatedBy = providerClass.getAnnotation(AstrixExcludedByProfile.class);
 				if (this.activeProfiles.contains(deactivatedBy.value())) {
-					log.debug("Rejecting provider, excluded by active profile. profile={} provider={}", deactivatedBy.value(), providerClass.getName());
+					log.debug("Rejecting provider, excluded by active profile. profile={} provider={}", deactivatedBy.value(), providerClass.getProviderClassName());
 					return false;
 				}
 			}

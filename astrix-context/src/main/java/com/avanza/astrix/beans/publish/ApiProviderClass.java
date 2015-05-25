@@ -41,8 +41,12 @@ public final class ApiProviderClass {
 		return providerClass.getAnnotation(annotationClass);
 	}
 	
-	public String getName() {
+	public String getProviderClassName() {
 		return this.providerClass.getName();
+	}
+	
+	public String getName() {
+		return this.providerClass.getSimpleName();
 	}
 
 	public Class<?> getProviderClass() {
@@ -68,7 +72,7 @@ public final class ApiProviderClass {
 	
 	@Override
 	public final String toString() {
-		return getName();
+		return getProviderClassName();
 	}
 	
 }

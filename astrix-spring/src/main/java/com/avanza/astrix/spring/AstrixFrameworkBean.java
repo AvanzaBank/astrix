@@ -41,6 +41,7 @@ import org.springframework.core.Ordered;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.config.DynamicConfig;
@@ -246,7 +247,9 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		serviceExporter.addServiceProvider(astrixContext.getInstance(ServiceAdministratorImpl.class));
 		// TODO 
 		ObjectSerializerDefinition serializer = ObjectSerializerDefinition.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
-		ServiceDefinition<ServiceAdministrator> serviceDefinition = new ServiceDefinition<>(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), serializer, true);
+		ServiceDefinition<ServiceAdministrator> serviceDefinition = new ServiceDefinition<>(ApiProvider.create("FrameworkServices"),
+																							AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
+																							serializer, true);
 		ExportedServiceBeanDefinition serviceAdminDefintion = new ExportedServiceBeanDefinition(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
 																			    serviceDefinition, 
 																			    true, // isVersioned  

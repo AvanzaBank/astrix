@@ -27,6 +27,7 @@ import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.inject.AstrixInjector;
+import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
@@ -88,17 +89,19 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 	private ServiceDefinition<?> createServiceDefinition(ApiProviderClass apiProviderClass, AstrixBeanDefinitionMethod serviceDefinitionMethod) {
 		Class<?> declaringApi = getDeclaringApi(apiProviderClass, serviceDefinitionMethod.getBeanType());
 		if (!(declaringApi.isAnnotationPresent(Versioned.class) || serviceDefinitionMethod.isVersioned())) {
-			return ServiceDefinition.create(serviceDefinitionMethod.getBeanKey(), 
+			return ServiceDefinition.create(ApiProvider.create(apiProviderClass.getName()), serviceDefinitionMethod.getBeanKey(), 
 								serviceDefinitionMethod.getServiceConfigClass(), 
 								ObjectSerializerDefinition.nonVersioned(), 
 								serviceDefinitionMethod.isDynamicQualified());
 		}
 		if (!apiProviderClass.isAnnotationPresent(AstrixObjectSerializerConfig.class)) {
 			throw new IllegalArgumentException("Illegal api-provider. Api is versioned but provider does not declare a @AstrixObjectSerializerConfig." +
-					" providedService=" + serviceDefinitionMethod.getBeanType().getName() + ", provider=" + apiProviderClass.getName());
+					" providedService=" + serviceDefinitionMethod.getBeanType().getName() + ", provider=" + apiProviderClass.getProviderClassName());
 		} 
 		AstrixObjectSerializerConfig serializerConfig = apiProviderClass.getAnnotation(AstrixObjectSerializerConfig.class);
-		return ServiceDefinition.create(serviceDefinitionMethod.getBeanKey(), serviceDefinitionMethod.getServiceConfigClass(), 
+		return ServiceDefinition.create(ApiProvider.create(apiProviderClass.getName()),
+										serviceDefinitionMethod.getBeanKey(), 
+										serviceDefinitionMethod.getServiceConfigClass(), 
 									    ObjectSerializerDefinition.versionedService(serializerConfig.version(), 
 									    serializerConfig.objectSerializerConfigurer()), 
 									    serviceDefinitionMethod.isDynamicQualified());
