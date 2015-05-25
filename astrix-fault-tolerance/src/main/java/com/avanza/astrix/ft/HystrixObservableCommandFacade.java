@@ -19,6 +19,7 @@ import rx.Observable;
 import rx.functions.Func1;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.core.function.Supplier;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixObservableCommand;
@@ -30,7 +31,7 @@ import com.netflix.hystrix.exception.HystrixRuntimeException;
  */
 class HystrixObservableCommandFacade<T> {
 
-	public static <T> Observable<T> observe(final Observable<T> observable, ObservableCommandSettings settings) {
+	public static <T> Observable<T> observe(final Supplier<Observable<T>> observableFactory, ObservableCommandSettings settings) {
 		Setter setter = Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(settings.getGroupKey()))
 							  .andCommandKey(HystrixCommandKey.Factory.asKey(settings.getCommandKey()))
 							  .andCommandPropertiesDefaults(com.netflix.hystrix.HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(settings.getTimeoutMillis())
@@ -39,7 +40,7 @@ class HystrixObservableCommandFacade<T> {
 		Observable<Result<T>> faultToleranceProtectedObservable = new HystrixObservableCommand<Result<T>>(setter) {
 			@Override
 			protected Observable<Result<T>> construct() {
-				return observable.map(new Func1<T, Result<T>>() {
+				return observableFactory.get().map(new Func1<T, Result<T>>() {
 					@Override
 					public Result<T> call(T t1) {
 						return Result.success(t1);

@@ -30,6 +30,7 @@ import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
+import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 import com.netflix.hystrix.HystrixCommandKey;
@@ -152,9 +153,9 @@ public class AstrixFaultToleranceTest {
 		private final AtomicInteger appliedFaultToleranceCount = new AtomicInteger();
 		
 		@Override
-		public <T> Observable<T> observe(Observable<T> observable, ObservableCommandSettings settings) {
+		public <T> Observable<T> observe(Supplier<Observable<T>> observable, ObservableCommandSettings settings) {
 			appliedFaultToleranceCount.incrementAndGet();
-			return observable;
+			return observable.get();
 		}
 
 		@Override

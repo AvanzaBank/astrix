@@ -22,6 +22,7 @@ import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigAware;
+import com.avanza.astrix.core.function.Supplier;
 
 /**
  * 
@@ -42,11 +43,11 @@ public final class AstrixFaultTolerance implements AstrixConfigAware {
 		this.impl = impl;
 	}
 
-	public <T> Observable<T> observe(Observable<T> observable, ObservableCommandSettings settings) {
+	public <T> Observable<T> observe(Supplier<Observable<T>> observable, ObservableCommandSettings settings) {
 		if (faultToleranceEnabled(settings)) {
 			return impl.observe(observable, settings);
 		} else {
-			return observable;
+			return observable.get();
 		}
 	}
 	
@@ -82,12 +83,12 @@ public final class AstrixFaultTolerance implements AstrixConfigAware {
 	}
 	
 	interface Impl {
-		<T> Observable<T> observe(Observable<T> observable, ObservableCommandSettings settings);
+		<T> Observable<T> observe(Supplier<Observable<T>> observable, ObservableCommandSettings settings);
 		<T> T execute(final CheckedCommand<T> command, HystrixCommandSettings settings) throws Throwable;
 	}
 	
 	static class HystrixImpl implements Impl {
-		public <T> Observable<T> observe(Observable<T> observable, ObservableCommandSettings settings) {
+		public <T> Observable<T> observe(Supplier<Observable<T>> observable, ObservableCommandSettings settings) {
 			return HystrixObservableCommandFacade.observe(observable, settings);
 		}
 		public <T> T execute(final CheckedCommand<T> command, HystrixCommandSettings settings) throws Throwable {

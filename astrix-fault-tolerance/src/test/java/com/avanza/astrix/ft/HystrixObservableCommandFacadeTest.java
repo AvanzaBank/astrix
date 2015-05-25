@@ -28,6 +28,7 @@ import rx.Observable.OnSubscribe;
 import rx.Subscriber;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.core.function.Supplier;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
@@ -46,8 +47,12 @@ public class HystrixObservableCommandFacadeTest {
 	
 	@Test
 	public void underlyingObservableIsWrappedWithFaultTolerance() throws Exception {
-		Observable<String> fooObservable = Observable.just("foo");
-		Observable<String> ftFooObs = HystrixObservableCommandFacade.observe(fooObservable, commandSettings);
+		Observable<String> ftFooObs = HystrixObservableCommandFacade.observe(new Supplier<Observable<String>>() {
+			@Override
+			public Observable<String> get() {
+				return Observable.just("foo");
+			}
+		}, commandSettings);
 
 		assertEquals("foo", ftFooObs.toBlocking().first());
 		assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, this.commandKey));
@@ -55,8 +60,13 @@ public class HystrixObservableCommandFacadeTest {
 	
 	@Test
 	public void serviceUnavailableThrownByUnderlyingObservableShouldCountAsFailure() throws Exception {
-		Observable<String> observable = Observable.error(new ServiceUnavailableException(""));
-		Observable<String> ftObservable = HystrixObservableCommandFacade.observe(observable, commandSettings);
+		Observable<String> ftObservable = HystrixObservableCommandFacade.observe(new Supplier<Observable<String>> () {
+			@Override
+			public Observable<String> get() {
+				return Observable.<String>error(new ServiceUnavailableException(""));
+			}
+			
+		}, commandSettings);
 		
 		try {
 			ftObservable.toBlocking().first();
@@ -70,8 +80,12 @@ public class HystrixObservableCommandFacadeTest {
 	
 	@Test
 	public void normalExceptionsThrownIsTreatedAsPartOfNormalApiFlowAndDoesNotCountAsFailure() throws Exception {
-		Observable<String> observable = Observable.error(new MyDomainException());
-		Observable<String> ftObservable = HystrixObservableCommandFacade.observe(observable, commandSettings);
+		Observable<String> ftObservable = HystrixObservableCommandFacade.observe(new Supplier<Observable<String>>() {
+			@Override
+			public Observable<String> get() {
+				return Observable.error(new MyDomainException());
+			}
+		}, commandSettings);
 		try {
 			ftObservable.toBlocking().first();
 			fail("All regular exception should be propagated as is from underlying observable");
@@ -88,13 +102,18 @@ public class HystrixObservableCommandFacadeTest {
 	
 	@Test
 	public void throwsServiceUnavailableOnTimeouts() throws Exception {
-		Observable<String> observable = Observable.create(new OnSubscribe<String>() {
+		Supplier<Observable<String>> timeoutCommandSupplier = new Supplier<Observable<String>>() {
 			@Override
-			public void call(Subscriber<? super String> t1) {
-				// Simulate timeout by not invoking subscriber
+			public Observable<String> get() {
+				return Observable.create(new OnSubscribe<String>() {
+					@Override
+					public void call(Subscriber<? super String> t1) {
+						// Simulate timeout by not invoking subscriber
+					}
+				});
 			}
-		});
-		Observable<String> ftObservable = HystrixObservableCommandFacade.observe(observable, commandSettings);
+		};
+		Observable<String> ftObservable = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
 		try {
 			ftObservable.toBlocking().first();
 			fail("All ServiceUnavailableException should be thrown on timeout");
@@ -108,14 +127,19 @@ public class HystrixObservableCommandFacadeTest {
 	
 	@Test
 	public void semaphoreRejectedCountsAsFailure() throws Exception {
-		Observable<String> observable = Observable.create(new OnSubscribe<String>() {
+		Supplier<Observable<String>> timeoutCommandSupplier = new Supplier<Observable<String>>() {
 			@Override
-			public void call(Subscriber<? super String> t1) {
-				// Simulate timeout by not invoking subscriber
+			public Observable<String> get() {
+				return Observable.create(new OnSubscribe<String>() {
+					@Override
+					public void call(Subscriber<? super String> t1) {
+						// Simulate timeout by not invoking subscriber
+					}
+				});
 			}
-		});
-		Observable<String> ftObservable1 = HystrixObservableCommandFacade.observe(observable, commandSettings);
-		Observable<String> ftObservable2 = HystrixObservableCommandFacade.observe(observable, commandSettings);
+		};
+		Observable<String> ftObservable1 = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
+		Observable<String> ftObservable2 = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
 		
 		// No need to subscribe to any of the above Observables. 
 		// Execution is started eagerly by HystrixObservableCommandFacade.observe

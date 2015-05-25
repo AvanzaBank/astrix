@@ -24,6 +24,7 @@ import org.openspaces.core.GigaSpace;
 import rx.Observable;
 import rx.functions.Func1;
 
+import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.ft.AstrixFaultTolerance;
 import com.avanza.astrix.ft.Command;
 import com.avanza.astrix.ft.HystrixCommandSettings;
@@ -65,7 +66,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 						return gigaSpace.execute(new AstrixServiceInvocationTask(request), routingKey);
 					}
 				}, new HystrixCommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
-		return faultTolerance.observe(GsUtil.toObservable(response), getServiceCommandSettings(request));
+		return faultTolerance.observe(supplierFor(GsUtil.toObservable(response)), getServiceCommandSettings(request));
 	}
 	
 
@@ -90,7 +91,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 			result = result.mergeWith(GsUtil.toObservable(response));
 		}
 		ObservableCommandSettings commandSettings = getServiceCommandSettings(requests.iterator().next().getRequest());
-		return faultTolerance.observe(result, commandSettings);
+		return faultTolerance.observe(supplierFor(result), commandSettings);
 
 	}
 	
@@ -107,7 +108,16 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 		Func1<List<AsyncResult<AstrixServiceInvocationResponse>>, Observable<AstrixServiceInvocationResponse>> listToObservable = 
 				GsUtil.asyncResultListToObservable();
 		Observable<AstrixServiceInvocationResponse> responseStream = r.flatMap(listToObservable);
-		return faultTolerance.observe(responseStream, getServiceCommandSettings(request));
+		return faultTolerance.observe(supplierFor(responseStream), getServiceCommandSettings(request));
+	}
+
+	private Supplier<Observable<AstrixServiceInvocationResponse>> supplierFor(final Observable<AstrixServiceInvocationResponse> responseStream) {
+		return new Supplier<Observable<AstrixServiceInvocationResponse>>() {
+			@Override
+			public Observable<AstrixServiceInvocationResponse> get() {
+				return responseStream;
+			}
+		};
 	}
 
 	private ObservableCommandSettings getServiceCommandSettings(AstrixServiceInvocationRequest request) {
