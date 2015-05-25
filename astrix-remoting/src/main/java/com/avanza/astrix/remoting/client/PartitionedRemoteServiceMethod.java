@@ -31,6 +31,7 @@ import rx.functions.Func1;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.core.function.Consumer;
 import com.avanza.astrix.core.util.ReflectionUtil;
 /**
  * 
@@ -175,7 +176,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		}
 
 		public List<RoutedServiceInvocationRequest> partitionInvocationRequest(AstrixServiceInvocationRequest invocationRequest, Object[] args) {
-			partitionedArgumentContainerType.iterateContainer(getContainerInstance(args), new Consumer() {
+			partitionedArgumentContainerType.iterateContainer(getContainerInstance(args), new Consumer<Object>() {
 				@Override
 				public void accept(Object element) {
 					addRoutingKey(element);
@@ -209,11 +210,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 	
 	private interface ContainerType {
 		ContainerBuilder newInstance();
-		<E> void iterateContainer(Object container, Consumer consumer);
-	}
-	
-	interface Consumer {
-		void accept(Object element);
+		void iterateContainer(Object container, Consumer<Object> consumer);
 	}
 	
 	private static class CollectionContainerType implements ContainerType {
@@ -229,7 +226,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		}
 
 		@Override
-		public void iterateContainer(Object container, Consumer consumer) {
+		public void iterateContainer(Object container, Consumer<Object> consumer) {
 			for (Object element : (Collection<? extends Object>) container) {
 				consumer.accept(element);
 			}
@@ -250,7 +247,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		}
 
 		@Override
-		public void iterateContainer(Object container, Consumer consumer) {
+		public void iterateContainer(Object container, Consumer<Object> consumer) {
 			for (int i = 0; i < Array.getLength(container); i++) {
 				consumer.accept(Array.get(container, i));
 			}
