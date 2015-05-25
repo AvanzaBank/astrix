@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
@@ -29,6 +30,7 @@ import rx.Subscriber;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.function.Supplier;
+import com.avanza.astrix.test.util.AstrixTestUtil;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
@@ -124,7 +126,6 @@ public class HystrixObservableCommandFacadeTest {
 		assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.TIMEOUT, this.commandKey));
 		assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SEMAPHORE_REJECTED, this.commandKey));
 	}
-	
 	@Test
 	public void semaphoreRejectedCountsAsFailure() throws Exception {
 		Supplier<Observable<String>> timeoutCommandSupplier = new Supplier<Observable<String>>() {
@@ -146,6 +147,36 @@ public class HystrixObservableCommandFacadeTest {
 		
 		assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, this.commandKey));
 		assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SEMAPHORE_REJECTED, this.commandKey));
+	}
+	
+	
+	@Test
+	public void doesNotInvokeSupplierWhenBulkHeadIsFull() throws Exception {
+		final AtomicInteger supplierInvocationCount = new AtomicInteger();
+		Supplier<Observable<String>> timeoutCommandSupplier = new Supplier<Observable<String>>() {
+			@Override
+			public Observable<String> get() {
+				supplierInvocationCount.incrementAndGet();
+				return Observable.create(new OnSubscribe<String>() {
+					@Override
+					public void call(Subscriber<? super String> t1) {
+						// Simulate timeout by not invoking subscriber
+					}
+				});
+			}
+		};
+		Observable<String> ftObservable1 = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
+		final Observable<String> ftObservable2 = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
+		
+		// No need to subscribe to any of the above Observables. 
+		// Execution is started eagerly by HystrixObservableCommandFacade.observe
+		assertEquals(1, supplierInvocationCount.get());
+		AstrixTestUtil.serviceInvocationException(new Supplier<String>() {
+			@Override
+			public String get() {
+				return ftObservable2.toBlocking().first();
+			}
+		}, AstrixTestUtil.isExceptionOfType(ServiceUnavailableException.class));
 	}
 	
 	private int getEventCountForCommand(HystrixRollingNumberEvent hystrixRollingNumberEvent, String commandKey) {
