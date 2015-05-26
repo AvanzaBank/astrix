@@ -19,8 +19,9 @@ package com.avanza.astrix.config;
  * @author Elias Lindholm (elilin)
  *
  */
-public class DynamicIntProperty implements DynamicProperty<Integer> {
+public final class DynamicIntProperty implements DynamicProperty<Integer> {
 	
+	private final DynamicPropertyListenerSupport<Integer> listenerSupport = new DynamicPropertyListenerSupport<>();
 	private volatile int value;
 	
 	public DynamicIntProperty() {
@@ -36,10 +37,22 @@ public class DynamicIntProperty implements DynamicProperty<Integer> {
 	
 	public void set(int value) {
 		this.value = value;
+		listenerSupport.notifyListeners(value);
 	}
 	
 	@Override
 	public String toString() {
 		return Integer.toString(value);
 	}
+	
+	@Override
+	public void addListener(DynamicPropertyListener<Integer> listener) {
+		listenerSupport.addListener(listener);
+	}
+
+	@Override
+	public void removeListener(DynamicPropertyListener<Integer> listener) {
+		listenerSupport.removeListener(listener);
+	}
+	
 }

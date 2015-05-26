@@ -21,6 +21,7 @@ package com.avanza.astrix.config;
  */
 public final class DynamicBooleanProperty implements DynamicProperty<Boolean> {
 	
+	private final DynamicPropertyListenerSupport<Boolean> listenerSupport = new DynamicPropertyListenerSupport<>();
 	private volatile boolean value;
 	
 	public DynamicBooleanProperty() {
@@ -36,10 +37,21 @@ public final class DynamicBooleanProperty implements DynamicProperty<Boolean> {
 	
 	public void set(boolean value) {
 		this.value = value;
+		this.listenerSupport.notifyListeners(value);
 	}
 	
 	@Override
 	public String toString() {
 		return Boolean.toString(value);
+	}
+
+	@Override
+	public void addListener(DynamicPropertyListener<Boolean> listener) {
+		listenerSupport.addListener(listener);
+	}
+
+	@Override
+	public void removeListener(DynamicPropertyListener<Boolean> listener) {
+		listenerSupport.removeListener(listener);
 	}
 }
