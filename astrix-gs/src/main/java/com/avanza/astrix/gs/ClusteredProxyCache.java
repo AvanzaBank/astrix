@@ -15,7 +15,11 @@
  */
 package com.avanza.astrix.gs;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -33,6 +37,10 @@ import com.avanza.astrix.beans.core.KeyLock;
 import com.avanza.astrix.beans.factory.ObjectCache;
 import com.avanza.astrix.beans.factory.ObjectCache.ObjectFactory;
 import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.DynamicIntProperty;
+import com.avanza.astrix.context.AstrixConfigAware;
+import com.avanza.astrix.core.util.NamedThreadFactory;
 import com.j_spaces.core.IJSpace;
 /**
  * Manages lifecycle for each clustered-proxy created by Astrix.
@@ -40,12 +48,13 @@ import com.j_spaces.core.IJSpace;
  * @author Elias Lindholm (elilin)
  *
  */
-public class ClusteredProxyCache {
+public class ClusteredProxyCache implements AstrixConfigAware {
 
 	
 	private static final Logger log = LoggerFactory.getLogger(ClusteredProxyCache.class);
 	private final ObjectCache objectCache = new ObjectCache();
 	private final KeyLock<String> proxyByUrlLock = new KeyLock<>();
+	private DynamicConfig config;
 	
 	/**
 	 * Retreives a given proxy from the cache and creates the proxy if it does not exits.
@@ -66,7 +75,7 @@ public class ClusteredProxyCache {
 				@Override
 				public GigaSpaceInstance create() throws Exception {
 					log.info("Creating clustered proxy against: " + spaceUrl);
-					return new GigaSpaceInstance(spaceUrl);
+					return new GigaSpaceInstance(spaceUrl, config);
 				}
 			});
 			spaceInstance.incConsumerCount();
@@ -90,9 +99,11 @@ public class ClusteredProxyCache {
 		@GuardedBy("spaceTaskDispatcherStateLock")
 		private volatile SpaceTaskDispatcher spaceTaskDispatcher;
 		private final Lock spaceTaskDispatcherStateLock = new ReentrantLock();
+		private final DynamicConfig config;
 		
-		public GigaSpaceInstance(String spaceUrl) {
+		public GigaSpaceInstance(String spaceUrl, DynamicConfig dynamicConfig) {
 			this.spaceUrl = spaceUrl;
+			this.config = dynamicConfig;
 			this.urlSpaceConfigurer = new UrlSpaceConfigurer(spaceUrl);
 			IJSpace space = urlSpaceConfigurer.create();
 			this.proxy = new GigaSpaceConfigurer(space).create();
@@ -110,8 +121,20 @@ public class ClusteredProxyCache {
 			spaceTaskDispatcherStateLock.lock();
 			try {
 				if (spaceTaskDispatcher == null) {
-					// TODO (1) Allow configuration of thread pool. (2) Naming of threads in thread pool
-					this.spaceTaskDispatcher = new SpaceTaskDispatcher(proxy, Executors.newFixedThreadPool(10)); 
+					/* 
+					 * TODO 
+					 * 	(1) Allow configuration of thread pool. 
+					 * 	(2) Naming of threads in thread pool should include space-name or qualifier, i.e "SpaceTaskDispatcher[customer-space]"
+					 */
+					String spaceInstanceName = proxy.getName();
+					DynamicIntProperty poolSize = config.getIntProperty("astrix.beans.gigaspace." + spaceInstanceName + ".spaceTaskDispatcher.poolsize", 10);
+					ThreadPoolExecutor taskExecutor = new ThreadPoolExecutor(poolSize.get(), 
+																			 poolSize.get(), 
+																			 0, 
+																			 TimeUnit.SECONDS,
+																			 new LinkedBlockingQueue<Runnable>(),
+																			 new NamedThreadFactory(String.format("SpaceTaskDispatcher[%s]", spaceInstanceName)));
+					this.spaceTaskDispatcher = new SpaceTaskDispatcher(proxy, taskExecutor); 
 				}
 				return spaceTaskDispatcher;
 			} finally {
@@ -138,6 +161,11 @@ public class ClusteredProxyCache {
 			this.spaceTaskDispatcher.destroy();
 			this.urlSpaceConfigurer.close();
 		}
+	}
+
+	@Override
+	public void setConfig(DynamicConfig config) {
+		this.config = config;
 	}
 
 }
