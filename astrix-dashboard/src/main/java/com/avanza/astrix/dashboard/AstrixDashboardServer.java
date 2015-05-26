@@ -29,8 +29,7 @@ public class AstrixDashboardServer {
 	public static void main(String[] args) {
 		System.setProperty("server.port", "9111");
 		System.setProperty(AstrixSettings.SERVICE_REGISTRY_URI.name(), AstrixServiceComponentNames.GS_REMOTING + 
-					":jini://*/*/service-registry-space?locators=testgssystem01.test.aza.se,testgssystem02.test.aza.se"); 
-//					":jini://*/*/service-registry-space?groups=astrix-demo-apps");
+					":jini://*/*/service-registry-space?groups=astrix-demo-apps");
 		SpringApplication.run(AstrixDashboardServer.class, args);
 	}
 
