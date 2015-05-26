@@ -56,7 +56,8 @@ public class GsRemotingComponent implements ServiceComponent {
 		AstrixObjectSerializer objectSerializer = versioningPlugin.create(serviceDefinition.getObjectSerializerDefinition());
 		
 		GigaSpaceInstance proxyInstance = proxyCache.getProxy(serviceProperties);
-		RemotingTransport remotingTransport = GsRemotingTransport.remoteSpace(proxyInstance.get(), faultTolerance);
+		GsRemotingTransport gsRemotingTransport = new GsRemotingTransport(proxyInstance.getSpaceTaskDispatcher(), faultTolerance);
+		RemotingTransport remotingTransport = RemotingTransport.create(gsRemotingTransport);
 		
 		T proxy = RemotingProxy.create(serviceDefinition.getServiceType(), remotingTransport, objectSerializer, new GsRoutingStrategy());
 		return BoundProxyServiceBeanInstance.create(proxy, proxyInstance);

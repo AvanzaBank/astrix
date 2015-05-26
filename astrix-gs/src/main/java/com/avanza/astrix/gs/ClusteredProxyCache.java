@@ -15,9 +15,13 @@
  */
 package com.avanza.astrix.gs;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.PreDestroy;
+import javax.annotation.concurrent.GuardedBy;
 
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.GigaSpaceConfigurer;
@@ -83,6 +87,9 @@ public class ClusteredProxyCache {
 		private final AtomicInteger proxyConsumerCount = new AtomicInteger(0);
 		private final String spaceUrl;
 		private final UrlSpaceConfigurer urlSpaceConfigurer;
+		@GuardedBy("spaceTaskDispatcherStateLock")
+		private volatile SpaceTaskDispatcher spaceTaskDispatcher;
+		private final Lock spaceTaskDispatcherStateLock = new ReentrantLock();
 		
 		public GigaSpaceInstance(String spaceUrl) {
 			this.spaceUrl = spaceUrl;
@@ -97,6 +104,19 @@ public class ClusteredProxyCache {
 
 		public GigaSpace get() {
 			return proxy;
+		}
+		
+		public SpaceTaskDispatcher getSpaceTaskDispatcher() {
+			spaceTaskDispatcherStateLock.lock();
+			try {
+				if (spaceTaskDispatcher == null) {
+					// TODO (1) Allow configuration of thread pool. (2) Naming of threads in thread pool
+					this.spaceTaskDispatcher = new SpaceTaskDispatcher(proxy, Executors.newFixedThreadPool(10)); 
+				}
+				return spaceTaskDispatcher;
+			} finally {
+				spaceTaskDispatcherStateLock.unlock();
+			}
 		}
 		
 		public void release() {
@@ -115,7 +135,8 @@ public class ClusteredProxyCache {
 		@PreDestroy
 		public void destroy() throws Exception {
 			log.info("Destroying clustered proxy against: " + spaceUrl);
-			urlSpaceConfigurer.destroy();
+			this.spaceTaskDispatcher.destroy();
+			this.urlSpaceConfigurer.close();
 		}
 	}
 
