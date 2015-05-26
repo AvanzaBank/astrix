@@ -17,15 +17,24 @@ package com.avanza.astrix.gs;
 
 import java.io.Serializable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.executor.DistributedTask;
 import org.openspaces.core.executor.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import rx.Observable;
 import rx.Observable.OnSubscribe;
 import rx.Subscriber;
 
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.DynamicIntProperty;
+import com.avanza.astrix.config.DynamicPropertyListener;
+import com.avanza.astrix.core.util.NamedThreadFactory;
 import com.avanza.astrix.remoting.util.GsUtil;
 import com.gigaspaces.async.AsyncFuture;
 import com.gigaspaces.internal.client.spaceproxy.SpaceProxyImpl;
@@ -47,12 +56,34 @@ public final class SpaceTaskDispatcher {
 	 * that a service invocation will never block, see com.avanza.astrix.gs.remoting.GsRemotingTransport
 	 */
 	
+	private static final Logger log = LoggerFactory.getLogger(SpaceTaskDispatcher.class);
 	private final GigaSpace gigaSpace;
-	private final ExecutorService executorService;
+	private final ThreadPoolExecutor executorService;
 
-	public SpaceTaskDispatcher(GigaSpace gigaSpace, ExecutorService executorService) {
+	public SpaceTaskDispatcher(GigaSpace gigaSpace, DynamicConfig config) {
 		this.gigaSpace = gigaSpace;
-		this.executorService = executorService;
+		/* 
+		 * TODO 
+		 * 	(1) Improve configuration mechanism used to configure thread pool. 
+		 */
+		String spaceInstanceName = gigaSpace.getName();
+		DynamicIntProperty poolSize = config.getIntProperty("astrix.beans.gigaspace." + spaceInstanceName + ".spaceTaskDispatcher.poolsize", 10);
+		this.executorService = new ThreadPoolExecutor(poolSize.get(), 
+											 poolSize.get(), 
+											 0, 
+											 TimeUnit.SECONDS,
+											 new LinkedBlockingQueue<Runnable>(),
+											 new NamedThreadFactory(String.format("SpaceTaskDispatcher[%s]", spaceInstanceName)));
+		poolSize.addListener(new DynamicPropertyListener<Integer>() {
+			@Override
+			public void propertyChanged(Integer newValue) {
+				log.info(String.format("Changing pool-size for SpaceTaskDistpatcher. space=%s newSize=%s, oldSize=%s", 
+										SpaceTaskDispatcher.this.gigaSpace.getName(), 
+										newValue, executorService.getMaximumPoolSize()));
+				executorService.setCorePoolSize(newValue);
+				executorService.setMaximumPoolSize(newValue);
+			}
+		});
 	}
 
 

@@ -15,11 +15,6 @@
  */
 package com.avanza.astrix.gs;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -38,9 +33,7 @@ import com.avanza.astrix.beans.factory.ObjectCache;
 import com.avanza.astrix.beans.factory.ObjectCache.ObjectFactory;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.config.DynamicIntProperty;
 import com.avanza.astrix.context.AstrixConfigAware;
-import com.avanza.astrix.core.util.NamedThreadFactory;
 import com.j_spaces.core.IJSpace;
 /**
  * Manages lifecycle for each clustered-proxy created by Astrix.
@@ -121,20 +114,7 @@ public class ClusteredProxyCache implements AstrixConfigAware {
 			spaceTaskDispatcherStateLock.lock();
 			try {
 				if (spaceTaskDispatcher == null) {
-					/* 
-					 * TODO 
-					 * 	(1) Allow configuration of thread pool. 
-					 * 	(2) Naming of threads in thread pool should include space-name or qualifier, i.e "SpaceTaskDispatcher[customer-space]"
-					 */
-					String spaceInstanceName = proxy.getName();
-					DynamicIntProperty poolSize = config.getIntProperty("astrix.beans.gigaspace." + spaceInstanceName + ".spaceTaskDispatcher.poolsize", 10);
-					ThreadPoolExecutor taskExecutor = new ThreadPoolExecutor(poolSize.get(), 
-																			 poolSize.get(), 
-																			 0, 
-																			 TimeUnit.SECONDS,
-																			 new LinkedBlockingQueue<Runnable>(),
-																			 new NamedThreadFactory(String.format("SpaceTaskDispatcher[%s]", spaceInstanceName)));
-					this.spaceTaskDispatcher = new SpaceTaskDispatcher(proxy, taskExecutor); 
+					this.spaceTaskDispatcher = new SpaceTaskDispatcher(proxy, config); 
 				}
 				return spaceTaskDispatcher;
 			} finally {
