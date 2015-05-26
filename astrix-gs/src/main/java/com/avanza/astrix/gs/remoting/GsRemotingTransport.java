@@ -26,13 +26,11 @@ import rx.functions.Func1;
 
 import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.ft.AstrixFaultTolerance;
-import com.avanza.astrix.ft.Command;
-import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.ft.ObservableCommandSettings;
-import com.avanza.astrix.remoting.client.RemotingTransport;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
+import com.avanza.astrix.remoting.client.RemotingTransport;
 import com.avanza.astrix.remoting.client.RemotingTransportSpi;
 import com.avanza.astrix.remoting.client.RoutedServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.RoutingKey;
@@ -59,65 +57,66 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 
 	@Override
 	public Observable<AstrixServiceInvocationResponse> submitRoutedRequest(final AstrixServiceInvocationRequest request, final RoutingKey routingKey) {
-		final AsyncFuture<AstrixServiceInvocationResponse> response = 
-				this.faultTolerance.execute(new Command<AsyncFuture<AstrixServiceInvocationResponse>>() {
-					@Override
-					public AsyncFuture<AstrixServiceInvocationResponse> call() {
-						return gigaSpace.execute(new AstrixServiceInvocationTask(request), routingKey);
-					}
-				}, new HystrixCommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
-		return faultTolerance.observe(supplierFor(GsUtil.toObservable(response)), getServiceCommandSettings(request));
+		return faultTolerance.observe(new Supplier<Observable<AstrixServiceInvocationResponse>>() {
+			@Override
+			public Observable<AstrixServiceInvocationResponse> get() {
+				return executeRoutedRequest(request, routingKey);
+			}
+
+		}, getServiceCommandSettings(request));
 	}
-	
 
 	@Override
 	public Observable<AstrixServiceInvocationResponse> submitRoutedRequests(final Collection<RoutedServiceInvocationRequest> requests) {
 		if (requests.isEmpty()) {
 			return Observable.empty();
 		}
-		final List<AsyncFuture<AstrixServiceInvocationResponse>> responses = 
-				this.faultTolerance.execute(new Command<List<AsyncFuture<AstrixServiceInvocationResponse>>>() {
-					@Override
-					public List<AsyncFuture<AstrixServiceInvocationResponse>> call() {
-						List<AsyncFuture<AstrixServiceInvocationResponse>> submittedInvocations = new LinkedList<>();
-						for (RoutedServiceInvocationRequest request : requests) {
-							submittedInvocations.add(gigaSpace.execute(new AstrixServiceInvocationTask(request.getRequest()), request.getRoutingkey()));
-						}
-						return submittedInvocations;
-					}
-				}, new HystrixCommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
+		return faultTolerance.observe(new Supplier<Observable<AstrixServiceInvocationResponse>>() {
+			@Override
+			public Observable<AstrixServiceInvocationResponse> get() {
+				return executeRoutedReqeuests(requests);
+			}
+
+		}, getServiceCommandSettings(requests.iterator().next().getRequest()));
+
+	}
+	
+	
+	@Override
+	public Observable<AstrixServiceInvocationResponse> submitBroadcastRequest(final AstrixServiceInvocationRequest request) {
+		return faultTolerance.observe(new Supplier<Observable<AstrixServiceInvocationResponse>>() {
+			@Override
+			public Observable<AstrixServiceInvocationResponse> get() {
+				return executeBroadcastRequest(request);
+			}
+
+		}, getServiceCommandSettings(request));
+	}
+	
+	private Observable<AstrixServiceInvocationResponse> executeRoutedRequest(AstrixServiceInvocationRequest request,
+																			  RoutingKey routingKey) {
+		return GsUtil.toObservable(gigaSpace.execute(new AstrixServiceInvocationTask(request), routingKey));
+	}
+	
+	private Observable<AstrixServiceInvocationResponse> executeRoutedReqeuests(Collection<RoutedServiceInvocationRequest> requests) {
+		List<AsyncFuture<AstrixServiceInvocationResponse>> responses = new LinkedList<>();
+		for (RoutedServiceInvocationRequest request : requests) {
+			responses.add(gigaSpace.execute(new AstrixServiceInvocationTask(request.getRequest()), request.getRoutingkey()));
+		}
 		Observable<AstrixServiceInvocationResponse> result = Observable.empty();
 		for (AsyncFuture<AstrixServiceInvocationResponse> response : responses) {
 			result = result.mergeWith(GsUtil.toObservable(response));
 		}
-		ObservableCommandSettings commandSettings = getServiceCommandSettings(requests.iterator().next().getRequest());
-		return faultTolerance.observe(supplierFor(result), commandSettings);
-
+		return result;
 	}
 	
-	@Override
-	public Observable<AstrixServiceInvocationResponse> submitBroadcastRequest(final AstrixServiceInvocationRequest request) {
-		final AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>> responses = 
-				faultTolerance.execute(new Command<AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>>>() {
-						@Override
-						public AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>> call() {
-							return gigaSpace.execute(new AstrixDistributedServiceInvocationTask(request));
-						}
-					}, new HystrixCommandSettings(gigaSpace.getName() + "_RemotingDispatcher", gigaSpace.getName()));
+	private Observable<AstrixServiceInvocationResponse> executeBroadcastRequest(AstrixServiceInvocationRequest request) {
+		AsyncFuture<List<AsyncResult<AstrixServiceInvocationResponse>>> responses = gigaSpace.execute(new AstrixDistributedServiceInvocationTask(request));
 		Observable<List<AsyncResult<AstrixServiceInvocationResponse>>> r = GsUtil.toObservable(responses);
 		Func1<List<AsyncResult<AstrixServiceInvocationResponse>>, Observable<AstrixServiceInvocationResponse>> listToObservable = 
 				GsUtil.asyncResultListToObservable();
 		Observable<AstrixServiceInvocationResponse> responseStream = r.flatMap(listToObservable);
-		return faultTolerance.observe(supplierFor(responseStream), getServiceCommandSettings(request));
-	}
-
-	private Supplier<Observable<AstrixServiceInvocationResponse>> supplierFor(final Observable<AstrixServiceInvocationResponse> responseStream) {
-		return new Supplier<Observable<AstrixServiceInvocationResponse>>() {
-			@Override
-			public Observable<AstrixServiceInvocationResponse> get() {
-				return responseStream;
-			}
-		};
+		return responseStream;
 	}
 
 	private ObservableCommandSettings getServiceCommandSettings(AstrixServiceInvocationRequest request) {
