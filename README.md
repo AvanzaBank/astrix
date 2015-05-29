@@ -56,6 +56,5 @@ Astrix uses a fault-tolerance layer implemented on top of Hystrix. Depending on 
 ## A note on compatibility
 The Astrix Framework has bean under rapid development for almost a year by now. At Avanza we are using it in our production environment since late 2014. The API:s in Astrix are becoming more stable in every release, but we will still need to make non-backwards compatible changes going forward, as well as completely change some of the concepts in the framework. In a true Agile spirit though, we have decided to move the project to github to share it with anyone interested, hopefully to gain some insights from feedback from brave early adopters. But… be warned, breaking changes will occur.
 
-
 ## Documentation
-[Tutorial](doc/tutorial/index.md) (Under development)
+[Wiki](https://github.com/AvanzaBank/astrix/wiki)
