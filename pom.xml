@@ -30,6 +30,13 @@
 		<url>http://http://git01.test.aza.se/asterix/astrix/tree/master</url>
 		<tag>HEAD</tag>
 	</scm>
+	<repositories>
+		<repository>
+			<id>gigaspaces</id>
+			<name>GigaSpaces</name>
+			<url>http://maven-repository.openspaces.org/</url>
+		</repository>
+	</repositories>
 	<distributionManagement>
 		<repository>
 			<id>aza.nexus</id>
