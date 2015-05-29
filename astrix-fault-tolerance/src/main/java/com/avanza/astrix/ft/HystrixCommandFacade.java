@@ -106,7 +106,8 @@ class HystrixCommandFacade<T> {
 					return HystrixResult.exception(getFailedExecutionException());
 				}
 				// Timeout or rejected in queue
-				return HystrixResult.exception(new ServiceUnavailableException(Objects.toString(cause)));
+				return HystrixResult.exception(new ServiceUnavailableException(String.format("cause=%s service=%s executionTime=%s", 
+																				Objects.toString(cause), getCommandKey().name(), getExecutionTimeInMilliseconds())));
 			}
 			
 			private ServiceUnavailableCause resolveUnavailableCause() {

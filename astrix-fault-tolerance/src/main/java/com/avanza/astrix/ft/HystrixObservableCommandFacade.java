@@ -78,18 +78,24 @@ class HystrixObservableCommandFacade<T> {
 
 			private ServiceUnavailableException createServiceUnavailableException() {
 				if (isResponseRejected()) {
-					return new ServiceUnavailableException("REJECTED_EXECUTION");
+					return new ServiceUnavailableException(String.format("cause=%s service=%s", 
+															"REJECTED_EXECUTION", getCommandKey().name()));
 				}
 				if (isResponseTimedOut()) {
-					return new ServiceUnavailableException("TIMEOUT");
+					return new ServiceUnavailableException(String.format("cause=%s service=%s executionTime=%s", 
+															"TIMEOUT", getCommandKey().name(), getExecutionTimeInMilliseconds()));
 				}
 				if (isResponseShortCircuited()) {
-					return new ServiceUnavailableException("SHORT_CIRCUITED");
+					return new ServiceUnavailableException(String.format("cause=%s service=%s", 
+															"SHORT_CIRCUITED", getCommandKey().name()));
 				}
 				if (isFailedExecution() && (getFailedExecutionException() instanceof ServiceUnavailableException)) {
-					return (ServiceUnavailableException) getFailedExecutionException();
+					ServiceUnavailableException result = (ServiceUnavailableException) getFailedExecutionException();
+					appendStackTrace(result, new ServiceUnavailableException(String.format("service=%s", getCommandKey().name())));
+					return result;
 				}
-				return new ServiceUnavailableException("UNKNOWN_CAUSE");
+				return new ServiceUnavailableException(String.format("cause=%s service=%s", 
+															"UNKNOWN", getCommandKey().name()));
 			}
 			
 		}.observe(); // Eagerly start execution of underlying observable
@@ -108,6 +114,14 @@ class HystrixObservableCommandFacade<T> {
 				return Observable.error(t1);
 			}
 		});
+	}
+	
+	private static void appendStackTrace(Throwable target, Throwable trace) {
+		Throwable lastThowableInChain = target;
+		while (lastThowableInChain.getCause() != null) {
+			lastThowableInChain = lastThowableInChain.getCause();
+		}
+		lastThowableInChain.initCause(trace);
 	}
 	
 	private static class Result<T> {
