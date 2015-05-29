@@ -27,7 +27,10 @@ public class DefaultAstrixRemoteResultReducer<T> implements AstrixRemoteResultRe
 	public List<T> reduce(List<AstrixRemoteResult<List<T>>> results) {
 		List<T> result = new ArrayList<>();
 		for (AstrixRemoteResult<List<T>> remoteResult : results) {
-			result.addAll(remoteResult.getResult());
+			List<T> r = remoteResult.getResult();
+			if (result != null) {
+				result.addAll(r);
+			}
 		}
 		return result;
 	}
