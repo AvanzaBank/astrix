@@ -27,7 +27,6 @@ import com.avanza.astrix.core.AstrixRouting;
  */
 public interface AstrixServiceRegistry {
 	
-	// TODO: versioning: Add empty service-consumer-properties for old clients?
 	<T> AstrixServiceRegistryEntry lookup(@AstrixRouting String type, String qualifier, ServiceConsumerProperties serviceConsumerProperties);
 	
 	<T> void register(AstrixServiceRegistryEntry properties, long lease);

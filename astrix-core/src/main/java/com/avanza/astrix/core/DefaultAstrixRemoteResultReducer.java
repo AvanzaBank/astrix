@@ -16,6 +16,7 @@
 package com.avanza.astrix.core;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class DefaultAstrixRemoteResultReducer<T> implements AstrixRemoteResultRe
 	public List<T> reduce(List<AstrixRemoteResult<List<T>>> results) {
 		List<T> result = new ArrayList<>();
 		for (AstrixRemoteResult<List<T>> remoteResult : results) {
-			List<T> r = remoteResult.getResult();
+			Collection<T> r = remoteResult.getResult();
 			if (result != null) {
 				result.addAll(r);
 			}
