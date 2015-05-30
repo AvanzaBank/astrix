@@ -23,6 +23,8 @@
 		<module>examples</module>
 		<module>doc-snippets</module>
 		<module>astrix-config</module>
+		<module>tutorial</module>
+		<module>astrix-all</module>
 	</modules>
 
 	<scm>
