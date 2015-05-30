@@ -5,7 +5,7 @@
 		<artifactId>astrix-parent</artifactId>
 		<version>MASTER-SNAPSHOT</version>
 	</parent>
-	<artifactId>tutorial</artifactId>
+	<artifactId>doc-snippets</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
