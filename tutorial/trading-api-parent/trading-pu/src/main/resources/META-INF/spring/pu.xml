@@ -6,8 +6,6 @@
 	xsi:schemaLocation="http://www.openspaces.org/schema/core http://www.openspaces.org/schema/core/openspaces-core.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-
-	<context:property-placeholder/>
 	<context:annotation-config />
 	<os-core:space id="space" url="/./trading-space" mirror="false" />
 	<os-core:giga-space id="gigaSpace" space="space" />
