@@ -1,5 +1,5 @@
 # Astrix
-Astrix is a framework designed to simplify development and maintenance of microservices. At Avanza we use Astrix to run around hundered microservices collaborating to provide the services required by the backend applications for the Avanza web site and our mobile applications.
+Astrix is a Java framework designed to simplify development and maintenance of microservices. At Avanza we use Astrix to run around hundered microservices collaborating to provide the services required by the backend applications for the Avanza web site and our mobile applications.
 
 Astrix is used by service consumers to:
 * Locate a provider for given service at runtime ("service discovery")
@@ -40,7 +40,7 @@ One of the core features provided by Astrix is service binding, which is done in
 
 It's also possible to locate providers without using the service-registry, for instance using configuration. The service-registry itself is located using the configuration mechanism.
 
-If a service is discovered using the service-registry, then a lease-manager thread will run for the given service in the background. The lease-manager will periodically ask the service-registry for information about where a given service is located, and if the service has moved the lease-manager will rebind the to the new provider.
+If a service is discovered using the service-registry, then a lease-manager thread will run for the given service in the background. The lease-manager will periodically ask the service-registry for information about where a given service is located, and if the service has moved the lease-manager will rebind to the new provider.
 
 ### Service Versioning
 A key goal of Astrix is to support independent release cycles of different microservices. To achieve that Astrix has built in support for data-format versioning which allows a service provider to serve clients that invokes the service using an old version of the client. Astrix uses a migration framework to upgrade incoming requests and downgrade outgoing responses to the version requested by the given client. 
@@ -58,3 +58,6 @@ The Astrix Framework has bean under rapid development for almost a year by now. 
 
 ## Documentation
 [Wiki](https://github.com/AvanzaBank/astrix/wiki)
+
+## License
+The Astrix Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
