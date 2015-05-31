@@ -442,24 +442,19 @@
 				    <artifactId>license-maven-plugin</artifactId>
 				    <version>2.11</version>
 					<configuration>
-						<header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+						<header>src/license/apache2.txt</header>
 						<properties>
-							<owner>Avanza</owner>
-							<email>-</email>
-							<inceptionYear>2014-2015</inceptionYear>
-							<project.inceptionYear>2014-2015</project.inceptionYear>
+							<owner>Avanza Bank AB</owner>
+							<inceptionYear>2014</inceptionYear>
+							<project.inceptionYear>2014</project.inceptionYear>
 						</properties>
+						<mapping>
+    						<java>SLASHSTAR_STYLE</java>
+						</mapping>
 						<includes>
 							<include>**/*.java</include>
 						</includes>
 					</configuration>
-				    <executions>
-				        <execution>
-				            <goals>
-				                <goal>check</goal>
-				            </goals>
-				        </execution>
-				    </executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -488,6 +483,18 @@
 						</manifest>
 					</archive>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 			<!-- This plugin makes sure that a source jar is always built together 
