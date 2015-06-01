@@ -57,7 +57,7 @@ public @interface AstrixPartitionedRouting {
 	 * into a return value. <p>
 	 */
 	@SuppressWarnings("rawtypes")
-	Class<? extends AstrixRemoteResultReducer> reducer() default DefaultAstrixRemoteResultReducer.class;
+	Class<? extends RemoteResultReducer> reducer() default DefaultAstrixRemoteResultReducer.class;
 
 	/**
 	 * Factory used to create instances of the partitioned argument Collection. Default to ArrayList.

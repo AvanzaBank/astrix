@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.remoting.server;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
@@ -28,7 +27,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +36,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.Test;
 
 import rx.Observable;
@@ -49,18 +46,16 @@ import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
 import com.avanza.astrix.core.AstrixRemoteResult;
-import com.avanza.astrix.core.AstrixRemoteResultReducer;
-import com.avanza.astrix.core.AstrixRouting;
-import com.avanza.astrix.core.CorrelationId;
+import com.avanza.astrix.core.RemoteResultReducer;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
 import com.avanza.astrix.core.ServiceInvocationException;
+import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
+import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.client.DefaultAstrixRoutingStrategy;
+import com.avanza.astrix.remoting.client.IncompatibleRemoteResultReducerException;
 import com.avanza.astrix.remoting.client.MissingServiceException;
 import com.avanza.astrix.remoting.client.RemotingProxy;
 import com.avanza.astrix.remoting.client.RemotingTransport;
-import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
-import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
-import com.avanza.astrix.remoting.client.IncompatibleRemoteResultReducerException;
 import com.avanza.astrix.remoting.client.RemotingTransportSpi;
 import com.avanza.astrix.remoting.client.RoutedServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.Router;
@@ -688,10 +683,10 @@ public class AstrixRemotingTest {
 		RemotingProxy.create(BroadcastServiceWithIllegalReducer.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 	}
 	
-	@Test(expected = IncompatibleRemoteResultReducerException.class)
-	public void throwsExceptionOnProxyCreationIfRemoteResultReducerDoesNotHaveAMethodSignatureCompatibleWithServiceMethodSignature_2() throws Exception {
-		RemotingProxy.create(IllegalReducerHelloService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
-	}
+//	@Test(expected = IncompatibleRemoteResultReducerException.class)
+//	public void throwsExceptionOnProxyCreationIfRemoteResultReducerDoesNotHaveAMethodSignatureCompatibleWithServiceMethodSignature_2() throws Exception {
+//		RemotingProxy.create(IllegalReducerHelloService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
+//	}
 	
 	@Test(expected = IllegalStateException.class)
 	public void throwsIllegalStateExceptionIfRoutingStrategyReturnsNull() throws Exception {
@@ -881,7 +876,7 @@ public class AstrixRemotingTest {
 		Set<Integer> ping(@AstrixPartitionedRouting(reducer = SetReducer.class, collectionFactory = HashSet.class) Set<Integer> nums);
 	}
 	
-	public static class SetReducer<T> implements AstrixRemoteResultReducer<Set<T>, Set<T>> {
+	public static class SetReducer<T> implements RemoteResultReducer<Set<T>> {
 		@Override
 		public Set<T> reduce(List<AstrixRemoteResult<Set<T>>> results) {
 			Set<T> result = new HashSet<>();
@@ -961,7 +956,7 @@ public class AstrixRemotingTest {
 		}
 	}
 	
-	public static class SummingReducer implements AstrixRemoteResultReducer<Integer, Integer> {
+	public static class SummingReducer implements RemoteResultReducer<Integer> {
 		@Override
 		public Integer reduce(List<AstrixRemoteResult<Integer>> results) {
 			int sum = 0;
@@ -986,11 +981,6 @@ public class AstrixRemotingTest {
 	
 	interface VoidService {
 		void hello(String message);
-	}
-	
-	interface IllegalReducerHelloService {
-		@AstrixBroadcast(reducer = StringToDateReducer.class)
-		String hello(String message);
 	}
 	
 	interface BroadcastVoidService {
@@ -1020,14 +1010,14 @@ public class AstrixRemotingTest {
 		Future<String> broadcast(BroadcastRequest request);
 	}
 	
-	public static class BroadcastReducer implements AstrixRemoteResultReducer<String, String> {
+	public static class BroadcastReducer implements RemoteResultReducer<String> {
 		@Override
 		public String reduce(List<AstrixRemoteResult<String>> result) {
 			return result.get(0).getResult(); // Only one 'partition'
 		}
 	}
 	
-	public static class GenericReducer<T> implements AstrixRemoteResultReducer<T, T> {
+	public static class GenericReducer<T> implements RemoteResultReducer<T> {
 
 		@Override
 		public T reduce(List<AstrixRemoteResult<T>> result) {
@@ -1036,23 +1026,16 @@ public class AstrixRemotingTest {
 		
 	}
 	
-	public static class StringToStringReducer implements AstrixRemoteResultReducer<String, String> {
+	public static class StringToStringReducer implements RemoteResultReducer<String> {
 		@Override
 		public String reduce(List<AstrixRemoteResult<String>> result) {
 			return null; // Never invoked, 
 		}
 	}
 	
-	public static class DateToDateReducer implements AstrixRemoteResultReducer<Date, Date> {
+	public static class DateToDateReducer implements RemoteResultReducer<Date> {
 		@Override
 		public Date reduce(List<AstrixRemoteResult<Date>> result) {
-			return null; // Never invoked, 
-		}
-	}
-	
-	public static class StringToDateReducer implements AstrixRemoteResultReducer<String, Date> {
-		@Override
-		public String reduce(List<AstrixRemoteResult<Date>> result) {
 			return null; // Never invoked, 
 		}
 	}

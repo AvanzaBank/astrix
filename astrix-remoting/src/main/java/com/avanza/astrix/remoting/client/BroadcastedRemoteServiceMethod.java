@@ -23,7 +23,7 @@ import rx.Observable;
 import rx.functions.Func1;
 
 import com.avanza.astrix.core.AstrixRemoteResult;
-import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.core.RemoteResultReducer;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
 /**
@@ -35,12 +35,12 @@ import com.avanza.astrix.core.util.ReflectionUtil;
 public class BroadcastedRemoteServiceMethod implements RemoteServiceMethod {
 	
 	private final String signature;
-	private final Class<? extends AstrixRemoteResultReducer> reducer;
+	private final Class<? extends RemoteResultReducer> reducer;
 	private final RemotingEngine remotingEngine;
 	private final Type returnType;
 	
 	public BroadcastedRemoteServiceMethod(String signature,
-			Class<? extends AstrixRemoteResultReducer> reducer,
+			Class<? extends RemoteResultReducer> reducer,
 			RemotingEngine remotingEngine, 
 			Type returnType) {
 		this.signature = signature;
@@ -53,7 +53,7 @@ public class BroadcastedRemoteServiceMethod implements RemoteServiceMethod {
 		return signature;
 	}
 	
-	private AstrixRemoteResultReducer<?, ?> newReducer() {
+	private RemoteResultReducer<?> newReducer() {
 		return ReflectionUtil.newInstance(this.reducer);
 	}
 
@@ -66,7 +66,7 @@ public class BroadcastedRemoteServiceMethod implements RemoteServiceMethod {
 			AstrixServiceInvocationRequest request, Object[] args) throws InstantiationException,
 			IllegalAccessException {
 		request.setArguments(remotingEngine.marshall(args));
-		final AstrixRemoteResultReducer<T, T> reducer = (AstrixRemoteResultReducer<T, T>) newReducer();
+		final RemoteResultReducer<T> reducer = (RemoteResultReducer<T>) newReducer();
 		Observable<List<AstrixServiceInvocationResponse>> responesObservable = remotingEngine.submitBroadcastRequest(request).toList();
 		if (returnType.equals(Void.TYPE)) {
 			return responesObservable.map(new Func1<List<AstrixServiceInvocationResponse>, T>() {

@@ -18,9 +18,9 @@ package lunch.grader.api;
 import java.util.List;
 
 import com.avanza.astrix.core.AstrixRemoteResult;
-import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.core.RemoteResultReducer;
 
-public class LunchRestaurantGradeReducer implements AstrixRemoteResultReducer<LunchRestaurantGrade, LunchRestaurantGrade> {
+public class LunchRestaurantGradeReducer implements RemoteResultReducer<LunchRestaurantGrade> {
 
 	@Override
 	public LunchRestaurantGrade reduce(List<AstrixRemoteResult<LunchRestaurantGrade>> grades) {

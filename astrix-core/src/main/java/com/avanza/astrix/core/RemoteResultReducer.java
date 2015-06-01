@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain.api;
+package com.avanza.astrix.core;
 
 import java.util.List;
 
-import com.avanza.astrix.core.AstrixRemoteResult;
-import com.avanza.astrix.core.RemoteResultReducer;
-
-public class LunchSuggestionReducer implements RemoteResultReducer<LunchRestaurant> {
-
-	@Override
-	public LunchRestaurant reduce(List<AstrixRemoteResult<LunchRestaurant>> result) {
-		for (AstrixRemoteResult<LunchRestaurant> l : result) {
-			if (l.getResult() != null) {
-				return l.getResult();
-			}
-		}
-		return null;
-	}
+/**
+ * @author Elias Lindholm (elilin)
+ */
+public interface RemoteResultReducer<T> {
+	
+	/**
+	 * Reduces the individual responses received from a broadcasted service
+	 * invocation into a single result.
+	 * 
+	 * @param result
+	 * @return
+	 */
+	T reduce(List<AstrixRemoteResult<T>> result);
 
 }

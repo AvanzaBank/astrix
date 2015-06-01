@@ -20,13 +20,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.avanza.astrix.core.AstrixRemoteResult;
-import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.core.RemoteResultReducer;
 
 /**
  * Reduce {@link Map}s into one {@link Map} containing the union of all input data
  * @author joasah
  */
-public class GenericAstrixMapReducer<K, V> implements AstrixRemoteResultReducer<Map<K, V>, Map<K, V>> {
+public class GenericAstrixMapReducer<K, V> implements RemoteResultReducer<Map<K, V>> {
 
 	@Override
 	public Map<K, V> reduce(List<AstrixRemoteResult<Map<K, V>>> results) {

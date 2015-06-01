@@ -16,25 +16,22 @@
 package com.avanza.astrix.remoting.client;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.List;
 
-import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.core.RemoteResultReducer;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
 final class RemotingProxyUtil {
 	
 	static void validateRemoteResultReducer(Method targetServiceMethod,
-			Class<? extends AstrixRemoteResultReducer> reducerType) {
+			Class<? extends RemoteResultReducer<?>> reducerType) {
 		validateRemoteResultReducerReturnType(targetServiceMethod, reducerType);
-		validateRemoteResultReducerArgumentType(targetServiceMethod, reducerType);
 	}
 	
 	private static void validateRemoteResultReducerReturnType(
 			Method targetServiceMethod,
-			Class<? extends AstrixRemoteResultReducer> reducerType) {
+			Class<? extends RemoteResultReducer<?>> reducerType) {
 		Method reduceMethod = ReflectionUtil.getMethod(reducerType, "reduce", List.class);
 		Class<?> returnType = targetServiceMethod.getReturnType();
 		if (returnType.equals(Void.TYPE)) {
@@ -47,32 +44,12 @@ final class RemotingProxyUtil {
 		if (!returnType.isAssignableFrom(reduceMethod.getReturnType())) {
 			throw new IncompatibleRemoteResultReducerException(
 					String.format(
-							"Return type of AstrixRemoteResultReducer must be same as (or subtype) of the one returned by the service method. "
+							"Return type of RemoteResultReducer must be same as (or subtype) of the one returned by the service method. "
 									+ "serviceMethod=%s reducerType=%s reducerReturnType=%s serviceMethodReturnType=%s",
 							targetServiceMethod, reducerType, returnType.getName(), reduceMethod.getReturnType().getName()));
 		}
 	}
 
 	
-	private static void validateRemoteResultReducerArgumentType(Method m,
-			Class<? extends AstrixRemoteResultReducer> reducerType) {
-		// Lookup the "<T>" type parameter in:
-		// "R reduce(List<AstrixRemoteResult<T>> result)";
-		Method reduceMethod = ReflectionUtil.getMethod(reducerType, "reduce", List.class);
-		ParameterizedType listType = (ParameterizedType) reduceMethod.getGenericParameterTypes()[0];
-		ParameterizedType astrixRemoteResultType = (ParameterizedType) listType.getActualTypeArguments()[0];
-		Type astrixRemoteResultTypeParameter = astrixRemoteResultType.getActualTypeArguments()[0];
-		if (!(astrixRemoteResultTypeParameter instanceof Class)) {
-			return;
-		}
-		Class<?> type = (Class<?>) astrixRemoteResultTypeParameter;
-		if (!type.isAssignableFrom(m.getReturnType()) && !m.getReturnType().equals(Void.TYPE)) {
-			throw new IncompatibleRemoteResultReducerException(
-					String.format(
-							"Generic argument type of AstrixRemoteResultReducer.reduce(List<AstrixRemoteResult<T>>) must same as of the one returned by the serivce method. "
-									+ "serviceMethod=%s reducerType=%s", m,
-							reducerType));
-		}
-	}
 
 }

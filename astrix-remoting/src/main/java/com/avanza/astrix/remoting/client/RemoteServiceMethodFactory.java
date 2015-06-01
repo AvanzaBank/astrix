@@ -17,14 +17,11 @@ package com.avanza.astrix.remoting.client;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.List;
 
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
-import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.core.RemoteResultReducer;
 import com.avanza.astrix.core.util.ReflectionUtil;
 /**
  * 
@@ -73,14 +70,14 @@ public class RemoteServiceMethodFactory {
 		return partitionedByIndex;
 	}
 
-	private Class<? extends AstrixRemoteResultReducer<?, ?>> getRemoteResultReducerClass(
+	private Class<? extends RemoteResultReducer<?>> getRemoteResultReducerClass(
 			Method proxyServiceMethod, Class<?> targetServiceType) {
 		Method targetServiceMethod = ReflectionUtil.getMethod(targetServiceType, proxyServiceMethod.getName(),proxyServiceMethod.getParameterTypes()); 
 		AstrixBroadcast broadcast = targetServiceMethod
 				.getAnnotation(AstrixBroadcast.class);
-		Class<? extends AstrixRemoteResultReducer> reducerType = broadcast.reducer();
+		Class<? extends RemoteResultReducer<?>> reducerType = (Class<? extends RemoteResultReducer<?>>) broadcast.reducer();
 		RemotingProxyUtil.validateRemoteResultReducer(targetServiceMethod, reducerType);
-		return (Class<? extends AstrixRemoteResultReducer<?, ?>>) reducerType;
+		return (Class<? extends RemoteResultReducer<?>>) reducerType;
 	}
 
 }

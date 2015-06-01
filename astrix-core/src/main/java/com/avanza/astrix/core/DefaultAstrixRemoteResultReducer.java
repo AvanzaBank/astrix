@@ -22,7 +22,7 @@ import java.util.List;
 /**
  *
  */
-public class DefaultAstrixRemoteResultReducer<T> implements AstrixRemoteResultReducer<List<T>, List<T>> {
+public class DefaultAstrixRemoteResultReducer<T> implements RemoteResultReducer<List<T>> {
 
 	@Override
 	public List<T> reduce(List<AstrixRemoteResult<List<T>>> results) {

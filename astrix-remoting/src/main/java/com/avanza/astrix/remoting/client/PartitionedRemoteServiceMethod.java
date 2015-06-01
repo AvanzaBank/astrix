@@ -32,7 +32,7 @@ import rx.functions.Func1;
 
 import com.avanza.astrix.core.AstrixPartitionedRouting;
 import com.avanza.astrix.core.AstrixRemoteResult;
-import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.core.RemoteResultReducer;
 import com.avanza.astrix.core.function.Consumer;
 import com.avanza.astrix.core.util.ReflectionUtil;
 /**
@@ -46,7 +46,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 	private final String methodSignature;
 	private final RemotingEngine remotingEngine;
 	private final Type targetReturnType;
-	private final Class<? extends AstrixRemoteResultReducer<?,?>> reducerType;
+	private final Class<? extends RemoteResultReducer<?>> reducerType;
 	private final ContainerType partitionedArgumentContainerType;
 	private final PartitionedRouter router;
 	private final Method proxiedMethod;
@@ -103,9 +103,9 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		return new CollectionContainerType(collectionFactory, (Class<?>)partitionedArgumentTypeParameters.getActualTypeArguments()[0]);
 	}
 
-	private Class<? extends AstrixRemoteResultReducer<?, ?>> getReducer(
+	private Class<? extends RemoteResultReducer<?>> getReducer(
 			AstrixPartitionedRouting partitionBy, Method targetServiceMethod) {
-		Class<? extends AstrixRemoteResultReducer<?,?>> reducerType = (Class<? extends AstrixRemoteResultReducer<?, ?>>) partitionBy.reducer();
+		Class<? extends RemoteResultReducer<?>> reducerType = (Class<? extends RemoteResultReducer<?>>) partitionBy.reducer();
 		RemotingProxyUtil.validateRemoteResultReducer(targetServiceMethod, reducerType);
 		return reducerType;
 	}
@@ -146,7 +146,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 				}
 			});
 		}
-		final AstrixRemoteResultReducer<T, T> reducer = newRemoteResultReducer();
+		final RemoteResultReducer<T> reducer = newRemoteResultReducer();
 		return responses.toList().map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
 			@Override
 			public T call(List<AstrixServiceInvocationResponse> t1) {
@@ -162,8 +162,8 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> AstrixRemoteResultReducer<T, T> newRemoteResultReducer() {
-		return (AstrixRemoteResultReducer<T, T>) ReflectionUtil.newInstance(this.reducerType);
+	private <T> RemoteResultReducer<T> newRemoteResultReducer() {
+		return (RemoteResultReducer<T>) ReflectionUtil.newInstance(this.reducerType);
 	}
 
 	private ContainerBuilder newCollectionInstance() {

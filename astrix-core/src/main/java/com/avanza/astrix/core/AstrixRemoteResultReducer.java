@@ -19,8 +19,10 @@ import java.util.List;
 
 /**
  * @author Elias Lindholm (elilin)
+ * @deprecated - design flaw -> replaced by {@link RemoteResultReducer}
  */
-public interface AstrixRemoteResultReducer<R, T> {
+@Deprecated
+public interface AstrixRemoteResultReducer<R, T> extends RemoteResultReducer<T> {
 	
 	/**
 	 * Reduces the individual responses received from a broadcasted service
@@ -29,6 +31,6 @@ public interface AstrixRemoteResultReducer<R, T> {
 	 * @param result
 	 * @return
 	 */
-	R reduce(List<AstrixRemoteResult<T>> result);
+	T reduce(List<AstrixRemoteResult<T>> result);
 
 }

@@ -30,6 +30,6 @@ import java.lang.annotation.Target;
 public @interface AstrixBroadcast {
 	
 	@SuppressWarnings("rawtypes")
-	Class<? extends AstrixRemoteResultReducer> reducer() default DefaultAstrixRemoteResultReducer.class;
+	Class<? extends RemoteResultReducer> reducer() default DefaultAstrixRemoteResultReducer.class;
 	
 }
