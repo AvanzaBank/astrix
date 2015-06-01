@@ -18,12 +18,14 @@ package com.avanza.astrix.remoting.client;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import rx.Observable;
 import rx.functions.Func1;
@@ -46,6 +48,8 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 	private final Type targetReturnType;
 	private final Class<? extends AstrixRemoteResultReducer<?,?>> reducerType;
 	private final ContainerType partitionedArgumentContainerType;
+	private final PartitionedRouter router;
+	private final Method proxiedMethod;
 
 	public PartitionedRemoteServiceMethod(int partitionedArgumentIndex,
 										  Method proxiedMethod,
@@ -53,12 +57,30 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 										  RemotingEngine remotingEngine,
 										  Type targetReturnType) {
 		this.partitionedArgumentIndex = partitionedArgumentIndex;
+		this.proxiedMethod = proxiedMethod;
 		this.methodSignature = methodSignature;
 		this.remotingEngine = remotingEngine;
 		this.targetReturnType = targetReturnType;
 		AstrixPartitionedRouting partitionedRouting = getPartitionedRoutingAnnotation(proxiedMethod, partitionedArgumentIndex);
 		this.reducerType = getReducer(partitionedRouting, proxiedMethod);
 		this.partitionedArgumentContainerType = getPartititonedArgumentContainerType(proxiedMethod, partitionedRouting);
+		this.router = createRouter(partitionedRouting);
+	}
+
+	private PartitionedRouter createRouter(AstrixPartitionedRouting partitionedRouting) {
+		Class<?> elementType = this.partitionedArgumentContainerType.getElementType();
+		if (!partitionedRouting.routingMethod().isEmpty()) {
+			Method routingMethod;
+			try {
+				routingMethod = elementType.getMethod(partitionedRouting.routingMethod());
+				return PartitionedRouter.routingMethod(routingMethod);
+			} catch (NoSuchMethodException | SecurityException e) {
+				throw new IllegalArgumentException("Failed to find routing method for partitioned routing:\n"
+												 + "service: " + ReflectionUtil.fullMethodName(proxiedMethod) + "\n"
+												 + "@AstrixPartitionedRouting.routingMethod: " + partitionedRouting.routingMethod(), e);
+			}
+		}
+		return PartitionedRouter.identity();
 	}
 
 	private ContainerType getPartititonedArgumentContainerType(Method proxiedMethod, AstrixPartitionedRouting partitionBy) {
@@ -73,7 +95,12 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 											 proxiedMethod.getParameterTypes()[partitionedArgumentIndex].getName(),
 											 collectionFactory));
 		}
-		return new CollectionContainerType(collectionFactory);
+		Type rawType = proxiedMethod.getGenericParameterTypes()[partitionedArgumentIndex];
+		if (!(rawType instanceof ParameterizedType)) {
+			throw new IllegalArgumentException("Illegal service method: " + ReflectionUtil.fullMethodName(proxiedMethod) + ".\nWhen defining a routingMethod for @AstrixPartitionedRouting the target Collection type must not be a raw type. \nwas: " + rawType);
+		}
+		ParameterizedType partitionedArgumentTypeParameters = (ParameterizedType) rawType;
+		return new CollectionContainerType(collectionFactory, (Class<?>)partitionedArgumentTypeParameters.getActualTypeArguments()[0]);
 	}
 
 	private Class<? extends AstrixRemoteResultReducer<?, ?>> getReducer(
@@ -179,7 +206,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 			partitionedArgumentContainerType.iterateContainer(getContainerInstance(args), new Consumer<Object>() {
 				@Override
 				public void accept(Object element) {
-					addRoutingKey(element);
+					addElement(element);
 				}
 			});
 			List<RoutedServiceInvocationRequest> result = new LinkedList<>();
@@ -195,15 +222,16 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 			return args[partitionedArgumentIndex];
 		}
 
-		public void addRoutingKey(Object requestedKey) {
-			int targetPartition = requestedKey.hashCode() % requests.length;
+		public void addElement(Object element) {
+			Object routingKey = router.getRoutingKey(element);
+			int targetPartition = routingKey.hashCode() % requests.length;
 			RoutedServiceInvocationRequestBuilder invocationRequestBuilderForPartition = this.requests[targetPartition];
 			if (invocationRequestBuilderForPartition == null) {
 				invocationRequestBuilderForPartition = new RoutedServiceInvocationRequestBuilder(newCollectionInstance(), targetPartition);
 				this.requests[targetPartition] = invocationRequestBuilderForPartition;
 				
 			}
-			invocationRequestBuilderForPartition.addKey(requestedKey);
+			invocationRequestBuilderForPartition.addKey(element);
 		}
 
 	}
@@ -211,13 +239,16 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 	private interface ContainerType {
 		ContainerBuilder newInstance();
 		void iterateContainer(Object container, Consumer<Object> consumer);
+		Class<?> getElementType();
 	}
 	
 	private static class CollectionContainerType implements ContainerType {
+		private final Class<?> elementType;
 		private final Class<? extends Collection<?>> collectionFactory;
 		
-		public CollectionContainerType(Class<? extends Collection<?>> collectionFactory) {
-			this.collectionFactory = collectionFactory;
+		public CollectionContainerType(Class<? extends Collection<?>> collectionFactory, Class<?> elementType) {
+			this.collectionFactory = Objects.requireNonNull(collectionFactory);
+			this.elementType = Objects.requireNonNull(elementType);
 		}
 
 		@Override
@@ -230,6 +261,11 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 			for (Object element : (Collection<? extends Object>) container) {
 				consumer.accept(element);
 			}
+		}
+		
+		@Override
+		public Class<?> getElementType() {
+			return elementType;
 		}
 	}
 	
@@ -251,6 +287,11 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 			for (int i = 0; i < Array.getLength(container); i++) {
 				consumer.accept(Array.get(container, i));
 			}
+		}
+		
+		@Override
+		public Class<?> getElementType() {
+			return this.elementType;
 		}
 	}
 	

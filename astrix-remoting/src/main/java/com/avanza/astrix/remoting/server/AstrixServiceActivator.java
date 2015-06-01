@@ -30,11 +30,11 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.ServiceInvocationException;
+import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.remoting.client.MissingServiceException;
 import com.avanza.astrix.remoting.client.MissingServiceMethodException;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
-import com.avanza.astrix.remoting.util.MethodSignatureBuilder;
 /**
  * Server side component used to invoke exported services. <p> 
  * 
@@ -56,7 +56,7 @@ public class AstrixServiceActivator {
 			this.objectSerializer = serializer;
 			for (Class<?> api : providedApis) {
 				for (Method m : api.getMethods()) {
-					methodBySignature.put(MethodSignatureBuilder.build(m), m);
+					methodBySignature.put(ReflectionUtil.methodSignatureWithoutReturnType(m), m);
 				}
 			}
 		}

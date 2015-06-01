@@ -57,7 +57,7 @@ public class ReflectionUtil {
 		try {
 			return type.getMethod(name, parameterTypes);
 		} catch (NoSuchMethodException | SecurityException e) {
-			throw new RuntimeException("Failed to get method from class", e);
+			throw new RuntimeException("Failed to get method from class. methodName=" + name + " class=" + type, e);
 		}
 	}
 	
@@ -67,6 +67,43 @@ public class ReflectionUtil {
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Failed to load class: " + name, e);
 		}
+	}
+
+	public static String fullMethodName(Method method) {
+		StringBuilder result = new StringBuilder();
+		result.append(method.getDeclaringClass().getName());
+		result.append("#");
+		result.append(method.getName());
+		result.append("(");
+		boolean first = true;
+		for (Class<?> param : method.getParameterTypes()) {
+			if (first) {
+				first = false;
+			} else {
+				result.append(", ");
+			}
+			result.append(param.getName());
+		}
+		result.append(")");
+		return result.toString();
+
+	}
+
+	public static String methodSignatureWithoutReturnType(Method method) {
+		StringBuilder methodSignatureBuilder = new StringBuilder(); 
+		methodSignatureBuilder.append(method.getName());
+		methodSignatureBuilder.append("(");
+		boolean first = true;
+		for (Class<?> param : method.getParameterTypes()) {
+			if (first) {
+				first = false;
+			} else {
+				methodSignatureBuilder.append(", ");
+			}
+			methodSignatureBuilder.append(param.getName());
+		}
+		methodSignatureBuilder.append(")");
+		return methodSignatureBuilder.toString();
 	}
 
 }

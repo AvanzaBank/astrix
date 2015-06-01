@@ -50,9 +50,11 @@ import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.core.AstrixRouting;
 import com.avanza.astrix.core.CorrelationId;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
 import com.avanza.astrix.core.ServiceInvocationException;
+import com.avanza.astrix.remoting.client.DefaultAstrixRoutingStrategy;
 import com.avanza.astrix.remoting.client.MissingServiceException;
 import com.avanza.astrix.remoting.client.RemotingProxy;
 import com.avanza.astrix.remoting.client.RemotingTransport;
@@ -308,6 +310,83 @@ public class AstrixRemotingTest {
 		partitionedPing.pingVoid(new String[]{"1", "2", "3"});
 	}
 	
+	@Test
+	public void partitionedRequest_routingOnPropertyOnTargetObject() throws Exception {
+		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		CalculatorArrayPojoService eventPartitionCalculator = new CalculatorArrayPojoService() {
+			@Override
+			public Integer squareSum(NumPojo... nums) {
+				int squareSum = 0;
+				for (NumPojo numPojo : nums) {
+					int num = numPojo.getNum();
+					if (num % 2 != 0) {
+						throw new AssertionError("Even Partition should only receive even numbers, but received: " + num);
+					}
+					squareSum += num * num;
+				}
+				return squareSum;
+			}
+
+		};
+		CalculatorArrayPojoService oddPartitionCalculator = new CalculatorArrayPojoService() {
+			@Override
+			public Integer squareSum(NumPojo... nums) {
+				int squareSum = 0;
+				for (NumPojo numPojo : nums) {
+					int num = numPojo.getNum();
+					if (num % 2 != 1) {
+						throw new AssertionError("Odd Partition hould only receive odd numbers, but received: " + num);
+					}
+					squareSum += num * num;
+				}
+				return squareSum;
+			}
+		};
+		
+		evenPartition.register(eventPartitionCalculator, objectSerializer, CalculatorArrayPojoService.class);
+		oddPartition.register(oddPartitionCalculator, objectSerializer, CalculatorArrayPojoService.class);
+
+		CalculatorArrayPojoService calculatorService = RemotingProxy.create(CalculatorArrayPojoService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		int squareSum = calculatorService.squareSum(new NumPojo(1), new NumPojo(2), new NumPojo(3), new NumPojo(4), new NumPojo(5));
+		assertEquals(1 + 4 + 9 + 16 + 25, squareSum);
+	}
+	
+	@Test
+	public void partitionedRequest_routingOnPropertyOnTargetObject_CollectionArgument() throws Exception {
+		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		CalculatorListPojoService eventPartitionCalculator = new CalculatorListPojoServiceImpl();
+		CalculatorListPojoService oddPartitionCalculator = new CalculatorListPojoServiceImpl();
+		
+		evenPartition.register(eventPartitionCalculator, objectSerializer, CalculatorListPojoService.class);
+		oddPartition.register(oddPartitionCalculator, objectSerializer, CalculatorListPojoService.class);
+
+		CalculatorListPojoService calculatorService = RemotingProxy.create(CalculatorListPojoService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		int squareSum = calculatorService.squareSum(Arrays.asList(new NumPojo(1), new NumPojo(2), new NumPojo(3), new NumPojo(4), new NumPojo(5)));
+		assertEquals(1 + 4 + 9 + 16 + 25, squareSum);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void partitionedRequest_routingOnProperty_throwsExceptionForRawTypes() throws Exception {
+		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		RemotingProxy.create(ServiceWithRawListRoutingArgument.class, directTransport(evenPartition), objectSerializer, new DefaultAstrixRoutingStrategy());
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void partitionedRequest_routingOnProperty_throwsExceptionForMissingMethods() throws Exception {
+		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		RemotingProxy.create(ServiceWithListMissingRoutingPropertyMethod.class, directTransport(evenPartition), objectSerializer, new DefaultAstrixRoutingStrategy());
+	}
+	
+	public interface ServiceWithRawListRoutingArgument {
+		List<Integer> foo(@AstrixPartitionedRouting(routingMethod = "getRoutingKey") List list);
+	}
+	
+	public interface ServiceWithListMissingRoutingPropertyMethod {
+		List<Integer> foo(@AstrixPartitionedRouting(routingMethod = "aMissingMethod") List<NumPojo> list);
+	}
+	
 	@Test(expected = IllegalArgumentException.class)
 	public void partitionedService_IncompatibleCollectionType_throwsException() throws Exception {
 		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
@@ -340,7 +419,6 @@ public class AstrixRemotingTest {
 	private static <T> Set<T> setOf(@SuppressWarnings("unchecked") T... values) {
 		return new HashSet<T>(Arrays.asList(values));
 	}
-
 
 	@Test
 	public void broadcastRequest_throwsException() throws Exception {
@@ -741,6 +819,27 @@ public class AstrixRemotingTest {
 		Integer squareSum(@AstrixPartitionedRouting(reducer = SummingReducer.class) Collection<Integer> nums);
 	}
 	
+	interface CalculatorArrayPojoService {
+		Integer squareSum(@AstrixPartitionedRouting(routingMethod="getNum", reducer = SummingReducer.class) NumPojo... nums);
+	}
+	
+	interface CalculatorListPojoService {
+		Integer squareSum(@AstrixPartitionedRouting(routingMethod="getNum", reducer = SummingReducer.class) List<NumPojo> nums);
+	}
+	
+	static class CalculatorListPojoServiceImpl implements CalculatorListPojoService {
+
+		@Override
+		public Integer squareSum(List<NumPojo> nums) {
+			int result = 0;
+			for (NumPojo n : nums) {
+				result += n.getNum() * n.getNum();
+			}
+			return result;
+		}
+		
+	}
+	
 	interface PartitionedPingService {
 		List<Short> ping(@AstrixPartitionedRouting short... nums);
 		List<Integer> ping(@AstrixPartitionedRouting int... nums);
@@ -750,6 +849,24 @@ public class AstrixRemotingTest {
 		List<Boolean> ping(@AstrixPartitionedRouting boolean... nums);
 		List<String> ping(@AstrixPartitionedRouting String... nums);
 		void pingVoid(@AstrixPartitionedRouting String... nums);
+	}
+	
+	
+	public static class NumPojo implements Serializable {
+		private static final long serialVersionUID = 1L;
+		private int num;
+		public NumPojo(int num) {
+			this.num = num;
+		}
+		public int getNum() {
+			return num;
+		}
+
+		@Override
+		public int hashCode() {
+			// Routes all arguments to same partition
+			return 1;
+		}
 	}
 	
 	interface InvalidCollectionTypePartitionedService {

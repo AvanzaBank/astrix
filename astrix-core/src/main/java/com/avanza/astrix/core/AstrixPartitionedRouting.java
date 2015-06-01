@@ -40,6 +40,18 @@ import java.util.Collection;
 @Retention(value=RetentionPolicy.RUNTIME)
 @Documented
 public @interface AstrixPartitionedRouting {
+	
+	/**
+	 * If defined, then the given method will be invoked on each element in the
+	 * target collection to decide what partition a given element should be routed
+	 * to.
+	 * 
+	 * The target method must take zero arguments and have non-void return type.
+	 * 
+	 * @return
+	 */
+	String routingMethod() default "";
+	
 	/**
 	 * AstrixRemoteResultReducer to use to reduce the response from each server partition
 	 * into a return value. <p>

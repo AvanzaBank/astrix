@@ -26,7 +26,6 @@ import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
 import com.avanza.astrix.core.AstrixRemoteResultReducer;
 import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.remoting.util.MethodSignatureBuilder;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -45,7 +44,7 @@ public class RemoteServiceMethodFactory {
 
 	public RemoteServiceMethod createRemoteServiceMethod(
 			Class<?> targetServiceType, Method proxiedMethod, Type targetReturnType) {
-		String methodSignature = MethodSignatureBuilder.build(proxiedMethod);
+		String methodSignature = ReflectionUtil.methodSignatureWithoutReturnType(proxiedMethod);
 		if (proxiedMethod.isAnnotationPresent(AstrixBroadcast.class)) {
 			return new BroadcastedRemoteServiceMethod(methodSignature,
 					getRemoteResultReducerClass(proxiedMethod, targetServiceType),
