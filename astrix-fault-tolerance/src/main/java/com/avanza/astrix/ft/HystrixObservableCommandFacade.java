@@ -31,13 +31,8 @@ import com.netflix.hystrix.exception.HystrixRuntimeException;
  */
 class HystrixObservableCommandFacade<T> {
 
-	public static <T> Observable<T> observe(final Supplier<Observable<T>> observableFactory, ObservableCommandSettings settings) {
-		Setter setter = Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(settings.getGroupKey()))
-							  .andCommandKey(HystrixCommandKey.Factory.asKey(settings.getCommandKey()))
-							  .andCommandPropertiesDefaults(com.netflix.hystrix.HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(settings.getTimeoutMillis())
-									  																			 .withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getMaxConcurrentRequests()));
-		
-		Observable<Result<T>> faultToleranceProtectedObservable = new HystrixObservableCommand<Result<T>>(setter) {
+	public static <T> Observable<T> observe(final Supplier<Observable<T>> observableFactory, Setter settings) {
+		Observable<Result<T>> faultToleranceProtectedObservable = new HystrixObservableCommand<Result<T>>(settings) {
 			@Override
 			protected Observable<Result<T>> construct() {
 				return observableFactory.get().map(new Func1<T, Result<T>>() {

@@ -13,30 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.publish;
+package com.avanza.astrix.ft;
+
+import rx.Observable;
+
+import com.avanza.astrix.core.function.Supplier;
+import com.netflix.hystrix.HystrixObservableCommand.Setter;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public final class ApiProvider {
-	
-	private final String name;
-	
-	private ApiProvider(String name) {
-		this.name = name;
-	}
-	public static ApiProvider create(String name) {
-		return new ApiProvider(name);
-	}
-
-	public String getName() {
-		return name;
-	}
-	
-	@Override
-	public String toString() {
-		return super.toString();
-	}
-
+public interface BeanFaultToleranceProvider {
+	<T> Observable<T> observe(final Supplier<Observable<T>> observableFactory, Setter settings);
+	<T> T execute(CheckedCommand<T> command, com.netflix.hystrix.HystrixCommand.Setter settings) throws Throwable;
 }

@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.gs.remoting;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -24,11 +23,10 @@ import rx.Observable;
 import rx.functions.Func1;
 
 import com.avanza.astrix.core.function.Supplier;
-import com.avanza.astrix.ft.AstrixFaultTolerance;
-import com.avanza.astrix.ft.ObservableCommandSettings;
+import com.avanza.astrix.ft.BeanFaultTolerance;
+import com.avanza.astrix.ft.HystrixObservableCommandSettings;
 import com.avanza.astrix.gs.SpaceTaskDispatcher;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
-import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.client.RemotingTransportSpi;
 import com.avanza.astrix.remoting.client.RoutedServiceInvocationRequest;
@@ -44,9 +42,9 @@ import com.gigaspaces.async.AsyncResult;
 public class GsRemotingTransport implements RemotingTransportSpi {
 
 	private final SpaceTaskDispatcher spaceTaskDispatcher;
-	private final AstrixFaultTolerance faultTolerance;
+	private final BeanFaultTolerance faultTolerance;
 	
-	public GsRemotingTransport(SpaceTaskDispatcher spaceTaskDispatcher, AstrixFaultTolerance faultTolerance) {
+	public GsRemotingTransport(SpaceTaskDispatcher spaceTaskDispatcher, BeanFaultTolerance faultTolerance) {
 		this.spaceTaskDispatcher = spaceTaskDispatcher;
 		this.faultTolerance = faultTolerance;
 	}
@@ -58,8 +56,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 			public Observable<AstrixServiceInvocationResponse> get() {
 				return observeRoutedRequest(request, routingKey);
 			}
-
-		}, getServiceCommandSettings(request));
+		}, new HystrixObservableCommandSettings());
 	}
 
 	@Override
@@ -72,8 +69,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 			public Observable<List<AstrixServiceInvocationResponse>> get() {
 				return observeRoutedReqeuests(requests);
 			}
-		}, getServiceCommandSettings(requests.iterator().next().getRequest()));
-
+		}, new HystrixObservableCommandSettings());
 	}
 	
 	
@@ -84,8 +80,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 			public Observable<List<AstrixServiceInvocationResponse>> get() {
 				return observeBroadcastRequest(request);
 			}
-
-		}, getServiceCommandSettings(request));
+		}, new HystrixObservableCommandSettings());
 	}
 	
 	private Observable<AstrixServiceInvocationResponse> observeRoutedRequest(AstrixServiceInvocationRequest request,
@@ -108,19 +103,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 		Observable<AstrixServiceInvocationResponse> responseStream = responses.flatMap(listToObservable);
 		return responseStream.toList();
 	}
-
-	private ObservableCommandSettings getServiceCommandSettings(AstrixServiceInvocationRequest request) {
-		String api = request.getHeader(AstrixServiceInvocationRequestHeaders.SERVICE_API);
-		String spaceName = spaceTaskDispatcher.getSpaceName();
-		String[] subPackagesAndClassName = api.split("[.]");
-		if (subPackagesAndClassName.length > 0) {
-			api = subPackagesAndClassName[subPackagesAndClassName.length - 1]; // Use simple class name without package name
-		}
-		String commandKey = spaceName + "_" + api;
-		ObservableCommandSettings commandSettings = new ObservableCommandSettings(commandKey, spaceTaskDispatcher.getSpaceName());
-		return commandSettings;
-	}
-
+	
 	@Override
 	public int partitionCount() {
 		return this.spaceTaskDispatcher.partitionCount();

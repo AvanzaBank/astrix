@@ -21,5 +21,5 @@ package com.avanza.astrix.beans.factory;
  * @param <T>
  */
 public interface FactoryBean<T> {
-
+	
 }

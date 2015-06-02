@@ -19,12 +19,13 @@ import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
-import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
-import com.avanza.astrix.ft.AstrixFaultTolerance;
+import com.avanza.astrix.ft.BeanFaultTolerance;
+import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.gs.ClusteredProxyCache.GigaSpaceInstance;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -39,7 +40,7 @@ import com.avanza.astrix.spring.AstrixSpringContext;
 public class GsComponent implements ServiceComponent {
 
 	private GsBinder gsBinder;
-	private AstrixFaultTolerance faultTolerance;
+	private BeanFaultToleranceFactory faultToleranceFactory;
 	private AstrixSpringContext astrixSpringContext;
 	private ClusteredProxyCache proxyCache;
 	
@@ -51,9 +52,8 @@ public class GsComponent implements ServiceComponent {
 			throw new UnsupportedTargetTypeException(getName(), targetType);
 		}
 		GigaSpaceInstance gigaSpaceInstance = proxyCache.getProxy(serviceProperties);
-		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
-		HystrixCommandSettings hystrixSettings = new HystrixCommandSettings(spaceName + "_" + GigaSpace.class.getSimpleName(), spaceName);
-		T proxyWithFaultTolerance = targetType.cast(AstrixGigaSpaceProxy.create(gigaSpaceInstance.get(), faultTolerance, hystrixSettings));
+		BeanFaultTolerance beanFaultTolerance = faultToleranceFactory.create(serviceDefinition);
+		T proxyWithFaultTolerance = targetType.cast(AstrixGigaSpaceProxy.create(gigaSpaceInstance.get(), beanFaultTolerance, new HystrixCommandSettings()));
 		return BoundProxyServiceBeanInstance.create(proxyWithFaultTolerance, gigaSpaceInstance);
 	}
 	
@@ -113,8 +113,8 @@ public class GsComponent implements ServiceComponent {
 	}
 	
 	@AstrixInject
-	public void setFaultTolerance(AstrixFaultTolerance faultTolerance) {
-		this.faultTolerance = faultTolerance;
+	public void setFaultTolerance(BeanFaultToleranceFactory beanFaultToleranceFactory) {
+		this.faultToleranceFactory = beanFaultToleranceFactory;
 	}
 
 }

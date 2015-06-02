@@ -17,12 +17,13 @@ package com.avanza.astrix.gs;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.ft.AstrixFaultTolerance;
+import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.CheckedCommand;
 import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.gigaspaces.internal.client.cache.SpaceCacheException;
@@ -38,18 +39,18 @@ import com.gigaspaces.internal.client.cache.SpaceCacheException;
  */
 public class AstrixGigaSpaceProxy implements InvocationHandler {
 
-	private GigaSpace gigaSpace;
-	private AstrixFaultTolerance faultTolerance;
-	private HystrixCommandSettings settings;
+	private final GigaSpace gigaSpace;
+	private final BeanFaultTolerance faultTolerance;
+	private final HystrixCommandSettings hystrixSettings;
 
-	public AstrixGigaSpaceProxy(GigaSpace gigaSpace, AstrixFaultTolerance faultTolerance, HystrixCommandSettings settings) {
-		this.gigaSpace = gigaSpace;
-		this.faultTolerance = faultTolerance;
-		this.settings = settings;
+	public AstrixGigaSpaceProxy(GigaSpace gigaSpace, BeanFaultTolerance faultTolerance, HystrixCommandSettings hystrixSettings) {
+		this.gigaSpace = Objects.requireNonNull(gigaSpace);
+		this.faultTolerance = Objects.requireNonNull(faultTolerance);
+		this.hystrixSettings = Objects.requireNonNull(hystrixSettings);
 	}
 
-	public static GigaSpace create(GigaSpace gigaSpace, AstrixFaultTolerance faultTolerance, HystrixCommandSettings settings) {
-		return ReflectionUtil.newProxy(GigaSpace.class, new AstrixGigaSpaceProxy(gigaSpace, faultTolerance, settings));
+	public static GigaSpace create(GigaSpace gigaSpace, BeanFaultTolerance faultTolerance, HystrixCommandSettings hystrixSettings) {
+		return ReflectionUtil.newProxy(GigaSpace.class, new AstrixGigaSpaceProxy(gigaSpace, faultTolerance, hystrixSettings));
 	}
 
 	@Override
@@ -63,7 +64,7 @@ public class AstrixGigaSpaceProxy implements InvocationHandler {
 					throw new ServiceUnavailableException("SpaceCacheNotAvailable", e);
 				}
 			}
-		}, settings);
+		}, this.hystrixSettings);
 	}
 
 }

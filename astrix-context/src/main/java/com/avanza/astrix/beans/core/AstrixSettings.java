@@ -113,7 +113,7 @@ public class AstrixSettings implements DynamicConfigSource, MutableConfigSource 
 	 * Service component used to export ServiceAdministrator api.
 	 */
 	public static final StringSetting SERVICE_ADMINISTRATOR_COMPONENT = StringSetting.create("astrix.service.administrator.component", AstrixServiceComponentNames.GS_REMOTING);
-	
+
 	private final MapConfigSource config = new MapConfigSource();
 	private final String configSourceId;
 	

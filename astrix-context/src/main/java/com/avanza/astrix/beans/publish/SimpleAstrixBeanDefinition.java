@@ -14,29 +14,33 @@
  * limitations under the License.
  */
 package com.avanza.astrix.beans.publish;
+
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
+ * @param <T>
  */
-public final class ApiProvider {
-	
-	private final String name;
-	
-	private ApiProvider(String name) {
-		this.name = name;
-	}
-	public static ApiProvider create(String name) {
-		return new ApiProvider(name);
+public final class SimpleAstrixBeanDefinition<T> implements AstrixBeanDefinition<T> {
+
+	private ApiProvider apiProvider;
+	private AstrixBeanKey<T> beanKey;
+
+	public SimpleAstrixBeanDefinition(ApiProvider apiProvider,
+									  AstrixBeanKey<T> beanKey) {
+		this.apiProvider = apiProvider;
+		this.beanKey = beanKey;
 	}
 
-	public String getName() {
-		return name;
-	}
-	
 	@Override
-	public String toString() {
-		return super.toString();
+	public AstrixBeanKey<T> getBeanKey() {
+		return this.beanKey;
+	}
+
+	@Override
+	public ApiProvider getDefiningApi() {
+		return this.apiProvider;
 	}
 
 }

@@ -36,6 +36,10 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.factory.AstrixBeanSettings;
+import com.avanza.astrix.beans.publish.ApiProvider;
+import com.avanza.astrix.beans.publish.SimpleAstrixBeanDefinition;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -50,10 +54,14 @@ import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 
 public abstract class FaultToleranceIntegrationTest {
 
+	private static final SimpleAstrixBeanDefinition<?> SERVICE_DEFINITION = 
+			new SimpleAstrixBeanDefinition<>(ApiProvider.create("FaultToleranceIntagrationTest"), AstrixBeanKey.create(SimpleService.class));
 	private Class<SimpleService> api = SimpleService.class;
 	private SimpleService provider = new SimpleServiceImpl();
 	private SimpleService testService;
-	private AstrixFaultTolerance faultTolerance = new AstrixFaultTolerance();
+	private BeanFaultToleranceFactory faultToleranceFactory;
+	private CountingCachingHystrixCommandNamingStrategy commandNamingStrategy = new CountingCachingHystrixCommandNamingStrategy();
+	private MapConfigSource config = new MapConfigSource();
 	
 	protected abstract ExecutionIsolationStrategy isolationStrategy();
 	
@@ -63,11 +71,13 @@ public abstract class FaultToleranceIntegrationTest {
 
 	@Before
 	public void createService() {
-		faultTolerance.setConfig(DynamicConfig.create(new MapConfigSource()));
-		testService = createProxy(api, provider, settingsRandomCommandKeyAndGroup());
+		faultToleranceFactory = new BeanFaultToleranceFactory(DynamicConfig.create(config), new HystrixBeanFaultToleranceProvider(), commandNamingStrategy);
+		testService = createProxy(api, provider, settings());
 	}
 	
 	private <T> T createProxy(Class<T> type, final T provider, final HystrixCommandSettings settings) {
+		final BeanFaultTolerance faultTolerance = faultToleranceFactory.create(
+				SERVICE_DEFINITION);
 		return ReflectionUtil.newProxy(type, new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
@@ -87,7 +97,7 @@ public abstract class FaultToleranceIntegrationTest {
 
 	@Test
 	public void createWithDefaultSettings() throws Exception {
-		SimpleService create = createProxy(api, provider, settingsRandomCommandKeyAndGroup());
+		SimpleService create = createProxy(api, provider, settings());
 		create.echo("");
 	}
 
@@ -168,10 +178,10 @@ public abstract class FaultToleranceIntegrationTest {
 	
 	@Test
 	public void rejectsWhenPoolIsFull() throws Exception {
-		HystrixCommandSettings settings = settingsRandomCommandKeyAndGroup();
+		HystrixCommandSettings settings = settings();
 		settings.setCoreSize(3);
 		settings.setMaxQueueSize(-1); // sync queue
-		settings.setExecutionIsolationThreadTimeoutInMilliseconds(5000);
+		config.set(AstrixBeanSettings.INITIAL_TIMEOUT.nameFor(AstrixBeanKey.create(SimpleService.class)), "5000");
 		settings.setSemaphoreMaxConcurrentRequests(3);
 		SimpleService serviceWithFt = createProxy(api, provider, settings);
 		ExecutorService pool = Executors.newCachedThreadPool();
@@ -251,17 +261,12 @@ public abstract class FaultToleranceIntegrationTest {
 	}
 	
 	
-	private HystrixCommandSettings settingsRandomCommandKeyAndGroup() {
-		HystrixCommandSettings settings = new HystrixCommandSettings(randomString(), randomString());
+	private HystrixCommandSettings settings() {
+		HystrixCommandSettings settings = new HystrixCommandSettings();
 		settings.setMetricsRollingStatisticalWindowInMilliseconds(2000);
 		settings.setExecutionIsolationStrategy(isolationStrategy());
 		return settings;
 	}
-	
-	private String randomString() {
-		return "" + Math.random();
-	}
-	
 	
 }
 

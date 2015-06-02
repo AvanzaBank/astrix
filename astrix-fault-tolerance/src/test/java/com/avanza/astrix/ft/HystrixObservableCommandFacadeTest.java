@@ -30,8 +30,10 @@ import rx.Subscriber;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.test.util.AstrixTestUtil;
+import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
+import com.netflix.hystrix.HystrixObservableCommand.Setter;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
 
 
@@ -40,10 +42,11 @@ public class HystrixObservableCommandFacadeTest {
 	private final String groupKey = UUID.randomUUID().toString();
 	private final String commandKey = UUID.randomUUID().toString();
 	
-	private final ObservableCommandSettings commandSettings = new ObservableCommandSettings(commandKey, groupKey) {{
-		setTimeoutMillis(25);
-		setMaxConcurrentRequests(1);
-	}};
+	private final Setter commandSettings = Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(groupKey))
+			  .andCommandKey(HystrixCommandKey.Factory.asKey(commandKey))
+			  .andCommandPropertiesDefaults(com.netflix.hystrix.HystrixCommandProperties.Setter()
+					  .withExecutionTimeoutInMilliseconds(25)
+					  .withExecutionIsolationSemaphoreMaxConcurrentRequests(1));
 	
 	
 	@Test

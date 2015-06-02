@@ -38,14 +38,18 @@ public @interface AstrixFaultToleranceProxy {
 	 * the target method. 
 	 * 
 	 * @return
+	 * @Deprecated - Not read, uses bean type as command key
 	 */
-	String commandKey();
+	@Deprecated
+	String commandKey() default "";
 	
 	/**
 	 * Command group name for the hystrix command that will
 	 * protect the target method.
 	 * 
 	 * @return
+	 * @Deprecated - Not read, uses @AstrixApiProvider annotated class-name as group key
 	 */
-	String groupKey();
+	@Deprecated
+	String groupKey() default "";
 }

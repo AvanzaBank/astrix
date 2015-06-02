@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 package com.avanza.astrix.ft;
-/**
- * Holds the group and command key associated with a HystrixCommand/HystrixObservableCommand.
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface HystrixCommandKeys {
-	
-	String getGroupKey();
-	
-	String getCommandKey();
 
+
+/**
+ * @author Elias Lindholm (elilin)
+ */
+public class HystrixObservableCommandSettings {
+
+	private int semaphoreMaxConcurrentRequests = 20;
+
+	public int getSemaphoreMaxConcurrentRequests() {
+		return this.semaphoreMaxConcurrentRequests;
+	}
+	
+	public void setSemaphoreMaxConcurrentRequests(
+			int semaprhoreMaxConcurrentRequests) {
+		this.semaphoreMaxConcurrentRequests = semaprhoreMaxConcurrentRequests;
+	}
+	
+	
+	
 }

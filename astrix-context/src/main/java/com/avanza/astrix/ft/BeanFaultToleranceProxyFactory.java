@@ -17,17 +17,19 @@ package com.avanza.astrix.ft;
 
 import java.util.List;
 
+import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+
 
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class FaultToleranceProxyFactory {
+public class BeanFaultToleranceProxyFactory {
 	
-	private FaultToleranceProxyProvider faultToleranceProxyProvider;
+	private BeanFaultToleranceProxyProvider faultToleranceProxyProvider;
 
-	public FaultToleranceProxyFactory(List<FaultToleranceProxyProvider> faultToleranceProxyProviders) {
+	public BeanFaultToleranceProxyFactory(List<BeanFaultToleranceProxyProvider> faultToleranceProxyProviders) {
 		if (faultToleranceProxyProviders.isEmpty()) {
 			this.faultToleranceProxyProvider = new NoFaultToleranceProvider();
 		} else {
@@ -35,15 +37,15 @@ public class FaultToleranceProxyFactory {
 		}
 	}
 
-	public <T> T addFaultTolerance(final Class<T> api, T provider, HystrixCommandKeys commandKeys) {
-		return faultToleranceProxyProvider.addFaultToleranceProxy(api, provider, commandKeys);
+	public <T> T addFaultTolerance(final AstrixBeanDefinition<T> beanDefinition, T provider) {
+		return faultToleranceProxyProvider.addFaultToleranceProxy(beanDefinition, provider);
 	}
 	
-	private static final class NoFaultToleranceProvider implements FaultToleranceProxyProvider {
+	private static final class NoFaultToleranceProvider implements BeanFaultToleranceProxyProvider {
 		@Override
-		public <T> T addFaultToleranceProxy(Class<T> type, T rawProvider, HystrixCommandKeys commandKeys) {
+		public <T> T addFaultToleranceProxy(
+				AstrixBeanDefinition<T> beanDefinition, T rawProvider) {
 			return rawProvider;
 		}
-		
 	}
 }

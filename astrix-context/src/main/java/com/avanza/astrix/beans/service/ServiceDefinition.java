@@ -17,6 +17,7 @@ package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.publish.ApiProvider;
+import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
 
 
 
@@ -32,7 +33,7 @@ import com.avanza.astrix.beans.publish.ApiProvider;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class ServiceDefinition<T> {
+public final class ServiceDefinition<T> implements AstrixBeanDefinition<T> {
 	
 	private final Class<?> serviceConfigClass;
 	private final ObjectSerializerDefinition objectSerializerDefinition;
@@ -76,6 +77,7 @@ public final class ServiceDefinition<T> {
 		return this.beanKey.getBeanType();
 	}
 	
+	@Override
 	public ApiProvider getDefiningApi() {
 		return definingApi;
 	}
@@ -103,6 +105,7 @@ public final class ServiceDefinition<T> {
 		return this.objectSerializerDefinition;
 	}
 
+	@Override
 	public AstrixBeanKey<T> getBeanKey() {
 		return this.beanKey;
 	}

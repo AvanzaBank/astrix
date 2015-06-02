@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
 /**
@@ -28,30 +29,29 @@ import com.avanza.astrix.core.util.ReflectionUtil;
  * @author Elias Lindholm (elilin)
  *
  */
-@MetaInfServices(FaultToleranceProxyProvider.class)
-public class HystrixFaultToleranceProxyProvider implements FaultToleranceProxyProvider {
+@MetaInfServices(BeanFaultToleranceProxyProvider.class)
+public class HystrixFaultToleranceProxyProvider implements BeanFaultToleranceProxyProvider {
 	
-	private AstrixFaultTolerance faultTolerance;
+	private BeanFaultToleranceFactory faultToleranceFactory;
 	
 	@AstrixInject
-	public void setFaultTolerance(AstrixFaultTolerance faultTolerance) {
-		this.faultTolerance = faultTolerance;
+	public void setFaultTolerance(BeanFaultToleranceFactory faultToleranceFactory) {
+		this.faultToleranceFactory = faultToleranceFactory;
 	}
-
 	@Override
-	public <T> T addFaultToleranceProxy(Class<T> type, T rawProvider, HystrixCommandKeys commandKeys) {
-		HystrixCommandSettings settings = new HystrixCommandSettings(commandKeys.getCommandKey(), commandKeys.getGroupKey());
-		return ReflectionUtil.newProxy(type, new HystrixFaultToleranceProxy(rawProvider, faultTolerance, settings));
+	public <T> T addFaultToleranceProxy(AstrixBeanDefinition<T> beanDefinition, T rawProvider) {
+		return ReflectionUtil.newProxy(beanDefinition.getBeanKey().getBeanType(), 
+									   new HystrixFaultToleranceProxy(rawProvider, faultToleranceFactory.create(beanDefinition), new HystrixCommandSettings()));
 	}
 	
 	private static class HystrixFaultToleranceProxy implements InvocationHandler {
 
 		private final Object provider;
-		private final AstrixFaultTolerance faultTolerance;
+		private final BeanFaultTolerance faultTolerance;
 		private final HystrixCommandSettings settings;
 		
 		public HystrixFaultToleranceProxy(Object rawProvider,
-				AstrixFaultTolerance faultTolerance, HystrixCommandSettings settings) {
+				BeanFaultTolerance faultTolerance, HystrixCommandSettings settings) {
 			this.provider = rawProvider;
 			this.faultTolerance = faultTolerance;
 			this.settings = settings;
@@ -66,7 +66,6 @@ public class HystrixFaultToleranceProxyProvider implements FaultToleranceProxyPr
 				}
 			}, settings);
 		}
-
 
 	}
 

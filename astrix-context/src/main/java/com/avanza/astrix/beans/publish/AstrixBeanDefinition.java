@@ -13,14 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft;
+package com.avanza.astrix.beans.publish;
+
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
+ * @param <T>
  */
-public interface FaultToleranceProxyProvider {
+public interface AstrixBeanDefinition<T> {
 	
-	public <T> T addFaultToleranceProxy(Class<T> type, T rawProvider, HystrixCommandKeys commandKeys);
+	// TODO: Is BeanDefinition the correct name for this class? Isn't it more like a PublishedBeanDefinition? or just an PublishedAstrixBean?
+	
+	AstrixBeanKey<T> getBeanKey();
+
+	ApiProvider getDefiningApi();
 
 }

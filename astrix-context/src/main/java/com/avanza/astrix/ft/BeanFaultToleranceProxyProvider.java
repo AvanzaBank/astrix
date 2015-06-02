@@ -13,30 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.publish;
+package com.avanza.astrix.ft;
+
+import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public final class ApiProvider {
+public interface BeanFaultToleranceProxyProvider {
 	
-	private final String name;
-	
-	private ApiProvider(String name) {
-		this.name = name;
-	}
-	public static ApiProvider create(String name) {
-		return new ApiProvider(name);
-	}
-
-	public String getName() {
-		return name;
-	}
-	
-	@Override
-	public String toString() {
-		return super.toString();
-	}
+	public <T> T addFaultToleranceProxy(AstrixBeanDefinition<T> beanDefinition, T rawProvider);
 
 }

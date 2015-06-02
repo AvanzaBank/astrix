@@ -18,8 +18,9 @@ package com.avanza.astrix.context;
 import java.lang.reflect.Method;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.publish.ApiProvider;
+import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
-import com.avanza.astrix.ft.HystrixCommandKeys;
 import com.avanza.astrix.provider.core.AstrixDynamicQualifier;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;
@@ -27,7 +28,7 @@ import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.core.ServiceConfig;
 import com.avanza.astrix.provider.versioning.Versioned;
 
-public class AstrixBeanDefinitionMethod {
+public class AstrixBeanDefinitionMethod<T> implements AstrixBeanDefinition<T> {
 	
 	private final Method method;
 	
@@ -39,7 +40,7 @@ public class AstrixBeanDefinitionMethod {
 		return method.isAnnotationPresent(Library.class);
 	}
 
-	public AstrixBeanKey<?> getBeanKey() {
+	public AstrixBeanKey<T> getBeanKey() {
 		return AstrixBeanKey.create(getBeanType(), getQualifier());
 	}
 
@@ -69,12 +70,12 @@ public class AstrixBeanDefinitionMethod {
 		return method.isAnnotationPresent(Versioned.class);
 	}
 
-	public static AstrixBeanDefinitionMethod create(Method astrixBeanDefinition) {
-		return new AstrixBeanDefinitionMethod(astrixBeanDefinition);
+	public static AstrixBeanDefinitionMethod<?> create(Method astrixBeanDefinition) {
+		return new AstrixBeanDefinitionMethod<>(astrixBeanDefinition);
 	}
 
-	public Class<?> getBeanType() {
-		return method.getReturnType();
+	public Class<T> getBeanType() {
+		return (Class<T>) method.getReturnType();
 	}
 	
 	/**
@@ -97,23 +98,9 @@ public class AstrixBeanDefinitionMethod {
 		return method.isAnnotationPresent(AstrixFaultToleranceProxy.class);
 	}
 	
-	/**
-	 * Returns hystrix settings used for fault tolerance proxy applied
-	 * to a library bean, see {@link #applyFtProxy()}
-	 * @return
-	 */
-	public HystrixCommandKeys getFtSettings() {
-		final AstrixFaultToleranceProxy ftSettings = method.getAnnotation(AstrixFaultToleranceProxy.class);
-		return new HystrixCommandKeys() {
-			@Override
-			public String getGroupKey() {
-				return ftSettings.groupKey();
-			}
-			@Override
-			public String getCommandKey() {
-				return ftSettings.commandKey();
-			}
-		};
+	@Override
+	public ApiProvider getDefiningApi() {
+		return ApiProvider.create(this.method.getDeclaringClass().getName());
 	}
 
 }

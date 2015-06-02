@@ -36,7 +36,8 @@ import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigAware;
 import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.ft.AstrixFaultTolerance;
+import com.avanza.astrix.ft.BeanFaultTolerance;
+import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.gs.AstrixGigaSpaceProxy;
 import com.avanza.astrix.gs.GsBinder;
@@ -62,7 +63,7 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	 * we have to use the AstrixInjetor to retrieve ServiceComponents.
 	 */
 	private AstrixInjector injector;
-	private AstrixFaultTolerance faultTolerance;
+	private BeanFaultToleranceFactory faultToleranceFactory;
 	
 	@Override
 	public <T> BoundServiceBeanInstance<T> bind(
@@ -92,9 +93,11 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		if (qualifier != null) {
 			commandKey = commandKey + "-" + qualifier;
 		}
-		HystrixCommandSettings hystrixSettings = new HystrixCommandSettings(commandKey, spaceName);
+		HystrixCommandSettings hystrixSettings = new HystrixCommandSettings();
 		hystrixSettings.setExecutionIsolationStrategy(ExecutionIsolationStrategy.SEMAPHORE);
 		hystrixSettings.setSemaphoreMaxConcurrentRequests(Integer.MAX_VALUE);
+		
+		BeanFaultTolerance faultTolerance = faultToleranceFactory.create(serviceDefinition);
 		
 		IJSpace localViewSpace = gslocalViewSpaceConfigurer.create();
 		GigaSpace localViewGigaSpace = AstrixGigaSpaceProxy.create(new GigaSpaceConfigurer(localViewSpace).create(), faultTolerance, hystrixSettings);
@@ -162,8 +165,9 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	}
 
 	@AstrixInject
-	public void setFaultTolerance(AstrixFaultTolerance faultTolerance) {
-		this.faultTolerance = faultTolerance;
+	public void setFaultToleranceFactory(
+			BeanFaultToleranceFactory faultToleranceFactory) {
+		this.faultToleranceFactory = faultToleranceFactory;
 	}
 
 	@Override

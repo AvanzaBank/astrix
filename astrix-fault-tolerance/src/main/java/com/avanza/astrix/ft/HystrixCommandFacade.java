@@ -24,10 +24,6 @@ import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommand.Setter;
-import com.netflix.hystrix.HystrixCommandGroupKey;
-import com.netflix.hystrix.HystrixCommandKey;
-import com.netflix.hystrix.HystrixCommandProperties;
-import com.netflix.hystrix.HystrixThreadPoolProperties;
 
 /**
  * @author Elias Lindholm (elilin)
@@ -38,16 +34,14 @@ class HystrixCommandFacade<T> {
 	private static final Logger log = LoggerFactory.getLogger(HystrixCommandFacade.class);
 
 	private final CheckedCommand<T> command;
-	private final HystrixCommandSettings settings;
 	private final Setter hystrixConfiguration;
 	
-	HystrixCommandFacade(CheckedCommand<T> command, HystrixCommandSettings settings) {
+	private HystrixCommandFacade(CheckedCommand<T> command, Setter hystrixConfiguration) {
 		this.command = command;
-		this.settings = settings;
-		this.hystrixConfiguration = createHystrixConfiguration();
+		this.hystrixConfiguration = hystrixConfiguration;
 	}
 
-	public static <T> T execute(CheckedCommand<T> command, HystrixCommandSettings settings) throws Throwable {
+	public static <T> T execute(CheckedCommand<T> command, Setter settings) throws Throwable {
 		return new HystrixCommandFacade<>(command, settings).execute();
 	}
 
@@ -127,27 +121,6 @@ class HystrixCommandFacade<T> {
 			}
 
 		};
-	}
-
-	private Setter createHystrixConfiguration() {
-		HystrixCommandProperties.Setter commandPropertiesDefault =
-				HystrixCommandProperties.Setter()
-						.withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests())
-						.withExecutionIsolationStrategy(settings.getExecutionIsolationStrategy())
-						.withExecutionTimeoutInMilliseconds(settings.getExecutionIsolationThreadTimeoutInMilliseconds());
-						
-		// MaxQueueSize must be set to a non negative value in order for QueueSizeRejectionThreshold to have any effect.
-		// We use a high value for MaxQueueSize in order to allow QueueSizeRejectionThreshold to change dynamically using archaius.
-		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =
-				HystrixThreadPoolProperties.Setter()
-						.withMaxQueueSize(settings.getMaxQueueSize())
-						.withQueueSizeRejectionThreshold(settings.getQueueSizeRejectionThreshold())
-						.withCoreSize(settings.getCoreSize());
-
-		return Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(settings.getGroupKey()))
-				.andCommandKey(HystrixCommandKey.Factory.asKey(settings.getCommandKey()))
-				.andCommandPropertiesDefaults(commandPropertiesDefault)
-				.andThreadPoolPropertiesDefaults(threadPoolPropertiesDefaults);
 	}
 
 	private static class HystrixResult<T> {

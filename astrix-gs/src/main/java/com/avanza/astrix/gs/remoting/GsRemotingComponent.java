@@ -25,7 +25,8 @@ import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.context.versioning.AstrixVersioningPlugin;
 import com.avanza.astrix.core.AstrixObjectSerializer;
-import com.avanza.astrix.ft.AstrixFaultTolerance;
+import com.avanza.astrix.ft.BeanFaultTolerance;
+import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.gs.BoundProxyServiceBeanInstance;
 import com.avanza.astrix.gs.ClusteredProxyCache;
 import com.avanza.astrix.gs.ClusteredProxyCache.GigaSpaceInstance;
@@ -45,7 +46,7 @@ import com.avanza.astrix.spring.AstrixSpringContext;
 public class GsRemotingComponent implements ServiceComponent {
 
 	private GsBinder gsBinder;
-	private AstrixFaultTolerance faultTolerance;
+	private BeanFaultToleranceFactory beanFaultToleranceFactory;
 	private AstrixSpringContext astrixSpringContext;
 	private AstrixServiceActivator serviceActivator;
 	private AstrixVersioningPlugin versioningPlugin;
@@ -56,6 +57,7 @@ public class GsRemotingComponent implements ServiceComponent {
 		AstrixObjectSerializer objectSerializer = versioningPlugin.create(serviceDefinition.getObjectSerializerDefinition());
 		
 		GigaSpaceInstance proxyInstance = proxyCache.getProxy(serviceProperties);
+		BeanFaultTolerance faultTolerance = beanFaultToleranceFactory.create(serviceDefinition);
 		GsRemotingTransport gsRemotingTransport = new GsRemotingTransport(proxyInstance.getSpaceTaskDispatcher(), faultTolerance);
 		RemotingTransport remotingTransport = RemotingTransport.create(gsRemotingTransport);
 		
@@ -118,8 +120,9 @@ public class GsRemotingComponent implements ServiceComponent {
 	}
 	
 	@AstrixInject
-	public void setFaultTolerance(AstrixFaultTolerance faultTolerance) {
-		this.faultTolerance = faultTolerance;
+	public void setBeanFaultToleranceFactory(
+			BeanFaultToleranceFactory beanFaultToleranceFactory) {
+		this.beanFaultToleranceFactory = beanFaultToleranceFactory;
 	}
 	
 	@AstrixInject

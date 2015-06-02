@@ -18,28 +18,27 @@ package com.avanza.astrix.context;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.ft.FaultToleranceProxyFactory;
-import com.avanza.astrix.ft.HystrixCommandKeys;
+import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.ft.BeanFaultToleranceProxyFactory;
 
 public class AstrixFtProxiedFactory<T> implements StandardFactoryBean<T> {
 	
 	private StandardFactoryBean<T> target;
-	private FaultToleranceProxyFactory faultToleranceProxyFactory;
-	private HystrixCommandKeys ftSettings;
+	private BeanFaultToleranceProxyFactory faultToleranceProxyFactory;
+	private AstrixBeanDefinition<T> beanDefinition;
 
 	public AstrixFtProxiedFactory(StandardFactoryBean<T> target,
-			FaultToleranceProxyFactory faultToleranceProxyFactory,
-			HystrixCommandKeys ftSettings) {
+								  BeanFaultToleranceProxyFactory faultToleranceProxyFactory,
+								  AstrixBeanDefinition<T> beanDefinition) {
 		this.target = target;
 		this.faultToleranceProxyFactory = faultToleranceProxyFactory;
-		this.ftSettings = ftSettings;
+		this.beanDefinition = beanDefinition;
 	}
 
 	@Override
 	public T create(AstrixBeans beans) {
 		T rawBean = target.create(beans);
-		Class<T> beanType = getBeanKey().getBeanType();
-		return faultToleranceProxyFactory.addFaultTolerance(beanType, rawBean, ftSettings);
+		return faultToleranceProxyFactory.addFaultTolerance(beanDefinition, rawBean); 
 	}
 
 	@Override

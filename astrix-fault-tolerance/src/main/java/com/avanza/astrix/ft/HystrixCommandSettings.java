@@ -22,29 +22,21 @@ import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
  * 
  * @author Kristoffer Erlandsson (krierl)
  */
-public class HystrixCommandSettings implements HystrixCommandKeys {
-
+public class HystrixCommandSettings {
+	
 	private int queueSizeRejectionThreshold = 10;
 	private int coreSize = 10;
 	private int semaphoreMaxConcurrentRequests = 10;
-	private String commandKey;
-	private String groupKey;
 	private int executionIsolationThreadTimeoutInMilliseconds = 1000;
 	private int metricsRollingStatisticalWindowInMilliseconds = 10_000;
 	private int maxQueueSize = 1_000_000;
 	private ExecutionIsolationStrategy executionIsolationStrategy = ExecutionIsolationStrategy.THREAD;
 	
-	public HystrixCommandSettings(String commandKey, String groupKey) {
-		this.commandKey = commandKey;
-		this.groupKey = groupKey;
+	public HystrixCommandSettings() {
 	}
 
 	public int getMaxQueueSize() {
 		return maxQueueSize;
-	}
-	
-	public String getGroupKey() {
-		return groupKey;
 	}
 	
 	public void setMaxQueueSize(int maxQueueSize) {
@@ -81,14 +73,6 @@ public class HystrixCommandSettings implements HystrixCommandKeys {
 
 	public void setSemaphoreMaxConcurrentRequests(int semaphoreMaxConcurrentRequests) {
 		this.semaphoreMaxConcurrentRequests = semaphoreMaxConcurrentRequests;
-	}
-
-	public String getCommandKey() {
-		return commandKey;
-	}
-
-	public void setCommandKey(String commandKey) {
-		this.commandKey = commandKey;
 	}
 
 	public int getExecutionIsolationThreadTimeoutInMilliseconds() {

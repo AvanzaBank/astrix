@@ -24,30 +24,37 @@ import org.mockito.Mockito;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.publish.ApiProvider;
+import com.avanza.astrix.beans.publish.SimpleAstrixBeanDefinition;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.ft.AstrixFaultTolerance;
+import com.avanza.astrix.ft.BeanFaultTolerance;
+import com.avanza.astrix.ft.BeanFaultToleranceFactory;
+import com.avanza.astrix.ft.HystrixBeanFaultToleranceProvider;
 import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.gigaspaces.internal.client.cache.SpaceCacheException;
 
 
 public class AstrixGigaSpaceProxyTest {
 	
-	private AstrixFaultTolerance faultTolerance;
+	private BeanFaultTolerance faultTolerance;
 
 	@Before
 	public void setup() {
-		faultTolerance = new AstrixFaultTolerance();
-		MapConfigSource config = new MapConfigSource();
-		config.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
-		faultTolerance.setConfig(DynamicConfig.create(config));
+		MapConfigSource configSource = new MapConfigSource();
+		configSource.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
+		DynamicConfig config = DynamicConfig.create(configSource);
+		BeanFaultToleranceFactory factory = new BeanFaultToleranceFactory(new HystrixBeanFaultToleranceProvider());
+		factory.setConfig(config);
+		faultTolerance = factory.create(new SimpleAstrixBeanDefinition<>(ApiProvider.create("test-provider"), AstrixBeanKey.create(GigaSpace.class)));
 	}
 	
 	@Test
 	public void proxiesInvocations() throws Exception {
 		GigaSpace gigaSpace = Mockito.mock(GigaSpace.class);
-		GigaSpace proxied = AstrixGigaSpaceProxy.create(gigaSpace, faultTolerance, new HystrixCommandSettings("foo", "bar"));
+		GigaSpace proxied = AstrixGigaSpaceProxy.create(gigaSpace, faultTolerance, new HystrixCommandSettings());
 		
 		Mockito.stub(gigaSpace.count(null)).toReturn(21);
 		
@@ -59,7 +66,7 @@ public class AstrixGigaSpaceProxyTest {
 		GigaSpace gigaSpace = Mockito.mock(GigaSpace.class);
 		
 		Mockito.stub(gigaSpace.count(null)).toThrow(new SpaceCacheException(""));
-		GigaSpace proxied = AstrixGigaSpaceProxy.create(gigaSpace, faultTolerance, new HystrixCommandSettings("foo", "bar"));
+		GigaSpace proxied = AstrixGigaSpaceProxy.create(gigaSpace, faultTolerance, new HystrixCommandSettings());
 		
 		try {
 			proxied.count(null);

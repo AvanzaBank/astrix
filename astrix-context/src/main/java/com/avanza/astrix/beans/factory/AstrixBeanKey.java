@@ -82,4 +82,8 @@ public final class AstrixBeanKey<T> {
 		return getBeanTypeName() + "-" + qualifier;
 	}
 
+	public boolean isQualified() {
+		return getQualifier() != null;
+	}
+
 }
