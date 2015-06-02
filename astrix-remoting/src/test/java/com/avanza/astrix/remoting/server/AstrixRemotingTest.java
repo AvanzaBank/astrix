@@ -321,6 +321,25 @@ public class AstrixRemotingTest {
 		Mockito.verifyZeroInteractions(evenPartitionPing, oddPartitionPing);
 	}
 	
+	@Test(expected = RemoteServiceInvocationException.class)
+	public void partitoinedRoutingRequest_NonServiceInovcationExcpetion_WrappedInRemoteServiceInvocation() throws Exception {
+		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		PartitionedPingService evenPartitionPing = new PartitionedPingServiceImpl() {
+			@Override
+			public List<String> ping(String... nums) {
+				throw new NullPointerException();
+			};
+		};
+		PartitionedPingService oddPartitionPing = new PartitionedPingServiceImpl();
+		
+		evenPartition.register(evenPartitionPing, objectSerializer, PartitionedPingService.class);
+		oddPartition.register(oddPartitionPing, objectSerializer, PartitionedPingService.class);
+
+		PartitionedPingService partitionedPing = RemotingProxy.create(PartitionedPingService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		partitionedPing.ping(new String[]{"1", "2", "3", "4", "5"});
+	}
+	
 	@Test
 	public void partitionedRequest_routingOnPropertyOnTargetObject() throws Exception {
 		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
