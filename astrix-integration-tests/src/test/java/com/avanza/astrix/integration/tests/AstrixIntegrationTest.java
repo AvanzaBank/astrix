@@ -175,6 +175,11 @@ public class AstrixIntegrationTest {
 		assertEquals(2, r.size());
 		assertThat(r, hasItem(restaurantWithName("McDonalds")));
 		assertThat(r, hasItem(restaurantWithName("Max Burger")));
+		
+		// It should be possible to send "empty" requests
+		r = lunchService.getLunchRestaurants();
+		assertEquals(0, r.size());
+		
 	}
 	
 	@Test

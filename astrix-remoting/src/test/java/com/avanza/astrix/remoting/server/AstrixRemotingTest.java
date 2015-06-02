@@ -37,6 +37,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -303,6 +304,21 @@ public class AstrixRemotingTest {
 
 		PartitionedPingService partitionedPing = RemotingProxy.create(PartitionedPingService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
 		partitionedPing.pingVoid(new String[]{"1", "2", "3"});
+	}
+	
+	@Test
+	public void partitionedRequest_emptyArgument() throws Exception {
+		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		PartitionedPingService evenPartitionPing = Mockito.mock(PartitionedPingService.class);
+		PartitionedPingService oddPartitionPing = Mockito.mock(PartitionedPingService.class);
+		
+		evenPartition.register(evenPartitionPing, objectSerializer, PartitionedPingService.class);
+		oddPartition.register(oddPartitionPing, objectSerializer, PartitionedPingService.class);
+
+		PartitionedPingService partitionedPing = RemotingProxy.create(PartitionedPingService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		partitionedPing.pingVoid(new String[]{});
+		Mockito.verifyZeroInteractions(evenPartitionPing, oddPartitionPing);
 	}
 	
 	@Test

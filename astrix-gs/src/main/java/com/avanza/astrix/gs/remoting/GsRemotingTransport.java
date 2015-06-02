@@ -15,7 +15,9 @@
  */
 package com.avanza.astrix.gs.remoting;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import rx.Observable;
@@ -63,7 +65,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 	@Override
 	public Observable<List<AstrixServiceInvocationResponse>> submitRoutedRequests(final Collection<RoutedServiceInvocationRequest> requests) {
 		if (requests.isEmpty()) {
-			return Observable.empty();
+			return Observable.just(Collections.<AstrixServiceInvocationResponse>emptyList());
 		}
 		return faultTolerance.observe(new Supplier<Observable<List<AstrixServiceInvocationResponse>>>() {
 			@Override
