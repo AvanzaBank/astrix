@@ -106,9 +106,13 @@ public final class SpaceTaskDispatcher {
 				executorService.execute(new Runnable() {
 					@Override
 					public void run() {
-						// Submit task on current thread in executorService
-						AsyncFuture<T> taskResult = gigaSpace.execute(task, routingKey);
-						GsUtil.subscribe(taskResult, t1);
+						try {
+							// Submit task on current thread in executorService
+							AsyncFuture<T> taskResult = gigaSpace.execute(task, routingKey);
+							GsUtil.subscribe(taskResult, t1);
+						} catch (Exception e) {
+							t1.onError(e);
+						}
 					}
 				});
 			}
@@ -122,9 +126,13 @@ public final class SpaceTaskDispatcher {
 				executorService.execute(new Runnable() {
 					@Override
 					public void run() {
-						// Submit task on current thread in executorService
-						AsyncFuture<R> taskResult = gigaSpace.execute(distributedTask);
-						GsUtil.subscribe(taskResult, t1);
+						try {
+							// Submit task on current thread in executorService
+							AsyncFuture<R> taskResult = gigaSpace.execute(distributedTask);
+							GsUtil.subscribe(taskResult, t1);
+						} catch (Exception e) {
+							t1.onError(e);
+						}
 					}
 				});
 			}
