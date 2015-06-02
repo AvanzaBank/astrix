@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.avanza.astrix</groupId>
 		<artifactId>astrix-parent</artifactId>
-		<version>MASTER-SNAPSHOT</version>
+		<version>0.26.4</version>
 	</parent>
 	<artifactId>astrix-core</artifactId>
 	<dependencies>
