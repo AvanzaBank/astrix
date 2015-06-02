@@ -39,11 +39,11 @@ public class RemotingTransport {
 		return impl.submitRoutedRequest(request, routingKey);
 	}
 	
-	public Observable<AstrixServiceInvocationResponse> submitRoutedRequests(List<RoutedServiceInvocationRequest> requests) {
+	public Observable<List<AstrixServiceInvocationResponse>> submitRoutedRequests(List<RoutedServiceInvocationRequest> requests) {
 		return impl.submitRoutedRequests(requests);
 	}
 	
-	public Observable<AstrixServiceInvocationResponse> submitBroadcastRequest(AstrixServiceInvocationRequest request) {
+	public Observable<List<AstrixServiceInvocationResponse>> submitBroadcastRequest(AstrixServiceInvocationRequest request) {
 		return impl.submitBroadcastRequest(request);
 	}
 

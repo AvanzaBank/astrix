@@ -77,6 +77,20 @@ public class GsUtil {
 			}
 		});
 	}
+	
+	public static <T> void subscribe(final AsyncFuture<T> asyncFuture, final Subscriber<? super T> t1) {
+		asyncFuture.setListener(new AsyncFutureListener<T>() {
+			@Override
+			public void onResult(AsyncResult<T> result) {
+				if (result.getException() == null) {
+					t1.onNext(result.getResult());
+					t1.onCompleted();
+				} else {
+					t1.onError(result.getException());
+				}
+			}
+		});
+	}
 
 	public static <T> Func1<List<AsyncResult<T>>, Observable<T>> asyncResultListToObservable() {
 		return new Func1<List<AsyncResult<T>>, Observable<T>>() {

@@ -1084,7 +1084,7 @@ public class AstrixRemotingTest {
 		}
 
 		@Override
-		public Observable<AstrixServiceInvocationResponse> submitBroadcastRequest(AstrixServiceInvocationRequest request) {
+		public Observable<List<AstrixServiceInvocationResponse>> submitBroadcastRequest(AstrixServiceInvocationRequest request) {
 			final List<AstrixServiceInvocationResponse> responses = new ArrayList<>();
 			for (AstrixServiceActivator partition : partitions) {
 				responses.add(partition.invokeService(request));
@@ -1097,7 +1097,7 @@ public class AstrixRemotingTest {
 					}
 					t1.onCompleted();
 				}
-			});
+			}).toList();
 			
 		}
 
@@ -1107,12 +1107,12 @@ public class AstrixRemotingTest {
 		}
 
 		@Override
-		public Observable<AstrixServiceInvocationResponse> submitRoutedRequests(Collection<RoutedServiceInvocationRequest> requests) {
+		public Observable<List<AstrixServiceInvocationResponse>> submitRoutedRequests(Collection<RoutedServiceInvocationRequest> requests) {
 			Observable<AstrixServiceInvocationResponse> result = Observable.empty();
 			for (RoutedServiceInvocationRequest request : requests) {
 				result = result.mergeWith(submitRoutedRequest(request.getRequest(), request.getRoutingkey()));
 			}
-			return result;
+			return result.toList();
 		}
 		
 	}

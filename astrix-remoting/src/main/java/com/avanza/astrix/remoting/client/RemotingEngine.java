@@ -82,11 +82,11 @@ public final class RemotingEngine {
 		return this.serviceTransport.submitRoutedRequest(request, routingKey);
 	}
 	
-	final Observable<AstrixServiceInvocationResponse> submitRoutedRequests(List<RoutedServiceInvocationRequest> requests) {
+	final Observable<List<AstrixServiceInvocationResponse>> submitRoutedRequests(List<RoutedServiceInvocationRequest> requests) {
 		return this.serviceTransport.submitRoutedRequests(requests);
 	}
 
-	final Observable<AstrixServiceInvocationResponse> submitBroadcastRequest(AstrixServiceInvocationRequest request) {
+	final Observable<List<AstrixServiceInvocationResponse>> submitBroadcastRequest(AstrixServiceInvocationRequest request) {
 		return this.serviceTransport.submitBroadcastRequest(request);
 	}
 

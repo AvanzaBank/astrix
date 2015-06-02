@@ -67,7 +67,7 @@ public class BroadcastedRemoteServiceMethod implements RemoteServiceMethod {
 			IllegalAccessException {
 		request.setArguments(remotingEngine.marshall(args));
 		final RemoteResultReducer<T> reducer = (RemoteResultReducer<T>) newReducer();
-		Observable<List<AstrixServiceInvocationResponse>> responesObservable = remotingEngine.submitBroadcastRequest(request).toList();
+		Observable<List<AstrixServiceInvocationResponse>> responesObservable = remotingEngine.submitBroadcastRequest(request);
 		if (returnType.equals(Void.TYPE)) {
 			return responesObservable.map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
 				@Override

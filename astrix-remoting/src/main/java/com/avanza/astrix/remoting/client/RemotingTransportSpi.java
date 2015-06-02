@@ -16,6 +16,7 @@
 package com.avanza.astrix.remoting.client;
 
 import java.util.Collection;
+import java.util.List;
 
 import rx.Observable;
 /**
@@ -30,6 +31,22 @@ import rx.Observable;
  */
 public interface RemotingTransportSpi {
 	
+	/* 
+	 * DESIGN NOTE:
+	 * 
+	 * The RemotingTransportSpi#submitRoutedRequests and RemotingTransportSpi#submitBroadcastRequest
+	 * where initially designed to return an Observable that emitted one event for the response
+	 * from each invocation (as opposed to emit a single event with a List of all responses).
+	 * 
+	 * The initial design caused problems when a subset of the service invocations did'nt return a response. 
+	 * It seems that the HystrixObservableCommand's timeout mechanism only relates to the first emitted event. 
+	 * As soon as one event is emitted (i.e a response from one service invocation is received), the timeout
+	 * mechanism no longer applies and the service invocation won't timeout no matter how long it takes for the
+	 * second event to be emitted. Therefore, in order to ensure that service invocation are protected
+	 * with a timeout, the RemotingTransportSpi has been designed to only emit one event with all responses,
+	 * or non at all.
+	 */
+	
 	/**
 	 * Send a single routed invocation request to the target cluster member.
 	 *  
@@ -43,18 +60,18 @@ public interface RemotingTransportSpi {
 	 * Sends each service invocation to the associate target cluster member.
 	 * 
 	 * @param requests
-	 * @return an Observable that will emit one item for the response for each routed invocation request.
+	 * @return an Observable that will emit one item with the responses from each invocation
 	 */
-	Observable<AstrixServiceInvocationResponse> submitRoutedRequests(Collection<RoutedServiceInvocationRequest> requests);
+	Observable<List<AstrixServiceInvocationResponse>> submitRoutedRequests(Collection<RoutedServiceInvocationRequest> requests);
 	
 	/**
 	 * Sends a service invocation request to each member in the cluster. 
 	 * 
 	 * @param request
-	 * @return an Observable that will emit one item for the response for the invocation of each member in
+	 * @return an Observable that will emit one item with the responses from the invocation of each member in
 	 * the entire cluster.
 	 */
-	Observable<AstrixServiceInvocationResponse> submitBroadcastRequest(AstrixServiceInvocationRequest request);
+	Observable<List<AstrixServiceInvocationResponse>> submitBroadcastRequest(AstrixServiceInvocationRequest request);
 	
 	/**
 	 * 

@@ -54,58 +54,57 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 		return faultTolerance.observe(new Supplier<Observable<AstrixServiceInvocationResponse>>() {
 			@Override
 			public Observable<AstrixServiceInvocationResponse> get() {
-				return executeRoutedRequest(request, routingKey);
+				return observeRoutedRequest(request, routingKey);
 			}
 
 		}, getServiceCommandSettings(request));
 	}
 
 	@Override
-	public Observable<AstrixServiceInvocationResponse> submitRoutedRequests(final Collection<RoutedServiceInvocationRequest> requests) {
+	public Observable<List<AstrixServiceInvocationResponse>> submitRoutedRequests(final Collection<RoutedServiceInvocationRequest> requests) {
 		if (requests.isEmpty()) {
 			return Observable.empty();
 		}
-		return faultTolerance.observe(new Supplier<Observable<AstrixServiceInvocationResponse>>() {
+		return faultTolerance.observe(new Supplier<Observable<List<AstrixServiceInvocationResponse>>>() {
 			@Override
-			public Observable<AstrixServiceInvocationResponse> get() {
+			public Observable<List<AstrixServiceInvocationResponse>> get() {
 				return observeRoutedReqeuests(requests);
 			}
-
 		}, getServiceCommandSettings(requests.iterator().next().getRequest()));
 
 	}
 	
 	
 	@Override
-	public Observable<AstrixServiceInvocationResponse> submitBroadcastRequest(final AstrixServiceInvocationRequest request) {
-		return faultTolerance.observe(new Supplier<Observable<AstrixServiceInvocationResponse>>() {
+	public Observable<List<AstrixServiceInvocationResponse>> submitBroadcastRequest(final AstrixServiceInvocationRequest request) {
+		return faultTolerance.observe(new Supplier<Observable<List<AstrixServiceInvocationResponse>>>() {
 			@Override
-			public Observable<AstrixServiceInvocationResponse> get() {
-				return executeBroadcastRequest(request);
+			public Observable<List<AstrixServiceInvocationResponse>> get() {
+				return observeBroadcastRequest(request);
 			}
 
 		}, getServiceCommandSettings(request));
 	}
 	
-	private Observable<AstrixServiceInvocationResponse> executeRoutedRequest(AstrixServiceInvocationRequest request,
+	private Observable<AstrixServiceInvocationResponse> observeRoutedRequest(AstrixServiceInvocationRequest request,
 																			  RoutingKey routingKey) {
 		return spaceTaskDispatcher.observe(new AstrixServiceInvocationTask(request), routingKey);
 	}
 	
-	private Observable<AstrixServiceInvocationResponse> observeRoutedReqeuests(Collection<RoutedServiceInvocationRequest> requests) {
+	private Observable<List<AstrixServiceInvocationResponse>> observeRoutedReqeuests(Collection<RoutedServiceInvocationRequest> requests) {
 		Observable<AstrixServiceInvocationResponse> result = Observable.empty();
 		for (RoutedServiceInvocationRequest request : requests) {
 			result = result.mergeWith(spaceTaskDispatcher.observe(new AstrixServiceInvocationTask(request.getRequest()), request.getRoutingkey()));
 		}
-		return result;
+		return result.toList();
 	}
 	
-	private Observable<AstrixServiceInvocationResponse> executeBroadcastRequest(AstrixServiceInvocationRequest request) {
+	private Observable<List<AstrixServiceInvocationResponse>> observeBroadcastRequest(AstrixServiceInvocationRequest request) {
 		Observable<List<AsyncResult<AstrixServiceInvocationResponse>>> responses = spaceTaskDispatcher.observe(new AstrixDistributedServiceInvocationTask(request));
 		Func1<List<AsyncResult<AstrixServiceInvocationResponse>>, Observable<AstrixServiceInvocationResponse>> listToObservable = 
 				GsUtil.asyncResultListToObservable();
 		Observable<AstrixServiceInvocationResponse> responseStream = responses.flatMap(listToObservable);
-		return responseStream;
+		return responseStream.toList();
 	}
 
 	private ObservableCommandSettings getServiceCommandSettings(AstrixServiceInvocationRequest request) {
