@@ -90,7 +90,7 @@ public final class ServiceDefinition<T> {
 			throw new IllegalStateException(String.format("Expected service configuration class of type=%s to be defined for service", type.getName()));
 		}
 		if (!type.isAssignableFrom(this.serviceConfigClass)) {
-			throw new IllegalStateException(String.format("Expected service configuration class of type=%s, but actualType=", type.getName(), serviceConfigClass.getName()));
+			throw new IllegalStateException(String.format("Expected service configuration class of type=%s, but actualType=%s", type.getName(), serviceConfigClass.getName()));
 		} 
 		return (Class<E>) serviceConfigClass;
 	}

@@ -22,7 +22,7 @@ public class MissingBeanDependencyException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	public MissingBeanDependencyException(AstrixBeanKey<? extends Object> requiredBy, Stack<AstrixBeanKey<?>> creationTrace) {
-		super(String.format("\n dependency: %s \n trace: %s", requiredBy, creationTrace));
+		super(String.format("%n dependency: %s %n trace: %s", requiredBy, creationTrace));
 	}
 
 }
