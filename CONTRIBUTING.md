@@ -5,6 +5,9 @@ For non-trivial contributions (i.e other than fixing spelling errors etc) you sh
 
 When submitting code, please make every effort to follow existing conventions and style in order to keep the code as readable as possible.
 
+## Continuous Integration
+https://travis-ci.org/AvanzaBank/astrix/builds
+
 ## License
 
 By contributing your code, you agree to license your contribution under the terms of the APLv2: https://github.com/AvanzaBank/astrix/blob/master/LICENSE
