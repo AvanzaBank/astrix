@@ -67,7 +67,8 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 			}
 			if (beanDefinition.isService()) {
 				ServiceDefinition<?> serviceDefinition = createServiceDefinition(apiProviderClass, beanDefinition);
-				ServiceDiscoveryFactory<?> serviceDiscoveryFactory = serviceDiscoveryMetaFactory.createServiceDiscoveryFactory(beanDefinition.getBeanKey(), astrixBeanDefinitionMethod);
+				ServiceDiscoveryFactory<?> serviceDiscoveryFactory = serviceDiscoveryMetaFactory.createServiceDiscoveryFactory(
+						beanDefinition.getBeanKey().getBeanType(), astrixBeanDefinitionMethod);
 				result.add(serviceMetaFactory.createServiceFactory(serviceDefinition, serviceDiscoveryFactory));
 				Class<?> asyncInterface = serviceMetaFactory.loadInterfaceIfExists(beanDefinition.getBeanType().getName() + "Async");
 				if (asyncInterface != null) {

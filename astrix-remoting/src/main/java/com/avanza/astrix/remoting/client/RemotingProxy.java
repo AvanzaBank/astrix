@@ -22,6 +22,7 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Future;
 
 import rx.Observable;
 
@@ -37,40 +38,23 @@ public class RemotingProxy implements InvocationHandler {
 	private final int apiVersion;
 	private final String serviceApi;
 	private final ConcurrentMap<Method, RemoteServiceMethod> remoteServiceMethodByMethod = new ConcurrentHashMap<>();
-	private final boolean isObservableApi;
-	private final boolean isAsyncApi;
 	private final RemoteServiceMethodFactory remoteServiceMethodFactory;
 
-	public static <T> T create(Class<T> service, RemotingTransport transport, AstrixObjectSerializer objectSerializer, RoutingStrategy routingStrategy) {
-		RemotingProxy handler = new RemotingProxy(service, objectSerializer, transport, routingStrategy);
-		T serviceProxy = (T) Proxy.newProxyInstance(RemotingProxy.class.getClassLoader(), new Class[]{service}, handler);
+	public static <T> T create(Class<T> proxyApi, Class<?> targetApi, RemotingTransport transport, AstrixObjectSerializer objectSerializer, RoutingStrategy routingStrategy) {
+		RemotingProxy handler = new RemotingProxy(proxyApi, targetApi, objectSerializer, transport, routingStrategy);
+		T serviceProxy = (T) Proxy.newProxyInstance(RemotingProxy.class.getClassLoader(), new Class[]{proxyApi}, handler);
 		return serviceProxy;
 	}
 	
 	private RemotingProxy(Class<?> proxiedServiceApi,
+						  Class<?> targetServiceApi,
 							    AstrixObjectSerializer objectSerializer,
 							    RemotingTransport AstrixServiceTransport,
 							    RoutingStrategy routingStrategy) {
+		this.serviceApi = targetServiceApi.getName();
 		this.apiVersion = objectSerializer.version();
 		RemotingEngine remotingEngine = new RemotingEngine(AstrixServiceTransport, objectSerializer, apiVersion);
 		this.remoteServiceMethodFactory = new RemoteServiceMethodFactory(remotingEngine, routingStrategy);
-		if (proxiedServiceApi.getSimpleName().startsWith("Observable")) {
-			String packageAndEventualOuterClassName = proxiedServiceApi.getName().substring(0, proxiedServiceApi.getName().length() - proxiedServiceApi.getSimpleName().length());
-			String serviceSimpleName = proxiedServiceApi.getSimpleName().substring("Observable".length());
-			String serviceClassName = packageAndEventualOuterClassName + serviceSimpleName;
-			this.serviceApi = serviceClassName; 
-			this.isObservableApi = true;
-			this.isAsyncApi = false;
-		} else if (proxiedServiceApi.getSimpleName().endsWith("Async")) {
-			String serviceClassName = proxiedServiceApi.getName().substring(0, proxiedServiceApi.getName().length() - "Async".length());
-			this.serviceApi = serviceClassName; 
-			this.isObservableApi = false;
-			this.isAsyncApi = true; 
-		} else {
-			this.serviceApi = proxiedServiceApi.getName();
-			this.isObservableApi = false;
-			this.isAsyncApi = false;
-		}
 		/*
 		 * For each of the following services the "targetServiceType" resolves to MyService:
 		 *  - MyService
@@ -104,20 +88,32 @@ public class RemotingProxy implements InvocationHandler {
 		invocationRequest.setHeader("serviceApi", this.serviceApi);
 		
 		Observable<?> result = remoteServiceMethod.invoke(invocationRequest, args);
-		if (isObservableApi) {
+		if (isObservableType(method.getReturnType())) {
 			return result;
 		}
-		if (isAsyncApi) {
+		if (isFutureType(method.getReturnType())) {
 			return new FutureAdapter<>(result);
 		}
 		return result.toBlocking().first();
 	}
 	
 	private Type getReturnType(Method method) {
-		if (isObservableApi || isAsyncApi) {
+		if (isObservableOrFutureType(method.getReturnType())) {
 			return ParameterizedType.class.cast(method.getGenericReturnType()).getActualTypeArguments()[0];
 		}
 		return method.getGenericReturnType();
+	}
+
+	private boolean isObservableOrFutureType(Class<?> returnType) {
+		return isFutureType(returnType) || isObservableType(returnType);
+	}
+
+	private boolean isObservableType(Class<?> returnType) {
+		return Observable.class.isAssignableFrom(returnType);
+	}
+
+	private boolean isFutureType(Class<?> returnType) {
+		return Future.class.isAssignableFrom(returnType);
 	}
 	
 }

@@ -140,11 +140,6 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	}
 	
 	@Override
-	public boolean supportsAsyncApis() {
-		return false;
-	}
-
-	@Override
 	public boolean requiresProviderInstance() {
 		return false;
 	}

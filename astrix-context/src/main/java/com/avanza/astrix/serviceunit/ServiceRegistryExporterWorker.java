@@ -102,11 +102,6 @@ public class ServiceRegistryExporterWorker extends Thread implements AstrixPubli
 			ServiceProperties serviceProperties = exportedService.exportServiceProperties();
 			serviceRegistryProviderClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());
 			log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
-			if (exportedService.exportsAsyncApi()) {
-				serviceProperties = exportedService.exportAsyncServiceProperties();
-				serviceRegistryProviderClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());
-				log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
-			}
 		}
 	}
 

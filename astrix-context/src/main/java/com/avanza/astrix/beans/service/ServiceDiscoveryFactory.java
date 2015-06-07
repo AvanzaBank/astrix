@@ -28,14 +28,16 @@ public final class ServiceDiscoveryFactory<T extends Annotation> {
 	
 	private final ServiceDiscoveryMetaFactoryPlugin<T> factory;
 	private final T annotation;
+	private final Class<?> beanType;
 	
-	public ServiceDiscoveryFactory(ServiceDiscoveryMetaFactoryPlugin<T> factory, T annotation) {
+	public ServiceDiscoveryFactory(ServiceDiscoveryMetaFactoryPlugin<T> factory, T annotation, Class<?> serviceBeanType) {
 		this.factory = factory;
 		this.annotation = annotation;
+		this.beanType = serviceBeanType;
 	}
 
-	public ServiceDiscovery create(AstrixBeanKey<?> beanKey) {
-		return factory.create(beanKey, annotation);
+	public ServiceDiscovery create(String beanQualifier) {
+		return factory.create(AstrixBeanKey.create(this.beanType, beanQualifier), annotation);
 	}
 	
 

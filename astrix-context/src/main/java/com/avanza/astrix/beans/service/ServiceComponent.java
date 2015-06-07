@@ -86,22 +86,6 @@ public interface ServiceComponent {
 	<T> void exportService(Class<T> providedApi, T provider, ServiceDefinition<T> serviceDefinition);
 	
 	/**
-	 * Whether the api supports an async version based on the following naming
-	 * convention:
-	 *  
-	 * <pre>
-	 * MyService
-	 * 	MyResult mySyncMethod(Argument)
-	 * 
-	 * MyServiceAsync
-	 * 	Future<MyResult> mySyncMethod(Argument)
-	 * </pre>
-	 * 
-	 * @return
-	 */
-	boolean supportsAsyncApis();
-	
-	/**
 	 * Defines whether an instance implementing a provided api is required when invoking ServiceComponent.exportService.
 	 * 
 	 * If true, Astrix will identify an instance that implements the given api and pass it to the exportService method and

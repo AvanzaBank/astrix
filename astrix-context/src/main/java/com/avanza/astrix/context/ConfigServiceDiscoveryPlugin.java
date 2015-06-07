@@ -39,7 +39,7 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactory
 	
 	@Override
 	public ServiceDiscovery create(AstrixBeanKey<?> key, AstrixConfigDiscovery lookupAnnotation) {
-		return new ConfigDiscovery(serviceComponents, config, lookupAnnotation.value());
+		return new ConfigDiscovery(serviceComponents, config, lookupAnnotation.value(), key);
 	}
 	
 	@Override
@@ -62,14 +62,16 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactory
 		private ServiceComponents serviceComponents;
 		private DynamicConfig config;
 		private String configEntryName;
+		private AstrixBeanKey<?> beanKey;
 		
 		
 		public ConfigDiscovery(ServiceComponents serviceComponents,
-				DynamicConfig config, String configEntryName) {
+				DynamicConfig config, String configEntryName, AstrixBeanKey<?> beanKey) {
 			super();
 			this.serviceComponents = serviceComponents;
 			this.config = config;
 			this.configEntryName = configEntryName;
+			this.beanKey = beanKey;
 		}
 
 		@Override
@@ -94,6 +96,8 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactory
 			ServiceComponent serviceComponent = getServiceComponent(component);
 			ServiceProperties serviceProperties = serviceComponent.parseServiceProviderUri(serviceProviderUri);
 			serviceProperties.setComponent(serviceComponent.getName());
+			serviceProperties.setApi(this.beanKey.getBeanType());
+			serviceProperties.setQualifier(this.beanKey.getQualifier());
 			return serviceProperties;
 		}
 		

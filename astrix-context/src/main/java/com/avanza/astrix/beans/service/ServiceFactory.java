@@ -40,10 +40,10 @@ public class ServiceFactory<T> implements DynamicFactoryBean<T> {
 	private final DynamicConfig config;
 
 	public ServiceFactory(ServiceDefinition<T> serviceDefinition, 
-								ServiceDiscoveryFactory<?> serviceDiscoveryFactory, 
-								ServiceComponents serviceComponents, 
-								ServiceLeaseManager leaseManager,
-								DynamicConfig config) {
+						  ServiceDiscoveryFactory<?> serviceDiscoveryFactory, 
+						  ServiceComponents serviceComponents, 
+						  ServiceLeaseManager leaseManager,
+						  DynamicConfig config) {
 		this.config = config;
 		this.serviceDefinition = Objects.requireNonNull(serviceDefinition);
 		this.serviceDiscoveryFactory = Objects.requireNonNull(serviceDiscoveryFactory);
@@ -52,7 +52,7 @@ public class ServiceFactory<T> implements DynamicFactoryBean<T> {
 	}
 
 	public T create(AstrixBeanKey<T> beanKey) {
-		ServiceDiscovery serviceDiscovery = serviceDiscoveryFactory.create(beanKey);
+		ServiceDiscovery serviceDiscovery = serviceDiscoveryFactory.create(beanKey.getQualifier());
 		ServiceBeanInstance<T> serviceBeanInstance = ServiceBeanInstance.create(serviceDefinition, beanKey, serviceDiscovery, serviceComponents, config);
 		serviceBeanInstance.bind();
 		leaseManager.startManageLease(serviceBeanInstance);

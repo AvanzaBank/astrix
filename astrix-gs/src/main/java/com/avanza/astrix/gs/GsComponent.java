@@ -84,11 +84,6 @@ public class GsComponent implements ServiceComponent {
 	}
 	
 	@Override
-	public boolean supportsAsyncApis() {
-		return false;
-	}
-
-	@Override
 	public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> definition) {
 		if (!definition.getServiceType().equals(GigaSpace.class)) {
 			throw new IllegalArgumentException("Can't export: " + definition.getServiceType());

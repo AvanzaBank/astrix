@@ -21,7 +21,6 @@ import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 
 class ServiceRegistryExportedService {
 	
-	private final Class<?> asyncService;
 	private final ServiceComponent serviceComponent;
 	private volatile boolean publishServices;
 	private final ExportedServiceBeanDefinition serviceBeanDefinition;
@@ -33,27 +32,6 @@ class ServiceRegistryExportedService {
 			throw new UnsupportedTargetTypeException(serviceComponent.getName(), serviceBeanDefinition.getBeanType());
 		}
 		this.serviceComponent = serviceComponent;
-		if (serviceComponent.supportsAsyncApis()) {
-			this.asyncService = loadInterfaceIfExists(serviceBeanDefinition.getBeanType().getName() + "Async");
-		} else {
-			this.asyncService = null;
-		}
-	}
-	
-	private Class<?> loadInterfaceIfExists(String interfaceName) {
-		try {
-			Class<?> c = Class.forName(interfaceName);
-			if (c.isInterface()) {
-				return c;
-			}
-		} catch (ClassNotFoundException e) {
-			// fall through and return null
-		}
-		return null;
-	}
-	
-	public boolean exportsAsyncApi() {
-		return this.asyncService != null;
 	}
 
 	public ServiceProperties exportServiceProperties() {
@@ -79,10 +57,4 @@ class ServiceRegistryExportedService {
 		this.publishServices = published;
 	}
 
-	public ServiceProperties exportAsyncServiceProperties() {
-		ServiceProperties serviceProperties = exportServiceProperties();
-		serviceProperties.setApi(asyncService);
-		return serviceProperties;
-	}
-	
 }

@@ -25,6 +25,7 @@ import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.context.versioning.AstrixVersioningPlugin;
 import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.gs.BoundProxyServiceBeanInstance;
@@ -60,8 +61,8 @@ public class GsRemotingComponent implements ServiceComponent {
 		BeanFaultTolerance faultTolerance = beanFaultToleranceFactory.create(serviceDefinition);
 		GsRemotingTransport gsRemotingTransport = new GsRemotingTransport(proxyInstance.getSpaceTaskDispatcher(), faultTolerance);
 		RemotingTransport remotingTransport = RemotingTransport.create(gsRemotingTransport);
-		
-		T proxy = RemotingProxy.create(serviceDefinition.getServiceType(), remotingTransport, objectSerializer, new GsRoutingStrategy());
+		T proxy = RemotingProxy.create(serviceDefinition.getServiceType(), ReflectionUtil.classForName(serviceProperties.getProperty(ServiceProperties.API))
+				, remotingTransport, objectSerializer, new GsRoutingStrategy());
 		return BoundProxyServiceBeanInstance.create(proxy, proxyInstance);
 	}
 	
@@ -128,11 +129,6 @@ public class GsRemotingComponent implements ServiceComponent {
 	@AstrixInject
 	public void setVersioningPlugin(AstrixVersioningPlugin versioningPlugin) {
 		this.versioningPlugin = versioningPlugin;
-	}
-
-	@Override
-	public boolean supportsAsyncApis() {
-		return true;
 	}
 	
 }

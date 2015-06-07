@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryDiscovery;
 
 /**
@@ -39,17 +38,17 @@ public class ServiceDiscoveryMetaFactory {
 		}
 	}
 	
-	public ServiceDiscoveryFactory<?> createServiceDiscoveryFactory(AstrixBeanKey<?> beanKey, AnnotatedElement annotatedElement) {
+	public ServiceDiscoveryFactory<?> createServiceDiscoveryFactory(Class<?> lookupBeanType, AnnotatedElement annotatedElement) {
 		ServiceDiscoveryMetaFactoryPlugin<?> servcieLookupPlugin = getServiceLookupPlugin(annotatedElement);
 		if (servcieLookupPlugin != null) {
-			return create(beanKey, annotatedElement, servcieLookupPlugin);
+			return create(lookupBeanType, annotatedElement, servcieLookupPlugin);
 		}
 		throw new IllegalArgumentException("Can't identify what lookup-strategy to use to locate services exported using annotated element: " + annotatedElement);
 	}
 	
-	private <T extends Annotation> ServiceDiscoveryFactory<?> create(AstrixBeanKey<?> beanKey, AnnotatedElement annotatedElement, ServiceDiscoveryMetaFactoryPlugin<T> lookupPlugin) {
+	private <T extends Annotation> ServiceDiscoveryFactory<?> create(Class<?> lookupBeanType, AnnotatedElement annotatedElement, ServiceDiscoveryMetaFactoryPlugin<T> lookupPlugin) {
 		T annotation = annotatedElement.getAnnotation(lookupPlugin.getDiscoveryAnnotationType());
-		return new ServiceDiscoveryFactory<>(lookupPlugin, annotation);
+		return new ServiceDiscoveryFactory<>(lookupPlugin, annotation, lookupBeanType);
 	}
 	
 	private ServiceDiscoveryMetaFactoryPlugin<?> getServiceLookupPlugin(AnnotatedElement annotatedElement) {

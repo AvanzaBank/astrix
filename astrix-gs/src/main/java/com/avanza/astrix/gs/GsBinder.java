@@ -78,7 +78,7 @@ public class GsBinder implements AstrixConfigAware {
 	
 	public ServiceProperties createProperties(GigaSpace space) {
 		ServiceProperties result = new ServiceProperties();
-		result.setApi(GigaSpace.class);
+//		result.setApi(GigaSpace.class);
 		result.setProperty(SPACE_NAME_PROPERTY, space.getSpace().getName());
 		result.setProperty(SPACE_URL_PROPERTY, new SpaceUrlBuilder(space).buildSpaceUrl());
 		return result;
@@ -91,7 +91,7 @@ public class GsBinder implements AstrixConfigAware {
 		}
 		String spaceName = spaceUrlMatcher.group(1);
 		ServiceProperties result = new ServiceProperties();
-		result.setApi(GigaSpace.class);
+//		result.setApi(GigaSpace.class);
 		result.setProperty(SPACE_NAME_PROPERTY, spaceName);
 		result.setProperty(SPACE_URL_PROPERTY, spaceUrl);
 		result.setQualifier(spaceName);

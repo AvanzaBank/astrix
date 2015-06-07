@@ -259,11 +259,6 @@ public class DirectComponent implements ServiceComponent {
 	}
 	
 	@Override
-	public boolean supportsAsyncApis() {
-		return false;
-	}
-
-	@Override
 	public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> exportedService) {
 		String id = this.idByExportedBean.get(exportedService.getBeanKey());
 		return getServiceProperties(id);
