@@ -17,109 +17,97 @@ package com.avanza.astrix.ft;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.junit.Before;
 import org.junit.Test;
-
-import rx.Observable;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanSettings;
 import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.SimpleAstrixBeanDefinition;
-import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
-import com.avanza.astrix.core.function.Supplier;
+import com.avanza.astrix.ft.BeanFaultToleranceTest.Ping;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
+import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
-import com.netflix.hystrix.HystrixObservableCommand.Setter;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
 
 public class BeanFaultToleranceTest {
 	
 	private static final AstrixBeanKey<Ping> ASTRIX_BEAN_KEY = AstrixBeanKey.create(Ping.class);
 	
-	private FakeBeanFaultToleranceProvider fakeFaultToleranceImpl = new FakeBeanFaultToleranceProvider();
-	private MapConfigSource config = new MapConfigSource();
-	private BeanFaultTolerance fakeBeanFaultTolerance;
+	private AstrixApplicationContext context;
+	private TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+	private Ping ping;
+	private Ping anotherPing;
 
 	@Before
 	public void setup() {
-		BeanFaultToleranceFactory faultToleranceFactory = new BeanFaultToleranceFactory(DynamicConfig.create(config), fakeFaultToleranceImpl, new CountingCachingHystrixCommandNamingStrategy());
-		fakeBeanFaultTolerance = faultToleranceFactory.create(new SimpleAstrixBeanDefinition<>(ApiProvider.create("BeanFaultToleranceTest.PingApi"), ASTRIX_BEAN_KEY));
-	}
-	
-	@Test
-	public void itShouldBePossibleToDisableFaultToleranceGloballyAtRuntime() throws Throwable {
-		assertEquals(0, fakeFaultToleranceImpl.appliedFaultToleranceCount.get());
-		assertEquals("foo", fakeBeanFaultTolerance.execute(new Command<String>() {
-			@Override
-			public String call() {
-				return "foo";
-			}
-		}, new HystrixCommandSettings()));
-		assertEquals(1, fakeFaultToleranceImpl.appliedFaultToleranceCount.get());
-
-		config.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
-		
-		assertEquals("foo", fakeBeanFaultTolerance.execute(new Command<String>() {
-			@Override
-			public String call() {
-				return "foo";
-			}
-		}, new HystrixCommandSettings()));
-		
-		assertEquals(1, fakeFaultToleranceImpl.appliedFaultToleranceCount.get());
-	}
-	
-	@Test
-	public void itShouldBePossibleToDisableFaultToleranceAtRuntimeForAGivenBean() throws Throwable {
-		HystrixCommandSettings hystrixCommandSettings = new HystrixCommandSettings();
-																
-		config.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
-		assertEquals(0, fakeFaultToleranceImpl.appliedFaultToleranceCount.get());
-		assertEquals("foo", fakeBeanFaultTolerance.execute(new Command<String>() {
-			@Override
-			public String call() {
-				return "foo";
-			}
-		}, hystrixCommandSettings));
-		assertEquals(1, fakeFaultToleranceImpl.appliedFaultToleranceCount.get());
-
-		config.set(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED.nameFor(ASTRIX_BEAN_KEY), "false");
-		assertEquals("foo", fakeBeanFaultTolerance.execute(new Command<String>() {
-			@Override
-			public String call() {
-				return "foo";
-			}
-		}, hystrixCommandSettings));
-		assertEquals(1, fakeFaultToleranceImpl.appliedFaultToleranceCount.get());
+		astrixConfigurer.registerApiProvider(PingApiProvider.class);
+		astrixConfigurer.set(HystrixCommandNamingStrategy.class.getName(), CountingCachingHystrixCommandNamingStrategy.class.getName());
+		astrixConfigurer.enableFaultTolerance(true);
+		context = (AstrixApplicationContext) astrixConfigurer.configure();
+		ping = context.getBean(Ping.class);
+		anotherPing = context.getBean(Ping.class, "another-ping");
 	}
 	
 	@Test
 	public void usesHystrixFaultToleranceProxyProviderPluginToApplyFaultToleranceToLibraries() throws Exception {
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.registerApiProvider(PingApiProvider.class);
-		astrixConfigurer.set(HystrixCommandNamingStrategy.class.getName(), CountingCachingHystrixCommandNamingStrategy.class.getName());
-		astrixConfigurer.enableFaultTolerance(true);
-		AstrixApplicationContext context = (AstrixApplicationContext) astrixConfigurer.configure();
-		Ping ping = context.getBean(Ping.class);
+		assertEquals(0, getAppliedFaultToleranceCount(Ping.class));
 
-		SimpleAstrixBeanDefinition<Ping> beanDefinition = new SimpleAstrixBeanDefinition<>(ApiProvider.create(PingApiProvider.class.getName()), AstrixBeanKey.create(Ping.class));
-		String commandKeyName = context.getInstance(BeanFaultToleranceFactory.class).getCommandNamingStrategy().getCommandKeyName(beanDefinition);
+		assertEquals("foo", ping.ping("foo"));
+		assertEquals(1, getAppliedFaultToleranceCount(Ping.class));
 		
-		assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, commandKeyName));
 		assertEquals("foo", ping.ping("foo"));
-		assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, commandKeyName));
+		assertEquals(2, getAppliedFaultToleranceCount(Ping.class));
+	}
+	
+	@Test
+	public void itShouldBePossibleToDisableFaultToleranceGloballyAtRuntime() throws Throwable {
+		assertEquals(0, getAppliedFaultToleranceCount(Ping.class));
+
 		assertEquals("foo", ping.ping("foo"));
-		assertEquals(2, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, commandKeyName));
+		assertEquals(1, getAppliedFaultToleranceCount(Ping.class));
+
+		astrixConfigurer.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
+
+		assertEquals("bar", ping.ping("bar"));
+		assertEquals(1, getAppliedFaultToleranceCount(Ping.class));
+	}
+	
+	@Test
+	public void itShouldBePossibleToDisableFaultToleranceAtRuntimeForAGivenBean() throws Throwable {
+		astrixConfigurer.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
+		assertEquals(0, getAppliedFaultToleranceCount(Ping.class));
+		assertEquals("foo", ping.ping("foo"));
+		assertEquals(1, getAppliedFaultToleranceCount(Ping.class));
+
+		astrixConfigurer.set(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED.nameFor(ASTRIX_BEAN_KEY), "false");
+		assertEquals("bar", ping.ping("bar"));
+		assertEquals(1, getAppliedFaultToleranceCount(Ping.class));
+		
+
+		assertEquals(0, getAppliedFaultToleranceCount(Ping.class, "another-ping"));
+		assertEquals("bar", anotherPing.ping("bar"));
+		assertEquals(1, getAppliedFaultToleranceCount(Ping.class, "another-ping"));
+		
+	}
+
+	private int getAppliedFaultToleranceCount(Class<?> beanType) {
+		return getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, getCommandKey(AstrixBeanKey.create(beanType)));
+	}
+	
+	private int getAppliedFaultToleranceCount(Class<?> beanType, String qualifier) {
+		return getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, getCommandKey(AstrixBeanKey.create(beanType, qualifier)));
+	}
+	
+	private <T> String getCommandKey(AstrixBeanKey<T> beanKey) {
+		SimpleAstrixBeanDefinition<T> beanDefinition = new SimpleAstrixBeanDefinition<>(ApiProvider.create(PingApiProvider.class.getName()), beanKey);
+		return context.getInstance(BeanFaultToleranceFactory.class).getCommandNamingStrategy().getCommandKeyName(beanDefinition);
 	}
 	
 	private int getEventCountForCommand(HystrixRollingNumberEvent hystrixRollingNumberEvent, String commandKey) {
@@ -150,27 +138,13 @@ public class BeanFaultToleranceTest {
 			return new PingImpl();
 		}
 		
-	}
-	
-	public static class FakeBeanFaultToleranceProvider implements BeanFaultToleranceProvider {
-		
-		private final AtomicInteger appliedFaultToleranceCount = new AtomicInteger();
-		
-		@Override
-		public <T> T execute(CheckedCommand<T> command, com.netflix.hystrix.HystrixCommand.Setter settings)
-						throws Throwable {
-			appliedFaultToleranceCount.incrementAndGet();
-			return command.call();
+		@AstrixFaultToleranceProxy
+		@Library
+		@AstrixQualifier("another-ping")
+		public Ping anotherPing() {
+			return new PingImpl();
 		}
 		
-
-		@Override
-		public <T> Observable<T> observe(Supplier<Observable<T>> observableFactory, Setter settings) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-
 	}
 	
 }
