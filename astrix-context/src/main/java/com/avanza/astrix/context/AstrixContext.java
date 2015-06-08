@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 
 /**
@@ -46,5 +47,12 @@ public interface AstrixContext extends Astrix, AutoCloseable {
 	 * The behavior when invoking such beans after destroy are undefined.
 	 */
 	void destroy();
+	
+	/**
+	 * Returns the DynamicConfig used by the given AstrixContext. <p>
+	 * '
+	 * @return
+	 */
+	DynamicConfig getConfig();
 
 }

@@ -32,6 +32,9 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
+import com.avanza.astrix.beans.factory.AstrixBeanSettings.BooleanBeanSetting;
+import com.avanza.astrix.beans.factory.AstrixBeanSettings.IntBeanSetting;
+import com.avanza.astrix.beans.factory.AstrixBeanSettings.LongBeanSetting;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
@@ -59,7 +62,6 @@ import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
  *
  */
 public class AstrixConfigurer {
-
 
 	private static final String CLASSPATH_OVERRIDE_SETTINGS = "META-INF/astrix/settings.properties";
 
@@ -336,6 +338,16 @@ public class AstrixConfigurer {
 		}
 	}
 
-	
+	public void set(BooleanBeanSetting beanSetting, AstrixBeanKey<?> beanKey, boolean value) {
+		set(beanSetting.nameFor(beanKey), value);
+	}
+
+	public void set(IntBeanSetting beanSetting, AstrixBeanKey<?> beanKey, int value) {
+		set(beanSetting.nameFor(beanKey), value);
+	}
+
+	public void set(LongBeanSetting beanSetting, AstrixBeanKey<?> beanKey, long value) {
+		set(beanSetting.nameFor(beanKey), value);
+	}
 
 }

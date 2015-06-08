@@ -120,6 +120,7 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 		return this.astrixInjector.getBean(classType);
 	}
 	
+	@Override
 	public DynamicConfig getConfig() {
 		return dynamicConfig;
 	}
