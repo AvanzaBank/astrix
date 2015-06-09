@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 import com.avanza.astrix.beans.service.ServiceProperties;
@@ -125,9 +126,14 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	
 	public <T> void registerProvider(Class<T> api, T provider, String subsystem) {
 		// TODO: remove this method?
-		ServiceRegistryExporterClient serviceRegistryClient = new ServiceRegistryExporterClient(this.serviceRegistry, subsystem, api.getName());
-		ServiceProperties servicePRoperties = DirectComponent.registerAndGetProperties(api, provider);
-		serviceRegistryClient.register(api, servicePRoperties, 60_000);
+		registerProvider(AstrixBeanKey.create(api), provider, subsystem);
+	}
+	
+	private <T> void registerProvider(AstrixBeanKey<T> beanKey, T provider, String subsystem) {
+		ServiceRegistryExporterClient serviceRegistryClient = new ServiceRegistryExporterClient(this.serviceRegistry, subsystem, beanKey.toString());
+		ServiceProperties serviceProperties = DirectComponent.registerAndGetProperties(beanKey.getBeanType(), provider);
+		serviceProperties.setQualifier(beanKey.getQualifier());
+		serviceRegistryClient.register(beanKey.getBeanType(), serviceProperties, 60_000);
 	}
 	
 	/**
@@ -138,6 +144,10 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	 */
 	public <T> void registerProvider(Class<T> api, T provider) {
 		registerProvider(api, provider, "default");
+	}
+	
+	public <T> void registerProvider(Class<T> api, String qualifier, T provider) {
+		registerProvider(AstrixBeanKey.create(api, qualifier), provider, "default");
 	}
 	
 	@Override
