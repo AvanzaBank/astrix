@@ -16,8 +16,8 @@
 package com.avanza.astrix.context;
 
 
+import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
-import com.avanza.astrix.context.versioning.AstrixVersioningPlugin;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 
 public class JavaSerializationVersioningPlugin implements AstrixVersioningPlugin {

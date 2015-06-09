@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
-/**
- * 
- * @author Elias Lindholm (elilin)
- * @deprecated - Replaced by com.avanza.astrix.beans.service.DirectComponent
- */
-@Deprecated
-public class DirectComponent extends com.avanza.astrix.beans.service.DirectComponent {
+package com.avanza.astrix.beans.publish;
+
+import com.avanza.astrix.config.DynamicConfig;
+
+public interface AstrixConfigAware {
+	
+	void setConfig(DynamicConfig config);
 
 }

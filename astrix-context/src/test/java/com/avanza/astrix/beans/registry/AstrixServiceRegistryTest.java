@@ -25,9 +25,9 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -50,8 +50,6 @@ public class AstrixServiceRegistryTest {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.setSubsystem("default");
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		clientContext = astrixConfigurer.configure();
 		
@@ -78,8 +76,6 @@ public class AstrixServiceRegistryTest {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.setSubsystem("default");
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		clientContext = astrixConfigurer.configure();
 		
@@ -110,8 +106,6 @@ public class AstrixServiceRegistryTest {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.setSubsystem("my-subsystem");
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		clientContext = astrixConfigurer.configure();
 		
@@ -135,8 +129,6 @@ public class AstrixServiceRegistryTest {
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		clientContext = astrixConfigurer.configure();
 		

@@ -19,6 +19,7 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.beans.publish.AstrixConfigAware;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceComponents;
 import com.avanza.astrix.beans.service.ServiceDiscovery;

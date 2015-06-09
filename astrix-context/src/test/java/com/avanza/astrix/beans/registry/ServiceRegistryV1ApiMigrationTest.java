@@ -19,11 +19,11 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
-import com.avanza.astrix.context.versioning.AstrixVersioningPlugin;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 
 

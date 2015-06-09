@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.beans.publish.AstrixConfigAware;
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.context.AstrixConfigAware;
 import com.avanza.astrix.core.util.ReflectionUtil;
 /**
  * 

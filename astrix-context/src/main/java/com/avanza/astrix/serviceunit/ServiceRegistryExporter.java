@@ -24,9 +24,9 @@ import org.slf4j.LoggerFactory;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.inject.AstrixInjector;
+import com.avanza.astrix.beans.publish.AstrixConfigAware;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.context.AstrixConfigAware;
 
 public class ServiceRegistryExporter implements AstrixConfigAware {
 	

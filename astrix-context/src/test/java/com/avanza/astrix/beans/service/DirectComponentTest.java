@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.service;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,6 +25,8 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
+import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 
@@ -37,9 +39,6 @@ public class DirectComponentTest {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		serviceRegistry.registerProvider(Ping.class, new PingImpl());
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		 // TODO: TestAstrixConfigurer should register AstrixServiceRegistryLibraryProvider and AstrixServiceRegistryServiceProvider
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixContext astrixContext = astrixConfigurer.configure();

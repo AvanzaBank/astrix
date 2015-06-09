@@ -21,8 +21,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
+import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.BooleanSetting;
 import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
@@ -31,8 +32,6 @@ import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.MutableConfigSource;
 import com.avanza.astrix.config.Setting;
-import com.avanza.astrix.config.StringSetting;
-import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 /**
  * 
@@ -48,7 +47,7 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	private AstrixServiceRegistry serviceRegistry = new AstrixServiceRegistryImpl(repo);
 	
 	public InMemoryServiceRegistry() {
-		this.id = DirectComponent.register(AstrixServiceRegistry.class, serviceRegistry);
+		this.id = DirectComponent.register(AstrixServiceRegistry.class, this);
 		this.configSourceId = GlobalConfigSourceRegistry.register(this);
 		this.configSource.set(AstrixSettings.SERVICE_REGISTRY_URI, getServiceUri());
 	}

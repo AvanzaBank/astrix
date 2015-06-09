@@ -17,6 +17,7 @@ package com.avanza.astrix.context.versioning;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 

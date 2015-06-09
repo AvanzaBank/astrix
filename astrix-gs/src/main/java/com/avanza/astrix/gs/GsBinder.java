@@ -24,9 +24,9 @@ import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.publish.AstrixConfigAware;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.context.AstrixConfigAware;
 import com.j_spaces.core.client.SpaceURL;
 
 /**

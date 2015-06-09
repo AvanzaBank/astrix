@@ -19,8 +19,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
+import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
-import com.avanza.astrix.context.versioning.AstrixVersioningPlugin;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.AstrixDynamicQualifier;

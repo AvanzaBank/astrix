@@ -32,9 +32,9 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
+import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.function.Supplier;
@@ -59,8 +59,6 @@ public class AstrixServiceRegistryLeaseManagerTest {
 		astrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixConfigurer.registerApiProvider(TestProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerAstrixBean(AstrixServiceRegistry.class, serviceRegistry);
 		context = astrixConfigurer.configure();
 		serviceRegistryExporterClient = new ServiceRegistryExporterClient(serviceRegistry, "default", "bar");
 		

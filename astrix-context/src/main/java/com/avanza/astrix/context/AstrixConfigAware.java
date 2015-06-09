@@ -15,10 +15,12 @@
  */
 package com.avanza.astrix.context;
 
-import com.avanza.astrix.config.DynamicConfig;
-
-public interface AstrixConfigAware {
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ * @deprecated renamed to com.avanza.astrix.beans.publish.AstrixConfigAware
+ */
+@Deprecated
+public interface AstrixConfigAware extends com.avanza.astrix.beans.publish.AstrixConfigAware {
 	
-	void setConfig(DynamicConfig config);
-
 }

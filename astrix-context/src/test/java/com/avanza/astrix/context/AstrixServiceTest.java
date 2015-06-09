@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.provider.core.AstrixApiProvider;

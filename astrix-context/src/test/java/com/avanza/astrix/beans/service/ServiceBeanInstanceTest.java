@@ -33,7 +33,6 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.DirectComponent;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -62,8 +61,6 @@ public class ServiceBeanInstanceTest {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 
 		astrixContext = astrixConfigurer.configure();
@@ -83,8 +80,6 @@ public class ServiceBeanInstanceTest {
 		String serviceId = DirectComponent.register(Ping.class, new PingImpl());
 		
 		TestAstrixConfigurer config = new TestAstrixConfigurer();
-		config.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		config.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		config.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		config.set("pingUri", DirectComponent.getServiceUri(serviceId));
 		config.registerApiProvider(PingApiProviderUsingConfigLookup.class);
@@ -120,8 +115,6 @@ public class ServiceBeanInstanceTest {
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixApplicationContext astrixContext = (AstrixApplicationContext) astrixConfigurer.configure();
 		
@@ -145,8 +138,6 @@ public class ServiceBeanInstanceTest {
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 5);
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixApplicationContext astrixContext = (AstrixApplicationContext) astrixConfigurer.configure();
@@ -204,8 +195,6 @@ public class ServiceBeanInstanceTest {
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixContext = astrixConfigurer.configure();
 		
@@ -217,8 +206,6 @@ public class ServiceBeanInstanceTest {
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 		astrixContext = astrixConfigurer.configure();
 
 		try {
