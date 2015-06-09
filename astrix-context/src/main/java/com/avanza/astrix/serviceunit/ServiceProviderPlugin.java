@@ -19,7 +19,8 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 import com.avanza.astrix.beans.publish.ApiProviderClass;
-
+import com.avanza.astrix.core.AstrixPlugin;
+@AstrixPlugin
 public interface ServiceProviderPlugin {
 	
 	List<ExportedServiceBeanDefinition> getExportedServices(ApiProviderClass descriptor);

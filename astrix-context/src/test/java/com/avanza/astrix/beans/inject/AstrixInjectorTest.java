@@ -23,28 +23,33 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.MapConfigSource;
+import com.avanza.astrix.core.AstrixPlugin;
+
 
 
 public class AstrixInjectorTest {
 	
+	AstrixPlugins plugins = new AstrixPlugins();
+	AstrixStrategies strategies = new AstrixStrategies(DynamicConfig.create(new MapConfigSource()));
 	
 	@Test
 	public void boundBeansRefersToSameBeanInstanceAsItsImplementationClass() throws Exception {
-		AstrixInjector injector = new AstrixInjector(new AstrixPlugins());
-		injector.bind(Foo.class, FooImpl.class);
+		AstrixInjector injector = new AstrixInjector(plugins, strategies);
+		injector.bind(FooPlugin.class, FooImpl.class);
 		
-		Foo fooBean = injector.getBean(Foo.class);
+		FooPlugin fooBean = injector.getBean(FooPlugin.class);
 		FooImpl fooImplBean = injector.getBean(FooImpl.class);
 		assertSame(fooBean, fooImplBean);
 	}
 	
 	@Test
 	public void pluginInstanceDoesNotReferToTheSameBeanInstancaAsItsImplementationClass() throws Exception {
-		AstrixPlugins plugins = new AstrixPlugins();
-		plugins.registerPlugin(Foo.class, new FooImpl());
-		AstrixInjector injector = new AstrixInjector(plugins);
+		plugins.registerPlugin(FooPlugin.class, new FooImpl());
+		AstrixInjector injector = new AstrixInjector(plugins, strategies);
 		
-		Foo fooBean = injector.getBean(Foo.class);
+		FooPlugin fooBean = injector.getBean(FooPlugin.class);
 		FooImpl fooImplBean = injector.getBean(FooImpl.class);
 		assertNotSame(fooBean, fooImplBean);
 	}
@@ -52,29 +57,30 @@ public class AstrixInjectorTest {
 	@Test
 	public void itsPossibleToWireInAllPluginsOfGivenType() throws Exception {
 		AstrixPlugins plugins = new AstrixPlugins();
-		plugins.registerPlugin(Foo.class, new FooImpl());
-		plugins.registerPlugin(Foo.class, new FooImpl2());
-		AstrixInjector injector = new AstrixInjector(plugins);
+		plugins.registerPlugin(FooPlugin.class, new FooImpl());
+		plugins.registerPlugin(FooPlugin.class, new FooImpl2());
+		AstrixInjector injector = new AstrixInjector(plugins, strategies);
 		
 		FooConsumer fooConsumer = injector.getBean(FooConsumer.class);
 		assertEquals(2, fooConsumer.foos.size());
 	}
 	
-	public interface Foo {
+	@AstrixPlugin
+	public interface FooPlugin {
 	}
 	
-	public class FooImpl implements Foo {
+	public class FooImpl implements FooPlugin {
 	}
 
-	public class FooImpl2 implements Foo {
+	public class FooImpl2 implements FooPlugin {
 	}
 	
 
 	public static class FooConsumer {
 		
-		private List<Foo> foos;
+		private List<FooPlugin> foos;
 
-		public FooConsumer(List<Foo> foos) {
+		public FooConsumer(List<FooPlugin> foos) {
 			this.foos = foos;
 		}
 	}

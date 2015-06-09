@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.spring;
+package com.avanza.astrix.ft;
 
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-
-import com.avanza.astrix.core.AstrixPlugin;
-
-@AstrixPlugin
-public interface AstrixSpringBeanDefinitionRegistryPostProcessorPlugin {
-
-	void postProcess(BeanDefinitionRegistry registry);
-
+import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public class DefaultHystrixCommandNamingStrategy implements HystrixCommandNamingStrategy {
+	@Override
+	public String getCommandKeyName(AstrixBeanDefinition<?> beanDefinition) {
+		return beanDefinition.getDefiningApi().getName()
+				+ "_" + beanDefinition.getBeanKey().getBeanType().getName();
+	}
+	@Override
+	public String getGroupKeyName(AstrixBeanDefinition<?> beanDefinition) {
+		return beanDefinition.getDefiningApi().getName();
+	}
 }

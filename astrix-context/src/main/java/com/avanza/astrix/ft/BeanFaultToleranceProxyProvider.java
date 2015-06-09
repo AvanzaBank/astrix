@@ -16,12 +16,15 @@
 package com.avanza.astrix.ft;
 
 import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.core.AstrixPlugin;
 
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
+// TODO: should this be a strategy?
+@AstrixPlugin
 public interface BeanFaultToleranceProxyProvider {
 	
 	public <T> T addFaultToleranceProxy(AstrixBeanDefinition<T> beanDefinition, T rawProvider);

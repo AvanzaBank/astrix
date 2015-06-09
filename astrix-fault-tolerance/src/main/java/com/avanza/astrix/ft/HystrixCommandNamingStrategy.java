@@ -16,27 +16,17 @@
 package com.avanza.astrix.ft;
 
 import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.core.AstrixStrategy;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
+@AstrixStrategy(DefaultHystrixCommandNamingStrategy.class)
 public interface HystrixCommandNamingStrategy {
 	
 	String getCommandKeyName(AstrixBeanDefinition<?> beanDefinition);
 	
 	String getGroupKeyName(AstrixBeanDefinition<?> beanDefinition);
-	
-	public static class Default implements HystrixCommandNamingStrategy {
-		@Override
-		public String getCommandKeyName(AstrixBeanDefinition<?> beanDefinition) {
-			return beanDefinition.getDefiningApi().getName()
-					+ "_" + beanDefinition.getBeanKey().getBeanType().getName();
-		}
-		@Override
-		public String getGroupKeyName(AstrixBeanDefinition<?> beanDefinition) {
-			return beanDefinition.getDefiningApi().getName();
-		}
-	}
 	
 }

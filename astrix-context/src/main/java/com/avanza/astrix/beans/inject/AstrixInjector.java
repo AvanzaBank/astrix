@@ -34,6 +34,8 @@ import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
+import com.avanza.astrix.core.AstrixPlugin;
+import com.avanza.astrix.core.AstrixStrategy;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 /**
  * 
@@ -45,8 +47,8 @@ public class AstrixInjector {
 	private InjectingBeanFactoryRegistry beanFactoryRegistry;
 	private AstrixBeanFactory beanFactory;
 	
-	public AstrixInjector(AstrixPlugins plugins) {
-		this.beanFactoryRegistry = new InjectingBeanFactoryRegistry(plugins);
+	public AstrixInjector(AstrixPlugins plugins, AstrixStrategies astrixStrategies) {
+		this.beanFactoryRegistry = new InjectingBeanFactoryRegistry(plugins, astrixStrategies);
 		this.beanFactory = new AstrixBeanFactory(beanFactoryRegistry);
 		this.beanFactory.registerBeanPostProcessor(new AstrixBeanDependencyInjectionBeanPostProcessor());
 	}
@@ -73,9 +75,11 @@ public class AstrixInjector {
 		private final ConcurrentMap<AstrixBeanKey<?>, StandardFactoryBean<?>> providerByBeanKey = new ConcurrentHashMap<>();
 		private final ConcurrentMap<AstrixBeanKey<?>, AstrixBeanKey<?>> beanBindings = new ConcurrentHashMap<>();
 		private final AstrixPlugins plugins;
+		private final AstrixStrategies strategies;
 		
-		public InjectingBeanFactoryRegistry(AstrixPlugins plugins) {
+		public InjectingBeanFactoryRegistry(AstrixPlugins plugins, AstrixStrategies strategies) {
 			this.plugins = plugins;
+			this.strategies = strategies;
 		}
 
 		@Override
@@ -87,11 +91,15 @@ public class AstrixInjector {
 			if (factory != null) {
 				return factory;
 			}
-			if (isPlugin(beanKey.getBeanType())) {
-				return new AstrixPluginFactoryBean<>(beanKey, plugins);
-			} else {
-				return new AstrixClassConstructorFactoryBean<>(beanKey, beanKey.getBeanType());
+			if (beanKey.getBeanType().isAnnotationPresent(AstrixStrategy.class) && !beanKey.isQualified()) {
+				AstrixStrategy strategy = beanKey.getBeanType().getAnnotation(AstrixStrategy.class);
+				Class<? extends T> providerClass = strategies.getProviderClass(beanKey.getBeanType(), strategy.value());
+				return new AstrixClassConstructorFactoryBean<T>(beanKey, providerClass);
 			}
+			if (beanKey.getBeanType().isAnnotationPresent(AstrixPlugin.class)) {
+				return new AstrixPluginFactoryBean<>(beanKey, plugins);
+			} 
+			return new AstrixClassConstructorFactoryBean<>(beanKey, beanKey.getBeanType());
 		}
 
 		public <T> void bind(Class<T> type, Class<? extends T> providerType) {
@@ -119,7 +127,7 @@ public class AstrixInjector {
 		}
 
 		private <T> boolean isPlugin(Class<T> type) {
-			return type.isInterface();
+			return type.isAnnotationPresent(AstrixPlugin.class);
 		}
 
 		@Override

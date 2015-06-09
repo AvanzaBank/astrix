@@ -15,14 +15,10 @@
  */
 package com.avanza.astrix.ft;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
 import com.avanza.astrix.beans.publish.AstrixConfigAware;
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.core.util.ReflectionUtil;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -30,14 +26,14 @@ import com.avanza.astrix.core.util.ReflectionUtil;
  */
 public class BeanFaultToleranceFactory implements AstrixConfigAware {
 	
-	private final Logger log = LoggerFactory.getLogger(BeanFaultToleranceFactory.class);
 	private DynamicConfig config;
 	private BeanFaultToleranceProvider faultToleranceProvider;
 	private HystrixCommandNamingStrategy commandNamingStrategy;
 	
 	@AstrixInject
-	public BeanFaultToleranceFactory(BeanFaultToleranceProvider beanFaultToleranceProvider) {
+	public BeanFaultToleranceFactory(BeanFaultToleranceProvider beanFaultToleranceProvider, HystrixCommandNamingStrategy commandNamingStrategy) {
 		this.faultToleranceProvider = beanFaultToleranceProvider;
+		this.commandNamingStrategy = commandNamingStrategy;
 	}
 	
 	public BeanFaultToleranceFactory(DynamicConfig config, BeanFaultToleranceProvider faultToleranceProvider, HystrixCommandNamingStrategy commandNamingStrategy) {
@@ -53,14 +49,6 @@ public class BeanFaultToleranceFactory implements AstrixConfigAware {
 	@Override
 	public void setConfig(DynamicConfig config) {
 		this.config = config;
-		this.commandNamingStrategy = createCommandNamingStragety(config);
-	}
-	
-	private HystrixCommandNamingStrategy createCommandNamingStragety(DynamicConfig config) {
-		String commandNamingStrategy = config.getStringProperty(HystrixCommandNamingStrategy.class.getName()
-				, HystrixCommandNamingStrategy.Default.class.getName()).get();
-		log.info("Using HystrixCommandNamingStrategy: {}", HystrixCommandNamingStrategy.class.getName());
-		return (HystrixCommandNamingStrategy) ReflectionUtil.newInstance(ReflectionUtil.classForName(commandNamingStrategy));
 	}
 	
 	public HystrixCommandNamingStrategy getCommandNamingStrategy() {

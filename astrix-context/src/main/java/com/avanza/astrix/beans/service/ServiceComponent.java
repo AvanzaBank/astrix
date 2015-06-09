@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.beans.service;
 
+import com.avanza.astrix.core.AstrixPlugin;
+
 
 
 /**
@@ -25,6 +27,7 @@ package com.avanza.astrix.beans.service;
  * @author Elias Lindholm (elilin)
  *
  */
+ @AstrixPlugin
 public interface ServiceComponent {
 	/**
 	 * Creates an bound service-instance for a given service definition.

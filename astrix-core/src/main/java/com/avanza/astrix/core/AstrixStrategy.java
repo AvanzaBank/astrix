@@ -13,15 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.spring;
+package com.avanza.astrix.core;
 
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import com.avanza.astrix.core.AstrixPlugin;
 
-@AstrixPlugin
-public interface AstrixSpringBeanDefinitionRegistryPostProcessorPlugin {
-
-	void postProcess(BeanDefinitionRegistry registry);
-
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+@Target(value={ElementType.TYPE})
+@Retention(value=RetentionPolicy.RUNTIME)
+@Documented
+public @interface AstrixStrategy {
+	/**
+	 * Default strategy to use
+	 * 
+	 * @return
+	 */
+	Class<?> value();
 }

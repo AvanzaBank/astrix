@@ -41,6 +41,7 @@ import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.inject.AstrixPlugins;
+import com.avanza.astrix.beans.inject.AstrixStrategies;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
 import com.avanza.astrix.beans.publish.ApiProviders;
@@ -86,7 +87,8 @@ public class AstrixConfigurer {
 	public AstrixContext configure() {
 		config = createDynamicConfig();
 		AstrixPlugins astrixPlugins = getPlugins();
-		AstrixInjector injector = new AstrixInjector(astrixPlugins);
+		AstrixStrategies astrixStrategies = new AstrixStrategies(config);
+		AstrixInjector injector = new AstrixInjector(astrixPlugins, astrixStrategies);
 		injector.bind(DynamicConfig.class, config);
 		injector.bind(AstrixContext.class, AstrixContextImpl.class);
 		injector.bind(AstrixFactoryBeanRegistry.class, SimpleAstrixFactoryBeanRegistry.class);

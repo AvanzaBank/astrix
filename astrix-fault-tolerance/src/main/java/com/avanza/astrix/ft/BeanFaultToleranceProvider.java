@@ -17,6 +17,7 @@ package com.avanza.astrix.ft;
 
 import rx.Observable;
 
+import com.avanza.astrix.core.AstrixPlugin;
 import com.avanza.astrix.core.function.Supplier;
 import com.netflix.hystrix.HystrixObservableCommand.Setter;
 /**
@@ -24,6 +25,8 @@ import com.netflix.hystrix.HystrixObservableCommand.Setter;
  * @author Elias Lindholm (elilin)
  *
  */
+// TODO: Should this be a strategy?
+@AstrixPlugin
 public interface BeanFaultToleranceProvider {
 	<T> Observable<T> observe(final Supplier<Observable<T>> observableFactory, Setter settings);
 	<T> T execute(CheckedCommand<T> command, com.netflix.hystrix.HystrixCommand.Setter settings) throws Throwable;
