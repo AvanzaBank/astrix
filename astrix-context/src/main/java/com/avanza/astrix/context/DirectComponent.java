@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.kohsuke.MetaInfServices;
@@ -72,12 +76,71 @@ public class DirectComponent implements ServiceComponent {
 		if (serviceProvider == null) {
 			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + serviceDefinition.getServiceType());
 		}
-		T provider = serviceDefinition.getServiceType().cast(serviceProvider.getProvider(versioningPlugin, serviceDefinition.getObjectSerializerDefinition()));
+		Object targetProvider = serviceProvider.getProvider(versioningPlugin, serviceDefinition.getObjectSerializerDefinition());
+		T provider;
+		if (serviceDefinition.getBeanKey().getBeanType().isAssignableFrom(targetProvider.getClass())) {
+			provider = serviceDefinition.getServiceType().cast(targetProvider);
+		} else {
+			provider = createProxy(serviceDefinition.getBeanKey().getBeanType(), targetProvider);
+		}
 		DirectBoundServiceBeanInstance<T> directServiceBeanInstance = new DirectBoundServiceBeanInstance<T>(provider);
 		this.nonReleasedInstances.add(directServiceBeanInstance);
 		return directServiceBeanInstance;
 	}
 	
+	private <T> T createProxy(Class<T> proxyApi, final Object targetProvider) {
+		return ReflectionUtil.newProxy(proxyApi, new InvocationHandler() {
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				try {
+					Method targetMethod = targetProvider.getClass().getMethod(method.getName(), method.getParameterTypes());
+					if (method.getReturnType().isAssignableFrom(Future.class)) {
+						return new DoneFuture(targetMethod.invoke(targetProvider, args));
+					}
+					return new DoneFuture(targetMethod.invoke(targetProvider, args));
+				} catch (NoSuchMethodException e) {
+					throw new RuntimeException("Target service does not contain method: " + e.getMessage());
+				}
+			}
+		});
+	}
+	
+	private static final class DoneFuture implements Future<Object>{ 
+
+		private Object result;
+		
+		public DoneFuture(Object result) {
+			this.result = result;
+		}
+
+		@Override
+		public boolean cancel(boolean mayInterruptIfRunning) {
+			return false;
+		}
+
+		@Override
+		public boolean isCancelled() {
+			return false;
+		}
+
+		@Override
+		public boolean isDone() {
+			return true;
+		}
+
+		@Override
+		public Object get() throws InterruptedException, ExecutionException {
+			return result;
+		}
+
+		@Override
+		public Object get(long timeout, TimeUnit unit)
+				throws InterruptedException, ExecutionException,
+				TimeoutException {
+			return result;
+		}
+	}
+
 	@Override
 	public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
 		return getServiceProperties(serviceProviderUri);
