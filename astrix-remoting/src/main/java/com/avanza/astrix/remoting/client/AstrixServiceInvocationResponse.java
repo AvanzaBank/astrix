@@ -94,5 +94,13 @@ public class AstrixServiceInvocationResponse implements Serializable {
 	public Object getThrownException() {
 		return thrownException;
 	}
+
+	public boolean isServiceUnavailable() {
+		String serviceUnavailable = getHeader("service-unavailable");
+		return serviceUnavailable != null && serviceUnavailable.equalsIgnoreCase("true");
+	}
 	
+	public void setServiceUnavailable(boolean unavailable) {
+		setHeader("service-unavailable", Boolean.toString(unavailable));
+	}
 }

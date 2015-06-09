@@ -31,10 +31,9 @@ import org.slf4j.LoggerFactory;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.ServiceInvocationException;
 import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.remoting.client.MissingServiceException;
-import com.avanza.astrix.remoting.client.MissingServiceMethodException;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
+import com.avanza.astrix.remoting.client.MissingServiceMethodException;
 /**
  * Server side component used to invoke exported services. <p> 
  * 
@@ -44,6 +43,7 @@ import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 public class AstrixServiceActivator {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AstrixServiceActivator.class);
+	private final ConcurrentMap<String, PublishedService<?>> serviceByType = new ConcurrentHashMap<>();
 	
 	static class PublishedService<T> {
 
@@ -111,8 +111,6 @@ public class AstrixServiceActivator {
 		
 	}
 	
-	private final ConcurrentMap<String, PublishedService<?>> serviceByType = new ConcurrentHashMap<>();
-	
 	public void register(Object provider, AstrixObjectSerializer objectSerializer, Class<?> publishedApi) {
 		if (!publishedApi.isAssignableFrom(provider.getClass())) {
 			throw new IllegalArgumentException("Provider: " + provider.getClass() + " does not implement: " + publishedApi);
@@ -131,7 +129,16 @@ public class AstrixServiceActivator {
 		String serviceApi = request.getHeader("serviceApi");
 		publishedService = this.serviceByType.get(serviceApi);
 		if (publishedService == null) {
-			throw new MissingServiceException("No such service: " + serviceApi);
+			/*
+			 * Service not available. This might happen in rare conditions when a processing unit
+			 * is restarted and old clients connects to the space before the framework is fully initialized. 
+			 */
+			AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
+			invocationResponse.setServiceUnavailable(true);;
+			invocationResponse.setExceptionMsg("Service not available in service activator: " + serviceApi);
+			invocationResponse.setCorrelationId(UUID.randomUUID().toString());
+			logger.info(String.format("Service not available. request=%s correlationId=%s", request, invocationResponse.getCorrelationId()));
+			return invocationResponse;
 		}
 		return publishedService.invoke(request, version, serviceApi);
 	}

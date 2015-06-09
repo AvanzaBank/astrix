@@ -17,61 +17,155 @@ package com.avanza.astrix.core;
 
 import java.util.Objects;
 
-
-public final class AstrixRemoteResult<T> {
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ * @param <T>
+ */
+public abstract class AstrixRemoteResult<T> {
 	
-	private final T result;
-	private final ServiceInvocationException exception;
-	private final CorrelationId correlationId;
+	private static class ServiceInvocationExceptionResult<T> extends AstrixRemoteResult<T> {
+		private final ServiceInvocationException exception;
+		private final CorrelationId correlationId;
+		
+		public ServiceInvocationExceptionResult(ServiceInvocationException exception, CorrelationId correlationId) {
+			this.exception = exception;
+			this.correlationId = correlationId;
+		}
 
-	private AstrixRemoteResult(T result, ServiceInvocationException exception, CorrelationId correlationId) {
-		this.result = result;
-		this.exception = exception;
-		this.correlationId = correlationId;
+		public T getResult() {
+			exception.reThrow(correlationId);
+			return null;
+		}
+		
+		public boolean hasThrownException() {
+			return true;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			@SuppressWarnings("unchecked")
+			ServiceInvocationExceptionResult<T> other = (ServiceInvocationExceptionResult<T>) obj;
+			return Objects.equals(exception, other.exception);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(exception, correlationId);
+		}
+		
+	}
+	
+	private static class SuccessfulResult<T> extends AstrixRemoteResult<T> {
+		
+		private final T result;
+		
+		public SuccessfulResult(T result) {
+			this.result = result;
+		}
+
+		public T getResult() {
+			return result;
+		}
+		
+		public boolean hasThrownException() {
+			return false;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			@SuppressWarnings("unchecked")
+			SuccessfulResult<T> other = (SuccessfulResult<T>) obj;
+			return Objects.equals(result, other.result);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(result);
+		}
+	}
+	
+	private static class ServiceUnavailableResult<T> extends AstrixRemoteResult<T> {
+		
+		private final CorrelationId correlationId;
+		private final String msg;
+		
+		public ServiceUnavailableResult(String msg, CorrelationId correlationId) {
+			this.msg = msg;
+			this.correlationId = correlationId;
+		}
+
+		public T getResult() {
+			throw new ServiceUnavailableException(msg + " correlationId=" + correlationId);
+		}
+		
+		public boolean hasThrownException() {
+			return true;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			@SuppressWarnings("unchecked")
+			ServiceUnavailableResult<T> other = (ServiceUnavailableResult<T>) obj;
+			return Objects.equals(correlationId, other.correlationId) 
+					&& Objects.equals(msg, other.msg);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(msg, correlationId);
+		}
+	}
+	
+	private AstrixRemoteResult() {
+		
+	}
+	public static <T> AstrixRemoteResult<T> voidResult() {
+		return new SuccessfulResult<>(null);
 	}
 	
 	public static <T> AstrixRemoteResult<T> successful(T result) {
-		return new AstrixRemoteResult<>(result, null, null);
+		return new SuccessfulResult<>(result);
 	}
 	
 	public static <T> AstrixRemoteResult<T> failure(ServiceInvocationException exception, CorrelationId correlationId) {
-		return new AstrixRemoteResult<>(null, exception, correlationId);
+		return new ServiceInvocationExceptionResult<>(exception, correlationId);
 	}
 	
-	public T getResult() {
-		if (hasThrownException()) {
-			exception.reThrow(correlationId);
-		}
-		return result;
-	}
-
-	public boolean hasThrownException() {
-		return exception != null;
-	}
-
-	public static <T> AstrixRemoteResult<T> voidResult() {
-		return new AstrixRemoteResult<>(null, null, null);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		@SuppressWarnings("unchecked")
-		AstrixRemoteResult<T> other = (AstrixRemoteResult<T>) obj;
-		return Objects.equals(result, other.result) && Objects.equals(exception, other.exception);
+	public static <T> AstrixRemoteResult<T> unavailable(String msg, CorrelationId correlationId) {
+		return new ServiceUnavailableResult<T>(msg, correlationId);
 	}
 	
-	@Override
-	public int hashCode() {
-		return Objects.hash(result, exception);
-	}
+	public abstract T getResult();
+
+	public abstract boolean hasThrownException();
 
 }

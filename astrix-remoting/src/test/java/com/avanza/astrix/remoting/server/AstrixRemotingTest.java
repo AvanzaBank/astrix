@@ -50,11 +50,11 @@ import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.RemoteResultReducer;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
 import com.avanza.astrix.core.ServiceInvocationException;
+import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.client.DefaultAstrixRoutingStrategy;
 import com.avanza.astrix.remoting.client.IncompatibleRemoteResultReducerException;
-import com.avanza.astrix.remoting.client.MissingServiceException;
 import com.avanza.astrix.remoting.client.RemotingProxy;
 import com.avanza.astrix.remoting.client.RemotingTransport;
 import com.avanza.astrix.remoting.client.RemotingTransportSpi;
@@ -162,7 +162,6 @@ public class AstrixRemotingTest {
 		String reply = serviceProxy.hello("kalle", "hello-");
 		assertEquals("hello-kalle", reply);
 	}
-	
 	
 	@Test
 	public void routedRequest_throwsExceptionOfNonServiceInvocationExceptionType() throws Exception {
@@ -511,8 +510,8 @@ public class AstrixRemotingTest {
 		assertEquals(provider.broadcast(new BroadcastRequest("kalle")), broadcastService.broadcast(new BroadcastRequest("kalle")));
 	}
 	
-	@Test(expected = MissingServiceException.class)
-	public void request_NoCorrespondingService_throwsException() throws Exception {
+	@Test(expected = ServiceUnavailableException.class)
+	public void request_NoCorrespondingServiceRegisteredInServiceActivator_throwsServiceUnavailableException() throws Exception {
 		TestService missingRemoteService = RemotingProxy.create(TestService.class, TestService.class,
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 		missingRemoteService.hello(new HelloRequest("foo"));
