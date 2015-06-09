@@ -15,6 +15,9 @@
  */
 package com.avanza.astrix.ft;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
 import com.avanza.astrix.config.DynamicConfig;
@@ -27,6 +30,7 @@ import com.avanza.astrix.core.util.ReflectionUtil;
  */
 public class BeanFaultToleranceFactory implements AstrixConfigAware {
 	
+	private final Logger log = LoggerFactory.getLogger(BeanFaultToleranceFactory.class);
 	private DynamicConfig config;
 	private BeanFaultToleranceProvider faultToleranceProvider;
 	private HystrixCommandNamingStrategy commandNamingStrategy;
@@ -52,9 +56,10 @@ public class BeanFaultToleranceFactory implements AstrixConfigAware {
 		this.commandNamingStrategy = createCommandNamingStragety(config);
 	}
 	
-	private static HystrixCommandNamingStrategy createCommandNamingStragety(DynamicConfig config) {
+	private HystrixCommandNamingStrategy createCommandNamingStragety(DynamicConfig config) {
 		String commandNamingStrategy = config.getStringProperty(HystrixCommandNamingStrategy.class.getName()
 				, HystrixCommandNamingStrategy.Default.class.getName()).get();
+		log.info("Using HystrixCommandNamingStrategy: {}", HystrixCommandNamingStrategy.class.getName());
 		return (HystrixCommandNamingStrategy) ReflectionUtil.newInstance(ReflectionUtil.classForName(commandNamingStrategy));
 	}
 	
