@@ -32,7 +32,7 @@ import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
-import com.avanza.astrix.ft.BeanFaultToleranceProxyFactory;
+import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
@@ -49,7 +49,7 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 	private AstrixInjector injector;
 	private AstrixServiceMetaFactory serviceMetaFactory;
 	private ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory;
-	private BeanFaultToleranceProxyFactory faultToleranceFactory;
+	private BeanFaultToleranceProxyStrategy faultToleranceFactory;
 	
 	@Override
 	public List<FactoryBean<?>> createFactoryBeans(ApiProviderClass apiProviderClass) {
@@ -147,7 +147,7 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 	}
 	
 	@AstrixInject
-	public void setFaultToleranceFactory(BeanFaultToleranceProxyFactory faultToleranceFactory) {
+	public void setFaultToleranceFactory(BeanFaultToleranceProxyStrategy faultToleranceFactory) {
 		this.faultToleranceFactory = faultToleranceFactory;
 	}
 

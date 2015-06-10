@@ -13,37 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.inject;
 
 import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
-import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 
-public class AstrixFtProxiedFactory<T> implements StandardFactoryBean<T> {
+class AlreadyInstantiatedFactoryBean<T> implements StandardFactoryBean<T> {
+
+	private AstrixBeanKey<T> beanKey;
+	private T instance;
 	
-	private StandardFactoryBean<T> target;
-	private BeanFaultToleranceProxyStrategy faultToleranceProxyFactory;
-	private AstrixBeanDefinition<T> beanDefinition;
-
-	public AstrixFtProxiedFactory(StandardFactoryBean<T> target,
-								  BeanFaultToleranceProxyStrategy faultToleranceProxyFactory,
-								  AstrixBeanDefinition<T> beanDefinition) {
-		this.target = target;
-		this.faultToleranceProxyFactory = faultToleranceProxyFactory;
-		this.beanDefinition = beanDefinition;
+	public AlreadyInstantiatedFactoryBean(AstrixBeanKey<T> beanKey, T instance) {
+		this.beanKey = beanKey;
+		this.instance = instance;
 	}
 
 	@Override
 	public T create(AstrixBeans beans) {
-		T rawBean = target.create(beans);
-		return faultToleranceProxyFactory.addFaultToleranceProxy(beanDefinition, rawBean); 
+		return instance;
 	}
 
 	@Override
 	public AstrixBeanKey<T> getBeanKey() {
-		return target.getBeanKey();
+		return beanKey;
 	}
-
+	
 }

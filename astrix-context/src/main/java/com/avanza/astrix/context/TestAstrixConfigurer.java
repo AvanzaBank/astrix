@@ -30,6 +30,7 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.Setting;
+import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 
 public class TestAstrixConfigurer {
 	
@@ -160,6 +161,10 @@ public class TestAstrixConfigurer {
 
 	public void activateProfile(String profile) {
 		this.configurer.activateProfile(profile);
+	}
+
+	public <T> void registerStrategy(Class<T> strategyInterface, T strategyInstance) {
+		this.configurer.registerStrategy(strategyInterface, strategyInstance);
 	}
 
 }

@@ -34,7 +34,7 @@ import com.avanza.astrix.beans.factory.CircularDependency;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
-import com.avanza.astrix.ft.BeanFaultToleranceProxyProvider;
+import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 
@@ -124,7 +124,7 @@ public class AstrixLibraryTest {
 		astrixConfigurer.registerApiProvider(MyLibraryProviderWithFaultTolerance.class);
 		final AtomicReference<Object> lastAppliedFaultTolerance = new AtomicReference<>(); 
 		final AtomicReference<AstrixBeanDefinition<?>> lastAppliedFaultToleranceSettings = new AtomicReference<>();
-		astrixConfigurer.registerPlugin(BeanFaultToleranceProxyProvider.class, new BeanFaultToleranceProxyProvider() {
+		astrixConfigurer.registerStrategy(BeanFaultToleranceProxyStrategy.class, new BeanFaultToleranceProxyStrategy() {
 			@Override
 			public <T> T addFaultToleranceProxy(AstrixBeanDefinition<T> beanDefinition, T rawProvider) {
 				lastAppliedFaultTolerance.set(rawProvider);
@@ -148,7 +148,7 @@ public class AstrixLibraryTest {
 		astrixConfigurer.registerApiProvider(MyLibraryProvider.class); // No Fault tolerance
 		final AtomicReference<Object> lastAppliedFaultTolerance = new AtomicReference<>(); 
 		final AtomicReference<AstrixBeanDefinition<?>> lastAppliedFaultToleranceSettings = new AtomicReference<>();
-		astrixConfigurer.registerPlugin(BeanFaultToleranceProxyProvider.class, new BeanFaultToleranceProxyProvider() {
+		astrixConfigurer.registerStrategy(BeanFaultToleranceProxyStrategy.class, new BeanFaultToleranceProxyStrategy() {
 			@Override
 			public <T> T addFaultToleranceProxy(AstrixBeanDefinition<T> beanDefinition, T rawProvider) {
 				lastAppliedFaultTolerance.set(rawProvider);

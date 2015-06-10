@@ -104,7 +104,7 @@ public class AstrixApiProviderTest {
 																		ObjectSerializerDefinition.versionedService(1, DummyObjectSerializerConfigurer.class));
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.registerPlugin(AstrixVersioningPlugin.class, new JavaSerializationVersioningPlugin());
+		astrixConfigurer.registerStrategy(AstrixVersioningPlugin.class, new JavaSerializationVersioningPlugin());
 		astrixConfigurer.registerApiProvider(VersionedPingServiceProvider.class);
 		astrixConfigurer.set("pingServiceUri", pingServiceUri);
 		astrixConfigurer.enableVersioning(true);
@@ -115,7 +115,7 @@ public class AstrixApiProviderTest {
 	}
 	
 	@Test
-	public void apiWithVersionedAnNonVersionedService() throws Exception {
+	public void apiWithVersionedAndTxNonVersionedService() throws Exception {
 		String pingServiceUri = DirectComponent.registerAndGetUri(PingService.class, 
 																		new PingServiceImpl(), 
 																		ObjectSerializerDefinition.versionedService(1, DummyObjectSerializerConfigurer.class));
@@ -124,7 +124,7 @@ public class AstrixApiProviderTest {
 																		ObjectSerializerDefinition.nonVersioned());
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.registerPlugin(AstrixVersioningPlugin.class, new JavaSerializationVersioningPlugin());
+		astrixConfigurer.registerStrategy(AstrixVersioningPlugin.class, new JavaSerializationVersioningPlugin());
 		astrixConfigurer.registerApiProvider(PublicAndInternalPingServiceProvider.class);
 		astrixConfigurer.set("pingServiceUri", pingServiceUri);
 		astrixConfigurer.set("internalPingServiceUri", internalPingServiceUri);

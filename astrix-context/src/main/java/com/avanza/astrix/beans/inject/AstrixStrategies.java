@@ -15,7 +15,17 @@
  */
 package com.avanza.astrix.beans.inject;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.core.AstrixStrategy;
 import com.avanza.astrix.core.util.ReflectionUtil;
 /**
  * 
@@ -24,26 +34,53 @@ import com.avanza.astrix.core.util.ReflectionUtil;
  */
 public final class AstrixStrategies {
 	
-	private DynamicConfig config;
+	private static final Logger log = LoggerFactory.getLogger(AstrixStrategies.class);
+	private final DynamicConfig config;
+	private final Map<Class<?>, Object> strategyInstanceByType = new ConcurrentHashMap<>();
 	
-	public AstrixStrategies(DynamicConfig config) {
+	public AstrixStrategies(DynamicConfig config, Map<Class<?>, Object> strategyInstanceByStrategyType) {
+		this.strategyInstanceByType.putAll(strategyInstanceByStrategyType);
 		this.config = config;
 	}
+	
+	public <T> StandardFactoryBean<T> getFactory(Class<T> strategyType) {
+		AstrixStrategy strategy = strategyType.getAnnotation(AstrixStrategy.class);
+		Object strategyInstance = strategyInstanceByType.get(strategyType);
+		if (strategyInstance != null) {
+			return new AlreadyInstantiatedFactoryBean<T>(AstrixBeanKey.create(strategyType), strategyType.cast(strategyInstance));
+		}
+		List<T> providers = AstrixPluginDiscovery.discoverAllPlugins(strategyType);
+		if (providers.size() == 1) {
+			return new AlreadyInstantiatedFactoryBean<T>(AstrixBeanKey.create(strategyType), providers.get(0));
+		}
+		if (providers.size() >= 1) {
+			Object provider = providers.get(0);
+			log.warn(String.format("Multiple strategy providers found. strategyType=%s usedStrategyInstance=%s foundInstances=%s", 
+								   strategyType.getName(), provider.getClass().getName(), providers));
+			return new AlreadyInstantiatedFactoryBean<T>(AstrixBeanKey.create(strategyType), strategyType.cast(provider));
+		}
+		Class<? extends T> providerClass = getProviderClass(strategyType, strategy.value());
+		return new ClassConstructorFactoryBean<T>(AstrixBeanKey.create(strategyType), providerClass);
+	}
 
-	public <T> Class<? extends T> getProviderClass(Class<T> strategy, Class<?> defaultStrategy) {
-		String providerClassName = config.getStringProperty(strategy.getName(), null).get();
-		if (providerClassName != null) {
-			Class<?> providerClass = ReflectionUtil.classForName(providerClassName);
-			if (!strategy.isAssignableFrom(providerClass)) {
-				throw new IllegalStateException(String.format("Illegal strategy. strategyType=%s strategyImpl=%s", strategy.getName(), providerClass.getName()));
+	private <T> Class<? extends T> getProviderClass(Class<T> strategy, Class<?> defaultStrategyClass) {
+		try {
+			String providerClassName = config.getStringProperty(strategy.getName(), null).get();
+			if (providerClassName != null) {
+				Class<?> providerClass = ReflectionUtil.classForName(providerClassName);
+				if (!strategy.isAssignableFrom(providerClass)) {
+					throw new IllegalStateException(String.format("Illegal strategy. strategyType=%s strategyImpl=%s", strategy.getName(), providerClass.getName()));
+				}
+				return (Class<? extends T>) providerClass;
 			}
-			return (Class<? extends T>) providerClass;
+			if (!strategy.isAssignableFrom(defaultStrategyClass)) {
+				throw new IllegalStateException(String.format("Illegal strategy. strategyType=%s strategyImpl=%s", strategy.getName(), defaultStrategyClass.getName()));
+			}
+			
+			return (Class<? extends T>) defaultStrategyClass;
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to load strategy: " + strategy.getName(), e);
 		}
-		if (!strategy.isAssignableFrom(defaultStrategy)) {
-			throw new IllegalStateException(String.format("Illegal strategy. strategyType=%s strategyImpl=%s", strategy.getName(), defaultStrategy.getName()));
-		}
-		
-		return (Class<? extends T>) defaultStrategy;
 	}
 
 }

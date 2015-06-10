@@ -29,8 +29,8 @@ import com.avanza.astrix.core.util.ReflectionUtil;
  * @author Elias Lindholm (elilin)
  *
  */
-@MetaInfServices(BeanFaultToleranceProxyProvider.class)
-public class HystrixFaultToleranceProxyProvider implements BeanFaultToleranceProxyProvider {
+@MetaInfServices(BeanFaultToleranceProxyStrategy.class)
+public class HystrixFaultToleranceProxyProvider implements BeanFaultToleranceProxyStrategy {
 	
 	private BeanFaultToleranceFactory faultToleranceFactory;
 	

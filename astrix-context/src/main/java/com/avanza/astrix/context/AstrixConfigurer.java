@@ -19,6 +19,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,6 +73,7 @@ public class AstrixConfigurer {
 	private ApiProviders astrixApiProviders;
 	private final Collection<StandardFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	private final List<AstrixPlugins.Plugin<?>> plugins = new ArrayList<>();
+	private final Map<Class<?>, Object> strategyInstanceByStrategyType = new HashMap<>();
 	private final AstrixSettings settings = new AstrixSettings();
 	
 	private DynamicConfig customConfig = null;
@@ -87,7 +89,7 @@ public class AstrixConfigurer {
 	public AstrixContext configure() {
 		config = createDynamicConfig();
 		AstrixPlugins astrixPlugins = getPlugins();
-		AstrixStrategies astrixStrategies = new AstrixStrategies(config);
+		AstrixStrategies astrixStrategies = new AstrixStrategies(config, strategyInstanceByStrategyType);
 		AstrixInjector injector = new AstrixInjector(astrixPlugins, astrixStrategies);
 		injector.bind(DynamicConfig.class, config);
 		injector.bind(AstrixContext.class, AstrixContextImpl.class);
@@ -235,6 +237,11 @@ public class AstrixConfigurer {
 	<T> AstrixConfigurer registerPlugin(Class<T> c, T provider) {
 		plugins.add(new AstrixPlugins.Plugin<>(c, Arrays.asList(provider)));
 		return this;
+	}
+	
+	// package private. Used for internal testing only
+	<T> void registerStrategy(Class<T> strategyInterface, T strategyInstance) {
+		this.strategyInstanceByStrategyType.put(strategyInterface, strategyInstance);
 	}
 
 	public AstrixConfigurer set(String settingName, long value) {

@@ -15,17 +15,17 @@
  */
 package com.avanza.astrix.ft;
 
-import rx.Observable;
-
+import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
 import com.avanza.astrix.core.AstrixStrategy;
-import com.avanza.astrix.core.function.Supplier;
-import com.netflix.hystrix.HystrixObservableCommand.Setter;
+
 /**
+ * 
  * @author Elias Lindholm (elilin)
+ *
  */
-// TODO: Should this really be a strategy?
-@AstrixStrategy(HystrixBeanFaultToleranceProvider.class)
-public interface BeanFaultToleranceProvider {
-	<T> Observable<T> observe(final Supplier<Observable<T>> observableFactory, Setter settings);
-	<T> T execute(CheckedCommand<T> command, com.netflix.hystrix.HystrixCommand.Setter settings) throws Throwable;
+@AstrixStrategy(NoFaultToleranceProvider.class)
+public interface BeanFaultToleranceProxyStrategy {
+	
+	public <T> T addFaultToleranceProxy(AstrixBeanDefinition<T> beanDefinition, T rawProvider);
+
 }

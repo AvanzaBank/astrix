@@ -28,7 +28,6 @@ import com.avanza.astrix.beans.publish.SimpleAstrixBeanDefinition;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
-import com.avanza.astrix.ft.BeanFaultToleranceTest.Ping;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;

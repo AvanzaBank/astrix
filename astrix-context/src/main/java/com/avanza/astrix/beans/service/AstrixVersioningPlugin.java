@@ -17,10 +17,9 @@ package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixObjectSerializer.NoVersioningSupport;
-import com.avanza.astrix.core.AstrixPlugin;
+import com.avanza.astrix.core.AstrixStrategy;
 
-// TODO: Should this be turned into a strategy?
-@AstrixPlugin
+@AstrixStrategy(AstrixVersioningPlugin.Default.class)
 public interface AstrixVersioningPlugin {
 	
 	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition);

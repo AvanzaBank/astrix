@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Test;
@@ -32,7 +33,7 @@ import com.avanza.astrix.core.AstrixPlugin;
 public class AstrixInjectorTest {
 	
 	AstrixPlugins plugins = new AstrixPlugins();
-	AstrixStrategies strategies = new AstrixStrategies(DynamicConfig.create(new MapConfigSource()));
+	AstrixStrategies strategies = new AstrixStrategies(DynamicConfig.create(new MapConfigSource()), new HashMap<Class<?>, Object>());
 	
 	@Test
 	public void boundBeansRefersToSameBeanInstanceAsItsImplementationClass() throws Exception {
