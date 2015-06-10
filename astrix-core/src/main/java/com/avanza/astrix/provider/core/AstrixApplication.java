@@ -24,6 +24,14 @@ import java.lang.annotation.Target;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 
 /**
+ * Used to define what services a given Astrix server provides.<p>
+ * 
+ * Note that @AstrixApplication annotated classes are not found using
+ * classpath scanning. To load the server part of the framework and start
+ * providing services defined by an @AstrixApplication the annotated
+ * class must be explicitly identified, for instance by setting the 
+ * com.avanza.astrix.spring.AstrixFrameworkBean#setApplicationDescriptor 
+ * property.<p>
  * 
  * @author Elias Lindholm (elilin)
  *
