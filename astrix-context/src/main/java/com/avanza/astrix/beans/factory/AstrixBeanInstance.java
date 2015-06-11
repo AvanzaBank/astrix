@@ -20,6 +20,8 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 /**
  * 
  * @author Elias Lindholm (elilin)

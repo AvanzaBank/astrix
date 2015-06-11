@@ -15,16 +15,18 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanFactory;
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
-import com.avanza.astrix.beans.factory.FactoryBean;
+import com.avanza.astrix.beans.factory.BeanConfiguration;
+import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
+import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviderPlugins;
 import com.avanza.astrix.beans.publish.ApiProviders;
+import com.avanza.astrix.beans.publish.PublishedBean;
 import com.avanza.astrix.beans.service.StatefulAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
 /**
@@ -41,17 +43,19 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	private final AstrixBeanFactory beanFactory;
 	private final DynamicConfig dynamicConfig;
 	private final AstrixInjector astrixInjector;
-	
+	private final BeanConfigurations beanConfigurations;
 	
 	public AstrixContextImpl(DynamicConfig dynamicConfig, AstrixInjector injector, ApiProviderPlugins apiProviderPlugins) {
 		this.dynamicConfig = dynamicConfig;
 		this.astrixInjector = injector;
 		this.apiProviderPlugins = apiProviderPlugins;
 		this.beanFactory = this.astrixInjector.getBean(AstrixBeanFactory.class); // The bean-factory used for apis managed by astrix
+		this.beanConfigurations = this.astrixInjector.getBean(BeanConfigurations.class); 
 		this.beanFactoryRegistry = (SimpleAstrixFactoryBeanRegistry) this.astrixInjector.getBean(AstrixFactoryBeanRegistry.class);
 		for (ApiProviderClass apiProvider : this.astrixInjector.getBean(ApiProviders.class).getAll()) {
-			for (FactoryBean<?> factory : this.apiProviderPlugins.getProviderPlugin(apiProvider).createFactoryBeans(apiProvider)) {
-				this.beanFactoryRegistry.registerFactory(factory);
+			for (PublishedBean publishedBean: this.apiProviderPlugins.getProviderPlugin(apiProvider).createFactoryBeans(apiProvider)) {
+				this.beanFactoryRegistry.registerFactory(publishedBean.getFactory());
+				this.beanConfigurations.setDefaultBeanConfig(publishedBean.getBeanKey(), publishedBean.getDefaultBeanSettingsOverride());
 			}
 		}
 	}
@@ -71,6 +75,10 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 		destroy();
 	}
 	
+	public BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey) {
+		return this.beanConfigurations.getBeanConfiguration(beanKey);
+	}
+	
 	@Override
 	public <T> T getBean(Class<T> beanType) {
 		return getBean(beanType, null);
@@ -84,6 +92,7 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	public <T> T getBean(AstrixBeanKey<T> beanKey) {
 		return beanFactory.getBean(beanKey);
 	}
+	
 
 	@Override
 	public <T> T waitForBean(Class<T> beanType, long timeoutMillis) throws InterruptedException {

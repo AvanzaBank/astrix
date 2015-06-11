@@ -19,13 +19,13 @@ import java.util.Objects;
 
 import rx.Observable;
 
+import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.factory.AstrixBeanSettings;
+import com.avanza.astrix.beans.factory.BeanConfiguration;
 import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.config.DynamicProperty;
+import com.avanza.astrix.config.DynamicIntProperty;
 import com.avanza.astrix.core.function.Supplier;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
@@ -40,25 +40,21 @@ import com.netflix.hystrix.HystrixThreadPoolProperties;
 public class BeanFaultTolerance {
 	
 	private final AstrixBeanDefinition<?> beanDefinition;
-	private final DynamicConfig config;
 	private final DynamicBooleanProperty faultToleranceEnabledForBean;
 	private final DynamicBooleanProperty faultToleranceEnabled;
 	private final BeanFaultToleranceProvider provider;
 	private final HystrixCommandNamingStrategy commandNamingStrategy;
+	private final DynamicIntProperty initialTimeout;
 	
-	public BeanFaultTolerance(AstrixBeanDefinition<?> serviceDefinition, DynamicConfig config, BeanFaultToleranceProvider provider, HystrixCommandNamingStrategy commandNamingStrategy) {
+	public BeanFaultTolerance(AstrixBeanDefinition<?> serviceDefinition, BeanConfiguration beanConfiguration, DynamicConfig config, BeanFaultToleranceProvider provider, HystrixCommandNamingStrategy commandNamingStrategy) {
 		this.beanDefinition = serviceDefinition;
-		this.config = config;
 		this.provider = provider;
-		this.faultToleranceEnabledForBean = getBeanSetting(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED);
+		this.initialTimeout = beanConfiguration.get(AstrixBeanSettings.INITIAL_TIMEOUT);
+		this.faultToleranceEnabledForBean = beanConfiguration.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED);
 		this.faultToleranceEnabled = AstrixSettings.ENABLE_FAULT_TOLERANCE.getFrom(config);
 		this.commandNamingStrategy = Objects.requireNonNull(commandNamingStrategy);
 	}
 	
-	private <T extends DynamicProperty<?>> T getBeanSetting(AstrixBeanSettings.BeanSetting<T> setting) {
-		return setting.getFor(beanDefinition.getBeanKey(), config);
-	}
-
 	public <T> Observable<T> observe(Supplier<Observable<T>> observable, HystrixObservableCommandSettings settings) {
 		if (!faultToleranceEnabled()) {
 			return observable.get();
@@ -105,13 +101,9 @@ public class BeanFaultTolerance {
 
 
 	private int getTimeoutMillis() {
-		return AstrixBeanSettings.INITIAL_TIMEOUT.getFor(getBeanKey(), config).get();
+		return this.initialTimeout.get();
 	}
 
-	private AstrixBeanKey<?> getBeanKey() {
-		return this.beanDefinition.getBeanKey();
-	}
-	
 	HystrixCommandKey getCommandKey() {
 		return HystrixCommandKey.Factory.asKey(commandNamingStrategy.getCommandKeyName(beanDefinition));
 	}

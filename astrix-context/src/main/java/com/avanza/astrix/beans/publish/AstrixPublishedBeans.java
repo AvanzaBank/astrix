@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.beans.publish;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 
 
 public interface AstrixPublishedBeans {

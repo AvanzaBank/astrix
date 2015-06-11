@@ -16,13 +16,19 @@
 package com.avanza.astrix.context;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanSettings;
+import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
 import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.provider.core.AstrixDynamicQualifier;
 import com.avanza.astrix.provider.core.AstrixQualifier;
+import com.avanza.astrix.provider.core.DefaultBeanSettings;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.core.ServiceConfig;
@@ -101,6 +107,17 @@ public class AstrixBeanDefinitionMethod<T> implements AstrixBeanDefinition<T> {
 	@Override
 	public ApiProvider getDefiningApi() {
 		return ApiProvider.create(this.method.getDeclaringClass().getName());
+	}
+	
+	public Map<BeanSetting<?>, Object> getDefaultBeanSettings() {
+		if (!getBeanType().isAnnotationPresent(DefaultBeanSettings.class)) {
+			return Collections.emptyMap();
+		}
+		DefaultBeanSettings defaultBeanSettings = getBeanType().getAnnotation(DefaultBeanSettings.class);
+		Map<BeanSetting<?>, Object> defaultSettings = new HashMap<>();
+		defaultSettings.put(AstrixBeanSettings.INITIAL_TIMEOUT, defaultBeanSettings.initialTimeout());
+		defaultSettings.put(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED, defaultBeanSettings.faultToleranceEnabled());
+		return defaultSettings;
 	}
 
 }

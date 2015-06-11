@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.serviceunit;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 /**
  * 

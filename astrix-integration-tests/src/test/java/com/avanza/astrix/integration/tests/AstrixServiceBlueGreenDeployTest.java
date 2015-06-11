@@ -34,8 +34,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.registry.ServiceRegistryClient;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;

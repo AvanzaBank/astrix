@@ -28,6 +28,7 @@ import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
+import com.avanza.astrix.beans.publish.PublishedBean;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
@@ -52,27 +53,23 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 	private BeanFaultToleranceProxyStrategy faultToleranceFactory;
 	
 	@Override
-	public List<FactoryBean<?>> createFactoryBeans(ApiProviderClass apiProviderClass) {
-		return getFactoryBeans(apiProviderClass);
-	}
-
-	private List<FactoryBean<?>> getFactoryBeans(ApiProviderClass apiProviderClass) {
-		List<FactoryBean<?>> result = new ArrayList<>();
-		// Create library factories
+	public List<PublishedBean> createFactoryBeans(ApiProviderClass apiProviderClass) {
+		List<PublishedBean> result = new ArrayList<>();
+		// Create factory for each exported bean in api.
 		for (Method astrixBeanDefinitionMethod : apiProviderClass.getProviderClass().getMethods()) {
 			AstrixBeanDefinitionMethod<?> beanDefinition = AstrixBeanDefinitionMethod.create(astrixBeanDefinitionMethod);
 			if (beanDefinition.isLibrary()) {
-				result.add(createLibraryFactory(apiProviderClass, astrixBeanDefinitionMethod, beanDefinition));
+				result.add(new PublishedBean(createLibraryFactory(apiProviderClass, astrixBeanDefinitionMethod, beanDefinition), beanDefinition.getDefaultBeanSettings()));
 				continue;
 			}
 			if (beanDefinition.isService()) {
 				ServiceDefinition<?> serviceDefinition = createServiceDefinition(apiProviderClass, beanDefinition);
 				ServiceDiscoveryFactory<?> serviceDiscoveryFactory = serviceDiscoveryMetaFactory.createServiceDiscoveryFactory(
 						beanDefinition.getBeanKey().getBeanType(), astrixBeanDefinitionMethod);
-				result.add(serviceMetaFactory.createServiceFactory(serviceDefinition, serviceDiscoveryFactory));
+				result.add(new PublishedBean(serviceMetaFactory.createServiceFactory(serviceDefinition, serviceDiscoveryFactory), beanDefinition.getDefaultBeanSettings()));
 				Class<?> asyncInterface = serviceMetaFactory.loadInterfaceIfExists(beanDefinition.getBeanType().getName() + "Async");
 				if (asyncInterface != null) {
-					result.add(serviceMetaFactory.createServiceFactory(serviceDefinition.asyncDefinition(asyncInterface), serviceDiscoveryFactory));
+					result.add(new PublishedBean(serviceMetaFactory.createServiceFactory(serviceDefinition.asyncDefinition(asyncInterface), serviceDiscoveryFactory), beanDefinition.getDefaultBeanSettings()));
 				}
 				continue;
 			}

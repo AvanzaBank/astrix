@@ -15,9 +15,9 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.publish.AstrixConfigAware;
 import com.avanza.astrix.beans.service.ServiceComponents;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;

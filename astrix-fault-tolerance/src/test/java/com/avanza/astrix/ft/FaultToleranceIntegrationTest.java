@@ -36,8 +36,9 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.factory.AstrixBeanSettings;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanSettings;
+import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.SimpleAstrixBeanDefinition;
 import com.avanza.astrix.config.DynamicConfig;
@@ -71,7 +72,10 @@ public abstract class FaultToleranceIntegrationTest {
 
 	@Before
 	public void createService() {
-		faultToleranceFactory = new BeanFaultToleranceFactory(DynamicConfig.create(config), new HystrixBeanFaultToleranceProvider(), commandNamingStrategy);
+		DynamicConfig dynamicConfig = DynamicConfig.create(config);
+		BeanConfigurations beanConfigurations = new BeanConfigurations();
+		beanConfigurations.setConfig(dynamicConfig);
+		faultToleranceFactory = new BeanFaultToleranceFactory(dynamicConfig, new HystrixBeanFaultToleranceProvider(), commandNamingStrategy, beanConfigurations);
 		testService = createProxy(api, provider, settings());
 	}
 	

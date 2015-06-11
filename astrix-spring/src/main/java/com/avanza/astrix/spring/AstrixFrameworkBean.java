@@ -39,8 +39,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.core.Ordered;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinition;

@@ -25,10 +25,10 @@ import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.factory.MissingBeanDependencyException;
 import com.avanza.astrix.beans.factory.MissingBeanProviderException;
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.publish.AstrixConfigAware;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;

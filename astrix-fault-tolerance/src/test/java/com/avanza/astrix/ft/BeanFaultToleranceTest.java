@@ -20,9 +20,9 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.factory.AstrixBeanSettings;
 import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.SimpleAstrixBeanDefinition;
 import com.avanza.astrix.context.AstrixApplicationContext;

@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 import com.avanza.astrix.beans.service.ServiceProperties;

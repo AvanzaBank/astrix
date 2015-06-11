@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.provider.core.AstrixQualifier;

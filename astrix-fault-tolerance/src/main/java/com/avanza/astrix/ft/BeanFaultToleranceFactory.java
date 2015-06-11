@@ -15,9 +15,10 @@
  */
 package com.avanza.astrix.ft;
 
+import com.avanza.astrix.beans.core.AstrixConfigAware;
+import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
-import com.avanza.astrix.beans.publish.AstrixConfigAware;
 import com.avanza.astrix.config.DynamicConfig;
 /**
  * 
@@ -27,23 +28,26 @@ import com.avanza.astrix.config.DynamicConfig;
 public class BeanFaultToleranceFactory implements AstrixConfigAware {
 	
 	private DynamicConfig config;
-	private BeanFaultToleranceProvider faultToleranceProvider;
-	private HystrixCommandNamingStrategy commandNamingStrategy;
+	private final BeanFaultToleranceProvider faultToleranceProvider;
+	private final HystrixCommandNamingStrategy commandNamingStrategy;
+	private final BeanConfigurations beanConfigurations;
 	
 	@AstrixInject
-	public BeanFaultToleranceFactory(BeanFaultToleranceProvider beanFaultToleranceProvider, HystrixCommandNamingStrategy commandNamingStrategy) {
+	public BeanFaultToleranceFactory(BeanFaultToleranceProvider beanFaultToleranceProvider, HystrixCommandNamingStrategy commandNamingStrategy, BeanConfigurations beanConfigurations) {
 		this.faultToleranceProvider = beanFaultToleranceProvider;
 		this.commandNamingStrategy = commandNamingStrategy;
+		this.beanConfigurations = beanConfigurations;
 	}
 	
-	public BeanFaultToleranceFactory(DynamicConfig config, BeanFaultToleranceProvider faultToleranceProvider, HystrixCommandNamingStrategy commandNamingStrategy) {
+	public BeanFaultToleranceFactory(DynamicConfig config, BeanFaultToleranceProvider faultToleranceProvider, HystrixCommandNamingStrategy commandNamingStrategy, BeanConfigurations beanConfigurations) {
 		this.faultToleranceProvider = faultToleranceProvider;
 		this.config = config;
 		this.commandNamingStrategy = commandNamingStrategy;
+		this.beanConfigurations = beanConfigurations;
 	}
 
 	public BeanFaultTolerance create(AstrixBeanDefinition<?> serviceDefinition) {
-		return new BeanFaultTolerance(serviceDefinition, config, faultToleranceProvider, commandNamingStrategy);
+		return new BeanFaultTolerance(serviceDefinition, beanConfigurations.getBeanConfiguration(serviceDefinition.getBeanKey()), config, faultToleranceProvider, commandNamingStrategy);
 	}
 
 	@Override

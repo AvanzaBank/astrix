@@ -17,6 +17,8 @@ package com.avanza.astrix.beans.factory;
 
 import java.util.Set;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+
 /**
  * 
  * @author Elias Lindholm (elilin)

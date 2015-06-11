@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.factory;
+package com.avanza.astrix.beans.core;
 
 import java.util.Objects;
 /**

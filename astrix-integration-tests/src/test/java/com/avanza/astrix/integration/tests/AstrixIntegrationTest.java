@@ -37,8 +37,8 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryClient;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;

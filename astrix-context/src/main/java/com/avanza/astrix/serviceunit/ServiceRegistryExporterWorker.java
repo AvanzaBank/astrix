@@ -23,8 +23,8 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistry;

@@ -21,6 +21,8 @@ import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.PreDestroy;
+
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 /**
  * 
  * @author Elias Lindholm (elilin)

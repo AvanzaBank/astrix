@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.context.AstrixContext;

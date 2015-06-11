@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.util.ReflectionUtil;

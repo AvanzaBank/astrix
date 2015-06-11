@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 import com.avanza.astrix.beans.service.ServiceProperties;
 /**

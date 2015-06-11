@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+
 /**
  * 
  * @author Elias Lindholm (elilin)

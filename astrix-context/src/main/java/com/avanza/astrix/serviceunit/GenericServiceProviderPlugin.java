@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.ApiProviderClass;

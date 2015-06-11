@@ -17,6 +17,8 @@ package com.avanza.astrix.beans.factory;
 
 import java.util.Stack;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+
 public class MissingBeanDependencyException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;

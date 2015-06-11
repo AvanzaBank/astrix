@@ -22,8 +22,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanFactory;
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;

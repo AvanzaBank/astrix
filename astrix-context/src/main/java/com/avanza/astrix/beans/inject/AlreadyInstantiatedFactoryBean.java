@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.beans.inject;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 

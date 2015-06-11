@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.context;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.publish.AstrixBeanDefinition;

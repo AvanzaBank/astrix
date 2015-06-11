@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.beans.publish;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -29,5 +29,5 @@ public interface AstrixBeanDefinition<T> {
 	AstrixBeanKey<T> getBeanKey();
 
 	ApiProvider getDefiningApi();
-
+	
 }

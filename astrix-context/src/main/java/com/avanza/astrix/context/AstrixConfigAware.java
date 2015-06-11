@@ -21,6 +21,6 @@ package com.avanza.astrix.context;
  * @deprecated renamed to com.avanza.astrix.beans.publish.AstrixConfigAware
  */
 @Deprecated
-public interface AstrixConfigAware extends com.avanza.astrix.beans.publish.AstrixConfigAware {
+public interface AstrixConfigAware extends com.avanza.astrix.beans.core.AstrixConfigAware {
 	
 }

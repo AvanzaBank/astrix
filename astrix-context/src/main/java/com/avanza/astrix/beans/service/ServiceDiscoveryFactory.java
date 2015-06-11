@@ -17,7 +17,7 @@ package com.avanza.astrix.beans.service;
 
 import java.lang.annotation.Annotation;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 /**
  * 
  * @author Elias Lindholm (elilin)

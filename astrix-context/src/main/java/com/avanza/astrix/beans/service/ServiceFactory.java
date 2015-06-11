@@ -18,7 +18,7 @@ package com.avanza.astrix.beans.service;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.DynamicFactoryBean;
 import com.avanza.astrix.beans.factory.FactoryBean;

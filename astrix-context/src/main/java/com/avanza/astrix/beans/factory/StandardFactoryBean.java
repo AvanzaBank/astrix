@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.beans.factory;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+
 
 /**
  * FactoryBean strategy used by {@link AstrixBeanFactory} to create a bean

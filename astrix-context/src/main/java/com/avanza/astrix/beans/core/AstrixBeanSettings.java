@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.factory;
+package com.avanza.astrix.beans.core;
 
-import com.avanza.astrix.config.DynamicBooleanProperty;
-import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.config.DynamicIntProperty;
-import com.avanza.astrix.config.DynamicLongProperty;
-import com.avanza.astrix.config.DynamicProperty;
+import java.util.Objects;
+
+import com.avanza.astrix.provider.core.DefaultBeanSettings;
 
 /**
  *
@@ -32,8 +30,8 @@ public class AstrixBeanSettings {
 	 * Determines whether fault tolerance should be applied for invocations on the associated
 	 * Astrix bean.
 	 */
-	public static final BooleanBeanSetting FAULT_TOLERANCE_ENABLED = new BooleanBeanSetting(
-			"faultTolerance.enabled", true);
+	public static final BooleanBeanSetting FAULT_TOLERANCE_ENABLED = 
+			new BooleanBeanSetting("faultTolerance.enabled", DefaultBeanSettings.DEFAULT_FAULT_TOLERANCE_ENABLED);
 
 	/**
 	 * When fault tolerance is enabled this setting defines the initial timeout used
@@ -42,22 +40,17 @@ public class AstrixBeanSettings {
 	 * any effect. All runtime changes to the timeout for the associated Astrix bean
 	 * should be done using the archauis configuration.    
 	 */
-	public static final IntBeanSetting INITIAL_TIMEOUT = new IntBeanSetting(
-			"faultTolerance.timeout", 1000);
+	public static final IntBeanSetting INITIAL_TIMEOUT = 
+			new IntBeanSetting("faultTolerance.timeout", DefaultBeanSettings.DEFAULT_INITIAL_TIMEOUT);
 
-	public static abstract class BeanSetting<T extends DynamicProperty<?>> {
+	public static abstract class BeanSetting<T> {
 		private String name;
+		private T defaultValue;
 
-		public BeanSetting(String name) {
+		private BeanSetting(String name, T defaultValue) {
 			this.name = name;
+			this.defaultValue = Objects.requireNonNull(defaultValue);
 		}
-
-		public T getFor(AstrixBeanKey<?> beanKey, DynamicConfig config) {
-			return getProperty(resolveSettingName(beanKey), config);
-		}
-
-		protected abstract T getProperty(String setting, DynamicConfig config);
-		
 
 		public String nameFor(AstrixBeanKey<?> beanKey) {
 			return resolveSettingName(beanKey);
@@ -71,52 +64,27 @@ public class AstrixBeanSettings {
 			return "astrix.bean." + beanKey.getBeanType().getName() + "."
 					+ name;
 		}
+		
+		public T defaultValue() {
+			return defaultValue;
+		}
 	}
 
-	public static class BooleanBeanSetting extends
-			BeanSetting<DynamicBooleanProperty> {
-		private final boolean defaultValue;
-
+	public static class BooleanBeanSetting extends BeanSetting<Boolean> {
 		public BooleanBeanSetting(String name, boolean defaultValue) {
-			super(name);
-			this.defaultValue = defaultValue;
-		}
-
-		@Override
-		protected DynamicBooleanProperty getProperty(String name,
-				DynamicConfig config) {
-			return config.getBooleanProperty(name, defaultValue);
+			super(name, defaultValue);
 		}
 	}
 
-	public static class LongBeanSetting extends
-			BeanSetting<DynamicLongProperty> {
-		private final long defaultValue;
-
+	public static class LongBeanSetting extends BeanSetting<Long> {
 		public LongBeanSetting(String name, long defaultValue) {
-			super(name);
-			this.defaultValue = defaultValue;
-		}
-
-		@Override
-		protected DynamicLongProperty getProperty(String name,
-				DynamicConfig config) {
-			return config.getLongProperty(name, defaultValue);
+			super(name, defaultValue);
 		}
 	}
 
-	public static class IntBeanSetting extends BeanSetting<DynamicIntProperty> {
-		private final int defaultValue;
-
+	public static class IntBeanSetting extends BeanSetting<Integer> {
 		public IntBeanSetting(String name, int defaultValue) {
-			super(name);
-			this.defaultValue = defaultValue;
-		}
-
-		@Override
-		protected DynamicIntProperty getProperty(String name,
-				DynamicConfig config) {
-			return config.getIntProperty(name, defaultValue);
+			super(name, defaultValue);
 		}
 	}
 

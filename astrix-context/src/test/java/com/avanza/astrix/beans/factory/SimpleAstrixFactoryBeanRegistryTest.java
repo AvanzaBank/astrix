@@ -19,6 +19,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+
 public class SimpleAstrixFactoryBeanRegistryTest {
 	
 //	@Test

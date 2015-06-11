@@ -15,20 +15,26 @@
  */
 package com.avanza.astrix.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
 import org.junit.Test;
 
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
-import com.avanza.astrix.beans.factory.AstrixBeanSettings.BooleanBeanSetting;
-import com.avanza.astrix.beans.factory.AstrixBeanSettings.IntBeanSetting;
-import com.avanza.astrix.beans.factory.AstrixBeanSettings.LongBeanSetting;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanSettings;
+import com.avanza.astrix.beans.core.AstrixBeanSettings.BooleanBeanSetting;
+import com.avanza.astrix.beans.core.AstrixBeanSettings.IntBeanSetting;
+import com.avanza.astrix.beans.core.AstrixBeanSettings.LongBeanSetting;
+import com.avanza.astrix.beans.factory.BeanConfiguration;
+import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviders;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
+import com.avanza.astrix.provider.core.DefaultBeanSettings;
+import com.avanza.astrix.provider.core.Service;
 
 public class AstrixConfigurerTest {
 	
@@ -49,14 +55,65 @@ public class AstrixConfigurerTest {
 		configurer.set(intSetting, AstrixBeanKey.create(Ping.class), 21);
 		configurer.set(longSetting, AstrixBeanKey.create(Ping.class), 19);
 		
-		AstrixContext astrixContext = configurer.configure();
+		AstrixContextImpl astrixContext = (AstrixContextImpl) configurer.configure();
+		BeanConfigurations beanConfigurations = astrixContext.getInstance(BeanConfigurations.class);
+		BeanConfiguration pingConfig = beanConfigurations.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
 		
-		assertEquals(21, intSetting.getFor(AstrixBeanKey.create(Ping.class), astrixContext.getConfig()).get());
-		assertFalse(aBooleanSetting.getFor(AstrixBeanKey.create(Ping.class), astrixContext.getConfig()).get());
-		assertEquals(19, longSetting.getFor(AstrixBeanKey.create(Ping.class), astrixContext.getConfig()).get());
+		assertEquals(21, pingConfig.get(intSetting).get());
+		assertFalse(pingConfig.get(aBooleanSetting).get());
+		assertEquals(19, pingConfig.get(longSetting).get());
 	}
 	
+	@Test
+	public void customDefaultBeanSettings() throws Exception {
+		AstrixConfigurer configurer = new AstrixConfigurer();
+		configurer.setAstrixApiProviders(new ApiProviders() {
+			@Override
+			public Collection<ApiProviderClass> getAll() {
+				return Arrays.asList(ApiProviderClass.create(PingApiProvider.class));
+			}
+		});
+		
+		AstrixContextImpl astrixContext = (AstrixContextImpl) configurer.configure();
+		BeanConfigurations beanConfigurations = astrixContext.getInstance(BeanConfigurations.class);
+		BeanConfiguration pingConfig = beanConfigurations.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
+
+		assertEquals(2000, pingConfig.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
+		assertFalse(pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
+	}
+	
+	@Test
+	public void customDefaultBeanSettingsAppliesToAsyncProxy() throws Exception {
+		AstrixConfigurer configurer = new AstrixConfigurer();
+		configurer.setAstrixApiProviders(new ApiProviders() {
+			@Override
+			public Collection<ApiProviderClass> getAll() {
+				return Arrays.asList(ApiProviderClass.create(PingApiProvider.class));
+			}
+		});
+		
+		AstrixContextImpl astrixContext = (AstrixContextImpl) configurer.configure();
+		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(PingAsync.class));
+
+		assertEquals(2000, pingConfig.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
+		assertFalse(pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
+	}
+	
+	@DefaultBeanSettings(
+		initialTimeout = 2000,
+		faultToleranceEnabled = false
+	)
 	public interface Ping {
 	}
-
+	
+	public interface PingAsync {
+	}
+	
+	@AstrixApiProvider
+	public interface PingApiProvider {
+		@Service
+		Ping ping();
+	}
+	
+	
 }

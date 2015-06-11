@@ -23,8 +23,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.openspaces.core.GigaSpace;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.AstrixBeanKey;
+import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.SimpleAstrixBeanDefinition;
 import com.avanza.astrix.config.DynamicConfig;
@@ -47,7 +48,9 @@ public class AstrixGigaSpaceProxyTest {
 		MapConfigSource configSource = new MapConfigSource();
 		configSource.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
 		DynamicConfig config = DynamicConfig.create(configSource);
-		BeanFaultToleranceFactory factory = new BeanFaultToleranceFactory(new HystrixBeanFaultToleranceProvider(), new DefaultHystrixCommandNamingStrategy());
+		BeanConfigurations beanConfigurations = new BeanConfigurations();
+		beanConfigurations.setConfig(config);
+		BeanFaultToleranceFactory factory = new BeanFaultToleranceFactory(new HystrixBeanFaultToleranceProvider(), new DefaultHystrixCommandNamingStrategy(), beanConfigurations);
 		factory.setConfig(config);
 		faultTolerance = factory.create(new SimpleAstrixBeanDefinition<>(ApiProvider.create("test-provider"), AstrixBeanKey.create(GigaSpace.class)));
 	}

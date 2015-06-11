@@ -23,10 +23,10 @@ import org.openspaces.core.space.cache.LocalViewSpaceConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.inject.AstrixInjector;
-import com.avanza.astrix.beans.publish.AstrixConfigAware;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceComponents;
