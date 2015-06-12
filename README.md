@@ -4,7 +4,7 @@ Astrix is a Java framework designed to simplify development and maintenance of m
 Astrix is used by service consumers to:
 * Locate a provider for given service at runtime ("service discovery")
 * Bind a service-proxy to an instance that can be used to invoke a discovered service ("service binding")
-* Test an application in isolation from the services consumed
+* Test an application isolated from the services it consumes
 * Ensure all service invocations are protected by a fault tolerance layer
 
 Astrix is used by service providers to:
@@ -19,7 +19,7 @@ The design philosophy behind Astrix aligns well with the characteristics of micr
 * Transport mechanism agnostic service consumers
 
 ### Selected centralized governance
-Microservices are a broad field and Astrix is designed to emphasize certain characteristics of microservices, whereas other characterisitcs are intentionally ignored. Most notably Astrix does not emphasize an organization where different microservices are developed using completely different technology stacks. Quite opposite Astrix assumes a standardization using the jvm as the platform for running microservices. But, apart from standardizing on the jvm, microservice providers are free to use a technology stack most suitable for their needs. Most notably each microservice could choose a data-store suitable for their needs, and a programming language of their choice, as long as it runs on the jvm and can run java code.
+Microservices are a broad field and Astrix is designed to emphasize certain characteristics of microservices, whereas other characteristics are intentionally ignored. Most notably Astrix does not emphasize an organization where different microservices are developed using completely different technology stacks. Quite opposite Astrix assumes a standardization using the jvm as the platform for running microservices. But, apart from standardizing on the jvm, microservice providers are free to use a technology stack most suitable for their needs. Most notably each microservice could choose a data-store suitable for their needs, and a programming language of their choice, as long as it runs on the jvm and can run java code.
 
 At Avanza we have choosen to standardize on a single language (Java), a single application framework (GigaSpaces, which in turn is built on top of Spring), and a single service framework (Astrix). This is actually quite restricting compared to the common view of microservices which often favor a more decentralized governance.
 
