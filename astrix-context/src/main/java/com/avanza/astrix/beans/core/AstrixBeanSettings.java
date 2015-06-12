@@ -24,7 +24,7 @@ import com.avanza.astrix.provider.core.DefaultBeanSettings;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixBeanSettings {
+public final class AstrixBeanSettings {
 
 	/**
 	 * Determines whether fault tolerance should be applied for invocations on the associated
@@ -42,6 +42,9 @@ public class AstrixBeanSettings {
 	 */
 	public static final IntBeanSetting INITIAL_TIMEOUT = 
 			new IntBeanSetting("faultTolerance.timeout", DefaultBeanSettings.DEFAULT_INITIAL_TIMEOUT);
+	
+	private AstrixBeanSettings() {
+	}
 
 	public static abstract class BeanSetting<T> {
 		private String name;
