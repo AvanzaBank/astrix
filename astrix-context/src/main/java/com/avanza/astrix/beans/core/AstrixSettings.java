@@ -15,16 +15,8 @@
  */
 package com.avanza.astrix.beans.core;
 
-import java.util.Map;
-
 import com.avanza.astrix.config.BooleanSetting;
-import com.avanza.astrix.config.DynamicConfigSource;
-import com.avanza.astrix.config.DynamicPropertyListener;
-import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.LongSetting;
-import com.avanza.astrix.config.MapConfigSource;
-import com.avanza.astrix.config.MutableConfigSource;
-import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.StringSetting;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 /**
@@ -32,7 +24,7 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixSettings implements DynamicConfigSource, MutableConfigSource {
+public final class AstrixSettings {
 	/**
 	 * Defines how long to wait between consecutive bind attempts when a service bean is
 	 * in UNBOUND state.
@@ -114,84 +106,6 @@ public class AstrixSettings implements DynamicConfigSource, MutableConfigSource 
 	 */
 	public static final StringSetting SERVICE_ADMINISTRATOR_COMPONENT = StringSetting.create("astrix.service.administrator.component", AstrixServiceComponentNames.GS_REMOTING);
 
-	private final MapConfigSource config = new MapConfigSource();
-	private final String configSourceId;
-	
-	public AstrixSettings() {
-		this.configSourceId = GlobalConfigSourceRegistry.register(this);
+	private AstrixSettings() {
 	}
-	
-	public String getConfigSourceId() {
-		return configSourceId;
-	}
-	
-	public final void setServiceRegistryUri(String serviceRegistryUri) {
-		set(SERVICE_REGISTRY_URI, serviceRegistryUri);
-	}
-
-	public final void set(String settingName, long value) {
-		this.config.set(settingName, Long.toString(value));
-	}
-	
-	public final void set(String settingName, String value) {
-		this.config.set(settingName, value);
-	}
-	
-	@Override
-	public final <T> void set(Setting<T> setting, T value) {
-		this.config.set(setting, value);
-	}
-	
-	@Override
-	public final void set(LongSetting setting, long value) {
-		this.config.set(setting, value);
-	}
-	
-	@Override
-	public final void set(BooleanSetting setting, boolean value) {
-		this.config.set(setting, value);
-	}
-	
-	public final void remove(String settingName) {
-		this.config.set(settingName, null);
-	}
-
-	public final void setAll(Map<String, String> settings) {
-		for (Map.Entry<String, String> setting : settings.entrySet()) {
-			this.config.set(setting.getKey(), setting.getValue());
-		}
-	}
-
-	public final void set(String settingName, boolean value) {
-		this.config.set(settingName, Boolean.toString(value));
-	}
-
-	public final String getString(String name) {
-		Object result = this.config.get(name);
-		if (result == null) {
-			return null;
-		}
-		return result.toString();
-	}
-
-	public final void setAll(AstrixSettings settings) {
-		this.config.setAll(settings.config);
-	}
-	
-	@Override
-	public final String toString() {
-		return this.config.toString();
-	}
-
-	public final String get(String settingName) {
-		return this.config.get(settingName);
-	}
-
-	@Override
-	public String get(String propertyName,
-			DynamicPropertyListener<String> propertyChangeListener) {
-		return this.config.get(propertyName, propertyChangeListener);
-	}
-	
-
 }

@@ -21,6 +21,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.config.GlobalConfigSourceRegistry;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.gs.test.util.PartitionedPu;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -30,11 +32,11 @@ public class LunchPuRunner {
 	public static void main(String[] args) throws IOException {
 		Logger.getRootLogger().setLevel(Level.INFO);
 		System.setProperty("com.gs.jini_lus.groups", "lunch-pu");
-		AstrixSettings settings = new AstrixSettings();
-		settings.setServiceRegistryUri(AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=service-registry");
+		MapConfigSource settings = new MapConfigSource();
+		settings.set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=service-registry");
 		PartitionedPu partitionedPu = new PartitionedPu(PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 				.numberOfPrimaries(1)
-				.contextProperty("configSourceId", settings.getConfigSourceId())
+				.contextProperty("configSourceId", GlobalConfigSourceRegistry.register(settings))
 				.numberOfBackups(0));
 		partitionedPu.run();
 	}

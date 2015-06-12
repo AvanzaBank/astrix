@@ -16,14 +16,16 @@
 package runners;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.config.GlobalConfigSourceRegistry;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.gs.test.util.PuApp;
 
 public class LunchGraderPuRunner {
 	
 	public static void main(String[] args) {
-		AstrixSettings externalConfig = new AstrixSettings();
+		MapConfigSource settings = new MapConfigSource();
 		System.setProperty("com.gs.jini_lus.groups", Config.LOOKUP_GROUP_NAME);
-		System.setProperty("configSourceId", externalConfig.getConfigSourceId());
+		System.setProperty("configSourceId", GlobalConfigSourceRegistry.register(settings));
 		PuApp.run("classpath:/META-INF/spring/lunch-grader-pu.xml");
 	}
 
