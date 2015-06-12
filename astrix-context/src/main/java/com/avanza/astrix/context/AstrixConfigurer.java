@@ -30,11 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.AstrixConfigAware;
-import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.BooleanBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.IntBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.LongBeanSetting;
+import com.avanza.astrix.beans.core.AstrixConfigAware;
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
@@ -52,6 +52,7 @@ import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
 import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.LongSetting;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.SystemPropertiesConfigSource;
@@ -74,7 +75,8 @@ public class AstrixConfigurer {
 	private final Collection<StandardFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	private final List<AstrixPlugins.Plugin<?>> plugins = new ArrayList<>();
 	private final Map<Class<?>, Object> strategyInstanceByStrategyType = new HashMap<>();
-	private final AstrixSettings settings = new AstrixSettings();
+	private final MapConfigSource settings = new MapConfigSource();
+	
 	
 	private DynamicConfig customConfig = null;
 	private final DynamicConfig wellKnownConfigSources = DynamicConfig.create(new SystemPropertiesConfigSource(), settings, PropertiesConfigSource.optionalClasspathPropertiesFile(CLASSPATH_OVERRIDE_SETTINGS));
@@ -245,12 +247,12 @@ public class AstrixConfigurer {
 	}
 
 	public AstrixConfigurer set(String settingName, long value) {
-		this.settings.set(settingName, value);
+		this.settings.set(settingName, Long.toString(value));
 		return this;
 	}
 	
 	public AstrixConfigurer set(String settingName, boolean value) {
-		this.settings.set(settingName, value);
+		this.settings.set(settingName, Boolean.toString(value));
 		return this;
 	}
 
@@ -270,7 +272,9 @@ public class AstrixConfigurer {
 	}
 	
 	public AstrixConfigurer setSettings(Map<String, String> settings) {
-		this.settings.setAll(settings);
+		for (Map.Entry<String, String> setting : settings.entrySet()) {
+			this.settings.set(setting.getKey(), setting.getValue());
+		}
 		return this;
 	}
 	
@@ -297,7 +301,7 @@ public class AstrixConfigurer {
 	}
 
 	void removeSetting(String name) {
-		this.settings.remove(name);
+		this.settings.set(name, null);
 	}
 
 	/**

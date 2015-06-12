@@ -57,7 +57,7 @@ public class MapConfigSource extends AbstractDynamicConfigSource implements Muta
 	public void set(BooleanSetting setting, boolean value) {
 		getProperty(setting.name()).set(Boolean.toString(value));
 	}
-
+	
 	private ListenableStringProperty getProperty(String propertyName) {
 		ListenableStringProperty result = propertyValues.get(propertyName);
 		if (result != null) {
