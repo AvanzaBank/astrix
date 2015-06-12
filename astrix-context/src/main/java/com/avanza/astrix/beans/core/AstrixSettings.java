@@ -156,14 +156,6 @@ public class AstrixSettings implements DynamicConfigSource, MutableConfigSource 
 		this.config.set(settingName, null);
 	}
 
-	public static AstrixSettings from(Map<String, String> settings) {
-		AstrixSettings result = new AstrixSettings();
-		for (Map.Entry<String, String> setting : settings.entrySet()) {
-			result.set(setting.getKey(), setting.getValue());
-		}
-		return result;
-	}
-
 	public final void setAll(Map<String, String> settings) {
 		for (Map.Entry<String, String> setting : settings.entrySet()) {
 			this.config.set(setting.getKey(), setting.getValue());
