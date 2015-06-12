@@ -15,13 +15,13 @@
  */
 package com.avanza.astrix.ft;
 
-import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 /**
  * @author Elias Lindholm (elilin)
  */
 public final class NoFaultToleranceProvider implements BeanFaultToleranceProxyStrategy {
 	@Override
-	public <T> T addFaultToleranceProxy(AstrixBeanDefinition<T> beanDefinition, T rawProvider) {
+	public <T> T addFaultToleranceProxy(PublishedAstrixBean<T> beanDefinition, T rawProvider) {
 		return rawProvider;
 	}
 }

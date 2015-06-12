@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.ft;
 
-import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.core.AstrixStrategy;
 /**
  * 
@@ -25,8 +25,8 @@ import com.avanza.astrix.core.AstrixStrategy;
 @AstrixStrategy(DefaultHystrixCommandNamingStrategy.class)
 public interface HystrixCommandNamingStrategy {
 	
-	String getCommandKeyName(AstrixBeanDefinition<?> beanDefinition);
+	String getCommandKeyName(PublishedAstrixBean<?> beanDefinition);
 	
-	String getGroupKeyName(AstrixBeanDefinition<?> beanDefinition);
+	String getGroupKeyName(PublishedAstrixBean<?> beanDefinition);
 	
 }

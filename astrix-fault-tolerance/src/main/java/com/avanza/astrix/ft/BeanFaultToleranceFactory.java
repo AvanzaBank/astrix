@@ -18,7 +18,7 @@ package com.avanza.astrix.ft;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
 /**
  * 
@@ -46,7 +46,7 @@ public class BeanFaultToleranceFactory implements AstrixConfigAware {
 		this.beanConfigurations = beanConfigurations;
 	}
 
-	public BeanFaultTolerance create(AstrixBeanDefinition<?> serviceDefinition) {
+	public BeanFaultTolerance create(PublishedAstrixBean<?> serviceDefinition) {
 		return new BeanFaultTolerance(serviceDefinition, beanConfigurations.getBeanConfiguration(serviceDefinition.getBeanKey()), config, faultToleranceProvider, commandNamingStrategy);
 	}
 

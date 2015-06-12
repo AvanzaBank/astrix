@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.ft;
 
-import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.core.AstrixStrategy;
 
 /**
@@ -26,6 +26,6 @@ import com.avanza.astrix.core.AstrixStrategy;
 @AstrixStrategy(NoFaultToleranceProvider.class)
 public interface BeanFaultToleranceProxyStrategy {
 	
-	public <T> T addFaultToleranceProxy(AstrixBeanDefinition<T> beanDefinition, T rawProvider);
+	public <T> T addFaultToleranceProxy(PublishedAstrixBean<T> beanDefinition, T rawProvider);
 
 }

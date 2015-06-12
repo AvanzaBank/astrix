@@ -32,7 +32,7 @@ import org.junit.Test;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.CircularDependency;
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -123,10 +123,10 @@ public class AstrixLibraryTest {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(MyLibraryProviderWithFaultTolerance.class);
 		final AtomicReference<Object> lastAppliedFaultTolerance = new AtomicReference<>(); 
-		final AtomicReference<AstrixBeanDefinition<?>> lastAppliedFaultToleranceSettings = new AtomicReference<>();
+		final AtomicReference<PublishedAstrixBean<?>> lastAppliedFaultToleranceSettings = new AtomicReference<>();
 		astrixConfigurer.registerStrategy(BeanFaultToleranceProxyStrategy.class, new BeanFaultToleranceProxyStrategy() {
 			@Override
-			public <T> T addFaultToleranceProxy(AstrixBeanDefinition<T> beanDefinition, T rawProvider) {
+			public <T> T addFaultToleranceProxy(PublishedAstrixBean<T> beanDefinition, T rawProvider) {
 				lastAppliedFaultTolerance.set(rawProvider);
 				lastAppliedFaultToleranceSettings.set(beanDefinition);
 				return rawProvider;
@@ -147,10 +147,10 @@ public class AstrixLibraryTest {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(MyLibraryProvider.class); // No Fault tolerance
 		final AtomicReference<Object> lastAppliedFaultTolerance = new AtomicReference<>(); 
-		final AtomicReference<AstrixBeanDefinition<?>> lastAppliedFaultToleranceSettings = new AtomicReference<>();
+		final AtomicReference<PublishedAstrixBean<?>> lastAppliedFaultToleranceSettings = new AtomicReference<>();
 		astrixConfigurer.registerStrategy(BeanFaultToleranceProxyStrategy.class, new BeanFaultToleranceProxyStrategy() {
 			@Override
-			public <T> T addFaultToleranceProxy(AstrixBeanDefinition<T> beanDefinition, T rawProvider) {
+			public <T> T addFaultToleranceProxy(PublishedAstrixBean<T> beanDefinition, T rawProvider) {
 				lastAppliedFaultTolerance.set(rawProvider);
 				lastAppliedFaultToleranceSettings.set(beanDefinition);
 				return rawProvider;

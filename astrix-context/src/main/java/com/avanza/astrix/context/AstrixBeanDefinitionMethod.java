@@ -24,7 +24,7 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
 import com.avanza.astrix.beans.publish.ApiProvider;
-import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.provider.core.AstrixDynamicQualifier;
 import com.avanza.astrix.provider.core.AstrixQualifier;
@@ -34,7 +34,7 @@ import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.core.ServiceConfig;
 import com.avanza.astrix.provider.versioning.Versioned;
 
-public class AstrixBeanDefinitionMethod<T> implements AstrixBeanDefinition<T> {
+public class AstrixBeanDefinitionMethod<T> implements PublishedAstrixBean<T> {
 	
 	private final Method method;
 	

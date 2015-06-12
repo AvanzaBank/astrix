@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
 /**
@@ -39,7 +39,7 @@ public class HystrixFaultToleranceProxyProvider implements BeanFaultTolerancePro
 		this.faultToleranceFactory = faultToleranceFactory;
 	}
 	@Override
-	public <T> T addFaultToleranceProxy(AstrixBeanDefinition<T> beanDefinition, T rawProvider) {
+	public <T> T addFaultToleranceProxy(PublishedAstrixBean<T> beanDefinition, T rawProvider) {
 		return ReflectionUtil.newProxy(beanDefinition.getBeanKey().getBeanType(), 
 									   new HystrixFaultToleranceProxy(rawProvider, faultToleranceFactory.create(beanDefinition), new HystrixCommandSettings()));
 	}

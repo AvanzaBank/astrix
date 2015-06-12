@@ -18,18 +18,18 @@ package com.avanza.astrix.context;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 
 public class AstrixFtProxiedFactory<T> implements StandardFactoryBean<T> {
 	
 	private StandardFactoryBean<T> target;
 	private BeanFaultToleranceProxyStrategy faultToleranceProxyFactory;
-	private AstrixBeanDefinition<T> beanDefinition;
+	private PublishedAstrixBean<T> beanDefinition;
 
 	public AstrixFtProxiedFactory(StandardFactoryBean<T> target,
 								  BeanFaultToleranceProxyStrategy faultToleranceProxyFactory,
-								  AstrixBeanDefinition<T> beanDefinition) {
+								  PublishedAstrixBean<T> beanDefinition) {
 		this.target = target;
 		this.faultToleranceProxyFactory = faultToleranceProxyFactory;
 		this.beanDefinition = beanDefinition;

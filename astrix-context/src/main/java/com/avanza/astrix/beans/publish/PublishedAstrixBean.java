@@ -22,9 +22,7 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
  *
  * @param <T>
  */
-public interface AstrixBeanDefinition<T> {
-	
-	// TODO: Is BeanDefinition the correct name for this class? Isn't it more like a PublishedBeanDefinition? or just an PublishedAstrixBean?
+public interface PublishedAstrixBean<T> {
 	
 	AstrixBeanKey<T> getBeanKey();
 

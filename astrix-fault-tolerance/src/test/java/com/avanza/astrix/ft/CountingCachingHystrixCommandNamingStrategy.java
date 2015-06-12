@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 
 public class CountingCachingHystrixCommandNamingStrategy implements HystrixCommandNamingStrategy {
 
@@ -27,16 +27,16 @@ public class CountingCachingHystrixCommandNamingStrategy implements HystrixComma
 	private final ConcurrentMap<String, GroupAndCommandKey> groupAndCommandByBeanDefinition = new ConcurrentHashMap<>();
 	
 	@Override
-	public String getCommandKeyName(AstrixBeanDefinition<?> beanDefinition) {
+	public String getCommandKeyName(PublishedAstrixBean<?> beanDefinition) {
 		return getGroupAndCommandKey(beanDefinition).commandKey;
 	}
 
 	@Override
-	public String getGroupKeyName(AstrixBeanDefinition<?> beanDefinition) {
+	public String getGroupKeyName(PublishedAstrixBean<?> beanDefinition) {
 		return getGroupAndCommandKey(beanDefinition).groupKey;
 	}
 	
-	private GroupAndCommandKey getGroupAndCommandKey(AstrixBeanDefinition<?> beanDefinition) {
+	private GroupAndCommandKey getGroupAndCommandKey(PublishedAstrixBean<?> beanDefinition) {
 		String key = keyFor(beanDefinition);
 		GroupAndCommandKey groupAndCommandKey = this.groupAndCommandByBeanDefinition.get(key);
 		if (groupAndCommandKey != null) {
@@ -47,7 +47,7 @@ public class CountingCachingHystrixCommandNamingStrategy implements HystrixComma
 		return groupAndCommandKey;
 	}
 	
-	private String keyFor(AstrixBeanDefinition<?> beanDefinition) {
+	private String keyFor(PublishedAstrixBean<?> beanDefinition) {
 		return beanDefinition.getDefiningApi().getName() + "###" + beanDefinition.getBeanKey().toString();
 	}
 	
@@ -55,7 +55,7 @@ public class CountingCachingHystrixCommandNamingStrategy implements HystrixComma
 		private final String groupKey;
 		private final String commandKey;
 		
-		public GroupAndCommandKey(AstrixBeanDefinition<?> beanDefinition) {
+		public GroupAndCommandKey(PublishedAstrixBean<?> beanDefinition) {
 			groupKey = beanDefinition.getDefiningApi().getName() + "[" + counter.incrementAndGet() + "]";
 			commandKey = beanDefinition.getBeanKey().toString() + "[" + counter.incrementAndGet() + "]";
 		}

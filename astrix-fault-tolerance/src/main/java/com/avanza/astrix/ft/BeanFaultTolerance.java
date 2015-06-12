@@ -22,7 +22,7 @@ import rx.Observable;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.BeanConfiguration;
-import com.avanza.astrix.beans.publish.AstrixBeanDefinition;
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicIntProperty;
@@ -39,14 +39,14 @@ import com.netflix.hystrix.HystrixThreadPoolProperties;
  */
 public class BeanFaultTolerance {
 	
-	private final AstrixBeanDefinition<?> beanDefinition;
+	private final PublishedAstrixBean<?> beanDefinition;
 	private final DynamicBooleanProperty faultToleranceEnabledForBean;
 	private final DynamicBooleanProperty faultToleranceEnabled;
 	private final BeanFaultToleranceProvider provider;
 	private final HystrixCommandNamingStrategy commandNamingStrategy;
 	private final DynamicIntProperty initialTimeout;
 	
-	public BeanFaultTolerance(AstrixBeanDefinition<?> serviceDefinition, BeanConfiguration beanConfiguration, DynamicConfig config, BeanFaultToleranceProvider provider, HystrixCommandNamingStrategy commandNamingStrategy) {
+	public BeanFaultTolerance(PublishedAstrixBean<?> serviceDefinition, BeanConfiguration beanConfiguration, DynamicConfig config, BeanFaultToleranceProvider provider, HystrixCommandNamingStrategy commandNamingStrategy) {
 		this.beanDefinition = serviceDefinition;
 		this.provider = provider;
 		this.initialTimeout = beanConfiguration.get(AstrixBeanSettings.INITIAL_TIMEOUT);
