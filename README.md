@@ -38,7 +38,7 @@ One of the core features provided by Astrix is service binding, which is done in
 2. Astrix uses information retrieved from discovery to decide what mechanism to use to bind to the given service provider. In Astrix that binding mechanism is called `ServiceComponent`
 3. Astrix uses the `ServiceComponent` to bind to the given provider
 
-It's also possible to locate providers without using the service-registry, for instance using configuration. The service-registry itself is located using the configuration mechanism.
+It's also possible to discover providers without using the service-registry, for instance using configuration. The service-registry itself is discovered using the configuration mechanism.
 
 If a service is discovered using the service-registry, then a lease-manager thread will run for the given service in the background. The lease-manager will periodically ask the service-registry for information about where a given service is located, and if the service has moved the lease-manager will rebind to the new provider.
 
