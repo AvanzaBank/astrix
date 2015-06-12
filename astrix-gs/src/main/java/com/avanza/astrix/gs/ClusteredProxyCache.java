@@ -138,7 +138,9 @@ public class ClusteredProxyCache implements AstrixConfigAware {
 		@PreDestroy
 		public void destroy() throws Exception {
 			log.info("Destroying clustered proxy against: " + spaceUrl);
-			this.spaceTaskDispatcher.destroy();
+			if (this.spaceTaskDispatcher != null) {
+				this.spaceTaskDispatcher.destroy();
+			}
 			this.urlSpaceConfigurer.close();
 		}
 	}
