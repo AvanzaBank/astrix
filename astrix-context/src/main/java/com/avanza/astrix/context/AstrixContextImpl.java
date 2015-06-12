@@ -15,6 +15,9 @@
  */
 package com.avanza.astrix.context;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
@@ -38,6 +41,8 @@ import com.avanza.astrix.config.DynamicConfig;
  */
 final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	
+	private static final Logger log = LoggerFactory.getLogger(AstrixContextImpl.class);
+	
 	private final SimpleAstrixFactoryBeanRegistry beanFactoryRegistry;
 	private final ApiProviderPlugins apiProviderPlugins;
 	private final AstrixBeanFactory beanFactory;
@@ -53,7 +58,12 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 		this.beanConfigurations = this.astrixInjector.getBean(BeanConfigurations.class); 
 		this.beanFactoryRegistry = (SimpleAstrixFactoryBeanRegistry) this.astrixInjector.getBean(AstrixFactoryBeanRegistry.class);
 		for (ApiProviderClass apiProvider : this.astrixInjector.getBean(ApiProviders.class).getAll()) {
+			log.debug("Creating factory beans for apiProvider={}", apiProvider.getName());
 			for (PublishedBean publishedBean: this.apiProviderPlugins.getProviderPlugin(apiProvider).createFactoryBeans(apiProvider)) {
+				log.debug("Registering factory for bean. beanKey={} apiProvider={} factoryType={}",  
+						publishedBean.getBeanKey(), 
+						apiProvider.getName(), 
+						publishedBean.getFactory().getClass().getName());
 				this.beanFactoryRegistry.registerFactory(publishedBean.getFactory());
 				this.beanConfigurations.setDefaultBeanConfig(publishedBean.getBeanKey(), publishedBean.getDefaultBeanSettingsOverride());
 			}

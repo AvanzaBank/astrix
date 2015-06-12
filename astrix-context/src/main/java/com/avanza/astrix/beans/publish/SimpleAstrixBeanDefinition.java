@@ -15,11 +15,7 @@
  */
 package com.avanza.astrix.beans.publish;
 
-import java.util.Collections;
-import java.util.Map;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
 /**
  * 
  * @author Elias Lindholm (elilin)
