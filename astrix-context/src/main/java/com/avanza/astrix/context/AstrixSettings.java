@@ -15,11 +15,28 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.config.LongSetting;
+import com.avanza.astrix.config.StringSetting;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
  * @deprecated - Moved to {@link com.avanza.astrix.beans.core.AstrixSettings}
  *
  */
-public class AstrixSettings extends com.avanza.astrix.beans.core.AstrixSettings {
+public class AstrixSettings {
+	
+	
+	/**
+	 * @deprecated - Replaced by {@link com.avanza.astrix.beans.core.AstrixSettings#BEAN_BIND_ATTEMPT_INTERVAL}
+	 */
+	@Deprecated
+	public static final LongSetting BEAN_BIND_ATTEMPT_INTERVAL = com.avanza.astrix.beans.core.AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL;
+
+	/**
+	 * @deprecated - Replaced by {@link com.avanza.astrix.beans.core.AstrixSettings#SERVICE_REGISTRY_URI}
+	 */
+	@Deprecated
+	public static final StringSetting ASTRIX_SERVICE_REGISTRY_URI = com.avanza.astrix.beans.core.AstrixSettings.SERVICE_REGISTRY_URI;
+
 }

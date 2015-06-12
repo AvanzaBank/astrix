@@ -31,6 +31,7 @@ import com.avanza.astrix.beans.registry.ServiceRegistryClient;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
@@ -54,8 +55,8 @@ public class ServiceRegistryPuIntegrationTest {
 															.startAsync(false)
 															.configure();
 	
-	private AstrixSettings clientConfig = new AstrixSettings() {{
-		set(SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
+	private MapConfigSource clientConfig = new MapConfigSource() {{
+		set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
 	}};
 	
 	private AstrixContext clientContext;

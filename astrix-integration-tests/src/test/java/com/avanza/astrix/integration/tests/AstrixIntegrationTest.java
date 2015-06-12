@@ -44,6 +44,8 @@ import com.avanza.astrix.beans.registry.ServiceRegistryClient;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.GlobalConfigSourceRegistry;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
@@ -85,17 +87,17 @@ public class AstrixIntegrationTest {
 															.startAsync(true)
 															.configure();
 	
-	private static AstrixSettings config = new AstrixSettings() {{
-		set(SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
-		set(SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
-		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
+	private static MapConfigSource config = new MapConfigSource() {{
+		set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
+		set(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
+		set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
 	}};
 	
 	@ClassRule
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
-											  .contextProperty("configSourceId", config.getConfigSourceId())
+											  .contextProperty("configSourceId", GlobalConfigSourceRegistry.register(config))
 											  .startAsync(true)
 											  .configure();
 	
@@ -103,7 +105,7 @@ public class AstrixIntegrationTest {
 	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
 														.numberOfPrimaries(1)
 														.numberOfBackups(0)
-													    .contextProperty("configSourceId", config.getConfigSourceId())
+														  .contextProperty("configSourceId", GlobalConfigSourceRegistry.register(config))
 														.startAsync(true)
 														.configure();
 

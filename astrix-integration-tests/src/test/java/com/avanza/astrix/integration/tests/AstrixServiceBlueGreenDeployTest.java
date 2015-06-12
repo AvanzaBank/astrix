@@ -15,7 +15,15 @@
  */
 package com.avanza.astrix.integration.tests;
 
-import static org.junit.Assert.*;
+import static com.avanza.astrix.beans.core.AstrixSettings.APPLICATION_INSTANCE_ID;
+import static com.avanza.astrix.beans.core.AstrixSettings.APPLICATION_TAG;
+import static com.avanza.astrix.beans.core.AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL;
+import static com.avanza.astrix.beans.core.AstrixSettings.SERVICE_ADMINISTRATOR_COMPONENT;
+import static com.avanza.astrix.beans.core.AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL;
+import static com.avanza.astrix.beans.core.AstrixSettings.SERVICE_REGISTRY_URI;
+import static com.avanza.astrix.beans.core.AstrixSettings.SUBSYSTEM_NAME;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,13 +44,14 @@ import org.springframework.core.env.MapPropertySource;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.registry.ServiceRegistryClient;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
+import com.avanza.astrix.beans.registry.ServiceRegistryClient;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.ConfigSource;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -72,14 +81,14 @@ public class AstrixServiceBlueGreenDeployTest {
 	
 	static String ACCOUNT_PERFORMANCE_SUBSYSTEM = "account-performance-subsystem";
 	
-	private AstrixSettings accountPerformanceClientConfig = new AstrixSettings() {{
+	private MapConfigSource accountPerformanceClientConfig = new MapConfigSource() {{
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
 		set(SUBSYSTEM_NAME, "client-subsystem");
 	}};
 	
-	private AstrixSettings feeder1clientConfig = new AstrixSettings() {{
+	private MapConfigSource feeder1clientConfig = new MapConfigSource() {{
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -87,7 +96,7 @@ public class AstrixServiceBlueGreenDeployTest {
 		set(APPLICATION_TAG, "1");
 	}};
 	
-	private AstrixSettings feeder2clientConfig = new AstrixSettings() {{
+	private MapConfigSource feeder2clientConfig = new MapConfigSource() {{
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -95,7 +104,7 @@ public class AstrixServiceBlueGreenDeployTest {
 		set(APPLICATION_TAG, "2");
 	}};
 	
-	private AstrixSettings server1Config = new AstrixSettings() {{
+	private MapConfigSource server1Config = new MapConfigSource() {{
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -104,7 +113,7 @@ public class AstrixServiceBlueGreenDeployTest {
 		set(APPLICATION_TAG, "1");
 	}};
 	
-	private AstrixSettings server2Config = new AstrixSettings() {{
+	private MapConfigSource server2Config = new MapConfigSource() {{
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -113,7 +122,7 @@ public class AstrixServiceBlueGreenDeployTest {
 		set(APPLICATION_TAG, "2");
 	}};
 	
-	private AstrixSettings feeder1Config = new AstrixSettings() {{
+	private MapConfigSource feeder1Config = new MapConfigSource() {{
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -122,7 +131,7 @@ public class AstrixServiceBlueGreenDeployTest {
 		set(APPLICATION_INSTANCE_ID, "feeder-server-1");
 	}};
 	
-	private AstrixSettings feeder2Config = new AstrixSettings() {{
+	private MapConfigSource feeder2Config = new MapConfigSource() {{
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -144,10 +153,10 @@ public class AstrixServiceBlueGreenDeployTest {
 	static class AstrixSpringApp implements AutoCloseable {
 		private AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 		
-		public AstrixSpringApp(AstrixSettings astrixSettings, Class<?> configuration) {
+		public AstrixSpringApp(MapConfigSource configSource, Class<?> configuration) {
 			this.context.register(configuration);
 			Map<String, Object> settings = new HashMap<>();
-			settings.put("configSourceId", astrixSettings.getConfigSourceId());
+			settings.put("configSourceId", GlobalConfigSourceRegistry.register(configSource));
 			context.getEnvironment().getPropertySources().addFirst(new MapPropertySource("astrixSettings", settings));
 		}
 
