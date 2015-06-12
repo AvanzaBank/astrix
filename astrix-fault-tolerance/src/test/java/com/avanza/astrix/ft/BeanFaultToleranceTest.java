@@ -24,7 +24,7 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.publish.ApiProvider;
-import com.avanza.astrix.beans.publish.SimpleAstrixBeanDefinition;
+import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
@@ -105,7 +105,7 @@ public class BeanFaultToleranceTest {
 	}
 	
 	private <T> String getCommandKey(AstrixBeanKey<T> beanKey) {
-		SimpleAstrixBeanDefinition<T> beanDefinition = new SimpleAstrixBeanDefinition<>(ApiProvider.create(PingApiProvider.class.getName()), beanKey);
+		SimplePublishedAstrixBean<T> beanDefinition = new SimplePublishedAstrixBean<>(ApiProvider.create(PingApiProvider.class.getName()), beanKey);
 		return context.getInstance(BeanFaultToleranceFactory.class).getCommandNamingStrategy().getCommandKeyName(beanDefinition);
 	}
 	

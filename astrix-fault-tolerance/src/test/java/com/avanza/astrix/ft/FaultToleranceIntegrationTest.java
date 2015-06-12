@@ -40,7 +40,7 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.publish.ApiProvider;
-import com.avanza.astrix.beans.publish.SimpleAstrixBeanDefinition;
+import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -55,8 +55,8 @@ import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 
 public abstract class FaultToleranceIntegrationTest {
 
-	private static final SimpleAstrixBeanDefinition<?> SERVICE_DEFINITION = 
-			new SimpleAstrixBeanDefinition<>(ApiProvider.create("FaultToleranceIntagrationTest"), AstrixBeanKey.create(SimpleService.class));
+	private static final SimplePublishedAstrixBean<?> PUBLISHED_BEAN_INFO = 
+			new SimplePublishedAstrixBean<>(ApiProvider.create("FaultToleranceIntagrationTest"), AstrixBeanKey.create(SimpleService.class));
 	private Class<SimpleService> api = SimpleService.class;
 	private SimpleService provider = new SimpleServiceImpl();
 	private SimpleService testService;
@@ -80,8 +80,7 @@ public abstract class FaultToleranceIntegrationTest {
 	}
 	
 	private <T> T createProxy(Class<T> type, final T provider, final HystrixCommandSettings settings) {
-		final BeanFaultTolerance faultTolerance = faultToleranceFactory.create(
-				SERVICE_DEFINITION);
+		final BeanFaultTolerance faultTolerance = faultToleranceFactory.create(PUBLISHED_BEAN_INFO);
 		return ReflectionUtil.newProxy(type, new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {

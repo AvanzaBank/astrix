@@ -22,12 +22,12 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
  *
  * @param <T>
  */
-public final class SimpleAstrixBeanDefinition<T> implements PublishedAstrixBean<T> {
+public final class SimplePublishedAstrixBean<T> implements PublishedAstrixBean<T> {
 
 	private ApiProvider apiProvider;
 	private AstrixBeanKey<T> beanKey;
 
-	public SimpleAstrixBeanDefinition(ApiProvider apiProvider,
+	public SimplePublishedAstrixBean(ApiProvider apiProvider,
 									  AstrixBeanKey<T> beanKey) {
 		this.apiProvider = apiProvider;
 		this.beanKey = beanKey;
