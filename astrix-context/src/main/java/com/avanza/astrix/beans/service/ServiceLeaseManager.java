@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.util.AstrixFrameworkThread;
 import com.avanza.astrix.config.DynamicConfig;
 /**
  * 
@@ -72,11 +73,10 @@ public class ServiceLeaseManager {
 		}
 	}
 
-	private class ServiceBindThread extends Thread {
+	private class ServiceBindThread extends AstrixFrameworkThread {
 		
 		public ServiceBindThread() {
-			super("Astrix-ServiceBind");
-			setDaemon(true);
+			super("ServiceBind");
 		}
 		
 		@Override
@@ -106,11 +106,10 @@ public class ServiceLeaseManager {
 		}
 	}
 	
-	private class ServiceLeaseRenewalThread extends Thread {
+	private class ServiceLeaseRenewalThread extends AstrixFrameworkThread {
 		
 		public ServiceLeaseRenewalThread() {
-			super("Astrix-ServiceLeaseRenewal");
-			setDaemon(true);
+			super("ServiceLeaseRenewal");
 		}
 		
 		@Override

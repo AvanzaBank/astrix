@@ -30,6 +30,7 @@ import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.util.AstrixFrameworkThread;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicLongProperty;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -40,7 +41,7 @@ import com.avanza.astrix.core.ServiceUnavailableException;
  * @author Elias Lindholm (elilin)
  * 
  */
-public class ServiceRegistryExporterWorker extends Thread implements AstrixPublishedBeansAware {
+public class ServiceRegistryExporterWorker extends AstrixFrameworkThread implements AstrixPublishedBeansAware {
 	
 	private final List<ServiceRegistryExportedService> exportedServices = new CopyOnWriteArrayList<>();
 	private ServiceRegistryExporterClient serviceRegistryProviderClient;
@@ -52,6 +53,7 @@ public class ServiceRegistryExporterWorker extends Thread implements AstrixPubli
 	private final Timer timer = new Timer();
 
 	public ServiceRegistryExporterWorker(DynamicConfig config) {
+		super("ServiceRegistryExporter");
 		this.config = config;
 		this.exportIntervallMillis = AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL.getFrom(config);
 		this.retryIntervallMillis = AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL.getFrom(config);
