@@ -39,7 +39,7 @@ import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.gigaspaces.internal.client.cache.SpaceCacheException;
 
 
-public class AstrixGigaSpaceProxyTest {
+public class GigaSpaceProxyTest {
 	
 	private BeanFaultTolerance faultTolerance;
 
@@ -58,7 +58,7 @@ public class AstrixGigaSpaceProxyTest {
 	@Test
 	public void proxiesInvocations() throws Exception {
 		GigaSpace gigaSpace = Mockito.mock(GigaSpace.class);
-		GigaSpace proxied = AstrixGigaSpaceProxy.create(gigaSpace, faultTolerance, new HystrixCommandSettings());
+		GigaSpace proxied = GigaSpaceProxy.create(gigaSpace, faultTolerance, new HystrixCommandSettings());
 		
 		Mockito.stub(gigaSpace.count(null)).toReturn(21);
 		
@@ -70,7 +70,7 @@ public class AstrixGigaSpaceProxyTest {
 		GigaSpace gigaSpace = Mockito.mock(GigaSpace.class);
 		
 		Mockito.stub(gigaSpace.count(null)).toThrow(new SpaceCacheException(""));
-		GigaSpace proxied = AstrixGigaSpaceProxy.create(gigaSpace, faultTolerance, new HystrixCommandSettings());
+		GigaSpace proxied = GigaSpaceProxy.create(gigaSpace, faultTolerance, new HystrixCommandSettings());
 		
 		try {
 			proxied.count(null);

@@ -39,7 +39,7 @@ import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.ft.HystrixCommandSettings;
-import com.avanza.astrix.gs.AstrixGigaSpaceProxy;
+import com.avanza.astrix.gs.GigaSpaceProxy;
 import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.spring.AstrixSpringContext;
@@ -100,7 +100,7 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		BeanFaultTolerance faultTolerance = faultToleranceFactory.create(serviceDefinition);
 		
 		IJSpace localViewSpace = gslocalViewSpaceConfigurer.create();
-		GigaSpace localViewGigaSpace = AstrixGigaSpaceProxy.create(new GigaSpaceConfigurer(localViewSpace).create(), faultTolerance, hystrixSettings);
+		GigaSpace localViewGigaSpace = GigaSpaceProxy.create(new GigaSpaceConfigurer(localViewSpace).create(), faultTolerance, hystrixSettings);
 		
 		BoundLocalViewGigaSpaceBeanInstance localViewGigaSpaceBeanInstance = 
 				new BoundLocalViewGigaSpaceBeanInstance(localViewGigaSpace, gslocalViewSpaceConfigurer, gsSpaceConfigurer);

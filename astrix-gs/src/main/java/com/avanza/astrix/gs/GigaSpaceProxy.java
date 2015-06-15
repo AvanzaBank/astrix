@@ -37,20 +37,20 @@ import com.gigaspaces.internal.client.cache.SpaceCacheException;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixGigaSpaceProxy implements InvocationHandler {
+public class GigaSpaceProxy implements InvocationHandler {
 
 	private final GigaSpace gigaSpace;
 	private final BeanFaultTolerance faultTolerance;
 	private final HystrixCommandSettings hystrixSettings;
 
-	public AstrixGigaSpaceProxy(GigaSpace gigaSpace, BeanFaultTolerance faultTolerance, HystrixCommandSettings hystrixSettings) {
+	public GigaSpaceProxy(GigaSpace gigaSpace, BeanFaultTolerance faultTolerance, HystrixCommandSettings hystrixSettings) {
 		this.gigaSpace = Objects.requireNonNull(gigaSpace);
 		this.faultTolerance = Objects.requireNonNull(faultTolerance);
 		this.hystrixSettings = Objects.requireNonNull(hystrixSettings);
 	}
 
 	public static GigaSpace create(GigaSpace gigaSpace, BeanFaultTolerance faultTolerance, HystrixCommandSettings hystrixSettings) {
-		return ReflectionUtil.newProxy(GigaSpace.class, new AstrixGigaSpaceProxy(gigaSpace, faultTolerance, hystrixSettings));
+		return ReflectionUtil.newProxy(GigaSpace.class, new GigaSpaceProxy(gigaSpace, faultTolerance, hystrixSettings));
 	}
 
 	@Override

@@ -53,7 +53,7 @@ public class GsComponent implements ServiceComponent {
 		}
 		GigaSpaceInstance gigaSpaceInstance = proxyCache.getProxy(serviceProperties);
 		BeanFaultTolerance beanFaultTolerance = faultToleranceFactory.create(serviceDefinition);
-		T proxyWithFaultTolerance = targetType.cast(AstrixGigaSpaceProxy.create(gigaSpaceInstance.get(), beanFaultTolerance, new HystrixCommandSettings()));
+		T proxyWithFaultTolerance = targetType.cast(GigaSpaceProxy.create(gigaSpaceInstance.get(), beanFaultTolerance, new HystrixCommandSettings()));
 		return BoundProxyServiceBeanInstance.create(proxyWithFaultTolerance, gigaSpaceInstance);
 	}
 	
