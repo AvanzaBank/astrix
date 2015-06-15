@@ -79,7 +79,6 @@ public class AstrixConfigurerTest {
 		BeanConfiguration pingConfig = beanConfigurations.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
 
 		assertEquals(2000, pingConfig.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
-		assertFalse(pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
 	}
 	
 	@Test
@@ -96,12 +95,10 @@ public class AstrixConfigurerTest {
 		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(PingAsync.class));
 
 		assertEquals(2000, pingConfig.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
-		assertFalse(pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
 	}
 	
 	@DefaultBeanSettings(
-		initialTimeout = 2000,
-		faultToleranceEnabled = false
+		initialTimeout = 2000
 	)
 	public interface Ping {
 	}

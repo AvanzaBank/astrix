@@ -116,7 +116,6 @@ public class AstrixBeanDefinitionMethod<T> implements PublishedAstrixBean<T> {
 		DefaultBeanSettings defaultBeanSettings = getBeanType().getAnnotation(DefaultBeanSettings.class);
 		Map<BeanSetting<?>, Object> defaultSettings = new HashMap<>();
 		defaultSettings.put(AstrixBeanSettings.INITIAL_TIMEOUT, defaultBeanSettings.initialTimeout());
-		defaultSettings.put(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED, defaultBeanSettings.faultToleranceEnabled());
 		return defaultSettings;
 	}
 

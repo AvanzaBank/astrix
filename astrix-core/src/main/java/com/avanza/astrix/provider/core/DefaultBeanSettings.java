@@ -44,7 +44,6 @@ import java.lang.annotation.Target;
 public @interface DefaultBeanSettings {
 	
 	int DEFAULT_INITIAL_TIMEOUT = 1000;
-	boolean DEFAULT_FAULT_TOLERANCE_ENABLED = true;
 	
 	/**
 	 * See AstrixBeanSettings#INITIAL_TIMEOUT
@@ -53,9 +52,4 @@ public @interface DefaultBeanSettings {
 	 */
 	int initialTimeout() default DEFAULT_INITIAL_TIMEOUT;
 	
-	/**
-	 * See AstrixBeanSettings#FAULT_TOLERANCE_ENABLED
-	 * @return
-	 */
-	boolean faultToleranceEnabled() default DEFAULT_FAULT_TOLERANCE_ENABLED;
 }
