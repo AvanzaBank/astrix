@@ -26,6 +26,7 @@ import java.util.concurrent.Future;
 
 import rx.Observable;
 
+import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.util.ReflectionUtil;
 /**
@@ -94,7 +95,21 @@ public class RemotingProxy implements InvocationHandler {
 		if (isFutureType(method.getReturnType())) {
 			return new FutureAdapter<>(result);
 		}
-		return result.toBlocking().first();
+		try {
+			return result.toBlocking().first();
+		} catch (Exception e) {
+			// Append invocation call stack
+			appendStackTrace(e, new AstrixCallStackTrace());
+			throw e;
+		}
+	}
+
+	private static void appendStackTrace(Throwable exception, AstrixCallStackTrace trace) {
+		Throwable lastThowableInChain = exception;
+		while (lastThowableInChain.getCause() != null) {
+			lastThowableInChain = lastThowableInChain.getCause();
+		}
+		lastThowableInChain.initCause(trace);
 	}
 	
 	private Type getReturnType(Method method) {

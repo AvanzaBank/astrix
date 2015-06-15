@@ -41,10 +41,6 @@ public class RoutedRemoteServiceMethod implements RemoteServiceMethod {
 		return signature;
 	}
 	
-	private RoutingKey getRoutingKey(Object... args) throws Exception {
-		return this.router.getRoutingKey(args);
-	}
-	
 	@Override
 	public Observable<?> invoke(AstrixServiceInvocationRequest invocationRequest, Object[] args) throws Exception {
 		invocationRequest.setArguments(remotingEngine.marshall(args));
