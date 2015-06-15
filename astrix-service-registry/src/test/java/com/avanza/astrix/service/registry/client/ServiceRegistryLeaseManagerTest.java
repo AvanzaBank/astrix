@@ -45,7 +45,7 @@ import com.avanza.astrix.test.util.Probe;
 
 
 
-public class AstrixServiceRegistryLeaseManagerTest {
+public class ServiceRegistryLeaseManagerTest {
 
 	private ServiceRegistryExporterClient serviceRegistryExporterClient;
 	private AstrixContext context;

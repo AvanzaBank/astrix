@@ -15,14 +15,22 @@
  */
 package com.avanza.astrix.service.registry.client;
 
-import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
-import com.avanza.astrix.provider.core.AstrixApiProvider;
-import com.avanza.astrix.provider.core.Library;
+import java.util.List;
 
-@AstrixApiProvider
-public class AstrixServiceRegistryAdministratorLibraryProvider {
-	@Library
-	public AstrixServiceRegistryAdministrator createAdministrator(AstrixServiceRegistry serviceRegistry) {
-		return new AstrixServiceRegistryAdministratorImpl(serviceRegistry);
+import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
+
+public class ServiceRegistryAdministratorImpl implements ServiceRegistryAdministrator {
+
+	private AstrixServiceRegistry serviceRegistry;
+
+	public ServiceRegistryAdministratorImpl(AstrixServiceRegistry serviceRegistry) {
+		this.serviceRegistry = serviceRegistry;
 	}
+
+	@Override
+	public List<AstrixServiceRegistryEntry> listServices() {
+		return serviceRegistry.listServices();
+	}
+
 }

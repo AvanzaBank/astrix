@@ -27,16 +27,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 import com.avanza.astrix.beans.service.ServiceProperties;
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryAdministrator;
+import com.avanza.astrix.service.registry.client.ServiceRegistryAdministrator;
 
 @RestController
 @RequestMapping("/services")
 public class ServiceRegistryController {
 	
-	private AstrixServiceRegistryAdministrator serviceRegistryAdmin;
+	private ServiceRegistryAdministrator serviceRegistryAdmin;
 	
 	@Autowired
-	public ServiceRegistryController(AstrixServiceRegistryAdministrator serviceRegistryAdmin) {
+	public ServiceRegistryController(ServiceRegistryAdministrator serviceRegistryAdmin) {
 		this.serviceRegistryAdmin = Objects.requireNonNull(serviceRegistryAdmin);
 	}
 

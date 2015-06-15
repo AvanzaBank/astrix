@@ -15,14 +15,13 @@
  */
 package com.avanza.astrix.service.registry.client;
 
+import static com.avanza.astrix.test.util.AstrixTestUtil.isExceptionOfType;
+import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationException;
 import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationResult;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,24 +41,22 @@ import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 
 
-public class AstrixServiceRegistryLookupTest {
+public class ServiceRegistryApiTest {
 	
 	private static final long UNUSED_LEASE = 10_000L;
 	private ServiceRegistryExporterClient serviceRegistryExporterClient;
 	private AstrixContext context;
-	private InMemoryServiceRegistry fakeServiceRegistry = new InMemoryServiceRegistry();
+	private InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 	
 	@Before
 	public void setup() {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		configurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 10);
-		configurer.set(AstrixSettings.SERVICE_REGISTRY_URI, fakeServiceRegistry.getServiceUri());
 		configurer.registerApiProvider(GreetingApiProvider.class);
-		configurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		configurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
+		configurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		context = configurer.configure();
-		serviceRegistryExporterClient = new ServiceRegistryExporterClient(fakeServiceRegistry, "default", "bar");
+		serviceRegistryExporterClient = new ServiceRegistryExporterClient(serviceRegistry, "default", "bar");
 	}
 	
 	@Test
@@ -91,13 +88,49 @@ public class AstrixServiceRegistryLookupTest {
 		}, equalTo("hello: kalle")));
 	}
 	
+	@Test
+	public void serviceIsReboundIfServiceIsMovedInRegistry() throws Exception {
+		final String providerId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		serviceRegistryExporterClient.register(GreetingService.class, DirectComponent.getServiceProperties(providerId), UNUSED_LEASE);
+		
+		final GreetingService dummyService = context.getBean(GreetingService.class);
+		assertEquals("hello: kalle", dummyService.hello("kalle"));
+		
+		final String newProviderId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hej: "));
+		serviceRegistryExporterClient.register(GreetingService.class, DirectComponent.getServiceProperties(newProviderId), UNUSED_LEASE);
+		
+		assertEventually(serviceInvocationResult(new Supplier<String>() {
+			@Override
+			public String get() {
+				return dummyService.hello("kalle");
+			}
+		}, equalTo("hej: kalle")));
+	}
+	
+	@Test
+	public void whenServiceIsRemovedFromRegistryItShouldStartThrowingServiceUnavailable() throws Exception {
+		final String providerId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
+		serviceRegistryExporterClient.register(GreetingService.class, DirectComponent.getServiceProperties(providerId), UNUSED_LEASE);
+		
+		final GreetingService dummyService = context.getBean(GreetingService.class);
+		assertEquals("hello: kalle", dummyService.hello("kalle"));
+		
+		serviceRegistry.clear(); // Simulate lease expiry
+		
+		assertEventually(serviceInvocationException(new Supplier<String>() {
+			@Override
+			public String get() {
+				return dummyService.hello("kalle");
+			}
+		}, isExceptionOfType(ServiceUnavailableException.class)));
+	}
+	
 	private void assertEventually(Probe probe) throws InterruptedException {
 		new Poller(1000, 1).check(probe);
 	}
 	
 	@AstrixApiProvider
 	interface GreetingApiProvider {
-		
 		@Service
 		GreetingService greetingService();
 	}

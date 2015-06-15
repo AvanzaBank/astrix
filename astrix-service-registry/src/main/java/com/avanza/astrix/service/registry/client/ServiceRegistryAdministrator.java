@@ -17,20 +17,10 @@ package com.avanza.astrix.service.registry.client;
 
 import java.util.List;
 
-import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 
-public class AstrixServiceRegistryAdministratorImpl implements AstrixServiceRegistryAdministrator {
+public interface ServiceRegistryAdministrator {
 
-	private AstrixServiceRegistry serviceRegistry;
-
-	public AstrixServiceRegistryAdministratorImpl(AstrixServiceRegistry serviceRegistry) {
-		this.serviceRegistry = serviceRegistry;
-	}
-
-	@Override
-	public List<AstrixServiceRegistryEntry> listServices() {
-		return serviceRegistry.listServices();
-	}
-
+	List<AstrixServiceRegistryEntry> listServices();
+	
 }

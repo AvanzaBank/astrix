@@ -20,7 +20,7 @@ import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.avanza.astrix.service.registry.client.AstrixServiceRegistryAdministrator;
+import com.avanza.astrix.service.registry.client.ServiceRegistryAdministrator;
 import com.avanza.astrix.spring.AstrixFrameworkBean;
 
 @Configuration
@@ -30,7 +30,7 @@ public class AstrixDashboardConfig {
 	public AstrixFrameworkBean astrix() {
 		AstrixFrameworkBean result = new AstrixFrameworkBean();
 		result.setConsumedAstrixBeans(Arrays.<Class<?>>asList(
-			AstrixServiceRegistryAdministrator.class
+			ServiceRegistryAdministrator.class
 		));
 		return result;
 	}
