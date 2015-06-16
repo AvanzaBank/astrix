@@ -64,7 +64,7 @@ public class AstrixContextImplTest {
 	}
 	
 	@Test
-	public void asterixBeansAreDestroyedUponContextDestroy() throws Exception {
+	public void astrixBeansAreDestroyedWhenContextIsDestroy() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
 		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
@@ -78,7 +78,7 @@ public class AstrixContextImplTest {
 	}
 	
 	@Test
-	public void asterixBeansAreInitializedWhenFirstCreated() throws Exception {
+	public void astrixBeansAreInitializedWhenFirstCreated() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
 		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
@@ -88,7 +88,7 @@ public class AstrixContextImplTest {
 	}
 	
 	@Test
-	public void cachesCreatedApis() throws Exception {
+	public void createdAstrixBeansAreCached() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
 		AstrixContextImpl AstrixContext = (AstrixContextImpl) astrixConfigurer.configure();
@@ -118,7 +118,7 @@ public class AstrixContextImplTest {
 	}
 	
 	@Test
-	public void preDestroyAnnotatedMethodsOnInstancesCreatedByAstrixAreInvokedWhenAstrixContextIsDestroyed() throws Exception {
+	public void internalClassesAreDestroyedWhenAstrixContextIsDestroyed() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 		HelloBean simpleClass = astrixContext.getInstance(HelloBean.class); // treat HelloBean as internal class
@@ -127,7 +127,7 @@ public class AstrixContextImplTest {
 		astrixContext.destroy();
 		assertTrue(simpleClass.destroyed);
 	}
-
+	
 	@Test
 	public void manyAstrixContextShouldBeAbleToRunInSameProcessWithoutInterferenceInShutdown() throws Exception {
 		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
@@ -141,6 +141,7 @@ public class AstrixContextImplTest {
 		
 		HelloBean helloBean2 = (HelloBean) context2.getBean(HelloBean.class);
 		assertFalse(helloBean2.destroyed);
+		
 		context2.destroy();
 		assertTrue(helloBean2.destroyed);
 	}

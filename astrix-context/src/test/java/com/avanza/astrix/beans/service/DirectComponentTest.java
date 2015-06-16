@@ -22,8 +22,6 @@ import java.util.concurrent.Future;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -31,8 +29,6 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 
 public class DirectComponentTest {
-	
-	
 	
 	@Test
 	public void itsPossibleToStubAsyncServiceUsingDirectComponent() throws Exception {

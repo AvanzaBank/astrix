@@ -28,8 +28,6 @@ import org.junit.After;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixContext;

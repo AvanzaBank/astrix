@@ -23,28 +23,8 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 
 public class SimpleAstrixFactoryBeanRegistryTest {
 	
-//	@Test
-//	public void simpleAstrixFactoryBeanRegistrySupportDynamicFactoryBean() throws Exception {
-//		SimpleAstrixFactoryBeanRegistry registry = new SimpleAstrixFactoryBeanRegistry();
-//		registry.registerFactory(new DynamicFactoryBean<Ping>() {
-//			@Override
-//			public Ping create(AstrixBeanKey<Ping> astrixBeanKey) {
-//				return new Ping(astrixBeanKey.getQualifier());
-//			}
-//			@Override
-//			public Class<Ping> getType() {
-//				return Ping.class;
-//			}
-//		});
-//		
-//		DynamicFactoryBean<Ping> pingFactory1 = registry.getDynamicFactoryBean(Ping.class);
-//		
-//		assertEquals("qualifier-1", pingFactory1.create(beanKey(Ping.class, "qualifier-1")).qualifier);
-//		assertEquals("qualifier-2", pingFactory1.create(beanKey(Ping.class, "qualifier-2")).qualifier);
-//	}
-	
 	@Test
-	public void syntesizesFactoryBeanUsingDynamicFactoryBean() throws Exception {
+	public void synthesizesFactoryBeanUsingDynamicFactoryBean() throws Exception {
 		SimpleAstrixFactoryBeanRegistry registry = new SimpleAstrixFactoryBeanRegistry();
 		registry.registerFactory(new DynamicFactoryBean<Ping>() {
 			@Override
