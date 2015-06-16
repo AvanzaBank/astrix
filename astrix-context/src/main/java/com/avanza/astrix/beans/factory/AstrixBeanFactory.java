@@ -41,10 +41,6 @@ public class AstrixBeanFactory {
 	public <T> T getBean(final AstrixBeanKey<T> key) {
 		return new CircularDependencyAwareAstrixBeanInstances().getBean(key);
 	}
-	
-	public <T> Set<AstrixBeanKey<T>> getBeanKeysOfType(Class<T> type) {
-		return this.registry.getBeansOfType(type);
-	}
 
 	@PreDestroy
 	public void destroy() {

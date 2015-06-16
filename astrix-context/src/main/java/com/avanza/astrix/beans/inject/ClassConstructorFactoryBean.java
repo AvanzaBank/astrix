@@ -29,7 +29,7 @@ import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 
-class ClassConstructorFactoryBean<T> implements StandardFactoryBean<T> {
+public final class ClassConstructorFactoryBean<T> implements StandardFactoryBean<T> {
 	
 	private AstrixBeanKey<T> beanKey;
 	private Class<? extends T> beanImplClass;
