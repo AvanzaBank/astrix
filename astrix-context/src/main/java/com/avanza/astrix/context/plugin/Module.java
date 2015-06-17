@@ -15,14 +15,11 @@
  */
 package com.avanza.astrix.context.plugin;
 
-public interface PluginContext {
+
+// TODO : remove @Module annotation?
+@com.avanza.astrix.core.AstrixPlugin
+public interface Module {
 	
-	<T> void bind(Class<T> type, Class<? extends T> providerType);
-
-	<T> void bind(Class<T> type, T provider);
-
-	void export(Class<?> pluginType);
+	void prepare(ModuleContext moduleContext);
 	
-	<T> void importPlugin(Class<T> pluginType);
-
 }

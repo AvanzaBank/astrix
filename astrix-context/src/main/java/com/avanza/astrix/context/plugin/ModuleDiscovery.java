@@ -23,9 +23,9 @@ import java.util.ServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class PluginDiscovery {
+class ModuleDiscovery {
 	
-	private static Logger log = LoggerFactory.getLogger(PluginDiscovery.class);
+	private static Logger log = LoggerFactory.getLogger(ModuleDiscovery.class);
 	
 	// TODO: remove?
 	private static <T> T discoverOnePlugin(Class<T> type) {
@@ -37,6 +37,17 @@ class PluginDiscovery {
 			throw new IllegalStateException("Multiple providers found for plugin: " + type + ". Plugins: " + plugins);
 		}
 		return plugins.get(0);
+	}
+	
+	static List<Module> loadModules() {
+		Iterator<Module> modules = ServiceLoader.load(Module.class).iterator();		
+		List<Module> result = new ArrayList<>();
+		while (modules.hasNext()) {
+			Module module = modules.next();
+			log.debug("Discovered module. module={} pluginProviderType={}", module.getClass().getName());
+			result.add(module);
+		}
+		return result; 
 	}
 
 	static <T> List<T> discoverAllPlugins(Class<T> type) {

@@ -25,6 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
@@ -34,25 +37,32 @@ import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.inject.ClassConstructorFactoryBean;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
-public class PluginManager {
+public class ModuleManager {
 	
-	private final ConcurrentMap<Class<?>, PluginInstance> pluginByExportedType = new ConcurrentHashMap<>();
-	private final List<PluginInstance> pluginInstances = new CopyOnWriteArrayList<>();
+	private final Logger log = LoggerFactory.getLogger(ModuleManager.class);
+	private final ConcurrentMap<Class<?>, ModuleInstance> moduleByExportedType = new ConcurrentHashMap<>();
+	private final List<ModuleInstance> moduleInstances = new CopyOnWriteArrayList<>();
 
-	public void register(AstrixPlugin plugin) {
-		PluginInstance pluginInstance = new PluginInstance(plugin);
-		for (Class<?> exportedType : pluginInstance.getExports()) {
-			pluginByExportedType.put(exportedType, pluginInstance);
-			pluginInstances.add(pluginInstance);
+	public void register(Module module) {
+		ModuleInstance moduleInstance = new ModuleInstance(module);
+		moduleInstances.add(moduleInstance);
+		for (Class<?> exportedType : moduleInstance.getExports()) {
+			ModuleInstance alreadyRegisteredProvider = moduleByExportedType.putIfAbsent(exportedType, moduleInstance);
+			if (alreadyRegisteredProvider != null) {
+				log.warn("Type already exported by another module. Ignoring export. type={} usedModule={} ignoredModule={}", 
+						exportedType.getName(),
+						alreadyRegisteredProvider.getName(),
+						moduleInstance.getName());
+			}
 		}
 	}
 
-	public <T> T getPluginInstance(Class<T> type) {
-		PluginInstance pluginInstance = pluginByExportedType.get(type);
-		if (pluginInstance == null) {
+	public <T> T getInstance(Class<T> type) {
+		ModuleInstance moduleInstance = moduleByExportedType.get(type);
+		if (moduleInstance == null) {
 			throw new IllegalArgumentException("Non exported type: " + type);
 		}
-		return pluginInstance.getInstance(type);
+		return moduleInstance.getInstance(type);
 	}
 	
 	public static class ClassConstructorFactoryBeanRegistry implements AstrixFactoryBeanRegistry {
@@ -74,26 +84,26 @@ public class PluginManager {
 		}
 	}
 	
-	public static class ExportedPluginFactoryBean<T> implements StandardFactoryBean<T> {
+	public static class ExportedModuleFactoryBean<T> implements StandardFactoryBean<T> {
 		private AstrixBeanKey<T> beanKey;
-		private PluginManager pluginManager;
+		private ModuleManager moduleManager;
 		
-		public ExportedPluginFactoryBean(AstrixBeanKey<T> beanKey, PluginManager pluginManager) {
+		public ExportedModuleFactoryBean(AstrixBeanKey<T> beanKey, ModuleManager moduleManager) {
 			this.beanKey = beanKey;
-			this.pluginManager = pluginManager;
+			this.moduleManager = moduleManager;
 		}
 
 		@Override
 		public T create(AstrixBeans beans) {
 			/*
-			 * Wraps retrieved plugin instance in proxy in order to avoid
-			 * that the retrieved plugin instance receives lifecycle callbacks
-			 * from the Injector used by the importing plugin instance.
+			 * Wraps retrieved module instance in proxy in order to avoid
+			 * that the retrieved module instance receives lifecycle callbacks
+			 * from the Injector used by the importing module instance.
 			 */
 			return ReflectionUtil.newProxy(beanKey.getBeanType(), new InvocationHandler() {
 				@Override
 				public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-					return pluginManager.getPluginInstance(beanKey.getBeanType());
+					return moduleManager.getInstance(beanKey.getBeanType());
 				}
 			});
 		}
@@ -105,18 +115,18 @@ public class PluginManager {
 		
 	}
 	
-	public class PluginInstance {
+	public class ModuleInstance {
 		
 		private final AstrixInjector injector;
-		private final AstrixPlugin plugin;
+		private final Module module;
 		private final HashSet<Class<?>> exports;
 		private final ClassConstructorFactoryBeanRegistry imports = new ClassConstructorFactoryBeanRegistry();
 		
-		public PluginInstance(AstrixPlugin plugin) {
-			this.plugin = plugin;
+		public ModuleInstance(Module module) {
+			this.module = module;
 			this.exports = new HashSet<>();
 			this.injector = new AstrixInjector(imports);
-			this.plugin.prepare(new PluginContext() {
+			this.module.prepare(new ModuleContext() {
 				@Override
 				public <T> void bind(Class<T> type, Class<? extends T> providerType) {
 					injector.bind(type, providerType);
@@ -126,23 +136,28 @@ public class PluginManager {
 					injector.bind(type, provider);
 				}
 				@Override
-				public void export(Class<?> pluginType) {
-					exports.add(pluginType);
+				public void export(Class<?> moduleType) {
+					exports.add(moduleType);
 				}
 				@Override
-				public <T> void importPlugin(final Class<T> pluginType) {
-					injector.bind(pluginType, new ExportedPluginFactoryBean<>(AstrixBeanKey.create(pluginType), PluginManager.this));
+				public <T> void importPlugin(final Class<T> moduleType) {
+					injector.bind(moduleType, new ExportedModuleFactoryBean<>(AstrixBeanKey.create(moduleType), ModuleManager.this));
 				}
 			});
+			
 		}
 
+		public String getName() {
+			return module.getClass().getName();
+		}
+		
 		public Set<Class<?>> getExports() {
 			return this.exports;
 		}
 
 		public <T> T getInstance(Class<T> type) {
 			if (!getExports().contains(type)) {
-				throw new IllegalArgumentException("Plugin does not export type=" + type);
+				throw new IllegalArgumentException("Module does not export type=" + type);
 			}
 			return injector.getBean(type);
 		}
@@ -153,15 +168,15 @@ public class PluginManager {
 	}
 
 	public void destroy() {
-		for (PluginInstance pluginInstance : this.pluginInstances) {
-			pluginInstance.destroy();
+		for (ModuleInstance moduleInstance : this.moduleInstances) {
+			moduleInstance.destroy();
 		}
 	}
 
 	public void autoDiscover() {
-		List<AstrixPlugin> plugins = PluginDiscovery.discoverAllPlugins(AstrixPlugin.class);
-		for (AstrixPlugin plugin : plugins) {
-			register(plugin);
+		List<Module> modules = ModuleDiscovery.loadModules();
+		for (Module module : modules) {
+			register(module);
 		}
 	}
 

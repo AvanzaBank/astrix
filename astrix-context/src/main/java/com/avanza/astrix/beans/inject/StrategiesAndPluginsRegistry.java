@@ -26,7 +26,7 @@ import com.avanza.astrix.core.AstrixPlugin;
 import com.avanza.astrix.core.AstrixStrategy;
 
 /**
- * Replace with PluginManager instance
+ * Replace with ModuleManager instance
  *
  */
 @Deprecated
