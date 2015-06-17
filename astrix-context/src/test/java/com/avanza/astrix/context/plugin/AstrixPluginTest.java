@@ -63,6 +63,21 @@ public class AstrixPluginTest {
 		assertEquals(1, pingDriver.destroyCount());
 	}
 	
+	@Test
+	public void multipleProvidersForSameTypeAPluginDoesNotDestroyImportedPlugins() throws Exception {
+		PluginManager pluginManager = new PluginManager();
+		pluginManager.register(new DependentPingPlugin());
+		pluginManager.register(new PingDriverPlugin());
+		
+		Ping ping = pluginManager.getPluginInstance(Ping.class);
+		PingDriver pingDriver = pluginManager.getPluginInstance(PingDriver.class);
+		
+		pluginManager.destroy();
+		
+		assertEquals(1, ping.destroyCount());
+		assertEquals(1, pingDriver.destroyCount());
+	}
+	
 	@com.avanza.astrix.core.AstrixPlugin
 	public interface Ping {
 		String ping(String msg);

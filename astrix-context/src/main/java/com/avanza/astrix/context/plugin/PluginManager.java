@@ -158,4 +158,11 @@ public class PluginManager {
 		}
 	}
 
+	public void autoDiscover() {
+		List<AstrixPlugin> plugins = PluginDiscovery.discoverAllPlugins(AstrixPlugin.class);
+		for (AstrixPlugin plugin : plugins) {
+			register(plugin);
+		}
+	}
+
 }

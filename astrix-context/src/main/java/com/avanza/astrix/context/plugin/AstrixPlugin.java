@@ -16,6 +16,8 @@
 package com.avanza.astrix.context.plugin;
 
 
+// TODO : remove @AstrixPlugin annotation?
+@com.avanza.astrix.core.AstrixPlugin
 public interface AstrixPlugin {
 	
 	void prepare(PluginContext pluginContext);

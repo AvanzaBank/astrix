@@ -29,8 +29,6 @@ import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.core.AstrixPlugin;
-import com.avanza.astrix.core.AstrixStrategy;
-import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -40,12 +38,6 @@ public class AstrixInjector {
 	
 	private InjectingBeanFactoryRegistry beanFactoryRegistry;
 	private AstrixBeanFactory beanFactory;
-	
-	public AstrixInjector(AstrixPlugins plugins, AstrixStrategies strategies) {
-		this.beanFactoryRegistry = new InjectingBeanFactoryRegistry(new StrategiesAndPluginsRegistry(plugins, strategies));
-		this.beanFactory = new AstrixBeanFactory(beanFactoryRegistry);
-		this.beanFactory.registerBeanPostProcessor(new AstrixBeanDependencyInjectionBeanPostProcessor());
-	}
 	
 	public AstrixInjector(AstrixFactoryBeanRegistry fallbackRegistry) {
 		this.beanFactoryRegistry = new InjectingBeanFactoryRegistry(fallbackRegistry);
@@ -78,49 +70,6 @@ public class AstrixInjector {
 	
 	public <T> T getBean(Class<T> type) {
 		return beanFactory.getBean(AstrixBeanKey.create(type));
-	}
-	
-	public class StrategiesAndPluginsRegistry implements AstrixFactoryBeanRegistry {
-		
-		private final AstrixPlugins plugins;
-		private final AstrixStrategies strategies;
-		
-		public StrategiesAndPluginsRegistry(AstrixPlugins plugins, AstrixStrategies strategies) {
-			this.plugins = plugins;
-			this.strategies = strategies;
-		}
-
-		public <T> StandardFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey) {
-			if (beanKey.getBeanType().isAnnotationPresent(AstrixStrategy.class) && !beanKey.isQualified()) {
-				return strategies.getFactory(beanKey.getBeanType());
-			}
-			if (beanKey.getBeanType().isAnnotationPresent(AstrixPlugin.class)) {
-				return new AstrixPluginFactoryBean<>(beanKey, plugins);
-			} 
-			// TODO: This is not a strategy or plugin
-			return new ClassConstructorFactoryBean<>(beanKey, beanKey.getBeanType());
-		}
-
-		public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
-			Set<AstrixBeanKey<T>> result = new HashSet<>();
-			if (isPlugin(type)) {
-				// Plugin
-				for (T plugin : plugins.getPlugins(type)) {
-					result.add(AstrixBeanKey.create(type, plugin.getClass().getName()));
-				}
-				return result;
-			}
-			return result;
-		}
-
-		private <T> boolean isPlugin(Class<T> type) {
-			return type.isAnnotationPresent(AstrixPlugin.class);
-		}
-
-		@Override
-		public <T> AstrixBeanKey<? extends T> resolveBean(AstrixBeanKey<T> beanKey) {
-			return beanKey;
-		}
 	}
 	
 	public class InjectingBeanFactoryRegistry implements AstrixFactoryBeanRegistry {
@@ -183,7 +132,7 @@ public class AstrixInjector {
 		}
 	}
 
-	private static class AstrixPluginFactoryBean<T> implements StandardFactoryBean<T> {
+	static class AstrixPluginFactoryBean<T> implements StandardFactoryBean<T> {
 		
 		private AstrixBeanKey<T> beanKey;
 		private AstrixPlugins plugins;

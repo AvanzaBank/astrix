@@ -44,6 +44,7 @@ import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.inject.AstrixPlugins;
 import com.avanza.astrix.beans.inject.AstrixStrategies;
+import com.avanza.astrix.beans.inject.StrategiesAndPluginsRegistry;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
 import com.avanza.astrix.beans.publish.ApiProviders;
@@ -56,6 +57,9 @@ import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.SystemPropertiesConfigSource;
+import com.avanza.astrix.context.plugin.AstrixPlugin;
+import com.avanza.astrix.context.plugin.PluginContext;
+import com.avanza.astrix.context.plugin.PluginManager;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
@@ -74,6 +78,7 @@ public class AstrixConfigurer {
 	private ApiProviders astrixApiProviders;
 	private final Collection<StandardFactoryBean<?>> standaloneFactories = new LinkedList<>();
 	private final List<AstrixPlugins.Plugin<?>> plugins = new ArrayList<>();
+	private final List<AstrixPlugin> newPlugins = new ArrayList<>();
 	private final Map<Class<?>, Object> strategyInstanceByStrategyType = new HashMap<>();
 	private final MapConfigSource settings = new MapConfigSource();
 	
@@ -90,9 +95,12 @@ public class AstrixConfigurer {
 	 */
 	public AstrixContext configure() {
 		config = createDynamicConfig();
+		
+//		PluginManager pluginManager = getPluginManager();
+		
 		AstrixPlugins astrixPlugins = getPlugins();
 		AstrixStrategies astrixStrategies = new AstrixStrategies(config, strategyInstanceByStrategyType);
-		AstrixInjector injector = new AstrixInjector(astrixPlugins, astrixStrategies);
+		AstrixInjector injector = new AstrixInjector(new StrategiesAndPluginsRegistry(astrixPlugins, astrixStrategies));
 		injector.bind(DynamicConfig.class, config);
 		injector.bind(AstrixContext.class, AstrixContextImpl.class);
 		injector.bind(AstrixFactoryBeanRegistry.class, SimpleAstrixFactoryBeanRegistry.class);
@@ -104,6 +112,20 @@ public class AstrixConfigurer {
 			context.registerBeanFactory(beanFactory);
 		}
 		return context;
+	}
+	
+	private PluginManager getPluginManager() {
+		PluginManager result = new PluginManager();
+		// TODO: move versioning configuration
+		if (!AstrixSettings.ENABLE_VERSIONING.getFrom(config).get()) {
+			registerPlugin(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Default.create());
+		}
+		for (AstrixPlugin plugin : newPlugins) {
+			result.register(plugin);
+		}
+		result.autoDiscover();
+		
+		return result;
 	}
 	
 	private AstrixPlugins getPlugins() {
@@ -236,8 +258,15 @@ public class AstrixConfigurer {
 	}
 	
 	// package private. Used for internal testing only
-	<T> AstrixConfigurer registerPlugin(Class<T> c, T provider) {
-		plugins.add(new AstrixPlugins.Plugin<>(c, Arrays.asList(provider)));
+	<T> AstrixConfigurer registerPlugin(final Class<T> type, final T provider) {
+		plugins.add(new AstrixPlugins.Plugin<>(type, Arrays.asList(provider)));
+		newPlugins.add(new AstrixPlugin() {
+			@Override
+			public void prepare(PluginContext pluginContext) {
+				pluginContext.bind(type, provider);
+				pluginContext.export(type);
+			}
+		});
 		return this;
 	}
 	

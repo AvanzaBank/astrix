@@ -35,7 +35,7 @@ public class AstrixInjectorTest {
 	
 	@Test
 	public void boundBeansRefersToSameBeanInstanceAsItsImplementationClass() throws Exception {
-		AstrixInjector injector = new AstrixInjector(plugins, strategies);
+		AstrixInjector injector = new AstrixInjector(new StrategiesAndPluginsRegistry(plugins, strategies));
 		injector.bind(FooPlugin.class, FooImpl.class);
 		
 		FooPlugin fooBean = injector.getBean(FooPlugin.class);
@@ -46,7 +46,7 @@ public class AstrixInjectorTest {
 	@Test
 	public void pluginInstanceDoesNotReferToTheSameBeanInstancaAsItsImplementationClass() throws Exception {
 		plugins.registerPlugin(FooPlugin.class, new FooImpl());
-		AstrixInjector injector = new AstrixInjector(plugins, strategies);
+		AstrixInjector injector = new AstrixInjector(new StrategiesAndPluginsRegistry(plugins, strategies));
 		
 		FooPlugin fooBean = injector.getBean(FooPlugin.class);
 		FooImpl fooImplBean = injector.getBean(FooImpl.class);
@@ -58,7 +58,7 @@ public class AstrixInjectorTest {
 		AstrixPlugins plugins = new AstrixPlugins();
 		plugins.registerPlugin(FooPlugin.class, new FooImpl());
 		plugins.registerPlugin(FooPlugin.class, new FooImpl2());
-		AstrixInjector injector = new AstrixInjector(plugins, strategies);
+		AstrixInjector injector = new AstrixInjector(new StrategiesAndPluginsRegistry(plugins, strategies));
 		
 		FooConsumer fooConsumer = injector.getBean(FooConsumer.class);
 		assertEquals(2, fooConsumer.foos.size());
