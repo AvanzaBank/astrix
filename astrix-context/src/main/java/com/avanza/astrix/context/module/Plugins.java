@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.plugin;
+package com.avanza.astrix.context.module;
 
+import java.util.Collection;
 
-// TODO : remove @Module annotation?
-@com.avanza.astrix.core.AstrixPlugin
-public interface Module {
+public interface Plugins {
 	
-	void prepare(ModuleContext moduleContext);
+	<T> Collection<T> getPlugins(Class<T> pluginType);
 	
+	<T> T getPlugin(Class<T> pluginType, String pluginQualifier);
+	
+	<T> void registerPlugin(Class<T> plugin, String pluginQualifier, T instance);
+
 }

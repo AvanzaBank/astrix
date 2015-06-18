@@ -19,7 +19,7 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 
-class AlreadyInstantiatedFactoryBean<T> implements StandardFactoryBean<T> {
+public class AlreadyInstantiatedFactoryBean<T> implements StandardFactoryBean<T> {
 
 	private AstrixBeanKey<T> beanKey;
 	private T instance;

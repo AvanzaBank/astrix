@@ -13,13 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.plugin;
+package com.avanza.astrix.context.module;
 
 import static org.junit.Assert.assertEquals;
+
+import java.util.Collection;
 
 import javax.annotation.PreDestroy;
 
 import org.junit.Test;
+
+import com.avanza.astrix.context.module.Module;
+import com.avanza.astrix.context.module.ModuleContext;
+import com.avanza.astrix.context.module.ModuleManager;
 
 
 public class ModuleTest {
@@ -76,7 +82,40 @@ public class ModuleTest {
 		assertEquals("not reversed", ping.ping("not reversed"));
 	}
 	
+//	@Test
+	public void pluginSupport() throws Exception {
+		ModuleManager moduleManager = new ModuleManager();
+		moduleManager.register(new Module() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.importType(Plugins.class);
+				moduleContext.export(PingPluginCollector.class);
+			}
+		});
+		moduleManager.register(new Module() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(Ping.class, NormalPing.class);
+				moduleContext.export(Ping.class);
+			}
+		});
+		moduleManager.register(new Module() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(Ping.class, NormalPing.class);
+				moduleContext.export(Ping.class);
+			}
+		});
+		
+		PingPluginCollector pingPluginCollector = moduleManager.getInstance(PingPluginCollector.class);
+		assertEquals(2, pingPluginCollector.pingPluginCount());
+	}
+	
 	public interface Ping {
+		String ping(String msg);
+	}
+	
+	public interface PingPlugin {
 		String ping(String msg);
 	}
 	
@@ -102,7 +141,21 @@ public class ModuleTest {
 		}
 	}
 	
-	public static class NormalPing implements Ping {
+	public static class PingPluginCollector {
+		private final Collection<PingPlugin> pingPlugins;
+
+		public PingPluginCollector(Plugins plugins) {
+			this.pingPlugins = plugins.getPlugins(PingPlugin.class);
+		}
+		
+		public int pingPluginCount() {
+			return pingPlugins.size();
+		}
+		
+		
+	}
+	
+	public static class NormalPing implements Ping, PingPlugin {
 		@Override
 		public String ping(String msg) {
 			return msg;
@@ -177,7 +230,7 @@ public class ModuleTest {
 		@Override
 		public void prepare(ModuleContext context) {
 			context.bind(Ping.class, DependentPing.class);
-			context.importPlugin(PingDriver.class);
+			context.importType(PingDriver.class);
 			context.export(Ping.class);
 		}
 

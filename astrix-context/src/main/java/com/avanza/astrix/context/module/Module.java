@@ -13,28 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.plugin;
+package com.avanza.astrix.context.module;
 
-public interface ModuleContext {
+
+// TODO : remove @Module annotation?
+@com.avanza.astrix.core.AstrixPlugin
+public interface Module {
 	
-	<T> void bind(Class<T> type, Class<? extends T> providerType);
-
-	<T> void bind(Class<T> type, T provider);
-
-	/**
-	 * Exports a given type provided by this module. Exported types are
-	 * available to be imported by other modules.
-	 * 
-	 * @param type
-	 */
-	void export(Class<?> type);
+	void prepare(ModuleContext moduleContext);
 	
-	/**
-	 * Imports a given type. Imported types are available for consumption by
-	 * internal classes in this module.
-	 * 
-	 * @param type
-	 */
-	<T> void importPlugin(Class<T> type);
-
 }

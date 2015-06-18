@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.plugin;
+package com.avanza.astrix.context.module;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,11 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
-import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
-import com.avanza.astrix.beans.factory.MissingBeanProviderException;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.beans.inject.AstrixInjector;
-import com.avanza.astrix.beans.inject.ClassConstructorFactoryBean;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
 public class ModuleManager {
@@ -63,25 +58,6 @@ public class ModuleManager {
 			throw new IllegalArgumentException("Non exported type: " + type);
 		}
 		return moduleInstance.getInstance(type);
-	}
-	
-	public static class ClassConstructorFactoryBeanRegistry implements AstrixFactoryBeanRegistry {
-		@Override
-		public <T> StandardFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey) {
-			Class<T> beanType = beanKey.getBeanType();
-			if (Modifier.isAbstract(beanType.getModifiers()) || beanType.isInterface()) {
-				throw new MissingBeanProviderException(beanKey);
-			}
-			return new ClassConstructorFactoryBean<>(beanKey, beanKey.getBeanType());
-		}
-		@Override
-		public <T> AstrixBeanKey<? extends T> resolveBean(AstrixBeanKey<T> beanKey) {
-			return beanKey;
-		}
-		@Override
-		public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
-			return new HashSet<>();
-		}
 	}
 	
 	public static class ExportedModuleFactoryBean<T> implements StandardFactoryBean<T> {
@@ -117,15 +93,14 @@ public class ModuleManager {
 	
 	public class ModuleInstance {
 		
-		private final AstrixInjector injector;
+		private final ModuleInjector injector;
 		private final Module module;
 		private final HashSet<Class<?>> exports;
-		private final ClassConstructorFactoryBeanRegistry imports = new ClassConstructorFactoryBeanRegistry();
 		
 		public ModuleInstance(Module module) {
 			this.module = module;
 			this.exports = new HashSet<>();
-			this.injector = new AstrixInjector(imports);
+			this.injector = new ModuleInjector();
 			this.module.prepare(new ModuleContext() {
 				@Override
 				public <T> void bind(Class<T> type, Class<? extends T> providerType) {
@@ -140,7 +115,7 @@ public class ModuleManager {
 					exports.add(moduleType);
 				}
 				@Override
-				public <T> void importPlugin(final Class<T> moduleType) {
+				public <T> void importType(final Class<T> moduleType) {
 					injector.bind(moduleType, new ExportedModuleFactoryBean<>(AstrixBeanKey.create(moduleType), ModuleManager.this));
 				}
 			});

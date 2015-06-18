@@ -30,10 +30,10 @@ import com.avanza.astrix.beans.inject.AstrixInjector;
  */
 public class AstrixSpringContext {
 	
-	/* TODO: Depending on AstrixInjector feels weird... 
+	/* TODO: Depending on ModuleInjector feels weird... 
 	 * It would be more natural to depend on AstrixContext but it causes circular dependency
 	 * right now. When introducing "service-unit" as a concept then this class should depend on
-	 * ServiceUnitContext instead of AstrixInjector.. 
+	 * ServiceUnitContext instead of ModuleInjector.. 
 	 */
 	
 	private AstrixInjector astrixInjector;
