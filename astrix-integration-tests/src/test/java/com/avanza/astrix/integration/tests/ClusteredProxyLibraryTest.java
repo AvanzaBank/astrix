@@ -63,7 +63,7 @@ public class ClusteredProxyLibraryTest {
 		GigaSpace proxy = lunchPu.getClusteredGigaSpace();
 		proxy.clear(null);
 		
-		configurer.enableFaultTolerance(true);
+		configurer.enableFaultTolerance(false);
 		configurer.enableVersioning(true);
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1000);
 		configurer.setConfig(DynamicConfig.create(serviceRegistry));

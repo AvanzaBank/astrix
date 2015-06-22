@@ -21,10 +21,50 @@ import org.openspaces.core.GigaSpace;
 
 public class RunningPuImpl implements RunningPu {
 
-	private PuRunner runner;
+	private final PuRunner runner;
+	private volatile State state;
+	
+	enum State {
+		NEW {
+			@Override
+			State start(PuRunner runner) throws Exception {
+				runner.run();
+				return RUNNING;
+			}
+			@Override
+			State stop(PuRunner runner) {
+				return CLOSED;
+			}
+		},
+		RUNNING {
+			@Override
+			State start(PuRunner runner) {
+				throw new IllegalStateException("Pu already running!");
+			}
+			@Override
+			State stop(PuRunner runner) throws Exception {
+				runner.shutdown();
+				return CLOSED;
+			}
+		},
+		CLOSED {
+			@Override
+			State start(PuRunner runner) throws Exception {
+				runner.run();
+				return RUNNING;
+			}
+			@Override
+			State stop(PuRunner runner) {
+				return CLOSED;
+			}
+		};
+		abstract State start(PuRunner runner) throws Exception;
+		abstract State stop(PuRunner runner) throws Exception;
+	}
 	
 	public RunningPuImpl(PuRunner runner) {
 		this.runner = runner;
+		this.state = State.NEW;
 	}
 
 	@Override
@@ -34,11 +74,13 @@ public class RunningPuImpl implements RunningPu {
 			public void evaluate() throws Throwable {
 				System.setProperty("com.gs.jini_lus.groups", runner.getLookupGroupName());
 				try {
-					runner.run();
+					if (runner.autostart()) {
+						start();
+					}
 					base.evaluate();
 				} finally {
 					try {
-						runner.shutdown();
+						stop();
 					} catch (Exception e) {
 						// Ignore
 					}
@@ -50,12 +92,17 @@ public class RunningPuImpl implements RunningPu {
 
 	@Override
 	public void close() throws Exception {
-		this.runner.shutdown();
+		stop();
 	}
 	
 	@Override
-	public void start() throws Exception {
-		this.runner.run();
+	public synchronized void start() throws Exception {
+		this.state = this.state.start(this.runner);
+	}
+	
+	@Override
+	public synchronized void stop() throws Exception {
+		this.state = this.state.stop(this.runner);
 	}
 
 	@Override

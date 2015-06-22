@@ -24,8 +24,8 @@ import org.openspaces.core.GigaSpace;
 
 public class AsyncPuRunner implements PuRunner {
 
-	private PuRunner puRunner;
-	private final ExecutorService worker = Executors.newSingleThreadExecutor();
+	private final PuRunner puRunner;
+	private volatile ExecutorService worker;
 	
 	public AsyncPuRunner(PuRunner puRunner) {
 		this.puRunner = puRunner;
@@ -33,6 +33,7 @@ public class AsyncPuRunner implements PuRunner {
 
 	@Override
 	public void run() throws Exception {
+		worker = Executors.newSingleThreadExecutor();
 		worker.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -61,6 +62,11 @@ public class AsyncPuRunner implements PuRunner {
 	@Override
 	public String getLookupGroupName() {
 		return puRunner.getLookupGroupName();
+	}
+	
+	@Override
+	public boolean autostart() {
+		return puRunner.autostart();
 	}
 
 	@Override

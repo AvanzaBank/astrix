@@ -18,8 +18,8 @@ package com.avanza.astrix.integration.tests;
 import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
 
 import org.hamcrest.Description;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
 
@@ -48,22 +48,23 @@ public class LocalViewDisconnectionTest {
 
 	private AstrixConfigurer configurer = new AstrixConfigurer();
 	private AstrixContext astrix;
-	private RunningPu lunchPu;
 	
-	@Before
+	@Rule
+	public RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
+											  .numberOfPrimaries(1)
+											  .numberOfBackups(0)
+									  		  .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
+											  .startAsync(false)
+											  .configure();
+	
+	@Before	
 	public void setup() throws Exception {
-		startPu();
-		configurer.enableFaultTolerance(true);
+		configurer.enableFaultTolerance(false);
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
 		configurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 100);
 		configurer.setConfig(DynamicConfig.create(serviceRegistry));
 		configurer.setSubsystem("lunch-system");
 		astrix = configurer.configure();
-	}
-	
-	@After
-	public void after() throws Exception {
-		stopPu();
 	}
 	
 	@Test
@@ -89,21 +90,15 @@ public class LocalViewDisconnectionTest {
 	}
 
 	private void startPu() throws Exception {
-		lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
-				  .numberOfPrimaries(1)
-				  .numberOfBackups(0)
-		  		  .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
-				  .startAsync(true)
-				  .configure();
 		lunchPu.start();
 	}
 
 	private void stopPu() throws Exception {
-		lunchPu.close();
+		lunchPu.stop();
 	}
 
 	private void assertEventually(Probe probe) throws InterruptedException {
-		new Poller(10000, 25).check(probe);
+		new Poller(10000, 100).check(probe);
 	}
 
 	private Probe objectCount(final GigaSpace localView, final Object template, final int expected) {

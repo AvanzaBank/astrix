@@ -18,7 +18,6 @@ package com.avanza.astrix.gs.test.util;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.UUID;
 
 public final class PartitionedPuConfigurer {
 	
@@ -28,7 +27,8 @@ public final class PartitionedPuConfigurer {
 	boolean startAsync = true;
 	Properties contextProperties = new Properties();
 	Map<String, Properties> beanProperies = new HashMap<>();
-	String lookupGroupName = UUID.randomUUID().toString();
+	String lookupGroupName = JVMGlobalLus.getLookupGroupName();
+	public boolean autostart = true;
 
 	public PartitionedPuConfigurer(String puXmlPath) {
 		this.puXmlPath = puXmlPath;
@@ -73,6 +73,11 @@ public final class PartitionedPuConfigurer {
 	
 	public PartitionedPuConfigurer contextProperty(String name, String value) {
 		this.contextProperties.setProperty(name, value);
+		return this;
+	}
+
+	public PartitionedPuConfigurer autostart(boolean autostart) {
+		this.autostart = autostart;
 		return this;
 	}
 

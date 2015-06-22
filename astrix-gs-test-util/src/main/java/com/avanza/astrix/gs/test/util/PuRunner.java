@@ -27,4 +27,6 @@ public interface PuRunner {
 
 	GigaSpace getClusteredGigaSpace();
 
+	boolean autostart();
+
 }

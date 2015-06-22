@@ -19,11 +19,15 @@ import org.junit.rules.TestRule;
 import org.openspaces.core.GigaSpace;
 
 public interface RunningPu extends TestRule, AutoCloseable  {
+	
+	// TODO: Rename to ManagedPu
 
 	String getLookupGroupName();
 
 	GigaSpace getClusteredGigaSpace();
 
 	void start() throws Exception;
+	
+	void stop() throws Exception;
 	
 }

@@ -42,6 +42,7 @@ public final class PartitionedPu implements PuRunner {
 	private Properties contextProperties = new Properties();
 	private Map<String, Properties> beanProperies = new HashMap<>();
 	private String lookupGroupName;
+	private boolean autostart;
 
 	public PartitionedPu(PartitionedPuConfigurer configurer) {
 		this.puXmlPath = configurer.puXmlPath;
@@ -50,6 +51,7 @@ public final class PartitionedPu implements PuRunner {
 		this.contextProperties.putAll(configurer.contextProperties);
 		this.beanProperies.putAll(configurer.beanProperies);
 		this.lookupGroupName = configurer.lookupGroupName;
+		this.autostart = configurer.autostart;
 	}
 
 	@Override
@@ -98,6 +100,10 @@ public final class PartitionedPu implements PuRunner {
 	@Override
 	public String getLookupGroupName() {
 		return this.lookupGroupName;
+	}
+	
+	public boolean autostart() {
+		return this.autostart ;
 	}
 	
 	@Override
