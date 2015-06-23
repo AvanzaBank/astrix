@@ -15,8 +15,8 @@
  */
 package com.avanza.astrix.test.util;
 
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -24,7 +24,7 @@ import org.junit.runners.model.Statement;
 
 public class AutoCloseableRule implements TestRule {
 
-	private final List<AutoCloseable> autoClosables = new LinkedList<AutoCloseable>();
+	private final List<AutoCloseable> autoClosables = new CopyOnWriteArrayList<>();
 	
 	@Override
 	public Statement apply(final Statement base, Description description) {

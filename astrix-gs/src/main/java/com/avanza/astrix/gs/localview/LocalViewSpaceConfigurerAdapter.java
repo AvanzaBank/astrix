@@ -25,8 +25,7 @@ public class LocalViewSpaceConfigurerAdapter implements LocalViewDefinition {
 	
 	private final LocalViewSpaceConfigurer localViewSpaceConfigurer;
 
-	public LocalViewSpaceConfigurerAdapter(
-			LocalViewSpaceConfigurer localViewSpaceConfigurer) {
+	public LocalViewSpaceConfigurerAdapter(LocalViewSpaceConfigurer localViewSpaceConfigurer) {
 		this.localViewSpaceConfigurer = localViewSpaceConfigurer;
 	}
 

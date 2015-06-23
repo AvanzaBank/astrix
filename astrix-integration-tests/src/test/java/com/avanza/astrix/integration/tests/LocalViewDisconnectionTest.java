@@ -17,9 +17,9 @@ package com.avanza.astrix.integration.tests;
 
 import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
 
+import org.apache.log4j.Level;
 import org.hamcrest.Description;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
@@ -40,7 +40,6 @@ import com.avanza.astrix.test.util.AutoCloseableRule;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 
-@Ignore
 public class LocalViewDisconnectionTest {
 	
 	private InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
@@ -69,6 +68,7 @@ public class LocalViewDisconnectionTest {
 		configurer.enableFaultTolerance(false);
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
 		configurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 100);
+		configurer.set(AstrixSettings.GS_LOCAL_VIEW_MAX_DISCONNECTION_TIME, 1000L);
 		configurer.setConfig(DynamicConfig.create(serviceRegistry));
 		configurer.setSubsystem("lunch-system");
 		astrix = autoClosables.add(configurer.configure());
@@ -91,6 +91,7 @@ public class LocalViewDisconnectionTest {
 						return localView.count(LunchRestaurant.template());
 					}
 				}, AstrixTestUtil.isExceptionOfType(ServiceUnavailableException.class)));
+
 
 		startPu();
 		assertEventually(objectCount(localView, LunchRestaurant.template(), 0));

@@ -35,6 +35,8 @@ import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.DynamicIntProperty;
+import com.avanza.astrix.config.DynamicLongProperty;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
@@ -64,6 +66,8 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	 */
 	private AstrixInjector injector;
 	private BeanFaultToleranceFactory faultToleranceFactory;
+	private DynamicLongProperty maxDisonnectionTime;
+	private DynamicIntProperty lookupTimeout;
 	
 	@Override
 	public <T> BoundServiceBeanInstance<T> bind(
@@ -83,9 +87,10 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		Class<LocalViewConfigurer> serviceConfigClass = serviceDefinition.getServiceConfigClass(LocalViewConfigurer.class);	
 		LocalViewConfigurer localViewConfigurer = ReflectionUtil.newInstance(serviceConfigClass);
 		UrlSpaceConfigurer gsSpaceConfigurer = new UrlSpaceConfigurer(serviceProperties.getProperty(GsBinder.SPACE_URL_PROPERTY));
-		IJSpace space = gsSpaceConfigurer.lookupTimeout(1_000).create();
+		IJSpace space = gsSpaceConfigurer.lookupTimeout(this.lookupTimeout.get()).create();
 		
 		LocalViewSpaceConfigurer gslocalViewSpaceConfigurer = new LocalViewSpaceConfigurer(space);
+		gslocalViewSpaceConfigurer.maxDisconnectionDuration(this.maxDisonnectionTime.get());
 		localViewConfigurer.configure(new LocalViewSpaceConfigurerAdapter(gslocalViewSpaceConfigurer));
 		
 		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
@@ -169,6 +174,8 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	@Override
 	public void setConfig(DynamicConfig config) {
 		this.disableLocalView = AstrixSettings.GS_DISABLE_LOCAL_VIEW.getFrom(config);
+		this.maxDisonnectionTime = AstrixSettings.GS_LOCAL_VIEW_MAX_DISCONNECTION_TIME.getFrom(config);
+		this.lookupTimeout = AstrixSettings.GS_LOCAL_VIEW_LOOKUP_TIMEOUT.getFrom(config);
 	}
 	
 	private static class BoundLocalViewGigaSpaceBeanInstance implements BoundServiceBeanInstance<GigaSpace> {

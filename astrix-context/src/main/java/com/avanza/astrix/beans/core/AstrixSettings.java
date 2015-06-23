@@ -16,6 +16,7 @@
 package com.avanza.astrix.beans.core;
 
 import com.avanza.astrix.config.BooleanSetting;
+import com.avanza.astrix.config.IntSetting;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.StringSetting;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -94,6 +95,8 @@ public final class AstrixSettings {
 	 * ({@link AstrixServiceComponentNames#GS_LOCAL_VIEW}) will use a regular clustered proxy instead.
 	 */
 	public static final BooleanSetting GS_DISABLE_LOCAL_VIEW = BooleanSetting.create("AstrixGsLocalViewComponent.disableLocalView", false);
+	public static final LongSetting GS_LOCAL_VIEW_MAX_DISCONNECTION_TIME = LongSetting.create("AstrixGsLocalViewComponent.maxDisconnectionTime", 60000L);
+	public static final IntSetting GS_LOCAL_VIEW_LOOKUP_TIMEOUT = IntSetting.create("AstrixGsLocalViewComponent.lookupTimeout", 1000);
 	
 	
 	public static final StringSetting APPLICATION_NAME = StringSetting.create("astrix.application.name", null);
