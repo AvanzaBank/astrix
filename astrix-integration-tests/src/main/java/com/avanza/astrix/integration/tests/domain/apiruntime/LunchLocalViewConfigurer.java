@@ -25,6 +25,6 @@ public class LunchLocalViewConfigurer implements LocalViewConfigurer {
 	@Override
 	public void configure(LocalViewDefinition localView) {
 		localView.addViewQuery(new SQLQuery<LunchRestaurant>());
-		localView.setMaxDisconnectionDuration(1000);
+//		localView.setMaxDisconnectionDuration(1000);
 	}
 }

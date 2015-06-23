@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
 
@@ -36,6 +37,7 @@ import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.api.LunchStatistics;
+import com.avanza.astrix.test.util.AutoCloseableRule;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 
@@ -52,6 +54,9 @@ public class ClusteredProxyLibraryTest {
 									  		  .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
 											  .startAsync(true)
 											  .configure();
+	
+	@Rule
+	public AutoCloseableRule autoClosables = new AutoCloseableRule();
 	
 	private LunchService lunchService;
 
@@ -72,7 +77,7 @@ public class ClusteredProxyLibraryTest {
 	@Test
 	public void aClusteredProxyIsConsumableUsingTheServiceRegistryFromTheSameSubsystem() throws Exception {
 		configurer.setSubsystem("lunch-system");
-		astrix = configurer.configure();
+		astrix = autoClosables.add(configurer.configure());
 		this.lunchService = astrix.waitForBean(LunchService.class, 10000);
 		
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
@@ -83,7 +88,7 @@ public class ClusteredProxyLibraryTest {
 	@Test(expected = ServiceUnavailableException.class)
 	public void aClusteredProxyIsNotConsumableFromAnotherSubsystem() throws Exception {
 		configurer.setSubsystem("another-subsystem");
-		astrix = configurer.configure();
+		astrix = autoClosables.add(configurer.configure());
 		
 		astrix.getBean(LunchStatistics.class).getRestaurantCount();
 	}
@@ -91,7 +96,7 @@ public class ClusteredProxyLibraryTest {
 	@Test
 	public void aClusteredProxyUsesOptimisticLockinWhenMasterSpaceIsConfiguredForOptimisticLocking() throws Exception {
 		configurer.setSubsystem("lunch-system");
-		astrix = configurer.configure();
+		astrix = autoClosables.add(configurer.configure());
 		GigaSpace proxy = astrix.waitForBean(GigaSpace.class, "lunch-space", 10000);
 		assertTrue(proxy.getSpace().isOptimisticLockingEnabled());
 	}
@@ -100,7 +105,7 @@ public class ClusteredProxyLibraryTest {
 	@Test
 	public void localViewTest() throws Exception {
 		configurer.setSubsystem("lunch-system");
-		astrix = configurer.configure();
+		astrix = autoClosables.add(configurer.configure());
 		this.lunchService = astrix.waitForBean(LunchService.class, 10_000L);
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		

@@ -22,6 +22,7 @@ import lunch.api.LunchService;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
@@ -30,6 +31,7 @@ import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
+import com.avanza.astrix.test.util.AutoCloseableRule;
 
 public class LunchIntegrationTest {
 	
@@ -39,6 +41,9 @@ public class LunchIntegrationTest {
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 												   .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
 												   .configure();
+	@Rule
+	public AutoCloseableRule autoClosables = new AutoCloseableRule(); 
+	
 	static {
 		Logger.getLogger("com.avanza").setLevel(Level.DEBUG);
 	}
@@ -48,7 +53,7 @@ public class LunchIntegrationTest {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 500);
 		configurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		AstrixContext astrix = configurer.configure();
+		AstrixContext astrix = autoClosables.add(configurer.configure());
 		LunchService lunchService = astrix.waitForBean(LunchService.class, 15_000);
 		
 		lunchService.addLunchRestaurant(new LunchRestaurant("McDonalds", "Fast Food"));

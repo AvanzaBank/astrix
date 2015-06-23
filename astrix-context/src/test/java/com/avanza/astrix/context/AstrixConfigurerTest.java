@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
@@ -35,8 +36,12 @@ import com.avanza.astrix.beans.publish.ApiProviders;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.DefaultBeanSettings;
 import com.avanza.astrix.provider.core.Service;
+import com.avanza.astrix.test.util.AutoCloseableRule;
 
 public class AstrixConfigurerTest {
+	
+	@Rule
+	public AutoCloseableRule autoClosables = new AutoCloseableRule(); 
 	
 	@Test
 	public void passesBeanSettingsToConfiguration() throws Exception {
@@ -55,7 +60,7 @@ public class AstrixConfigurerTest {
 		configurer.set(intSetting, AstrixBeanKey.create(Ping.class), 21);
 		configurer.set(longSetting, AstrixBeanKey.create(Ping.class), 19);
 		
-		AstrixContextImpl astrixContext = (AstrixContextImpl) configurer.configure();
+		AstrixContextImpl astrixContext = autoClosables.add((AstrixContextImpl) configurer.configure());
 		BeanConfigurations beanConfigurations = astrixContext.getInstance(BeanConfigurations.class);
 		BeanConfiguration pingConfig = beanConfigurations.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
 		
@@ -74,7 +79,7 @@ public class AstrixConfigurerTest {
 			}
 		});
 		
-		AstrixContextImpl astrixContext = (AstrixContextImpl) configurer.configure();
+		AstrixContextImpl astrixContext = autoClosables.add((AstrixContextImpl) configurer.configure());
 		BeanConfigurations beanConfigurations = astrixContext.getInstance(BeanConfigurations.class);
 		BeanConfiguration pingConfig = beanConfigurations.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
 
@@ -91,7 +96,7 @@ public class AstrixConfigurerTest {
 			}
 		});
 		
-		AstrixContextImpl astrixContext = (AstrixContextImpl) configurer.configure();
+		AstrixContextImpl astrixContext = autoClosables.add((AstrixContextImpl) configurer.configure());
 		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(PingAsync.class));
 
 		assertEquals(2000, pingConfig.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());

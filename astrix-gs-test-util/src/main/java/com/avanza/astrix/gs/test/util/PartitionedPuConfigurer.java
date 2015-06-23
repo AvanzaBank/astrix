@@ -28,6 +28,7 @@ public final class PartitionedPuConfigurer {
 	Properties contextProperties = new Properties();
 	Map<String, Properties> beanProperies = new HashMap<>();
 	String lookupGroupName = JVMGlobalLus.getLookupGroupName();
+	String spaceName = "test-space";
 	public boolean autostart = true;
 
 	public PartitionedPuConfigurer(String puXmlPath) {
@@ -78,6 +79,11 @@ public final class PartitionedPuConfigurer {
 
 	public PartitionedPuConfigurer autostart(boolean autostart) {
 		this.autostart = autostart;
+		return this;
+	}
+
+	public PartitionedPuConfigurer spaceName(String spaceName) {
+		this.spaceName = spaceName;
 		return this;
 	}
 

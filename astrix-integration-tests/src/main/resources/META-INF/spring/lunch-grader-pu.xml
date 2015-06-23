@@ -9,8 +9,7 @@
 
 	<context:property-placeholder/>
 	<context:annotation-config />
-	<os-core:space id="space" url="/./lunch-grader-space"
-		mirror="false" />
+	<os-core:space id="space" url="/./${spaceName}" mirror="false" />
 	<os-core:giga-space id="gigaSpace" space="space" />
 
 	<bean id="astrixFrameworkBean" class="com.avanza.astrix.spring.AstrixFrameworkBean">

@@ -33,8 +33,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.hamcrest.Description;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -66,7 +66,7 @@ import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
 import com.avanza.astrix.provider.versioning.Versioned;
 import com.avanza.astrix.serviceunit.ServiceAdministrator;
 import com.avanza.astrix.spring.AstrixFrameworkBean;
-import com.avanza.astrix.test.util.AstrixTestUtil;
+import com.avanza.astrix.test.util.AutoCloseableRule;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
@@ -141,12 +141,16 @@ public class AstrixServiceBlueGreenDeployTest {
 	}};
 	
 
+	
+	@Rule
+	public AutoCloseableRule autoClosables = new AutoCloseableRule();
+	
 	private AstrixContext feeder1clientContext;
 	private AstrixContext feeder2clientContext;
-	private AstrixSpringApp server1 = new AstrixSpringApp(server1Config, AccountPerformanceAppConfig.class);
-	private AstrixSpringApp server2 = new AstrixSpringApp(server2Config, AccountPerformanceAppConfig.class);
-	private AstrixSpringApp feeder1 = new AstrixSpringApp(feeder1Config, FeederAppConfig.class);
-	private AstrixSpringApp feeder2 = new AstrixSpringApp(feeder2Config, FeederAppConfig.class);
+	private final AstrixSpringApp server1 = autoClosables.add(new AstrixSpringApp(server1Config, AccountPerformanceAppConfig.class));
+	private final AstrixSpringApp server2 = autoClosables.add(new AstrixSpringApp(server2Config, AccountPerformanceAppConfig.class));
+	private final AstrixSpringApp feeder1 = autoClosables.add(new AstrixSpringApp(feeder1Config, FeederAppConfig.class));
+	private final AstrixSpringApp feeder2 = autoClosables.add(new AstrixSpringApp(feeder2Config, FeederAppConfig.class));
 	private AstrixContext accountPerformanceClientContext;
 	private AccountPerformance accountPerformance;
 
@@ -171,20 +175,9 @@ public class AstrixServiceBlueGreenDeployTest {
 	
 	@Before
 	public void setup() throws Exception {
-		this.feeder1clientContext = new AstrixConfigurer().setConfig(DynamicConfig.create(feeder1clientConfig)).configure();
-		this.feeder2clientContext = new AstrixConfigurer().setConfig(DynamicConfig.create(feeder2clientConfig)).configure();
-		this.accountPerformanceClientContext = new AstrixConfigurer().setConfig(DynamicConfig.create(accountPerformanceClientConfig)).configure();
-	}
-	
-	@After
-	public void after() throws Exception {
-		AstrixTestUtil.closeSafe(feeder1clientContext);
-		AstrixTestUtil.closeSafe(feeder2clientContext);
-		AstrixTestUtil.closeSafe(accountPerformanceClientContext);
-		AstrixTestUtil.closeSafe(server1);
-		AstrixTestUtil.closeSafe(server2);
-		AstrixTestUtil.closeSafe(feeder1);
-		AstrixTestUtil.closeSafe(feeder2);
+		this.feeder1clientContext = autoClosables.add(new AstrixConfigurer().setConfig(DynamicConfig.create(feeder1clientConfig)).configure());
+		this.feeder2clientContext = autoClosables.add(new AstrixConfigurer().setConfig(DynamicConfig.create(feeder2clientConfig)).configure());
+		this.accountPerformanceClientContext = autoClosables.add(new AstrixConfigurer().setConfig(DynamicConfig.create(accountPerformanceClientConfig)).configure());
 	}
 	
 	@Test
@@ -228,17 +221,22 @@ public class AstrixServiceBlueGreenDeployTest {
 		// Verify traffic eventually moves to instance-2
 		assertEventually(new Probe() {
 			private String lastReply;
+			private Exception lastException;
 			@Override
 			public boolean isSatisfied() {
 				return lastReply.startsWith("server-2");
 			}
 			@Override
 			public void sample() {
-				lastReply = accountPerformance.getAppInstanceId();
+				try {
+					lastReply = accountPerformance.getAppInstanceId();
+				} catch (Exception e) {
+					lastException = e;
+				}
 			}
 			@Override
 			public void describeFailureTo(Description description) {
-				description.appendText("Expected reply from instance 1, but was " + lastReply);
+				description.appendText("Expected reply from instance 1, but was reply=" + lastReply + " lastException:\n" + lastException);
 			}
 		});
 	}

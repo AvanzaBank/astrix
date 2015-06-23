@@ -34,6 +34,7 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
 
@@ -65,6 +66,7 @@ import com.avanza.astrix.integration.tests.domain2.api.LunchRestaurantGrader;
 import com.avanza.astrix.integration.tests.domain2.apiruntime.PublicLunchFeeder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.test.util.AstrixTestUtil;
+import com.avanza.astrix.test.util.AutoCloseableRule;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 /**
@@ -108,6 +110,9 @@ public class AstrixIntegrationTest {
 														  .contextProperty("configSourceId", GlobalConfigSourceRegistry.register(config))
 														.startAsync(true)
 														.configure();
+	
+	@Rule 
+	public AutoCloseableRule autoClosables = new AutoCloseableRule();
 
 	private LunchService lunchService;
 	private LunchUtil lunchUtil;
@@ -132,7 +137,7 @@ public class AstrixIntegrationTest {
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
 		configurer.setConfig(DynamicConfig.create(config));
 		configurer.setSubsystem("test-sub-system");
-		astrix = configurer.configure();
+		astrix = autoClosables.add(configurer.configure());
 		this.lunchService = astrix.getBean(LunchService.class);
 		this.lunchUtil = astrix.getBean(LunchUtil.class);
 		this.lunchRestaurantGrader = astrix.getBean(LunchRestaurantGrader.class);
@@ -151,11 +156,6 @@ public class AstrixIntegrationTest {
 		astrix.waitForBean(Ping.class, "lunch-ping", 5000);
 	}
 	
-	@After
-	public void after() {
-		astrix.destroy();
-	}
-
 	@Test
 	public void routedRemotingRequest() throws Exception {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());

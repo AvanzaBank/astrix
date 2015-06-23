@@ -15,9 +15,11 @@
  */
 package se.avanzabank.trading.pu;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import se.avanzabank.trading.api.Account;
@@ -30,6 +32,7 @@ import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
+import com.avanza.astrix.test.util.AutoCloseableRule;
 
 public class TradingPuTest {
 	
@@ -40,12 +43,16 @@ public class TradingPuTest {
 														   .startAsync(false)
 														   .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
 														   .configure();
+	@Rule
+	public AutoCloseableRule autoCloseableRule = new AutoCloseableRule();
 	
 	@Test
 	public void accountServiceConsumtionExample() throws Exception {
-		AstrixContext context = new AstrixConfigurer().set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri())
-													  .configure();
-		AccountService accountService = context.getBean(AccountService.class);
+		AstrixContext context = autoCloseableRule.add(new AstrixConfigurer()
+															.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri())
+															.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 50)
+															.configure());	
+		AccountService accountService = context.waitForBean(AccountService.class, 10_000L);
 	
 		assertNull(accountService.getAccount(AccountId.valueOf("21")));
 		

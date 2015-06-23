@@ -19,6 +19,7 @@ import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lun
 
 import org.hamcrest.Description;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
@@ -35,9 +36,11 @@ import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.test.util.AstrixTestUtil;
+import com.avanza.astrix.test.util.AutoCloseableRule;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 
+@Ignore
 public class LocalViewDisconnectionTest {
 	
 	private InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
@@ -50,9 +53,13 @@ public class LocalViewDisconnectionTest {
 	private AstrixContext astrix;
 	
 	@Rule
+	public AutoCloseableRule autoClosables = new AutoCloseableRule();
+	
+	@Rule
 	public RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
+											  .spaceName("local-view-disonnection-test")
 									  		  .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
 											  .startAsync(false)
 											  .configure();
@@ -64,7 +71,7 @@ public class LocalViewDisconnectionTest {
 		configurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 100);
 		configurer.setConfig(DynamicConfig.create(serviceRegistry));
 		configurer.setSubsystem("lunch-system");
-		astrix = configurer.configure();
+		astrix = autoClosables.add(configurer.configure());
 	}
 	
 	@Test

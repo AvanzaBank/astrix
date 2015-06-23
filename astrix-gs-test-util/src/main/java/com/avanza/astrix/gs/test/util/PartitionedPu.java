@@ -52,6 +52,7 @@ public final class PartitionedPu implements PuRunner {
 		this.beanProperies.putAll(configurer.beanProperies);
 		this.lookupGroupName = configurer.lookupGroupName;
 		this.autostart = configurer.autostart;
+		this.contextProperties.put("spaceName", UniqueSpaceNameLookup.getSpaceNameWithSequence(configurer.spaceName));
 	}
 
 	@Override

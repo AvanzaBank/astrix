@@ -22,6 +22,12 @@
   		<artifactId>astrix-all</artifactId>
   		<version>${project.version}</version>
   	</dependency>
+	<dependency>
+		<groupId>org.slf4j</groupId>
+     	<artifactId>slf4j-log4j12</artifactId>
+	</dependency>
+  	
+
   	<dependency>
   		<groupId>com.gigaspaces</groupId>
   		<artifactId>gs-runtime</artifactId>
@@ -31,6 +37,12 @@
   		<artifactId>gs-openspaces</artifactId>
   	</dependency>
   	
+	<dependency>
+  		<groupId>${project.groupId}</groupId>
+  		<artifactId>astrix-test-util</artifactId>
+  		<version>${project.version}</version>
+  		<scope>test</scope>
+  	</dependency>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
   		<artifactId>astrix-gs-test-util</artifactId>

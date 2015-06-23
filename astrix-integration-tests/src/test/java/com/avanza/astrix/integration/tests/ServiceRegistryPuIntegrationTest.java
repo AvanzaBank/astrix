@@ -37,6 +37,7 @@ import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.test.util.AutoCloseableRule;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 /**
@@ -61,16 +62,14 @@ public class ServiceRegistryPuIntegrationTest {
 	
 	private AstrixContext clientContext;
 	
+	@Rule
+	public AutoCloseableRule autoCloseableRule = new AutoCloseableRule();
+	
 	@Before
 	public void setup() throws Exception {
-		this.clientContext = new AstrixConfigurer().setConfig(DynamicConfig.create(clientConfig)).configure();
+		this.clientContext = autoCloseableRule.add(new AstrixConfigurer().setConfig(DynamicConfig.create(clientConfig)).configure());
 	}
 	
-	@After
-	public void after() throws Exception {
-		clientContext.destroy();
-	}
-
 	@Test
 	public void serviceRegistration() throws Exception {
 		AstrixServiceRegistry serviceRegistry = clientContext.getBean(AstrixServiceRegistry.class);
@@ -113,10 +112,6 @@ public class ServiceRegistryPuIntegrationTest {
 	}
 	
 	interface AnotherService {
-	}
-	
-	private void assertEventually(Probe probe) throws InterruptedException {
-		new Poller(10_000, 10).check(probe);
 	}
 	
 }

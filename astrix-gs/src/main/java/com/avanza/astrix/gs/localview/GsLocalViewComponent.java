@@ -78,6 +78,7 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 			ServiceComponent gsComponent = injector.getBean(ServiceComponents.class).getComponent(AstrixServiceComponentNames.GS);
 			return gsComponent.bind(serviceDefinition, serviceProperties);
 		}
+		log.info("Creating local view. bean={} serviceProperties={}", serviceDefinition.getBeanKey(), serviceProperties.getProperties());
 		// TODO: protect creation of localView with fault-tolerance?
 		Class<LocalViewConfigurer> serviceConfigClass = serviceDefinition.getServiceConfigClass(LocalViewConfigurer.class);	
 		LocalViewConfigurer localViewConfigurer = ReflectionUtil.newInstance(serviceConfigClass);
@@ -177,8 +178,8 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		private UrlSpaceConfigurer spaceConfigurer;
 		
 		public BoundLocalViewGigaSpaceBeanInstance(GigaSpace instance,
-				LocalViewSpaceConfigurer localViewSpaceConfigurer,
-				UrlSpaceConfigurer spaceConfigurer) {
+												   LocalViewSpaceConfigurer localViewSpaceConfigurer,
+												   UrlSpaceConfigurer spaceConfigurer) {
 			this.instance = instance;
 			this.localViewSpaceConfigurer = localViewSpaceConfigurer;
 			this.spaceConfigurer = spaceConfigurer;
@@ -192,8 +193,8 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		@Override
 		public void release() {
 			try {
-				localViewSpaceConfigurer.destroy();
-				spaceConfigurer.destroy();
+				localViewSpaceConfigurer.close();
+				spaceConfigurer.close();
 			} catch (Exception e) {
 				log.error("Failed to destroy local-view", e);
 			}

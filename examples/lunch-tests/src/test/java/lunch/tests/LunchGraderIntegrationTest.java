@@ -22,6 +22,7 @@ import lunch.api.LunchService;
 import lunch.grader.api.LunchRestaurantGrader;
 
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -31,6 +32,7 @@ import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
+import com.avanza.astrix.test.util.AutoCloseableRule;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 
@@ -45,6 +47,8 @@ public class LunchGraderIntegrationTest {
 			   											 .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
 			   											 .startAsync(false)
 														 .configure();
+	@Rule
+	public AutoCloseableRule autoCloseableRule = new AutoCloseableRule();
 	
 	@Test
 	public void itsPossibleToStubOutServiceDependenciesUsingInMemoryServiceRegistry() throws Exception {
@@ -55,7 +59,7 @@ public class LunchGraderIntegrationTest {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		configurer.setSubsystem("lunch-system");
-		AstrixContext astrix = configurer.configure();
+		AstrixContext astrix = autoCloseableRule.add(configurer.configure());
 		final LunchRestaurantGrader grader = astrix.waitForBean(LunchRestaurantGrader.class, 5_000);
 		
 		// Not that the lunch-grader-pu grader.grade uses another service internally, hence we must wait

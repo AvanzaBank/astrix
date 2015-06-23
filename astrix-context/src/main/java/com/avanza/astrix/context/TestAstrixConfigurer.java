@@ -30,7 +30,6 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.Setting;
-import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 
 public class TestAstrixConfigurer {
 	
