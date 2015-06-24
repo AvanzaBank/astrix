@@ -65,10 +65,9 @@ public class ModuleManager {
 			throw new IllegalArgumentException("Non exported type: " + type);
 		}
 		if (moduleInstances.size() > 1) {
-//			log.warn("Type already exported by another module. Ignoring export. type={} usedModule={} ignoredModule={}", 
-//			exportedType.getName(),
-//			alreadyRegisteredProvider.getName(),
-//			moduleInstance.getName());			
+			log.warn("Type exported by multiple modules. Using first registered provider. Ignoring export. type={} usedModule={}",
+					type,
+					moduleInstances.get(0).getName());
 		}
 		return moduleInstances.get(0).getInstance(type);
 	}
@@ -122,7 +121,6 @@ public class ModuleManager {
 			return ReflectionUtil.newProxy(beanKey.getBeanType(), new InvocationHandler() {
 				@Override
 				public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-//					return moduleManager.getInstance(beanKey);
 					return method.invoke(instance, args);
 				}
 			});
@@ -140,13 +138,11 @@ public class ModuleManager {
 		private final ModuleInjector injector;
 		private final Module module;
 		private final HashSet<Class<?>> exports;
-		private final HashSet<Class<?>> importedBeans;
 		private final HashSet<Class<?>> importedTypes;
 		
 		public ModuleInstance(Module module) {
 			this.module = module;
 			this.exports = new HashSet<>();
-			this.importedBeans = new HashSet<>();
 			this.importedTypes = new HashSet<>();
 			this.injector = new ModuleInjector(new AstrixFactoryBeanRegistry() {
 				@Override
@@ -157,7 +153,7 @@ public class ModuleManager {
 				
 				@Override
 				public <T> StandardFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey) {
-					if (importedBeans.contains(beanKey.getBeanType()) || importedTypes.contains(beanKey.getBeanType())) {
+					if (importedTypes.contains(beanKey.getBeanType())) {
 						return new ExportedModuleFactoryBean<>(beanKey, ModuleManager.this);
 					}
 					// Check if beanType is abstract

@@ -155,6 +155,20 @@ public class ModuleTest {
 	}
 	
 	@Test
+	public void injectingAllBeansOfImportedTypesWithNoRegisteredProviders() throws Exception {
+		ModuleManager moduleManager = new ModuleManager();
+		moduleManager.register(new Module() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.importType(Ping.class);
+				moduleContext.export(PingPluginCollector.class);
+			}
+		});
+		PingPluginCollector pingPluginCollector = moduleManager.getInstance(PingPluginCollector.class);
+		assertEquals(0, pingPluginCollector.pingPluginCount());
+	}
+	
+	@Test
 	public void multipleExportedBeansOfImportedType_UsesFirstRegisteredProvider() throws Exception {
 		ModuleManager moduleManager = new ModuleManager();
 		moduleManager.register(new Module() {
