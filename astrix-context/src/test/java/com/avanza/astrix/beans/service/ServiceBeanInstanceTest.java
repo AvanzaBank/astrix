@@ -37,6 +37,7 @@ import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.function.Supplier;
+import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
@@ -122,7 +123,7 @@ public class ServiceBeanInstanceTest {
 		Ping ping = astrixContext.getBean(Ping.class);
 		assertEquals("foo", ping.ping("foo"));
 
-		DirectComponent directComponent = astrixContext.getInstance(ServiceComponents.class).getComponent(DirectComponent.class);
+		DirectComponent directComponent = (DirectComponent) astrixContext.getInstance(ServiceComponents.class).getComponent(AstrixServiceComponentNames.DIRECT);
 		assertEquals(2, directComponent.getBoundServices().size());
 		assertThat("Expected at least one service to be bound after pingBean is bound", directComponent.getBoundServices().size(), greaterThanOrEqualTo(1));
 		
@@ -142,7 +143,7 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixApplicationContext astrixContext = (AstrixApplicationContext) astrixConfigurer.configure();
 		
-		DirectComponent directComponent = astrixContext.getInstance(ServiceComponents.class).getComponent(DirectComponent.class);
+		DirectComponent directComponent = (DirectComponent) astrixContext.getInstance(ServiceComponents.class).getComponent(AstrixServiceComponentNames.DIRECT);
 
 		final Ping ping = astrixContext.getBean(Ping.class);
 		ping.ping("foo");

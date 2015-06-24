@@ -39,15 +39,6 @@ public class ServiceComponents {
 		return serviceComponent;
 	}
 	
-	public <T extends ServiceComponent> T getComponent(Class<T> componentType) {
-		for (ServiceComponent component : componentsByName.values()) {
-			if (component.getClass().equals(componentType)) {
-				return componentType.cast(component);
-			}
-		}
-		throw new MissingServiceComponentException(String.format("ServiceComponent instance not found: type=%s. Did you forget to put the jar containing the given ServiceComponent on the classpath?", componentType));
-	}
-	
 	public Collection<ServiceComponent> getAll() {
 		return this.componentsByName.values();
 	}
