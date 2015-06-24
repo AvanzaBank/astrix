@@ -197,6 +197,35 @@ public class ModuleTest {
 		assertEquals("oof", pingPluginCollector.getPing().ping("foo"));
 	}
 	
+	@Test
+	public void getBeansOfTypeReturnsAllExportedBeansOfAGivenType() throws Exception {
+		ModuleManager moduleManager = new ModuleManager();
+		moduleManager.register(new Module() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(SinglePingCollector.class, SinglePingCollector.class);
+				moduleContext.importType(Ping.class);
+				moduleContext.export(SinglePingCollector.class);
+			}
+		});
+		moduleManager.register(new Module() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(Ping.class, ReversePing.class);
+				moduleContext.export(Ping.class);
+			}
+		});
+		moduleManager.register(new Module() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(Ping.class, NormalPing.class);
+				moduleContext.export(Ping.class);
+			}
+		});
+		assertEquals(1, moduleManager.getBeansOfType(SinglePingCollector.class).size());
+		assertEquals(2, moduleManager.getBeansOfType(Ping.class).size());
+	}
+	
 	public interface Ping {
 		String ping(String msg);
 	}
