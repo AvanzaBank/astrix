@@ -17,7 +17,6 @@ package com.avanza.astrix.context.module;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -91,9 +90,6 @@ public class ModuleInjector {
 				return factory;
 			}
 			return importedBeans.getFactoryBean(beanKey);
-			// Check if beanType is abstract
-//			throw new MissingBeanProviderException(beanKey);
-//			return new ClassConstructorFactoryBean<>(beanKey, beanKey.getBeanType());
 		}
 
 		public <T> void bind(AstrixBeanKey<T> beanKey, Class<? extends T> providerType) {
@@ -105,13 +101,6 @@ public class ModuleInjector {
 		@Override
 		public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
 			return this.importedBeans.getBeansOfType(type);
-//			Set<AstrixBeanKey<T>> result = new HashSet<>();
-//			if (providerByBeanKey.containsKey(AstrixBeanKey.create(type))) {
-//				result.add(AstrixBeanKey.create(type));
-//				return result;
-//			}
-//			result.add(AstrixBeanKey.create(type));
-//			return result;
 		}
 
 		@Override

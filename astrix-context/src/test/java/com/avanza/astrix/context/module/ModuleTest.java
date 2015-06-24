@@ -15,14 +15,25 @@
  */
 package com.avanza.astrix.context.module;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.annotation.PreDestroy;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
+
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
+import com.avanza.astrix.beans.factory.AstrixBeans;
 
 
 public class ModuleTest {
@@ -224,6 +235,75 @@ public class ModuleTest {
 		});
 		assertEquals(1, moduleManager.getBeansOfType(SinglePingCollector.class).size());
 		assertEquals(2, moduleManager.getBeansOfType(Ping.class).size());
+	}
+	
+	@Test
+	public void allExportedBeansOfType() throws Exception {
+		ModuleManager moduleManager = new ModuleManager();
+		moduleManager.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(SinglePingCollector.class, SinglePingCollector.class);
+				moduleContext.importType(Ping.class);
+				moduleContext.export(SinglePingCollector.class);
+			}
+			@Override
+			public String name() {
+				return "collector";
+			}
+		});
+		moduleManager.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(Ping.class, ReversePing.class);
+				moduleContext.export(Ping.class);
+			}
+			@Override
+			public String name() {
+				return "reverse-ping";
+			}
+		});
+		moduleManager.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(Ping.class, NormalPing.class);
+				moduleContext.export(Ping.class);
+			}
+			@Override
+			public String name() {
+				return "ping";
+			}
+		});
+		Set<AstrixBeanKey<?>> exportedBeanKeys = moduleManager.getExportedBeanKeys();
+		assertEquals(3, exportedBeanKeys.size());
+		assertTrue(exportedBeanKeys.contains(AstrixBeanKey.create(SinglePingCollector.class, "collector")));
+		assertTrue(exportedBeanKeys.contains(AstrixBeanKey.create(Ping.class, "reverse-ping")));
+		assertTrue(exportedBeanKeys.contains(AstrixBeanKey.create(Ping.class, "ping")));
+		
+		assertEquals(NormalPing.class, moduleManager.getInstance(Ping.class, "ping").getClass());
+		assertEquals(ReversePing.class, moduleManager.getInstance(Ping.class, "reverse-ping").getClass());
+	}
+	
+	@Test
+	public void beanPostProcessorAreAppliedToAllCreatedBeansThatAreNotCreatedBeforeRegisteringThePostProcessor() throws Exception {
+		ModuleManager moduleManager = new ModuleManager();
+		final BlockingQueue<Object> postProcessedBeans = new LinkedBlockingQueue<Object>();
+		moduleManager.register(new Module() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(Ping.class, ReversePing.class);
+				moduleContext.export(Ping.class);
+			}
+		});
+		moduleManager.registerBeanPostProcessor(new AstrixBeanPostProcessor() {
+			@Override
+			public void postProcess(Object bean, AstrixBeans astrixBeans) {
+				postProcessedBeans.add(bean);
+			}
+		});
+		
+		moduleManager.getInstance(Ping.class); // trigger creation of Ping
+		assertThat(postProcessedBeans.poll(), instanceOf(ReversePing.class));
 	}
 	
 	public interface Ping {

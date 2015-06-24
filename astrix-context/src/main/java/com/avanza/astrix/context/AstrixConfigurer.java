@@ -96,25 +96,50 @@ public class AstrixConfigurer {
 	public AstrixContext configure() {
 		config = createDynamicConfig();
 		
-//		ModuleManager pluginManager = getPluginManager();
 		
-		AstrixPlugins astrixPlugins = getPlugins();
+		final AstrixPlugins astrixPlugins = getPlugins();
 		AstrixStrategies astrixStrategies = new AstrixStrategies(config, strategyInstanceByStrategyType);
 		AstrixInjector injector = new AstrixInjector(new StrategiesAndPluginsRegistry(astrixPlugins, astrixStrategies));
+		
+		
 		injector.bind(DynamicConfig.class, config);
 		injector.bind(AstrixContext.class, AstrixContextImpl.class);
 		injector.bind(AstrixFactoryBeanRegistry.class, SimpleAstrixFactoryBeanRegistry.class);
 		injector.bind(ApiProviders.class, new FilteredApiProviders(getApiProviders(astrixPlugins), activeProfiles));
 		injector.registerBeanPostProcessor(new InternalBeanPostProcessor(injector.getBean(AstrixBeanFactory.class)));
-		AstrixContextImpl context = injector.getBean(AstrixContextImpl.class);
+		final AstrixContextImpl context = injector.getBean(AstrixContextImpl.class);
 		for (StandardFactoryBean<?> beanFactory : standaloneFactories) {
 			log.debug("Registering standalone factory: bean={}", beanFactory.getBeanKey());
 			context.registerBeanFactory(beanFactory);
 		}
+		
+		ModuleManager moduleManager = getModuleManager();
+		moduleManager.register(new Module() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(DynamicConfig.class, config);
+				moduleContext.bind(AstrixContext.class, AstrixContextImpl.class);
+				moduleContext.bind(AstrixFactoryBeanRegistry.class, SimpleAstrixFactoryBeanRegistry.class);
+				moduleContext.bind(ApiProviders.class, new FilteredApiProviders(getApiProviders(astrixPlugins), activeProfiles));
+				moduleContext.export(AstrixContext.class);
+				moduleContext.export(AstrixBeanFactory.class); // TODO: Don't export AstrixBeanFactory
+			}
+		});
+		moduleManager.registerBeanPostProcessor(new InternalBeanPostProcessor(moduleManager.getInstance(AstrixBeanFactory.class)));
+		
+		
+//		moduleManager.register(new Module() {
+//			@Override
+//			public void prepare(ModuleContext moduleContext) {
+//				moduleContext.bind(AstrixContext.class, context);
+//				moduleContext.export(AstrixContext.class);
+//			}
+//		});
+//		return moduleManager.getInstance(AstrixContext.class);
 		return context;
 	}
 	
-	private ModuleManager getPluginManager() {
+	private ModuleManager getModuleManager() {
 		ModuleManager result = new ModuleManager();
 		// TODO: move versioning configuration
 		if (!AstrixSettings.ENABLE_VERSIONING.getFrom(config).get()) {

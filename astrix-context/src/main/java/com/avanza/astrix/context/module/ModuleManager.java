@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
@@ -38,6 +40,7 @@ public class ModuleManager {
 	private final Logger log = LoggerFactory.getLogger(ModuleManager.class);
 	private final ConcurrentMap<Class<?>, List<ModuleInstance>> moduleByExportedType = new ConcurrentHashMap<>();
 	private final List<ModuleInstance> moduleInstances = new CopyOnWriteArrayList<>();
+	private final ModuleBeanPostProcessors moduleBeanPostProcessors = new ModuleBeanPostProcessors();
 
 	public void register(Module module) {
 		ModuleInstance moduleInstance = new ModuleInstance(module);
@@ -57,16 +60,29 @@ public class ModuleManager {
 	}
 
 	public <T> T getInstance(Class<T> type) {
-		List<ModuleInstance> moduleInstances = moduleByExportedType.get(type);
-		if (moduleInstances == null) {
+		List<ModuleInstance> exportingModules = moduleByExportedType.get(type);
+		if (exportingModules == null) {
 			throw new IllegalArgumentException("Non exported type: " + type);
 		}
-		if (moduleInstances.size() > 1) {
+		if (exportingModules.size() > 1) {
 			log.warn("Type exported by multiple modules. Using first registered provider. Ignoring export. type={} usedModule={}",
 					type,
-					moduleInstances.get(0).getName());
+					exportingModules.get(0).getName());
 		}
-		return moduleInstances.get(0).getInstance(type);
+		return exportingModules.get(0).getInstance(type);
+	}
+	
+	public <T> T getInstance(Class<T> type, String exportingModuleName) {
+		List<ModuleInstance> exportingModules = moduleByExportedType.get(type);
+		if (exportingModules == null) {
+			throw new IllegalArgumentException("Non exported type: " + type);
+		}
+		for (ModuleInstance module : exportingModules) {
+			if (module.getName().equals(exportingModuleName)) {
+				return module.getInstance(type);
+			}
+		}
+		throw new IllegalArgumentException(String.format("Non exported type by module: type=%s module=%s", type, exportingModuleName));
 	}
 	
 	private <T> T getInstance(AstrixBeanKey<T> beanKey) {
@@ -84,6 +100,16 @@ public class ModuleManager {
 			}
 		}
 		throw new IllegalArgumentException("Non exported bean: " + beanKey);
+	}
+	
+	public Set<AstrixBeanKey<?>> getExportedBeanKeys() {
+		Set<AstrixBeanKey<?>> result = new HashSet<>();
+		for (Map.Entry<Class<?>, List<ModuleInstance>> exportedTypes : this.moduleByExportedType.entrySet()) {
+			for (ModuleInstance moduleInstance : exportedTypes.getValue()) {
+				result.add(AstrixBeanKey.create(exportedTypes.getKey(), moduleInstance.getName()));
+			}
+		}
+		return result;
 	}
 	
 	public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
@@ -131,9 +157,11 @@ public class ModuleManager {
 		private final Module module;
 		private final HashSet<Class<?>> exports;
 		private final HashSet<Class<?>> importedTypes;
+		private final String moduleName;
 		
 		public ModuleInstance(Module module) {
 			this.module = module;
+			this.moduleName = getModuleName(module);
 			this.exports = new HashSet<>();
 			this.importedTypes = new HashSet<>();
 			this.injector = new ModuleInjector(new AstrixFactoryBeanRegistry() {
@@ -163,6 +191,7 @@ public class ModuleManager {
 					return ModuleManager.this.getBeansOfType(type);
 				}
 			});
+			this.injector.registerBeanPostProcessor(moduleBeanPostProcessors);
 			this.module.prepare(new ModuleContext() {
 				@Override
 				public <T> void bind(Class<T> type, Class<? extends T> providerType) {
@@ -185,8 +214,15 @@ public class ModuleManager {
 			
 		}
 
-		public String getName() {
+		private String getModuleName(Module module) {
+			if (module instanceof NamedModule) {
+				return NamedModule.class.cast(module).name();
+			}
 			return module.getClass().getName();
+		}
+
+		public String getName() {
+			return this.moduleName;
 		}
 		
 		public Set<Class<?>> getExports() {
@@ -215,6 +251,24 @@ public class ModuleManager {
 		List<Module> modules = ModuleDiscovery.loadModules();
 		for (Module module : modules) {
 			register(module);
+		}
+	}
+
+	public void registerBeanPostProcessor(AstrixBeanPostProcessor beanPostProcessor) {
+		this.moduleBeanPostProcessors.add(beanPostProcessor);
+	}
+	
+	private static class ModuleBeanPostProcessors implements AstrixBeanPostProcessor {
+		private final List<AstrixBeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();		
+		@Override
+		public void postProcess(Object bean, AstrixBeans astrixBeans) {
+			for (AstrixBeanPostProcessor beanPostProcessor : beanPostProcessors) {
+				beanPostProcessor.postProcess(bean, astrixBeans);
+			}
+		}
+		
+		void add(AstrixBeanPostProcessor beanPostProcessor) {
+			this.beanPostProcessors.add(beanPostProcessor);
 		}
 	}
 
