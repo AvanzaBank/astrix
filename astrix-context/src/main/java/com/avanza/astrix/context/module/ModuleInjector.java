@@ -113,7 +113,7 @@ public class ModuleInjector {
 		}
 	}
 
-	private static class AstrixBeanDependencyInjectionBeanPostProcessor implements AstrixBeanPostProcessor {
+	private class AstrixBeanDependencyInjectionBeanPostProcessor implements AstrixBeanPostProcessor {
 
 		@Override
 		public void postProcess(Object target, AstrixBeans beans) {
@@ -129,7 +129,7 @@ public class ModuleInjector {
 				Object[] deps = new Object[m.getParameterTypes().length];
 				for (int argIndex = 0; argIndex < deps.length; argIndex++) {
 					Class<?> dep = m.getParameterTypes()[argIndex];
-					deps[argIndex] = beans.getBean(AstrixBeanKey.create(dep, null));
+					deps[argIndex] = getBean(dep);
 				}
 				try {
 					m.invoke(target, deps);
@@ -138,6 +138,7 @@ public class ModuleInjector {
 				}
 			}
 		}
+		
 	}
 	
 	public void destroy() {

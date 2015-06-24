@@ -103,7 +103,7 @@ public class AstrixBeanFactory {
 			StandardFactoryBean<? extends T> factoryBean = registry.getFactoryBean(beanKey);
 			AstrixBeanInstance<? extends T> instance = createBeanInstance(factoryBean);
 			for (AstrixBeanPostProcessor beanPostProcessor : beanPostProcessors) {
-				beanPostProcessor.postProcess(instance.get(), this);
+				instance.postProcess(beanPostProcessor, this);
 			}
 			constructionStack.pop();
 			return instance;

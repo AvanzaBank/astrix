@@ -34,6 +34,7 @@ import org.junit.Test;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
+import com.avanza.astrix.beans.inject.AstrixInject;
 
 
 public class ModuleTest {
@@ -306,6 +307,88 @@ public class ModuleTest {
 		assertThat(postProcessedBeans.poll(), instanceOf(ReversePing.class));
 	}
 	
+	@Test
+	public void setterInjectedDependencies() throws Exception {
+		ModuleManager moduleManager = new ModuleManager();
+		moduleManager.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(AType.class, A.class);
+				
+				moduleContext.importType(BType.class);
+				
+				moduleContext.export(AType.class);
+			}
+			@Override
+			public String name() {
+				return "A";
+			}
+		});
+		moduleManager.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(BType.class, B.class);
+				moduleContext.importType(CType.class);
+				moduleContext.export(BType.class);
+			}
+			@Override
+			public String name() {
+				return "B";
+			}
+		});
+		moduleManager.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(CType.class, C.class);
+				moduleContext.export(CType.class);
+			}
+			@Override
+			public String name() {
+				return "C";
+			}
+		});
+		
+		assertEquals(A.class, moduleManager.getInstance(AType.class).getClass());
+		assertThat(moduleManager.getInstance(AType.class).getB(), instanceOf(B.class));
+	}
+	
+	public interface AType {
+		BType getB();
+	}
+	
+	public interface BType {
+	}
+	
+	public interface CType {
+	}
+	
+	public static class A implements AType {
+		private BType b;
+		
+		@AstrixInject
+		public void setB(BType b) {
+			this.b = b;
+		}
+		
+		@Override
+		public BType getB() {
+			return this.b;
+		}
+	}
+	
+	public static class B implements BType  {
+		private CType c;
+
+		@AstrixInject
+		public void setC(CType c) {
+			this.c = c;
+		}
+	}
+	
+	public static class C implements CType  {
+	}
+	
+
 	public interface Ping {
 		String ping(String msg);
 	}

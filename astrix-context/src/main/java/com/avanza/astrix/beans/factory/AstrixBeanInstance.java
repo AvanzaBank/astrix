@@ -106,5 +106,11 @@ public class AstrixBeanInstance<T> {
 	public String toString() {
 		return this.beanKey.toString();
 	}
+
+	public void postProcess(AstrixBeanPostProcessor beanPostProcessor, AstrixBeans astrixBeans) {
+		if (lifecycle) {
+			beanPostProcessor.postProcess(get(), astrixBeans);
+		}
+	}
 	
 }

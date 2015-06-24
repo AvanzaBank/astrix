@@ -60,6 +60,9 @@ import com.avanza.astrix.config.SystemPropertiesConfigSource;
 import com.avanza.astrix.context.module.Module;
 import com.avanza.astrix.context.module.ModuleContext;
 import com.avanza.astrix.context.module.ModuleManager;
+import com.avanza.astrix.context.module.NamedModule;
+import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
+import com.avanza.astrix.ft.NoFaultToleranceProvider;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
@@ -113,29 +116,63 @@ public class AstrixConfigurer {
 			context.registerBeanFactory(beanFactory);
 		}
 		
-		ModuleManager moduleManager = getModuleManager();
-		moduleManager.register(new Module() {
-			@Override
-			public void prepare(ModuleContext moduleContext) {
-				moduleContext.bind(DynamicConfig.class, config);
-				moduleContext.bind(AstrixContext.class, AstrixContextImpl.class);
-				moduleContext.bind(AstrixFactoryBeanRegistry.class, SimpleAstrixFactoryBeanRegistry.class);
-				moduleContext.bind(ApiProviders.class, new FilteredApiProviders(getApiProviders(astrixPlugins), activeProfiles));
-				moduleContext.export(AstrixContext.class);
-				moduleContext.export(AstrixBeanFactory.class); // TODO: Don't export AstrixBeanFactory
-			}
-		});
-		moduleManager.registerBeanPostProcessor(new InternalBeanPostProcessor(moduleManager.getInstance(AstrixBeanFactory.class)));
-		
-		
-//		moduleManager.register(new Module() {
+//		ModuleManager moduleManager = getModuleManager();
+//		moduleManager.register(new NamedModule() {
 //			@Override
 //			public void prepare(ModuleContext moduleContext) {
-//				moduleContext.bind(AstrixContext.class, context);
+//				moduleContext.bind(DynamicConfig.class, config);
+//				moduleContext.bind(AstrixContext.class, AstrixContextImpl.class);
+//				moduleContext.bind(AstrixFactoryBeanRegistry.class, SimpleAstrixFactoryBeanRegistry.class);
+//				moduleContext.bind(ApiProviders.class, new FilteredApiProviders(getApiProviders(astrixPlugins), activeProfiles));
+//				
+//				moduleContext.importType(ApiProviderPlugin.class);
+//				
+//				moduleContext.export(AstrixInjector.class);
+////				moduleContext.export(AstrixFactoryBeanRegistry.class);
 //				moduleContext.export(AstrixContext.class);
+//				moduleContext.export(DynamicConfig.class);
+//				moduleContext.export(AstrixBeanFactory.class); // TODO: Don't export AstrixBeanFactory
+//			}
+//			@Override
+//			public String name() {
+//				return "context";
 //			}
 //		});
+//		moduleManager.register(new NamedModule() {
+//			@Override
+//			public void prepare(ModuleContext moduleContext) {
+//				moduleContext.bind(ApiProviderPlugin.class, GenericAstrixApiProviderPlugin.class);
+//
+//				moduleContext.importType(AstrixInjector.class);
+//				moduleContext.importType(DynamicConfig.class);
+//				moduleContext.importType(BeanFaultToleranceProxyStrategy.class);
+//				
+//				moduleContext.export(ApiProviderPlugin.class);
+//			}
+//			@Override
+//			public String name() {
+//				return "generic-api-provider";
+//			}
+//		});
+//		moduleManager.register(new NamedModule() {
+//			@Override
+//			public void prepare(ModuleContext moduleContext) {
+//				moduleContext.bind(BeanFaultToleranceProxyStrategy.class, NoFaultToleranceProvider.class); // TODO: Load fault tolerance!
+//
+////				moduleContext.importType(BeanFaultToleranceProxyStrategy.class); // This is a strategy
+////				moduleContext.importType(AstrixInjector.class);
+////				moduleContext.importType(DynamicConfig.class);
+//				
+//				moduleContext.export(BeanFaultToleranceProxyStrategy.class);
+//			}
+//			@Override
+//			public String name() {
+//				return "fault-tolerance";
+//			}
+//		});
+//		moduleManager.registerBeanPostProcessor(new InternalBeanPostProcessor(moduleManager.getInstance(AstrixBeanFactory.class)));
 //		return moduleManager.getInstance(AstrixContext.class);
+		
 		return context;
 	}
 	
@@ -374,7 +411,7 @@ public class AstrixConfigurer {
 		return this;
 	}
 	
-	public static  class InternalBeanPostProcessor implements AstrixBeanPostProcessor {
+	public static class InternalBeanPostProcessor implements AstrixBeanPostProcessor {
 		
 		private final AstrixBeanFactory publishedApis;
 		

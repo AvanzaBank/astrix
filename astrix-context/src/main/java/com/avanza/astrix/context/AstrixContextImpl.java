@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanFactory;
-import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.BeanConfiguration;
 import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
@@ -50,14 +49,19 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	private final AstrixInjector astrixInjector;
 	private final BeanConfigurations beanConfigurations;
 	
-	public AstrixContextImpl(DynamicConfig dynamicConfig, AstrixInjector injector, ApiProviderPlugins apiProviderPlugins) {
+	public AstrixContextImpl(DynamicConfig dynamicConfig, AstrixInjector injector, ApiProviderPlugins apiProviderPlugins, 
+							 AstrixBeanFactory beanFactory, 
+							 BeanConfigurations beanConfigurations,
+							 SimpleAstrixFactoryBeanRegistry beanFactoryRegistry,
+							 ApiProviders apiProviders) {
 		this.dynamicConfig = dynamicConfig;
 		this.astrixInjector = injector;
 		this.apiProviderPlugins = apiProviderPlugins;
-		this.beanFactory = this.astrixInjector.getBean(AstrixBeanFactory.class); // The bean-factory used for apis managed by astrix
-		this.beanConfigurations = this.astrixInjector.getBean(BeanConfigurations.class); 
-		this.beanFactoryRegistry = (SimpleAstrixFactoryBeanRegistry) this.astrixInjector.getBean(AstrixFactoryBeanRegistry.class);
-		for (ApiProviderClass apiProvider : this.astrixInjector.getBean(ApiProviders.class).getAll()) {
+		
+		this.beanFactory = beanFactory;
+		this.beanConfigurations = beanConfigurations;
+		this.beanFactoryRegistry = beanFactoryRegistry;
+		for (ApiProviderClass apiProvider : apiProviders.getAll()) {
 			log.debug("Creating factory beans for apiProvider={}", apiProvider.getName());
 			for (PublishedBean publishedBean: this.apiProviderPlugins.getProviderPlugin(apiProvider).createFactoryBeans(apiProvider)) {
 				log.debug("Registering factory for bean. beanKey={} apiProvider={} factoryType={}",  
@@ -69,7 +73,6 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 			}
 		}
 	}
-	
 	
 	<T> void registerBeanFactory(StandardFactoryBean<T> beanFactory) {
 		this.beanFactoryRegistry.registerFactory(beanFactory);
