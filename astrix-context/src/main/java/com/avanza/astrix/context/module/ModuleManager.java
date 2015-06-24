@@ -46,20 +46,17 @@ public class ModuleManager {
 		ModuleInstance moduleInstance = new ModuleInstance(module);
 		moduleInstances.add(moduleInstance);
 		for (Class<?> exportedType : moduleInstance.getExports()) {
-			List<ModuleInstance> modules = moduleByExportedType.get(exportedType);
-			if (modules == null) {
-				modules = new LinkedList<ModuleManager.ModuleInstance>();
-				moduleByExportedType.put(exportedType, modules);
-			}
-			modules.add(moduleInstance);
-//			ModuleInstance alreadyRegisteredProvider = moduleByExportedType.putIfAbsent(exportedType, moduleInstance);
-//			if (alreadyRegisteredProvider != null) {
-//				log.warn("Type already exported by another module. Ignoring export. type={} usedModule={} ignoredModule={}", 
-//						exportedType.getName(),
-//						alreadyRegisteredProvider.getName(),
-//						moduleInstance.getName());
-//			}
+			getExportingModules(exportedType).add(moduleInstance);
 		}
+	}
+
+	private List<ModuleInstance> getExportingModules(Class<?> exportedType) {
+		List<ModuleInstance> modules = moduleByExportedType.get(exportedType);
+		if (modules == null) {
+			modules = new LinkedList<ModuleManager.ModuleInstance>();
+			moduleByExportedType.put(exportedType, modules);
+		}
+		return modules;
 	}
 
 	public <T> T getInstance(Class<T> type) {
