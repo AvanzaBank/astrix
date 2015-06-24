@@ -16,9 +16,7 @@
 package com.avanza.astrix.context.module;
 
 import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -144,8 +142,9 @@ public class ModuleTest {
 		moduleManager.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(PingCollector.class, PingCollectorImpl.class);
 				moduleContext.importType(Ping.class);
-				moduleContext.export(PingPluginCollector.class);
+				moduleContext.export(PingCollector.class);
 			}
 		});
 		moduleManager.register(new Module() {
@@ -162,8 +161,8 @@ public class ModuleTest {
 				moduleContext.export(Ping.class);
 			}
 		});
-		PingPluginCollector pingPluginCollector = moduleManager.getInstance(PingPluginCollector.class);
-		assertEquals(2, pingPluginCollector.pingPluginCount());
+		PingCollector pingPluginCollector = moduleManager.getInstance(PingCollector.class);
+		assertEquals(2, pingPluginCollector.pingInstanceCount());
 	}
 	
 	@Test
@@ -172,12 +171,13 @@ public class ModuleTest {
 		moduleManager.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(PingCollector.class, PingCollectorImpl.class);
 				moduleContext.importType(Ping.class);
-				moduleContext.export(PingPluginCollector.class);
+				moduleContext.export(PingCollector.class);
 			}
 		});
-		PingPluginCollector pingPluginCollector = moduleManager.getInstance(PingPluginCollector.class);
-		assertEquals(0, pingPluginCollector.pingPluginCount());
+		PingCollector pingPluginCollector = moduleManager.getInstance(PingCollector.class);
+		assertEquals(0, pingPluginCollector.pingInstanceCount());
 	}
 	
 	@Test
@@ -186,9 +186,9 @@ public class ModuleTest {
 		moduleManager.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
-				moduleContext.bind(SinglePingCollector.class, SinglePingCollector.class);
+				moduleContext.bind(PingCollector.class, SinglePingCollector.class);
 				moduleContext.importType(Ping.class);
-				moduleContext.export(SinglePingCollector.class);
+				moduleContext.export(PingCollector.class);
 			}
 		});
 		moduleManager.register(new Module() {
@@ -205,7 +205,7 @@ public class ModuleTest {
 				moduleContext.export(Ping.class);
 			}
 		});
-		SinglePingCollector pingPluginCollector = moduleManager.getInstance(SinglePingCollector.class);
+		PingCollector pingPluginCollector = moduleManager.getInstance(PingCollector.class);
 		assertEquals("oof", pingPluginCollector.getPing().ping("foo"));
 	}
 	
@@ -215,9 +215,9 @@ public class ModuleTest {
 		moduleManager.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
-				moduleContext.bind(SinglePingCollector.class, SinglePingCollector.class);
+				moduleContext.bind(PingCollector.class, SinglePingCollector.class);
 				moduleContext.importType(Ping.class);
-				moduleContext.export(SinglePingCollector.class);
+				moduleContext.export(PingCollector.class);
 			}
 		});
 		moduleManager.register(new Module() {
@@ -234,7 +234,7 @@ public class ModuleTest {
 				moduleContext.export(Ping.class);
 			}
 		});
-		assertEquals(1, moduleManager.getBeansOfType(SinglePingCollector.class).size());
+		assertEquals(1, moduleManager.getBeansOfType(PingCollector.class).size());
 		assertEquals(2, moduleManager.getBeansOfType(Ping.class).size());
 	}
 	
@@ -246,7 +246,7 @@ public class ModuleTest {
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(SinglePingCollector.class, SinglePingCollector.class);
 				moduleContext.importType(Ping.class);
-				moduleContext.export(SinglePingCollector.class);
+				moduleContext.export(PingCollector.class);
 			}
 			@Override
 			public String name() {
@@ -277,7 +277,7 @@ public class ModuleTest {
 		});
 		Set<AstrixBeanKey<?>> exportedBeanKeys = moduleManager.getExportedBeanKeys();
 		assertEquals(3, exportedBeanKeys.size());
-		assertTrue(exportedBeanKeys.contains(AstrixBeanKey.create(SinglePingCollector.class, "collector")));
+		assertTrue(exportedBeanKeys.contains(AstrixBeanKey.create(PingCollector.class, "collector")));
 		assertTrue(exportedBeanKeys.contains(AstrixBeanKey.create(Ping.class, "reverse-ping")));
 		assertTrue(exportedBeanKeys.contains(AstrixBeanKey.create(Ping.class, "ping")));
 		
@@ -418,19 +418,29 @@ public class ModuleTest {
 		}
 	}
 	
-	public static class PingPluginCollector {
-		private final Collection<Ping> pingPlugins;
+	public interface PingCollector {
+		int pingInstanceCount();
+		Ping getPing();
+	}
+	
+	public static class PingCollectorImpl implements PingCollector {
+		private final Collection<Ping> pingInstances;
 
-		public PingPluginCollector(List<Ping> pingPlugins) {
-			this.pingPlugins = pingPlugins;
+		public PingCollectorImpl(List<Ping> pingPlugins) {
+			this.pingInstances = pingPlugins;
 		}
 		
-		public int pingPluginCount() {
-			return pingPlugins.size();
+		public int pingInstanceCount() {
+			return pingInstances.size();
+		}
+		
+		@Override
+		public Ping getPing() {
+			throw new UnsupportedOperationException();
 		}
 	}
 	
-	public static class SinglePingCollector {
+	public static class SinglePingCollector implements PingCollector {
 		private final Ping ping;
 
 		public SinglePingCollector(Ping ping) {
@@ -441,6 +451,11 @@ public class ModuleTest {
 			return ping;
 		}
 
+		@Override
+		public int pingInstanceCount() {
+			return ping != null ? 1 : 0;
+		}
+		
 	}
 	
 	public static class NormalPing implements Ping, PingPlugin {
