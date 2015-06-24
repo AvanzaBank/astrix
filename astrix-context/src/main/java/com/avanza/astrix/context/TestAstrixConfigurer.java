@@ -147,6 +147,12 @@ public class TestAstrixConfigurer {
 			return type;
 		}
 		
+		@Override
+		public boolean lifecycled() {
+			return true;
+		}
+		
+		
 	}
 
 	public TestAstrixConfigurer enableVersioning(boolean enableVersioning) {

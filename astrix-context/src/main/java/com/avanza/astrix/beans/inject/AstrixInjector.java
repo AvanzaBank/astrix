@@ -163,6 +163,11 @@ public class AstrixInjector {
 		public AstrixBeanKey<T> getBeanKey() {
 			return beanKey;
 		}
+		
+		@Override
+		public boolean lifecycled() {
+			return true;
+		}
 	}
 	
 	private static class AstrixBeanDependencyInjectionBeanPostProcessor implements AstrixBeanPostProcessor {

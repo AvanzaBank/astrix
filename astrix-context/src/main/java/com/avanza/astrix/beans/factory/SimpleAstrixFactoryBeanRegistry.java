@@ -110,6 +110,11 @@ public class SimpleAstrixFactoryBeanRegistry implements AstrixFactoryBeanRegistr
 		public AstrixBeanKey<T> getBeanKey() {
 			return key;
 		}
+		
+		@Override
+		public boolean lifecycled() {
+			return true;
+		}
 	}
 
 	

@@ -38,5 +38,10 @@ public class AlreadyInstantiatedFactoryBean<T> implements StandardFactoryBean<T>
 	public AstrixBeanKey<T> getBeanKey() {
 		return beanKey;
 	}
+
+	@Override
+	public boolean lifecycled() {
+		return true;
+	}
 	
 }

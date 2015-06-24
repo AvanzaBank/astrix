@@ -46,4 +46,9 @@ public class AstrixFtProxiedFactory<T> implements StandardFactoryBean<T> {
 		return target.getBeanKey();
 	}
 
+	@Override
+	public boolean lifecycled() {
+		return target.lifecycled();
+	}
+
 }

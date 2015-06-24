@@ -15,8 +15,6 @@
  */
 package com.avanza.astrix.context.module;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -34,7 +32,6 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.core.util.ReflectionUtil;
 
 public class ModuleManager {
 	
@@ -112,25 +109,20 @@ public class ModuleManager {
 
 		@Override
 		public T create(AstrixBeans beans) {
-			/*
-			 * Wraps retrieved module instance in proxy in order to avoid
-			 * that the retrieved module instance receives lifecycle callbacks
-			 * from the Injector used by the importing module instance.
-			 */
-			final T instance = moduleManager.getInstance(beanKey);
-			return ReflectionUtil.newProxy(beanKey.getBeanType(), new InvocationHandler() {
-				@Override
-				public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-					return method.invoke(instance, args);
-				}
-			});
+			return moduleManager.getInstance(beanKey);
 		}
 
 		@Override
 		public AstrixBeanKey<T> getBeanKey() {
 			return beanKey;
 		}
-		
+		@Override
+		public boolean lifecycled() {
+			/*
+			 * Exported beans are lifecycled by the module they belong to
+			 */
+			return false;
+		}
 	}
 	
 	public class ModuleInstance {
@@ -181,13 +173,13 @@ public class ModuleManager {
 					injector.bind(AstrixBeanKey.create(type), provider);
 				}
 				@Override
-				public void export(Class<?> moduleType) {
-					exports.add(moduleType);
+				public void export(Class<?> type) {
+					exports.add(type);
 				}
 				@Override
-				public <T> void importType(final Class<T> moduleType) {
-					importedTypes.add(moduleType);
-					injector.bind(AstrixBeanKey.create(moduleType), new ExportedModuleFactoryBean<>(AstrixBeanKey.create(moduleType), ModuleManager.this));
+				public <T> void importType(final Class<T> type) {
+					importedTypes.add(type);
+					injector.bind(AstrixBeanKey.create(type), new ExportedModuleFactoryBean<>(AstrixBeanKey.create(type), ModuleManager.this));
 				}
 			});
 			

@@ -78,4 +78,9 @@ public class AstrixLibraryFactory<T> implements StandardFactoryBean<T> {
 		return this.beanKey;
 	}
 	
+	@Override
+	public boolean lifecycled() {
+		return true;
+	}
+	
 }

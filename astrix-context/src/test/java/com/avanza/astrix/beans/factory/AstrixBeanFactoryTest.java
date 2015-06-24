@@ -240,6 +240,11 @@ public class AstrixBeanFactoryTest {
 		public AstrixBeanKey<T> getBeanKey() {
 			return this.key;
 		}
+		
+		@Override
+		public boolean lifecycled() {
+			return true;
+		}
 
 	}
 

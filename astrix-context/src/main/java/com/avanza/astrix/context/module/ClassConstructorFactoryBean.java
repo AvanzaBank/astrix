@@ -130,4 +130,9 @@ public final class ClassConstructorFactoryBean<T> implements StandardFactoryBean
 	public AstrixBeanKey<T> getBeanKey() {
 		return beanKey;
 	}
+
+	@Override
+	public boolean lifecycled() {
+		return true;
+	}
 }

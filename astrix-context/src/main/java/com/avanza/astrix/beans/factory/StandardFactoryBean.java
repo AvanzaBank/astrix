@@ -49,6 +49,8 @@ public interface StandardFactoryBean<T> extends FactoryBean<T> {
 	 */
 	T create(AstrixBeans beans);
 	
+	boolean lifecycled();
+	
 	/**
 	 * Identifier for the bean created by this factory.
 	 * 
