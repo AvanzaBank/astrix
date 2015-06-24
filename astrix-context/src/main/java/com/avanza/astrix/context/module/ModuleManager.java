@@ -193,22 +193,8 @@ public class ModuleManager {
 				}
 				@Override
 				public <T> void importType(final Class<T> moduleType) {
+					importedTypes.add(moduleType);
 					injector.bind(AstrixBeanKey.create(moduleType), new ExportedModuleFactoryBean<>(AstrixBeanKey.create(moduleType), ModuleManager.this));
-				}
-				
-				@Override
-				public <T> void importAllOfType(Class<T> type) {
-					importedTypes.add(type);
-				}
-				
-				@Override
-				public <T> void bind(Class<T> type, Class<? extends T> providerType, String qualifier) {
-					injector.bind(AstrixBeanKey.create(type, qualifier), providerType);
-				}
-				@Override
-				public <T> void bind(Class<T> type, T provider, String qualifier) {
-					injector.bind(AstrixBeanKey.create(type, qualifier), provider);
-					
 				}
 			});
 			

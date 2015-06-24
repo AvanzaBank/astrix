@@ -89,7 +89,7 @@ public class ModuleTest {
 		moduleManager.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
-				moduleContext.importAllOfType(Ping.class);
+				moduleContext.importType(Ping.class);
 				moduleContext.export(PingPluginCollector.class);
 			}
 		});
