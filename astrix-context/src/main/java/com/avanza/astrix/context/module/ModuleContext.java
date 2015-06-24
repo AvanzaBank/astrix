@@ -18,8 +18,14 @@ package com.avanza.astrix.context.module;
 public interface ModuleContext {
 	
 	<T> void bind(Class<T> type, Class<? extends T> providerType);
-
+	
 	<T> void bind(Class<T> type, T provider);
+	
+	// TODO: remove qualified bind methods?
+	<T> void bind(Class<T> type, Class<? extends T> providerType, String qualifier);
+
+	// TODO: remove qualified bind methods?
+	<T> void bind(Class<T> type, T provider, String qualifier);
 
 	/**
 	 * Exports a given type provided by this module. Exported types are
@@ -36,5 +42,7 @@ public interface ModuleContext {
 	 * @param type
 	 */
 	<T> void importType(Class<T> type);
+	
+	<T> void importAllOfType(Class<T> type);
 
 }

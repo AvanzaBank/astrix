@@ -27,12 +27,8 @@ import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
-import com.avanza.astrix.beans.factory.MissingBeanProviderException;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.beans.inject.AlreadyInstantiatedFactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.inject.AstrixPlugins;
-import com.avanza.astrix.beans.inject.ClassConstructorFactoryBean;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -43,8 +39,8 @@ public class ModuleInjector {
 	private InjectingBeanFactoryRegistry beanFactoryRegistry;
 	private AstrixBeanFactory beanFactory;
 	
-	public ModuleInjector() {
-		this.beanFactoryRegistry = new InjectingBeanFactoryRegistry();
+	public ModuleInjector(AstrixFactoryBeanRegistry importedBeans) {
+		this.beanFactoryRegistry = new InjectingBeanFactoryRegistry(importedBeans);
 		this.beanFactory = new AstrixBeanFactory(beanFactoryRegistry);
 		this.beanFactory.registerBeanPostProcessor(new AstrixBeanDependencyInjectionBeanPostProcessor());
 	}
@@ -58,17 +54,15 @@ public class ModuleInjector {
 	}
 	
 	
-	public <T> void bind(Class<T> type, Class<? extends T> providerType) {
-		this.beanFactoryRegistry.bind(type, providerType);
+	public <T> void bind(AstrixBeanKey<T> beanKey, Class<? extends T> providerType) {
+		this.beanFactoryRegistry.bind(beanKey, providerType);
 	}
 
-	public <T> void bind(Class<T> type, T provider) {
-		AstrixBeanKey<T> beanKey = AstrixBeanKey.create(type);
+	public <T> void bind(AstrixBeanKey<T> beanKey, T provider) {
 		this.beanFactoryRegistry.providerByBeanKey.put(beanKey, new AlreadyInstantiatedFactoryBean<>(beanKey, provider));
 	}
 	
-	public <T> void bind(Class<T> type, StandardFactoryBean<T> factory) {
-		AstrixBeanKey<T> beanKey = AstrixBeanKey.create(type);
+	public <T> void bind(AstrixBeanKey<T> beanKey, StandardFactoryBean<T> factory) {
 		this.beanFactoryRegistry.providerByBeanKey.put(beanKey, factory);
 	}
 	
@@ -80,7 +74,12 @@ public class ModuleInjector {
 		
 		private final ConcurrentMap<AstrixBeanKey<?>, StandardFactoryBean<?>> providerByBeanKey = new ConcurrentHashMap<>();
 		private final ConcurrentMap<AstrixBeanKey<?>, AstrixBeanKey<?>> beanBindings = new ConcurrentHashMap<>();
+		private final AstrixFactoryBeanRegistry importedBeans;
 		
+		public InjectingBeanFactoryRegistry(AstrixFactoryBeanRegistry importedBeans) {
+			this.importedBeans = importedBeans;
+		}
+
 		@Override
 		public <T> StandardFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey) {
 			Class<T> beanType = beanKey.getBeanType();
@@ -91,26 +90,28 @@ public class ModuleInjector {
 			if (factory != null) {
 				return factory;
 			}
+			return importedBeans.getFactoryBean(beanKey);
 			// Check if beanType is abstract
 //			throw new MissingBeanProviderException(beanKey);
-			return new ClassConstructorFactoryBean<>(beanKey, beanKey.getBeanType());
+//			return new ClassConstructorFactoryBean<>(beanKey, beanKey.getBeanType());
 		}
 
-		public <T> void bind(Class<T> type, Class<? extends T> providerType) {
-			this.beanBindings.put(AstrixBeanKey.create(type), AstrixBeanKey.create(providerType));
-			this.providerByBeanKey.put(AstrixBeanKey.create(providerType),
-									   new ClassConstructorFactoryBean<T>(AstrixBeanKey.create(type), providerType));
+		public <T> void bind(AstrixBeanKey<T> beanKey, Class<? extends T> providerType) {
+			this.beanBindings.put(beanKey, AstrixBeanKey.create(providerType));
+			this.providerByBeanKey.put(AstrixBeanKey.create(providerType, beanKey.getQualifier()),
+									   new ClassConstructorFactoryBean<T>(beanKey, providerType));
 		}
 
 		@Override
 		public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
-			Set<AstrixBeanKey<T>> result = new HashSet<>();
-			if (providerByBeanKey.containsKey(AstrixBeanKey.create(type))) {
-				result.add(AstrixBeanKey.create(type));
-				return result;
-			}
-			result.add(AstrixBeanKey.create(type));
-			return result;
+			return this.importedBeans.getBeansOfType(type);
+//			Set<AstrixBeanKey<T>> result = new HashSet<>();
+//			if (providerByBeanKey.containsKey(AstrixBeanKey.create(type))) {
+//				result.add(AstrixBeanKey.create(type));
+//				return result;
+//			}
+//			result.add(AstrixBeanKey.create(type));
+//			return result;
 		}
 
 		@Override
@@ -123,39 +124,6 @@ public class ModuleInjector {
 		}
 	}
 
-	static class AstrixPluginFactoryBean<T> implements StandardFactoryBean<T> {
-		
-		private AstrixBeanKey<T> beanKey;
-		private AstrixPlugins plugins;
-		
-		public AstrixPluginFactoryBean(AstrixBeanKey<T> beanKey, AstrixPlugins plugins) {
-			this.beanKey = beanKey;
-			this.plugins = plugins;
-		}
-
-		@Override
-		public T create(AstrixBeans beans) {
-			if (beanKey.getQualifier() != null) {
-				// Get given instance of plugin
-				return plugins.getPluginInstance(beanKey.getBeanType(), getPluginProviderType());
-			}
-			return plugins.getPlugin(beanKey.getBeanType());
-		}
-
-		private Class<? extends T> getPluginProviderType() {
-			try {
-				return (Class<? extends T>) Class.forName(beanKey.getQualifier());
-			} catch (ClassNotFoundException e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		@Override
-		public AstrixBeanKey<T> getBeanKey() {
-			return beanKey;
-		}
-	}
-	
 	private static class AstrixBeanDependencyInjectionBeanPostProcessor implements AstrixBeanPostProcessor {
 
 		@Override

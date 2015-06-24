@@ -18,6 +18,7 @@ package com.avanza.astrix.context.module;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.PreDestroy;
 
@@ -46,7 +47,7 @@ public class ModuleTest {
 	}
 	
 	@Test
-	public void moduleWithDependencie() throws Exception {
+	public void moduleWithDependencies() throws Exception {
 		ModuleManager moduleManager = new ModuleManager();
 		moduleManager.register(new DependentPingModule());
 		moduleManager.register(new PingDriverModule());
@@ -55,13 +56,13 @@ public class ModuleTest {
 	}
 	
 	@Test
-	public void destroyingAModuleManagerInovkedDestroyAnnotatedMethodsExactlyOnce() throws Exception {
+	public void destroyingAModuleManagerInvokesDestroyAnnotatedMethodsExactlyOnce() throws Exception {
 		ModuleManager moduleManager = new ModuleManager();
 		moduleManager.register(new DependentPingModule());
 		moduleManager.register(new PingDriverModule());
 
 		// NOTE: Create Ping to ensure that PingDriver is note destroyed twice.
-		//       Once when module contianing ping is destroyed, and once when drive 
+		//       Once when module containing ping is destroyed, and once when drive 
 		//       module is destroyed
 		moduleManager.getInstance(Ping.class); 
 		PingDriver pingDriver = moduleManager.getInstance(PingDriver.class);
@@ -82,13 +83,13 @@ public class ModuleTest {
 		assertEquals("not reversed", ping.ping("not reversed"));
 	}
 	
-//	@Test
-	public void pluginSupport() throws Exception {
+	@Test
+	public void itsPossibleToImportAllExportedBeansOfAGivenType() throws Exception {
 		ModuleManager moduleManager = new ModuleManager();
 		moduleManager.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
-				moduleContext.importType(Plugins.class);
+				moduleContext.importAllOfType(Ping.class);
 				moduleContext.export(PingPluginCollector.class);
 			}
 		});
@@ -106,10 +107,10 @@ public class ModuleTest {
 				moduleContext.export(Ping.class);
 			}
 		});
-		
 		PingPluginCollector pingPluginCollector = moduleManager.getInstance(PingPluginCollector.class);
 		assertEquals(2, pingPluginCollector.pingPluginCount());
 	}
+	
 	
 	public interface Ping {
 		String ping(String msg);
@@ -142,10 +143,10 @@ public class ModuleTest {
 	}
 	
 	public static class PingPluginCollector {
-		private final Collection<PingPlugin> pingPlugins;
+		private final Collection<Ping> pingPlugins;
 
-		public PingPluginCollector(Plugins plugins) {
-			this.pingPlugins = plugins.getPlugins(PingPlugin.class);
+		public PingPluginCollector(List<Ping> pingPlugins) {
+			this.pingPlugins = pingPlugins;
 		}
 		
 		public int pingPluginCount() {
