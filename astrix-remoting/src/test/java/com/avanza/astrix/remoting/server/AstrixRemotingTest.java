@@ -71,7 +71,7 @@ import com.avanza.astrix.remoting.client.RoutingStrategy;
 public class AstrixRemotingTest {
 
 	AstrixObjectSerializer objectSerializer = new JavaSerializationSerializer(1);
-	AstrixServiceActivator partition1 = new AstrixServiceActivator();
+	AstrixServiceActivatorImpl partition1 = new AstrixServiceActivatorImpl();
 	
 	private static class NoRoutingStrategy implements RoutingStrategy {
 		@Override
@@ -115,7 +115,7 @@ public class AstrixRemotingTest {
 		assertEquals("reply-kalle", reply.getGreeting());
 	}
 	
-	private static RemotingTransport directTransport(AstrixServiceActivator... partitions) {
+	private static RemotingTransport directTransport(AstrixServiceActivatorImpl... partitions) {
 		return RemotingTransport.create(new PartitionedDirectTransport(Arrays.asList(partitions)));
 	}
 	
@@ -216,7 +216,7 @@ public class AstrixRemotingTest {
 
 	@Test
 	public void broadcastRequest() throws Exception {
-		AstrixServiceActivator partition2 = new AstrixServiceActivator();
+		AstrixServiceActivatorImpl partition2 = new AstrixServiceActivatorImpl();
 		PingService impl = new PingService() {
 			@Override
 			public List<String> ping(String msg) {
@@ -235,8 +235,8 @@ public class AstrixRemotingTest {
 	
 	@Test
 	public void partitionedRequest() throws Exception {
-		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
-		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
+		AstrixServiceActivatorImpl oddPartition = new AstrixServiceActivatorImpl();
 		CalculatorListService eventPartitionCalculator = new CalculatorListService() {
 			@Override
 			public Integer squareSum(Collection<Integer> nums) {
@@ -274,8 +274,8 @@ public class AstrixRemotingTest {
 	
 	@Test
 	public void partitionedRequest_GenericArrayArgument() throws Exception {
-		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
-		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
+		AstrixServiceActivatorImpl oddPartition = new AstrixServiceActivatorImpl();
 		PartitionedPingService eventPartitionPing = new PartitionedPingServiceImpl();
 		PartitionedPingService oddPartitionPing = new PartitionedPingServiceImpl();
 		
@@ -293,8 +293,8 @@ public class AstrixRemotingTest {
 	
 	@Test
 	public void partitionedRequest_voidReturnType() throws Exception {
-		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
-		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
+		AstrixServiceActivatorImpl oddPartition = new AstrixServiceActivatorImpl();
 		PartitionedPingService eventPartitionPing = new PartitionedPingServiceImpl();
 		PartitionedPingService oddPartitionPing = new PartitionedPingServiceImpl();
 		
@@ -307,8 +307,8 @@ public class AstrixRemotingTest {
 	
 	@Test
 	public void partitionedRequest_emptyArgument() throws Exception {
-		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
-		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
+		AstrixServiceActivatorImpl oddPartition = new AstrixServiceActivatorImpl();
 		PartitionedPingService evenPartitionPing = Mockito.mock(PartitionedPingService.class);
 		PartitionedPingService oddPartitionPing = Mockito.mock(PartitionedPingService.class);
 		
@@ -323,8 +323,8 @@ public class AstrixRemotingTest {
 	
 	@Test(expected = RemoteServiceInvocationException.class)
 	public void partitoinedRoutingRequest_NonServiceInovcationExcpetion_WrappedInRemoteServiceInvocation() throws Exception {
-		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
-		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
+		AstrixServiceActivatorImpl oddPartition = new AstrixServiceActivatorImpl();
 		PartitionedPingService evenPartitionPing = new PartitionedPingServiceImpl() {
 			@Override
 			public List<String> ping(String... nums) {
@@ -343,8 +343,8 @@ public class AstrixRemotingTest {
 	
 	@Test
 	public void partitionedRequest_routingOnPropertyOnTargetObject() throws Exception {
-		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
-		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
+		AstrixServiceActivatorImpl oddPartition = new AstrixServiceActivatorImpl();
 		CalculatorArrayPojoService eventPartitionCalculator = new CalculatorArrayPojoService() {
 			@Override
 			public Integer squareSum(NumPojo... nums) {
@@ -386,8 +386,8 @@ public class AstrixRemotingTest {
 	
 	@Test
 	public void partitionedRequest_routingOnPropertyOnTargetObject_CollectionArgument() throws Exception {
-		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
-		AstrixServiceActivator oddPartition = new AstrixServiceActivator();
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
+		AstrixServiceActivatorImpl oddPartition = new AstrixServiceActivatorImpl();
 		CalculatorListPojoService eventPartitionCalculator = new CalculatorListPojoServiceImpl();
 		CalculatorListPojoService oddPartitionCalculator = new CalculatorListPojoServiceImpl();
 		
@@ -401,14 +401,14 @@ public class AstrixRemotingTest {
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void partitionedRequest_routingOnProperty_throwsExceptionForRawTypes() throws Exception {
-		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
 		RemotingProxy.create(ServiceWithRawListRoutingArgument.class, ServiceWithRawListRoutingArgument.class, 
 				directTransport(evenPartition), objectSerializer, new DefaultAstrixRoutingStrategy());
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void partitionedRequest_routingOnProperty_throwsExceptionForMissingMethods() throws Exception {
-		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
 		RemotingProxy.create(ServiceWithListMissingRoutingPropertyMethod.class, ServiceWithListMissingRoutingPropertyMethod.class,
 				directTransport(evenPartition), objectSerializer, new DefaultAstrixRoutingStrategy());
 	}
@@ -423,21 +423,21 @@ public class AstrixRemotingTest {
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void partitionedService_IncompatibleCollectionType_throwsException() throws Exception {
-		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
 		RemotingProxy.create(InvalidCollectionTypePartitionedService.class, InvalidCollectionTypePartitionedService.class, 
 				directTransport(evenPartition), objectSerializer, new NoRoutingStrategy());
 	}
 	
 	@Test(expected = IncompatibleRemoteResultReducerException.class)
 	public void partitionedService_IncompatibleReducer_throwsException() throws Exception {
-		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
 		RemotingProxy.create(InvalidReducerPartitionedService.class, InvalidReducerPartitionedService.class,
 				directTransport(evenPartition), objectSerializer, new NoRoutingStrategy());
 	}
 	
 	@Test
 	public void partitionedService_NonListCollection() throws Exception {
-		AstrixServiceActivator evenPartition = new AstrixServiceActivator();
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
 		PartitionedServiceUsingSet sevenPartitionService = new PartitionedServiceUsingSet() {
 			@Override
 			public Set<Integer> ping(Set<Integer> nums) {
@@ -570,7 +570,7 @@ public class AstrixRemotingTest {
 			}
 			
 		};
-		partition1 = new AstrixServiceActivator();
+		partition1 = new AstrixServiceActivatorImpl();
 		
 		TestService impl = new TestService() {
 			@Override
@@ -1116,9 +1116,9 @@ public class AstrixRemotingTest {
 	
 	private static class PartitionedDirectTransport implements RemotingTransportSpi {
 
-		private List<AstrixServiceActivator> partitions;
+		private List<AstrixServiceActivatorImpl> partitions;
 		
-		public PartitionedDirectTransport(List<AstrixServiceActivator> partitions) {
+		public PartitionedDirectTransport(List<AstrixServiceActivatorImpl> partitions) {
 			this.partitions = partitions;
 		}
 
@@ -1134,14 +1134,14 @@ public class AstrixRemotingTest {
 			});
 		}
 
-		private AstrixServiceActivator getActivator(RoutingKey routingKey) {
+		private AstrixServiceActivatorImpl getActivator(RoutingKey routingKey) {
 			return partitions.get(routingKey.hashCode() % partitions.size());
 		}
 
 		@Override
 		public Observable<List<AstrixServiceInvocationResponse>> submitBroadcastRequest(AstrixServiceInvocationRequest request) {
 			final List<AstrixServiceInvocationResponse> responses = new ArrayList<>();
-			for (AstrixServiceActivator partition : partitions) {
+			for (AstrixServiceActivatorImpl partition : partitions) {
 				responses.add(partition.invokeService(request));
 			}
 			return Observable.create(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {

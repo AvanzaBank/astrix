@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
+import com.avanza.astrix.beans.service.ObjectSerializerFactory;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -32,7 +33,8 @@ public class ServiceRegistryV1ApiMigrationTest {
 	@Test
 	public void generatesApplicationInstanceIdFromQualifierAndApiTypeFor_AstrixServiceRegistryEntry_onVersion1() throws Exception {
 		AstrixApplicationContext context = (AstrixApplicationContext) new TestAstrixConfigurer().enableVersioning(true).configure();
-		AstrixVersioningPlugin versioningPlugin = context.getPlugin(AstrixVersioningPlugin.class);
+//		AstrixVersioningPlugin versioningPlugin = context.getPlugin(AstrixVersioningPlugin.class);
+		ObjectSerializerFactory versioningPlugin = context.getInstance(ObjectSerializerFactory.class);
 		AstrixObjectSerializer objectSerializer = versioningPlugin.create(ObjectSerializerDefinition.versionedService(2, ServiceRegistryObjectSerializerConfigurer.class));
 
 		

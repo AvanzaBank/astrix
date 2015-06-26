@@ -15,7 +15,8 @@
  */
 package com.avanza.astrix.context;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -61,8 +62,7 @@ public class AstrixConfigurerTest {
 		configurer.set(longSetting, AstrixBeanKey.create(Ping.class), 19);
 		
 		AstrixContextImpl astrixContext = autoClosables.add((AstrixContextImpl) configurer.configure());
-		BeanConfigurations beanConfigurations = astrixContext.getInstance(BeanConfigurations.class);
-		BeanConfiguration pingConfig = beanConfigurations.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
+		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
 		
 		assertEquals(21, pingConfig.get(intSetting).get());
 		assertFalse(pingConfig.get(aBooleanSetting).get());
@@ -80,8 +80,7 @@ public class AstrixConfigurerTest {
 		});
 		
 		AstrixContextImpl astrixContext = autoClosables.add((AstrixContextImpl) configurer.configure());
-		BeanConfigurations beanConfigurations = astrixContext.getInstance(BeanConfigurations.class);
-		BeanConfiguration pingConfig = beanConfigurations.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
+		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
 
 		assertEquals(2000, pingConfig.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
 	}

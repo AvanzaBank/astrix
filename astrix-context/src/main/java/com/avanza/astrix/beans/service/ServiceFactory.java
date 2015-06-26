@@ -23,7 +23,6 @@ import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.DynamicFactoryBean;
 import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.config.DynamicConfig;
 
 /**
  * 
@@ -33,18 +32,15 @@ import com.avanza.astrix.config.DynamicConfig;
  */
 public class ServiceFactory<T> implements DynamicFactoryBean<T> {
 
-	private final ServiceComponents serviceComponents;
+	private final ServiceComponentRegistry serviceComponents;
 	private final ServiceDiscoveryFactory<?> serviceDiscoveryFactory;
 	private final ServiceLeaseManager leaseManager;
 	private final ServiceDefinition<T> serviceDefinition;
-	private final DynamicConfig config;
 
 	public ServiceFactory(ServiceDefinition<T> serviceDefinition, 
 						  ServiceDiscoveryFactory<?> serviceDiscoveryFactory, 
-						  ServiceComponents serviceComponents, 
-						  ServiceLeaseManager leaseManager,
-						  DynamicConfig config) {
-		this.config = config;
+						  ServiceComponentRegistry serviceComponents, 
+						  ServiceLeaseManager leaseManager) {
 		this.serviceDefinition = Objects.requireNonNull(serviceDefinition);
 		this.serviceDiscoveryFactory = Objects.requireNonNull(serviceDiscoveryFactory);
 		this.serviceComponents = Objects.requireNonNull(serviceComponents);
@@ -53,7 +49,7 @@ public class ServiceFactory<T> implements DynamicFactoryBean<T> {
 
 	public T create(AstrixBeanKey<T> beanKey) {
 		ServiceDiscovery serviceDiscovery = serviceDiscoveryFactory.create(beanKey.getQualifier());
-		ServiceBeanInstance<T> serviceBeanInstance = ServiceBeanInstance.create(serviceDefinition, beanKey, serviceDiscovery, serviceComponents, config);
+		ServiceBeanInstance<T> serviceBeanInstance = ServiceBeanInstance.create(serviceDefinition, beanKey, serviceDiscovery, serviceComponents);
 		serviceBeanInstance.bind();
 		leaseManager.startManageLease(serviceBeanInstance);
 		return beanKey.getBeanType().cast(
@@ -69,19 +65,17 @@ public class ServiceFactory<T> implements DynamicFactoryBean<T> {
 
 	public static <T> FactoryBean<T> dynamic(ServiceDefinition<T> serviceDefinition, 
 													ServiceDiscoveryFactory<?> serviceDiscovery, 
-													ServiceComponents serviceComponents, 
-													ServiceLeaseManager leaseManager,
-													DynamicConfig config) {
-		return new ServiceFactory<T>(serviceDefinition, serviceDiscovery, serviceComponents, leaseManager, config);
+													ServiceComponentRegistry serviceComponents, 
+													ServiceLeaseManager leaseManager) {
+		return new ServiceFactory<T>(serviceDefinition, serviceDiscovery, serviceComponents, leaseManager);
 	}
 	
 	public static <T> FactoryBean<T> standard(ServiceDefinition<T> serviceDefinition, 
 													AstrixBeanKey<T> beanType, 
 													ServiceDiscoveryFactory<?> serviceDiscoveryFactory, 
-													ServiceComponents serviceComponents, 
-													ServiceLeaseManager leaseManager,
-													DynamicConfig config) {
-		ServiceFactory<T> serviceFactory = new ServiceFactory<T>(serviceDefinition, serviceDiscoveryFactory, serviceComponents, leaseManager, config);
+													ServiceComponentRegistry serviceComponents, 
+													ServiceLeaseManager leaseManager) {
+		ServiceFactory<T> serviceFactory = new ServiceFactory<T>(serviceDefinition, serviceDiscoveryFactory, serviceComponents, leaseManager);
 		return new FactoryBeanAdapter<T>(serviceFactory, beanType);
 	}
 	

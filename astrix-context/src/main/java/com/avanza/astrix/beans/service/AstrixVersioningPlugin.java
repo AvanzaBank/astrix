@@ -17,10 +17,10 @@ package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixObjectSerializer.NoVersioningSupport;
-import com.avanza.astrix.core.AstrixStrategy;
 
-@AstrixStrategy(AstrixVersioningPlugin.Default.class)
 public interface AstrixVersioningPlugin {
+	
+	// TODO: rename
 	
 	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition);
 	

@@ -17,44 +17,16 @@ package com.avanza.astrix.spring;
 
 import org.springframework.context.ApplicationContext;
 
-import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.inject.AstrixInjector;
-/**
- * Acts as a bride between Astrix and Spring.
- * 
- * - Astrix managed classes can read spring-beans by accessing the ApplicationContext
- * - Spring managed classes might access Astrix by autowiring in this class
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public class AstrixSpringContext {
-	
-	/* TODO: Depending on ModuleInjector feels weird... 
-	 * It would be more natural to depend on AstrixContext but it causes circular dependency
-	 * right now. When introducing "service-unit" as a concept then this class should depend on
-	 * ServiceUnitContext instead of ModuleInjector.. 
-	 */
-	
-	private AstrixInjector astrixInjector;
-	private ApplicationContext applicationContext;
+import com.avanza.astrix.context.AstrixContext;
 
-	@AstrixInject
-	public void setAstrixInjector(AstrixInjector astrixInjector) {
-		this.astrixInjector = astrixInjector;
-	}
+public interface AstrixSpringContext {
+
+	ApplicationContext getApplicationContext();
+
+	<T> T getInstance(Class<T> type);
+
+	void setApplicationContext(ApplicationContext applicationContext);
 	
-	public void setApplicationContext(ApplicationContext applicationContext) {
-		this.applicationContext = applicationContext;
-	}
-	
-	public ApplicationContext getApplicationContext() {
-		return applicationContext;
-	}
-	
-	public <T> T getInstance(
-			Class<T> type) {
-		return astrixInjector.getBean(type);
-	}
-	
+	void setAstrixContext(AstrixContext applicationContext);
+
 }

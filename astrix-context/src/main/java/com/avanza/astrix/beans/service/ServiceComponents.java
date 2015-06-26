@@ -20,17 +20,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
 
-public class ServiceComponents {
 
+class ServiceComponents implements ServiceComponentRegistry {
+
+	private final Logger log = org.slf4j.LoggerFactory.getLogger(ServiceComponents.class);
 	private final Map<String, ServiceComponent> componentsByName = new ConcurrentHashMap<>();
 	
 	public ServiceComponents(List<ServiceComponent> serviceComponents) {
+		log.debug("Creating ServiceComponentRegistry with " + serviceComponents.size() + " service components");
 		for (ServiceComponent serviceComponent : serviceComponents) {
+			log.debug("Registering service component: " + serviceComponent.getName());
 			componentsByName.put(serviceComponent.getName(), serviceComponent);
 		}
 	}
 	
+	@Override
 	public ServiceComponent getComponent(String name) {
 		ServiceComponent serviceComponent = componentsByName.get(name);
 		if (serviceComponent == null) {

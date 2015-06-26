@@ -92,9 +92,9 @@ public final class ClassConstructorFactoryBean<T> implements StandardFactoryBean
 	}
 
 	private Constructor<T> getFactory() throws NoSuchMethodException {
-		Constructor<?>[] constructors = beanImplClass.getConstructors();
+		Constructor<?>[] constructors = beanImplClass.getDeclaredConstructors();
 		if (constructors.length == 0) {
-			throw new IllegalStateException("Couldnt find public constructor on: " + beanImplClass.getName());
+			throw new IllegalStateException("Couldnt find constructor on: " + beanImplClass.getName());
 		}
 		if (constructors.length == 1) {
 			return (Constructor<T>) constructors[0];

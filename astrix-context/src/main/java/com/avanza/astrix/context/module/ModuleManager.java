@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.context.module;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -26,6 +28,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.annotation.PreDestroy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +37,7 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
+import com.avanza.astrix.beans.factory.MissingBeanProviderException;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 
 public class ModuleManager {
@@ -65,13 +70,22 @@ public class ModuleManager {
 			throw new IllegalArgumentException("Non exported type: " + type);
 		}
 		if (exportingModules.size() > 1) {
-			log.warn("Type exported by multiple modules. Using first registered provider. Ignoring export. type={} usedModule={}",
-					type,
-					exportingModules.get(0).getName());
+			log.warn("Type exported by multiple modules. Using first registered provider. Ignoring export. type={} usedModule={} ignoredModules={}",
+					type.getName(),
+					exportingModules.get(0).getName(),
+					getModulesNames(exportingModules.subList(1, exportingModules.size())));
 		}
 		return exportingModules.get(0).getInstance(type);
 	}
 	
+	private List<String> getModulesNames(List<ModuleInstance> modules) {
+		List<String> result = new ArrayList<String>(modules.size());
+		for (ModuleInstance instance : modules) {
+			result.add(instance.getName());
+		}
+		return result;
+	}
+
 	public <T> T getInstance(Class<T> type, String exportingModuleName) {
 		List<ModuleInstance> exportingModules = moduleByExportedType.get(type);
 		if (exportingModules == null) {
@@ -178,7 +192,7 @@ public class ModuleManager {
 					}
 					// Check if beanType is abstract
 					if (beanKey.getBeanType().isInterface()) {
-						throw new IllegalArgumentException(beanKey.toString());
+						throw new MissingBeanProviderException(beanKey, String.format("Failed to create bean=%s in module=%s", beanKey.toString(), moduleName));
 					}
 					return new ClassConstructorFactoryBean<>(beanKey, beanKey.getBeanType());
 				}
@@ -186,7 +200,7 @@ public class ModuleManager {
 				@Override
 				public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
 					if (!importedTypes.contains(type)) {
-						return Collections.emptySet();
+						return new HashSet<>();
 					}
 					return ModuleManager.this.getBeansOfType(type);
 				}
@@ -247,16 +261,10 @@ public class ModuleManager {
 		}
 	}
 
+	@PreDestroy
 	public void destroy() {
 		for (ModuleInstance moduleInstance : this.moduleInstances) {
 			moduleInstance.destroy();
-		}
-	}
-
-	public void autoDiscover() {
-		List<Module> modules = ModuleDiscovery.loadModules();
-		for (Module module : modules) {
-			register(module);
 		}
 	}
 
@@ -276,6 +284,14 @@ public class ModuleManager {
 		void add(AstrixBeanPostProcessor beanPostProcessor) {
 			this.beanPostProcessors.add(beanPostProcessor);
 		}
+	}
+
+	public <T> Collection<T> getInstances(Class<T> type) {
+		List<T> result = new LinkedList<T>();
+		for (AstrixBeanKey<T> key : getBeansOfType(type)) {
+			result.add(getInstance(key.getBeanType(), key.getQualifier()));
+		}
+		return result;
 	}
 
 }

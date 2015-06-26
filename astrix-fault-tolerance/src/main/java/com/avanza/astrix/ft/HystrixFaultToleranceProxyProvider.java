@@ -32,10 +32,10 @@ import com.avanza.astrix.core.util.ReflectionUtil;
 @MetaInfServices(BeanFaultToleranceProxyStrategy.class)
 public class HystrixFaultToleranceProxyProvider implements BeanFaultToleranceProxyStrategy {
 	
-	private BeanFaultToleranceFactory faultToleranceFactory;
+	private BeanFaultToleranceFactoryImpl faultToleranceFactory;
 	
 	@AstrixInject
-	public void setFaultTolerance(BeanFaultToleranceFactory faultToleranceFactory) {
+	public void setFaultTolerance(BeanFaultToleranceFactoryImpl faultToleranceFactory) {
 		this.faultToleranceFactory = faultToleranceFactory;
 	}
 	@Override

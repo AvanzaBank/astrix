@@ -20,12 +20,15 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PreDestroy;
+
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.beans.factory.FactoryBean;
+import com.avanza.astrix.beans.config.AstrixConfig;
+import com.avanza.astrix.beans.core.AstrixConfigAware;
+import com.avanza.astrix.beans.factory.ObjectCache;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
 import com.avanza.astrix.beans.publish.PublishedBean;
@@ -33,6 +36,7 @@ import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
+import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
@@ -47,10 +51,26 @@ import com.avanza.astrix.provider.versioning.Versioned;
 @MetaInfServices(ApiProviderPlugin.class)
 public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 	
-	private AstrixInjector injector;
+	// TODO: really use injector? 
+//	private AstrixInjector injector = new AstrixInjector(new AstrixFactoryBeanRegistry() {
+//		@Override
+//		public <T> AstrixBeanKey<? extends T> resolveBean(AstrixBeanKey<T> beanKey) {
+//			return beanKey;
+//		}
+//		@Override
+//		public <T> StandardFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey) {
+//			return new ClassConstructorFactoryBean<>(beanKey, beanKey.getBeanType());
+//		}
+//		@Override
+//		public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
+//			return Collections.emptySet();
+//		}
+//	});
+	private ObjectCache provideInstanceCache = new ObjectCache();
 	private AstrixServiceMetaFactory serviceMetaFactory;
 	private ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory;
 	private BeanFaultToleranceProxyStrategy faultToleranceFactory;
+	private AstrixConfig config;
 	
 	@Override
 	public List<PublishedBean> createFactoryBeans(ApiProviderClass apiProviderClass) {
@@ -81,7 +101,7 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 			ApiProviderClass apiProviderClass,
 			Method astrixBeanDefinitionMethod,
 			AstrixBeanDefinitionMethod<T> beanDefinition) {
-		Object libraryProviderInstance = getInstanceProvider(apiProviderClass.getProviderClass());
+		Object libraryProviderInstance = getApiProviderInstance(apiProviderClass.getProviderClass());
 		StandardFactoryBean<T> libraryFactory = new AstrixLibraryFactory<>(libraryProviderInstance, astrixBeanDefinitionMethod, beanDefinition.getQualifier());
 		if (beanDefinition.applyFtProxy()) {
 			libraryFactory = new AstrixFtProxiedFactory<T>(libraryFactory, faultToleranceFactory, beanDefinition);
@@ -119,8 +139,18 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 		throw new IllegalArgumentException(String.format("ApiProvider does not provide service. providerClass=%s service=%s", apiProviderClass, providedService.getName()));
 	}
 
-	private Object getInstanceProvider(Class<?> provider) {
-		return injector.getBean(provider);
+	private Object getApiProviderInstance(final Class<?> provider) {
+//		return injector.getBean(provider);
+		return provideInstanceCache.getInstance(provider, new ObjectCache.ObjectFactory<Object>() {
+			@Override
+			public Object create() throws Exception {
+				Object instance = ReflectionUtil.newInstance(provider);
+				if (instance instanceof AstrixConfigAware) {
+					AstrixConfigAware.class.cast(instance).setConfig(config.getConfig());
+				}
+				return instance;
+			}
+		});
 	}
 
 	@Override
@@ -128,9 +158,19 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 		return AstrixApiProvider.class;
 	}
 	
+	@PreDestroy
+	public void destroy() {
+		this.provideInstanceCache.destroy();
+	}
+	
+//	@AstrixInject
+//	public void setAstrixContext(AstrixInjector injector) {
+//		this.injector = injector;
+//	}
+	
 	@AstrixInject
-	public void setAstrixContext(AstrixInjector injector) {
-		this.injector = injector;
+	public void setConfig(AstrixConfig config) {
+		this.config = config;
 	}
 	
 	@AstrixInject

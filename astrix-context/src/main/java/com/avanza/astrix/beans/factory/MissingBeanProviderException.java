@@ -34,6 +34,11 @@ public class MissingBeanProviderException extends RuntimeException {
 		this.beanType = beanType;
 	}
 	
+	public MissingBeanProviderException(AstrixBeanKey<? extends Object> beanType, String msg) {
+		super(msg);
+		this.beanType = beanType;
+	}
+	
 	public AstrixBeanKey<? extends Object> getBeanType() {
 		return beanType;
 	}

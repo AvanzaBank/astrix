@@ -24,6 +24,4 @@ public interface AstrixApplicationContext extends AstrixContext {
 
 	DynamicConfig getConfig();
 
-	<T> T getPlugin(Class<T> pluginType);
-
 }

@@ -15,31 +15,33 @@
  */
 package com.avanza.astrix.context;
 
-import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.factory.FactoryBean;
-import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.service.ServiceComponents;
+import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
 import com.avanza.astrix.beans.service.ServiceFactory;
 import com.avanza.astrix.beans.service.ServiceLeaseManager;
-import com.avanza.astrix.config.DynamicConfig;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public final class AstrixServiceMetaFactory implements AstrixConfigAware {
+public final class AstrixServiceMetaFactory {
 
-	private ServiceComponents serviceComponents;
+	private ServiceComponentRegistry serviceComponents;
 	private ServiceLeaseManager leaseManager;
-	private DynamicConfig config;
+	
+	public AstrixServiceMetaFactory(ServiceComponentRegistry serviceComponents,
+									ServiceLeaseManager leaseManager) {
+		this.serviceComponents = serviceComponents;
+		this.leaseManager = leaseManager;
+	}
 
 	public <T> FactoryBean<T> createServiceFactory(ServiceDefinition<T> serviceDefinition, ServiceDiscoveryFactory<?> serviceDiscoveryFactory) {
 		if (serviceDefinition.isDynamicQualified()) {
-			return ServiceFactory.dynamic(serviceDefinition, serviceDiscoveryFactory, serviceComponents, leaseManager, config);
+			return ServiceFactory.dynamic(serviceDefinition, serviceDiscoveryFactory, serviceComponents, leaseManager);
 		}
-		return ServiceFactory.standard(serviceDefinition, serviceDefinition.getBeanKey(), serviceDiscoveryFactory, serviceComponents, leaseManager, config);
+		return ServiceFactory.standard(serviceDefinition, serviceDefinition.getBeanKey(), serviceDiscoveryFactory, serviceComponents, leaseManager);
 	}
 	
 	public Class<?> loadInterfaceIfExists(String interfaceName) {
@@ -53,21 +55,5 @@ public final class AstrixServiceMetaFactory implements AstrixConfigAware {
 		}
 		return null;
 	}
-
-	@AstrixInject
-	public void setServiceComponents(ServiceComponents serviceComponents) {
-		this.serviceComponents = serviceComponents;
-	}
-	
-	@AstrixInject
-	public void setLeaseManager(ServiceLeaseManager leaseManager) {
-		this.leaseManager = leaseManager;
-	}
-	
-	@Override
-	public void setConfig(DynamicConfig config) {
-		this.config = config;
-	}
-
 
 }

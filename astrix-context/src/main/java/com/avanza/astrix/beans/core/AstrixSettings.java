@@ -87,6 +87,8 @@ public final class AstrixSettings {
 	public static final StringSetting SUBSYSTEM_NAME = StringSetting.create("AstrixContext.subsystem", "default");
 	
 	public static final BooleanSetting ENABLE_FAULT_TOLERANCE = BooleanSetting.create("AstrixContext.enableFaultTolerance", true);
+	
+	// TODO: remove this setting?
 	public static final BooleanSetting ENABLE_VERSIONING = BooleanSetting.create("AstrixContext.enableVersioning", true);
 	public static final StringSetting GIGA_SPACE_BEAN_NAME = StringSetting.create("AstrixGsComponent.gigaSpaceBeanName", null);
 	public static final StringSetting DYNAMIC_CONFIG_FACTORY = StringSetting.create("com.avanza.astrix.context.AstrixDynamicConfigFactory", null);

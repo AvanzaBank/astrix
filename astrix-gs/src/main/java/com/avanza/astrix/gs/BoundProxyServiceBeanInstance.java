@@ -16,7 +16,7 @@
 package com.avanza.astrix.gs;
 
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
-import com.avanza.astrix.gs.ClusteredProxyCache.GigaSpaceInstance;
+import com.avanza.astrix.gs.ClusteredProxyCacheImpl.GigaSpaceInstance;
 
 public class BoundProxyServiceBeanInstance<T> implements BoundServiceBeanInstance<T> {
 

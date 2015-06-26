@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.util.ReflectionUtil;
@@ -49,7 +48,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	private final String id = Integer.toString(nextId.incrementAndGet()); // Used for debugging to distinguish between many context's started within same jvm.
 	
 	private final AstrixBeanKey<T> beanKey;
-	private final ServiceComponents serviceComponents;
+	private final ServiceComponentRegistry serviceComponents;
 	private final ServiceDefinition<T> serviceDefinition;
 	/*
 	 * Monitor used to signal state changes. (waitForBean)
@@ -71,8 +70,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	private ServiceBeanInstance(ServiceDefinition<T> serviceDefinition, 
 								AstrixBeanKey<T> beanKey, 
 								ServiceDiscovery serviceDiscovery, 
-								ServiceComponents serviceComponents, 
-								DynamicConfig config) {
+								ServiceComponentRegistry serviceComponents) {
 		this.serviceDiscovery = serviceDiscovery;
 		this.serviceDefinition = Objects.requireNonNull(serviceDefinition);
 		this.beanKey = Objects.requireNonNull(beanKey);
@@ -84,9 +82,8 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	public static <T> ServiceBeanInstance<T> create(ServiceDefinition<T> serviceDefinition, 
 													AstrixBeanKey<T> beanKey, 
 													ServiceDiscovery serviceDiscovery, 
-													ServiceComponents serviceComponents, 
-													DynamicConfig config) {
-		return new ServiceBeanInstance<T>(serviceDefinition, beanKey, serviceDiscovery, serviceComponents, config);
+													ServiceComponentRegistry serviceComponents) {
+		return new ServiceBeanInstance<T>(serviceDefinition, beanKey, serviceDiscovery, serviceComponents);
 	}
 	
 	public void renewLease() {

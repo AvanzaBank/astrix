@@ -25,11 +25,11 @@ import java.util.concurrent.ConcurrentMap;
  * @author Elias Lindholm (elilin)
  *
  */
-public class ApiProviderPlugins {
+final class ApiProviderPlugins {
 	
 	private final ConcurrentMap<Class<? extends Annotation>, ApiProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	
-	public ApiProviderPlugins(Collection<ApiProviderPlugin> apiProviderPlugins) {
+	ApiProviderPlugins(Collection<ApiProviderPlugin> apiProviderPlugins) {
 		for (ApiProviderPlugin plugin : apiProviderPlugins) {
 			ApiProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
@@ -39,7 +39,7 @@ public class ApiProviderPlugins {
 		}
 	}
 	
-	public ApiProviderPlugin getProviderPlugin(ApiProviderClass apiProvider) {
+	ApiProviderPlugin getProviderPlugin(ApiProviderClass apiProvider) {
 		for (ApiProviderPlugin plugin : pluginByAnnotationType.values()) {
 			if (apiProvider.isAnnotationPresent(plugin.getProviderAnnotationType())) {
 				return plugin;

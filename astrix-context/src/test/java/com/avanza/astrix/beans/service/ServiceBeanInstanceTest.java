@@ -121,7 +121,7 @@ public class ServiceBeanInstanceTest {
 		Ping ping = astrixContext.getBean(Ping.class);
 		assertEquals("foo", ping.ping("foo"));
 
-		DirectComponent directComponent = (DirectComponent) astrixContext.getInstance(ServiceComponents.class).getComponent(AstrixServiceComponentNames.DIRECT);
+		DirectComponent directComponent = (DirectComponent) astrixContext.getInstance(ServiceComponentRegistry.class).getComponent(AstrixServiceComponentNames.DIRECT);
 		assertEquals(2, directComponent.getBoundServices().size());
 		assertThat("Expected at least one service to be bound after pingBean is bound", directComponent.getBoundServices().size(), greaterThanOrEqualTo(1));
 		
@@ -141,7 +141,7 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		AstrixApplicationContext astrixContext = (AstrixApplicationContext) astrixConfigurer.configure();
 		
-		DirectComponent directComponent = (DirectComponent) astrixContext.getInstance(ServiceComponents.class).getComponent(AstrixServiceComponentNames.DIRECT);
+		DirectComponent directComponent = (DirectComponent) astrixContext.getInstance(ServiceComponentRegistry.class).getComponent(AstrixServiceComponentNames.DIRECT);
 
 		final Ping ping = astrixContext.getBean(Ping.class);
 		ping.ping("foo");
@@ -249,7 +249,7 @@ public class ServiceBeanInstanceTest {
 		astrixContext.waitForBean(Ping.class, 100);
 	}
 	
-	static class FakeComponent extends DirectComponent {
+	static class FakeComponent implements ServiceComponent {
 		
 		@Override
 		public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> versioningContext, ServiceProperties serviceProperties) {
@@ -259,6 +259,30 @@ public class ServiceBeanInstanceTest {
 		@Override
 		public String getName() {
 			return "test";
+		}
+
+		@Override
+		public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
+			return new ServiceProperties();
+		}
+
+		@Override
+		public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> exportedServiceDefinition) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean canBindType(Class<?> type) {
+			return true;
+		}
+
+		@Override
+		public <T> void exportService(Class<T> providedApi, T provider, ServiceDefinition<T> serviceDefinition) {
+		}
+
+		@Override
+		public boolean requiresProviderInstance() {
+			return false;
 		}
 	}
 	

@@ -100,7 +100,11 @@ public class ModuleInjector {
 
 		@Override
 		public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
-			return this.importedBeans.getBeansOfType(type);
+			Set<AstrixBeanKey<T>> result = this.importedBeans.getBeansOfType(type);
+			if (beanBindings.containsKey(AstrixBeanKey.create(type))) {
+				result.add(AstrixBeanKey.create(type));
+			}
+			return result;
 		}
 
 		@Override

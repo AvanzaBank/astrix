@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -50,12 +51,12 @@ import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
-import com.avanza.astrix.serviceunit.ServiceAdministrator;
-import com.avanza.astrix.serviceunit.ServiceAdministratorImpl;
-import com.avanza.astrix.serviceunit.ServiceAdministratorVersioningConfigurer;
 import com.avanza.astrix.serviceunit.ExportedServiceBeanDefinition;
+import com.avanza.astrix.serviceunit.ServiceAdministrator;
+import com.avanza.astrix.serviceunit.ServiceAdministratorVersioningConfigurer;
 import com.avanza.astrix.serviceunit.ServiceExporter;
 import com.avanza.astrix.serviceunit.ServiceRegistryExporter;
+import com.avanza.astrix.serviceunit.ServiceUnitModule;
 
 /**
  * 
@@ -105,12 +106,14 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		astrixContext = createAsterixContext(getDynamicConfig(applicationContext));
 		astrixContext.getInstance(AstrixSpringContext.class).setApplicationContext(applicationContext);
+		astrixContext.getInstance(AstrixSpringContext.class).setAstrixContext(astrixContext);
 		for (Class<?> consumedAstrixBean : this.consumedAstrixBeans) {
 			beanFactory.registerSingleton(consumedAstrixBean.getName(), astrixContext.getBean(consumedAstrixBean));
 		}
 		beanFactory.registerSingleton(AstrixSpringContext.class.getName(), astrixContext.getInstance(AstrixSpringContext.class));
 		beanFactory.registerSingleton(AstrixContext.class.getName(), astrixContext);
-		beanFactory.addBeanPostProcessor(astrixContext.getInstance(AstrixBeanPostProcessor.class));
+		beanFactory.addBeanPostProcessor(astrixContext.getInstance(BeanPostProcessor.class));
+//		beanFactory.addBeanPostProcessor(astrixContext.getInstance(AstrixBeanPostProcessor.class));
 	}
 
 	/**
@@ -207,6 +210,11 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	}
 	
 	private AstrixApplicationContext createAsterixContext(DynamicConfig optionalConfig) {
+		if (isServer()) {
+			// Register server part of framework
+//			configurer.registerModule(new SpringModule());
+//			configurer.registerModule(new ServiceUnitModule());
+		}
 		configurer.setSettings(this.settings);
 		if (optionalConfig != null) {
 			configurer.setConfig(optionalConfig);
@@ -238,13 +246,13 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	}
 
 	private void exportAllProvidedServices() {
-		if (applicationDescriptor == null) {
+		if (!isServer()) {
 			return; // current application exports no services
 		}
 		String applicationInstanceId = setupApplicationInstanceId();
 		ServiceExporter serviceExporter = astrixContext.getInstance(ServiceExporter.class);
 		
-		serviceExporter.addServiceProvider(astrixContext.getInstance(ServiceAdministratorImpl.class));
+		serviceExporter.addServiceProvider(astrixContext.getInstance(ServiceAdministrator.class));
 		// TODO 
 		ObjectSerializerDefinition serializer = ObjectSerializerDefinition.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
 		ServiceDefinition<ServiceAdministrator> serviceDefinition = new ServiceDefinition<>(ApiProvider.create("FrameworkServices"),
@@ -259,7 +267,13 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		
 		serviceExporter.setServiceDescriptor(applicationDescriptor); // TODO This is a hack. Avoid setting serviceDescriptor explicitly here
 		serviceExporter.exportProvidedServices();
-		astrixContext.getInstance(ServiceRegistryExporter.class).startPublishServices();
+		serviceExporter.startPublishServices();
+		
+//		astrixContext.getInstance(ServiceRegistryExporter.class).startPublishServices();
+	}
+
+	private boolean isServer() {
+		return applicationDescriptor != null;
 	}
 	
 

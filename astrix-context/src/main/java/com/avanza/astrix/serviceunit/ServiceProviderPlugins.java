@@ -17,18 +17,17 @@ package com.avanza.astrix.serviceunit;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 
-public class ServiceProviderPlugins {
+class ServiceProviderPlugins {
 	
 	private final ConcurrentMap<Class<? extends Annotation>, ServiceProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	
-	public ServiceProviderPlugins(Collection<ServiceProviderPlugin> apiProviderPlugins) {
+	public ServiceProviderPlugins(List<ServiceProviderPlugin> apiProviderPlugins) {
 		for (ServiceProviderPlugin plugin : apiProviderPlugins) {
 			ServiceProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {

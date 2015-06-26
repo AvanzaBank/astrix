@@ -15,38 +15,10 @@
  */
 package com.avanza.astrix.beans.factory;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.AstrixConfigAware;
-import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
-import com.avanza.astrix.config.DynamicConfig;
 /**
  * @author Elias Lindholm (elilin)
  */
-public final class BeanConfigurations implements AstrixConfigAware {
-	
-	private DynamicConfig config;
-	private final Map<AstrixBeanKey<?>, Map<BeanSetting<?>, Object>> beanSettingByType = new ConcurrentHashMap<>();
-
-	public BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey) {
-		Map<BeanSetting<?>, Object> defaultBeanSettingsOverride = beanSettingByType.get(beanKey);
-		if (defaultBeanSettingsOverride == null) {
-			defaultBeanSettingsOverride = Collections.emptyMap();
-		}
-		return new BeanConfiguration(beanKey, config, defaultBeanSettingsOverride);
-	}
-
-	@Override
-	public void setConfig(DynamicConfig config) {
-		this.config = config;
-	}
-
-	public void setDefaultBeanConfig(AstrixBeanKey<?> beanKey,
-			Map<BeanSetting<?>, Object> defaultBeanSettingsOverride) {
-		this.beanSettingByType.put(beanKey, defaultBeanSettingsOverride);
-	}
-	
+public interface BeanConfigurations {
+	BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey);
 }

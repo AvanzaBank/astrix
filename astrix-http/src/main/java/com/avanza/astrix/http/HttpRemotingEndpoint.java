@@ -3,6 +3,7 @@ package com.avanza.astrix.http;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
 /*
  * Copyright 2014 Avanza Bank AB
  *

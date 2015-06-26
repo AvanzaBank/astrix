@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Avanza Bank AB
+ * Copyright 2014 Avanza Bank AB	
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,11 @@
  */
 package com.avanza.astrix.gs.remoting;
 
-import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
+import com.avanza.astrix.beans.service.ObjectSerializerFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
@@ -30,7 +29,7 @@ import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.gs.BoundProxyServiceBeanInstance;
 import com.avanza.astrix.gs.ClusteredProxyCache;
-import com.avanza.astrix.gs.ClusteredProxyCache.GigaSpaceInstance;
+import com.avanza.astrix.gs.ClusteredProxyCacheImpl.GigaSpaceInstance;
 import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.remoting.client.RemotingProxy;
@@ -43,19 +42,19 @@ import com.avanza.astrix.spring.AstrixSpringContext;
  * @author Elias Lindholm
  *
  */
-@MetaInfServices(ServiceComponent.class)
+//@MetaInfServices(ServiceComponent.class)
 public class GsRemotingComponent implements ServiceComponent {
 
 	private GsBinder gsBinder;
 	private BeanFaultToleranceFactory beanFaultToleranceFactory;
 	private AstrixSpringContext astrixSpringContext;
 	private AstrixServiceActivator serviceActivator;
-	private AstrixVersioningPlugin versioningPlugin;
+	private ObjectSerializerFactory objectSerializerFactory;
 	private ClusteredProxyCache proxyCache;
 	
 	@Override
 	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
-		AstrixObjectSerializer objectSerializer = versioningPlugin.create(serviceDefinition.getObjectSerializerDefinition());
+		AstrixObjectSerializer objectSerializer = objectSerializerFactory.create(serviceDefinition.getObjectSerializerDefinition());
 		
 		GigaSpaceInstance proxyInstance = proxyCache.getProxy(serviceProperties);
 		BeanFaultTolerance faultTolerance = beanFaultToleranceFactory.create(serviceDefinition);
@@ -90,7 +89,7 @@ public class GsRemotingComponent implements ServiceComponent {
 	
 	@Override
 	public <T> void exportService(Class<T> providedApi, T provider, ServiceDefinition<T> serviceDefinition) {
-		AstrixObjectSerializer objectSerializer = versioningPlugin.create(serviceDefinition.getObjectSerializerDefinition()); 
+		AstrixObjectSerializer objectSerializer = objectSerializerFactory.create(serviceDefinition.getObjectSerializerDefinition()); 
 		this.serviceActivator.register(provider, objectSerializer, providedApi);
 	}
 	
@@ -127,8 +126,8 @@ public class GsRemotingComponent implements ServiceComponent {
 	}
 	
 	@AstrixInject
-	public void setVersioningPlugin(AstrixVersioningPlugin versioningPlugin) {
-		this.versioningPlugin = versioningPlugin;
+	public void setObjectSerializerFactory(ObjectSerializerFactory objectSerializerFactory) {
+		this.objectSerializerFactory = objectSerializerFactory;
 	}
 	
 }

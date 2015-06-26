@@ -43,11 +43,13 @@ public class BeanFaultToleranceTest {
 	private TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 	private Ping ping;
 	private Ping anotherPing;
+	private CountingCachingHystrixCommandNamingStrategy commandNamingStrategy = new CountingCachingHystrixCommandNamingStrategy();
 
 	@Before
 	public void setup() {
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
-		astrixConfigurer.set(HystrixCommandNamingStrategy.class.getName(), CountingCachingHystrixCommandNamingStrategy.class.getName());
+//		astrixConfigurer.set(HystrixCommandNamingStrategy.class.getName(), CountingCachingHystrixCommandNamingStrategy.class.getName());
+		astrixConfigurer.registerStrategy(HystrixCommandNamingStrategy.class, commandNamingStrategy);
 		astrixConfigurer.enableFaultTolerance(true);
 		context = (AstrixApplicationContext) astrixConfigurer.configure();
 		ping = context.getBean(Ping.class);
@@ -106,7 +108,9 @@ public class BeanFaultToleranceTest {
 	
 	private <T> String getCommandKey(AstrixBeanKey<T> beanKey) {
 		SimplePublishedAstrixBean<T> beanDefinition = new SimplePublishedAstrixBean<>(ApiProvider.create(PingApiProvider.class.getName()), beanKey);
-		return context.getInstance(BeanFaultToleranceFactory.class).getCommandNamingStrategy().getCommandKeyName(beanDefinition);
+//		return context.getInstance(BeanFaultToleranceFactory.class).getCommandNamingStrategy().getCommandKeyName(beanDefinition);
+//		return context.getInstance(HystrixCommandNamingStrategy.class).getCommandKeyName(beanDefinition);
+		return commandNamingStrategy.getCommandKeyName(beanDefinition);
 	}
 	
 	private int getEventCountForCommand(HystrixRollingNumberEvent hystrixRollingNumberEvent, String commandKey) {

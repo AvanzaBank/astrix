@@ -39,6 +39,7 @@ import org.junit.Test;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.factory.BeanConfigurations;
+import com.avanza.astrix.beans.factory.BeanConfigurationsImpl;
 import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
@@ -60,7 +61,7 @@ public abstract class FaultToleranceIntegrationTest {
 	private Class<SimpleService> api = SimpleService.class;
 	private SimpleService provider = new SimpleServiceImpl();
 	private SimpleService testService;
-	private BeanFaultToleranceFactory faultToleranceFactory;
+	private BeanFaultToleranceFactoryImpl faultToleranceFactory;
 	private CountingCachingHystrixCommandNamingStrategy commandNamingStrategy = new CountingCachingHystrixCommandNamingStrategy();
 	private MapConfigSource config = new MapConfigSource();
 	
@@ -73,9 +74,9 @@ public abstract class FaultToleranceIntegrationTest {
 	@Before
 	public void createService() {
 		DynamicConfig dynamicConfig = DynamicConfig.create(config);
-		BeanConfigurations beanConfigurations = new BeanConfigurations();
+		BeanConfigurationsImpl beanConfigurations = new BeanConfigurationsImpl();
 		beanConfigurations.setConfig(dynamicConfig);
-		faultToleranceFactory = new BeanFaultToleranceFactory(dynamicConfig, new HystrixBeanFaultToleranceProvider(), commandNamingStrategy, beanConfigurations);
+		faultToleranceFactory = new BeanFaultToleranceFactoryImpl(dynamicConfig, new HystrixBeanFaultToleranceProvider(), commandNamingStrategy, beanConfigurations);
 		testService = createProxy(api, provider, settings());
 	}
 	

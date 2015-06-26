@@ -24,6 +24,7 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.util.AstrixFrameworkThread;
 import com.avanza.astrix.config.DynamicConfig;
@@ -36,12 +37,12 @@ public class ServiceLeaseManager {
 	
 	private final Logger log = LoggerFactory.getLogger(ServiceLeaseManager.class);
 	private final List<ServiceBeanInstance<?>> leasedServices = new CopyOnWriteArrayList<>();
-	private final DynamicConfig config;
+	private final AstrixConfig config;
 	private final ServiceLeaseRenewalThread leaseRenewalThread = new ServiceLeaseRenewalThread();
 	private final ServiceBindThread serviceBindThread = new ServiceBindThread();
 	private final AtomicBoolean isStarted = new AtomicBoolean(false);
 	
-	public ServiceLeaseManager(DynamicConfig config) {
+	public ServiceLeaseManager(AstrixConfig config) {
 		this.config = config;
 	}
 	
@@ -88,7 +89,8 @@ public class ServiceLeaseManager {
 					}
 				}
 				try {
-					Thread.sleep(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL.getFrom(config).get());
+//					Thread.sleep(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL.getFrom(config).get());
+					Thread.sleep(config.get(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL).get());
 				} catch (InterruptedException e) {
 					interrupt();
 				}
@@ -119,7 +121,8 @@ public class ServiceLeaseManager {
 					renewLease(leasedService);
 				}
 				try {
-					Thread.sleep(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL.getFrom(config).get());
+//					Thread.sleep(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL.getFrom(config).get());
+					Thread.sleep(config.get(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL).get());
 				} catch (InterruptedException e) {
 					interrupt();
 				}

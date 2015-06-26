@@ -16,7 +16,11 @@
 package com.avanza.astrix.context.module;
 
 import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,7 +30,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.annotation.PreDestroy;
 
-import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
@@ -48,6 +51,22 @@ public class ModuleTest {
 			}
 		});
 		assertEquals(PingWithInternalDriver.class, moduleManager.getInstance(Ping.class).getClass());
+	}
+	
+	
+	@Test
+	public void createdBeansAreCached() throws Exception {
+		ModuleManager moduleManager = new ModuleManager();
+		moduleManager.register(new Module() {
+			@Override
+			public void prepare(ModuleContext context) {
+				context.bind(Ping.class, PingWithInternalDriver.class);
+				context.export(Ping.class);
+			}
+		});
+		Ping ping1 = moduleManager.getInstance(Ping.class);
+		Ping ping2 = moduleManager.getInstance(Ping.class);
+		assertSame(ping1, ping2);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
@@ -91,7 +110,9 @@ public class ModuleTest {
 			@Override
 			public void prepare(ModuleContext context) {
 				context.bind(Ping.class, PingWithImportedDriver.class);
+				
 				context.importType(PingDriver.class);
+				
 				context.export(Ping.class);
 			}
 		});
@@ -99,6 +120,7 @@ public class ModuleTest {
 			@Override
 			public void prepare(ModuleContext context) {
 				context.bind(PingDriver.class, PingDriverImpl.class);
+				
 				context.export(PingDriver.class);
 			}
 		});
@@ -352,6 +374,123 @@ public class ModuleTest {
 		assertThat(moduleManager.getInstance(AType.class).getB(), instanceOf(B.class));
 	}
 	
+	@Test
+	public void includesBoundComponentsInSameModuleWhenInjectingListOfAllInstancesOfGivenType() throws Exception {
+		ModuleManager moduleManager = new ModuleManager();
+		moduleManager.register(new Module() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(Ping.class, NormalPing.class);
+				moduleContext.bind(PingCollector.class, PingCollectorImpl.class);
+				
+				moduleContext.export(PingCollector.class);
+			}
+		});
+		
+		assertEquals(1, moduleManager.getInstance(PingCollector.class).pingInstanceCount());
+	}
+	
+	@Test
+	public void exportingMultipleInterfaceFromSameInstance() throws Exception {
+		ModuleManager moduleManager = new ModuleManager();
+		moduleManager.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(Ping.class, SuperPing.class);
+				moduleContext.bind(PingCollector.class, SuperPing.class);
+				
+				moduleContext.export(Ping.class);
+				moduleContext.export(PingCollector.class);
+			}
+			@Override
+			public String name() {
+				return "ping";
+			}
+		});
+		Ping ping = moduleManager.getInstance(Ping.class);
+		PingCollector pingCollector = moduleManager.getInstance(PingCollector.class);
+		assertNotNull(ping);
+		assertSame(ping, pingCollector);
+	}
+	
+//	@Test
+	public void strategiesSupport() throws Exception {
+		ModuleManager moduleManager = new ModuleManager();
+		moduleManager.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(Ping.class, PingWithImportedDriver.class);
+
+				moduleContext.importType(PingDriver.class);
+				
+				moduleContext.export(Ping.class);
+			}
+			@Override
+			public String name() {
+				return "ping";
+			}
+		});
+		Ping ping = moduleManager.getInstance(Ping.class);
+		PingCollector pingCollector = moduleManager.getInstance(PingCollector.class);
+		assertNotNull(ping);
+		assertSame(ping, pingCollector);
+	}
+	
+	
+	
+	
+	// TODO: detect circular dependencies!
+//	@Test
+	public void circularDependencies() throws Exception {
+		ModuleManager moduleManager = new ModuleManager();
+		moduleManager.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(BType.class, CircularTypeB.class);
+				
+				moduleContext.importType(CType.class);
+				
+				moduleContext.export(BType.class);
+			}
+			@Override
+			public String name() {
+				return "b";
+			}
+		});
+		moduleManager.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(CType.class, CircularTypeC.class);
+				
+				moduleContext.importType(BType.class);
+				
+				moduleContext.export(CType.class);
+			}
+			@Override
+			public String name() {
+				return "c";
+			}
+		});
+		
+		moduleManager.getInstance(BType.class);
+	}
+	
+	public static class CircularTypeB implements BType {
+		CType c;
+		public CircularTypeB(CType c) {
+			this.c = c;
+		}
+		
+	}
+	
+	public static class CircularTypeC implements CType {
+		BType b;
+		public CircularTypeC(BType b) {
+			this.b = b;
+		}
+	}
+	
+	
 	public interface AType {
 		BType getB();
 	}
@@ -386,6 +525,25 @@ public class ModuleTest {
 	}
 	
 	public static class C implements CType  {
+	}
+	
+	public static class SuperPing implements Ping, PingCollector {
+
+		@Override
+		public int pingInstanceCount() {
+			return 1;
+		}
+
+		@Override
+		public Ping getPing() {
+			return this;
+		}
+
+		@Override
+		public String ping(String msg) {
+			return msg;
+		}
+		
 	}
 	
 

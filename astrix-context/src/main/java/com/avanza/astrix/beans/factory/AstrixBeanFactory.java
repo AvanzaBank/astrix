@@ -75,7 +75,7 @@ public class AstrixBeanFactory {
 			return getBeanInstance(beanKey).get();
 		}
 		
-		public <T> AstrixBeanInstance<? extends T> getBeanInstance(AstrixBeanKey<T> beanKey) {
+		public <T> AstrixBeanInstance<? extends T> getBeanInstance(final AstrixBeanKey<T> beanKey) {
 			final AstrixBeanKey<? extends T> resolvedBeanKey = registry.resolveBean(beanKey);
 			return beanInstanceCache.getInstance(resolvedBeanKey, new ObjectCache.ObjectFactory<AstrixBeanInstance<? extends T>>() {
 				@Override
@@ -90,7 +90,14 @@ public class AstrixBeanFactory {
 						}
 						// It's the top level bean thats missing, propagate
 						throw e;
-					}
+					} catch (BeanCreationException e) {
+						throw e;
+					} catch (CircularDependency e) {
+						throw e;
+					} catch (Exception e) {
+						throw e;
+//						throw new BeanCreationException(String.format("Failed to create bean=%s trace=%s", beanKey.toString(), constructionStack), e);
+					} 
 				}
 			});
 		}
@@ -103,7 +110,12 @@ public class AstrixBeanFactory {
 			StandardFactoryBean<? extends T> factoryBean = registry.getFactoryBean(beanKey);
 			AstrixBeanInstance<? extends T> instance = createBeanInstance(factoryBean);
 			for (AstrixBeanPostProcessor beanPostProcessor : beanPostProcessors) {
-				instance.postProcess(beanPostProcessor, this);
+				try {
+					instance.postProcess(beanPostProcessor, this);
+				} catch (Exception e) {
+					throw new RuntimeException(String.format("Failed to invoke beanPostProcessor. bean=%s postProcessor=%s", beanKey, beanPostProcessor.getClass().getName()), e);
+//					throw e;
+				}
 			}
 			constructionStack.pop();
 			return instance;

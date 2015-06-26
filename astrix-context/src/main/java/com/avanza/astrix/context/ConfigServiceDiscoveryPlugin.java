@@ -21,10 +21,10 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.service.ServiceComponent;
-import com.avanza.astrix.beans.service.ServiceComponents;
+import com.avanza.astrix.beans.service.ServiceComponentRegistry;
+import com.avanza.astrix.beans.service.ServiceDiscovery;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
 import com.avanza.astrix.beans.service.ServiceProperties;
-import com.avanza.astrix.beans.service.ServiceDiscovery;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 /**
@@ -35,7 +35,9 @@ import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 @MetaInfServices(ServiceDiscoveryMetaFactoryPlugin.class)
 public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactoryPlugin<AstrixConfigDiscovery>, AstrixConfigAware {
 
-	private ServiceComponents serviceComponents;
+	// TODO: remove
+	
+	private ServiceComponentRegistry serviceComponents;
 	private DynamicConfig config;
 	
 	@Override
@@ -54,19 +56,19 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactory
 	}
 	
 	@AstrixInject
-	public void setServiceComponents(ServiceComponents serviceComponents) {
+	public void setServiceComponents(ServiceComponentRegistry serviceComponents) {
 		this.serviceComponents = serviceComponents;
 	}
 
 	private static class ConfigDiscovery implements ServiceDiscovery {
 
-		private ServiceComponents serviceComponents;
+		private ServiceComponentRegistry serviceComponents;
 		private DynamicConfig config;
 		private String configEntryName;
 		private AstrixBeanKey<?> beanKey;
 		
 		
-		public ConfigDiscovery(ServiceComponents serviceComponents,
+		public ConfigDiscovery(ServiceComponentRegistry serviceComponents,
 				DynamicConfig config, String configEntryName, AstrixBeanKey<?> beanKey) {
 			super();
 			this.serviceComponents = serviceComponents;

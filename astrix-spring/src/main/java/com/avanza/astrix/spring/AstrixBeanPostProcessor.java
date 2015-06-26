@@ -18,7 +18,6 @@ package com.avanza.astrix.spring;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
-import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 import com.avanza.astrix.serviceunit.ServiceExporter;
 /**
@@ -30,6 +29,10 @@ public class AstrixBeanPostProcessor implements BeanPostProcessor {
 	
 	private ServiceExporter serviceExporter;
 	
+	public AstrixBeanPostProcessor(ServiceExporter serviceExporter) {
+		this.serviceExporter = serviceExporter;
+	}
+
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		if (bean.getClass().isAnnotationPresent(AstrixServiceExport.class)) {
@@ -42,11 +45,6 @@ public class AstrixBeanPostProcessor implements BeanPostProcessor {
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
-	}
-	
-	@AstrixInject
-	public void setServiceComponents(ServiceExporter serviceExporter) {
-		this.serviceExporter = serviceExporter;
 	}
 	
 }

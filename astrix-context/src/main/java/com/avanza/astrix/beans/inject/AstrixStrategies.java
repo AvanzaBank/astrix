@@ -34,6 +34,8 @@ import com.avanza.astrix.core.util.ReflectionUtil;
  */
 public final class AstrixStrategies {
 	
+	// TODO: remove
+	
 	private static final Logger log = LoggerFactory.getLogger(AstrixStrategies.class);
 	private final DynamicConfig config;
 	private final Map<Class<?>, Object> strategyInstanceByType = new ConcurrentHashMap<>();

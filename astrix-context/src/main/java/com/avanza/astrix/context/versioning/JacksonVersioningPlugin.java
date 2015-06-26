@@ -23,8 +23,10 @@ import com.avanza.astrix.core.AstrixObjectSerializer;
 
 @MetaInfServices(AstrixVersioningPlugin.class)
 public class JacksonVersioningPlugin implements AstrixVersioningPlugin {
+	
 	@Override
 	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
+		// TODO: remove check  if service is versioned
 		if (serializerDefinition.isVersioned()) {
 			return new VersionJacksonAstrixObjectSerializer(serializerDefinition);
 		}

@@ -33,6 +33,8 @@ import com.avanza.astrix.provider.core.AstrixServiceRegistryDiscovery;
 @MetaInfServices(ServiceDiscoveryMetaFactoryPlugin.class)
 public class ServiceRegistryDiscoveryPlugin implements ServiceDiscoveryMetaFactoryPlugin<AstrixServiceRegistryDiscovery>, AstrixPublishedBeansAware {
 
+	// TODO: remove
+	
 	private AstrixPublishedBeans beans;
 
 	@Override

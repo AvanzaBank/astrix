@@ -23,6 +23,7 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
@@ -31,7 +32,6 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.util.AstrixFrameworkThread;
-import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicLongProperty;
 import com.avanza.astrix.core.ServiceUnavailableException;
 /**
@@ -49,15 +49,15 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread impleme
 	private final DynamicLongProperty exportIntervallMillis;		  
 	private final DynamicLongProperty serviceLeaseTimeMillis;
 	private final DynamicLongProperty retryIntervallMillis;
-	private final DynamicConfig config;
+	private final AstrixConfig config;
 	private final Timer timer = new Timer();
 
-	public ServiceRegistryExporterWorker(DynamicConfig config) {
+	public ServiceRegistryExporterWorker(AstrixConfig config) {
 		super("ServiceRegistryExporter");
 		this.config = config;
-		this.exportIntervallMillis = AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL.getFrom(config);
-		this.retryIntervallMillis = AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL.getFrom(config);
-		this.serviceLeaseTimeMillis = AstrixSettings.SERVICE_REGISTRY_LEASE.getFrom(config);
+		this.exportIntervallMillis = config.get(AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL);
+		this.retryIntervallMillis = config.get(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL);
+		this.serviceLeaseTimeMillis = config.get(AstrixSettings.SERVICE_REGISTRY_LEASE);
 	}
 	
 	public void startServiceExporter() {
@@ -114,9 +114,9 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread impleme
 
 	@Override
 	public void setAstrixBeans(AstrixPublishedBeans beans) {
-		String subsystem = AstrixSettings.SUBSYSTEM_NAME.getFrom(config).get();
-		String applicationInstanceId = AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(config).get();
-		String applicationTag = AstrixSettings.APPLICATION_TAG.getFrom(config).get();
+		String subsystem = config.get(AstrixSettings.SUBSYSTEM_NAME).get();
+		String applicationInstanceId = config.get(AstrixSettings.APPLICATION_INSTANCE_ID).get();
+		String applicationTag = config.get(AstrixSettings.APPLICATION_TAG).get();
 		String zone = subsystem;
 		if (applicationTag != null) {
 			zone = subsystem + "#"  + applicationTag;
