@@ -13,23 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.versioning;
+package com.avanza.astrix.serviceunit;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
 import com.avanza.astrix.context.AstrixContextConfig;
 import com.avanza.astrix.context.AstrixContextPlugin;
 
 @MetaInfServices(AstrixContextPlugin.class)
-public class JacksonVersioningPlugin implements AstrixContextPlugin {
+public class ServiceUnitPlugin implements AstrixContextPlugin {
 
 	// TODO: avoid loading this module using plugin mechanism. 
-	// Requires breaking reversing dependency between versioning and serivceunit package
-
+	// Requires breaking reversing dependency between context and serivceunit package
+	
 	@Override
 	public void register(AstrixContextConfig astrixContextConfig) {
-		astrixContextConfig.bindStrategy(AstrixVersioningPlugin.class, new JacksonVersioningModule());
+		astrixContextConfig.registerModule(new ServiceUnitModule());
 	}
-
 }

@@ -49,11 +49,9 @@ import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
 import com.avanza.astrix.beans.publish.BeansPublishModule;
 import com.avanza.astrix.beans.publish.PublishedBeanFactory;
-import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
-import com.avanza.astrix.beans.service.ConfigDiscoveryModule;
+import com.avanza.astrix.beans.registry.ServiceRegistryDiscoveryModule;
 import com.avanza.astrix.beans.service.DirectComponentModule;
 import com.avanza.astrix.beans.service.ServiceModule;
-import com.avanza.astrix.beans.service.ServiceRegistryDiscoveryModule;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.MapConfigSource;
@@ -64,13 +62,11 @@ import com.avanza.astrix.context.module.Module;
 import com.avanza.astrix.context.module.ModuleContext;
 import com.avanza.astrix.context.module.ModuleManager;
 import com.avanza.astrix.context.module.NamedModule;
-import com.avanza.astrix.context.versioning.JacksonVersioningModule;
 import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 import com.avanza.astrix.ft.NoFaultToleranceProvider;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
-import com.avanza.astrix.serviceunit.ServiceUnitModule;
 /**
  * Used to configure and create an {@link AstrixContext}. <p>
  * 
@@ -98,7 +94,7 @@ public class AstrixConfigurer {
 	private DynamicConfig config;
 	
 	public AstrixConfigurer() {
-		strategies.registerDefault(AstrixVersioningPlugin.class, new JacksonVersioningModule());
+//		strategies.registerDefault(AstrixVersioningPlugin.class, new JacksonVersioningModule());
 		strategies.registerDefault(BeanFaultToleranceProxyStrategy.class, SingleInstanceModule.create(BeanFaultToleranceProxyStrategy.class, new NoFaultToleranceProvider()));
 	}
 	
@@ -228,7 +224,6 @@ public class AstrixConfigurer {
 		moduleManager.register(new ServiceModule());
 		moduleManager.register(new AstrixConfigModule(config));
 		moduleManager.register(new GenericAstrixApiProviderModule());
-		moduleManager.register(new ServiceUnitModule());
 		
 		// TODO: Create AstrixContextModule and: moduleManager.getInstance(AstrixContext.class);
 		final AstrixContextImpl context = new AstrixContextImpl(config, /*new FilteredApiProviders(getApiProviders(), activeProfiles), */moduleManager);

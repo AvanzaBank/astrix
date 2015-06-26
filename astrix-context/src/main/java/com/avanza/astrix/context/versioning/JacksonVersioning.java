@@ -15,21 +15,19 @@
  */
 package com.avanza.astrix.context.versioning;
 
-import org.kohsuke.MetaInfServices;
-
 import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
-import com.avanza.astrix.context.AstrixContextConfig;
-import com.avanza.astrix.context.AstrixContextPlugin;
+import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
+import com.avanza.astrix.core.AstrixObjectSerializer;
 
-@MetaInfServices(AstrixContextPlugin.class)
-public class JacksonVersioningPlugin implements AstrixContextPlugin {
-
-	// TODO: avoid loading this module using plugin mechanism. 
-	// Requires breaking reversing dependency between versioning and serivceunit package
+public class JacksonVersioning implements AstrixVersioningPlugin {
 
 	@Override
-	public void register(AstrixContextConfig astrixContextConfig) {
-		astrixContextConfig.bindStrategy(AstrixVersioningPlugin.class, new JacksonVersioningModule());
+	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
+		// TODO: remove check  if service is versioned
+		if (serializerDefinition.isVersioned()) {
+			return new VersionJacksonAstrixObjectSerializer(serializerDefinition);
+		}
+		return new AstrixObjectSerializer.NoVersioningSupport();
 	}
 
 }

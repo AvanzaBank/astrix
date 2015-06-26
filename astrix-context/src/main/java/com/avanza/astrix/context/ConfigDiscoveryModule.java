@@ -13,28 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.service;
+package com.avanza.astrix.context;
 
+import com.avanza.astrix.beans.config.AstrixConfig;
+import com.avanza.astrix.beans.service.ServiceComponentRegistry;
+import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
 import com.avanza.astrix.context.module.ModuleContext;
 import com.avanza.astrix.context.module.NamedModule;
 
-public class ServiceModule implements NamedModule {
+public class ConfigDiscoveryModule implements NamedModule {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(ServiceComponentRegistry.class, ServiceComponents.class);
-		moduleContext.bind(ObjectSerializerFactory.class, ObjectSerializerFactoryImpl.class);
+		moduleContext.bind(ServiceDiscoveryMetaFactoryPlugin.class, ConfigServiceDiscoveryPluginImpl.class);
 		
-		moduleContext.importType(AstrixVersioningPlugin.class);
-		moduleContext.importType(ServiceComponent.class);
+		moduleContext.importType(ServiceComponentRegistry.class);
+		moduleContext.importType(AstrixConfig.class);
 		
-		moduleContext.export(ServiceComponentRegistry.class);
-		moduleContext.export(ObjectSerializerFactory.class);
+		moduleContext.export(ServiceDiscoveryMetaFactoryPlugin.class);
 	}
 
 	@Override
 	public String name() {
-		return "service";
+		return "config-discovery";
 	}
 
 }
