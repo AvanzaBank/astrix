@@ -76,7 +76,7 @@ public abstract class FaultToleranceIntegrationTest {
 		DynamicConfig dynamicConfig = DynamicConfig.create(config);
 		BeanConfigurationsImpl beanConfigurations = new BeanConfigurationsImpl();
 		beanConfigurations.setConfig(dynamicConfig);
-		faultToleranceFactory = new BeanFaultToleranceFactoryImpl(dynamicConfig, new HystrixBeanFaultToleranceProvider(), commandNamingStrategy, beanConfigurations);
+		faultToleranceFactory = new BeanFaultToleranceFactoryImpl(dynamicConfig, commandNamingStrategy, beanConfigurations);
 		testService = createProxy(api, provider, settings());
 	}
 	

@@ -17,7 +17,6 @@ package com.avanza.astrix.ft;
 
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.factory.BeanConfigurations;
-import com.avanza.astrix.beans.factory.BeanConfigurationsImpl;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
@@ -26,22 +25,19 @@ import com.avanza.astrix.config.DynamicConfig;
  * @author Elias Lindholm (elilin)
  *
  */
-public class BeanFaultToleranceFactoryImpl implements AstrixConfigAware, BeanFaultToleranceFactory {
+public final class BeanFaultToleranceFactoryImpl implements AstrixConfigAware, BeanFaultToleranceFactory {
 	
 	private DynamicConfig config;
-	private final BeanFaultToleranceProvider faultToleranceProvider;
 	private final HystrixCommandNamingStrategy commandNamingStrategy;
 	private final BeanConfigurations beanConfigurations;
 	
 	@AstrixInject
-	public BeanFaultToleranceFactoryImpl(BeanFaultToleranceProvider beanFaultToleranceProvider, HystrixCommandNamingStrategy commandNamingStrategy, BeanConfigurations beanConfigurations) {
-		this.faultToleranceProvider = beanFaultToleranceProvider;
+	public BeanFaultToleranceFactoryImpl(HystrixCommandNamingStrategy commandNamingStrategy, BeanConfigurations beanConfigurations) {
 		this.commandNamingStrategy = commandNamingStrategy;
 		this.beanConfigurations = beanConfigurations;
 	}
 	
-	public BeanFaultToleranceFactoryImpl(DynamicConfig config, BeanFaultToleranceProvider faultToleranceProvider, HystrixCommandNamingStrategy commandNamingStrategy, BeanConfigurations beanConfigurations) {
-		this.faultToleranceProvider = faultToleranceProvider;
+	public BeanFaultToleranceFactoryImpl(DynamicConfig config, HystrixCommandNamingStrategy commandNamingStrategy, BeanConfigurations beanConfigurations) {
 		this.config = config;
 		this.commandNamingStrategy = commandNamingStrategy;
 		this.beanConfigurations = beanConfigurations;
@@ -49,7 +45,7 @@ public class BeanFaultToleranceFactoryImpl implements AstrixConfigAware, BeanFau
 
 	@Override
 	public BeanFaultTolerance create(PublishedAstrixBean<?> serviceDefinition) {
-		return new BeanFaultTolerance(serviceDefinition, beanConfigurations.getBeanConfiguration(serviceDefinition.getBeanKey()), config, faultToleranceProvider, commandNamingStrategy);
+		return new BeanFaultTolerance(serviceDefinition, beanConfigurations.getBeanConfiguration(serviceDefinition.getBeanKey()), config, commandNamingStrategy);
 	}
 
 	@Override

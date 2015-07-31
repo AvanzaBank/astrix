@@ -37,18 +37,16 @@ import com.netflix.hystrix.HystrixThreadPoolProperties;
  * @author Elias Lindholm (elilin)
  *
  */
-public class BeanFaultTolerance {
+public final class BeanFaultTolerance {
 	
 	private final PublishedAstrixBean<?> beanDefinition;
 	private final DynamicBooleanProperty faultToleranceEnabledForBean;
 	private final DynamicBooleanProperty faultToleranceEnabled;
-	private final BeanFaultToleranceProvider provider;
 	private final HystrixCommandNamingStrategy commandNamingStrategy;
 	private final DynamicIntProperty initialTimeout;
 	
-	public BeanFaultTolerance(PublishedAstrixBean<?> serviceDefinition, BeanConfiguration beanConfiguration, DynamicConfig config, BeanFaultToleranceProvider provider, HystrixCommandNamingStrategy commandNamingStrategy) {
+	BeanFaultTolerance(PublishedAstrixBean<?> serviceDefinition, BeanConfiguration beanConfiguration, DynamicConfig config, HystrixCommandNamingStrategy commandNamingStrategy) {
 		this.beanDefinition = serviceDefinition;
-		this.provider = provider;
 		this.initialTimeout = beanConfiguration.get(AstrixBeanSettings.INITIAL_TIMEOUT);
 		this.faultToleranceEnabledForBean = beanConfiguration.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED);
 		this.faultToleranceEnabled = AstrixSettings.ENABLE_FAULT_TOLERANCE.getFrom(config);
@@ -64,14 +62,14 @@ public class BeanFaultTolerance {
 				  .andCommandPropertiesDefaults(com.netflix.hystrix.HystrixCommandProperties.Setter()
 						  .withExecutionTimeoutInMilliseconds(getTimeoutMillis())
 						  .withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests()));
-		return provider.observe(observable, setter);
+		return HystrixObservableCommandFacade.observe(observable, setter);
 	}
 	
 	public <T> T execute(final CheckedCommand<T> command, HystrixCommandSettings settings) throws Throwable {
 		if (!faultToleranceEnabled()) {
 			return command.call();
 		} 
-		return provider.execute(command, createHystrixConfiguration(settings));
+		return HystrixCommandFacade.execute(command, createHystrixConfiguration(settings));
 	}
 	
 	private com.netflix.hystrix.HystrixCommand.Setter createHystrixConfiguration(HystrixCommandSettings settings) {

@@ -34,7 +34,6 @@ import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactoryImpl;
 import com.avanza.astrix.ft.DefaultHystrixCommandNamingStrategy;
-import com.avanza.astrix.ft.HystrixBeanFaultToleranceProvider;
 import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.gigaspaces.internal.client.cache.SpaceCacheException;
 
@@ -50,7 +49,7 @@ public class GigaSpaceProxyTest {
 		DynamicConfig config = DynamicConfig.create(configSource);
 		BeanConfigurationsImpl beanConfigurations = new BeanConfigurationsImpl();
 		beanConfigurations.setConfig(config);
-		BeanFaultToleranceFactoryImpl factory = new BeanFaultToleranceFactoryImpl(new HystrixBeanFaultToleranceProvider(), new DefaultHystrixCommandNamingStrategy(), beanConfigurations);
+		BeanFaultToleranceFactoryImpl factory = new BeanFaultToleranceFactoryImpl(new DefaultHystrixCommandNamingStrategy(), beanConfigurations);
 		factory.setConfig(config);
 		faultTolerance = factory.create(new SimplePublishedAstrixBean<>(ApiProvider.create("test-provider"), AstrixBeanKey.create(GigaSpace.class)));
 	}
