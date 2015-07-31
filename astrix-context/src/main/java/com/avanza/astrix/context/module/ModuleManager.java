@@ -228,7 +228,6 @@ public class ModuleManager {
 						throw new IllegalArgumentException(String.format("Its only allowed to interface types. module=%s importedType=%s", moduleName, type));
 					}
 					importedTypes.add(type);
-					injector.bind(AstrixBeanKey.create(type), new ExportedModuleFactoryBean<>(AstrixBeanKey.create(type), ModuleManager.this));
 				}
 			});
 			
