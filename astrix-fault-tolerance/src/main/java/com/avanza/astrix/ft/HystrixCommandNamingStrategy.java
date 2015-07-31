@@ -22,7 +22,7 @@ import com.avanza.astrix.core.AstrixStrategy;
  * @author Elias Lindholm (elilin)
  *
  */
-@AstrixStrategy(DefaultHystrixCommandNamingStrategy.class)
+@AstrixStrategy
 public interface HystrixCommandNamingStrategy {
 	
 	String getCommandKeyName(PublishedAstrixBean<?> beanDefinition);

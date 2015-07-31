@@ -23,7 +23,7 @@ import com.avanza.astrix.core.AstrixStrategy;
  * @author Elias Lindholm (elilin)
  *
  */
-@AstrixStrategy(NoFaultToleranceProvider.class)
+@AstrixStrategy
 public interface BeanFaultToleranceProxyStrategy {
 	
 	public <T> T addFaultToleranceProxy(PublishedAstrixBean<T> beanDefinition, T rawProvider);

@@ -31,10 +31,4 @@ import java.lang.annotation.Target;
 @Retention(value=RetentionPolicy.RUNTIME)
 @Documented
 public @interface AstrixStrategy {
-	/**
-	 * Default strategy to use
-	 * 
-	 * @return
-	 */
-	Class<?> value();
 }
