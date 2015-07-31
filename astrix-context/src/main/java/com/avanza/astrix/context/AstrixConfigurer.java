@@ -41,7 +41,6 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.beans.inject.AstrixPlugins;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
 import com.avanza.astrix.beans.publish.ApiProviders;
@@ -81,7 +80,6 @@ public class AstrixConfigurer {
 	
 	private ApiProviders astrixApiProviders;
 	private final Collection<StandardFactoryBean<?>> standaloneFactories = new LinkedList<>();
-//	private final List<AstrixPlugins.Plugin<?>> plugins = new ArrayList<>();
 	private final List<Module> modules = new ArrayList<>();
 	private final Map<Class<?>, Object> strategyInstanceByStrategyType = new HashMap<>();
 	private final MapConfigSource settings = new MapConfigSource();
@@ -94,7 +92,6 @@ public class AstrixConfigurer {
 	private DynamicConfig config;
 	
 	public AstrixConfigurer() {
-//		strategies.registerDefault(AstrixVersioningPlugin.class, new JacksonVersioningModule());
 		strategies.registerDefault(BeanFaultToleranceProxyStrategy.class, SingleInstanceModule.create(BeanFaultToleranceProxyStrategy.class, new NoFaultToleranceProvider()));
 	}
 	
@@ -191,23 +188,9 @@ public class AstrixConfigurer {
 	 * @return
 	 */
 	public AstrixContext configure() {
-		
 		config = createDynamicConfig();
 		
-		
-//		final AstrixPlugins astrixPlugins = getPlugins();
-//		AstrixStrategies astrixStrategies = new AstrixStrategies(config, strategyInstanceByStrategyType);
-//		final AstrixInjector injector = new AstrixInjector(new StrategiesAndPluginsRegistry(astrixPlugins, astrixStrategies));
-//		
-//		injector.bind(DynamicConfig.class, config);
-//		injector.bind(AstrixContext.class, AstrixContextImpl.class);
-//		injector.bind(AstrixFactoryBeanRegistry.class, SimpleAstrixFactoryBeanRegistry.class);
-//		injector.bind(ApiProviders.class, new FilteredApiProviders(getApiProviders(astrixPlugins), activeProfiles));
-//		injector.bind(PublishedBeanFactory.class, PublishedBeanFactoryImpl.class);
-//		injector.registerBeanPostProcessor(new InternalBeanPostProcessor(injector.getBean(AstrixBeanFactory.class)));
-//		final AstrixContextImpl context = injector.getBean(AstrixContextImpl.class);
-
-		final ModuleManager moduleManager = createModuleManager();
+		ModuleManager moduleManager = createModuleManager();
 		loadAstrixContextPlugins(moduleManager);
 		for (Map.Entry<Class<?>, Object> strategiesOverride : this.strategyInstanceByStrategyType.entrySet()) {
 			final Class<?> strategyInterface = strategiesOverride.getKey();
@@ -276,15 +259,6 @@ public class AstrixConfigurer {
 		return result;
 	}
 	
-//	private AstrixPlugins getPlugins() {
-//		AstrixPlugins result = new AstrixPlugins();
-//		for (AstrixPlugins.Plugin<?> plugin : plugins) {
-//			result.registerPlugin(plugin);
-//		}
-//		configureVersioning(result);
-//		return result;
-//	}
-
 	private DynamicConfig createDynamicConfig() {
 		if (customConfig != null) {
 			return DynamicConfig.merged(customConfig, wellKnownConfigSources);
@@ -389,14 +363,6 @@ public class AstrixConfigurer {
 		return result;
 	}
 	
-//	private List<Class<? extends Annotation>> getAllApiProviderAnnotationsTypes(AstrixPlugins astrixPlugins) {
-//		List<Class<? extends Annotation>> result = new ArrayList<>();
-//		for (ApiProviderPlugin plugin : astrixPlugins.getPlugins(ApiProviderPlugin.class)) {
-//			result.add(plugin.getProviderAnnotationType());
-//		}
-//		return result;
-//	}
-
 	/**
 	 * Sets the base-package used when scanning for {@link AstrixApiProvider}'s.<p> 
 	 * 
@@ -418,19 +384,6 @@ public class AstrixConfigurer {
 		return this;
 	}
 	
-//	private void configureVersioning(AstrixPlugins plugins) {
-//		if (AstrixSettings.ENABLE_VERSIONING.getFrom(config).get()) {
-//			discoverOnePlugin(plugins, AstrixVersioningPlugin.class);
-//		} else {
-//			plugins.registerPlugin(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Default.create());
-//		}
-//	}
-	
-	private static <T> void discoverOnePlugin(AstrixPlugins plugin, Class<T> type) {
-		T provider = plugin.getPlugin(type);
-		log.debug("Found plugin for {}, using {}", type.getName(), provider.getClass().getName());
-	}
-
 	// package private. Used for internal testing only
 	void setAstrixApiProviders(ApiProviders astrixApiProviders) {
 		this.astrixApiProviders = astrixApiProviders;
@@ -438,7 +391,6 @@ public class AstrixConfigurer {
 	
 	// package private. Used for internal testing only
 	<T> AstrixConfigurer registerPlugin(final Class<T> type, final T provider) {
-//		plugins.add(new AstrixPlugins.Plugin<>(type, Arrays.asList(provider)));
 		modules.add(new NamedModule() {
 			@Override
 			public void prepare(ModuleContext pluginContext) {
@@ -537,38 +489,6 @@ public class AstrixConfigurer {
 		return this;
 	}
 	
-//	public static class InternalBeanPostProcessor implements AstrixBeanPostProcessor {
-//		
-//		private final AstrixBeanFactory publishedApis;
-//		
-//		public InternalBeanPostProcessor(AstrixBeanFactory publishedApis) {
-//			this.publishedApis = publishedApis;
-//		}
-//
-//		@Override
-//		public void postProcess(Object bean, AstrixBeans beans) {
-//			injectAwareDependencies(bean, beans);
-//		}
-//		
-//		private void injectAwareDependencies(Object object, AstrixBeans beans) {
-//			if (object instanceof AstrixPublishedBeansAware) {
-//				injectBeanDependencies((AstrixPublishedBeansAware)object);
-//			}
-//			if (object instanceof AstrixConfigAware) {
-//				AstrixConfigAware.class.cast(object).setConfig(beans.getBean(AstrixBeanKey.create(DynamicConfig.class)));
-//			}
-//		}
-//		
-//		private void injectBeanDependencies(AstrixPublishedBeansAware beanDependenciesAware) {
-//			beanDependenciesAware.setAstrixBeans(new AstrixPublishedBeans() {
-//				@Override
-//				public <T> T getBean(AstrixBeanKey<T> beanKey) {
-//					return publishedApis.getBean(beanKey);
-//				}
-//			});
-//		}
-//	}
-
 	public void set(BooleanBeanSetting beanSetting, AstrixBeanKey<?> beanKey, boolean value) {
 		set(beanSetting.nameFor(beanKey), value);
 	}

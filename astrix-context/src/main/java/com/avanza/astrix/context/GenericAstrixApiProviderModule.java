@@ -15,14 +15,7 @@
  */
 package com.avanza.astrix.context;
 
-import java.util.Collections;
-import java.util.Set;
-
 import com.avanza.astrix.beans.config.AstrixConfig;
-import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
-import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.beans.inject.ClassConstructorFactoryBean;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;

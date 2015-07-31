@@ -15,9 +15,6 @@
  */
 package com.avanza.astrix.context.module;
 
-
-// TODO : remove @Module annotation?
-@com.avanza.astrix.core.AstrixPlugin
 public interface Module {
 	
 	void prepare(ModuleContext moduleContext);

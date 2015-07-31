@@ -17,9 +17,6 @@ package com.avanza.astrix.beans.publish;
 
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanFactory;
 import com.avanza.astrix.beans.factory.BeanConfiguration;
@@ -34,8 +31,6 @@ import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
  */
 public class PublishedBeanFactoryImpl implements PublishedBeanFactory, AstrixPublishedBeans {
 
-	private static final Logger log = LoggerFactory.getLogger(PublishedBeanFactoryImpl.class);
-	
 	private final SimpleAstrixFactoryBeanRegistry beanFactoryRegistry;
 	private final AstrixBeanFactory beanFactory;
 	private final BeanConfigurationsImpl beanConfigurations;
@@ -48,23 +43,6 @@ public class PublishedBeanFactoryImpl implements PublishedBeanFactory, AstrixPub
 		this.beanConfigurations = beanConfigurations;
 	}
 
-//	@Override
-//	public void register(ApiProviderClass apiProvider) {
-//		log.debug("Registering apiProvider={}", apiProvider.getName());
-//		for (PublishedBean publishedBean : createPublishedBeans(apiProvider)) {
-//			log.debug("Registering factory for bean. beanKey={} apiProvider={} factoryType={}",  
-//					publishedBean.getBeanKey(), 
-//					apiProvider.getName(), 
-//					publishedBean.getFactory().getClass().getName());
-//			this.beanFactoryRegistry.registerFactory(publishedBean.getFactory());
-//			this.beanConfigurations.setDefaultBeanConfig(publishedBean.getBeanKey(), publishedBean.getDefaultBeanSettingsOverride());
-//		}
-//	}
-	
-//	private Collection<PublishedBean> createPublishedBeans(ApiProviderClass apiProvider) {
-//		return apiProviderPlugins.getProviderPlugin(apiProvider).createFactoryBeans(apiProvider);
-//	}
-
 	@Override
 	public BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey) {
 		return this.beanConfigurations.getBeanConfiguration(beanKey);
@@ -74,11 +52,6 @@ public class PublishedBeanFactoryImpl implements PublishedBeanFactory, AstrixPub
 	public <T> T getBean(AstrixBeanKey<T> beanKey) {
 		return this.beanFactory.getBean(beanKey);
 	}
-
-//	@Override
-//	public <T> void registerFactoryBean(StandardFactoryBean<T> beanFactory) {
-//		this.beanFactoryRegistry.registerFactory(beanFactory);
-//	}
 
 	@Override
 	public Set<AstrixBeanKey<? extends Object>> getDependencies(AstrixBeanKey<? extends Object> beanKey) {

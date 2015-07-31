@@ -51,8 +51,6 @@ public class BeanPublisherImpl implements BeanPublisher {
 					apiProvider.getName(), 
 					publishedBean.getFactory().getClass().getName());
 			this.beanFactory.registerBean(publishedBean);
-//			this.beanFactory.registerFactory(publishedBean.getFactory());
-//			this.beanConfigurations.setDefaultBeanConfig(publishedBean.getBeanKey(), publishedBean.getDefaultBeanSettingsOverride());
 		}
 	}
 	
@@ -62,7 +60,6 @@ public class BeanPublisherImpl implements BeanPublisher {
 
 	@Override
 	public <T> void registerFactoryBean(StandardFactoryBean<T> beanFactory) {
-//		this.beanFactoryRegistry.registerFactory(beanFactory);
 		this.beanFactory.registerBean(new PublishedBean(beanFactory, new HashMap<AstrixBeanSettings.BeanSetting<?>, Object>()));
 	}
 }

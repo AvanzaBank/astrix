@@ -17,8 +17,6 @@ package com.avanza.astrix.spring;
 
 import org.springframework.context.ApplicationContext;
 
-import com.avanza.astrix.beans.inject.AstrixInject;
-import com.avanza.astrix.beans.inject.AstrixInjector;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixContext;
 /**

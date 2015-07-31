@@ -19,7 +19,6 @@ import java.util.Set;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.BeanConfiguration;
-import com.avanza.astrix.beans.factory.StandardFactoryBean;
 
 
 /**
@@ -29,16 +28,9 @@ import com.avanza.astrix.beans.factory.StandardFactoryBean;
  */
 public interface PublishedBeanFactory {
 
-//	void register(ApiProviderClass apiProvider);
-
-	// TODO: This should probably be removed from this interface as well
-//	<T> void registerFactoryBean(StandardFactoryBean<T> beanFactory);
-
-	// TODO: Remove this method from this interface
 	BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey);
 	
 	<T> T getBean(AstrixBeanKey<T> beanKey);
-	
 	
 	Set<AstrixBeanKey<? extends Object>> getDependencies(AstrixBeanKey<? extends Object> beanKey);
 }
