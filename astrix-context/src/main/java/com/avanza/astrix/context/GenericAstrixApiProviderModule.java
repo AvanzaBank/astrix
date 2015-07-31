@@ -33,21 +33,6 @@ public class GenericAstrixApiProviderModule implements NamedModule {
 	@Override
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(ApiProviderPlugin.class, GenericAstrixApiProviderPlugin.class);
-		// TODO: should GenericAstrixApiProviderPlugin realy use AstrixInjector?
-//		moduleContext.bind(AstrixFactoryBeanRegistry.class, new AstrixFactoryBeanRegistry() {
-//			@Override
-//			public <T> AstrixBeanKey<? extends T> resolveBean(AstrixBeanKey<T> beanKey) {
-//				return beanKey;
-//			}
-//			@Override
-//			public <T> StandardFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey) {
-//				return new ClassConstructorFactoryBean<>(beanKey, beanKey.getBeanType());
-//			}
-//			@Override
-//			public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
-//				return Collections.emptySet();
-//			}
-//		});
 		
 		moduleContext.importType(ServiceComponentRegistry.class);
 		moduleContext.importType(AstrixConfig.class);
@@ -61,6 +46,5 @@ public class GenericAstrixApiProviderModule implements NamedModule {
 	public String name() {
 		return getClass().getPackage().getName();
 	}
-	
 
 }

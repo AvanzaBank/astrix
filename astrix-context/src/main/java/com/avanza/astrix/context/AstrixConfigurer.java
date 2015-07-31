@@ -209,7 +209,7 @@ public class AstrixConfigurer {
 		moduleManager.register(new GenericAstrixApiProviderModule());
 		
 		// TODO: Create AstrixContextModule and: moduleManager.getInstance(AstrixContext.class);
-		final AstrixContextImpl context = new AstrixContextImpl(config, /*new FilteredApiProviders(getApiProviders(), activeProfiles), */moduleManager);
+		final AstrixContextImpl context = new AstrixContextImpl(config, moduleManager);
 		ApiProviders apiProviders = new FilteredApiProviders(getApiProviders(moduleManager), activeProfiles);
 		for (ApiProviderClass apiProvider : apiProviders.getAll()) {
 			context.register(apiProvider);

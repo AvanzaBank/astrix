@@ -22,8 +22,6 @@ import java.util.List;
 
 import javax.annotation.PreDestroy;
 
-import org.kohsuke.MetaInfServices;
-
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.factory.ObjectCache;
@@ -48,24 +46,10 @@ import com.avanza.astrix.provider.versioning.Versioned;
  * @author Elias Lindholm
  *
  */
-@MetaInfServices(ApiProviderPlugin.class)
 public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
+
+	// TODO: Rename this abstractions: Its not a plugin anymore
 	
-	// TODO: really use injector? 
-//	private AstrixInjector injector = new AstrixInjector(new AstrixFactoryBeanRegistry() {
-//		@Override
-//		public <T> AstrixBeanKey<? extends T> resolveBean(AstrixBeanKey<T> beanKey) {
-//			return beanKey;
-//		}
-//		@Override
-//		public <T> StandardFactoryBean<T> getFactoryBean(AstrixBeanKey<T> beanKey) {
-//			return new ClassConstructorFactoryBean<>(beanKey, beanKey.getBeanType());
-//		}
-//		@Override
-//		public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
-//			return Collections.emptySet();
-//		}
-//	});
 	private ObjectCache provideInstanceCache = new ObjectCache();
 	private AstrixServiceMetaFactory serviceMetaFactory;
 	private ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory;
@@ -140,7 +124,6 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 	}
 
 	private Object getApiProviderInstance(final Class<?> provider) {
-//		return injector.getBean(provider);
 		return provideInstanceCache.getInstance(provider, new ObjectCache.ObjectFactory<Object>() {
 			@Override
 			public Object create() throws Exception {
@@ -163,10 +146,6 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 		this.provideInstanceCache.destroy();
 	}
 	
-//	@AstrixInject
-//	public void setAstrixContext(AstrixInjector injector) {
-//		this.injector = injector;
-//	}
 	
 	@AstrixInject
 	public void setConfig(AstrixConfig config) {
