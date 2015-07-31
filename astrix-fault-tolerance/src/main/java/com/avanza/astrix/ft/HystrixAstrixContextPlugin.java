@@ -28,8 +28,6 @@ public class HystrixAstrixContextPlugin implements AstrixContextPlugin {
 	
 	@Override
 	public void register(AstrixContextConfig astrixContextConfig) {
-//		astrixContextConfig.registerModule(new HystrixModule());
-		
 		// Exposes strategy: HystrixCommandNamingStrategy
 		astrixContextConfig.registerStrategy(HystrixCommandNamingStrategy.class, new DefaultHystrixCommandNamingStrategy());
 		

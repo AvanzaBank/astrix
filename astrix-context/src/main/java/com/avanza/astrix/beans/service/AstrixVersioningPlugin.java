@@ -15,9 +15,12 @@
  */
 package com.avanza.astrix.beans.service;
 
+import com.avanza.astrix.beans.service.AstrixVersioningPlugin.Default;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixObjectSerializer.NoVersioningSupport;
+import com.avanza.astrix.core.AstrixStrategy;
 
+@AstrixStrategy(Default.class)
 public interface AstrixVersioningPlugin {
 	
 	// TODO: rename

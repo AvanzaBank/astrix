@@ -61,6 +61,7 @@ import com.avanza.astrix.context.module.Module;
 import com.avanza.astrix.context.module.ModuleContext;
 import com.avanza.astrix.context.module.ModuleManager;
 import com.avanza.astrix.context.module.NamedModule;
+import com.avanza.astrix.core.AstrixStrategy;
 import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 import com.avanza.astrix.ft.NoFaultToleranceProvider;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -100,23 +101,15 @@ public class AstrixConfigurer {
 		
 		private final Map<Class<?>, Module> strategyModuleByType = new HashMap<Class<?>, Module>();
 		
-		public Module getStrategy(final Class<?> strategyType) {
-			final Module target = resloveStrategy(strategyType);
-			verify(strategyType, target);
-			return target;
-		}
-
-		private Module resloveStrategy(Class<?> strategyType) {
-			Module module = strategyModuleByType.get(strategyType);
-			return module;
-		}
-
 		public void registerDefault(final Class<?> strategyType, final Module module) {
 			verify(strategyType, module);
 			this.strategyModuleByType.put(strategyType, module);
 		}
 
 		private void verify(final Class<?> strategyType, final Module module) {
+			if (!strategyType.isAnnotationPresent(AstrixStrategy.class)) {
+				throw new IllegalArgumentException("Strategy interfaces must be annotated with @AstrixStrategy. type: " + strategyType.getName());
+			}
 			final AtomicBoolean strategyExported = new AtomicBoolean(false);
 			module.prepare(new ModuleContext() {
 				@Override
