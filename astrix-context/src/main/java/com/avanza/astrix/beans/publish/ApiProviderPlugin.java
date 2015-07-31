@@ -19,7 +19,6 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 import com.avanza.astrix.beans.factory.FactoryBean;
-import com.avanza.astrix.context.GenericAstrixApiProviderPlugin;
 import com.avanza.astrix.core.AstrixPlugin;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 

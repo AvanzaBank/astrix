@@ -45,7 +45,7 @@ import com.avanza.astrix.provider.versioning.Versioned;
  * @author Elias Lindholm
  *
  */
-public final class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
+final class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 
 	// TODO: Rename this abstractions: Its not a plugin anymore
 	
