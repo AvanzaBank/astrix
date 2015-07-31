@@ -30,8 +30,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.kohsuke.MetaInfServices;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.core.AstrixObjectSerializer;
@@ -42,7 +40,6 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
  * @author Elias Lindholm (elilin)
  *
  */
-@MetaInfServices(ServiceComponent.class)
 public class DirectComponent implements ServiceComponent {
 	
 	private final static AtomicLong idGen = new AtomicLong();
