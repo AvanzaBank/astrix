@@ -26,7 +26,6 @@ import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.factory.ObjectCache;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
 import com.avanza.astrix.beans.publish.PublishedBean;
@@ -46,16 +45,27 @@ import com.avanza.astrix.provider.versioning.Versioned;
  * @author Elias Lindholm
  *
  */
-public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
+public final class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 
 	// TODO: Rename this abstractions: Its not a plugin anymore
 	
-	private ObjectCache provideInstanceCache = new ObjectCache();
-	private AstrixServiceMetaFactory serviceMetaFactory;
-	private ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory;
-	private BeanFaultToleranceProxyStrategy faultToleranceFactory;
-	private AstrixConfig config;
+	private final ObjectCache provideInstanceCache = new ObjectCache();
+	private final AstrixServiceMetaFactory serviceMetaFactory;
+	private final ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory;
+	private final BeanFaultToleranceProxyStrategy faultToleranceFactory;
+	private final AstrixConfig config;
 	
+	public GenericAstrixApiProviderPlugin(
+			AstrixServiceMetaFactory serviceMetaFactory,
+			ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory,
+			BeanFaultToleranceProxyStrategy faultToleranceFactory,
+			AstrixConfig config) {
+		this.serviceMetaFactory = serviceMetaFactory;
+		this.serviceDiscoveryMetaFactory = serviceDiscoveryMetaFactory;
+		this.faultToleranceFactory = faultToleranceFactory;
+		this.config = config;
+	}
+
 	@Override
 	public List<PublishedBean> createFactoryBeans(ApiProviderClass apiProviderClass) {
 		List<PublishedBean> result = new ArrayList<>();
@@ -146,25 +156,4 @@ public class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 		this.provideInstanceCache.destroy();
 	}
 	
-	
-	@AstrixInject
-	public void setConfig(AstrixConfig config) {
-		this.config = config;
-	}
-	
-	@AstrixInject
-	public void setServiceLookupFactory(ServiceDiscoveryMetaFactory serviceLookupFactory) {
-		this.serviceDiscoveryMetaFactory = serviceLookupFactory;
-	}
-	
-	@AstrixInject
-	public void setServiceMetaFactory(AstrixServiceMetaFactory serviceMetaFactory) {
-		this.serviceMetaFactory = serviceMetaFactory;
-	}
-	
-	@AstrixInject
-	public void setFaultToleranceFactory(BeanFaultToleranceProxyStrategy faultToleranceFactory) {
-		this.faultToleranceFactory = faultToleranceFactory;
-	}
-
 }
