@@ -31,10 +31,6 @@ public class ServiceRegistryDiscoveryPluginImpl implements ServiceDiscoveryMetaF
 
 	private AstrixPublishedBeans beans;
 	
-//	public ServiceRegistryDiscoveryPluginImpl(AstrixPublishedBeans beans) {
-//		this.beans = beans;
-//	}
-
 	@Override
 	public Class<AstrixServiceRegistryDiscovery> getDiscoveryAnnotationType() {
 		return AstrixServiceRegistryDiscovery.class;
