@@ -228,6 +228,7 @@ public class AstrixConfigurer {
 		Iterator<AstrixContextPlugin> contextPlugins = ServiceLoader.load(AstrixContextPlugin.class).iterator();
 		while (contextPlugins.hasNext()) {
 			AstrixContextPlugin contextPlugin = contextPlugins.next();
+			log.debug("Registering AstrixContextPlugin: astrixContextPlugin={}", contextPlugin.getClass().getName());
 			contextPlugin.register(new AstrixContextConfig() {
 				@Override
 				public <T> void registerStrategy(Class<T> strategyType, T defaultInstance) {
@@ -402,11 +403,6 @@ public class AstrixConfigurer {
 				return "plugin-" + type.getName() + "[" + provider.getClass().getName() + "]";
 			}
 		});
-		return this;
-	}
-	
-	public AstrixConfigurer registerModule(Module module) {
-		this.modules.add(module);
 		return this;
 	}
 	
