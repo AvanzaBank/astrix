@@ -25,7 +25,7 @@ public class ConfigDiscoveryModule implements NamedModule {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(ServiceDiscoveryMetaFactoryPlugin.class, ConfigServiceDiscoveryPluginImpl.class);
+		moduleContext.bind(ServiceDiscoveryMetaFactoryPlugin.class, ConfigServiceDiscoveryPlugin.class);
 		
 		moduleContext.importType(ServiceComponentRegistry.class);
 		moduleContext.importType(AstrixConfig.class);

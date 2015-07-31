@@ -15,31 +15,29 @@
  */
 package com.avanza.astrix.context;
 
-import org.kohsuke.MetaInfServices;
-
+import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.AstrixConfigAware;
-import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDiscovery;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
 import com.avanza.astrix.beans.service.ServiceProperties;
-import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-@MetaInfServices(ServiceDiscoveryMetaFactoryPlugin.class)
-public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactoryPlugin<AstrixConfigDiscovery>, AstrixConfigAware {
+public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactoryPlugin<AstrixConfigDiscovery> {
 
-	// TODO: remove
-	
 	private ServiceComponentRegistry serviceComponents;
-	private DynamicConfig config;
+	private AstrixConfig config;
 	
+	public ConfigServiceDiscoveryPlugin(ServiceComponentRegistry serviceComponents, AstrixConfig config) {
+		this.serviceComponents = serviceComponents;
+		this.config = config;
+	}
+
 	@Override
 	public ServiceDiscovery create(AstrixBeanKey<?> key, AstrixConfigDiscovery lookupAnnotation) {
 		return new ConfigDiscovery(serviceComponents, config, lookupAnnotation.value(), key);
@@ -50,27 +48,16 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactory
 		return AstrixConfigDiscovery.class;
 	}
 
-	@Override
-	public void setConfig(DynamicConfig config) {
-		this.config = config;
-	}
-	
-	@AstrixInject
-	public void setServiceComponents(ServiceComponentRegistry serviceComponents) {
-		this.serviceComponents = serviceComponents;
-	}
-
 	private static class ConfigDiscovery implements ServiceDiscovery {
 
 		private ServiceComponentRegistry serviceComponents;
-		private DynamicConfig config;
+		private AstrixConfig config;
 		private String configEntryName;
 		private AstrixBeanKey<?> beanKey;
 		
 		
 		public ConfigDiscovery(ServiceComponentRegistry serviceComponents,
-				DynamicConfig config, String configEntryName, AstrixBeanKey<?> beanKey) {
-			super();
+				AstrixConfig config, String configEntryName, AstrixBeanKey<?> beanKey) {
 			this.serviceComponents = serviceComponents;
 			this.config = config;
 			this.configEntryName = configEntryName;
