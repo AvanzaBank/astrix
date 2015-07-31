@@ -107,7 +107,6 @@ public class AstrixApiProviderTest {
 		astrixConfigurer.registerStrategy(AstrixVersioningPlugin.class, new JavaSerializationVersioningPlugin());
 		astrixConfigurer.registerApiProvider(VersionedPingServiceProvider.class);
 		astrixConfigurer.set("pingServiceUri", pingServiceUri);
-		TestAstrixConfigurer enableVersioning = astrixConfigurer;
 		AstrixContext context = astrixConfigurer.configure();
 		
 		PingService pingService = context.getBean(PingService.class);

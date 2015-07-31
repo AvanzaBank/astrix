@@ -154,11 +154,6 @@ public class TestAstrixConfigurer {
 		
 	}
 
-	public TestAstrixConfigurer enableVersioning(boolean enableVersioning) {
-		AstrixConfigurer enableVersioning1 = this.configurer;
-		return this;
-	}
-
 	public void removeSetting(String name) {
 		this.configurer.removeSetting(name);
 	}
