@@ -69,7 +69,7 @@ public class ClusteredProxyLibraryTest {
 		proxy.clear(null);
 		
 		configurer.enableFaultTolerance(false);
-		configurer.enableVersioning(true);
+		AstrixConfigurer enableVersioning = configurer;
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1000);
 		configurer.setConfig(DynamicConfig.create(serviceRegistry));
 	}

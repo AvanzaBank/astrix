@@ -133,7 +133,7 @@ public class AstrixIntegrationTest {
 		
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.enableFaultTolerance(true);
-		configurer.enableVersioning(true);
+		AstrixConfigurer enableVersioning = configurer;
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
 		configurer.setConfig(DynamicConfig.create(config));
 		configurer.setSubsystem("test-sub-system");

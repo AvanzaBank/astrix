@@ -183,11 +183,15 @@ public class AstrixConfigurer {
 	public AstrixContext configure() {
 		config = createDynamicConfig();
 		
-		ModuleManager moduleManager = createModuleManager();
+		ModuleManager moduleManager = new ModuleManager();
+		for (Module plugin : modules) {
+			moduleManager.register(plugin);
+		}
+		
 		loadAstrixContextPlugins(moduleManager);
 		for (Map.Entry<Class<?>, Object> strategiesOverride : this.strategyInstanceByStrategyType.entrySet()) {
-			final Class<?> strategyInterface = strategiesOverride.getKey();
-			final Object strategyInstance = strategiesOverride.getValue();
+			Class<?> strategyInterface = strategiesOverride.getKey();
+			Object strategyInstance = strategiesOverride.getValue();
 			this.strategies.registerDefault(strategyInterface, SingleInstanceModule.create(strategyInterface, strategyInstance));
 		}
 		
@@ -238,19 +242,6 @@ public class AstrixConfigurer {
 				
 			});
 		}
-	}
-	
-	private ModuleManager createModuleManager() {
-		ModuleManager result = new ModuleManager();
-		// TODO: move versioning configuration
-//		if (!AstrixSettings.ENABLE_VERSIONING.getFrom(config).get()) {
-//			registerPlugin(AstrixVersioningPlugin.class, AstrixVersioningPlugin.Default.create());
-//		}
-		for (Module plugin : modules) {
-			result.register(plugin);
-		}
-		
-		return result;
 	}
 	
 	private DynamicConfig createDynamicConfig() {
@@ -370,11 +361,6 @@ public class AstrixConfigurer {
 	
 	public AstrixConfigurer enableFaultTolerance(boolean enableFaultTolerance) {
 		this.settings.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, enableFaultTolerance);
-		return this;
-	}
-	
-	public AstrixConfigurer enableVersioning(boolean enableVersioning) {
-		this.settings.set(AstrixSettings.ENABLE_VERSIONING, enableVersioning);
 		return this;
 	}
 	

@@ -45,7 +45,6 @@ public class TestAstrixConfigurer {
 				return apiProviders;
 			}
 		});
-		configurer.enableVersioning(false);
 		configurer.enableFaultTolerance(false);
 		configurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, false);
 		registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
@@ -156,7 +155,7 @@ public class TestAstrixConfigurer {
 	}
 
 	public TestAstrixConfigurer enableVersioning(boolean enableVersioning) {
-		this.configurer.enableVersioning(enableVersioning);
+		AstrixConfigurer enableVersioning1 = this.configurer;
 		return this;
 	}
 

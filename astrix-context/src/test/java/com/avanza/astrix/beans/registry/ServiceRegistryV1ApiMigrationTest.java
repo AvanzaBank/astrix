@@ -32,8 +32,7 @@ public class ServiceRegistryV1ApiMigrationTest {
 	
 	@Test
 	public void generatesApplicationInstanceIdFromQualifierAndApiTypeFor_AstrixServiceRegistryEntry_onVersion1() throws Exception {
-		AstrixApplicationContext context = (AstrixApplicationContext) new TestAstrixConfigurer().enableVersioning(true).configure();
-//		AstrixVersioningPlugin versioningPlugin = context.getPlugin(AstrixVersioningPlugin.class);
+		AstrixApplicationContext context = (AstrixApplicationContext) new TestAstrixConfigurer().configure();
 		ObjectSerializerFactory versioningPlugin = context.getInstance(ObjectSerializerFactory.class);
 		AstrixObjectSerializer objectSerializer = versioningPlugin.create(ObjectSerializerDefinition.versionedService(2, ServiceRegistryObjectSerializerConfigurer.class));
 
