@@ -48,11 +48,6 @@ public class ModuleInjector {
 		this.beanFactory.registerBeanPostProcessor(beanPostProcessor);
 	}
 	
-	<T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
-		return this.beanFactoryRegistry.getBeansOfType(type);
-	}
-	
-	
 	public <T> void bind(AstrixBeanKey<T> beanKey, Class<? extends T> providerType) {
 		this.beanFactoryRegistry.bind(beanKey, providerType);
 	}
