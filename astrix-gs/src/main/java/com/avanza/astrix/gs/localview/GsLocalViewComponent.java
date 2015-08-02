@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.gs.localview;
 
-import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.GigaSpaceConfigurer;
 import org.openspaces.core.space.UrlSpaceConfigurer;
@@ -53,7 +52,6 @@ import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
  * @author Elias Lindholm (elilin)
  *
  */
-@MetaInfServices(ServiceComponent.class)
 public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware {
 
 	private static Logger log = LoggerFactory.getLogger(GsLocalViewComponent.class);
@@ -62,9 +60,8 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	private DynamicBooleanProperty disableLocalView;
 	/*
 	 * To avoid circular dependency between GsLocalViewComponent and ServiceComponents
-	 * we have to use the AstrixInjetor to retrieve ServiceComponents.
+	 * we have to use the ModuleInjetor to retrieve ServiceComponents.
 	 */
-//	private AstrixInjector injector;
 	private ModuleInjector injector;
 	private BeanFaultToleranceFactory faultToleranceFactory;
 	private DynamicLongProperty maxDisonnectionTime;

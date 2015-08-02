@@ -15,13 +15,11 @@
  */
 package com.avanza.astrix.gs;
 
-import org.kohsuke.MetaInfServices;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import com.avanza.astrix.spring.AstrixSpringBeanDefinitionRegistryPostProcessorPlugin;
 
-@MetaInfServices(AstrixSpringBeanDefinitionRegistryPostProcessorPlugin.class)
 public class GsBeanDefinitionRegistryPostProcessorPlugin implements AstrixSpringBeanDefinitionRegistryPostProcessorPlugin {
 
 	@Override

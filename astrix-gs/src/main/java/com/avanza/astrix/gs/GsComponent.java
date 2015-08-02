@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.gs;
 
-import org.kohsuke.MetaInfServices;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.inject.AstrixInject;
@@ -36,7 +35,6 @@ import com.avanza.astrix.spring.AstrixSpringContext;
  * @author Elias Lindholm
  *
  */
-@MetaInfServices(ServiceComponent.class)
 public class GsComponent implements ServiceComponent {
 
 	private GsBinder gsBinder;
