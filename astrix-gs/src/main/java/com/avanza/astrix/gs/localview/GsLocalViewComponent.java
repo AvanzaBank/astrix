@@ -60,7 +60,7 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	private DynamicBooleanProperty disableLocalView;
 	/*
 	 * To avoid circular dependency between GsLocalViewComponent and ServiceComponents
-	 * we have to use the ModuleInjetor to retrieve ServiceComponents.
+	 * we have to use the ModuleInjector to retrieve ServiceComponents.
 	 */
 	private ModuleInjector injector;
 	private BeanFaultToleranceFactory faultToleranceFactory;

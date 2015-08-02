@@ -24,7 +24,7 @@ import com.avanza.astrix.context.AstrixContextPlugin;
 public class ServiceUnitPlugin implements AstrixContextPlugin {
 
 	// TODO: avoid loading this module using plugin mechanism. 
-	// Requires breaking reversing dependency between context and serivceunit package
+	// Requires breaking reversing dependency between context and serviceunit package
 	
 	@Override
 	public void register(AstrixContextConfig astrixContextConfig) {

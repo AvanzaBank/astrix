@@ -20,8 +20,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.kohsuke.MetaInfServices;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.ApiProvider;
@@ -40,7 +38,6 @@ import com.avanza.astrix.provider.versioning.Versioned;
  * @author Elias Lindholm
  *
  */
-@MetaInfServices(ServiceProviderPlugin.class)
 public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	
 	private ServiceDiscoveryMetaFactory serviceLookupFactory;
