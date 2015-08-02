@@ -18,8 +18,6 @@ package com.avanza.astrix.ft;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import org.kohsuke.MetaInfServices;
-
 import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.core.util.ReflectionUtil;
@@ -29,13 +27,12 @@ import com.avanza.astrix.core.util.ReflectionUtil;
  * @author Elias Lindholm (elilin)
  *
  */
-@MetaInfServices(BeanFaultToleranceProxyStrategy.class)
 public class HystrixFaultToleranceProxyProvider implements BeanFaultToleranceProxyStrategy {
 	
-	private BeanFaultToleranceFactoryImpl faultToleranceFactory;
+	private BeanFaultToleranceFactory faultToleranceFactory;
 	
 	@AstrixInject
-	public void setFaultTolerance(BeanFaultToleranceFactoryImpl faultToleranceFactory) {
+	public void setFaultTolerance(BeanFaultToleranceFactory faultToleranceFactory) {
 		this.faultToleranceFactory = faultToleranceFactory;
 	}
 	@Override

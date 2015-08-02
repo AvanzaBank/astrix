@@ -50,6 +50,7 @@ public class BeanFaultToleranceTest {
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 //		astrixConfigurer.set(HystrixCommandNamingStrategy.class.getName(), CountingCachingHystrixCommandNamingStrategy.class.getName());
 		astrixConfigurer.registerStrategy(HystrixCommandNamingStrategy.class, commandNamingStrategy);
+//		astrixConfigurer.registerStrategy(BeanFaultToleranceProxyStrategy.class, new HystrixFaultToleranceProxyProvider());
 		astrixConfigurer.enableFaultTolerance(true);
 		context = (AstrixApplicationContext) astrixConfigurer.configure();
 		ping = context.getBean(Ping.class);

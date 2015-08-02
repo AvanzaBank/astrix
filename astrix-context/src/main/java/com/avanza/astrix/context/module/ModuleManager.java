@@ -16,7 +16,6 @@
 package com.avanza.astrix.context.module;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -40,14 +39,14 @@ import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.MissingBeanProviderException;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 
-public class ModuleManager {
+class ModuleManager implements Modules {
 	
 	private final Logger log = LoggerFactory.getLogger(ModuleManager.class);
 	private final ConcurrentMap<Class<?>, List<ModuleInstance>> moduleByExportedType = new ConcurrentHashMap<>();
 	private final List<ModuleInstance> moduleInstances = new CopyOnWriteArrayList<>();
 	private final ModuleBeanPostProcessors moduleBeanPostProcessors = new ModuleBeanPostProcessors();
 
-	public void register(Module module) {
+	void register(Module module) {
 		ModuleInstance moduleInstance = new ModuleInstance(module);
 		moduleInstances.add(moduleInstance);
 		for (Class<?> exportedType : moduleInstance.getExports()) {
@@ -64,6 +63,7 @@ public class ModuleManager {
 		return modules;
 	}
 
+	@Override
 	public <T> T getInstance(Class<T> type) {
 		List<ModuleInstance> exportingModules = moduleByExportedType.get(type);
 		if (exportingModules == null) {
@@ -260,6 +260,7 @@ public class ModuleManager {
 		}
 	}
 
+	@Override
 	@PreDestroy
 	public void destroy() {
 		for (ModuleInstance moduleInstance : this.moduleInstances) {
@@ -283,14 +284,6 @@ public class ModuleManager {
 		void add(AstrixBeanPostProcessor beanPostProcessor) {
 			this.beanPostProcessors.add(beanPostProcessor);
 		}
-	}
-
-	public <T> Collection<T> getInstances(Class<T> type) {
-		List<T> result = new LinkedList<T>();
-		for (AstrixBeanKey<T> key : getBeansOfType(type)) {
-			result.add(getInstance(key.getBeanType(), key.getQualifier()));
-		}
-		return result;
 	}
 
 }

@@ -23,7 +23,7 @@ import com.avanza.astrix.beans.publish.BeanPublisher;
 import com.avanza.astrix.beans.publish.PublishedBeanFactory;
 import com.avanza.astrix.beans.service.StatefulAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.context.module.ModuleManager;
+import com.avanza.astrix.context.module.Modules;
 /**
  * An AstrixContextImpl is the runtime-environment for the astrix-framework. It is used
  * both by consuming applications as well as server applications. AstrixContextImpl providers access
@@ -36,9 +36,9 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	private final PublishedBeanFactory publishedBeanFactory;
 	private final BeanPublisher beanPublisher;
 	private final DynamicConfig dynamicConfig;
-	private final ModuleManager moduleManager;
+	private final Modules moduleManager;
 	
-	public AstrixContextImpl(DynamicConfig config, ModuleManager moduleManager) {
+	public AstrixContextImpl(DynamicConfig config, Modules moduleManager) {
 		this.dynamicConfig = config;
 		this.moduleManager = moduleManager;
 		this.beanPublisher = moduleManager.getInstance(BeanPublisher.class);

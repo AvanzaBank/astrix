@@ -16,13 +16,16 @@
 package com.avanza.astrix.context;
 
 import com.avanza.astrix.context.module.Module;
+import com.avanza.astrix.context.module.StrategyContextPreparer;
 
 public interface AstrixContextConfig {
 
 	void registerModule(Module module);
 
-	<T> void registerStrategy(Class<T> strategyType, T defaultInstance);
-
-	<T> void bindStrategy(Class<T> strategy, Module module);
+	<T> void registerDefaultStrategy(Class<T> strategyType, Class<? extends T> strategyProvider);
+	
+	<T> void registerStrategy(Class<T> strategyType, Class<? extends T> strategyProvider);
+	
+	<T> void registerStrategy(Class<T> strategyType, Class<? extends T> strategyProvider, StrategyContextPreparer contextPreparer);
 
 }

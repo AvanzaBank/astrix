@@ -34,11 +34,11 @@ public class BeanPublisherImpl implements BeanPublisher {
 
 	private static final Logger log = LoggerFactory.getLogger(BeanPublisherImpl.class);
 	
-	private final ApiProviderPlugins apiProviderPlugins;
+	private final ApiProviderPluginsImpl apiProviderPluginsImpl;
 	private final PublishedBeanFactoryImpl beanFactory;
 	
-	public BeanPublisherImpl(ApiProviderPlugins apiProviderPlugins, PublishedBeanFactoryImpl beanFactory) {
-		this.apiProviderPlugins = apiProviderPlugins;
+	public BeanPublisherImpl(ApiProviderPluginsImpl apiProviderPluginsImpl, PublishedBeanFactoryImpl beanFactory) {
+		this.apiProviderPluginsImpl = apiProviderPluginsImpl;
 		this.beanFactory = beanFactory;
 	}
 
@@ -55,7 +55,7 @@ public class BeanPublisherImpl implements BeanPublisher {
 	}
 	
 	private Collection<PublishedBean> createPublishedBeans(ApiProviderClass apiProvider) {
-		return apiProviderPlugins.getProviderPlugin(apiProvider).createFactoryBeans(apiProvider);
+		return apiProviderPluginsImpl.getProviderPlugin(apiProvider).createFactoryBeans(apiProvider);
 	}
 
 	@Override

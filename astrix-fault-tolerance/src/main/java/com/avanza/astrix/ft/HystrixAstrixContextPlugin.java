@@ -22,6 +22,8 @@ import com.avanza.astrix.context.AstrixContextConfig;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.module.ModuleContext;
 import com.avanza.astrix.context.module.NamedModule;
+import com.avanza.astrix.context.module.StrategyContext;
+import com.avanza.astrix.context.module.StrategyContextPreparer;
 
 @MetaInfServices(AstrixContextPlugin.class)
 public class HystrixAstrixContextPlugin implements AstrixContextPlugin {
@@ -29,32 +31,33 @@ public class HystrixAstrixContextPlugin implements AstrixContextPlugin {
 	@Override
 	public void register(AstrixContextConfig astrixContextConfig) {
 		// Exposes strategy: HystrixCommandNamingStrategy
-		astrixContextConfig.registerStrategy(HystrixCommandNamingStrategy.class, new DefaultHystrixCommandNamingStrategy());
+		astrixContextConfig.registerDefaultStrategy(HystrixCommandNamingStrategy.class, DefaultHystrixCommandNamingStrategy.class);
 		
-		astrixContextConfig.bindStrategy(BeanFaultToleranceProxyStrategy.class, new HystrixModule());
+		astrixContextConfig.registerModule(new HystrixModule());
+		astrixContextConfig.registerStrategy(BeanFaultToleranceProxyStrategy.class, HystrixFaultToleranceProxyProvider.class, 
+				new StrategyContextPreparer() {
+					@Override
+					public void prepare(StrategyContext context) {
+						context.importType(BeanFaultToleranceFactory.class);
+					}
+				});
+		
 	}
 	
 	private static class HystrixModule implements NamedModule {
 		@Override
 		public void prepare(ModuleContext moduleContext) {
-			moduleContext.bind(BeanFaultToleranceProxyStrategy.class, HystrixFaultToleranceProxyProvider.class);
 			moduleContext.bind(BeanFaultToleranceFactory.class, BeanFaultToleranceFactoryImpl.class);
 			
 			moduleContext.importType(HystrixCommandNamingStrategy.class); // strategy
 			moduleContext.importType(BeanConfigurations.class);
 			
 			moduleContext.export(BeanFaultToleranceFactory.class);
-			
-			// TODO: how do we override a strategy???
-			moduleContext.export(BeanFaultToleranceProxyStrategy.class); // provide a strategy implementation
-									 
 		}
-
 		@Override
 		public String name() {
 			return "hystrix-fault-tolerance";
 		}
-		
 	}
 	
 }

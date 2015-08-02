@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.publish;
+package com.avanza.astrix.context.module;
 
-import java.util.Collection;
+public interface Modules {
+	
+	<T> T getInstance(Class<T> type);
 
-public interface ApiProviderPlugins {
-	Collection<ApiProviderPlugin> getAll();
+	void destroy();
+	
 }

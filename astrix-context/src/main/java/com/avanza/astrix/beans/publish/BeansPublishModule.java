@@ -28,6 +28,7 @@ public class BeansPublishModule implements NamedModule {
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(PublishedBeanFactory.class, PublishedBeanFactoryImpl.class);
 		moduleContext.bind(BeanPublisher.class, BeanPublisherImpl.class);
+		moduleContext.bind(ApiProviderPlugins.class, ApiProviderPluginsImpl.class);
 		
 		moduleContext.bind(AstrixFactoryBeanRegistry.class, SimpleAstrixFactoryBeanRegistry.class);
 		moduleContext.bind(BeanConfigurations.class, BeanConfigurationsImpl.class);
@@ -36,6 +37,7 @@ public class BeansPublishModule implements NamedModule {
 		
 		moduleContext.export(PublishedBeanFactory.class);
 		moduleContext.export(AstrixPublishedBeans.class);
+		moduleContext.export(ApiProviderPlugins.class);
 		moduleContext.export(BeanPublisher.class);
 		moduleContext.export(BeanConfigurations.class); // TODO; should BeanConfigurations be exported from this module?
 	}

@@ -13,23 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.versioning;
+package com.avanza.astrix.context.module;
 
-import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
-import com.avanza.astrix.context.module.ModuleContext;
-import com.avanza.astrix.context.module.NamedModule;
-
-public class JacksonVersioningModule implements NamedModule {
-
-	@Override
-	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(AstrixVersioningPlugin.class, JacksonVersioning.class);
-		moduleContext.export(AstrixVersioningPlugin.class);
-	}
-
-	@Override
-	public String name() {
-		return "jackson-versioning";
-	}
-
+public interface StrategyContextPreparer {
+	void prepare(StrategyContext context);
 }
