@@ -24,7 +24,7 @@ public class DirectComponentModule implements NamedModule {
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(ServiceComponent.class, DirectComponent.class);
 		
-		moduleContext.importType(AstrixVersioningPlugin.class);
+		moduleContext.importType(ObjectSerializerFactory.class);
 		
 		moduleContext.export(ServiceComponent.class);
 	}

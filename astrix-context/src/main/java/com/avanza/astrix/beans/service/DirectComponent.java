@@ -31,7 +31,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -45,20 +44,17 @@ public class DirectComponent implements ServiceComponent {
 	private final static AtomicLong idGen = new AtomicLong();
 	private final static Map<String, ServiceProvider<?>> providerById = new ConcurrentHashMap<>();
 	
-	private AstrixVersioningPlugin versioningPlugin;
+	private final ObjectSerializerFactory objectSerializerFactory;
 	private final List<DirectBoundServiceBeanInstance<?>> nonReleasedInstances = new ArrayList<>();
 	private final ConcurrentMap<AstrixBeanKey<?>, String> idByExportedBean = new ConcurrentHashMap<>();
 	
-	
-	@AstrixInject
-	public void setVersioningPlugin(AstrixVersioningPlugin versioningPlugin) {
-		this.versioningPlugin = versioningPlugin;
+	public DirectComponent(ObjectSerializerFactory objectSerializerFactory) {
+		this.objectSerializerFactory = objectSerializerFactory;
 	}
-	
+
 	public List<? extends BoundServiceBeanInstance<?>> getBoundServices() {
 		return this.nonReleasedInstances;
 	}
-	
 	
 	@Override
 	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
@@ -67,7 +63,7 @@ public class DirectComponent implements ServiceComponent {
 		if (serviceProvider == null) {
 			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + serviceDefinition.getServiceType());
 		}
-		Object targetProvider = serviceProvider.getProvider(versioningPlugin, serviceDefinition.getObjectSerializerDefinition());
+		Object targetProvider = serviceProvider.getProvider(objectSerializerFactory, serviceDefinition.getObjectSerializerDefinition());
 		T provider;
 		if (serviceDefinition.getBeanKey().getBeanType().isAssignableFrom(targetProvider.getClass())) {
 			provider = serviceDefinition.getServiceType().cast(targetProvider);
@@ -195,14 +191,6 @@ public class DirectComponent implements ServiceComponent {
 		return AstrixServiceComponentNames.DIRECT + ":" + id; 
 	}
 	
-	public static <T> T getServiceProvider(Class<T> expectedType, String id) {
-		ServiceProvider<T> provider = (ServiceProvider<T>) providerById.get(id);
-		if (provider == null) {
-			throw new IllegalArgumentException("No provider registered with id: " + id);
-		}
-		return provider.getProvider(AstrixVersioningPlugin.Default.create(), ObjectSerializerDefinition.nonVersioned());
-	}
-	
 	static class ServiceProvider<T> {
 		
 		private String directId;
@@ -223,7 +211,7 @@ public class DirectComponent implements ServiceComponent {
 			return type;
 		}
 		
-		public T getProvider(AstrixVersioningPlugin astrixVersioningPlugin, ObjectSerializerDefinition clientSerializerDefinition) {
+		public T getProvider(ObjectSerializerFactory objectSerializerFactory, ObjectSerializerDefinition clientSerializerDefinition) {
 			return provider;
 		}
 	}
@@ -242,13 +230,13 @@ public class DirectComponent implements ServiceComponent {
 		}
 		
 		@Override
-		public T getProvider(AstrixVersioningPlugin astrixVersioningPlugin, ObjectSerializerDefinition serializerDefinition) {
+		public T getProvider(ObjectSerializerFactory objectSerializerFactory, ObjectSerializerDefinition serializerDefinition) {
 			if (serverSerializerDefinition.isVersioned() || serializerDefinition.isVersioned()) {
 				VersionedServiceProviderProxy serializationHandlingProxy = 
 						new VersionedServiceProviderProxy(provider, 
 														  serializerDefinition.version(), 
-														  astrixVersioningPlugin.create(serializerDefinition), 
-														  astrixVersioningPlugin.create(serverSerializerDefinition));
+														  objectSerializerFactory.create(serializerDefinition), 
+														  objectSerializerFactory.create(serverSerializerDefinition));
 				return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[]{type}, serializationHandlingProxy);
 			}
 			return provider;

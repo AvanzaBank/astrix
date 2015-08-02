@@ -42,7 +42,6 @@ import com.avanza.astrix.spring.AstrixSpringContext;
  * @author Elias Lindholm
  *
  */
-//@MetaInfServices(ServiceComponent.class)
 public class GsRemotingComponent implements ServiceComponent {
 
 	private GsBinder gsBinder;

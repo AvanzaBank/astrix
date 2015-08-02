@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 package com.avanza.astrix.context;
+
+import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
+import com.avanza.astrix.beans.service.ObjectSerializerFactory;
+import com.avanza.astrix.core.AstrixObjectSerializer;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -21,5 +26,14 @@ package com.avanza.astrix.context;
  */
 @Deprecated
 public class DirectComponent extends com.avanza.astrix.beans.service.DirectComponent {
+	
+	public DirectComponent() {
+		super(new ObjectSerializerFactory() {
+			@Override
+			public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
+				return new AstrixObjectSerializer.NoVersioningSupport();
+			}
+		});
+	}
 
 }
