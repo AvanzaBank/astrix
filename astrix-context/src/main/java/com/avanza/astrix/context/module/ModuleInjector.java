@@ -27,7 +27,6 @@ import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.beans.inject.AstrixInject;
 /**
  * 
  * @author Elias Lindholm (elilin)

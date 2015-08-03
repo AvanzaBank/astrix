@@ -17,12 +17,12 @@ package com.avanza.astrix.gs.remoting;
 
 import org.openspaces.core.GigaSpace;
 
-import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.ObjectSerializerFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.context.module.AstrixInject;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.BeanFaultTolerance;

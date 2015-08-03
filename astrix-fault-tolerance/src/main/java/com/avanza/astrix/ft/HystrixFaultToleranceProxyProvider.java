@@ -18,8 +18,8 @@ package com.avanza.astrix.ft;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
+import com.avanza.astrix.context.module.AstrixInject;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
 /**

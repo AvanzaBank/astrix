@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.serviceunit;
 
-import com.avanza.astrix.beans.inject.AstrixInject;
+import com.avanza.astrix.context.module.AstrixInject;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 
 @AstrixServiceExport(ServiceAdministrator.class)

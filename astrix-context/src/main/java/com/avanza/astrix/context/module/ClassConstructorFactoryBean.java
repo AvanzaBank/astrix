@@ -27,7 +27,6 @@ import java.util.Set;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 
 final class ClassConstructorFactoryBean<T> implements StandardFactoryBean<T> {

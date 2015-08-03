@@ -35,7 +35,6 @@ import org.junit.Test;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
-import com.avanza.astrix.beans.inject.AstrixInject;
 
 
 public class ModuleTest {

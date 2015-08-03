@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
@@ -35,6 +34,7 @@ import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicIntProperty;
 import com.avanza.astrix.config.DynamicLongProperty;
+import com.avanza.astrix.context.module.AstrixInject;
 import com.avanza.astrix.context.module.ModuleInjector;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.BeanFaultTolerance;

@@ -17,12 +17,12 @@ package com.avanza.astrix.gs;
 
 import org.openspaces.core.GigaSpace;
 
-import com.avanza.astrix.beans.inject.AstrixInject;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
+import com.avanza.astrix.context.module.AstrixInject;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.ft.HystrixCommandSettings;
