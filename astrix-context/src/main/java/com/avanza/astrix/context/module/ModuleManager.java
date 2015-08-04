@@ -16,6 +16,7 @@
 package com.avanza.astrix.context.module;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -76,6 +77,15 @@ class ModuleManager implements Modules {
 					getModulesNames(exportingModules.subList(1, exportingModules.size())));
 		}
 		return exportingModules.get(0).getInstance(type);
+	}
+	
+	@Override
+	public <T> Collection<T> getAll(Class<T> type) {
+		List<T> result = new ArrayList<T>();
+		for (AstrixBeanKey<T> key : getBeansOfType(type)) {
+			result.add(getInstance(key));
+		}
+		return result;
 	}
 	
 	private List<String> getModulesNames(List<ModuleInstance> modules) {

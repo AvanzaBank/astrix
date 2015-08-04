@@ -15,76 +15,80 @@
  */
 package com.avanza.astrix.context.module;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.annotation.PreDestroy;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
-import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
 import com.avanza.astrix.beans.factory.AstrixBeans;
+import com.avanza.astrix.beans.factory.CircularDependency;
 
 
 public class ModuleTest {
 	
+	
 	@Test
 	public void exportedBeansAreAccessibleOutsideTheModule() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new Module() {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext context) {
 				context.bind(Ping.class, PingWithInternalDriver.class);
 				context.export(Ping.class);
 			}
 		});
-		assertEquals(PingWithInternalDriver.class, moduleManager.getInstance(Ping.class).getClass());
+		Modules modules = modulesConfigurer.configure();
+		assertEquals(PingWithInternalDriver.class, modules.getInstance(Ping.class).getClass());
 	}
 	
 	
 	@Test
 	public void createdBeansAreCached() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new Module() {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext context) {
 				context.bind(Ping.class, PingWithInternalDriver.class);
 				context.export(Ping.class);
 			}
 		});
-		Ping ping1 = moduleManager.getInstance(Ping.class);
-		Ping ping2 = moduleManager.getInstance(Ping.class);
+		Modules modules = modulesConfigurer.configure();
+		Ping ping1 = modules.getInstance(Ping.class);
+		Ping ping2 = modules.getInstance(Ping.class);
 		assertSame(ping1, ping2);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void itsNotAllowedToPullNonExportedInstancesFromAModule() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new Module() {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext context) {
 				context.bind(Ping.class, PingWithInternalDriver.class);
 				context.export(Ping.class);
 			}
 		});
-		moduleManager.getInstance(PingDriverImpl.class);
+		Modules modules = modulesConfigurer.configure();
+		modules.getInstance(PingDriverImpl.class);
 	}
 	
 	@Test
 	public void itsPossibleToImportBeansExportedByOtherModules() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new Module() {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext context) {
 				context.bind(Ping.class, PingWithImportedDriver.class);
@@ -92,20 +96,21 @@ public class ModuleTest {
 				context.export(Ping.class);
 			}
 		});
-		moduleManager.register(new Module() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext context) {
 				context.bind(PingDriver.class, PingDriverImpl.class);
 				context.export(PingDriver.class);
 			}
 		});
-		assertEquals(PingWithImportedDriver.class, moduleManager.getInstance(Ping.class).getClass());
+		Modules modules = modulesConfigurer.configure();
+		assertEquals(PingWithImportedDriver.class, modules.getInstance(Ping.class).getClass());
 	}
 	
 	@Test
-	public void destroyingAModuleManagerInvokesDestroyAnnotatedMethodsExactlyOnce() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new Module() {
+	public void destroyingAModulesInstanceInvokesDestroyAnnotatedMethodsExactlyOnce() throws Exception {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext context) {
 				context.bind(Ping.class, PingWithImportedDriver.class);
@@ -115,7 +120,7 @@ public class ModuleTest {
 				context.export(Ping.class);
 			}
 		});
-		moduleManager.register(new Module() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext context) {
 				context.bind(PingDriver.class, PingDriverImpl.class);
@@ -127,25 +132,26 @@ public class ModuleTest {
 		// NOTE: Create Ping to ensure that PingDriver is note destroyed twice.
 		//       Once when module containing ping is destroyed, and once when drive 
 		//       module is destroyed
-		moduleManager.getInstance(Ping.class); 
-		PingDriver pingDriver = moduleManager.getInstance(PingDriver.class);
+		Modules modules = modulesConfigurer.configure();
+		modules.getInstance(Ping.class); 
+		PingDriver pingDriver = modules.getInstance(PingDriver.class);
 		
-		moduleManager.destroy();
+		modules.destroy();
 		
 		assertEquals(1, pingDriver.destroyCount());
 	}
 	
 	@Test
 	public void multipleExportedBeansOfSameType_UsesFirstProvider() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new Module() {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, NormalPing.class);
 				moduleContext.export(Ping.class);
 			}
 		});
-		moduleManager.register(new Module() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, ReversePing.class);
@@ -153,14 +159,15 @@ public class ModuleTest {
 			}
 		});
 		
-		Ping ping = moduleManager.getInstance(Ping.class);
+		Modules modules = modulesConfigurer.configure();
+		Ping ping = modules.getInstance(Ping.class);
 		assertEquals("not reversed", ping.ping("not reversed"));
 	}
 	
 	@Test
 	public void itsPossibleToImportAllExportedBeansOfAGivenType() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new Module() {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(PingCollector.class, PingCollectorImpl.class);
@@ -168,28 +175,29 @@ public class ModuleTest {
 				moduleContext.export(PingCollector.class);
 			}
 		});
-		moduleManager.register(new Module() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, NormalPing.class);
 				moduleContext.export(Ping.class);
 			}
 		});
-		moduleManager.register(new Module() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, ReversePing.class);
 				moduleContext.export(Ping.class);
 			}
 		});
-		PingCollector pingPluginCollector = moduleManager.getInstance(PingCollector.class);
+		Modules modules = modulesConfigurer.configure();
+		PingCollector pingPluginCollector = modules.getInstance(PingCollector.class);
 		assertEquals(2, pingPluginCollector.pingInstanceCount());
 	}
 	
 	@Test
 	public void injectingAllBeansOfImportedTypesWithNoRegisteredProviders() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new Module() {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(PingCollector.class, PingCollectorImpl.class);
@@ -197,14 +205,15 @@ public class ModuleTest {
 				moduleContext.export(PingCollector.class);
 			}
 		});
-		PingCollector pingPluginCollector = moduleManager.getInstance(PingCollector.class);
+		Modules modules = modulesConfigurer.configure();
+		PingCollector pingPluginCollector = modules.getInstance(PingCollector.class);
 		assertEquals(0, pingPluginCollector.pingInstanceCount());
 	}
 	
 	@Test
 	public void multipleExportedBeansOfImportedType_UsesFirstRegisteredProvider() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new Module() {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(PingCollector.class, SinglePingCollector.class);
@@ -212,28 +221,29 @@ public class ModuleTest {
 				moduleContext.export(PingCollector.class);
 			}
 		});
-		moduleManager.register(new Module() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, ReversePing.class);
 				moduleContext.export(Ping.class);
 			}
 		});
-		moduleManager.register(new Module() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, NormalPing.class);
 				moduleContext.export(Ping.class);
 			}
 		});
-		PingCollector pingPluginCollector = moduleManager.getInstance(PingCollector.class);
+		Modules modules = modulesConfigurer.configure();
+		PingCollector pingPluginCollector = modules.getInstance(PingCollector.class);
 		assertEquals("oof", pingPluginCollector.getPing().ping("foo"));
 	}
 	
 	@Test
 	public void getBeansOfTypeReturnsAllExportedBeansOfAGivenType() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new Module() {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(PingCollector.class, SinglePingCollector.class);
@@ -241,97 +251,54 @@ public class ModuleTest {
 				moduleContext.export(PingCollector.class);
 			}
 		});
-		moduleManager.register(new Module() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, ReversePing.class);
 				moduleContext.export(Ping.class);
 			}
 		});
-		moduleManager.register(new Module() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, NormalPing.class);
 				moduleContext.export(Ping.class);
 			}
 		});
-		assertEquals(1, moduleManager.getBeansOfType(PingCollector.class).size());
-		assertEquals(2, moduleManager.getBeansOfType(Ping.class).size());
-	}
-	
-	@Test
-	public void allExportedBeansOfType() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new NamedModule() {
-			@Override
-			public void prepare(ModuleContext moduleContext) {
-				moduleContext.bind(SinglePingCollector.class, SinglePingCollector.class);
-				moduleContext.importType(Ping.class);
-				moduleContext.export(PingCollector.class);
-			}
-			@Override
-			public String name() {
-				return "collector";
-			}
-		});
-		moduleManager.register(new NamedModule() {
-			@Override
-			public void prepare(ModuleContext moduleContext) {
-				moduleContext.bind(Ping.class, ReversePing.class);
-				moduleContext.export(Ping.class);
-			}
-			@Override
-			public String name() {
-				return "reverse-ping";
-			}
-		});
-		moduleManager.register(new NamedModule() {
-			@Override
-			public void prepare(ModuleContext moduleContext) {
-				moduleContext.bind(Ping.class, NormalPing.class);
-				moduleContext.export(Ping.class);
-			}
-			@Override
-			public String name() {
-				return "ping";
-			}
-		});
-		Set<AstrixBeanKey<?>> exportedBeanKeys = moduleManager.getExportedBeanKeys();
-		assertEquals(3, exportedBeanKeys.size());
-		assertTrue(exportedBeanKeys.contains(AstrixBeanKey.create(PingCollector.class, "collector")));
-		assertTrue(exportedBeanKeys.contains(AstrixBeanKey.create(Ping.class, "reverse-ping")));
-		assertTrue(exportedBeanKeys.contains(AstrixBeanKey.create(Ping.class, "ping")));
-		
-		assertEquals(NormalPing.class, moduleManager.getInstance(Ping.class, "ping").getClass());
-		assertEquals(ReversePing.class, moduleManager.getInstance(Ping.class, "reverse-ping").getClass());
+		Modules modules = modulesConfigurer.configure();
+		Collection<Ping> pings = modules.getAll(Ping.class);
+		assertEquals(2, pings.size());
+		assertThat(pings, hasItem(Matchers.<Ping>instanceOf(NormalPing.class)));
+		assertThat(pings, hasItem(Matchers.<Ping>instanceOf(ReversePing.class)));
 	}
 	
 	@Test
 	public void beanPostProcessorAreAppliedToAllCreatedBeansThatAreNotCreatedBeforeRegisteringThePostProcessor() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		final BlockingQueue<Object> postProcessedBeans = new LinkedBlockingQueue<Object>();
-		moduleManager.register(new Module() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, ReversePing.class);
 				moduleContext.export(Ping.class);
 			}
 		});
-		moduleManager.registerBeanPostProcessor(new AstrixBeanPostProcessor() {
+		modulesConfigurer.registerBeanPostProcessor(new AstrixBeanPostProcessor() {
 			@Override
 			public void postProcess(Object bean, AstrixBeans astrixBeans) {
 				postProcessedBeans.add(bean);
 			}
 		});
-		
-		moduleManager.getInstance(Ping.class); // trigger creation of Ping
+
+		Modules modules = modulesConfigurer.configure();
+		modules.getInstance(Ping.class); // trigger creation of Ping
 		assertThat(postProcessedBeans.poll(), instanceOf(ReversePing.class));
 	}
 	
 	@Test
 	public void setterInjectedDependencies() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new NamedModule() {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new NamedModule() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(AType.class, A.class);
@@ -345,7 +312,7 @@ public class ModuleTest {
 				return "A";
 			}
 		});
-		moduleManager.register(new NamedModule() {
+		modulesConfigurer.register(new NamedModule() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(BType.class, B.class);
@@ -357,7 +324,7 @@ public class ModuleTest {
 				return "B";
 			}
 		});
-		moduleManager.register(new NamedModule() {
+		modulesConfigurer.register(new NamedModule() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(CType.class, C.class);
@@ -369,14 +336,16 @@ public class ModuleTest {
 			}
 		});
 		
-		assertEquals(A.class, moduleManager.getInstance(AType.class).getClass());
-		assertThat(moduleManager.getInstance(AType.class).getB(), instanceOf(B.class));
+		Modules modules = modulesConfigurer.configure();
+
+		assertEquals(A.class, modules.getInstance(AType.class).getClass());
+		assertThat(modules.getInstance(AType.class).getB(), instanceOf(B.class));
 	}
 	
 	@Test
 	public void includesBoundComponentsInSameModuleWhenInjectingListOfAllInstancesOfGivenType() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new Module() {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, NormalPing.class);
@@ -386,13 +355,14 @@ public class ModuleTest {
 			}
 		});
 		
-		assertEquals(1, moduleManager.getInstance(PingCollector.class).pingInstanceCount());
+		Modules modules = modulesConfigurer.configure();
+		assertEquals(1, modules.getInstance(PingCollector.class).pingInstanceCount());
 	}
 	
 	@Test
 	public void exportingMultipleInterfaceFromSameInstance() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new NamedModule() {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new NamedModule() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, SuperPing.class);
@@ -406,16 +376,17 @@ public class ModuleTest {
 				return "ping";
 			}
 		});
-		Ping ping = moduleManager.getInstance(Ping.class);
-		PingCollector pingCollector = moduleManager.getInstance(PingCollector.class);
+		Modules modules = modulesConfigurer.configure();
+		Ping ping = modules.getInstance(Ping.class);
+		PingCollector pingCollector = modules.getInstance(PingCollector.class);
 		assertNotNull(ping);
 		assertSame(ping, pingCollector);
 	}
 	
 //	@Test
 	public void strategiesSupport() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new NamedModule() {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new NamedModule() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, PingWithImportedDriver.class);
@@ -429,8 +400,10 @@ public class ModuleTest {
 				return "ping";
 			}
 		});
-		Ping ping = moduleManager.getInstance(Ping.class);
-		PingCollector pingCollector = moduleManager.getInstance(PingCollector.class);
+		Modules modules = modulesConfigurer.configure();
+		
+		Ping ping = modules.getInstance(Ping.class);
+		PingCollector pingCollector = modules.getInstance(PingCollector.class);
 		assertNotNull(ping);
 		assertSame(ping, pingCollector);
 	}
@@ -439,16 +412,81 @@ public class ModuleTest {
 	
 	
 	// TODO: detect circular dependencies!
-//	@Test
-	public void circularDependencies() throws Exception {
-		ModuleManager moduleManager = new ModuleManager();
-		moduleManager.register(new NamedModule() {
+//	@Test(expected = CircularModuleDependency.class)
+	public void circularDependenciesAreNotAllowedOnAModularLevel() throws Exception {
+		/*
+		 * Class dependencies contains no cycles:
+		 * B 
+		 * C -> D
+		 * D -> B
+		 * 
+		 * But module dependencies contains cycle:
+		 * 
+		 * ModuleB -> ModuleD
+		 * ModuleD -> ModuleB
+		 */
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new NamedModule() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
-				moduleContext.bind(BType.class, CircularTypeB.class);
+				moduleContext.bind(BType.class, new BType() {
+				});
+				moduleContext.bind(CType.class, new CType() {
+					@AstrixInject
+					public void setDType(DType D) {
+					}
+				});
+				moduleContext.importType(DType.class);
+				moduleContext.export(BType.class);
+			}
+			@Override
+			public String name() {
+				return "ModuleB";
+			}
+		});
+		modulesConfigurer.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(DType.class, new DType() {
+					@AstrixInject
+					public void setBtType(BType b) {
+					}
+				});
+				moduleContext.importType(BType.class);
 				
-				moduleContext.importType(CType.class);
-				
+				moduleContext.export(DType.class);
+			}
+			@Override
+			public String name() {
+				return "ModuleD";
+			}
+		});
+		Modules modules = modulesConfigurer.configure();
+		
+		modules.getInstance(BType.class);
+	}
+	
+//	@Test(expected = CircularDependency.class)
+	public void circularDependenciesAreNotAllowedOnInsideAModule() throws Exception {
+		/*
+		 * Class dependencies contains cycle:
+		 * B -> C, C -> B
+		 * 
+		 */
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(BType.class, new BType() {
+					@AstrixInject
+					public void setCType(CType b) {
+					}
+				});
+				moduleContext.bind(CType.class, new CType() {
+					@AstrixInject
+					public void setBType(BType b) {
+					}
+				});
 				moduleContext.export(BType.class);
 			}
 			@Override
@@ -456,39 +494,9 @@ public class ModuleTest {
 				return "b";
 			}
 		});
-		moduleManager.register(new NamedModule() {
-			@Override
-			public void prepare(ModuleContext moduleContext) {
-				moduleContext.bind(CType.class, CircularTypeC.class);
-				
-				moduleContext.importType(BType.class);
-				
-				moduleContext.export(CType.class);
-			}
-			@Override
-			public String name() {
-				return "c";
-			}
-		});
-		
-		moduleManager.getInstance(BType.class);
+		Modules modules = modulesConfigurer.configure();
+		modules.getInstance(BType.class);
 	}
-	
-	public static class CircularTypeB implements BType {
-		CType c;
-		public CircularTypeB(CType c) {
-			this.c = c;
-		}
-		
-	}
-	
-	public static class CircularTypeC implements CType {
-		BType b;
-		public CircularTypeC(BType b) {
-			this.b = b;
-		}
-	}
-	
 	
 	public interface AType {
 		BType getB();
@@ -498,6 +506,9 @@ public class ModuleTest {
 	}
 	
 	public interface CType {
+	}
+	
+	public interface DType {
 	}
 	
 	public static class A implements AType {

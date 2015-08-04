@@ -15,10 +15,14 @@
  */
 package com.avanza.astrix.context.module;
 
+import java.util.Collection;
+
 public interface Modules {
 	
 	<T> T getInstance(Class<T> type);
 
 	void destroy();
+
+	<T> Collection<T> getAll(Class<T> type);
 	
 }
