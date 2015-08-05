@@ -149,11 +149,7 @@ public class AstrixConfigurer {
 		while (contextPlugins.hasNext()) {
 			AstrixContextPlugin contextPlugin = contextPlugins.next();
 			log.debug("Registering AstrixContextPlugin: astrixContextPlugin={}", contextPlugin.getClass().getName());
-			contextPlugin.register(new AstrixContextConfig() {
-				@Override
-				public void registerModule(Module module) {
-					modulesConfigurer.register(module);
-				}
+			contextPlugin.registerStrategies(new AstrixStrategiesConfig() {
 				@Override
 				public <T> void registerDefaultStrategy(Class<T> strategyType, Class<? extends T> strategyProvider) {
 					modulesConfigurer.registerDefault(StrategyProvider.create(strategyType, strategyProvider));
@@ -171,6 +167,7 @@ public class AstrixConfigurer {
 				}
 				
 			});
+			modulesConfigurer.register(contextPlugin);
 		}
 	}
 	

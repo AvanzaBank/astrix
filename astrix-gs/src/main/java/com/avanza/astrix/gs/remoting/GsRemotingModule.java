@@ -19,20 +19,18 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.service.ObjectSerializerFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
-import com.avanza.astrix.context.AstrixContextConfig;
+import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.gs.ClusteredProxyCache;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 import com.avanza.astrix.spring.AstrixSpringContext;
 @MetaInfServices(AstrixContextPlugin.class)
-public class GsRemotingModule implements NamedModule, AstrixContextPlugin {
+public class GsRemotingModule implements AstrixContextPlugin {
 
 	@Override
-	public void register(AstrixContextConfig astrixContextConfig) {
-		astrixContextConfig.registerModule(this);
+	public void registerStrategies(AstrixStrategiesConfig astrixContextConfig) {
 	}
 
 	@Override

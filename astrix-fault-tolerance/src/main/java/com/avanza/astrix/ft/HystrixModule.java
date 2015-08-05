@@ -18,19 +18,17 @@ package com.avanza.astrix.ft;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.factory.BeanConfigurations;
-import com.avanza.astrix.context.AstrixContextConfig;
+import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.modules.StrategyContext;
 import com.avanza.astrix.modules.StrategyContextPreparer;
 
 @MetaInfServices(AstrixContextPlugin.class)
-public class HystrixAstrixContextPlugin implements AstrixContextPlugin {
+public class HystrixModule implements AstrixContextPlugin {
 	
 	@Override
-	public void register(AstrixContextConfig astrixContextConfig) {
-		astrixContextConfig.registerModule(this);
-		
+	public void registerStrategies(AstrixStrategiesConfig astrixContextConfig) {
 		// Exposes strategy: HystrixCommandNamingStrategy
 		astrixContextConfig.registerDefaultStrategy(HystrixCommandNamingStrategy.class, DefaultHystrixCommandNamingStrategy.class);
 		
@@ -55,7 +53,7 @@ public class HystrixAstrixContextPlugin implements AstrixContextPlugin {
 	}
 	@Override
 	public String name() {
-		return "hystrix-fault-tolerance";
+		return getClass().getPackage().getName();
 	}
 	
 }

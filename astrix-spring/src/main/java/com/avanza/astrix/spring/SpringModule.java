@@ -18,7 +18,7 @@ package com.avanza.astrix.spring;
 import org.kohsuke.MetaInfServices;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
-import com.avanza.astrix.context.AstrixContextConfig;
+import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.serviceunit.ServiceExporter;
@@ -42,8 +42,7 @@ public class SpringModule implements AstrixContextPlugin {
 	}
 
 	@Override
-	public void register(AstrixContextConfig astrixContextConfig) {
-		astrixContextConfig.registerModule(this);
+	public void registerStrategies(AstrixStrategiesConfig astrixContextConfig) {
 	}
 
 }

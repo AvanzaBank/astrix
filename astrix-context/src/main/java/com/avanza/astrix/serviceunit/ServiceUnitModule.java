@@ -19,7 +19,7 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
-import com.avanza.astrix.context.AstrixContextConfig;
+import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.modules.ModuleContext;
 
@@ -45,8 +45,7 @@ public class ServiceUnitModule implements AstrixContextPlugin {
 	}
 
 	@Override
-	public void register(AstrixContextConfig astrixContextConfig) {
-		astrixContextConfig.registerModule(this);
+	public void registerStrategies(AstrixStrategiesConfig astrixContextConfig) {
 	}
 
 }

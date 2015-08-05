@@ -15,12 +15,9 @@
  */
 package com.avanza.astrix.context;
 
-import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.StrategyContextPreparer;
 
-public interface AstrixContextConfig {
-
-	void registerModule(Module module);
+public interface AstrixStrategiesConfig {
 
 	<T> void registerDefaultStrategy(Class<T> strategyType, Class<? extends T> strategyProvider);
 	
