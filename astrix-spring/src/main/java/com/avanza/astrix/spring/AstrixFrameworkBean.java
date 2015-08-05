@@ -208,11 +208,6 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	}
 	
 	private AstrixApplicationContext createAsterixContext(DynamicConfig optionalConfig) {
-		if (isServer()) {
-			// Register server part of framework
-//			configurer.registerModule(new SpringModule());
-//			configurer.registerModule(new ServiceUnitModule());
-		}
 		configurer.setSettings(this.settings);
 		if (optionalConfig != null) {
 			configurer.setConfig(optionalConfig);
@@ -273,7 +268,6 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	
 
 	private void setupApplicationInstanceId() {
-		// TODO: Set APPLICATION_INSTANCE_ID on AstrixApplicationContext insteadof AstrixConfigurer
 		String applicationInstanceId = AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(this.astrixContext.getConfig()).get();
 		if (applicationInstanceId == null) {
 			applicationInstanceId = this.applicationDescriptor.toString();
