@@ -96,19 +96,6 @@ class ModuleManager implements Modules {
 		return result;
 	}
 
-	public <T> T getInstance(Class<T> type, String exportingModuleName) {
-		List<ModuleInstance> exportingModules = moduleByExportedType.get(type);
-		if (exportingModules == null) {
-			throw new IllegalArgumentException("Non exported type: " + type);
-		}
-		for (ModuleInstance module : exportingModules) {
-			if (module.getName().equals(exportingModuleName)) {
-				return module.getInstance(type);
-			}
-		}
-		throw new IllegalArgumentException(String.format("Non exported type by module: type=%s module=%s", type, exportingModuleName));
-	}
-	
 	private <T> T getInstance(AstrixBeanKey<T> beanKey) {
 		if (!beanKey.isQualified()) {
 			return getInstance(beanKey.getBeanType());
