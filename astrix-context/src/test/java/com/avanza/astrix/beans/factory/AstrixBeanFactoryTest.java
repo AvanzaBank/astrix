@@ -241,11 +241,6 @@ public class AstrixBeanFactoryTest {
 			return this.key;
 		}
 		
-		@Override
-		public boolean lifecycled() {
-			return true;
-		}
-
 	}
 
 }

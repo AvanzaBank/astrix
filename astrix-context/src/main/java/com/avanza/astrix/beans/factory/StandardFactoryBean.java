@@ -30,8 +30,6 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
  */
 public interface StandardFactoryBean<T> extends FactoryBean<T> {
 	
-	// Rename to PredefinedKeyFactoryBean?
-	
 	/**
 	 * Creates the bean. Dependencies
 	 * required by the bean may be pulled out
@@ -48,8 +46,6 @@ public interface StandardFactoryBean<T> extends FactoryBean<T> {
 	 * @return
 	 */
 	T create(AstrixBeans beans);
-	
-	boolean lifecycled();
 	
 	/**
 	 * Identifier for the bean created by this factory.

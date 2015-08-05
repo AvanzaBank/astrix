@@ -34,19 +34,17 @@ public class AstrixBeanInstance<T> {
 	private final T instance;
 	private final AstrixBeanKey<?> beanKey;
 	private final Set<AstrixBeanKey<?>> dependencies;
-	private boolean lifecycle;
 	
-	private AstrixBeanInstance(AstrixBeanKey<T> beanKey, T instance, Set<AstrixBeanKey<?>> transitiveDependencies, boolean lifecycle) {
+	private AstrixBeanInstance(AstrixBeanKey<T> beanKey, T instance, Set<AstrixBeanKey<?>> transitiveDependencies) {
 		this.beanKey = beanKey;
 		this.instance = instance;
-		dependencies = transitiveDependencies;
-		this.lifecycle = lifecycle;
+		this.dependencies = transitiveDependencies;
 	}
 	
 	static <T> AstrixBeanInstance<T> create(AstrixBeans factoryBeanContext, StandardFactoryBean<T> factory) {
 		TransitiveDependencyCollector dependencyCollectingContext = new TransitiveDependencyCollector(factoryBeanContext);
 		T instance = factory.create(dependencyCollectingContext);
-		return new AstrixBeanInstance<T>(factory.getBeanKey(), instance, dependencyCollectingContext.getTransitiveDependencies(), factory.lifecycled());
+		return new AstrixBeanInstance<T>(factory.getBeanKey(), instance, dependencyCollectingContext.getTransitiveDependencies());
 	}
 	
 	public T get() {
@@ -68,16 +66,12 @@ public class AstrixBeanInstance<T> {
 	
 	@PreDestroy
 	public final void destroy() {
-		if (lifecycle) {
-			ObjectCache.destroy(get());
-		}
+		ObjectCache.destroy(get());
 	}
 	
 	@PostConstruct
 	public final void init() {
-		if (lifecycle) {
-			ObjectCache.init(get());
-		}
+		ObjectCache.init(get());
 	}
 	
 	private static class TransitiveDependencyCollector implements AstrixBeans {
@@ -109,9 +103,7 @@ public class AstrixBeanInstance<T> {
 	}
 
 	public void postProcess(AstrixBeanPostProcessor beanPostProcessor, AstrixBeans astrixBeans) {
-		if (lifecycle) {
-			beanPostProcessor.postProcess(get(), astrixBeans);
-		}
+		beanPostProcessor.postProcess(get(), astrixBeans);
 	}
 	
 }

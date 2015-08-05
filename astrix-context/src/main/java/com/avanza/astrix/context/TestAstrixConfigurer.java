@@ -146,12 +146,6 @@ public class TestAstrixConfigurer {
 			return type;
 		}
 		
-		@Override
-		public boolean lifecycled() {
-			return true;
-		}
-		
-		
 	}
 
 	public void removeSetting(String name) {
