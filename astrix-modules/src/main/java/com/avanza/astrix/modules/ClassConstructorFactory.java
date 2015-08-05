@@ -24,8 +24,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.avanza.astrix.context.module.AstrixInject;
-
 final class ClassConstructorFactory<T> implements Factory<T> {
 	
 	private Class<T> factory;

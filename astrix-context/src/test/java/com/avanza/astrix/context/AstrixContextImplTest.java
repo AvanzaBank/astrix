@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.factory.MissingBeanDependencyException;
 import com.avanza.astrix.beans.factory.MissingBeanProviderException;
-import com.avanza.astrix.context.module.AstrixInject;
+import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 

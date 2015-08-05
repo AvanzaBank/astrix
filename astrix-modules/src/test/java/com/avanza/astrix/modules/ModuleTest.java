@@ -32,8 +32,6 @@ import javax.annotation.PreDestroy;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
-import com.avanza.astrix.context.module.AstrixInject;
-
 
 public class ModuleTest {
 	

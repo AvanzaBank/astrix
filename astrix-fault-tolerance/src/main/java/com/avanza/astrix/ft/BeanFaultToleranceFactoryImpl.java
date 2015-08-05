@@ -19,7 +19,7 @@ import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.context.module.AstrixInject;
+import com.avanza.astrix.modules.AstrixInject;
 /**
  * 
  * @author Elias Lindholm (elilin)

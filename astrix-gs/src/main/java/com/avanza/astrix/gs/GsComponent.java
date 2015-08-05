@@ -22,11 +22,11 @@ import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
-import com.avanza.astrix.context.module.AstrixInject;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.gs.ClusteredProxyCacheImpl.GigaSpaceInstance;
+import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.spring.AstrixSpringContext;
 /**
