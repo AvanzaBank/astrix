@@ -54,6 +54,27 @@ public final class ObjectCache {
 		return create(objectId, factory);
 	}
 	
+	public void destroyInCache(Object id) {
+		lockedObjects.lock(id);
+		try {
+			Object object = this.instanceById.remove(id);
+			if (object == null) {
+				// Already destroyed
+				return;
+			}
+			// destroy instance
+			try {
+				destroy(object);
+			} catch (RuntimeException e) {
+				throw e;
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to destroy instance of: " + id, e);
+			}
+		} finally {
+			lockedObjects.unlock(id);
+		}
+	}
+	
 	public void destroy() {
 		for (Object object : this.instanceById.values()) {
 			destroy(object);

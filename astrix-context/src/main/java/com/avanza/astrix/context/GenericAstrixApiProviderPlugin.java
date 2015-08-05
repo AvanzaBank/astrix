@@ -24,7 +24,6 @@ import javax.annotation.PreDestroy;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
-import com.avanza.astrix.beans.factory.ObjectCache;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
@@ -35,6 +34,7 @@ import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
+import com.avanza.astrix.modules.ObjectCache;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
@@ -47,8 +47,6 @@ import com.avanza.astrix.provider.versioning.Versioned;
  */
 final class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 
-	// TODO: Rename this abstractions: Its not a plugin anymore
-	
 	private final ObjectCache provideInstanceCache = new ObjectCache();
 	private final AstrixServiceMetaFactory serviceMetaFactory;
 	private final ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory;

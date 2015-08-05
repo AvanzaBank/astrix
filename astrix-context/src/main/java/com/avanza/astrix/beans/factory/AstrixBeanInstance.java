@@ -22,6 +22,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.modules.ObjectCache;
 /**
  * 
  * @author Elias Lindholm (elilin)
