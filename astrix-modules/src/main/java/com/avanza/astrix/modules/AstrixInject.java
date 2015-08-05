@@ -30,5 +30,4 @@ import java.lang.annotation.Target;
 @Documented
 public @interface AstrixInject {
 	
-	// TODO: move to astrix.modules package
 }

@@ -17,7 +17,6 @@ package com.avanza.astrix.integration.tests;
 
 import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
 
-import org.apache.log4j.Level;
 import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Rule;

@@ -31,9 +31,7 @@ import com.avanza.astrix.modules.ObjectCache.ObjectFactory;
  * @author Elias Lindholm (elilin)
  *
  */
-public class ModuleInjector {
-	
-	// TODO: make package private?
+class ModuleInjector {
 	
 	private final ObjectCache objectCache = new ObjectCache();
 	private final ConcurrentMap<Class<?>, Class<?>> beanBindings = new ConcurrentHashMap<>();

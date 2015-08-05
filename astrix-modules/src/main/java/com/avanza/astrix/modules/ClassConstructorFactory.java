@@ -24,7 +24,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-final class ClassConstructorFactory<T> implements Factory<T> {
+final class ClassConstructorFactory<T> {
 	
 	private Class<T> factory;
 	
@@ -32,7 +32,6 @@ final class ClassConstructorFactory<T> implements Factory<T> {
 		this.factory = factory;
 	}
 	
-	@Override
 	public T create(Dependencies dependencies) {
 		Constructor<T> factory = getFactory();
 		Object[] args = new Object[factory.getParameterTypes().length];
