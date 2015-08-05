@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
@@ -140,9 +141,36 @@ class ModuleManager implements Modules {
 		}
 	}
 	
+	public static class CreationFrame {
+		
+		private ModuleInstance module;
+		private Class<?> type;
+		public CreationFrame(ModuleInstance module, Class<?> type) {
+			this.module = module;
+			this.type = type;
+		}
+		@Override
+		public int hashCode() {
+			return Objects.hash(module, type);
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			CreationFrame other = (CreationFrame) obj;
+			return Objects.equals(module, other.module)
+					&& Objects.equals(type, other.type);
+		}
+		
+	}
+	
 	public class CircularModuleDependenciesAwareCreation {
 		
-		private final Stack<ModuleInstance> creationStack = new Stack<>();
+		private final Stack<CreationFrame> creationStack = new Stack<>();
 		
 		public <T> T get(final Class<T> type) {
 			List<ModuleInstance> exportingModules = moduleByExportedType.get(type);
@@ -172,28 +200,26 @@ class ModuleManager implements Modules {
 		}
 		
 		private <T> T getInstance(final Class<T> type, ModuleInstance exportingModule) {
-			try {
-				if (creationStack.contains(exportingModule)) {
-					throw new CircularModuleDependency();
-				}
-				creationStack.add(exportingModule);
-				T result = exportingModule.getInstance(type, new ImportedDependencies() {
-					@Override
-					public <D> Collection<D> getAll(Class<D> type) {
-						return CircularModuleDependenciesAwareCreation.this.getAll(type);
-					}
-					
-					@Override
-					public <D> D get(Class<D> type) {
-						return CircularModuleDependenciesAwareCreation.this.get(type);
-					}
-				});
-				creationStack.pop();
-				return result;
-			} catch (CircularModuleDependency e) {
-				e.addToDependencyTrace(type, exportingModule);
-				throw e;
+			CreationFrame creationFrame = new CreationFrame(exportingModule, type);
+			if (creationStack.contains(creationFrame)) {
+				CircularDependency circularDependency = new CircularDependency();
+				circularDependency.addToDependencyTrace(type, exportingModule.getName());
+				throw circularDependency;
 			}
+			creationStack.add(creationFrame);
+			T result = exportingModule.getInstance(type, new ImportedDependencies() {
+				@Override
+				public <D> Collection<D> getAll(Class<D> type) {
+					return CircularModuleDependenciesAwareCreation.this.getAll(type);
+				}
+				
+				@Override
+				public <D> D get(Class<D> type) {
+					return CircularModuleDependenciesAwareCreation.this.get(type);
+				}
+			});
+			creationStack.pop();
+			return result;
 		}
 		
 	}

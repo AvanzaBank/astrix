@@ -33,15 +33,6 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import com.avanza.astrix.context.module.AstrixInject;
-import com.avanza.astrix.modules.CircularDependency;
-import com.avanza.astrix.modules.CircularModuleDependency;
-import com.avanza.astrix.modules.MissingBeanBinding;
-import com.avanza.astrix.modules.Module;
-import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.ModuleInstancePostProcessor;
-import com.avanza.astrix.modules.Modules;
-import com.avanza.astrix.modules.ModulesConfigurer;
-import com.avanza.astrix.modules.NamedModule;
 
 
 public class ModuleTest {
@@ -453,8 +444,8 @@ public class ModuleTest {
 		assertSame(ping, pingCollector);
 	}
 	
-	@Test(expected = CircularModuleDependency.class)
-	public void circularDependenciesAreNotAllowedOnAModularLevel() throws Exception {
+	@Test
+	public void circularDependenciesAreAllowedOnAModularLevel() throws Exception {
 		/*
 		 * Class dependencies contains no cycles:
 		 * A -> B (ModA)
@@ -495,6 +486,47 @@ public class ModuleTest {
 			@Override
 			public String name() {
 				return "ModuleD";
+			}
+		});
+		Modules modules = modulesConfigurer.configure();
+		
+		modules.getInstance(AType.class);
+	}
+	
+	@Test(expected = CircularDependency.class)
+	public void circularDependenciesAreDetectedBetweenModules() throws Exception {
+		/*
+		 * A -> B (ModA)
+		 * B -> A (ModB)
+		 * 
+		 */
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(AType.class, A.class);
+				
+				moduleContext.importType(BType.class);
+				
+				moduleContext.export(AType.class);
+			}
+			@Override
+			public String name() {
+				return "ModuleA";
+			}
+		});
+		modulesConfigurer.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(BType.class, CircularB.class);
+				
+				moduleContext.importType(AType.class);
+				
+				moduleContext.export(BType.class);
+			}
+			@Override
+			public String name() {
+				return "ModuleB";
 			}
 		});
 		Modules modules = modulesConfigurer.configure();
@@ -565,10 +597,10 @@ public class ModuleTest {
 	
 
 	public static class CircularB implements BType  {
-		private A a;
+		private AType a;
 
 		@AstrixInject
-		public void setA(A a) {
+		public void setA(AType a) {
 			this.a = a;
 		}
 	}

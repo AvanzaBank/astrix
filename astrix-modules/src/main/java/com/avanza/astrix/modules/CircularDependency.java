@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.modules;
 
-import java.util.Stack;
+import java.util.LinkedList;
 
 
 
@@ -27,17 +27,22 @@ import java.util.Stack;
 public class CircularDependency extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
-
-	public CircularDependency(Stack<Class<?>> dependencyTrace, String moduleName) {
-		super("Circular dependency detected, module=" + moduleName + " dependency tree:\n" + createTrace(dependencyTrace));
+	private final LinkedList<String> dependencyTrace = new LinkedList<String>();
+	
+	public void addToDependencyTrace(Class<?> type, String moduleName) {
+		dependencyTrace.addFirst(type.getName() + " [" + moduleName + "]");
 	}
-
-	private static String createTrace(Stack<Class<?>> trace) {
+	
+	@Override
+	public String getMessage() {
 		StringBuilder result = new StringBuilder();
-		StringBuilder indent = new StringBuilder();
-		for (Class<?> key : trace) {
-			result.append(indent.toString()).append(key).append("\n");
-			indent.append("  ");
+		for (String dep : dependencyTrace) {
+			if (result.length() > 0) {
+				result.append("\n --> ");
+			} else {
+				result.append("\n     ");
+			}
+			result.append(dep);
 		}
 		return result.toString();
 	}

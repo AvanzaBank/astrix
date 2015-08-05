@@ -97,34 +97,40 @@ public class ModuleInjector {
 		}
 		
 		private <T> T doCreate(final Class<T> type) {
-			if (constructionStack.contains(type)) {
-				throw new CircularDependency(constructionStack, moduleName);
+			try {
+				if (constructionStack.contains(type)) {
+//				throw new CircularDependency(constructionStack, moduleName);
+					throw new CircularDependency();
+				}
+				constructionStack.add(type);
+				final ClassConstructorFactory<T> factory = new ClassConstructorFactory<T>(type);
+				T result = factory.create(new Dependencies() {
+					@Override
+					public <E> Collection<E> getAll(Class<E> type) {
+						List<E> result = new ArrayList<>();
+						if (ModuleInjector.this.imports.contains(type)) {
+							result.addAll(importedDependencies.getAll(type));
+						}
+						if (ModuleInjector.this.beanBindings.containsKey(type)) {
+							result.add(create(type));
+						}
+						return result;
+					}
+					@Override
+					public <E> E get(Class<E> type) {
+						if (ModuleInjector.this.imports.contains(type)) {
+							return importedDependencies.get(type);
+						}
+						return create(type); 
+					}
+				});
+				postProcessors.postProcess(result);
+				constructionStack.pop();
+				return result;
+			} catch (CircularDependency circularDependency) {
+				circularDependency.addToDependencyTrace(type, moduleName);
+				throw circularDependency;
 			}
-			constructionStack.add(type);
-			final ClassConstructorFactory<T> factory = new ClassConstructorFactory<T>(type);
-			T result = factory.create(new Dependencies() {
-				@Override
-				public <E> Collection<E> getAll(Class<E> type) {
-					List<E> result = new ArrayList<>();
-					if (ModuleInjector.this.imports.contains(type)) {
-						result.addAll(importedDependencies.getAll(type));
-					}
-					if (ModuleInjector.this.beanBindings.containsKey(type)) {
-						result.add(create(type));
-					}
-					return result;
-				}
-				@Override
-				public <E> E get(Class<E> type) {
-					if (ModuleInjector.this.imports.contains(type)) {
-						return importedDependencies.get(type);
-					}
-					return create(type); 
-				}
-			});
-			postProcessors.postProcess(result);
-			constructionStack.pop();
-			return result;
 		}
 	}
 
