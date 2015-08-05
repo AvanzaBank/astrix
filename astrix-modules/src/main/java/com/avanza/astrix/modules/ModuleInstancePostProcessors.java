@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.module;
+package com.avanza.astrix.modules;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-
-/**
- * @author Elias Lindholm (elilin)
- */
-@Target(value = { ElementType.METHOD, ElementType.CONSTRUCTOR })
-@Retention(value = RetentionPolicy.RUNTIME)
-@Documented
-public @interface AstrixInject {
+final class ModuleInstancePostProcessors implements ModuleInstancePostProcessor {
+	private final List<ModuleInstancePostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();		
+	@Override
+	public void postProcess(Object bean) {
+		for (ModuleInstancePostProcessor beanPostProcessor : beanPostProcessors) {
+			beanPostProcessor.postProcess(bean);
+		}
+	}
+	void add(ModuleInstancePostProcessor beanPostProcessor) {
+		this.beanPostProcessors.add(beanPostProcessor);
+	}
 }

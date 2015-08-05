@@ -25,6 +25,7 @@
 		<module>astrix-config</module>
 		<module>tutorial</module>
 		<module>astrix-all</module>
+		<module>astrix-modules</module>
 	</modules>
 
 	<scm>
