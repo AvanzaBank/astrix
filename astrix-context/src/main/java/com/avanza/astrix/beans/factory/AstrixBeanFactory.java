@@ -104,12 +104,7 @@ public class AstrixBeanFactory {
 			StandardFactoryBean<? extends T> factoryBean = registry.getFactoryBean(beanKey);
 			AstrixBeanInstance<? extends T> instance = createBeanInstance(factoryBean);
 			for (AstrixBeanPostProcessor beanPostProcessor : beanPostProcessors) {
-				try {
-					instance.postProcess(beanPostProcessor, this);
-				} catch (Exception e) {
-					throw new RuntimeException(String.format("Failed to invoke beanPostProcessor. bean=%s postProcessor=%s", beanKey, beanPostProcessor.getClass().getName()), e);
-//					throw e;
-				}
+				instance.postProcess(beanPostProcessor, this);
 			}
 			constructionStack.pop();
 			return instance;
