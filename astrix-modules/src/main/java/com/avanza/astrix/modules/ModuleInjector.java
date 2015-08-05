@@ -61,15 +61,15 @@ class ModuleInjector {
 		if (!exports.contains(type)) {
 			throw new IllegalArgumentException("Non exported bean: " + type);
 		}
-		return new CirucularDependenciesAwareCreation(importedDependencies).create(type);
+		return new CircularDependenciesAwareCreation(importedDependencies).create(type);
 	}
 	
-	public class CirucularDependenciesAwareCreation {
+	private class CircularDependenciesAwareCreation {
 		
 		private final Stack<Class<?>> constructionStack = new Stack<>();
 		private final ImportedDependencies importedDependencies;
 		
-		public CirucularDependenciesAwareCreation(ImportedDependencies importedDependencies) {
+		public CircularDependenciesAwareCreation(ImportedDependencies importedDependencies) {
 			this.importedDependencies = importedDependencies;
 		}
 
@@ -97,7 +97,6 @@ class ModuleInjector {
 		private <T> T doCreate(final Class<T> type) {
 			try {
 				if (constructionStack.contains(type)) {
-//				throw new CircularDependency(constructionStack, moduleName);
 					throw new CircularDependency();
 				}
 				constructionStack.add(type);

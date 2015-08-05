@@ -15,10 +15,13 @@
  */
 package com.avanza.astrix.remoting.server;
 
-import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
+import org.kohsuke.MetaInfServices;
 
-public class RemotingServerModule implements NamedModule {
+import com.avanza.astrix.context.AstrixContextConfig;
+import com.avanza.astrix.context.AstrixContextPlugin;
+import com.avanza.astrix.modules.ModuleContext;
+@MetaInfServices(AstrixContextPlugin.class)
+public class RemotingServerModule implements AstrixContextPlugin {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
@@ -30,6 +33,11 @@ public class RemotingServerModule implements NamedModule {
 	@Override
 	public String name() {
 		return getClass().getPackage().getName();
+	}
+
+	@Override
+	public void register(AstrixContextConfig astrixContextConfig) {
+		astrixContextConfig.registerModule(this);
 	}
 
 }

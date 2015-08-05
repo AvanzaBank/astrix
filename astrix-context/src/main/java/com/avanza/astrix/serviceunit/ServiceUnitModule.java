@@ -15,12 +15,16 @@
  */
 package com.avanza.astrix.serviceunit;
 
+import org.kohsuke.MetaInfServices;
+
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
+import com.avanza.astrix.context.AstrixContextConfig;
+import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
 
-public class ServiceUnitModule implements NamedModule {
+@MetaInfServices(AstrixContextPlugin.class)
+public class ServiceUnitModule implements AstrixContextPlugin {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
@@ -38,6 +42,11 @@ public class ServiceUnitModule implements NamedModule {
 	@Override
 	public String name() {
 		return getClass().getPackage().getName();
+	}
+
+	@Override
+	public void register(AstrixContextConfig astrixContextConfig) {
+		astrixContextConfig.registerModule(this);
 	}
 
 }

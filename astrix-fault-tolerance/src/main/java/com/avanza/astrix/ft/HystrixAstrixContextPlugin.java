@@ -21,7 +21,6 @@ import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.context.AstrixContextConfig;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
 import com.avanza.astrix.modules.StrategyContext;
 import com.avanza.astrix.modules.StrategyContextPreparer;
 
@@ -30,10 +29,11 @@ public class HystrixAstrixContextPlugin implements AstrixContextPlugin {
 	
 	@Override
 	public void register(AstrixContextConfig astrixContextConfig) {
+		astrixContextConfig.registerModule(this);
+		
 		// Exposes strategy: HystrixCommandNamingStrategy
 		astrixContextConfig.registerDefaultStrategy(HystrixCommandNamingStrategy.class, DefaultHystrixCommandNamingStrategy.class);
 		
-		astrixContextConfig.registerModule(new HystrixModule());
 		astrixContextConfig.registerStrategy(BeanFaultToleranceProxyStrategy.class, HystrixFaultToleranceProxyProvider.class, 
 				new StrategyContextPreparer() {
 					@Override
@@ -44,20 +44,18 @@ public class HystrixAstrixContextPlugin implements AstrixContextPlugin {
 		
 	}
 	
-	private static class HystrixModule implements NamedModule {
-		@Override
-		public void prepare(ModuleContext moduleContext) {
-			moduleContext.bind(BeanFaultToleranceFactory.class, BeanFaultToleranceFactoryImpl.class);
-			
-			moduleContext.importType(HystrixCommandNamingStrategy.class); // strategy
-			moduleContext.importType(BeanConfigurations.class);
-			
-			moduleContext.export(BeanFaultToleranceFactory.class);
-		}
-		@Override
-		public String name() {
-			return "hystrix-fault-tolerance";
-		}
+	@Override
+	public void prepare(ModuleContext moduleContext) {
+		moduleContext.bind(BeanFaultToleranceFactory.class, BeanFaultToleranceFactoryImpl.class);
+		
+		moduleContext.importType(HystrixCommandNamingStrategy.class); // strategy
+		moduleContext.importType(BeanConfigurations.class);
+		
+		moduleContext.export(BeanFaultToleranceFactory.class);
+	}
+	@Override
+	public String name() {
+		return "hystrix-fault-tolerance";
 	}
 	
 }
