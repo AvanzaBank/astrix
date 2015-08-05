@@ -119,6 +119,29 @@ public class ModuleTest {
 		modules.getInstance(PingDriverImpl.class);
 	}
 	
+	@Test(expected = ModuleNameConflict.class)
+	public void itsNotAllowedToRegisterMultipleModulesWithSameName() throws Exception {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext context) {
+			}
+			@Override
+			public String name() {
+				return "a";
+			}
+		});
+		modulesConfigurer.register(new NamedModule() {
+			@Override
+			public void prepare(ModuleContext context) {
+			}
+			@Override
+			public String name() {
+				return "a";
+			}
+		});
+	}
+	
 	@Test
 	public void itsPossibleToImportBeansExportedByOtherModules() throws Exception {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
