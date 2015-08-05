@@ -91,13 +91,6 @@ public class AstrixBeanFactory {
 						}
 						// It's the top level bean thats missing, propagate
 						throw e;
-					} catch (BeanCreationException e) {
-						throw e;
-					} catch (CircularDependency e) {
-						throw e;
-					} catch (Exception e) {
-						throw e;
-//						throw new BeanCreationException(String.format("Failed to create bean=%s trace=%s", beanKey.toString(), constructionStack), e);
 					} 
 				}
 			});
