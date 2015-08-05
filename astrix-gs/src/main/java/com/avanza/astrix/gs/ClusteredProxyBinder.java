@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.publish;
+package com.avanza.astrix.gs;
 
-import com.avanza.astrix.beans.factory.StandardFactoryBean;
+import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
+import com.avanza.astrix.beans.service.ServiceDefinition;
+import com.avanza.astrix.beans.service.ServiceProperties;
 
-
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface BeanPublisher {
-	
-	void register(ApiProviderClass apiProvider);
-
-	<T> void registerFactoryBean(StandardFactoryBean<T> beanFactory);
+public interface ClusteredProxyBinder {
+	<T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties);
 }

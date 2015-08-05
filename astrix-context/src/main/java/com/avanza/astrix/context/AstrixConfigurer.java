@@ -130,7 +130,7 @@ public class AstrixConfigurer {
 		Modules modules = modulesConfigurer.configure();
 		awareInjector.setModules(modules);
 
-		final AstrixContextImpl context = new AstrixContextImpl(config, modules);
+		final AstrixContextImpl context = new AstrixContextImpl(modules);
 		ApiProviders apiProviders = new FilteredApiProviders(getApiProviders(modules, config), activeProfiles);
 		for (ApiProviderClass apiProvider : apiProviders.getAll()) {
 			context.register(apiProvider);

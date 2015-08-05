@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.BeanConfiguration;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
@@ -36,13 +37,13 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	private final PublishedBeanFactory publishedBeanFactory;
 	private final BeanPublisher beanPublisher;
 	private final DynamicConfig dynamicConfig;
-	private final Modules moduleManager;
+	private final Modules modules;
 	
-	public AstrixContextImpl(DynamicConfig config, Modules moduleManager) {
-		this.dynamicConfig = config;
-		this.moduleManager = moduleManager;
-		this.beanPublisher = moduleManager.getInstance(BeanPublisher.class);
-		this.publishedBeanFactory = moduleManager.getInstance(PublishedBeanFactory.class);
+	public AstrixContextImpl(Modules modules) {
+		this.modules = modules;
+		this.dynamicConfig = modules.getInstance(AstrixConfig.class).getConfig();
+		this.beanPublisher = modules.getInstance(BeanPublisher.class);
+		this.publishedBeanFactory = modules.getInstance(PublishedBeanFactory.class);
 	}
 	
 
@@ -56,7 +57,7 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	
 	@Override
 	public void destroy() {
-		this.moduleManager.destroy();
+		this.modules.destroy();
 	}
 
 	@Override
@@ -111,7 +112,7 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	 * @return
 	 */
 	public final <T> T getInstance(final Class<T> classType) {
-		return this.moduleManager.getInstance(classType);
+		return this.modules.getInstance(classType);
 	}
 	
 	@Override

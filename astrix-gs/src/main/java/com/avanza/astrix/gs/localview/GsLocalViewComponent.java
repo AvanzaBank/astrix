@@ -26,7 +26,6 @@ import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.ServiceComponent;
-import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
@@ -38,10 +37,9 @@ import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.ft.HystrixCommandSettings;
+import com.avanza.astrix.gs.ClusteredProxyBinder;
 import com.avanza.astrix.gs.GigaSpaceProxy;
 import com.avanza.astrix.gs.GsBinder;
-import com.avanza.astrix.modules.AstrixInject;
-import com.avanza.astrix.modules.Modules;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.spring.AstrixSpringContext;
 import com.j_spaces.core.IJSpace;
@@ -58,15 +56,23 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	private GsBinder gsBinder;
 	private AstrixSpringContext astrixSpringContext;
 	private DynamicBooleanProperty disableLocalView;
-	/*
-	 * To avoid circular dependency between GsLocalViewComponent and ServiceComponents
-	 * we have to use the ModuleInjector to retrieve ServiceComponents.
-	 */
-	private Modules modules;
 	private BeanFaultToleranceFactory faultToleranceFactory;
 	private DynamicLongProperty maxDisonnectionTime;
 	private DynamicIntProperty lookupTimeout;
+	private ClusteredProxyBinder clusteredProxyBinder;
 	
+	
+	
+	public GsLocalViewComponent(GsBinder gsBinder,
+			AstrixSpringContext astrixSpringContext,
+			BeanFaultToleranceFactory faultToleranceFactory,
+			ClusteredProxyBinder clusteredProxyBinder) {
+		this.gsBinder = gsBinder;
+		this.astrixSpringContext = astrixSpringContext;
+		this.faultToleranceFactory = faultToleranceFactory;
+		this.clusteredProxyBinder = clusteredProxyBinder;
+	}
+
 	@Override
 	public <T> BoundServiceBeanInstance<T> bind(
 			ServiceDefinition<T> serviceDefinition,
@@ -77,8 +83,7 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		}
 		if (disableLocalView.get()) {
 			log.info("LocalView is disabled. Creating reqular proxy");
-			ServiceComponent gsComponent = modules.getInstance(ServiceComponentRegistry.class).getComponent(AstrixServiceComponentNames.GS);
-			return gsComponent.bind(serviceDefinition, serviceProperties);
+			return clusteredProxyBinder.bind(serviceDefinition, serviceProperties);
 		}
 		log.info("Creating local view. bean={} serviceProperties={}", serviceDefinition.getBeanKey(), serviceProperties.getProperties());
 		// TODO: protect creation of localView with fault-tolerance?
@@ -148,27 +153,6 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		return false;
 	}
 	
-	@AstrixInject
-	public void setGsBinder(GsBinder gsBinder) {
-		this.gsBinder = gsBinder;
-	}
-	
-	@AstrixInject
-	public void setGsBinder(AstrixSpringContext astrixSpringContext) {
-		this.astrixSpringContext = astrixSpringContext;
-	}
-	
-	@AstrixInject
-	public void setModules(Modules modules) {
-		this.modules = modules;
-	}
-	
-	@AstrixInject
-	public void setFaultToleranceFactory(
-			BeanFaultToleranceFactory faultToleranceFactory) {
-		this.faultToleranceFactory = faultToleranceFactory;
-	}
-
 	@Override
 	public void setConfig(DynamicConfig config) {
 		this.disableLocalView = AstrixSettings.GS_DISABLE_LOCAL_VIEW.getFrom(config);

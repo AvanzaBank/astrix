@@ -33,10 +33,10 @@ import com.avanza.astrix.beans.factory.StandardFactoryBean;
 public class BeanPublisherImpl implements BeanPublisher {
 
 	private static final Logger log = LoggerFactory.getLogger(BeanPublisherImpl.class);
-	
+
 	private final ApiProviderPluginsImpl apiProviderPluginsImpl;
 	private final PublishedBeanFactoryImpl beanFactory;
-	
+
 	public BeanPublisherImpl(ApiProviderPluginsImpl apiProviderPluginsImpl, PublishedBeanFactoryImpl beanFactory) {
 		this.apiProviderPluginsImpl = apiProviderPluginsImpl;
 		this.beanFactory = beanFactory;

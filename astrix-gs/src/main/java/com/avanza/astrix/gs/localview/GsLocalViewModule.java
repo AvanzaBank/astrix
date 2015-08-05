@@ -16,10 +16,9 @@
 package com.avanza.astrix.gs.localview;
 
 import com.avanza.astrix.beans.service.ServiceComponent;
-import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
+import com.avanza.astrix.gs.ClusteredProxyBinder;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.Modules;
 import com.avanza.astrix.modules.NamedModule;
 import com.avanza.astrix.spring.AstrixSpringContext;
 
@@ -31,8 +30,7 @@ public class GsLocalViewModule implements NamedModule {
 		
 		moduleContext.importType(AstrixSpringContext.class);
 		moduleContext.importType(BeanFaultToleranceFactory.class);
-		moduleContext.importType(ServiceComponentRegistry.class);
-		moduleContext.importType(Modules.class);
+		moduleContext.importType(ClusteredProxyBinder.class);
 		
 		moduleContext.export(ServiceComponent.class);
 	}

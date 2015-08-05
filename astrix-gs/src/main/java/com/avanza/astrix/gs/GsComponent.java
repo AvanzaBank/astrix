@@ -35,7 +35,7 @@ import com.avanza.astrix.spring.AstrixSpringContext;
  * @author Elias Lindholm
  *
  */
-public class GsComponent implements ServiceComponent {
+public class GsComponent implements ServiceComponent, ClusteredProxyBinder {
 
 	private GsBinder gsBinder;
 	private BeanFaultToleranceFactory faultToleranceFactory;

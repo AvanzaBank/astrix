@@ -26,12 +26,14 @@ public class GsModule implements NamedModule {
 	@Override
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(ServiceComponent.class, GsComponent.class);
+		moduleContext.bind(ClusteredProxyBinder.class, GsComponent.class);
 		moduleContext.bind(ClusteredProxyCache.class, ClusteredProxyCacheImpl.class);
 		
 		moduleContext.importType(AstrixSpringContext.class);
 		moduleContext.importType(BeanFaultToleranceFactory.class);
 		
 		moduleContext.export(ServiceComponent.class);
+		moduleContext.export(ClusteredProxyBinder.class);
 		moduleContext.export(ClusteredProxyCache.class);
 	}
 
