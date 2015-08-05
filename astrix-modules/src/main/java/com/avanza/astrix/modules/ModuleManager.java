@@ -173,9 +173,6 @@ class ModuleManager implements Modules {
 		private final Stack<CreationFrame> creationStack = new Stack<>();
 		
 		public <T> T get(final Class<T> type) {
-			if (type.equals(Modules.class)) {
-				return type.cast(ModuleManager.this);
-			}
 			List<ModuleInstance> exportingModules = moduleByExportedType.get(type);
 			if (exportingModules == null) {
 				throw new MissingProvider(type);
