@@ -29,9 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixConfigAware;
-import com.avanza.astrix.beans.core.KeyLock;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.modules.KeyLock;
 import com.avanza.astrix.modules.ObjectCache;
 import com.avanza.astrix.modules.ObjectCache.ObjectFactory;
 import com.j_spaces.core.IJSpace;
