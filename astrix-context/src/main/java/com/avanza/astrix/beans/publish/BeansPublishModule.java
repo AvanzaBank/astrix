@@ -19,8 +19,8 @@ import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.factory.BeanConfigurationsImpl;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
-import com.avanza.astrix.context.module.ModuleContext;
-import com.avanza.astrix.context.module.NamedModule;
+import com.avanza.astrix.modules.ModuleContext;
+import com.avanza.astrix.modules.NamedModule;
 
 public class BeansPublishModule implements NamedModule {
 

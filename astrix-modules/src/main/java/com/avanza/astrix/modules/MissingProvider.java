@@ -13,8 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.module;
+package com.avanza.astrix.modules;
 
-public interface StrategyContextPreparer {
-	void prepare(StrategyContext context);
+
+
+
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public class MissingProvider extends ModulesConfigurationException {
+
+	public MissingProvider(Class<?> type) {
+		super("No module is exporting type: " + type.getName());
+	}
+
+	private static final long serialVersionUID = 1L;
+
 }

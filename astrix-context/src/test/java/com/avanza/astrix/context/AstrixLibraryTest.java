@@ -32,7 +32,6 @@ import org.junit.Test;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.CircularDependency;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-import com.avanza.astrix.context.module.AstrixInject;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -81,13 +80,6 @@ public class AstrixLibraryTest {
 
 		IndependentApi bean = AstrixContext.getBean(IndependentApi.class);
 		assertNotNull(bean);
-	}
-	
-	@Test(expected = IllegalArgumentException.class)
-	public void injectAnnotatedMethodMustAcceptAtLeastOneDependency() throws Exception {
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
-		astrixContext.getInstance(IllegalDependendClass.class);
 	}
 	
 	@Test
@@ -163,12 +155,6 @@ public class AstrixLibraryTest {
 		assertEquals("hello: bar", helloBean.hello("bar"));
 		assertNull(lastAppliedFaultTolerance.get());
 		assertNull(lastAppliedFaultToleranceSettings.get());
-	}
-	
-	public static class IllegalDependendClass {
-		@AstrixInject
-		public void setVersioningPlugin() {
-		}
 	}
 	
 	@AstrixApiProvider

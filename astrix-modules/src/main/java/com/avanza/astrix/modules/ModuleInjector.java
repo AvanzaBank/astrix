@@ -33,7 +33,7 @@ import com.avanza.astrix.modules.ObjectCache.ObjectFactory;
  */
 public class ModuleInjector {
 	
-	// TODO: make protected
+	// TODO: make package private?
 	
 	private final ObjectCache objectCache = new ObjectCache();
 	private final ConcurrentMap<Class<?>, Class<?>> beanBindings = new ConcurrentHashMap<>();
@@ -127,9 +127,9 @@ public class ModuleInjector {
 				postProcessors.postProcess(result);
 				constructionStack.pop();
 				return result;
-			} catch (CircularDependency circularDependency) {
-				circularDependency.addToDependencyTrace(type, moduleName);
-				throw circularDependency;
+			} catch (ModulesConfigurationException configurationException) {
+				configurationException.addToDependencyTrace(type, moduleName);
+				throw configurationException;
 			}
 		}
 	}

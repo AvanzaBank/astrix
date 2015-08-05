@@ -107,7 +107,7 @@ public class ModuleTest {
 		assertSame(ping1, ping2);
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingProvider.class)
 	public void itsNotAllowedToPullNonExportedInstancesFromAModule() throws Exception {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {

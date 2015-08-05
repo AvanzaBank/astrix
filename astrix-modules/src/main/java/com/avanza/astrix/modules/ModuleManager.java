@@ -173,9 +173,12 @@ class ModuleManager implements Modules {
 		private final Stack<CreationFrame> creationStack = new Stack<>();
 		
 		public <T> T get(final Class<T> type) {
+			if (type.equals(Modules.class)) {
+				return type.cast(ModuleManager.this);
+			}
 			List<ModuleInstance> exportingModules = moduleByExportedType.get(type);
 			if (exportingModules == null) {
-				throw new IllegalArgumentException("Non exported type: " + type);
+				throw new MissingProvider(type);
 			}
 			if (exportingModules.size() > 1) {
 				log.warn("Type exported by multiple modules. Using first registered provider. Ignoring export. type={} usedModule={} ignoredModules={}",

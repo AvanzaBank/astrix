@@ -15,8 +15,8 @@
  */
 package com.avanza.astrix.context;
 
-import com.avanza.astrix.context.module.Module;
-import com.avanza.astrix.context.module.StrategyContextPreparer;
+import com.avanza.astrix.modules.Module;
+import com.avanza.astrix.modules.StrategyContextPreparer;
 
 public interface AstrixContextConfig {
 

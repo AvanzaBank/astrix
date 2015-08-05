@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.modules;
 
-import java.util.LinkedList;
 
 
 
@@ -24,27 +23,8 @@ import java.util.LinkedList;
  * @author Elias Lindholm (elilin)
  *
  */
-public class CircularDependency extends RuntimeException {
+public class CircularDependency extends ModulesConfigurationException {
 
 	private static final long serialVersionUID = 1L;
-	private final LinkedList<String> dependencyTrace = new LinkedList<String>();
-	
-	public void addToDependencyTrace(Class<?> type, String moduleName) {
-		dependencyTrace.addFirst(type.getName() + " [" + moduleName + "]");
-	}
-	
-	@Override
-	public String getMessage() {
-		StringBuilder result = new StringBuilder();
-		for (String dep : dependencyTrace) {
-			if (result.length() > 0) {
-				result.append("\n --> ");
-			} else {
-				result.append("\n     ");
-			}
-			result.append(dep);
-		}
-		return result.toString();
-	}
 
 }

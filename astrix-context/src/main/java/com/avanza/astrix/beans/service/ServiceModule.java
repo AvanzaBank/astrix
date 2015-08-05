@@ -15,8 +15,8 @@
  */
 package com.avanza.astrix.beans.service;
 
-import com.avanza.astrix.context.module.ModuleContext;
-import com.avanza.astrix.context.module.NamedModule;
+import com.avanza.astrix.modules.ModuleContext;
+import com.avanza.astrix.modules.NamedModule;
 
 public class ServiceModule implements NamedModule {
 

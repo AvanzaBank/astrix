@@ -16,8 +16,8 @@
 package com.avanza.astrix.beans.config;
 
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.context.module.ModuleContext;
-import com.avanza.astrix.context.module.NamedModule;
+import com.avanza.astrix.modules.ModuleContext;
+import com.avanza.astrix.modules.NamedModule;
 
 /**
  * 

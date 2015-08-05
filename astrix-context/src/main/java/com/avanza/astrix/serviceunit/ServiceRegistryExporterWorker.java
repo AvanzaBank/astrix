@@ -51,6 +51,7 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread impleme
 	private final DynamicLongProperty retryIntervallMillis;
 	private final AstrixConfig config;
 	private final Timer timer = new Timer();
+	private AstrixPublishedBeans beans;
 
 	public ServiceRegistryExporterWorker(AstrixConfig config) {
 		super("ServiceRegistryExporter");
@@ -65,7 +66,25 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread impleme
 			log.info("No ServiceExporters configured. No services will be published to service registry");
 			return;
 		}
+		createServiceRegistryExporterClient();
 		start();
+	}
+
+	private void createServiceRegistryExporterClient() {
+		/*
+		 * The ServiceRegistryExporterClient is created lazily to
+		 * avoid that the service registry is attempting to create an 
+		 * AstrixServiceRegistry instance against itself.
+		 */
+		String subsystem = config.get(AstrixSettings.SUBSYSTEM_NAME).get();
+		String applicationInstanceId = config.get(AstrixSettings.APPLICATION_INSTANCE_ID).get();
+		String applicationTag = config.get(AstrixSettings.APPLICATION_TAG).get();
+		String zone = subsystem;
+		if (applicationTag != null) {
+			zone = subsystem + "#"  + applicationTag;
+		}
+		AstrixServiceRegistry serviceRegistry= beans.getBean(AstrixBeanKey.create(AstrixServiceRegistry.class));
+		this.serviceRegistryProviderClient = new ServiceRegistryExporterClient(serviceRegistry, subsystem, applicationInstanceId, zone);
 	}
 	
 	@PreDestroy
@@ -114,15 +133,7 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread impleme
 
 	@Override
 	public void setAstrixBeans(AstrixPublishedBeans beans) {
-		String subsystem = config.get(AstrixSettings.SUBSYSTEM_NAME).get();
-		String applicationInstanceId = config.get(AstrixSettings.APPLICATION_INSTANCE_ID).get();
-		String applicationTag = config.get(AstrixSettings.APPLICATION_TAG).get();
-		String zone = subsystem;
-		if (applicationTag != null) {
-			zone = subsystem + "#"  + applicationTag;
-		}
-		AstrixServiceRegistry serviceRegistry= beans.getBean(AstrixBeanKey.create(AstrixServiceRegistry.class));
-		this.serviceRegistryProviderClient = new ServiceRegistryExporterClient(serviceRegistry, subsystem, applicationInstanceId, zone);
+		this.beans = beans;
 	}
 	
 	private static class Timer {

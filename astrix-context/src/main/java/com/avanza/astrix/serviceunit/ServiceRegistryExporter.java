@@ -25,35 +25,26 @@ import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.context.module.AstrixInject;
-import com.avanza.astrix.context.module.ModuleInjector;
 
 public class ServiceRegistryExporter implements AstrixConfigAware {
 	
 	private static final Logger log = LoggerFactory.getLogger(ServiceRegistryExporter.class);
 	private final List<ServiceRegistryExportedService> exportedServices = new CopyOnWriteArrayList<>();
-//	private AstrixInjector injector;
-	private ModuleInjector injector;
 	private DynamicConfig config;
+	private ServiceRegistryExporterWorker exporterWorker;
 	
+	public ServiceRegistryExporter(ServiceRegistryExporterWorker exporterWorker) {
+		this.exporterWorker = exporterWorker;
+	}
+
 	public <T> void addExportedService(ExportedServiceBeanDefinition serviceBeanDefinition, ServiceComponent serviceComponent) {
 		boolean publishServices = AstrixSettings.PUBLISH_SERVICES.getFrom(config).get();
 		exportedServices.add(new ServiceRegistryExportedService(serviceComponent, serviceBeanDefinition, publishServices));
 	}
 	
-//	@AstrixInject
-//	public void setInjector(AstrixInjector injector) {
-//		this.injector = injector;
-//	}
-	
 	@Override
 	public void setConfig(DynamicConfig config) {
 		this.config = config;
-	}
-	
-	@AstrixInject
-	public void setInjector(ModuleInjector injector) {
-		this.injector = injector;
 	}
 	
 	public void startPublishServices() {
@@ -73,8 +64,7 @@ public class ServiceRegistryExporter implements AstrixConfigAware {
 	}
 	
 	private ServiceRegistryExporterWorker getExporterWorker() {
-//		return injector.getBean(ServiceRegistryExporterWorker.class);
-		return injector.getBean(ServiceRegistryExporterWorker.class);
+		return this.exporterWorker;
 	}
 
 	public void setPublished(boolean published) {

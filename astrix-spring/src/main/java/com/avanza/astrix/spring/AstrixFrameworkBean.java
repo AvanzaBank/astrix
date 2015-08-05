@@ -55,8 +55,6 @@ import com.avanza.astrix.serviceunit.ExportedServiceBeanDefinition;
 import com.avanza.astrix.serviceunit.ServiceAdministrator;
 import com.avanza.astrix.serviceunit.ServiceAdministratorVersioningConfigurer;
 import com.avanza.astrix.serviceunit.ServiceExporter;
-import com.avanza.astrix.serviceunit.ServiceRegistryExporter;
-import com.avanza.astrix.serviceunit.ServiceUnitModule;
 
 /**
  * 
@@ -105,6 +103,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		astrixContext = createAsterixContext(getDynamicConfig(applicationContext));
+		setupApplicationInstanceId();
 		astrixContext.getInstance(AstrixSpringContext.class).setApplicationContext(applicationContext);
 		astrixContext.getInstance(AstrixSpringContext.class).setAstrixContext(astrixContext);
 		for (Class<?> consumedAstrixBean : this.consumedAstrixBeans) {
@@ -113,7 +112,6 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		beanFactory.registerSingleton(AstrixSpringContext.class.getName(), astrixContext.getInstance(AstrixSpringContext.class));
 		beanFactory.registerSingleton(AstrixContext.class.getName(), astrixContext);
 		beanFactory.addBeanPostProcessor(astrixContext.getInstance(BeanPostProcessor.class));
-//		beanFactory.addBeanPostProcessor(astrixContext.getInstance(AstrixBeanPostProcessor.class));
 	}
 
 	/**
@@ -222,8 +220,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		if (this.subsystem != null) {
 			configurer.setSubsystem(this.subsystem);
 		}
-		AstrixApplicationContext astrixContext = (AstrixApplicationContext) configurer.configure();
-		return astrixContext;
+		return (AstrixApplicationContext) configurer.configure();
 	}
 
 	@Override
@@ -249,11 +246,10 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		if (!isServer()) {
 			return; // current application exports no services
 		}
-		String applicationInstanceId = setupApplicationInstanceId();
+		String applicationInstanceId = getApplicationInstanceId();
 		ServiceExporter serviceExporter = astrixContext.getInstance(ServiceExporter.class);
 		
 		serviceExporter.addServiceProvider(astrixContext.getInstance(ServiceAdministrator.class));
-		// TODO 
 		ObjectSerializerDefinition serializer = ObjectSerializerDefinition.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
 		ServiceDefinition<ServiceAdministrator> serviceDefinition = new ServiceDefinition<>(ApiProvider.create("FrameworkServices"),
 																							AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
@@ -268,16 +264,16 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		serviceExporter.setServiceDescriptor(applicationDescriptor); // TODO This is a hack. Avoid setting serviceDescriptor explicitly here
 		serviceExporter.exportProvidedServices();
 		serviceExporter.startPublishServices();
-		
-//		astrixContext.getInstance(ServiceRegistryExporter.class).startPublishServices();
 	}
 
 	private boolean isServer() {
 		return applicationDescriptor != null;
 	}
 	
+	
 
-	private String setupApplicationInstanceId() {
+	private void setupApplicationInstanceId() {
+		// TODO: Set APPLICATION_INSTANCE_ID on AstrixApplicationContext insteadof AstrixConfigurer
 		String applicationInstanceId = AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(this.astrixContext.getConfig()).get();
 		if (applicationInstanceId == null) {
 			applicationInstanceId = this.applicationDescriptor.toString();
@@ -287,7 +283,10 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		} else {
 			log.info("Current applicationInstanceId={}", applicationInstanceId);
 		}
-		return applicationInstanceId;
+	}
+	
+	private String getApplicationInstanceId() {
+		return AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(this.astrixContext.getConfig()).get();
 	}
 
 	public void setConsumedAstrixBeans(Class<?>... consumedAstrixBeans) {

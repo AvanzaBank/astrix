@@ -17,8 +17,8 @@ package com.avanza.astrix.beans.registry;
 
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
-import com.avanza.astrix.context.module.ModuleContext;
-import com.avanza.astrix.context.module.NamedModule;
+import com.avanza.astrix.modules.ModuleContext;
+import com.avanza.astrix.modules.NamedModule;
 
 public class ServiceRegistryDiscoveryModule implements NamedModule {
 

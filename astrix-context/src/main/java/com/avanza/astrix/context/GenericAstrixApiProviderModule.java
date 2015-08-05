@@ -19,9 +19,9 @@ import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
-import com.avanza.astrix.context.module.ModuleContext;
-import com.avanza.astrix.context.module.NamedModule;
 import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
+import com.avanza.astrix.modules.ModuleContext;
+import com.avanza.astrix.modules.NamedModule;
 
 /**
  * 

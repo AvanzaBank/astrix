@@ -35,13 +35,13 @@ import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicIntProperty;
 import com.avanza.astrix.config.DynamicLongProperty;
 import com.avanza.astrix.context.module.AstrixInject;
-import com.avanza.astrix.context.module.ModuleInjector;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.ft.HystrixCommandSettings;
 import com.avanza.astrix.gs.GigaSpaceProxy;
 import com.avanza.astrix.gs.GsBinder;
+import com.avanza.astrix.modules.Modules;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.spring.AstrixSpringContext;
 import com.j_spaces.core.IJSpace;
@@ -62,7 +62,7 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	 * To avoid circular dependency between GsLocalViewComponent and ServiceComponents
 	 * we have to use the ModuleInjector to retrieve ServiceComponents.
 	 */
-	private ModuleInjector injector;
+	private Modules modules;
 	private BeanFaultToleranceFactory faultToleranceFactory;
 	private DynamicLongProperty maxDisonnectionTime;
 	private DynamicIntProperty lookupTimeout;
@@ -77,7 +77,7 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		}
 		if (disableLocalView.get()) {
 			log.info("LocalView is disabled. Creating reqular proxy");
-			ServiceComponent gsComponent = injector.getBean(ServiceComponentRegistry.class).getComponent(AstrixServiceComponentNames.GS);
+			ServiceComponent gsComponent = modules.getInstance(ServiceComponentRegistry.class).getComponent(AstrixServiceComponentNames.GS);
 			return gsComponent.bind(serviceDefinition, serviceProperties);
 		}
 		log.info("Creating local view. bean={} serviceProperties={}", serviceDefinition.getBeanKey(), serviceProperties.getProperties());
@@ -159,10 +159,10 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	}
 	
 	@AstrixInject
-	public void setInjector(ModuleInjector injector) {
-		this.injector = injector;
+	public void setModules(Modules modules) {
+		this.modules = modules;
 	}
-
+	
 	@AstrixInject
 	public void setFaultToleranceFactory(
 			BeanFaultToleranceFactory faultToleranceFactory) {

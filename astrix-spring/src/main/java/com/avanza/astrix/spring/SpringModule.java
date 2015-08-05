@@ -17,8 +17,8 @@ package com.avanza.astrix.spring;
 
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
-import com.avanza.astrix.context.module.ModuleContext;
-import com.avanza.astrix.context.module.NamedModule;
+import com.avanza.astrix.modules.ModuleContext;
+import com.avanza.astrix.modules.NamedModule;
 import com.avanza.astrix.serviceunit.ServiceExporter;
 
 public class SpringModule implements NamedModule {

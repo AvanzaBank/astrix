@@ -37,8 +37,6 @@ import com.avanza.astrix.beans.core.AstrixBeanSettings.IntBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.LongBeanSetting;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.AstrixBeanPostProcessor;
-import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
@@ -58,16 +56,17 @@ import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.SystemPropertiesConfigSource;
-import com.avanza.astrix.context.module.Module;
-import com.avanza.astrix.context.module.ModuleContext;
-import com.avanza.astrix.context.module.Modules;
-import com.avanza.astrix.context.module.ModulesConfigurer;
-import com.avanza.astrix.context.module.NamedModule;
-import com.avanza.astrix.context.module.StrategyContextPreparer;
-import com.avanza.astrix.context.module.StrategyProvider;
 import com.avanza.astrix.context.versioning.JacksonVersioning;
 import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 import com.avanza.astrix.ft.NoFaultToleranceProvider;
+import com.avanza.astrix.modules.Module;
+import com.avanza.astrix.modules.ModuleContext;
+import com.avanza.astrix.modules.ModuleInstancePostProcessor;
+import com.avanza.astrix.modules.Modules;
+import com.avanza.astrix.modules.ModulesConfigurer;
+import com.avanza.astrix.modules.NamedModule;
+import com.avanza.astrix.modules.StrategyContextPreparer;
+import com.avanza.astrix.modules.StrategyProvider;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
@@ -196,7 +195,7 @@ public class AstrixConfigurer {
 		}
 	}
 	
-	private final class AstrixAwareInjector implements AstrixBeanPostProcessor {
+	private final class AstrixAwareInjector implements ModuleInstancePostProcessor {
 		private Modules modules;
 		private DynamicConfig config;
 
@@ -209,7 +208,7 @@ public class AstrixConfigurer {
 		}
 		
 		@Override
-		public void postProcess(Object bean, AstrixBeans astrixBeans) {
+		public void postProcess(Object bean) {
 			if (bean instanceof AstrixPublishedBeansAware) {
 				AstrixPublishedBeansAware.class.cast(bean).setAstrixBeans(new AstrixPublishedBeans() {
 					@Override
@@ -236,7 +235,7 @@ public class AstrixConfigurer {
 
 		@Override
 		public Collection<ApiProviderClass> getAll() {
-			List<ApiProviderClass> result = new LinkedList<>();
+			Set<ApiProviderClass> result = new HashSet<>();
 			for (ApiProviderClass providerClass : apiProviders.getAll()) {
 				if (isActive(providerClass)) {
 					log.debug("Found provider: provider={}", providerClass.getProviderClassName());
