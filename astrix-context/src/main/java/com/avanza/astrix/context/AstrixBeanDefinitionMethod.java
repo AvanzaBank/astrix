@@ -110,12 +110,19 @@ public class AstrixBeanDefinitionMethod<T> implements PublishedAstrixBean<T> {
 	}
 	
 	public Map<BeanSetting<?>, Object> getDefaultBeanSettings() {
-		if (!getBeanType().isAnnotationPresent(DefaultBeanSettings.class)) {
-			return Collections.emptyMap();
-		}
-		DefaultBeanSettings defaultBeanSettings = getBeanType().getAnnotation(DefaultBeanSettings.class);
 		Map<BeanSetting<?>, Object> defaultSettings = new HashMap<>();
-		defaultSettings.put(AstrixBeanSettings.INITIAL_TIMEOUT, defaultBeanSettings.initialTimeout());
+		if (getBeanType().isAnnotationPresent(DefaultBeanSettings.class)) {
+			// Default settings defined on service api
+			DefaultBeanSettings defaultBeanSettingsOnApi = getBeanType().getAnnotation(DefaultBeanSettings.class);
+			defaultSettings.put(AstrixBeanSettings.INITIAL_TIMEOUT, defaultBeanSettingsOnApi.initialTimeout());
+			defaultSettings.put(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED, defaultBeanSettingsOnApi.faultToleranceEnabled());
+		}
+		if (this.method.isAnnotationPresent(DefaultBeanSettings.class)) {
+			// Default settings defined on service definition
+			DefaultBeanSettings defaultBeanSettingsInDefinition = this.method.getAnnotation(DefaultBeanSettings.class);
+			defaultSettings.put(AstrixBeanSettings.INITIAL_TIMEOUT, defaultBeanSettingsInDefinition.initialTimeout());
+			defaultSettings.put(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED, defaultBeanSettingsInDefinition.faultToleranceEnabled());
+		}
 		return defaultSettings;
 	}
 

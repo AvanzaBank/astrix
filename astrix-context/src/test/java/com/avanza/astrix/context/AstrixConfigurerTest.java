@@ -83,6 +83,24 @@ public class AstrixConfigurerTest {
 		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
 
 		assertEquals(2000, pingConfig.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
+		assertEquals(false, pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
+	}
+	
+	@Test
+	public void itsPossibleToOverrideCustomDefaultBeanSettingsOnBeanDefinition() throws Exception {
+		AstrixConfigurer configurer = new AstrixConfigurer();
+		configurer.setAstrixApiProviders(new ApiProviders() {
+			@Override
+			public Collection<ApiProviderClass> getAll() {
+				return Arrays.asList(ApiProviderClass.create(PingApiProviderWithOverridingDefault.class));
+			}
+		});
+		
+		AstrixContextImpl astrixContext = autoClosables.add((AstrixContextImpl) configurer.configure());
+		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
+
+		assertEquals(3000, pingConfig.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
+		assertEquals(true, pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
 	}
 	
 	@Test
@@ -102,7 +120,8 @@ public class AstrixConfigurerTest {
 	}
 	
 	@DefaultBeanSettings(
-		initialTimeout = 2000
+		initialTimeout = 2000,
+		faultToleranceEnabled = false
 	)
 	public interface Ping {
 	}
@@ -112,6 +131,16 @@ public class AstrixConfigurerTest {
 	
 	@AstrixApiProvider
 	public interface PingApiProvider {
+		@Service
+		Ping ping();
+	}
+	
+	@AstrixApiProvider
+	public interface PingApiProviderWithOverridingDefault {
+		@DefaultBeanSettings(
+			initialTimeout=3000,
+			faultToleranceEnabled = true
+		)
 		@Service
 		Ping ping();
 	}

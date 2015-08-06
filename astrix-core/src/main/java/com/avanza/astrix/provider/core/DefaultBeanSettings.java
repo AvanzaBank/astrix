@@ -38,12 +38,13 @@ import java.lang.annotation.Target;
  * @author Elias Lindholm (elilin)
  *
  */
-@Target(value={ElementType.TYPE})
+@Target(value={ElementType.TYPE, ElementType.METHOD})
 @Retention(value=RetentionPolicy.RUNTIME)
 @Documented
 public @interface DefaultBeanSettings {
 	
 	int DEFAULT_INITIAL_TIMEOUT = 1000;
+	boolean DEFAULT_FAULT_TOLERANCE_ENABLED = true;
 	
 	/**
 	 * See AstrixBeanSettings#INITIAL_TIMEOUT
@@ -51,5 +52,13 @@ public @interface DefaultBeanSettings {
 	 * @return
 	 */
 	int initialTimeout() default DEFAULT_INITIAL_TIMEOUT;
+	
+	
+	/**
+	 * See AstrixBeanSettings#INITIAL_TIMEOUT
+	 * 
+	 * @return
+	 */
+	boolean faultToleranceEnabled() default DEFAULT_FAULT_TOLERANCE_ENABLED;
 	
 }
