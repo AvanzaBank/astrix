@@ -16,7 +16,7 @@
 		<module>astrix-service-registry-pu</module>
 		<module>astrix-test-util</module>
 		<module>astrix-gs-test-util</module>
-		<module>astrix-dashboard</module>
+		<!--<module>astrix-dashboard</module>-->
 		<module>astrix-spring</module>
 		<module>astrix-http</module>
 		<module>astrix-remoting</module>
