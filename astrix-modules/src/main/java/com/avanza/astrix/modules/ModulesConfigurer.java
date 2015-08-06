@@ -17,7 +17,6 @@ package com.avanza.astrix.modules;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -26,7 +25,7 @@ public class ModulesConfigurer {
 	
 	private final ConcurrentMap<String, Module> moduleNames = new ConcurrentHashMap<>();
 	private final List<Module> modules = new LinkedList<>();
-	private final Map<Class<?>, StrategyProvider<?>> strategyProviders = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Class<?>, StrategyProvider<?>> strategyProviders = new ConcurrentHashMap<>();
 	private final List<ModuleInstancePostProcessor> postProcessors = new CopyOnWriteArrayList<>();
 	
 	public void register(Module module) {
