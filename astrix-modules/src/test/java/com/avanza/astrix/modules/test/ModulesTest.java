@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.modules;
+package com.avanza.astrix.modules.test;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
@@ -32,8 +32,21 @@ import javax.annotation.PreDestroy;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
+import com.avanza.astrix.modules.AstrixInject;
+import com.avanza.astrix.modules.CircularDependency;
+import com.avanza.astrix.modules.MissingBeanBinding;
+import com.avanza.astrix.modules.MissingProvider;
+import com.avanza.astrix.modules.Module;
+import com.avanza.astrix.modules.ModuleContext;
+import com.avanza.astrix.modules.ModuleInstancePostProcessor;
+import com.avanza.astrix.modules.ModuleNameConflict;
+import com.avanza.astrix.modules.Modules;
+import com.avanza.astrix.modules.ModulesConfigurer;
+import com.avanza.astrix.modules.NamedModule;
+import com.avanza.astrix.modules.StrategyProvider;
 
-public class ModuleTest {
+
+public class ModulesTest {
 	
 	
 	@Test
@@ -116,7 +129,7 @@ public class ModuleTest {
 			}
 		});
 		Modules modules = modulesConfigurer.configure();
-		modules.getInstance(PingDriverImpl.class);
+		modules.getInstance(NormalPingDriver.class);
 	}
 	
 	@Test(expected = ModuleNameConflict.class)
@@ -156,7 +169,7 @@ public class ModuleTest {
 		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext context) {
-				context.bind(PingDriver.class, PingDriverImpl.class);
+				context.bind(PingDriver.class, NormalPingDriver.class);
 				context.export(PingDriver.class);
 			}
 		});
@@ -180,7 +193,7 @@ public class ModuleTest {
 		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext context) {
-				context.bind(PingDriver.class, PingDriverImpl.class);
+				context.bind(PingDriver.class, NormalPingDriver.class);
 				
 				context.export(PingDriver.class);
 			}
@@ -440,10 +453,10 @@ public class ModuleTest {
 		assertSame(ping, pingCollector);
 	}
 	
-//	@Test
+	@Test
 	public void strategiesSupport() throws Exception {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
-		modulesConfigurer.register(new NamedModule() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, PingWithImportedDriver.class);
@@ -452,17 +465,52 @@ public class ModuleTest {
 				
 				moduleContext.export(Ping.class);
 			}
-			@Override
-			public String name() {
-				return "ping";
-			}
 		});
+		modulesConfigurer.register(StrategyProvider.create(PingDriver.class, NormalPingDriver.class));
 		Modules modules = modulesConfigurer.configure();
 		
 		Ping ping = modules.getInstance(Ping.class);
-		PingCollector pingCollector = modules.getInstance(PingCollector.class);
-		assertNotNull(ping);
-		assertSame(ping, pingCollector);
+		assertEquals("foo", ping.ping("foo"));
+	}
+	
+	@Test
+	public void registerDefaultDoesNotOverridePreviouslyRegisteredStrategy() throws Exception {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new Module() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(Ping.class, PingWithImportedDriver.class);
+
+				moduleContext.importType(PingDriver.class);
+				
+				moduleContext.export(Ping.class);
+			}
+		});
+		modulesConfigurer.register(StrategyProvider.create(PingDriver.class, NormalPingDriver.class));
+		modulesConfigurer.registerDefault(StrategyProvider.create(PingDriver.class, ReversePingDriver.class));
+		Modules modules = modulesConfigurer.configure();
+		
+		Ping ping = modules.getInstance(Ping.class);
+		assertEquals("foo", ping.ping("foo"));
+	}
+	
+	@Test
+	public void registerOverridesPreviouslyRegisteredStrategy() throws Exception {
+		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
+		modulesConfigurer.register(new Module() {
+			@Override
+			public void prepare(ModuleContext moduleContext) {
+				moduleContext.bind(Ping.class, PingWithImportedDriver.class);
+				moduleContext.importType(PingDriver.class);
+				moduleContext.export(Ping.class);
+			}
+		});
+		modulesConfigurer.register(StrategyProvider.create(PingDriver.class, NormalPingDriver.class));
+		modulesConfigurer.register(StrategyProvider.create(PingDriver.class, ReversePingDriver.class));
+		Modules modules = modulesConfigurer.configure();
+		
+		Ping ping = modules.getInstance(Ping.class);
+		assertEquals("oof", ping.ping("foo"));
 	}
 	
 	@Test
@@ -662,10 +710,26 @@ public class ModuleTest {
 		int destroyCount();
 	}
 	
-	public static class PingDriverImpl implements PingDriver {
+	public static class NormalPingDriver implements PingDriver {
 		private int destroyCount = 0;
 		public String ping(String msg) {
 			return msg;
+		}
+		@Override
+		public int destroyCount() {
+			return destroyCount;
+		}
+		
+		@PreDestroy
+		public void destroy() {
+			destroyCount++;
+		}
+	}
+	
+	public static class ReversePingDriver implements PingDriver {
+		private int destroyCount = 0;
+		public String ping(String msg) {
+			return new ReversePing().ping(msg);
 		}
 		@Override
 		public int destroyCount() {
@@ -734,9 +798,9 @@ public class ModuleTest {
 	
 	public static class PingWithInternalDriver implements Ping {
 		
-		private PingDriverImpl pingDriver;
+		private NormalPingDriver pingDriver;
 		
-		public PingWithInternalDriver(PingDriverImpl pingDependency) {
+		public PingWithInternalDriver(NormalPingDriver pingDependency) {
 			this.pingDriver = pingDependency;
 		}
 

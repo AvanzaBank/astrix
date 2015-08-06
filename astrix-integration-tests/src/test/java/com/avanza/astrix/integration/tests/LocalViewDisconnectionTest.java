@@ -67,7 +67,7 @@ public class LocalViewDisconnectionTest {
 		configurer.enableFaultTolerance(false);
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
 		configurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 100);
-		configurer.set(AstrixSettings.GS_LOCAL_VIEW_MAX_DISCONNECTION_TIME, 1000L);
+		configurer.set(AstrixSettings.GS_LOCAL_VIEW_MAX_DISCONNECTION_TIME, 2000L);
 		configurer.setConfig(DynamicConfig.create(serviceRegistry));
 		configurer.setSubsystem("lunch-system");
 		astrix = autoClosables.add(configurer.configure());
