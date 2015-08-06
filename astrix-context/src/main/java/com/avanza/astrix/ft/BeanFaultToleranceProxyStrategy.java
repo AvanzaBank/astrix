@@ -16,14 +16,12 @@
 package com.avanza.astrix.ft;
 
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-import com.avanza.astrix.core.AstrixStrategy;
 
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-@AstrixStrategy
 public interface BeanFaultToleranceProxyStrategy {
 	
 	public <T> T addFaultToleranceProxy(PublishedAstrixBean<T> beanDefinition, T rawProvider);

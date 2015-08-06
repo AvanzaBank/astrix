@@ -19,7 +19,6 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 import com.avanza.astrix.beans.factory.FactoryBean;
-import com.avanza.astrix.core.AstrixPlugin;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 
 
@@ -36,7 +35,6 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
  * @author Elias Lindholm (elilin)
  *
  */
-@AstrixPlugin
 public interface ApiProviderPlugin {
 	
 	List<PublishedBean> createFactoryBeans(ApiProviderClass apiProviderClass);

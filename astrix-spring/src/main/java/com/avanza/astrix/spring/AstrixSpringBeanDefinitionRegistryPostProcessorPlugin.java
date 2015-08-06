@@ -17,9 +17,6 @@ package com.avanza.astrix.spring;
 
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
-import com.avanza.astrix.core.AstrixPlugin;
-
-@AstrixPlugin
 public interface AstrixSpringBeanDefinitionRegistryPostProcessorPlugin {
 
 	void postProcess(BeanDefinitionRegistry registry);
