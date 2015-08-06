@@ -103,7 +103,9 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		astrixContext = createAsterixContext(getDynamicConfig(applicationContext));
-		setupApplicationInstanceId();
+		if (isServer()) {
+			setupApplicationInstanceId();
+		}
 		astrixContext.getInstance(AstrixSpringContext.class).setApplicationContext(applicationContext);
 		astrixContext.getInstance(AstrixSpringContext.class).setAstrixContext(astrixContext);
 		for (Class<?> consumedAstrixBean : this.consumedAstrixBeans) {
