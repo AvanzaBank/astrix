@@ -68,9 +68,8 @@ import com.avanza.astrix.modules.StrategyProvider;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
-import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 import com.avanza.astrix.versioning.core.ObjectSerializerModule;
-import com.avanza.astrix.versioning.jackson1.Jackson1SerializerPlugin;
+import com.avanza.astrix.versioning.jackson1.Jackson1SerializerModule;
 /**
  * Used to configure and create an {@link AstrixContext}. <p>
  * 
@@ -106,7 +105,6 @@ public class AstrixConfigurer {
 		
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.registerDefault(StrategyProvider.create(BeanFaultToleranceProxyStrategy.class, NoFaultToleranceProvider.class));
-		modulesConfigurer.registerDefault(StrategyProvider.create(ObjectSerializerFactoryPlugin.class, Jackson1SerializerPlugin.class));
 		
 		for (Module plugin : customModules) {
 			modulesConfigurer.register(plugin);
@@ -124,6 +122,7 @@ public class AstrixConfigurer {
 		modulesConfigurer.register(new BeansPublishModule());
 		modulesConfigurer.register(new ServiceModule());
 		modulesConfigurer.register(new ObjectSerializerModule());
+		modulesConfigurer.register(new Jackson1SerializerModule());
 		modulesConfigurer.register(new AstrixConfigModule(config));
 		modulesConfigurer.register(new GenericAstrixApiProviderModule());
 		

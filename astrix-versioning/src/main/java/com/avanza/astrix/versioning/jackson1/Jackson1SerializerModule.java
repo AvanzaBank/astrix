@@ -15,21 +15,23 @@
  */
 package com.avanza.astrix.versioning.jackson1;
 
-import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
-import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
-import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
+import com.avanza.astrix.modules.ModuleContext;
+import com.avanza.astrix.modules.NamedModule;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 
-final class Jackson1SerializerPlugin implements ObjectSerializerFactoryPlugin {
+public class Jackson1SerializerModule implements NamedModule {
 
 	@Override
-	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
-		return new Jackson1AstrixObjectSerializer(serializerDefinition);
+	public void prepare(ModuleContext moduleContext) {
+		moduleContext.bind(ObjectSerializerFactoryPlugin.class, Jackson1SerializerPlugin.class);
+		
+		moduleContext.export(ObjectSerializerFactoryPlugin.class);
 	}
-	
+
 	@Override
-	public Class<? extends AstrixObjectSerializerConfigurer> getConfigurerType() {
-		return Jackson1ObjectSerializerConfigurer.class;
+	public String name() {
+		return getClass().getPackage().getName();
 	}
+
 
 }
