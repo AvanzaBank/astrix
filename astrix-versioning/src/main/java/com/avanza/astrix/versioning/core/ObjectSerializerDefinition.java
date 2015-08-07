@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.versioning.core;
 
-import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
 /**
  * 
  * @author Elias Lindholm (elilin)

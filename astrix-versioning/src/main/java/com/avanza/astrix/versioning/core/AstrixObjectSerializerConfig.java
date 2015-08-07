@@ -13,19 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.provider.versioning;
+package com.avanza.astrix.versioning.core;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 
 /**
- * Used on the server side to upgrade incoming arguments and downgrade outgoing responses.
- * 
  * @author Elias Lindholm (elilin)
- *
  */
-public interface AstrixJsonApiMigration {
+@Target(value = { ElementType.TYPE })
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface AstrixObjectSerializerConfig {
 	
-	int fromVersion();
+	/**
+	 * Data format version. <p>
+	 * 
+	 * @return
+	 */
+	int version();
 	
-	AstrixJsonMessageMigration<?>[] getMigrations();
-
+	Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfigurer();
+	
 }

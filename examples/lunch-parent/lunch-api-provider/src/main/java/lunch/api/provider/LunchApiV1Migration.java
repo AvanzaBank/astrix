@@ -19,8 +19,8 @@ import lunch.api.LunchRestaurant;
 
 import org.codehaus.jackson.node.ObjectNode;
 
-import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
-import com.avanza.astrix.provider.versioning.AstrixJsonMessageMigration;
+import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
+import com.avanza.astrix.versioning.jackson1.AstrixJsonMessageMigration;
 
 public class LunchApiV1Migration implements AstrixJsonApiMigration {
 

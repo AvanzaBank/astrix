@@ -59,17 +59,17 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixApplication;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 import com.avanza.astrix.provider.core.Service;
-import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
-import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
-import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
-import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
-import com.avanza.astrix.provider.versioning.Versioned;
 import com.avanza.astrix.serviceunit.ServiceAdministrator;
 import com.avanza.astrix.spring.AstrixFrameworkBean;
 import com.avanza.astrix.test.util.AutoCloseableRule;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
-import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfig;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
+import com.avanza.astrix.versioning.core.Versioned;
+import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
+import com.avanza.astrix.versioning.jackson1.Jackson1ObjectSerializerConfigurer;
+import com.avanza.astrix.versioning.jackson1.JacksonObjectMapperBuilder;
 /**
  * 
  * @author Elias Lindholm (elilin)

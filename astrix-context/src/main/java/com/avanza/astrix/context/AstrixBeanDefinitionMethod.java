@@ -32,7 +32,7 @@ import com.avanza.astrix.provider.core.DefaultBeanSettings;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.core.ServiceConfig;
-import com.avanza.astrix.provider.versioning.Versioned;
+import com.avanza.astrix.versioning.core.Versioned;
 
 public class AstrixBeanDefinitionMethod<T> implements PublishedAstrixBean<T> {
 	

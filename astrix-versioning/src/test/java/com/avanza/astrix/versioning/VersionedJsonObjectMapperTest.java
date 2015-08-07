@@ -25,8 +25,8 @@ import java.util.List;
 import org.codehaus.jackson.node.ObjectNode;
 import org.junit.Test;
 
-import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
-import com.avanza.astrix.provider.versioning.AstrixJsonMessageMigration;
+import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
+import com.avanza.astrix.versioning.jackson1.AstrixJsonMessageMigration;
 import com.avanza.astrix.versioning.jackson1.VersionedJsonObjectMapper;
 import com.avanza.astrix.versioning.jackson1.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
 import com.google.common.reflect.TypeToken;

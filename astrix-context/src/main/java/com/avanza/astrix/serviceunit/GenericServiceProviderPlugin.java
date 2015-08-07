@@ -29,9 +29,9 @@ import com.avanza.astrix.context.AstrixBeanDefinitionMethod;
 import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryDiscovery;
-import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
-import com.avanza.astrix.provider.versioning.Versioned;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfig;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
+import com.avanza.astrix.versioning.core.Versioned;
 
 /**
  * 

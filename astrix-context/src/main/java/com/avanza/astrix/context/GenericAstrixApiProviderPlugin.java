@@ -36,9 +36,9 @@ import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 import com.avanza.astrix.modules.ObjectCache;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
-import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
-import com.avanza.astrix.provider.versioning.Versioned;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfig;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
+import com.avanza.astrix.versioning.core.Versioned;
 
 /**
  * 

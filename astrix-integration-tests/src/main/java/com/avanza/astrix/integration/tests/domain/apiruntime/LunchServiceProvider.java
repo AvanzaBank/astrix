@@ -25,8 +25,8 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.core.ServiceConfig;
-import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
-import com.avanza.astrix.provider.versioning.Versioned;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfig;
+import com.avanza.astrix.versioning.core.Versioned;
 
 @AstrixObjectSerializerConfig(
 	version = 2,

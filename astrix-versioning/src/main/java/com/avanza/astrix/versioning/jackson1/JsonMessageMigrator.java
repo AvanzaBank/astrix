@@ -20,8 +20,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.jackson.node.ObjectNode;
-
-import com.avanza.astrix.provider.versioning.AstrixJsonMessageMigration;
 /**
  * A message migrator is responsible for migration a message on an old version
  * to the current version, and also responsible for migration messages on the

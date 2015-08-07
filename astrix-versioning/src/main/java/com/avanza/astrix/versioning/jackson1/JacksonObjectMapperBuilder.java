@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.versioning.plugin;
+package com.avanza.astrix.versioning.jackson1;
 
+import org.codehaus.jackson.map.JsonDeserializer;
+import org.codehaus.jackson.map.JsonSerializer;
 /**
  * 
- * @author Elias Lindholm
- * @deprecated Moved to com.avanza.astrix.versioning.jackson1.Jackson1ObjectSerializerConfigurer
+ * @author Elias Lindholm (elilin)
+ *
  */
-@Deprecated
-public interface Jackson1ObjectSerializerConfigurer extends com.avanza.astrix.versioning.jackson1.Jackson1ObjectSerializerConfigurer {
-	
-	
+public interface JacksonObjectMapperBuilder {
+	<T> void addSerializer(Class<T> type, JsonSerializer<T> serializer);
+	<T> void addDeserializer(Class<T> type, JsonDeserializer<T> deserializer);
 }

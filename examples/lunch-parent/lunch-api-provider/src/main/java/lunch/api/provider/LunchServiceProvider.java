@@ -19,8 +19,8 @@ import lunch.api.LunchService;
 
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
-import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
-import com.avanza.astrix.provider.versioning.Versioned;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfig;
+import com.avanza.astrix.versioning.core.Versioned;
 
 
 // The API is versioned.

@@ -18,9 +18,9 @@ package com.avanza.astrix.integration.tests.domain.apiruntime;
 import java.util.Arrays;
 import java.util.List;
 
-import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
-import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
-import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
+import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
+import com.avanza.astrix.versioning.jackson1.Jackson1ObjectSerializerConfigurer;
+import com.avanza.astrix.versioning.jackson1.JacksonObjectMapperBuilder;
 
 
 public class LunchApiObjectSerializerConfigurer implements Jackson1ObjectSerializerConfigurer {

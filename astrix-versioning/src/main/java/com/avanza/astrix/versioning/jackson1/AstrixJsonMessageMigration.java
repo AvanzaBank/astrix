@@ -13,20 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.provider.versioning;
+package com.avanza.astrix.versioning.jackson1;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
+import org.codehaus.jackson.node.ObjectNode;
 
 /**
+ * 
  * @author Elias Lindholm (elilin)
+ *
+ * @param <T>
  */
-@Target(value = { ElementType.TYPE, ElementType.METHOD })
-@Retention(value = RetentionPolicy.RUNTIME)
-@Documented
-public @interface Versioned {
+public interface AstrixJsonMessageMigration<T> {
+	
+	/**
+	 * The java type representing the given json message.
+	 * 
+	 * @return
+	 */
+	Class<T> getJavaType();
+	
+	/**
+	 * Upgrades a given json message to the next version. <p>
+	 * @param json
+	 */
+	void upgrade(ObjectNode json);
+	
+	/**
+	 * Downgrades a given json-message to this version (fromVersion()), from 
+	 * the next version. <p>	
+	 * 
+	 * @param json
+	 */
+	void downgrade(ObjectNode json);
+	
+	
+
 }

@@ -26,11 +26,11 @@ import com.avanza.astrix.provider.core.AstrixDynamicQualifier;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
-import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
-import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
-import com.avanza.astrix.provider.versioning.Versioned;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfig;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
+import com.avanza.astrix.versioning.core.Versioned;
 
 
 public class AstrixApiProviderTest {

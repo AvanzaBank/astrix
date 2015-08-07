@@ -19,8 +19,8 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
-import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
-import com.avanza.astrix.provider.versioning.Versioned;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfig;
+import com.avanza.astrix.versioning.core.Versioned;
 
 /**
  * The service registry api uses Astrix-remoting to export its service. Note that

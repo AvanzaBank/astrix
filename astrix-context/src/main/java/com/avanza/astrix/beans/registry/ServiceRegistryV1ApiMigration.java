@@ -18,8 +18,8 @@ package com.avanza.astrix.beans.registry;
 import org.codehaus.jackson.node.ObjectNode;
 
 import com.avanza.astrix.beans.service.ServiceProperties;
-import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
-import com.avanza.astrix.provider.versioning.AstrixJsonMessageMigration;
+import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
+import com.avanza.astrix.versioning.jackson1.AstrixJsonMessageMigration;
 
 public class ServiceRegistryV1ApiMigration implements AstrixJsonApiMigration {
 

@@ -17,14 +17,13 @@ package com.avanza.astrix.versioning.jackson1;
 
 import java.util.List;
 
-import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
-import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
-import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
 
+/**
+ * @author Elias Lindholm
+ * 
+ */
 public interface Jackson1ObjectSerializerConfigurer extends AstrixObjectSerializerConfigurer {
-	
 	List<? extends AstrixJsonApiMigration> apiMigrations();
-	
 	void configure(JacksonObjectMapperBuilder objectMapperBuilder);
-	
 }

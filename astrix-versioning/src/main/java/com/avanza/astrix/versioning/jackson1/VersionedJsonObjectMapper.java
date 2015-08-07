@@ -37,9 +37,6 @@ import org.codehaus.jackson.map.module.SimpleModule;
 import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jackson.type.JavaType;
 
-import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
-import com.avanza.astrix.provider.versioning.AstrixJsonMessageMigration;
-import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
 import com.avanza.astrix.versioning.jackson1.JsonMessageMigrator.Builder;
 
 public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
