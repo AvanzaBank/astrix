@@ -27,8 +27,8 @@ import org.junit.Test;
 
 import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
 import com.avanza.astrix.provider.versioning.AstrixJsonMessageMigration;
-import com.avanza.astrix.versioning.VersionedJsonObjectMapper;
-import com.avanza.astrix.versioning.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
+import com.avanza.astrix.versioning.jackson1.VersionedJsonObjectMapper;
+import com.avanza.astrix.versioning.jackson1.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
 import com.google.common.reflect.TypeToken;
 
 

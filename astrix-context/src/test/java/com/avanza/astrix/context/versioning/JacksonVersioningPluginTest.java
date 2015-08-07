@@ -23,12 +23,12 @@ import java.util.List;
 import org.codehaus.jackson.node.ObjectNode;
 import org.junit.Test;
 
-import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
 import com.avanza.astrix.provider.versioning.AstrixJsonMessageMigration;
-import com.avanza.astrix.provider.versioning.AstrixVersioned;
 import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
+import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
+import com.avanza.astrix.versioning.jackson1.Jackson1SerializerPlugin;
 import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
 
 public class JacksonVersioningPluginTest {
@@ -63,10 +63,6 @@ public class JacksonVersioningPluginTest {
 		assertEquals(null, deserializedPojo.getBar()); // bar is stripped during downgrade
 	}
 	
-	@AstrixVersioned(
-		version = 2,
-		objectSerializerConfigurer = TestObjectMapperConfigurer.class
-	)
 	public static class FakeDescriptor {
 	}
 	

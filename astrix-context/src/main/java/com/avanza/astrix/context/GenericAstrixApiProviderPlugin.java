@@ -28,7 +28,6 @@ import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
 import com.avanza.astrix.beans.publish.PublishedBean;
-import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
@@ -39,6 +38,7 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 import com.avanza.astrix.provider.versioning.Versioned;
+import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 
 /**
  * 

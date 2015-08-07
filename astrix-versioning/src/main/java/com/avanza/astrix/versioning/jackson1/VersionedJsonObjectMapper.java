@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.versioning;
+package com.avanza.astrix.versioning.jackson1;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -34,14 +34,13 @@ import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.module.SimpleModule;
-import org.codehaus.jackson.map.type.TypeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jackson.type.JavaType;
 
 import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
 import com.avanza.astrix.provider.versioning.AstrixJsonMessageMigration;
 import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
-import com.avanza.astrix.versioning.JsonMessageMigrator.Builder;
+import com.avanza.astrix.versioning.jackson1.JsonMessageMigrator.Builder;
 
 public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 	

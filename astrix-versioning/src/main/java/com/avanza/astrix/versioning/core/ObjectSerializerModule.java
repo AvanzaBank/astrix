@@ -13,26 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.service;
+package com.avanza.astrix.versioning.core;
 
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.modules.NamedModule;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
+import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 
-public class DirectComponentModule implements NamedModule {
+public class ObjectSerializerModule implements NamedModule {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(ServiceComponent.class, DirectComponent.class);
+		moduleContext.bind(ObjectSerializerFactory.class, ObjectSerializerFactoryImpl.class);
 		
-		moduleContext.importType(ObjectSerializerFactory.class);
+		moduleContext.importType(ObjectSerializerFactoryPlugin.class);
 		
-		moduleContext.export(ServiceComponent.class);
+		moduleContext.export(ObjectSerializerFactory.class);
 	}
 
 	@Override
 	public String name() {
-		return "direct-component";
+		return getClass().getPackage().getName();
 	}
 
 }

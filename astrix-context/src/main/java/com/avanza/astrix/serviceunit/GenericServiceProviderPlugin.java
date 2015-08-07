@@ -23,7 +23,6 @@ import java.util.List;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
-import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
 import com.avanza.astrix.context.AstrixBeanDefinitionMethod;
@@ -32,6 +31,7 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryDiscovery;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfig;
 import com.avanza.astrix.provider.versioning.Versioned;
+import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 
 /**
  * 

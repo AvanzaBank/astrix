@@ -43,7 +43,6 @@ import org.springframework.core.Ordered;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.publish.ApiProvider;
-import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.Astrix;
@@ -55,6 +54,7 @@ import com.avanza.astrix.serviceunit.ExportedServiceBeanDefinition;
 import com.avanza.astrix.serviceunit.ServiceAdministrator;
 import com.avanza.astrix.serviceunit.ServiceAdministratorVersioningConfigurer;
 import com.avanza.astrix.serviceunit.ServiceExporter;
+import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 
 /**
  * 

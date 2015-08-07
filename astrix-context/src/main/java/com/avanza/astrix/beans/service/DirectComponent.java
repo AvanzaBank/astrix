@@ -34,6 +34,8 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
+import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
 /**
  * 
  * @author Elias Lindholm (elilin)

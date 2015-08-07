@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.versioning;
+package com.avanza.astrix.versioning.jackson1;
 
 import java.lang.reflect.Type;
 
-import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
-import com.avanza.astrix.versioning.JsonObjectMapper;
-import com.avanza.astrix.versioning.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
-import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
+import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
+import com.avanza.astrix.versioning.jackson1.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
 
 public class Jackson1AstrixObjectSerializer implements AstrixObjectSerializer {
 

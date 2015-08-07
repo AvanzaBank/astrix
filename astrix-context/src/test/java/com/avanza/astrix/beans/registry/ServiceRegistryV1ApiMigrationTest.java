@@ -19,13 +19,13 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.avanza.astrix.beans.service.ObjectSerializerFactoryPlugin;
-import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
-import com.avanza.astrix.beans.service.ObjectSerializerFactory;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
+import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
+import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 
 
 public class ServiceRegistryV1ApiMigrationTest {

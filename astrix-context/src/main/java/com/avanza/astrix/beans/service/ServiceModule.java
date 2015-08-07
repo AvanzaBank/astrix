@@ -17,19 +17,18 @@ package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.modules.NamedModule;
+import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
 
 public class ServiceModule implements NamedModule {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(ServiceComponentRegistry.class, ServiceComponents.class);
-		moduleContext.bind(ObjectSerializerFactory.class, ObjectSerializerFactoryImpl.class);
 		
-		moduleContext.importType(ObjectSerializerFactoryPlugin.class);
+		moduleContext.importType(ObjectSerializerFactory.class);
 		moduleContext.importType(ServiceComponent.class);
 		
 		moduleContext.export(ServiceComponentRegistry.class);
-		moduleContext.export(ObjectSerializerFactory.class);
 	}
 
 	@Override

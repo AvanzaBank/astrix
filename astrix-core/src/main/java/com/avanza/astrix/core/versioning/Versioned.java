@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.versioning;
+package com.avanza.astrix.core.versioning;
 
-import com.avanza.astrix.beans.service.ObjectSerializerFactoryPlugin;
-import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
-import com.avanza.astrix.core.AstrixObjectSerializer;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class Jackson1SerializerPlugin implements ObjectSerializerFactoryPlugin {
 
-	@Override
-	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
-		return new Jackson1AstrixObjectSerializer(serializerDefinition);
-	}
-
+/**
+ * @author Elias Lindholm (elilin)
+ */
+@Target(value = { ElementType.TYPE, ElementType.METHOD })
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface Versioned {
 }

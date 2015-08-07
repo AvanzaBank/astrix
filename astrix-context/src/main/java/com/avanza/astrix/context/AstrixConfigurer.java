@@ -47,7 +47,6 @@ import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
 import com.avanza.astrix.beans.publish.BeansPublishModule;
 import com.avanza.astrix.beans.publish.PublishedBeanFactory;
 import com.avanza.astrix.beans.registry.ServiceRegistryDiscoveryModule;
-import com.avanza.astrix.beans.service.ObjectSerializerFactoryPlugin;
 import com.avanza.astrix.beans.service.DirectComponentModule;
 import com.avanza.astrix.beans.service.ServiceModule;
 import com.avanza.astrix.config.DynamicConfig;
@@ -56,7 +55,6 @@ import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.SystemPropertiesConfigSource;
-import com.avanza.astrix.context.versioning.Jackson1SerializerPlugin;
 import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 import com.avanza.astrix.ft.NoFaultToleranceProvider;
 import com.avanza.astrix.modules.Module;
@@ -70,6 +68,9 @@ import com.avanza.astrix.modules.StrategyProvider;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
+import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
+import com.avanza.astrix.versioning.core.ObjectSerializerModule;
+import com.avanza.astrix.versioning.jackson1.Jackson1SerializerPlugin;
 /**
  * Used to configure and create an {@link AstrixContext}. <p>
  * 
@@ -122,6 +123,7 @@ public class AstrixConfigurer {
 		modulesConfigurer.register(new ConfigDiscoveryModule());
 		modulesConfigurer.register(new BeansPublishModule());
 		modulesConfigurer.register(new ServiceModule());
+		modulesConfigurer.register(new ObjectSerializerModule());
 		modulesConfigurer.register(new AstrixConfigModule(config));
 		modulesConfigurer.register(new GenericAstrixApiProviderModule());
 		

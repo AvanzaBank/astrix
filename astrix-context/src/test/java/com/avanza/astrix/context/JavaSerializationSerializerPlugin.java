@@ -16,9 +16,9 @@
 package com.avanza.astrix.context;
 
 
-import com.avanza.astrix.beans.service.ObjectSerializerFactoryPlugin;
-import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
+import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 
 public class JavaSerializationSerializerPlugin implements ObjectSerializerFactoryPlugin {
 	

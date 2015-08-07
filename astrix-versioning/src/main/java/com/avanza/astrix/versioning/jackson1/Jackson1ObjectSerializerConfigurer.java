@@ -13,11 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.service;
+package com.avanza.astrix.versioning.jackson1;
 
-import com.avanza.astrix.core.AstrixObjectSerializer;
-public interface ObjectSerializerFactory {
+import java.util.List;
+
+import com.avanza.astrix.provider.versioning.AstrixJsonApiMigration;
+import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
+import com.avanza.astrix.provider.versioning.JacksonObjectMapperBuilder;
+
+public interface Jackson1ObjectSerializerConfigurer extends AstrixObjectSerializerConfigurer {
 	
-	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition);
-
+	List<? extends AstrixJsonApiMigration> apiMigrations();
+	
+	void configure(JacksonObjectMapperBuilder objectMapperBuilder);
+	
 }

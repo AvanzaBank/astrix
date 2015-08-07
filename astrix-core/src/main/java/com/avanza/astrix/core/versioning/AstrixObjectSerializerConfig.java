@@ -13,26 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.service;
+package com.avanza.astrix.core.versioning;
 
-import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
-import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class DirectComponentModule implements NamedModule {
 
-	@Override
-	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(ServiceComponent.class, DirectComponent.class);
-		
-		moduleContext.importType(ObjectSerializerFactory.class);
-		
-		moduleContext.export(ServiceComponent.class);
-	}
-
-	@Override
-	public String name() {
-		return "direct-component";
-	}
-
+/**
+ * @author Elias Lindholm (elilin)
+ */
+@Target(value = { ElementType.TYPE })
+@Retention(value = RetentionPolicy.RUNTIME)
+@Documented
+public @interface AstrixObjectSerializerConfig {
+	
+	/**
+	 * Data format version. <p>
+	 * 
+	 * @return
+	 */
+	int version();
+	
+	Class<? extends AstrixObjectSerializerConfigurer> objectSerializerConfigurer();
+	
 }

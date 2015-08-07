@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.versioning.core;
 
 import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
+import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 
-/**
- * 
- * @author Elias Lindholm (elilin)
- * @deprecated - Replaced by com.avanza.astrix.beans.service.DirectComponent
- */
-@Deprecated
-public class DirectComponent extends com.avanza.astrix.beans.service.DirectComponent {
-	
-	public DirectComponent() {
-		super(new ObjectSerializerFactory() {
-			@Override
-			public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
-				return new AstrixObjectSerializer.NoVersioningSupport();
-			}
-		});
+class ObjectSerializerFactoryImpl implements ObjectSerializerFactory {
+
+	private ObjectSerializerFactoryPlugin objectSerializerFactoryPlugin;
+
+	public ObjectSerializerFactoryImpl(ObjectSerializerFactoryPlugin versioningPlugin) {
+		this.objectSerializerFactoryPlugin = versioningPlugin;
+	}
+
+	@Override
+	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
+		if (serializerDefinition.isVersioned()) {
+			return objectSerializerFactoryPlugin.create(serializerDefinition); 
+		}
+		return new AstrixObjectSerializer.NoVersioningSupport();
 	}
 
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.service;
+package com.avanza.astrix.versioning.core;
 
 import com.avanza.astrix.provider.versioning.AstrixObjectSerializerConfigurer;
 /**
