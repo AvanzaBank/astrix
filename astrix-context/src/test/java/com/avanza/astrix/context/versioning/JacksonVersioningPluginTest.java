@@ -35,7 +35,7 @@ public class JacksonVersioningPluginTest {
 	
 	@Test
 	public void serializesV2Objects() throws Exception {
-		AstrixObjectSerializer astrixObjectSerializer = new JacksonVersioning().create(ObjectSerializerDefinition.versionedService(2, TestObjectMapperConfigurer.class));
+		AstrixObjectSerializer astrixObjectSerializer = new Jackson1SerializerPlugin().create(ObjectSerializerDefinition.versionedService(2, TestObjectMapperConfigurer.class));
 		
 		Object serialized = astrixObjectSerializer.serialize(new TestPojoV2("foo", "bar"), 2);
 		TestPojoV2 deserializedPojo = astrixObjectSerializer.deserialize(serialized, TestPojoV2.class, 2);
@@ -45,7 +45,7 @@ public class JacksonVersioningPluginTest {
 	
 	@Test
 	public void deserializesFromV1ObjectsByUpgrading() throws Exception {
-		AstrixObjectSerializer astrixObjectSerializer = new JacksonVersioning().create(ObjectSerializerDefinition.versionedService(2, TestObjectMapperConfigurer.class));
+		AstrixObjectSerializer astrixObjectSerializer = new Jackson1SerializerPlugin().create(ObjectSerializerDefinition.versionedService(2, TestObjectMapperConfigurer.class));
 		
 		Object serializedV1 = astrixObjectSerializer.serialize(new TestPojoV1("foo"), 1);
 		TestPojoV2 deserializedPojo = astrixObjectSerializer.deserialize(serializedV1, TestPojoV2.class, 1);
@@ -55,7 +55,7 @@ public class JacksonVersioningPluginTest {
 	
 	@Test
 	public void serializesToV1ObjectsByDowngrading() throws Exception {
-		AstrixObjectSerializer astrixObjectSerializer = new JacksonVersioning().create(ObjectSerializerDefinition.versionedService(2, TestObjectMapperConfigurer.class));
+		AstrixObjectSerializer astrixObjectSerializer = new Jackson1SerializerPlugin().create(ObjectSerializerDefinition.versionedService(2, TestObjectMapperConfigurer.class));
 		
 		Object serializedV1 = astrixObjectSerializer.serialize(new TestPojoV2("foo", "bar"), 1); // bar will be removed during serialization
 		TestPojoV2 deserializedPojo = astrixObjectSerializer.deserialize(serializedV1, TestPojoV2.class, 2);

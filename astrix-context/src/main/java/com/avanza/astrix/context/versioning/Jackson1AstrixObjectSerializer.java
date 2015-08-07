@@ -24,12 +24,12 @@ import com.avanza.astrix.versioning.JsonObjectMapper;
 import com.avanza.astrix.versioning.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
 import com.avanza.astrix.versioning.plugin.Jackson1ObjectSerializerConfigurer;
 
-public class VersionJacksonAstrixObjectSerializer implements AstrixObjectSerializer {
+public class Jackson1AstrixObjectSerializer implements AstrixObjectSerializer {
 
 	private JsonObjectMapper objectMapper;
 	private int version;
 
-	public VersionJacksonAstrixObjectSerializer(ObjectSerializerDefinition serializerDefinition) {
+	public Jackson1AstrixObjectSerializer(ObjectSerializerDefinition serializerDefinition) {
 		Class<? extends AstrixObjectSerializerConfigurer> serializerBuilder = serializerDefinition.getObjectSerializerConfigurerClass();
 		this.version = serializerDefinition.version();
 		try {

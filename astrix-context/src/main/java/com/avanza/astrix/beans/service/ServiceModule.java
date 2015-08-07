@@ -25,7 +25,7 @@ public class ServiceModule implements NamedModule {
 		moduleContext.bind(ServiceComponentRegistry.class, ServiceComponents.class);
 		moduleContext.bind(ObjectSerializerFactory.class, ObjectSerializerFactoryImpl.class);
 		
-		moduleContext.importType(AstrixVersioningPlugin.class);
+		moduleContext.importType(ObjectSerializerFactoryPlugin.class);
 		moduleContext.importType(ServiceComponent.class);
 		
 		moduleContext.export(ServiceComponentRegistry.class);

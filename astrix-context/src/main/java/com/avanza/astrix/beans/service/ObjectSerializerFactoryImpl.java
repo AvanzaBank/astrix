@@ -15,23 +15,23 @@
  */
 package com.avanza.astrix.beans.service;
 
-import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
+import com.avanza.astrix.beans.service.ObjectSerializerFactoryPlugin;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.beans.service.ObjectSerializerFactory;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 
 class ObjectSerializerFactoryImpl implements ObjectSerializerFactory {
 
-	private AstrixVersioningPlugin versioningPlugin;
+	private ObjectSerializerFactoryPlugin objectSerializerFactoryPlugin;
 
-	public ObjectSerializerFactoryImpl(AstrixVersioningPlugin versioningPlugin) {
-		this.versioningPlugin = versioningPlugin;
+	public ObjectSerializerFactoryImpl(ObjectSerializerFactoryPlugin versioningPlugin) {
+		this.objectSerializerFactoryPlugin = versioningPlugin;
 	}
 
 	@Override
 	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
 		if (serializerDefinition.isVersioned()) {
-			return versioningPlugin.create(serializerDefinition); 
+			return objectSerializerFactoryPlugin.create(serializerDefinition); 
 		}
 		return new AstrixObjectSerializer.NoVersioningSupport();
 	}

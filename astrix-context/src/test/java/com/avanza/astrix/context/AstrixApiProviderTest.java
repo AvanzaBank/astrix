@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
+import com.avanza.astrix.beans.service.ObjectSerializerFactoryPlugin;
 import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -104,7 +104,7 @@ public class AstrixApiProviderTest {
 																		ObjectSerializerDefinition.versionedService(1, DummyObjectSerializerConfigurer.class));
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.registerStrategy(AstrixVersioningPlugin.class, new JavaSerializationVersioningPlugin());
+		astrixConfigurer.registerStrategy(ObjectSerializerFactoryPlugin.class, new JavaSerializationSerializerPlugin());
 		astrixConfigurer.registerApiProvider(VersionedPingServiceProvider.class);
 		astrixConfigurer.set("pingServiceUri", pingServiceUri);
 		AstrixContext context = astrixConfigurer.configure();
@@ -123,7 +123,7 @@ public class AstrixApiProviderTest {
 																		ObjectSerializerDefinition.nonVersioned());
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.registerStrategy(AstrixVersioningPlugin.class, new JavaSerializationVersioningPlugin());
+		astrixConfigurer.registerStrategy(ObjectSerializerFactoryPlugin.class, new JavaSerializationSerializerPlugin());
 		astrixConfigurer.registerApiProvider(PublicAndInternalPingServiceProvider.class);
 		astrixConfigurer.set("pingServiceUri", pingServiceUri);
 		astrixConfigurer.set("internalPingServiceUri", internalPingServiceUri);

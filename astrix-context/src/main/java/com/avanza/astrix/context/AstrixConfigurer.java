@@ -47,7 +47,7 @@ import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
 import com.avanza.astrix.beans.publish.BeansPublishModule;
 import com.avanza.astrix.beans.publish.PublishedBeanFactory;
 import com.avanza.astrix.beans.registry.ServiceRegistryDiscoveryModule;
-import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
+import com.avanza.astrix.beans.service.ObjectSerializerFactoryPlugin;
 import com.avanza.astrix.beans.service.DirectComponentModule;
 import com.avanza.astrix.beans.service.ServiceModule;
 import com.avanza.astrix.config.DynamicConfig;
@@ -56,7 +56,7 @@ import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.SystemPropertiesConfigSource;
-import com.avanza.astrix.context.versioning.JacksonVersioning;
+import com.avanza.astrix.context.versioning.Jackson1SerializerPlugin;
 import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 import com.avanza.astrix.ft.NoFaultToleranceProvider;
 import com.avanza.astrix.modules.Module;
@@ -105,7 +105,7 @@ public class AstrixConfigurer {
 		
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.registerDefault(StrategyProvider.create(BeanFaultToleranceProxyStrategy.class, NoFaultToleranceProvider.class));
-		modulesConfigurer.registerDefault(StrategyProvider.create(AstrixVersioningPlugin.class, JacksonVersioning.class));
+		modulesConfigurer.registerDefault(StrategyProvider.create(ObjectSerializerFactoryPlugin.class, Jackson1SerializerPlugin.class));
 		
 		for (Module plugin : customModules) {
 			modulesConfigurer.register(plugin);

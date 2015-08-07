@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.context.versioning;
 
-
-import com.avanza.astrix.beans.service.AstrixVersioningPlugin;
+import com.avanza.astrix.beans.service.ObjectSerializerFactoryPlugin;
 import com.avanza.astrix.beans.service.ObjectSerializerDefinition;
 import com.avanza.astrix.core.AstrixObjectSerializer;
 
-public class JavaSerializationVersioningPlugin implements AstrixVersioningPlugin {
-	
+public class Jackson1SerializerPlugin implements ObjectSerializerFactoryPlugin {
+
 	@Override
-	public AstrixObjectSerializer create(
-			ObjectSerializerDefinition serializerDefinition) {
-		return new JavaSerializationSerializer(serializerDefinition.version());
+	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
+		return new Jackson1AstrixObjectSerializer(serializerDefinition);
 	}
-	
+
 }
