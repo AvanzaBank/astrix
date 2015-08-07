@@ -25,10 +25,7 @@ public class JavaSerializationVersioningPlugin implements AstrixVersioningPlugin
 	@Override
 	public AstrixObjectSerializer create(
 			ObjectSerializerDefinition serializerDefinition) {
-		if (serializerDefinition.isVersioned()) {
-			return new JavaSerializationSerializer(serializerDefinition.version());
-		}
-		return new AstrixObjectSerializer.NoVersioningSupport();
+		return new JavaSerializationSerializer(serializerDefinition.version());
 	}
 	
 }

@@ -23,11 +23,7 @@ public class JacksonVersioning implements AstrixVersioningPlugin {
 
 	@Override
 	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
-		// TODO: remove check  if service is versioned
-		if (serializerDefinition.isVersioned()) {
-			return new VersionJacksonAstrixObjectSerializer(serializerDefinition);
-		}
-		return new AstrixObjectSerializer.NoVersioningSupport();
+		return new VersionJacksonAstrixObjectSerializer(serializerDefinition);
 	}
 
 }
