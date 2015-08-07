@@ -15,25 +15,34 @@
  */
 package com.avanza.astrix.versioning.core;
 
+import java.util.List;
+
 import com.avanza.astrix.core.AstrixObjectSerializer;
-import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
-import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
-import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 
 class ObjectSerializerFactoryImpl implements ObjectSerializerFactory {
 
-	private ObjectSerializerFactoryPlugin objectSerializerFactoryPlugin;
+	private List<ObjectSerializerFactoryPlugin> objectSerializerFactoryPlugins;
 
-	public ObjectSerializerFactoryImpl(ObjectSerializerFactoryPlugin versioningPlugin) {
-		this.objectSerializerFactoryPlugin = versioningPlugin;
+	public ObjectSerializerFactoryImpl(List<ObjectSerializerFactoryPlugin> versioningPlugins) {
+		this.objectSerializerFactoryPlugins = versioningPlugins;
 	}
 
 	@Override
 	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
 		if (serializerDefinition.isVersioned()) {
-			return objectSerializerFactoryPlugin.create(serializerDefinition); 
+			return getObjectSerializerFactoryPlugin(serializerDefinition).create(serializerDefinition); 
 		}
 		return new AstrixObjectSerializer.NoVersioningSupport();
+	}
+
+	private ObjectSerializerFactoryPlugin getObjectSerializerFactoryPlugin(
+			ObjectSerializerDefinition serializerDefinition) {
+		for (ObjectSerializerFactoryPlugin plugin : objectSerializerFactoryPlugins) {
+			if (plugin.getConfigurerType().isAssignableFrom(serializerDefinition.getObjectSerializerConfigurerClass())) {
+				return plugin;
+			}
+		}
+		throw new IllegalStateException("Cant find ObjectSerializerFactoryPlugin to handle AstrixObjectSerializerConfigurer class: " + serializerDefinition.getObjectSerializerConfigurerClass());
 	}
 
 }

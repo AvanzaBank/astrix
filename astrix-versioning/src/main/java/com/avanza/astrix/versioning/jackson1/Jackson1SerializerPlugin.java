@@ -16,6 +16,7 @@
 package com.avanza.astrix.versioning.jackson1;
 
 import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 
@@ -24,6 +25,11 @@ public class Jackson1SerializerPlugin implements ObjectSerializerFactoryPlugin {
 	@Override
 	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
 		return new Jackson1AstrixObjectSerializer(serializerDefinition);
+	}
+	
+	@Override
+	public Class<? extends AstrixObjectSerializerConfigurer> getConfigurerType() {
+		return Jackson1ObjectSerializerConfigurer.class;
 	}
 
 }

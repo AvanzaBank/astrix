@@ -16,21 +16,11 @@
 package com.avanza.astrix.versioning.core;
 
 import com.avanza.astrix.core.AstrixObjectSerializer;
-import com.avanza.astrix.core.AstrixObjectSerializer.NoVersioningSupport;
 
 public interface ObjectSerializerFactoryPlugin {
 	
 	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition);
 	
-	public static class Default {
-		public static ObjectSerializerFactoryPlugin create() {
-			return new ObjectSerializerFactoryPlugin() {
-				@Override
-				public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
-					return new NoVersioningSupport();
-				}
-			};
-		}
-	}
-
+	public Class<? extends AstrixObjectSerializerConfigurer> getConfigurerType();
+	
 }

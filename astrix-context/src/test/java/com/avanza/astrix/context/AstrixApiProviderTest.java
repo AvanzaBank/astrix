@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.service.DirectComponent;
+import com.avanza.astrix.context.JavaSerializationSerializerPlugin.JavaSerializationConfigurer;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.AstrixDynamicQualifier;
@@ -101,7 +102,7 @@ public class AstrixApiProviderTest {
 	public void versionedApi() throws Exception {
 		String pingServiceUri = DirectComponent.registerAndGetUri(PingService.class, 
 																		new PingServiceImpl(), 
-																		ObjectSerializerDefinition.versionedService(1, DummyObjectSerializerConfigurer.class));
+																		ObjectSerializerDefinition.versionedService(1, JavaSerializationSerializerPlugin.JavaSerializationConfigurer.class));
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerStrategy(ObjectSerializerFactoryPlugin.class, new JavaSerializationSerializerPlugin());
@@ -117,7 +118,7 @@ public class AstrixApiProviderTest {
 	public void apiWithVersionedAndTxNonVersionedService() throws Exception {
 		String pingServiceUri = DirectComponent.registerAndGetUri(PingService.class, 
 																		new PingServiceImpl(), 
-																		ObjectSerializerDefinition.versionedService(1, DummyObjectSerializerConfigurer.class));
+																		ObjectSerializerDefinition.versionedService(1, JavaSerializationSerializerPlugin.JavaSerializationConfigurer.class));
 		String internalPingServiceUri = DirectComponent.registerAndGetUri(InternalPingService.class, 
 																		new InternalPingServiceImpl(), 
 																		ObjectSerializerDefinition.nonVersioned());
@@ -253,7 +254,7 @@ public class AstrixApiProviderTest {
 	
 	@AstrixObjectSerializerConfig(
 		version = 1,
-		objectSerializerConfigurer = DummyObjectSerializerConfigurer.class
+		objectSerializerConfigurer = JavaSerializationConfigurer.class
 	)
 	@AstrixApiProvider
 	public interface VersionedPingServiceProvider {
@@ -272,7 +273,7 @@ public class AstrixApiProviderTest {
 	
 	@AstrixObjectSerializerConfig(
 		version = 1,
-		objectSerializerConfigurer = DummyObjectSerializerConfigurer.class
+		objectSerializerConfigurer = JavaSerializationConfigurer.class
 	)
 	@AstrixApiProvider
 	public interface PublicAndInternalPingServiceProvider {
@@ -285,9 +286,6 @@ public class AstrixApiProviderTest {
 		@AstrixConfigDiscovery("internalPingServiceUri")
 		@Service
 		InternalPingService internalPingService();
-	}
-	
-	public static class DummyObjectSerializerConfigurer implements AstrixObjectSerializerConfigurer {
 	}
 	
 	@AstrixApiProvider

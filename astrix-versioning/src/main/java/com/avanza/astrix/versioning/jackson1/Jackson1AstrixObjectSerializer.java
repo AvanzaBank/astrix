@@ -22,7 +22,7 @@ import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.jackson1.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
 
-public class Jackson1AstrixObjectSerializer implements AstrixObjectSerializer {
+class Jackson1AstrixObjectSerializer implements AstrixObjectSerializer {
 
 	private JsonObjectMapper objectMapper;
 	private int version;

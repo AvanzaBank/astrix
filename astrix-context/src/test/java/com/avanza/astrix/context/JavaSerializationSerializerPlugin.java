@@ -17,6 +17,7 @@ package com.avanza.astrix.context;
 
 
 import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 
@@ -26,6 +27,14 @@ public class JavaSerializationSerializerPlugin implements ObjectSerializerFactor
 	public AstrixObjectSerializer create(
 			ObjectSerializerDefinition serializerDefinition) {
 		return new JavaSerializationSerializer(serializerDefinition.version());
+	}
+
+	@Override
+	public Class<? extends AstrixObjectSerializerConfigurer> getConfigurerType() {
+		return JavaSerializationConfigurer.class;
+	}
+	
+	public interface JavaSerializationConfigurer extends AstrixObjectSerializerConfigurer {
 	}
 	
 }
