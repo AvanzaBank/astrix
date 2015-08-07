@@ -23,7 +23,7 @@ import java.util.List;
 import org.codehaus.jackson.node.ObjectNode;
 import org.junit.Test;
 
-import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
 import com.avanza.astrix.versioning.jackson1.AstrixJsonMessageMigration;

@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.context;
 
-import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
 

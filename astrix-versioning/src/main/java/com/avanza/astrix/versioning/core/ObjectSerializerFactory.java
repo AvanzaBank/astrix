@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.versioning.core;
 
-import com.avanza.astrix.core.AstrixObjectSerializer;
 public interface ObjectSerializerFactory {
 	
 	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition);

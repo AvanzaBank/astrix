@@ -27,8 +27,8 @@ import java.util.concurrent.Future;
 import rx.Observable;
 
 import com.avanza.astrix.core.AstrixCallStackTrace;
-import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.util.ReflectionUtil;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 /**
  * 
  * @author Elias Lindholm (elilin)

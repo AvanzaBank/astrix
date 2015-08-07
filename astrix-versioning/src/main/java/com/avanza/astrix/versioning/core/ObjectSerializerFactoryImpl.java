@@ -17,8 +17,6 @@ package com.avanza.astrix.versioning.core;
 
 import java.util.List;
 
-import com.avanza.astrix.core.AstrixObjectSerializer;
-
 class ObjectSerializerFactoryImpl implements ObjectSerializerFactory {
 
 	private List<ObjectSerializerFactoryPlugin> objectSerializerFactoryPlugins;

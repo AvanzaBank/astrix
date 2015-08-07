@@ -17,7 +17,7 @@ package com.avanza.astrix.versioning.jackson1;
 
 import java.lang.reflect.Type;
 
-import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.jackson1.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;

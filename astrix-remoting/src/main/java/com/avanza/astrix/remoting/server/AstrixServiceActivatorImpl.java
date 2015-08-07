@@ -28,12 +28,12 @@ import java.util.concurrent.ConcurrentMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.ServiceInvocationException;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.client.MissingServiceMethodException;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 /**
  * Server side component used to invoke exported services. <p> 
  * 

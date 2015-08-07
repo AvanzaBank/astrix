@@ -24,7 +24,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Type;
 
-import com.avanza.astrix.core.AstrixObjectSerializer;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 /**
  * {@link AstrixObjectSerializer} using java serialization mechanism. Does not use version number. <p>
  * 

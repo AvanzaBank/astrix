@@ -44,7 +44,6 @@ import rx.Subscriber;
 
 import com.avanza.astrix.context.JavaSerializationSerializer;
 import com.avanza.astrix.core.AstrixBroadcast;
-import com.avanza.astrix.core.AstrixObjectSerializer;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.RemoteResultReducer;
@@ -62,6 +61,7 @@ import com.avanza.astrix.remoting.client.RoutedServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.Router;
 import com.avanza.astrix.remoting.client.RoutingKey;
 import com.avanza.astrix.remoting.client.RoutingStrategy;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 
 /**
  * 
