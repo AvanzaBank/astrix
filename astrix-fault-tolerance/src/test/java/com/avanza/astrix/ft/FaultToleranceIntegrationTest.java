@@ -38,7 +38,6 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
-import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.factory.BeanConfigurationsImpl;
 import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
@@ -52,7 +51,6 @@ import com.avanza.astrix.ft.service.SimpleServiceImpl;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 import com.google.common.base.Throwables;
-import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 
 public abstract class FaultToleranceIntegrationTest {
 
@@ -65,7 +63,7 @@ public abstract class FaultToleranceIntegrationTest {
 	private CountingCachingHystrixCommandNamingStrategy commandNamingStrategy = new CountingCachingHystrixCommandNamingStrategy();
 	private MapConfigSource config = new MapConfigSource();
 	
-	protected abstract ExecutionIsolationStrategy isolationStrategy();
+	protected abstract IsolationStrategy isolationStrategy();
 	
 	protected SimpleService testService() {
 		return testService;

@@ -37,13 +37,13 @@ import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.ft.HystrixCommandSettings;
+import com.avanza.astrix.ft.IsolationStrategy;
 import com.avanza.astrix.gs.ClusteredProxyBinder;
 import com.avanza.astrix.gs.GigaSpaceProxy;
 import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.spring.AstrixSpringContext;
 import com.j_spaces.core.IJSpace;
-import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 /**
  * Allows publishing a GigaSpace's local-view.
  * 
@@ -103,7 +103,7 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 			commandKey = commandKey + "-" + qualifier;
 		}
 		HystrixCommandSettings hystrixSettings = new HystrixCommandSettings();
-		hystrixSettings.setExecutionIsolationStrategy(ExecutionIsolationStrategy.SEMAPHORE);
+		hystrixSettings.setExecutionIsolationStrategy(IsolationStrategy.SEMAPHORE);
 		hystrixSettings.setSemaphoreMaxConcurrentRequests(Integer.MAX_VALUE);
 		
 		BeanFaultTolerance faultTolerance = faultToleranceFactory.create(serviceDefinition);

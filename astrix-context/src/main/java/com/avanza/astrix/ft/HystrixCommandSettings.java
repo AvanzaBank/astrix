@@ -15,8 +15,6 @@
  */
 package com.avanza.astrix.ft;
 
-import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
-
 /**
  * Contains settings for the Hystrix Command. The initial values of the fields are used as defaults.
  * 
@@ -30,7 +28,7 @@ public class HystrixCommandSettings {
 	private int executionIsolationThreadTimeoutInMilliseconds = 1000;
 	private int metricsRollingStatisticalWindowInMilliseconds = 10_000;
 	private int maxQueueSize = 1_000_000;
-	private ExecutionIsolationStrategy executionIsolationStrategy = ExecutionIsolationStrategy.THREAD;
+	private IsolationStrategy executionIsolationStrategy = IsolationStrategy.THREAD;
 	
 	public HystrixCommandSettings() {
 	}
@@ -83,11 +81,11 @@ public class HystrixCommandSettings {
 		this.executionIsolationThreadTimeoutInMilliseconds = executionIsolationThreadTimeoutInMilliseconds;
 	}
 
-	public void setExecutionIsolationStrategy(ExecutionIsolationStrategy executionIsolationStrategy) {
+	public void setExecutionIsolationStrategy(IsolationStrategy executionIsolationStrategy) {
 		this.executionIsolationStrategy = executionIsolationStrategy;
 	}
 	
-	public ExecutionIsolationStrategy getExecutionIsolationStrategy() {
+	public IsolationStrategy getExecutionIsolationStrategy() {
 		return executionIsolationStrategy;
 	}
 }

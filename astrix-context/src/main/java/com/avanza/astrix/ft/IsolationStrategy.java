@@ -15,11 +15,7 @@
  */
 package com.avanza.astrix.ft;
 
-public class FaultToleranceSemaphoreIsolationIntegrationTest extends FaultToleranceIntegrationTest {
-
-	@Override
-	protected IsolationStrategy isolationStrategy() {
-		return IsolationStrategy.SEMAPHORE;
-	}
-
+public enum IsolationStrategy {
+	THREAD,
+	SEMAPHORE
 }

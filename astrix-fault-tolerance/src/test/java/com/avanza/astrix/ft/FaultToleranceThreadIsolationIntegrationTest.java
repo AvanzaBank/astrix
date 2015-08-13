@@ -23,7 +23,6 @@ import org.junit.Test;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.google.common.base.Throwables;
-import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 
 public class FaultToleranceThreadIsolationIntegrationTest extends FaultToleranceIntegrationTest {
 
@@ -31,8 +30,8 @@ public class FaultToleranceThreadIsolationIntegrationTest extends FaultTolerance
 	
 	
 	@Override
-	protected ExecutionIsolationStrategy isolationStrategy() {
-		return ExecutionIsolationStrategy.THREAD;
+	protected IsolationStrategy isolationStrategy() {
+		return IsolationStrategy.THREAD;
 	}
 
 	@Test(expected=ServiceUnavailableException.class)

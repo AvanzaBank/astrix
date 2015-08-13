@@ -17,8 +17,6 @@ package com.avanza.astrix.ft;
 
 import java.util.Objects;
 
-import rx.Observable;
-
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.BeanConfiguration;
@@ -30,8 +28,11 @@ import com.avanza.astrix.core.function.Supplier;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
+import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixObservableCommand.Setter;
 import com.netflix.hystrix.HystrixThreadPoolProperties;
+
+import rx.Observable;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -76,7 +77,7 @@ public final class BeanFaultTolerance {
 		HystrixCommandProperties.Setter commandPropertiesDefault =
 				HystrixCommandProperties.Setter()
 						.withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests())
-						.withExecutionIsolationStrategy(settings.getExecutionIsolationStrategy())
+						.withExecutionIsolationStrategy(getHystrixIsolationStrategy(settings))
 						.withExecutionTimeoutInMilliseconds(getTimeoutMillis());
 						
 		// MaxQueueSize must be set to a non negative value in order for QueueSizeRejectionThreshold to have any effect.
@@ -91,6 +92,12 @@ public final class BeanFaultTolerance {
 				.andCommandKey(getCommandKey())
 				.andCommandPropertiesDefaults(commandPropertiesDefault)
 				.andThreadPoolPropertiesDefaults(threadPoolPropertiesDefaults);
+	}
+
+	private ExecutionIsolationStrategy getHystrixIsolationStrategy(HystrixCommandSettings settings) {
+		return settings.getExecutionIsolationStrategy() == IsolationStrategy.SEMAPHORE 
+				? ExecutionIsolationStrategy.SEMAPHORE
+				: ExecutionIsolationStrategy.THREAD;
 	}
 	
 	private <T> boolean faultToleranceEnabled() {
