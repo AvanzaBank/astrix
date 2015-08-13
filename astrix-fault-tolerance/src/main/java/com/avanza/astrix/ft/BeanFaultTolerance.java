@@ -15,106 +15,14 @@
  */
 package com.avanza.astrix.ft;
 
-import java.util.Objects;
-
-import com.avanza.astrix.beans.core.AstrixBeanSettings;
-import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.BeanConfiguration;
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-import com.avanza.astrix.config.DynamicBooleanProperty;
-import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.config.DynamicIntProperty;
 import com.avanza.astrix.core.function.Supplier;
-import com.netflix.hystrix.HystrixCommandGroupKey;
-import com.netflix.hystrix.HystrixCommandKey;
-import com.netflix.hystrix.HystrixCommandProperties;
-import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
-import com.netflix.hystrix.HystrixObservableCommand.Setter;
-import com.netflix.hystrix.HystrixThreadPoolProperties;
 
 import rx.Observable;
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public final class BeanFaultTolerance {
-	
-	private final PublishedAstrixBean<?> beanDefinition;
-	private final DynamicBooleanProperty faultToleranceEnabledForBean;
-	private final DynamicBooleanProperty faultToleranceEnabled;
-	private final HystrixCommandNamingStrategy commandNamingStrategy;
-	private final DynamicIntProperty initialTimeout;
-	
-	BeanFaultTolerance(PublishedAstrixBean<?> serviceDefinition, BeanConfiguration beanConfiguration, DynamicConfig config, HystrixCommandNamingStrategy commandNamingStrategy) {
-		this.beanDefinition = serviceDefinition;
-		this.initialTimeout = beanConfiguration.get(AstrixBeanSettings.INITIAL_TIMEOUT);
-		this.faultToleranceEnabledForBean = beanConfiguration.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED);
-		this.faultToleranceEnabled = AstrixSettings.ENABLE_FAULT_TOLERANCE.getFrom(config);
-		this.commandNamingStrategy = Objects.requireNonNull(commandNamingStrategy);
-	}
-	
-	public <T> Observable<T> observe(Supplier<Observable<T>> observable, HystrixObservableCommandSettings settings) {
-		if (!faultToleranceEnabled()) {
-			return observable.get();
-		}
-		Setter setter = Setter.withGroupKey(getGroupKey())
-				  .andCommandKey(getCommandKey())
-				  .andCommandPropertiesDefaults(com.netflix.hystrix.HystrixCommandProperties.Setter()
-						  .withExecutionTimeoutInMilliseconds(getTimeoutMillis())
-						  .withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests()));
-		return HystrixObservableCommandFacade.observe(observable, setter);
-	}
-	
-	public <T> T execute(final CheckedCommand<T> command, HystrixCommandSettings settings) throws Throwable {
-		if (!faultToleranceEnabled()) {
-			return command.call();
-		} 
-		return HystrixCommandFacade.execute(command, createHystrixConfiguration(settings));
-	}
-	
-	private com.netflix.hystrix.HystrixCommand.Setter createHystrixConfiguration(HystrixCommandSettings settings) {
-		HystrixCommandProperties.Setter commandPropertiesDefault =
-				HystrixCommandProperties.Setter()
-						.withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests())
-						.withExecutionIsolationStrategy(getHystrixIsolationStrategy(settings))
-						.withExecutionTimeoutInMilliseconds(getTimeoutMillis());
-						
-		// MaxQueueSize must be set to a non negative value in order for QueueSizeRejectionThreshold to have any effect.
-		// We use a high value for MaxQueueSize in order to allow QueueSizeRejectionThreshold to change dynamically using archaius.
-		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =
-				HystrixThreadPoolProperties.Setter()
-						.withMaxQueueSize(settings.getMaxQueueSize())
-						.withQueueSizeRejectionThreshold(settings.getQueueSizeRejectionThreshold())
-						.withCoreSize(settings.getCoreSize());
 
-		return com.netflix.hystrix.HystrixCommand.Setter.withGroupKey(getGroupKey())
-				.andCommandKey(getCommandKey())
-				.andCommandPropertiesDefaults(commandPropertiesDefault)
-				.andThreadPoolPropertiesDefaults(threadPoolPropertiesDefaults);
-	}
+public interface BeanFaultTolerance {
 
-	private ExecutionIsolationStrategy getHystrixIsolationStrategy(HystrixCommandSettings settings) {
-		return settings.getExecutionIsolationStrategy() == IsolationStrategy.SEMAPHORE 
-				? ExecutionIsolationStrategy.SEMAPHORE
-				: ExecutionIsolationStrategy.THREAD;
-	}
-	
-	private <T> boolean faultToleranceEnabled() {
-		return faultToleranceEnabled.get() && faultToleranceEnabledForBean.get();
-	}
+	<T> Observable<T> observe(Supplier<Observable<T>> observable, HystrixObservableCommandSettings settings);
 
+	<T> T execute(CheckedCommand<T> command, HystrixCommandSettings settings) throws Throwable;
 
-	private int getTimeoutMillis() {
-		return this.initialTimeout.get();
-	}
-
-	HystrixCommandKey getCommandKey() {
-		return HystrixCommandKey.Factory.asKey(commandNamingStrategy.getCommandKeyName(beanDefinition));
-	}
-
-	HystrixCommandGroupKey getGroupKey() {
-		return HystrixCommandGroupKey.Factory.asKey(commandNamingStrategy.getGroupKeyName(beanDefinition));
-	}
-	
 }

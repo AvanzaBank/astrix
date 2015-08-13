@@ -19,9 +19,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import rx.Observable;
-import rx.functions.Func1;
-
 import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.HystrixObservableCommandSettings;
@@ -33,6 +30,9 @@ import com.avanza.astrix.remoting.client.RoutedServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.RoutingKey;
 import com.avanza.astrix.remoting.util.GsUtil;
 import com.gigaspaces.async.AsyncResult;
+
+import rx.Observable;
+import rx.functions.Func1;
 /**
  * RemotingTransport implementation based on GigaSpaces task execution. <p> 
  * 

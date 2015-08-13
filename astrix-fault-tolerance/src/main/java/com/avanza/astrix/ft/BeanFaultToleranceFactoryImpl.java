@@ -45,7 +45,7 @@ public final class BeanFaultToleranceFactoryImpl implements AstrixConfigAware, B
 
 	@Override
 	public BeanFaultTolerance create(PublishedAstrixBean<?> serviceDefinition) {
-		return new BeanFaultTolerance(serviceDefinition, beanConfigurations.getBeanConfiguration(serviceDefinition.getBeanKey()), config, commandNamingStrategy);
+		return new BeanFaultToleranceImpl(serviceDefinition, beanConfigurations.getBeanConfiguration(serviceDefinition.getBeanKey()), config, commandNamingStrategy);
 	}
 
 	@Override
