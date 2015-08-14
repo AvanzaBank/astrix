@@ -41,21 +41,14 @@ import rx.functions.Func1;
 public class GsRemotingTransport implements RemotingTransportSpi {
 
 	private final SpaceTaskDispatcher spaceTaskDispatcher;
-	private final BeanFaultTolerance faultTolerance;
 	
-	public GsRemotingTransport(SpaceTaskDispatcher spaceTaskDispatcher, BeanFaultTolerance faultTolerance) {
+	public GsRemotingTransport(SpaceTaskDispatcher spaceTaskDispatcher) {
 		this.spaceTaskDispatcher = spaceTaskDispatcher;
-		this.faultTolerance = faultTolerance;
 	}
 	
 	@Override
 	public Observable<AstrixServiceInvocationResponse> submitRoutedRequest(final AstrixServiceInvocationRequest request, final RoutingKey routingKey) {
-		return faultTolerance.observe(new Supplier<Observable<AstrixServiceInvocationResponse>>() {
-			@Override
-			public Observable<AstrixServiceInvocationResponse> get() {
-				return observeRoutedRequest(request, routingKey);
-			}
-		});
+		return observeRoutedRequest(request, routingKey);
 	}
 
 	@Override
@@ -63,22 +56,12 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 		if (requests.isEmpty()) {
 			return Observable.just(Collections.<AstrixServiceInvocationResponse>emptyList());
 		}
-		return faultTolerance.observe(new Supplier<Observable<List<AstrixServiceInvocationResponse>>>() {
-			@Override
-			public Observable<List<AstrixServiceInvocationResponse>> get() {
-				return observeRoutedReqeuests(requests);
-			}
-		});
+		return observeRoutedReqeuests(requests);
 	}
 	
 	@Override
 	public Observable<List<AstrixServiceInvocationResponse>> submitBroadcastRequest(final AstrixServiceInvocationRequest request) {
-		return faultTolerance.observe(new Supplier<Observable<List<AstrixServiceInvocationResponse>>>() {
-			@Override
-			public Observable<List<AstrixServiceInvocationResponse>> get() {
-				return observeBroadcastRequest(request);
-			}
-		});
+		return observeBroadcastRequest(request);
 	}
 	
 	private Observable<AstrixServiceInvocationResponse> observeRoutedRequest(AstrixServiceInvocationRequest request,

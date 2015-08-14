@@ -22,11 +22,7 @@ import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
-import com.avanza.astrix.ft.BeanFaultTolerance;
-import com.avanza.astrix.ft.BeanFaultToleranceFactory;
-import com.avanza.astrix.ft.CommandSettings;
 import com.avanza.astrix.gs.ClusteredProxyCacheImpl.GigaSpaceInstance;
-import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.spring.AstrixSpringContext;
 /**
@@ -38,11 +34,15 @@ import com.avanza.astrix.spring.AstrixSpringContext;
 public class GsComponent implements ServiceComponent, ClusteredProxyBinder {
 
 	private GsBinder gsBinder;
-	private BeanFaultToleranceFactory faultToleranceFactory;
 	private AstrixSpringContext astrixSpringContext;
 	private ClusteredProxyCache proxyCache;
 	
-	
+	public GsComponent(GsBinder gsBinder, AstrixSpringContext astrixSpringContext, ClusteredProxyCache proxyCache) {
+		this.gsBinder = gsBinder;
+		this.astrixSpringContext = astrixSpringContext;
+		this.proxyCache = proxyCache;
+	}
+
 	@Override
 	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
 		Class<T> targetType = serviceDefinition.getServiceType();
@@ -50,8 +50,7 @@ public class GsComponent implements ServiceComponent, ClusteredProxyBinder {
 			throw new UnsupportedTargetTypeException(getName(), targetType);
 		}
 		GigaSpaceInstance gigaSpaceInstance = proxyCache.getProxy(serviceProperties);
-		BeanFaultTolerance beanFaultTolerance = faultToleranceFactory.create(serviceDefinition);
-		T proxyWithFaultTolerance = targetType.cast(GigaSpaceProxy.create(gigaSpaceInstance.get(), beanFaultTolerance));
+		T proxyWithFaultTolerance = targetType.cast(GigaSpaceProxy.create(gigaSpaceInstance.get()));
 		return BoundProxyServiceBeanInstance.create(proxyWithFaultTolerance, gigaSpaceInstance);
 	}
 	
@@ -90,24 +89,5 @@ public class GsComponent implements ServiceComponent, ClusteredProxyBinder {
 		return gsBinder.createProperties(space);
 	}
 	
-	@AstrixInject
-	public void setAstrixContext(AstrixSpringContext astrixSpringContext) {
-		this.astrixSpringContext = astrixSpringContext;
-	}
-	
-	@AstrixInject
-	public void setProxyCache(ClusteredProxyCache proxyCache) {
-		this.proxyCache = proxyCache;
-	}
-	
-	@AstrixInject
-	public void setGsBinder(GsBinder gsBinder) {
-		this.gsBinder = gsBinder;
-	}
-	
-	@AstrixInject
-	public void setFaultTolerance(BeanFaultToleranceFactory beanFaultToleranceFactory) {
-		this.faultToleranceFactory = beanFaultToleranceFactory;
-	}
 
 }

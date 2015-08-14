@@ -19,8 +19,6 @@ import com.avanza.astrix.ft.CommandSettings;
 
 public interface FaultToleranceConfigurator {
 	
-	// TODO: this interface is not used yes, remove or introduce?
-	
 	void configure(CommandSettings commandSettings);
 
 }

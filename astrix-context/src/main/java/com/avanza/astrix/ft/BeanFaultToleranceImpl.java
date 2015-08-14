@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.ft;
 
+import java.util.concurrent.Future;
+
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.BeanConfiguration;

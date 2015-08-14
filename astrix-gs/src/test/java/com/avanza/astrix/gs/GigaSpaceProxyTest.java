@@ -28,18 +28,11 @@ import com.avanza.astrix.beans.factory.BeanConfigurationsImpl;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.core.function.Supplier;
-import com.avanza.astrix.ft.BeanFaultTolerance;
-import com.avanza.astrix.ft.CheckedCommand;
 import com.gigaspaces.internal.client.cache.SpaceCacheException;
-
-import rx.Observable;
 
 
 public class GigaSpaceProxyTest {
 	
-	private BeanFaultTolerance faultTolerance;
-
 	@Before
 	public void setup() {
 		MapConfigSource configSource = new MapConfigSource();
@@ -47,22 +40,12 @@ public class GigaSpaceProxyTest {
 		DynamicConfig config = DynamicConfig.create(configSource);
 		BeanConfigurationsImpl beanConfigurations = new BeanConfigurationsImpl();
 		beanConfigurations.setConfig(config);
-		faultTolerance = new BeanFaultTolerance() {
-			@Override
-			public <T> Observable<T> observe(Supplier<Observable<T>> observable) {
-				return observable.get();
-			}
-			@Override
-			public <T> T execute(CheckedCommand<T> command) throws Throwable {
-				return command.call();
-			}
-		};
 	}
 	
 	@Test
 	public void proxiesInvocations() throws Exception {
 		GigaSpace gigaSpace = Mockito.mock(GigaSpace.class);
-		GigaSpace proxied = GigaSpaceProxy.create(gigaSpace, faultTolerance);
+		GigaSpace proxied = GigaSpaceProxy.create(gigaSpace);
 		
 		Mockito.stub(gigaSpace.count(null)).toReturn(21);
 		
@@ -74,7 +57,7 @@ public class GigaSpaceProxyTest {
 		GigaSpace gigaSpace = Mockito.mock(GigaSpace.class);
 		
 		Mockito.stub(gigaSpace.count(null)).toThrow(new SpaceCacheException(""));
-		GigaSpace proxied = GigaSpaceProxy.create(gigaSpace, faultTolerance);
+		GigaSpace proxied = GigaSpaceProxy.create(gigaSpace);
 		
 		try {
 			proxied.count(null);

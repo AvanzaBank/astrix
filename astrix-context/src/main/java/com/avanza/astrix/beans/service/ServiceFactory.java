@@ -23,6 +23,8 @@ import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.DynamicFactoryBean;
 import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
+import com.avanza.astrix.ft.BeanFaultTolerance;
+import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 
 /**
  * 
@@ -36,20 +38,23 @@ public class ServiceFactory<T> implements DynamicFactoryBean<T> {
 	private final ServiceDiscoveryFactory<?> serviceDiscoveryFactory;
 	private final ServiceLeaseManager leaseManager;
 	private final ServiceDefinition<T> serviceDefinition;
+	private final BeanFaultToleranceFactory beanFaultToleranceFactory;
 
 	public ServiceFactory(ServiceDefinition<T> serviceDefinition, 
 						  ServiceDiscoveryFactory<?> serviceDiscoveryFactory, 
 						  ServiceComponentRegistry serviceComponents, 
-						  ServiceLeaseManager leaseManager) {
+						  ServiceLeaseManager leaseManager,
+						  BeanFaultToleranceFactory beanFaultToleranceFactory) {
 		this.serviceDefinition = Objects.requireNonNull(serviceDefinition);
 		this.serviceDiscoveryFactory = Objects.requireNonNull(serviceDiscoveryFactory);
 		this.serviceComponents = Objects.requireNonNull(serviceComponents);
 		this.leaseManager = Objects.requireNonNull(leaseManager);
+		this.beanFaultToleranceFactory = Objects.requireNonNull(beanFaultToleranceFactory);
 	}
 
 	public T create(AstrixBeanKey<T> beanKey) {
 		ServiceDiscovery serviceDiscovery = serviceDiscoveryFactory.create(beanKey.getQualifier());
-		ServiceBeanInstance<T> serviceBeanInstance = ServiceBeanInstance.create(serviceDefinition, beanKey, serviceDiscovery, serviceComponents);
+		ServiceBeanInstance<T> serviceBeanInstance = ServiceBeanInstance.create(serviceDefinition, beanKey, serviceDiscovery, serviceComponents, beanFaultToleranceFactory);
 		serviceBeanInstance.bind();
 		leaseManager.startManageLease(serviceBeanInstance);
 		return beanKey.getBeanType().cast(
@@ -66,16 +71,18 @@ public class ServiceFactory<T> implements DynamicFactoryBean<T> {
 	public static <T> FactoryBean<T> dynamic(ServiceDefinition<T> serviceDefinition, 
 													ServiceDiscoveryFactory<?> serviceDiscovery, 
 													ServiceComponentRegistry serviceComponents, 
-													ServiceLeaseManager leaseManager) {
-		return new ServiceFactory<T>(serviceDefinition, serviceDiscovery, serviceComponents, leaseManager);
+													ServiceLeaseManager leaseManager,
+													BeanFaultToleranceFactory beanFaultToleranceFactory) {
+		return new ServiceFactory<T>(serviceDefinition, serviceDiscovery, serviceComponents, leaseManager, beanFaultToleranceFactory);
 	}
 	
 	public static <T> FactoryBean<T> standard(ServiceDefinition<T> serviceDefinition, 
 													AstrixBeanKey<T> beanType, 
 													ServiceDiscoveryFactory<?> serviceDiscoveryFactory, 
 													ServiceComponentRegistry serviceComponents, 
-													ServiceLeaseManager leaseManager) {
-		ServiceFactory<T> serviceFactory = new ServiceFactory<T>(serviceDefinition, serviceDiscoveryFactory, serviceComponents, leaseManager);
+													ServiceLeaseManager leaseManager,
+													 BeanFaultToleranceFactory beanFaultToleranceFactory) {
+		ServiceFactory<T> serviceFactory = new ServiceFactory<T>(serviceDefinition, serviceDiscoveryFactory, serviceComponents, leaseManager, beanFaultToleranceFactory);
 		return new FactoryBeanAdapter<T>(serviceFactory, beanType);
 	}
 	

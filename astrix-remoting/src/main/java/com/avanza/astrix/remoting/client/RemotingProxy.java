@@ -24,11 +24,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 
-import rx.Observable;
-
+import com.avanza.astrix.beans.core.FutureAdapter;
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
+
+import rx.Observable;
 /**
  * 
  * @author Elias Lindholm (elilin)

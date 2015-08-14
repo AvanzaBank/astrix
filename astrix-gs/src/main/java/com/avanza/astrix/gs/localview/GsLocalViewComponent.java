@@ -35,8 +35,6 @@ import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicIntProperty;
 import com.avanza.astrix.config.DynamicLongProperty;
 import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.ft.BeanFaultTolerance;
-import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.ft.CommandSettings;
 import com.avanza.astrix.ft.IsolationStrategy;
 import com.avanza.astrix.gs.ClusteredProxyBinder;
@@ -57,7 +55,6 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	private GsBinder gsBinder;
 	private AstrixSpringContext astrixSpringContext;
 	private DynamicBooleanProperty disableLocalView;
-	private BeanFaultToleranceFactory faultToleranceFactory;
 	private DynamicLongProperty maxDisonnectionTime;
 	private DynamicIntProperty lookupTimeout;
 	private ClusteredProxyBinder clusteredProxyBinder;
@@ -66,11 +63,9 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	
 	public GsLocalViewComponent(GsBinder gsBinder,
 			AstrixSpringContext astrixSpringContext,
-			BeanFaultToleranceFactory faultToleranceFactory,
 			ClusteredProxyBinder clusteredProxyBinder) {
 		this.gsBinder = gsBinder;
 		this.astrixSpringContext = astrixSpringContext;
-		this.faultToleranceFactory = faultToleranceFactory;
 		this.clusteredProxyBinder = clusteredProxyBinder;
 	}
 
@@ -104,14 +99,8 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 			commandKey = commandKey + "-" + qualifier;
 		}
 		
-		CommandSettings commandSettings = new CommandSettings();
-		commandSettings.setExecutionIsolationStrategy(IsolationStrategy.SEMAPHORE);
-		commandSettings.setSemaphoreMaxConcurrentRequests(Integer.MAX_VALUE);
-		
-		BeanFaultTolerance faultTolerance = faultToleranceFactory.create(serviceDefinition, commandSettings);
-		
 		IJSpace localViewSpace = gslocalViewSpaceConfigurer.create();
-		GigaSpace localViewGigaSpace = GigaSpaceProxy.create(new GigaSpaceConfigurer(localViewSpace).create(), faultTolerance);
+		GigaSpace localViewGigaSpace = GigaSpaceProxy.create(new GigaSpaceConfigurer(localViewSpace).create());
 		
 		BoundLocalViewGigaSpaceBeanInstance localViewGigaSpaceBeanInstance = 
 				new BoundLocalViewGigaSpaceBeanInstance(localViewGigaSpace, gslocalViewSpaceConfigurer, gsSpaceConfigurer);

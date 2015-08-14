@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.remoting.client;
+package com.avanza.astrix.beans.core;
+
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -24,7 +25,7 @@ import java.util.concurrent.TimeoutException;
 import rx.Observable;
 import rx.functions.Action1;
 
-class FutureAdapter<T> implements Future<T> {
+public class FutureAdapter<T> implements Future<T> {
 	
 	private final CountDownLatch done = new CountDownLatch(1);
 	private volatile T result;

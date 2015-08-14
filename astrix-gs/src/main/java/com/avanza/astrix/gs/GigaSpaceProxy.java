@@ -23,15 +23,9 @@ import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.ft.BeanFaultTolerance;
-import com.avanza.astrix.ft.CheckedCommand;
-import com.avanza.astrix.ft.CommandSettings;
 import com.gigaspaces.internal.client.cache.SpaceCacheException;
 /**
- * This proxy adds fault tolerance to a GigaSpace clustered proxy.
- * 
- * 1. All invocations will be protected using AstrixFaultTolerance.
- * 2. Some exceptions thrown by the space-proxy will be wrapped in ServiceUnavailableException
+ * 1. Some exceptions thrown by the space-proxy will be wrapped in ServiceUnavailableException
  *    to ensure circuit-breaker logic is triggered when space is not available.
  * 
  * @author Elias Lindholm (elilin)
@@ -40,29 +34,22 @@ import com.gigaspaces.internal.client.cache.SpaceCacheException;
 public class GigaSpaceProxy implements InvocationHandler {
 
 	private final GigaSpace gigaSpace;
-	private final BeanFaultTolerance faultTolerance;
 
-	public GigaSpaceProxy(GigaSpace gigaSpace, BeanFaultTolerance faultTolerance) {
+	public GigaSpaceProxy(GigaSpace gigaSpace) {
 		this.gigaSpace = Objects.requireNonNull(gigaSpace);
-		this.faultTolerance = Objects.requireNonNull(faultTolerance);
 	}
 
-	public static GigaSpace create(GigaSpace gigaSpace, BeanFaultTolerance faultTolerance) {
-		return ReflectionUtil.newProxy(GigaSpace.class, new GigaSpaceProxy(gigaSpace, faultTolerance));
+	public static GigaSpace create(GigaSpace gigaSpace) {
+		return ReflectionUtil.newProxy(GigaSpace.class, new GigaSpaceProxy(gigaSpace));
 	}
 
 	@Override
 	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
-		return faultTolerance.execute(new CheckedCommand<Object>() {
-			@Override
-			public Object call() throws Throwable {
-				try {
-					return ReflectionUtil.invokeMethod(method, gigaSpace, args);
-				} catch (SpaceCacheException e) {
-					throw new ServiceUnavailableException("SpaceCacheNotAvailable", e);
-				}
-			}
-		});
+		try {
+			return ReflectionUtil.invokeMethod(method, gigaSpace, args);
+		} catch (SpaceCacheException e) {
+			throw new ServiceUnavailableException("SpaceCacheNotAvailable", e);
+		}
 	}
 
 }

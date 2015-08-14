@@ -21,6 +21,7 @@ import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
 import com.avanza.astrix.beans.service.ServiceFactory;
 import com.avanza.astrix.beans.service.ServiceLeaseManager;
+import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -30,18 +31,21 @@ public final class AstrixServiceMetaFactory {
 
 	private ServiceComponentRegistry serviceComponents;
 	private ServiceLeaseManager leaseManager;
+	private BeanFaultToleranceFactory beanFaultToleranceFactory;
 	
 	public AstrixServiceMetaFactory(ServiceComponentRegistry serviceComponents,
-									ServiceLeaseManager leaseManager) {
+									ServiceLeaseManager leaseManager,
+									BeanFaultToleranceFactory beanFaultToleranceFactory) {
 		this.serviceComponents = serviceComponents;
 		this.leaseManager = leaseManager;
+		this.beanFaultToleranceFactory = beanFaultToleranceFactory;
 	}
 
 	public <T> FactoryBean<T> createServiceFactory(ServiceDefinition<T> serviceDefinition, ServiceDiscoveryFactory<?> serviceDiscoveryFactory) {
 		if (serviceDefinition.isDynamicQualified()) {
-			return ServiceFactory.dynamic(serviceDefinition, serviceDiscoveryFactory, serviceComponents, leaseManager);
+			return ServiceFactory.dynamic(serviceDefinition, serviceDiscoveryFactory, serviceComponents, leaseManager, beanFaultToleranceFactory);
 		}
-		return ServiceFactory.standard(serviceDefinition, serviceDefinition.getBeanKey(), serviceDiscoveryFactory, serviceComponents, leaseManager);
+		return ServiceFactory.standard(serviceDefinition, serviceDefinition.getBeanKey(), serviceDiscoveryFactory, serviceComponents, leaseManager, beanFaultToleranceFactory);
 	}
 	
 	public Class<?> loadInterfaceIfExists(String interfaceName) {

@@ -22,7 +22,7 @@ public class MissingBeanBinding extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	public MissingBeanBinding(String moduleName, Class<?> type, Stack<Class<?>> dependencyTrace) {
-		super("Missing bean biding. module=" + moduleName + " type=" + type.getName() + " dependency tree:\n" + createTrace(dependencyTrace));
+		super("Missing bean biding:\n module: " + moduleName + "\n type: " + type.getName() + "\ndependency tree:\n" + createTrace(dependencyTrace));
 	}
 
 	private static String createTrace(Stack<Class<?>> trace) {
