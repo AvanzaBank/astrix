@@ -15,16 +15,14 @@
  */
 package com.avanza.astrix.ft;
 
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface HystrixCommandNamingStrategy {
-	
-	String getCommandKeyName(PublishedAstrixBean<?> beanDefinition);
-	
-	String getGroupKeyName(PublishedAstrixBean<?> beanDefinition);
+import com.avanza.astrix.core.function.Supplier;
+
+import rx.Observable;
+
+public interface BeanFaultTolerance {
+
+	<T> Observable<T> observe(Supplier<Observable<T>> observable);
+
+	<T> T execute(CheckedCommand<T> command) throws Throwable;
 	
 }

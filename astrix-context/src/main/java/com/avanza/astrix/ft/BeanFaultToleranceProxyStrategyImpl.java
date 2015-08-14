@@ -20,38 +20,34 @@ import java.lang.reflect.Method;
 
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.modules.AstrixInject;
 
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class HystrixFaultToleranceProxyProvider implements BeanFaultToleranceProxyStrategy {
+class BeanFaultToleranceProxyStrategyImpl implements BeanFaultToleranceProxyStrategy {
 	
-	private BeanFaultToleranceFactory faultToleranceFactory;
+	private final BeanFaultToleranceFactory faultToleranceFactory;
 	
-	@AstrixInject
-	public void setFaultTolerance(BeanFaultToleranceFactory faultToleranceFactory) {
+	public BeanFaultToleranceProxyStrategyImpl(BeanFaultToleranceFactory faultToleranceFactory) {
 		this.faultToleranceFactory = faultToleranceFactory;
 	}
+	
 	@Override
 	public <T> T addFaultToleranceProxy(PublishedAstrixBean<T> beanDefinition, T rawProvider) {
 		return ReflectionUtil.newProxy(beanDefinition.getBeanKey().getBeanType(), 
-									   new HystrixFaultToleranceProxy(rawProvider, faultToleranceFactory.create(beanDefinition), new HystrixCommandSettings()));
+									   new BeanFaultToleranceProxy(rawProvider, faultToleranceFactory.create(beanDefinition)));
 	}
 	
-	private static class HystrixFaultToleranceProxy implements InvocationHandler {
+	private static class BeanFaultToleranceProxy implements InvocationHandler {
 
 		private final Object provider;
 		private final BeanFaultTolerance faultTolerance;
-		private final HystrixCommandSettings settings;
 		
-		public HystrixFaultToleranceProxy(Object rawProvider,
-				BeanFaultTolerance faultTolerance, HystrixCommandSettings settings) {
+		public BeanFaultToleranceProxy(Object rawProvider, BeanFaultTolerance faultTolerance) {
 			this.provider = rawProvider;
 			this.faultTolerance = faultTolerance;
-			this.settings = settings;
 		}
 
 		@Override
@@ -61,7 +57,7 @@ public class HystrixFaultToleranceProxyProvider implements BeanFaultTolerancePro
 				public Object call() throws Throwable {
 					return ReflectionUtil.invokeMethod(method, provider, args);
 				}
-			}, settings);
+			});
 		}
 
 	}

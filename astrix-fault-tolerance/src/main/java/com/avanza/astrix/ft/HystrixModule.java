@@ -17,43 +17,25 @@ package com.avanza.astrix.ft;
 
 import org.kohsuke.MetaInfServices;
 
-import com.avanza.astrix.beans.factory.BeanConfigurations;
-import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.AstrixContextPlugin;
+import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.StrategyContext;
-import com.avanza.astrix.modules.StrategyContextPreparer;
 
 @MetaInfServices(AstrixContextPlugin.class)
 public class HystrixModule implements AstrixContextPlugin {
 	
 	@Override
-	public void registerStrategies(AstrixStrategiesConfig astrixContextConfig) {
-		// Exposes strategy: HystrixCommandNamingStrategy
-		astrixContextConfig.registerDefaultStrategy(HystrixCommandNamingStrategy.class, DefaultHystrixCommandNamingStrategy.class);
-		
-		astrixContextConfig.registerStrategy(BeanFaultToleranceProxyStrategy.class, HystrixFaultToleranceProxyProvider.class, 
-				new StrategyContextPreparer() {
-					@Override
-					public void prepare(StrategyContext context) {
-						context.importType(BeanFaultToleranceFactory.class);
-					}
-				});
-		
+	public String name() {
+		return getClass().getPackage().getName() + ".hystrix"; // TODO: rename this package and remove suffix
 	}
 	
 	@Override
-	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(BeanFaultToleranceFactory.class, BeanFaultToleranceFactoryImpl.class);
-		
-		moduleContext.importType(HystrixCommandNamingStrategy.class); // strategy
-		moduleContext.importType(BeanConfigurations.class);
-		
-		moduleContext.export(BeanFaultToleranceFactory.class);
+	public void registerStrategies(AstrixStrategiesConfig strategiesConfig) {
+		strategiesConfig.registerStrategy(FaultToleranceSpi.class, HystrixFaultTolerance.class);
 	}
+
 	@Override
-	public String name() {
-		return getClass().getPackage().getName();
+	public void prepare(ModuleContext moduleContext) {
 	}
 	
 }

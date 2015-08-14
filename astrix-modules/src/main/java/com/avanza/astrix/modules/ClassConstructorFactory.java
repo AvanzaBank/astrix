@@ -76,7 +76,7 @@ final class ClassConstructorFactory<T> {
 			try {
 				m.invoke(target, deps);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new RuntimeException("Failed to inject dependencies into Astrix managed component: " + target.getClass().getName(), e);
+				throw new RuntimeException("Failed to inject dependencies into class instantiated by modules: " + target.getClass().getName(), e);
 			}
 		}
 	}

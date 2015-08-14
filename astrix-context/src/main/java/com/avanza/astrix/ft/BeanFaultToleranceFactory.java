@@ -15,14 +15,12 @@
  */
 package com.avanza.astrix.ft;
 
-import com.avanza.astrix.core.function.Supplier;
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 
-import rx.Observable;
+public interface BeanFaultToleranceFactory {
 
-public interface BeanFaultTolerance {
-
-	<T> Observable<T> observe(Supplier<Observable<T>> observable, HystrixObservableCommandSettings settings);
-
-	<T> T execute(CheckedCommand<T> command, HystrixCommandSettings settings) throws Throwable;
+	BeanFaultTolerance create(PublishedAstrixBean<?> serviceDefinition);
+	
+	BeanFaultTolerance create(PublishedAstrixBean<?> serviceDefinition, CommandSettings commandSettings);
 
 }

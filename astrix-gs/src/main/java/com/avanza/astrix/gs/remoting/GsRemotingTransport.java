@@ -21,7 +21,6 @@ import java.util.List;
 
 import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.ft.BeanFaultTolerance;
-import com.avanza.astrix.ft.HystrixObservableCommandSettings;
 import com.avanza.astrix.gs.SpaceTaskDispatcher;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
@@ -56,7 +55,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 			public Observable<AstrixServiceInvocationResponse> get() {
 				return observeRoutedRequest(request, routingKey);
 			}
-		}, new HystrixObservableCommandSettings());
+		});
 	}
 
 	@Override
@@ -69,9 +68,8 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 			public Observable<List<AstrixServiceInvocationResponse>> get() {
 				return observeRoutedReqeuests(requests);
 			}
-		}, new HystrixObservableCommandSettings());
+		});
 	}
-	
 	
 	@Override
 	public Observable<List<AstrixServiceInvocationResponse>> submitBroadcastRequest(final AstrixServiceInvocationRequest request) {
@@ -80,7 +78,7 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 			public Observable<List<AstrixServiceInvocationResponse>> get() {
 				return observeBroadcastRequest(request);
 			}
-		}, new HystrixObservableCommandSettings());
+		});
 	}
 	
 	private Observable<AstrixServiceInvocationResponse> observeRoutedRequest(AstrixServiceInvocationRequest request,

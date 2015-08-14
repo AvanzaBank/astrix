@@ -25,7 +25,7 @@ import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.CheckedCommand;
-import com.avanza.astrix.ft.HystrixCommandSettings;
+import com.avanza.astrix.ft.CommandSettings;
 import com.gigaspaces.internal.client.cache.SpaceCacheException;
 /**
  * This proxy adds fault tolerance to a GigaSpace clustered proxy.
@@ -41,16 +41,14 @@ public class GigaSpaceProxy implements InvocationHandler {
 
 	private final GigaSpace gigaSpace;
 	private final BeanFaultTolerance faultTolerance;
-	private final HystrixCommandSettings hystrixSettings;
 
-	public GigaSpaceProxy(GigaSpace gigaSpace, BeanFaultTolerance faultTolerance, HystrixCommandSettings hystrixSettings) {
+	public GigaSpaceProxy(GigaSpace gigaSpace, BeanFaultTolerance faultTolerance) {
 		this.gigaSpace = Objects.requireNonNull(gigaSpace);
 		this.faultTolerance = Objects.requireNonNull(faultTolerance);
-		this.hystrixSettings = Objects.requireNonNull(hystrixSettings);
 	}
 
-	public static GigaSpace create(GigaSpace gigaSpace, BeanFaultTolerance faultTolerance, HystrixCommandSettings hystrixSettings) {
-		return ReflectionUtil.newProxy(GigaSpace.class, new GigaSpaceProxy(gigaSpace, faultTolerance, hystrixSettings));
+	public static GigaSpace create(GigaSpace gigaSpace, BeanFaultTolerance faultTolerance) {
+		return ReflectionUtil.newProxy(GigaSpace.class, new GigaSpaceProxy(gigaSpace, faultTolerance));
 	}
 
 	@Override
@@ -64,7 +62,7 @@ public class GigaSpaceProxy implements InvocationHandler {
 					throw new ServiceUnavailableException("SpaceCacheNotAvailable", e);
 				}
 			}
-		}, this.hystrixSettings);
+		});
 	}
 
 }

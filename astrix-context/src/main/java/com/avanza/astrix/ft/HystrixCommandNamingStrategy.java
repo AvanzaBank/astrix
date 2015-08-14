@@ -15,23 +15,18 @@
  */
 package com.avanza.astrix.ft;
 
-
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 /**
+ * 
  * @author Elias Lindholm (elilin)
+ *
  */
-public class HystrixObservableCommandSettings {
-
-	private int semaphoreMaxConcurrentRequests = 20;
-
-	public int getSemaphoreMaxConcurrentRequests() {
-		return this.semaphoreMaxConcurrentRequests;
-	}
+public interface HystrixCommandNamingStrategy {
 	
-	public void setSemaphoreMaxConcurrentRequests(
-			int semaprhoreMaxConcurrentRequests) {
-		this.semaphoreMaxConcurrentRequests = semaprhoreMaxConcurrentRequests;
-	}
+	// TODO: Rename this abstraction
 	
+	String getCommandKeyName(PublishedAstrixBean<?> beanDefinition);
 	
+	String getGroupKeyName(PublishedAstrixBean<?> beanDefinition);
 	
 }

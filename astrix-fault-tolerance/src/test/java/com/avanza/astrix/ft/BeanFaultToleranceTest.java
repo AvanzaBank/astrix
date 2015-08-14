@@ -21,15 +21,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.AstrixBeanSettings;
-import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.publish.ApiProvider;
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
-import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
@@ -37,22 +35,27 @@ import com.netflix.hystrix.util.HystrixRollingNumberEvent;
 
 public class BeanFaultToleranceTest {
 	
-	private static final AstrixBeanKey<Ping> ASTRIX_BEAN_KEY = AstrixBeanKey.create(Ping.class);
-	
 	private AstrixApplicationContext context;
 	private TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 	private Ping ping;
-	private Ping anotherPing;
-	private CountingCachingHystrixCommandNamingStrategy commandNamingStrategy = new CountingCachingHystrixCommandNamingStrategy();
+	private HystrixCommandNamingStrategy commandNamingStrategy = new HystrixCommandNamingStrategy() {
+		@Override
+		public String getGroupKeyName(PublishedAstrixBean<?> beanDefinition) {
+			return "BeanFaultToleranceTestKey";
+		}
+		@Override
+		public String getCommandKeyName(PublishedAstrixBean<?> beanDefinition) {
+			return "BeanFaultToleranceTestGroup";
+		}
+	};
 
 	@Before
 	public void setup() {
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
-		astrixConfigurer.registerStrategy(HystrixCommandNamingStrategy.class, commandNamingStrategy);
 		astrixConfigurer.enableFaultTolerance(true);
+		astrixConfigurer.registerStrategy(HystrixCommandNamingStrategy.class, commandNamingStrategy);
 		context = (AstrixApplicationContext) astrixConfigurer.configure();
 		ping = context.getBean(Ping.class);
-		anotherPing = context.getBean(Ping.class, "another-ping");
 	}
 	
 	@Test
@@ -66,43 +69,8 @@ public class BeanFaultToleranceTest {
 		assertEquals(2, getAppliedFaultToleranceCount(Ping.class));
 	}
 	
-	@Test
-	public void itShouldBePossibleToDisableFaultToleranceGloballyAtRuntime() throws Throwable {
-		assertEquals(0, getAppliedFaultToleranceCount(Ping.class));
-
-		assertEquals("foo", ping.ping("foo"));
-		assertEquals(1, getAppliedFaultToleranceCount(Ping.class));
-
-		astrixConfigurer.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
-
-		assertEquals("bar", ping.ping("bar"));
-		assertEquals(1, getAppliedFaultToleranceCount(Ping.class));
-	}
-	
-	@Test
-	public void itShouldBePossibleToDisableFaultToleranceAtRuntimeForAGivenBean() throws Throwable {
-		astrixConfigurer.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
-		assertEquals(0, getAppliedFaultToleranceCount(Ping.class));
-		assertEquals("foo", ping.ping("foo"));
-		assertEquals(1, getAppliedFaultToleranceCount(Ping.class));
-
-		astrixConfigurer.set(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED.nameFor(ASTRIX_BEAN_KEY), "false");
-		assertEquals("bar", ping.ping("bar"));
-		assertEquals(1, getAppliedFaultToleranceCount(Ping.class));
-		
-
-		assertEquals(0, getAppliedFaultToleranceCount(Ping.class, "another-ping"));
-		assertEquals("bar", anotherPing.ping("bar"));
-		assertEquals(1, getAppliedFaultToleranceCount(Ping.class, "another-ping"));
-		
-	}
-
 	private int getAppliedFaultToleranceCount(Class<?> beanType) {
 		return getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, getCommandKey(AstrixBeanKey.create(beanType)));
-	}
-	
-	private int getAppliedFaultToleranceCount(Class<?> beanType, String qualifier) {
-		return getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, getCommandKey(AstrixBeanKey.create(beanType, qualifier)));
 	}
 	
 	private <T> String getCommandKey(AstrixBeanKey<T> beanKey) {
@@ -137,14 +105,6 @@ public class BeanFaultToleranceTest {
 		public Ping ping() {
 			return new PingImpl();
 		}
-		
-		@AstrixFaultToleranceProxy
-		@Library
-		@AstrixQualifier("another-ping")
-		public Ping anotherPing() {
-			return new PingImpl();
-		}
-		
 	}
 	
 }

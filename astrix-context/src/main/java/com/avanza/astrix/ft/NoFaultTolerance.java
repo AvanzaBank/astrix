@@ -15,19 +15,20 @@
  */
 package com.avanza.astrix.ft;
 
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
+import com.avanza.astrix.core.function.Supplier;
 
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface BeanFaultToleranceProxyStrategy {
-	// TODO: Merge with Bean? or rename to BeanFaultToleranceProxyFactory
+import rx.Observable;
 
-	<T> T addFaultToleranceProxy(PublishedAstrixBean<T> beanDefinition, T rawProvider);
-	
-	
-	
+public class NoFaultTolerance implements FaultToleranceSpi {
+
+	@Override
+	public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
+		return observable.get();
+	}
+
+	@Override
+	public <T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable {
+		return command.call();
+	}
 
 }

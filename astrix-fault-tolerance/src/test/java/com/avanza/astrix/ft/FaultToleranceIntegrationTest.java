@@ -27,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -38,11 +39,6 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
-import com.avanza.astrix.beans.factory.BeanConfigurationsImpl;
-import com.avanza.astrix.beans.publish.ApiProvider;
-import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
-import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.service.SimpleService;
@@ -54,14 +50,12 @@ import com.google.common.base.Throwables;
 
 public abstract class FaultToleranceIntegrationTest {
 
-	private static final SimplePublishedAstrixBean<?> PUBLISHED_BEAN_INFO = 
-			new SimplePublishedAstrixBean<>(ApiProvider.create("FaultToleranceIntagrationTest"), AstrixBeanKey.create(SimpleService.class));
 	private Class<SimpleService> api = SimpleService.class;
 	private SimpleService provider = new SimpleServiceImpl();
 	private SimpleService testService;
-	private BeanFaultToleranceFactoryImpl faultToleranceFactory;
-	private CountingCachingHystrixCommandNamingStrategy commandNamingStrategy = new CountingCachingHystrixCommandNamingStrategy();
-	private MapConfigSource config = new MapConfigSource();
+	private HystrixFaultTolerance faultTolerance = new HystrixFaultTolerance();
+	private String groupName = UUID.randomUUID().toString();
+	private String commandName = UUID.randomUUID().toString();
 	
 	protected abstract IsolationStrategy isolationStrategy();
 	
@@ -71,15 +65,10 @@ public abstract class FaultToleranceIntegrationTest {
 
 	@Before
 	public void createService() {
-		DynamicConfig dynamicConfig = DynamicConfig.create(config);
-		BeanConfigurationsImpl beanConfigurations = new BeanConfigurationsImpl();
-		beanConfigurations.setConfig(dynamicConfig);
-		faultToleranceFactory = new BeanFaultToleranceFactoryImpl(dynamicConfig, commandNamingStrategy, beanConfigurations);
 		testService = createProxy(api, provider, settings());
 	}
 	
-	private <T> T createProxy(Class<T> type, final T provider, final HystrixCommandSettings settings) {
-		final BeanFaultTolerance faultTolerance = faultToleranceFactory.create(PUBLISHED_BEAN_INFO);
+	private <T> T createProxy(Class<T> type, final T provider, final CommandSettings settings) {
 		return ReflectionUtil.newProxy(type, new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
@@ -180,11 +169,12 @@ public abstract class FaultToleranceIntegrationTest {
 	
 	@Test
 	public void rejectsWhenPoolIsFull() throws Exception {
-		HystrixCommandSettings settings = settings();
+		CommandSettings settings = settings();
 		settings.setCoreSize(3);
 		settings.setMaxQueueSize(-1); // sync queue
-		config.set(AstrixBeanSettings.INITIAL_TIMEOUT.nameFor(AstrixBeanKey.create(SimpleService.class)), "5000");
+//		config.set(AstrixBeanSettings.INITIAL_TIMEOUT.nameFor(AstrixBeanKey.create(SimpleService.class)), "5000");
 		settings.setSemaphoreMaxConcurrentRequests(3);
+		settings.setInitialTimeoutInMilliseconds(5000);
 		SimpleService serviceWithFt = createProxy(api, provider, settings);
 		ExecutorService pool = Executors.newCachedThreadPool();
 		Collection<R> runners = new ArrayList<R>();
@@ -263,10 +253,12 @@ public abstract class FaultToleranceIntegrationTest {
 	}
 	
 	
-	private HystrixCommandSettings settings() {
-		HystrixCommandSettings settings = new HystrixCommandSettings();
+	private CommandSettings settings() {
+		CommandSettings settings = new CommandSettings();
 		settings.setMetricsRollingStatisticalWindowInMilliseconds(2000);
 		settings.setExecutionIsolationStrategy(isolationStrategy());
+		settings.setCommandName(commandName);
+		settings.setGroupName(groupName);
 		return settings;
 	}
 	

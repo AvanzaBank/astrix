@@ -24,7 +24,7 @@ import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
-import com.avanza.astrix.ft.HystrixCommandSettings;
+import com.avanza.astrix.ft.CommandSettings;
 import com.avanza.astrix.gs.ClusteredProxyCacheImpl.GigaSpaceInstance;
 import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -51,7 +51,7 @@ public class GsComponent implements ServiceComponent, ClusteredProxyBinder {
 		}
 		GigaSpaceInstance gigaSpaceInstance = proxyCache.getProxy(serviceProperties);
 		BeanFaultTolerance beanFaultTolerance = faultToleranceFactory.create(serviceDefinition);
-		T proxyWithFaultTolerance = targetType.cast(GigaSpaceProxy.create(gigaSpaceInstance.get(), beanFaultTolerance, new HystrixCommandSettings()));
+		T proxyWithFaultTolerance = targetType.cast(GigaSpaceProxy.create(gigaSpaceInstance.get(), beanFaultTolerance));
 		return BoundProxyServiceBeanInstance.create(proxyWithFaultTolerance, gigaSpaceInstance);
 	}
 	

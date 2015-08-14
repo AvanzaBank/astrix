@@ -55,8 +55,11 @@ import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.SystemPropertiesConfigSource;
-import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
-import com.avanza.astrix.ft.NoFaultToleranceProvider;
+import com.avanza.astrix.ft.DefaultHystrixCommandNamingStrategy;
+import com.avanza.astrix.ft.FaultToleranceModule;
+import com.avanza.astrix.ft.FaultToleranceSpi;
+import com.avanza.astrix.ft.HystrixCommandNamingStrategy;
+import com.avanza.astrix.ft.NoFaultTolerance;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.modules.ModuleInstancePostProcessor;
@@ -104,7 +107,8 @@ public class AstrixConfigurer {
 		DynamicConfig config = createDynamicConfig();
 		
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
-		modulesConfigurer.registerDefault(StrategyProvider.create(BeanFaultToleranceProxyStrategy.class, NoFaultToleranceProvider.class));
+		modulesConfigurer.registerDefault(StrategyProvider.create(HystrixCommandNamingStrategy.class, DefaultHystrixCommandNamingStrategy.class));
+		modulesConfigurer.registerDefault(StrategyProvider.create(FaultToleranceSpi.class, NoFaultTolerance.class));
 		
 		for (Module plugin : customModules) {
 			modulesConfigurer.register(plugin);
@@ -125,6 +129,7 @@ public class AstrixConfigurer {
 		modulesConfigurer.register(new Jackson1SerializerModule());
 		modulesConfigurer.register(new AstrixConfigModule(config));
 		modulesConfigurer.register(new GenericAstrixApiProviderModule());
+		modulesConfigurer.register(new FaultToleranceModule());
 		
 		AstrixAwareInjector awareInjector = new AstrixAwareInjector(config);
 		modulesConfigurer.registerBeanPostProcessor(awareInjector);

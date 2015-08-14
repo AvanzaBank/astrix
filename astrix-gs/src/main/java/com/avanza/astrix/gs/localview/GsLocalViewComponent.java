@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
+import com.avanza.astrix.beans.service.FaultToleranceConfigurator;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
@@ -36,7 +37,7 @@ import com.avanza.astrix.config.DynamicLongProperty;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
-import com.avanza.astrix.ft.HystrixCommandSettings;
+import com.avanza.astrix.ft.CommandSettings;
 import com.avanza.astrix.ft.IsolationStrategy;
 import com.avanza.astrix.gs.ClusteredProxyBinder;
 import com.avanza.astrix.gs.GigaSpaceProxy;
@@ -50,7 +51,7 @@ import com.j_spaces.core.IJSpace;
  * @author Elias Lindholm (elilin)
  *
  */
-public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware {
+public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware, FaultToleranceConfigurator {
 
 	private static Logger log = LoggerFactory.getLogger(GsLocalViewComponent.class);
 	private GsBinder gsBinder;
@@ -102,18 +103,25 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		if (qualifier != null) {
 			commandKey = commandKey + "-" + qualifier;
 		}
-		HystrixCommandSettings hystrixSettings = new HystrixCommandSettings();
-		hystrixSettings.setExecutionIsolationStrategy(IsolationStrategy.SEMAPHORE);
-		hystrixSettings.setSemaphoreMaxConcurrentRequests(Integer.MAX_VALUE);
 		
-		BeanFaultTolerance faultTolerance = faultToleranceFactory.create(serviceDefinition);
+		CommandSettings commandSettings = new CommandSettings();
+		commandSettings.setExecutionIsolationStrategy(IsolationStrategy.SEMAPHORE);
+		commandSettings.setSemaphoreMaxConcurrentRequests(Integer.MAX_VALUE);
+		
+		BeanFaultTolerance faultTolerance = faultToleranceFactory.create(serviceDefinition, commandSettings);
 		
 		IJSpace localViewSpace = gslocalViewSpaceConfigurer.create();
-		GigaSpace localViewGigaSpace = GigaSpaceProxy.create(new GigaSpaceConfigurer(localViewSpace).create(), faultTolerance, hystrixSettings);
+		GigaSpace localViewGigaSpace = GigaSpaceProxy.create(new GigaSpaceConfigurer(localViewSpace).create(), faultTolerance);
 		
 		BoundLocalViewGigaSpaceBeanInstance localViewGigaSpaceBeanInstance = 
 				new BoundLocalViewGigaSpaceBeanInstance(localViewGigaSpace, gslocalViewSpaceConfigurer, gsSpaceConfigurer);
 		return (BoundServiceBeanInstance<T>) localViewGigaSpaceBeanInstance;
+	}
+	
+	@Override
+	public void configure(CommandSettings commandSettings) {
+		commandSettings.setExecutionIsolationStrategy(IsolationStrategy.SEMAPHORE);
+		commandSettings.setSemaphoreMaxConcurrentRequests(Integer.MAX_VALUE);
 	}
 
 	@Override

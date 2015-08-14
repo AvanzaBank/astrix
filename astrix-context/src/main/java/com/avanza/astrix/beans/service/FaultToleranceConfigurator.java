@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft;
+package com.avanza.astrix.beans.service;
 
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
+import com.avanza.astrix.ft.CommandSettings;
 
-public interface BeanFaultToleranceFactory {
-
-	BeanFaultTolerance create(PublishedAstrixBean<?> serviceDefinition);
+public interface FaultToleranceConfigurator {
+	
+	// TODO: this interface is not used yes, remove or introduce?
+	
+	void configure(CommandSettings commandSettings);
 
 }

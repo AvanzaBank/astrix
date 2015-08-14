@@ -20,17 +20,19 @@ package com.avanza.astrix.ft;
  * 
  * @author Kristoffer Erlandsson (krierl)
  */
-public class HystrixCommandSettings {
+public class CommandSettings {
 	
 	private int queueSizeRejectionThreshold = 10;
 	private int coreSize = 10;
 	private int semaphoreMaxConcurrentRequests = 10;
-	private int executionIsolationThreadTimeoutInMilliseconds = 1000;
+	private int initialTimeoutInMilliseconds = 1000;
 	private int metricsRollingStatisticalWindowInMilliseconds = 10_000;
 	private int maxQueueSize = 1_000_000;
 	private IsolationStrategy executionIsolationStrategy = IsolationStrategy.THREAD;
+	private String commandName;
+	private String groupName;
 	
-	public HystrixCommandSettings() {
+	public CommandSettings() {
 	}
 
 	public int getMaxQueueSize() {
@@ -73,12 +75,12 @@ public class HystrixCommandSettings {
 		this.semaphoreMaxConcurrentRequests = semaphoreMaxConcurrentRequests;
 	}
 
-	public int getExecutionIsolationThreadTimeoutInMilliseconds() {
-		return executionIsolationThreadTimeoutInMilliseconds;
+	public int getInitialTimeoutInMilliseconds() {
+		return initialTimeoutInMilliseconds;
 	}
 
-	public void setExecutionIsolationThreadTimeoutInMilliseconds(int executionIsolationThreadTimeoutInMilliseconds) {
-		this.executionIsolationThreadTimeoutInMilliseconds = executionIsolationThreadTimeoutInMilliseconds;
+	public void setInitialTimeoutInMilliseconds(int initialTimeoutInMilliseconds) {
+		this.initialTimeoutInMilliseconds = initialTimeoutInMilliseconds;
 	}
 
 	public void setExecutionIsolationStrategy(IsolationStrategy executionIsolationStrategy) {
@@ -87,5 +89,21 @@ public class HystrixCommandSettings {
 	
 	public IsolationStrategy getExecutionIsolationStrategy() {
 		return executionIsolationStrategy;
+	}
+	
+	public String getCommandName() {
+		return commandName;
+	}
+	
+	public void setCommandName(String commandName) {
+		this.commandName = commandName;
+	}
+	
+	public String getGroupName() {
+		return groupName;
+	}
+	
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
 	}
 }

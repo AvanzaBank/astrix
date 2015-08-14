@@ -15,13 +15,14 @@
  */
 package com.avanza.astrix.ft;
 
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-/**
- * @author Elias Lindholm (elilin)
- */
-public final class NoFaultToleranceProvider implements BeanFaultToleranceProxyStrategy {
-	@Override
-	public <T> T addFaultToleranceProxy(PublishedAstrixBean<T> beanDefinition, T rawProvider) {
-		return rawProvider;
-	}
+import com.avanza.astrix.core.function.Supplier;
+
+import rx.Observable;
+
+public interface FaultToleranceSpi {
+
+	<T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings);
+
+	<T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable;
+
 }

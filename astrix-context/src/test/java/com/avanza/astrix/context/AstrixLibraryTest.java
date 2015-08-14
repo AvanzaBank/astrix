@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.PreDestroy;
@@ -33,9 +34,15 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.CircularDependency;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
+import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
+import com.avanza.astrix.ft.CheckedCommand;
+import com.avanza.astrix.ft.CommandSettings;
+import com.avanza.astrix.ft.FaultToleranceSpi;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
+
+import rx.Observable;
 
 
 public class AstrixLibraryTest {
@@ -114,24 +121,27 @@ public class AstrixLibraryTest {
 	public void appliesFaultToleranceProxyToAstrixFaultToleranceProxyAnnotatedLibraries() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(MyLibraryProviderWithFaultTolerance.class);
-		final AtomicReference<Object> lastAppliedFaultTolerance = new AtomicReference<>(); 
-		final AtomicReference<PublishedAstrixBean<?>> lastAppliedFaultToleranceSettings = new AtomicReference<>();
-		astrixConfigurer.registerStrategy(BeanFaultToleranceProxyStrategy.class, new BeanFaultToleranceProxyStrategy() {
+		astrixConfigurer.enableFaultTolerance(true);
+		final AtomicInteger appliedFtCount = new AtomicInteger(0);
+		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, new FaultToleranceSpi() {
 			@Override
-			public <T> T addFaultToleranceProxy(PublishedAstrixBean<T> beanDefinition, T rawProvider) {
-				lastAppliedFaultTolerance.set(rawProvider);
-				lastAppliedFaultToleranceSettings.set(beanDefinition);
-				return rawProvider;
+			public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
+				appliedFtCount.incrementAndGet();
+				return observable.get();
+			}
+			@Override
+			public <T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable {
+				appliedFtCount.incrementAndGet();
+				return command.call();
 			}
 		});
 		AstrixContext context = astrixConfigurer.configure();
 		
 		HelloBean helloBean = context.getBean(HelloBean.class);
 		
+		assertEquals(0, appliedFtCount.get());
 		assertEquals("hello: bar", helloBean.hello("bar"));
-		assertSame("HelloBean should be decorated with fault tolerance proxy", helloBean, lastAppliedFaultTolerance.get());
-		assertEquals(AstrixBeanKey.create(HelloBean.class), lastAppliedFaultToleranceSettings.get().getBeanKey());
-		assertEquals(MyLibraryProviderWithFaultTolerance.class.getName(), lastAppliedFaultToleranceSettings.get().getDefiningApi().getName());
+		assertEquals(1, appliedFtCount.get());
 	}
 	
 	@Test
@@ -237,7 +247,7 @@ public class AstrixLibraryTest {
 		}
 	}
 	
-	interface HelloBean {
+	public interface HelloBean {
 		String hello(String msg);
 	}
 	
