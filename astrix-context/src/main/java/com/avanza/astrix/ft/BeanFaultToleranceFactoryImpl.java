@@ -39,18 +39,17 @@ final class BeanFaultToleranceFactoryImpl implements BeanFaultToleranceFactory {
 		this.commandNamingStrategy = commandNamingStrategy;
 	}
 
-	@Override
-	public BeanFaultTolerance create(PublishedAstrixBean<?> serviceDefinition) {
-		return create(serviceDefinition, new CommandSettings());
+	public <T> T addFaultToleranceProxy(PublishedAstrixBean<T> serviceDefinition, T target, CommandSettings commandSettings) {
+		return create(serviceDefinition, commandSettings).addFaultToleranceProxy(serviceDefinition.getBeanKey().getBeanType(), target);
 	}
 
-	@Override
-	public BeanFaultTolerance create(PublishedAstrixBean<?> serviceDefinition, CommandSettings commandSettings) {
+	public BeanFaultToleranceImpl create(PublishedAstrixBean<?> serviceDefinition, CommandSettings commandSettings) {
 		BeanConfiguration beanConfiguration = beanConfigurations.getBeanConfiguration(serviceDefinition.getBeanKey());
 		commandSettings.setCommandName(commandNamingStrategy.getCommandKeyName(serviceDefinition));
 		commandSettings.setGroupName(commandNamingStrategy.getGroupKeyName(serviceDefinition));
 		commandSettings.setInitialTimeoutInMilliseconds(beanConfiguration.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
 		return new BeanFaultToleranceImpl(beanConfiguration, astrixConfig.getConfig(), faultTolerance, commandSettings);
 	}
+	
 	
 }

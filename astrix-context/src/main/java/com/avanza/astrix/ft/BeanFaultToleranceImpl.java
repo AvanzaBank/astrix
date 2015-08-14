@@ -34,7 +34,7 @@ import rx.Observable;
  * @author Elias Lindholm (elilin)
  *
  */
-final class BeanFaultToleranceImpl implements BeanFaultTolerance {
+final class BeanFaultToleranceImpl {
 
 	private final DynamicBooleanProperty faultToleranceEnabledForBean;
 	private final DynamicBooleanProperty faultToleranceEnabled;
@@ -49,27 +49,13 @@ final class BeanFaultToleranceImpl implements BeanFaultTolerance {
 		this.faultToleranceEnabled = AstrixSettings.ENABLE_FAULT_TOLERANCE.getFrom(config);
 	}
 	
-	@Override
-	public <T> Observable<T> observe(Supplier<Observable<T>> observable) {
-		if (!faultToleranceEnabled()) {
-			return observable.get();
-		}
-		return beanFaultToleranceSpi.observe(observable, commandSettings);
-	}
-	
-	@Override
-	public <T> T execute(final CheckedCommand<T> command) throws Throwable {
-		if (!faultToleranceEnabled()) {
-			return command.call();
-		}
-		return beanFaultToleranceSpi.execute(command, commandSettings);
-	}
-	
-	@Override
 	public <T> T addFaultToleranceProxy(final Class<T> api, final T target) {
 		return ReflectionUtil.newProxy(api, new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				if (!faultToleranceEnabled()) {
+					return ReflectionUtil.invokeMethod(method, target, args);
+				}
 				if (isObservableType(method.getReturnType()) || isFutureType(method.getReturnType())) {
 					return observe(target, method, args);
 				}
@@ -106,6 +92,15 @@ final class BeanFaultToleranceImpl implements BeanFaultTolerance {
 			return new FutureAdapter<>(faultToleranceProtectedResult);
 		}
 		return faultToleranceProtectedResult;
+	}
+	
+
+	private <T> Observable<T> observe(Supplier<Observable<T>> observable) {
+		return beanFaultToleranceSpi.observe(observable, commandSettings);
+	}
+	
+	private <T> T execute(final CheckedCommand<T> command) throws Throwable {
+		return beanFaultToleranceSpi.execute(command, commandSettings);
 	}
 	
 	private boolean isFutureType(Class<?> type) {

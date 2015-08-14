@@ -33,7 +33,6 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.ft.CommandSettings;
 
@@ -230,7 +229,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 					throw new UnsupportedTargetTypeException(serviceComponent.getName(), beanKey.getBeanType());
 				}
 				BoundServiceBeanInstance<T> boundInstance = serviceComponent.bind(serviceDefinition, serviceProperties);
-				T faultToleranceProtectedInstance = createBeanFaultTolerance(serviceComponent).addFaultToleranceProxy(getBeanKey().getBeanType(), boundInstance.get());
+				T faultToleranceProtectedInstance = addFaultTolerance(serviceComponent, boundInstance.get());
 				setState(new Bound(boundInstance, faultToleranceProtectedInstance));
 				currentProperties = serviceProperties;
 			} catch (IllegalServiceMetadataException e) {
@@ -241,12 +240,12 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 			}
 		}
 
-		private BeanFaultTolerance createBeanFaultTolerance(ServiceComponent serviceComponent) {
+		private T addFaultTolerance(ServiceComponent serviceComponent, T instance) {
 			CommandSettings faultToleranceSettings = new CommandSettings();
 			if (serviceComponent instanceof FaultToleranceConfigurator) {
 				FaultToleranceConfigurator.class.cast(serviceComponent).configure(faultToleranceSettings);
 			}
-			return beanFaultToleranceFactory.create(serviceDefinition, faultToleranceSettings);
+			return beanFaultToleranceFactory.addFaultToleranceProxy(serviceDefinition, instance, faultToleranceSettings);
 		}
 
 		protected final void transitionToUnboundState() {

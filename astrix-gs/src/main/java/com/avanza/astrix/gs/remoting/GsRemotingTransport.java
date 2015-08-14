@@ -19,8 +19,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.avanza.astrix.core.function.Supplier;
-import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.gs.SpaceTaskDispatcher;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;

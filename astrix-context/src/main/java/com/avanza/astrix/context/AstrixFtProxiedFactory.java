@@ -19,8 +19,8 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
+import com.avanza.astrix.ft.CommandSettings;
 
 public class AstrixFtProxiedFactory<T> implements StandardFactoryBean<T> {
 	
@@ -39,8 +39,7 @@ public class AstrixFtProxiedFactory<T> implements StandardFactoryBean<T> {
 	@Override
 	public T create(AstrixBeans beans) {
 		T rawBean = target.create(beans);
-		BeanFaultTolerance beanFaultTolerance = faultToleranceProxyFactory.create(beanDefinition);
-		return beanFaultTolerance.addFaultToleranceProxy(target.getBeanKey().getBeanType(), rawBean); 
+		return faultToleranceProxyFactory.addFaultToleranceProxy(beanDefinition, rawBean, new CommandSettings());
 	}
 
 	@Override

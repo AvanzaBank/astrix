@@ -19,8 +19,6 @@ import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 
 public interface BeanFaultToleranceFactory {
 
-	BeanFaultTolerance create(PublishedAstrixBean<?> serviceDefinition);
-	
-	BeanFaultTolerance create(PublishedAstrixBean<?> serviceDefinition, CommandSettings commandSettings);
+	<T> T addFaultToleranceProxy(PublishedAstrixBean<T> serviceDefinition, T target, CommandSettings commandSettings);
 
 }
