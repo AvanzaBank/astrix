@@ -25,4 +25,6 @@ public interface BeanFaultTolerance {
 
 	<T> T execute(CheckedCommand<T> command) throws Throwable;
 	
+	<T> T addFaultToleranceProxy(Class<T> api, T provider);
+	
 }

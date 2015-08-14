@@ -20,7 +20,6 @@ import com.avanza.astrix.beans.publish.ApiProviderPlugin;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
-import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.modules.NamedModule;
 
@@ -37,7 +36,6 @@ public class GenericAstrixApiProviderModule implements NamedModule {
 		
 		moduleContext.importType(ServiceComponentRegistry.class);
 		moduleContext.importType(AstrixConfig.class);
-		moduleContext.importType(BeanFaultToleranceProxyStrategy.class);
 		moduleContext.importType(ServiceDiscoveryMetaFactoryPlugin.class);
 		moduleContext.importType(BeanFaultToleranceFactory.class);
 		

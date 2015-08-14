@@ -25,7 +25,6 @@ public class FaultToleranceModule implements NamedModule {
 	@Override
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(BeanFaultToleranceFactory.class, BeanFaultToleranceFactoryImpl.class);
-		moduleContext.bind(BeanFaultToleranceProxyStrategy.class, BeanFaultToleranceProxyStrategyImpl.class);
 		
 		moduleContext.importType(FaultToleranceSpi.class);
 		moduleContext.importType(HystrixCommandNamingStrategy.class);
@@ -33,7 +32,6 @@ public class FaultToleranceModule implements NamedModule {
 		moduleContext.importType(AstrixConfig.class);
 		
 		moduleContext.export(BeanFaultToleranceFactory.class);
-		moduleContext.export(BeanFaultToleranceProxyStrategy.class);
 	}
 
 	@Override

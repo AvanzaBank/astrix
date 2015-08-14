@@ -24,13 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.DoneFuture;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
@@ -84,9 +82,9 @@ public class DirectComponent implements ServiceComponent {
 				try {
 					Method targetMethod = targetProvider.getClass().getMethod(method.getName(), method.getParameterTypes());
 					if (method.getReturnType().isAssignableFrom(Future.class)) {
-						return new DoneFuture(targetMethod.invoke(targetProvider, args));
+						return new DoneFuture<>(targetMethod.invoke(targetProvider, args));
 					}
-					return new DoneFuture(targetMethod.invoke(targetProvider, args));
+					return new DoneFuture<>(targetMethod.invoke(targetProvider, args));
 				} catch (NoSuchMethodException e) {
 					throw new RuntimeException("Target service does not contain method: " + e.getMessage());
 				}
@@ -94,42 +92,6 @@ public class DirectComponent implements ServiceComponent {
 		});
 	}
 	
-	private static final class DoneFuture implements Future<Object>{ 
-
-		private Object result;
-		
-		public DoneFuture(Object result) {
-			this.result = result;
-		}
-
-		@Override
-		public boolean cancel(boolean mayInterruptIfRunning) {
-			return false;
-		}
-
-		@Override
-		public boolean isCancelled() {
-			return false;
-		}
-
-		@Override
-		public boolean isDone() {
-			return true;
-		}
-
-		@Override
-		public Object get() throws InterruptedException, ExecutionException {
-			return result;
-		}
-
-		@Override
-		public Object get(long timeout, TimeUnit unit)
-				throws InterruptedException, ExecutionException,
-				TimeoutException {
-			return result;
-		}
-	}
-
 	@Override
 	public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
 		return getServiceProperties(serviceProviderUri);

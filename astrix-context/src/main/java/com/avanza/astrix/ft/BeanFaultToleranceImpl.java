@@ -15,14 +15,18 @@
  */
 package com.avanza.astrix.ft;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.util.concurrent.Future;
 
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.core.FutureAdapter;
 import com.avanza.astrix.beans.factory.BeanConfiguration;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.core.function.Supplier;
+import com.avanza.astrix.core.util.ReflectionUtil;
 
 import rx.Observable;
 /**
@@ -61,6 +65,57 @@ final class BeanFaultToleranceImpl implements BeanFaultTolerance {
 		return beanFaultToleranceSpi.execute(command, commandSettings);
 	}
 	
+	@Override
+	public <T> T addFaultToleranceProxy(final Class<T> api, final T target) {
+		return ReflectionUtil.newProxy(api, new InvocationHandler() {
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				if (isObservableType(method.getReturnType()) || isFutureType(method.getReturnType())) {
+					return observe(target, method, args);
+				}
+				return execute(target, method, args);
+			}
+		});
+	}
+	
+	private Object execute(final Object target, final Method method, final Object[] args) throws Throwable {
+		return execute(new CheckedCommand<Object>() {
+			@Override
+			public Object call() throws Throwable {
+				return ReflectionUtil.invokeMethod(method, target, args);
+			};
+		});
+	}
+
+	private Object observe(final Object target, final Method method, final Object[] args) {
+		Observable<Object> faultToleranceProtectedResult = observe(new Supplier<Observable<Object>>() {
+			@Override
+			public Observable<Object> get() {
+				try {
+					Object asyncResult = ReflectionUtil.invokeMethod(method, target, args);
+					if (isObservableType(method.getReturnType())) {
+						 return (Observable<Object>) asyncResult;
+					}
+					return Observable.<Object>from((Future) asyncResult);
+				} catch (Throwable e) {
+					return Observable.error(e);
+				}
+			}
+		});
+		if (isFutureType(method.getReturnType())) {
+			return new FutureAdapter<>(faultToleranceProtectedResult);
+		}
+		return faultToleranceProtectedResult;
+	}
+	
+	private boolean isFutureType(Class<?> type) {
+		return Future.class.isAssignableFrom(type);
+	}
+
+	private boolean isObservableType(Class<?> type) {
+		return Observable.class.isAssignableFrom(type);
+	}
+
 	
 	private <T> boolean faultToleranceEnabled() {
 		return faultToleranceEnabled.get() && faultToleranceEnabledForBean.get();

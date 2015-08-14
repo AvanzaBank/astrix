@@ -20,22 +20,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
-import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.DoneFuture;
 import com.avanza.astrix.beans.factory.CircularDependency;
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.core.function.Supplier;
-import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
 import com.avanza.astrix.ft.CheckedCommand;
 import com.avanza.astrix.ft.CommandSettings;
 import com.avanza.astrix.ft.FaultToleranceSpi;
@@ -122,49 +119,66 @@ public class AstrixLibraryTest {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(MyLibraryProviderWithFaultTolerance.class);
 		astrixConfigurer.enableFaultTolerance(true);
-		final AtomicInteger appliedFtCount = new AtomicInteger(0);
+		final AtomicInteger appliedOberveCount = new AtomicInteger(0);
+		final AtomicInteger appliedExecuteCount = new AtomicInteger(0);
 		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, new FaultToleranceSpi() {
 			@Override
 			public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
-				appliedFtCount.incrementAndGet();
+				appliedOberveCount.incrementAndGet();
 				return observable.get();
 			}
+			
 			@Override
 			public <T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable {
-				appliedFtCount.incrementAndGet();
+				appliedExecuteCount.incrementAndGet();
 				return command.call();
-			}
-		});
-		AstrixContext context = astrixConfigurer.configure();
-		
-		HelloBean helloBean = context.getBean(HelloBean.class);
-		
-		assertEquals(0, appliedFtCount.get());
-		assertEquals("hello: bar", helloBean.hello("bar"));
-		assertEquals(1, appliedFtCount.get());
-	}
-	
-	@Test
-	public void doesNotApplyFaultToleranceProxyToNonAstrixFaultToleranceProxyAnnotatedLibraries() throws Exception {
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.registerApiProvider(MyLibraryProvider.class); // No Fault tolerance
-		final AtomicReference<Object> lastAppliedFaultTolerance = new AtomicReference<>(); 
-		final AtomicReference<PublishedAstrixBean<?>> lastAppliedFaultToleranceSettings = new AtomicReference<>();
-		astrixConfigurer.registerStrategy(BeanFaultToleranceProxyStrategy.class, new BeanFaultToleranceProxyStrategy() {
-			@Override
-			public <T> T addFaultToleranceProxy(PublishedAstrixBean<T> beanDefinition, T rawProvider) {
-				lastAppliedFaultTolerance.set(rawProvider);
-				lastAppliedFaultToleranceSettings.set(beanDefinition);
-				return rawProvider;
 			}
 		});
 		AstrixContext context = astrixConfigurer.configure();
 		
 		HelloBean helloBean= context.getBean(HelloBean.class);
 		
+		assertEquals(0, appliedExecuteCount.get());
 		assertEquals("hello: bar", helloBean.hello("bar"));
-		assertNull(lastAppliedFaultTolerance.get());
-		assertNull(lastAppliedFaultToleranceSettings.get());
+		assertEquals(1, appliedExecuteCount.get());
+		
+		assertEquals(0, appliedOberveCount.get());
+		assertEquals("hello: bar", helloBean.asyncHello("bar").get());
+		assertEquals(1, appliedOberveCount.get());
+	}
+	
+	@Test
+	public void doesNotApplyFaultToleranceProxyToNonAstrixFaultToleranceProxyAnnotatedLibraries() throws Exception {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.enableFaultTolerance(true);
+		astrixConfigurer.registerApiProvider(MyLibraryProvider.class); // No Fault tolerance
+		final AtomicInteger appliedOberveCount = new AtomicInteger(0);
+		final AtomicInteger appliedExecuteCount = new AtomicInteger(0);
+		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, new FaultToleranceSpi() {
+			@Override
+			public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
+				appliedOberveCount.incrementAndGet();
+				return observable.get();
+			}
+			
+			@Override
+			public <T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable {
+				appliedExecuteCount.incrementAndGet();
+				return command.call();
+			}
+		});
+		AstrixContext context = astrixConfigurer.configure();
+		
+		HelloBean helloBean= context.getBean(HelloBean.class);
+		
+		assertEquals(0, appliedExecuteCount.get());
+		assertEquals("hello: bar", helloBean.hello("bar"));
+		assertEquals(0, appliedExecuteCount.get());
+		
+		assertEquals(0, appliedOberveCount.get());
+		assertEquals("hello: bar", helloBean.asyncHello("bar").get());
+		assertEquals(0, appliedOberveCount.get());
+		
 	}
 	
 	@AstrixApiProvider
@@ -249,6 +263,7 @@ public class AstrixLibraryTest {
 	
 	public interface HelloBean {
 		String hello(String msg);
+		Future<String> asyncHello(String msg);
 	}
 	
 	static class HelloBeanImpl implements HelloBean {
@@ -256,6 +271,11 @@ public class AstrixLibraryTest {
 
 		public String hello(String msg) {
 			return "hello: " + msg;
+		}
+		
+		@Override
+		public Future<String> asyncHello(String msg) {
+			return new DoneFuture<>(hello(msg));
 		}
 	}
 	

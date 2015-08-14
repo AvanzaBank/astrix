@@ -19,7 +19,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
@@ -31,17 +30,12 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.core.FutureAdapter;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.BeanFaultTolerance;
 import com.avanza.astrix.ft.BeanFaultToleranceFactory;
-import com.avanza.astrix.ft.CheckedCommand;
 import com.avanza.astrix.ft.CommandSettings;
-
-import rx.Observable;
 
 /**
  * 
@@ -236,8 +230,8 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 					throw new UnsupportedTargetTypeException(serviceComponent.getName(), beanKey.getBeanType());
 				}
 				BoundServiceBeanInstance<T> boundInstance = serviceComponent.bind(serviceDefinition, serviceProperties);
-				BeanFaultTolerance faultTolerance = createBeanFaultTolerance(serviceComponent);
-				setState(new Bound(boundInstance, faultTolerance));
+				T faultToleranceProtectedInstance = createBeanFaultTolerance(serviceComponent).addFaultToleranceProxy(getBeanKey().getBeanType(), boundInstance.get());
+				setState(new Bound(boundInstance, faultToleranceProtectedInstance));
 				currentProperties = serviceProperties;
 			} catch (IllegalServiceMetadataException e) {
 				setState(new IllegalServiceMetadataState(e.getMessage()));
@@ -286,57 +280,16 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	private class Bound extends BeanState {
 
 		private final BoundServiceBeanInstance<T> serviceBeanInstance;
-		private final BeanFaultTolerance faultTolerance;
+		private final T faultToleranceProtectedInstance;
 		
-		public Bound(BoundServiceBeanInstance<T> bean, BeanFaultTolerance faultTolerance) {
+		public Bound(BoundServiceBeanInstance<T> bean, T faultToleranceProtectedInstance) {
 			this.serviceBeanInstance = bean;
-			this.faultTolerance = faultTolerance;
+			this.faultToleranceProtectedInstance = faultToleranceProtectedInstance;
 		}
 
 		@Override
 		public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
-			if (isObservableType(method.getReturnType()) || isFutureType(method.getReturnType())) {
-				return observe(method, args);
-			}
-			return execute(method, args);
-		}
-
-		private Object execute(final Method method, final Object[] args) throws Throwable {
-			return faultTolerance.execute(new CheckedCommand<Object>() {
-				@Override
-				public Object call() throws Throwable {
-					return ReflectionUtil.invokeMethod(method, serviceBeanInstance.get(), args);
-				};
-			});
-		}
-
-		private Object observe(final Method method, final Object[] args) {
-			Observable<Object> faultToleranceProtectedResult = faultTolerance.observe(new Supplier<Observable<Object>>() {
-				@Override
-				public Observable<Object> get() {
-					try {
-						Object asyncResult = ReflectionUtil.invokeMethod(method, serviceBeanInstance.get(), args);;
-						if (isObservableType(method.getReturnType())) {
-							 return (Observable<Object>) asyncResult;
-						}
-						return Observable.<Object>from((Future) asyncResult);
-					} catch (Throwable e) {
-						return Observable.error(e);
-					}
-				}
-			});
-			if (isFutureType(method.getReturnType())) {
-				return new FutureAdapter<>(faultToleranceProtectedResult);
-			}
-			return faultToleranceProtectedResult;
-		}
-		
-		private boolean isFutureType(Class<?> type) {
-			return Future.class.isAssignableFrom(type);
-		}
-
-		private boolean isObservableType(Class<?> type) {
-			return Observable.class.isAssignableFrom(type);
+			return ReflectionUtil.invokeMethod(method, faultToleranceProtectedInstance, args);
 		}
 
 		@Override

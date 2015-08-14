@@ -32,7 +32,7 @@ import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
 import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.ft.BeanFaultToleranceProxyStrategy;
+import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.modules.ObjectCache;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
@@ -50,13 +50,13 @@ final class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 	private final ObjectCache provideInstanceCache = new ObjectCache();
 	private final AstrixServiceMetaFactory serviceMetaFactory;
 	private final ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory;
-	private final BeanFaultToleranceProxyStrategy faultToleranceFactory;
+	private final BeanFaultToleranceFactory faultToleranceFactory;
 	private final AstrixConfig config;
 	
 	public GenericAstrixApiProviderPlugin(
 			AstrixServiceMetaFactory serviceMetaFactory,
 			ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory,
-			BeanFaultToleranceProxyStrategy faultToleranceFactory,
+			BeanFaultToleranceFactory faultToleranceFactory,
 			AstrixConfig config) {
 		this.serviceMetaFactory = serviceMetaFactory;
 		this.serviceDiscoveryMetaFactory = serviceDiscoveryMetaFactory;
