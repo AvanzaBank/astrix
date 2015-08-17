@@ -37,14 +37,11 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.CheckedCommand;
 import com.avanza.astrix.ft.CommandSettings;
 import com.avanza.astrix.ft.IsolationStrategy;
-import com.avanza.astrix.ft.hystrix.HystrixFaultTolerance;
 import com.avanza.astrix.ft.service.SimpleService;
 import com.avanza.astrix.ft.service.SimpleServiceException;
 import com.avanza.astrix.ft.service.SimpleServiceImpl;

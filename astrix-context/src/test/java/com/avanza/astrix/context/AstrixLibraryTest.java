@@ -29,7 +29,7 @@ import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
-import com.avanza.astrix.beans.core.DoneFuture;
+import com.avanza.astrix.beans.core.BasicFuture;
 import com.avanza.astrix.beans.factory.CircularDependency;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.core.function.Supplier;
@@ -275,7 +275,7 @@ public class AstrixLibraryTest {
 		
 		@Override
 		public Future<String> asyncHello(String msg) {
-			return new DoneFuture<>(hello(msg));
+			return new BasicFuture<>(hello(msg));
 		}
 	}
 	

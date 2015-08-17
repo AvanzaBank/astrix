@@ -15,26 +15,35 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.BasicFuture;
 import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
+import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
+import com.avanza.astrix.provider.core.DefaultBeanSettings;
 import com.avanza.astrix.provider.core.Library;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
+
+import rx.Observable;
 
 public class HystrixFaulttoleranceIntegrationTest {
 	
@@ -59,6 +68,7 @@ public class HystrixFaulttoleranceIntegrationTest {
 			}
 		};
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
+		astrixConfigurer.registerApiProvider(CorruptPingApiProvider.class);
 		astrixConfigurer.enableFaultTolerance(true);
 		astrixConfigurer.registerStrategy(HystrixCommandNamingStrategy.class, commandNamingStrategy);
 		context = (AstrixApplicationContext) astrixConfigurer.configure();
@@ -74,6 +84,77 @@ public class HystrixFaulttoleranceIntegrationTest {
 		
 		assertEquals("foo", ping.ping("foo"));
 		assertEquals(2, getAppliedFaultToleranceCount(Ping.class));
+	}
+
+	
+	/*
+	 * The following three tests test core abstractions in com.avanza.astrix.ft but uses the
+	 * hystrix-implementation to get a full integration test of the desired behavior.
+	 * (The desired behaviour is that poorly designed code which might block despite returning
+	 * Future/Observable types should not the consumer.
+	 */
+	@Test(timeout = 2000)
+	public void usesThreadIsolationByDefaultForObservableReturnTypes() throws Exception {
+		CorruptPing ping = context.getBean(CorruptPing.class);
+		for (int i = 0; i < 100; i++) {
+			try {
+				ping.blockingObserve("foo").toBlocking().first();
+			} catch (ServiceUnavailableException e) {
+			}
+		}
+	}
+	
+	@Test(timeout = 2000)
+	public void usesThreadIsolationByDefaultForFutureReturnTypes() throws Exception {
+		CorruptPing ping = context.getBean(CorruptPing.class);
+		for (int i = 0; i < 100; i++) {
+			try {
+				ping.blockingQueue("foo").get();
+			} catch (ExecutionException e) {
+				assertTrue(e.getCause() instanceof ServiceUnavailableException);
+			}
+		}
+	}
+	
+	@Test(timeout = 2000)
+	public void callingGetOnReturnedFutureShouldNotBlockForever() throws Exception {
+		CorruptPing ping = context.getBean(CorruptPing.class);
+		try {
+			ping.neverEndingFuture("foo").get();
+		} catch (Exception e) {
+			assertTrue(e.getCause() instanceof ServiceUnavailableException);
+		}
+	}
+	
+	@DefaultBeanSettings(initialTimeout=1)
+	public interface CorruptPing {
+		Observable<String> blockingObserve(String foo);
+		Future<String> blockingQueue(String foo);
+		Future<String> neverEndingFuture(String foo);
+		
+	}
+	
+	public static class CorruptPingImpl implements CorruptPing {
+		private final CountDownLatch countDownLatch = new CountDownLatch(1);
+		public Observable<String> blockingObserve(final String msg) {
+			block();
+			return Observable.just(msg);
+		}
+		private void block() {
+			try {
+				countDownLatch.await(); // Simulate blocking construction of observable
+			} catch (InterruptedException e) {
+			}
+		}
+		@Override
+		public Future<String> blockingQueue(String msg) {
+			block();
+			return new BasicFuture<String>(msg);
+		}
+		@Override
+		public Future<String> neverEndingFuture(String msg) {
+			return new BasicFuture<>(); // Never set result on future
+		}
 	}
 	
 	private int getAppliedFaultToleranceCount(Class<?> beanType) {
@@ -111,6 +192,15 @@ public class HystrixFaulttoleranceIntegrationTest {
 		@Library
 		public Ping ping() {
 			return new PingImpl();
+		}
+	}
+	
+	@AstrixApiProvider
+	public static class CorruptPingApiProvider {
+		@AstrixFaultToleranceProxy
+		@Library
+		public CorruptPing observablePing() {
+			return new CorruptPingImpl();
 		}
 	}
 	

@@ -28,7 +28,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.DoneFuture;
+import com.avanza.astrix.beans.core.BasicFuture;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
@@ -82,9 +82,9 @@ public class DirectComponent implements ServiceComponent {
 				try {
 					Method targetMethod = targetProvider.getClass().getMethod(method.getName(), method.getParameterTypes());
 					if (method.getReturnType().isAssignableFrom(Future.class)) {
-						return new DoneFuture<>(targetMethod.invoke(targetProvider, args));
+						return new BasicFuture<>(targetMethod.invoke(targetProvider, args));
 					}
-					return new DoneFuture<>(targetMethod.invoke(targetProvider, args));
+					return new BasicFuture<>(targetMethod.invoke(targetProvider, args));
 				} catch (NoSuchMethodException e) {
 					throw new RuntimeException("Target service does not contain method: " + e.getMessage());
 				}

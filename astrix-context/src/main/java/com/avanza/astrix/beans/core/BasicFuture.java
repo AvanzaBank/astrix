@@ -15,19 +15,35 @@
  */
 package com.avanza.astrix.beans.core;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public final class DoneFuture<T> implements Future<T> {
+public final class BasicFuture<T> implements Future<T> {
 
-	private final T result;
+	private final CountDownLatch done = new CountDownLatch(1);
+	private volatile T result;
 	
-	public DoneFuture(T result) {
+	public BasicFuture(T result) {
 		this.result = result;
+		this.done.countDown();
 	}
-
+	
+	public BasicFuture() {
+	}
+	
+	public void set(T result) {
+		synchronized (done) {
+			if (isDone()) {
+				throw new IllegalStateException("Future already set");
+			}
+			this.result = result;
+			done.countDown();
+		}
+	}
+	
 	@Override
 	public boolean cancel(boolean mayInterruptIfRunning) {
 		return false;
@@ -40,11 +56,12 @@ public final class DoneFuture<T> implements Future<T> {
 
 	@Override
 	public boolean isDone() {
-		return true;
+		return done.getCount() == 0;
 	}
 
 	@Override
 	public T get() throws InterruptedException, ExecutionException {
+		done.await();
 		return result;
 	}
 
@@ -52,6 +69,7 @@ public final class DoneFuture<T> implements Future<T> {
 	public T get(long timeout, TimeUnit unit)
 			throws InterruptedException, ExecutionException,
 			TimeoutException {
+		done.await(timeout, unit);
 		return result;
 	}
 }
