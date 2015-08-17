@@ -94,7 +94,7 @@ class HystrixCommandFacade<T> {
 			protected HystrixResult<T> getFallback() {
 				// getFallback is only invoked when the underlying api threw an ServiceUnavailableException, or the
 				// when the invocation reached timeout. In any case, treat this as service unavailable.
-				ServiceUnavailableCause cause = resolveUnavailableCause();
+				String cause = resolveUnavailableCause();
 				log.info(String.format("Aborted command execution: cause=%s circuit=%s", cause, this.getCommandKey().name()));
 				if (isFailedExecution()) {
 					// Underlying service threw ServiceUnavailableException
@@ -105,20 +105,20 @@ class HystrixCommandFacade<T> {
 																				Objects.toString(cause), getCommandKey().name(), getExecutionTimeInMilliseconds())));
 			}
 			
-			private ServiceUnavailableCause resolveUnavailableCause() {
+			private String resolveUnavailableCause() {
 				if (isResponseRejected()) {
-					return ServiceUnavailableCause.REJECTED_EXECUTION;
+					return "REJECTED_EXECUTION";
 				}
 				if (isResponseTimedOut()) {
-					return ServiceUnavailableCause.TIMEOUT;
+					return "TIMEOUT";
 				}
 				if (isResponseShortCircuited()) {
-					return ServiceUnavailableCause.SHORT_CIRCUITED;
+					return "SHORT_CIRCUITED";
 				}
 				if (isFailedExecution()) {
-					return ServiceUnavailableCause.UNAVAILABLE;
+					return "UNAVAILABLE";
 				}
-				return ServiceUnavailableCause.UNKNOWN;
+				return "UNKNOWN";
 			}
 
 		};
