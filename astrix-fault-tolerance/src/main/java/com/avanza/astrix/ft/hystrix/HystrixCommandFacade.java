@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft;
+package com.avanza.astrix.ft.hystrix;
 
 import java.util.Objects;
 
@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.ft.CheckedCommand;
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommand.Setter;
 

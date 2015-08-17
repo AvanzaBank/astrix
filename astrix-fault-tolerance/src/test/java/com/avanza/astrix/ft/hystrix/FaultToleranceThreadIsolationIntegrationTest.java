@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft;
+package com.avanza.astrix.ft.hystrix;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
@@ -22,6 +22,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.ft.IsolationStrategy;
 import com.google.common.base.Throwables;
 
 public class FaultToleranceThreadIsolationIntegrationTest extends FaultToleranceIntegrationTest {

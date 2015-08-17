@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft;
+package com.avanza.astrix.ft.hystrix;
 
 import com.avanza.astrix.core.function.Supplier;
+import com.avanza.astrix.ft.CheckedCommand;
+import com.avanza.astrix.ft.CommandSettings;
+import com.avanza.astrix.ft.FaultToleranceSpi;
+import com.avanza.astrix.ft.IsolationStrategy;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;

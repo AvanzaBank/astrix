@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft;
+package com.avanza.astrix.ft.hystrix;
+
+import com.avanza.astrix.ft.IsolationStrategy;
 
 public class FaultToleranceSemaphoreIsolationIntegrationTest extends FaultToleranceIntegrationTest {
 

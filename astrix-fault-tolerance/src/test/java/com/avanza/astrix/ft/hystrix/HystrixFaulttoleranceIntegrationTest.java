@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft;
+package com.avanza.astrix.ft.hystrix;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,6 +29,7 @@ import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
+import com.avanza.astrix.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 import com.netflix.hystrix.HystrixCommandKey;

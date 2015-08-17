@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft;
+package com.avanza.astrix.ft.hystrix;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -29,6 +29,7 @@ import rx.Subscriber;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.function.Supplier;
+import com.avanza.astrix.ft.hystrix.HystrixObservableCommandFacade;
 import com.avanza.astrix.test.util.AstrixTestUtil;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
