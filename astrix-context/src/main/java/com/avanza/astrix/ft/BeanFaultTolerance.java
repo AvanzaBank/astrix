@@ -34,14 +34,14 @@ import rx.Observable;
  * @author Elias Lindholm (elilin)
  *
  */
-final class BeanFaultToleranceImpl {
+final class BeanFaultTolerance {
 
 	private final DynamicBooleanProperty faultToleranceEnabledForBean;
 	private final DynamicBooleanProperty faultToleranceEnabled;
 	private final FaultToleranceSpi beanFaultToleranceSpi;
 	private final CommandSettings commandSettings;
 	
-	BeanFaultToleranceImpl(BeanConfiguration beanConfiguration, DynamicConfig config, FaultToleranceSpi beanFaultToleranceSpi,
+	BeanFaultTolerance(BeanConfiguration beanConfiguration, DynamicConfig config, FaultToleranceSpi beanFaultToleranceSpi,
 			CommandSettings commandSettings) {
 		this.beanFaultToleranceSpi = beanFaultToleranceSpi;
 		this.commandSettings = commandSettings;
@@ -65,42 +65,33 @@ final class BeanFaultToleranceImpl {
 	}
 	
 	private Object execute(final Object target, final Method method, final Object[] args) throws Throwable {
-		return execute(new CheckedCommand<Object>() {
+		return beanFaultToleranceSpi.execute(new CheckedCommand<Object>() {
 			@Override
 			public Object call() throws Throwable {
 				return ReflectionUtil.invokeMethod(method, target, args);
 			};
-		});
+		}, commandSettings);
 	}
 
 	private Object observe(final Object target, final Method method, final Object[] args) {
-		Observable<Object> faultToleranceProtectedResult = observe(new Supplier<Observable<Object>>() {
+		Observable<Object> result = beanFaultToleranceSpi.observe(new Supplier<Observable<Object>>() {
 			@Override
 			public Observable<Object> get() {
 				try {
 					Object asyncResult = ReflectionUtil.invokeMethod(method, target, args);
 					if (isObservableType(method.getReturnType())) {
-						 return (Observable<Object>) asyncResult;
+						return (Observable<Object>) asyncResult;
 					}
 					return Observable.<Object>from((Future) asyncResult);
 				} catch (Throwable e) {
 					return Observable.error(e);
 				}
 			}
-		});
+		}, commandSettings);
 		if (isFutureType(method.getReturnType())) {
-			return new FutureAdapter<>(faultToleranceProtectedResult);
+			return new FutureAdapter<>(result);
 		}
-		return faultToleranceProtectedResult;
-	}
-	
-
-	private <T> Observable<T> observe(Supplier<Observable<T>> observable) {
-		return beanFaultToleranceSpi.observe(observable, commandSettings);
-	}
-	
-	private <T> T execute(final CheckedCommand<T> command) throws Throwable {
-		return beanFaultToleranceSpi.execute(command, commandSettings);
+		return result;
 	}
 	
 	private boolean isFutureType(Class<?> type) {

@@ -24,5 +24,5 @@ public interface FaultToleranceSpi {
 	<T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings);
 
 	<T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable;
-
+	
 }

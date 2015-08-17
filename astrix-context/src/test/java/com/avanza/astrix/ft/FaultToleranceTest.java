@@ -88,7 +88,6 @@ public class FaultToleranceTest {
 
 		assertEquals("bar", anotherPing.ping("bar"));
 		assertEquals(2, getAppliedFaultToleranceCount());
-		
 	}
 
 	public interface Ping {

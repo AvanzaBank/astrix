@@ -17,6 +17,8 @@ package com.avanza.astrix.ft;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,24 +35,28 @@ import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
 
-public class BeanFaultToleranceTest {
+public class HystrixFaulttoleranceIntegrationTest {
+	
+	private static final AtomicInteger counter = new AtomicInteger(0);
 	
 	private AstrixApplicationContext context;
 	private TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 	private Ping ping;
-	private HystrixCommandNamingStrategy commandNamingStrategy = new HystrixCommandNamingStrategy() {
-		@Override
-		public String getGroupKeyName(PublishedAstrixBean<?> beanDefinition) {
-			return "BeanFaultToleranceTestKey";
-		}
-		@Override
-		public String getCommandKeyName(PublishedAstrixBean<?> beanDefinition) {
-			return "BeanFaultToleranceTestGroup";
-		}
-	};
+	private HystrixCommandNamingStrategy commandNamingStrategy;
 
 	@Before
 	public void setup() {
+		counter.incrementAndGet();
+		commandNamingStrategy = new HystrixCommandNamingStrategy() {
+			@Override
+			public String getGroupKeyName(PublishedAstrixBean<?> beanDefinition) {
+				return "BeanFaultToleranceTestKey-" + counter.get();
+			}
+			@Override
+			public String getCommandKeyName(PublishedAstrixBean<?> beanDefinition) {
+				return "BeanFaultToleranceTestGroup-" + counter.get();
+			}
+		};
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		astrixConfigurer.enableFaultTolerance(true);
 		astrixConfigurer.registerStrategy(HystrixCommandNamingStrategy.class, commandNamingStrategy);
