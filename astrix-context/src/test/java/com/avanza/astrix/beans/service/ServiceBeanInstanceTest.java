@@ -71,7 +71,7 @@ public class ServiceBeanInstanceTest {
 		serviceRegistry.registerProvider(Ping.class, new PingImpl());
 		
 		// Bean should be bound
-		astrixContext.waitForBean(Ping.class, 100);
+		astrixContext.waitForBean(Ping.class, 5000);
 	}
 	
 	@Test

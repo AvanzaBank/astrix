@@ -58,10 +58,10 @@ public class DirectComponent implements ServiceComponent {
 	
 	@Override
 	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
-		String providerName = serviceProperties.getProperty("providerId");
-		ServiceProvider<?> serviceProvider = providerById.get(providerName);
+		String providerId = serviceProperties.getProperty("providerId");
+		ServiceProvider<?> serviceProvider = providerById.get(providerId);
 		if (serviceProvider == null) {
-			throw new IllegalStateException("Cant find provider for with name="  + providerName + " and type=" + serviceDefinition.getServiceType());
+			throw new IllegalStateException("Cant find provider for with id="  + providerId + " and type=" + serviceDefinition.getServiceType());
 		}
 		Object targetProvider = serviceProvider.getProvider(objectSerializerFactory, serviceDefinition.getObjectSerializerDefinition());
 		T provider;
