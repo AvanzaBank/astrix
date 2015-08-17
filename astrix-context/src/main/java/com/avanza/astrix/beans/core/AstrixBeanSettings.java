@@ -38,7 +38,7 @@ public final class AstrixBeanSettings {
 	 * for invocations on the associated bean. This setting is named "initial" to
 	 * reflect the fact that updates to this bean settings at runtime will not have
 	 * any effect. All runtime changes to the timeout for the associated Astrix bean
-	 * should be done using the archauis configuration.    
+	 * should be done using the archaius configuration.    
 	 */
 	public static final IntBeanSetting INITIAL_TIMEOUT = 
 			new IntBeanSetting("faultTolerance.timeout", DefaultBeanSettings.DEFAULT_INITIAL_TIMEOUT);

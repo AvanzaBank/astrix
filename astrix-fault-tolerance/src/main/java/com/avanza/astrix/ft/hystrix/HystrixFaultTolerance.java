@@ -39,9 +39,7 @@ final class HystrixFaultTolerance implements FaultToleranceSpi {
 	public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
 		Setter setter = Setter.withGroupKey(getGroupKey(settings))
 				  .andCommandKey(getCommandKey(settings))
-				  .andCommandPropertiesDefaults(com.netflix.hystrix.HystrixCommandProperties.Setter()
-						  .withExecutionTimeoutInMilliseconds(settings.getInitialTimeoutInMilliseconds())
-						  .withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests()));
+				  .andCommandPropertiesDefaults(createCommandProperties(settings));
 		return HystrixObservableCommandFacade.observe(observable, setter);
 	}
 
@@ -51,24 +49,34 @@ final class HystrixFaultTolerance implements FaultToleranceSpi {
 	}
 	
 	private com.netflix.hystrix.HystrixCommand.Setter createHystrixConfiguration(CommandSettings settings) {
-		HystrixCommandProperties.Setter commandPropertiesDefault =
-				HystrixCommandProperties.Setter()
-						.withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests())
-						.withExecutionIsolationStrategy(getHystrixIsolationStrategy(settings))
-						.withExecutionTimeoutInMilliseconds(settings.getInitialTimeoutInMilliseconds());
+		HystrixCommandProperties.Setter commandPropertiesDefault = createCommandProperties(settings);
 						
 		// MaxQueueSize must be set to a non negative value in order for QueueSizeRejectionThreshold to have any effect.
 		// We use a high value for MaxQueueSize in order to allow QueueSizeRejectionThreshold to change dynamically using archaius.
-		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =
-				HystrixThreadPoolProperties.Setter()
-						.withMaxQueueSize(settings.getMaxQueueSize())
-						.withQueueSizeRejectionThreshold(settings.getQueueSizeRejectionThreshold())
-						.withCoreSize(settings.getCoreSize());
+		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults = createThreadPoolProperties(settings);
 
 		return com.netflix.hystrix.HystrixCommand.Setter.withGroupKey(getGroupKey(settings))
 				.andCommandKey(getCommandKey(settings))
 				.andCommandPropertiesDefaults(commandPropertiesDefault)
 				.andThreadPoolPropertiesDefaults(threadPoolPropertiesDefaults);
+	}
+
+	private HystrixThreadPoolProperties.Setter createThreadPoolProperties(CommandSettings settings) {
+		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =
+				HystrixThreadPoolProperties.Setter()
+						.withMaxQueueSize(settings.getMaxQueueSize())
+						.withQueueSizeRejectionThreshold(settings.getQueueSizeRejectionThreshold())
+						.withCoreSize(settings.getCoreSize());
+		return threadPoolPropertiesDefaults;
+	}
+
+	private HystrixCommandProperties.Setter createCommandProperties(CommandSettings settings) {
+		HystrixCommandProperties.Setter commandPropertiesDefault =
+				HystrixCommandProperties.Setter()
+						.withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests())
+						.withExecutionIsolationStrategy(getHystrixIsolationStrategy(settings))
+						.withExecutionTimeoutInMilliseconds(settings.getInitialTimeoutInMilliseconds());
+		return commandPropertiesDefault;
 	}
 	
 	private HystrixCommandGroupKey getGroupKey(CommandSettings settings) {

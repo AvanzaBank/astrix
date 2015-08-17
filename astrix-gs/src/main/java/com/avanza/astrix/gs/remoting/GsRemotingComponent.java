@@ -18,10 +18,13 @@ package com.avanza.astrix.gs.remoting;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
+import com.avanza.astrix.beans.service.FaultToleranceConfigurator;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.core.util.ReflectionUtil;
+import com.avanza.astrix.ft.CommandSettings;
+import com.avanza.astrix.ft.IsolationStrategy;
 import com.avanza.astrix.gs.BoundProxyServiceBeanInstance;
 import com.avanza.astrix.gs.ClusteredProxyCache;
 import com.avanza.astrix.gs.ClusteredProxyCacheImpl.GigaSpaceInstance;
@@ -40,7 +43,7 @@ import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
  * @author Elias Lindholm
  *
  */
-public class GsRemotingComponent implements ServiceComponent {
+public class GsRemotingComponent implements ServiceComponent, FaultToleranceConfigurator {
 
 	private GsBinder gsBinder;
 	private AstrixSpringContext astrixSpringContext;
@@ -117,6 +120,11 @@ public class GsRemotingComponent implements ServiceComponent {
 	@AstrixInject
 	public void setObjectSerializerFactory(ObjectSerializerFactory objectSerializerFactory) {
 		this.objectSerializerFactory = objectSerializerFactory;
+	}
+
+	@Override
+	public void configure(CommandSettings commandSettings) {
+		commandSettings.setExecutionIsolationStrategy(IsolationStrategy.SEMAPHORE);
 	}
 	
 }

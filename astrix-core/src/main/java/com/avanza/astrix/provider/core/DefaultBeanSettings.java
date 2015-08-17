@@ -26,12 +26,20 @@ import java.lang.annotation.Target;
  * Allows Overriding the default bean settings for a given Astrix bean by 
  * annotating the exported bean type.<p> 
  * 
- * Example usage:
+ * Example usage 1, in service-interface definition:
  * <pre>
  * {@literal @}DefaultBeanSettings(initialTimeout = 2000)
  * public interface TradingService {
  *    // Method definitions
  * }
+ * </pre>
+ * 
+ * Example usage 2, in Astrix bean definition:
+ * <pre>
+ * 
+ * {@literal @}DefaultBeanSettings(initialTimeout = 3000)
+ * {@literal @}Service
+ * public AccountService accountService();
  * </pre>
  * 
  * 

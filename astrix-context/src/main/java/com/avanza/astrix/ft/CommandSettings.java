@@ -24,7 +24,7 @@ public class CommandSettings {
 	
 	private int queueSizeRejectionThreshold = 10;
 	private int coreSize = 10;
-	private int semaphoreMaxConcurrentRequests = 10;
+	private int semaphoreMaxConcurrentRequests = 20;
 	private int initialTimeoutInMilliseconds = 1000;
 	private int metricsRollingStatisticalWindowInMilliseconds = 10_000;
 	private int maxQueueSize = 1_000_000;

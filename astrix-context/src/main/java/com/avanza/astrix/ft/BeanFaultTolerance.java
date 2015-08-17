@@ -18,6 +18,7 @@ package com.avanza.astrix.ft;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
@@ -82,7 +83,7 @@ final class BeanFaultTolerance {
 					if (isObservableType(method.getReturnType())) {
 						return (Observable<Object>) asyncResult;
 					}
-					return Observable.<Object>from((Future) asyncResult);
+					return Observable.<Object>from((Future) asyncResult, commandSettings.getInitialTimeoutInMilliseconds(), TimeUnit.MILLISECONDS);
 				} catch (Throwable e) {
 					return Observable.error(e);
 				}
