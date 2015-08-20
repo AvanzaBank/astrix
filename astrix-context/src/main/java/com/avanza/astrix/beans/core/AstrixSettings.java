@@ -33,7 +33,7 @@ public final class AstrixSettings {
 	public static final LongSetting BEAN_BIND_ATTEMPT_INTERVAL = LongSetting.create("StatefulAstrixBeanInstance.beanBindAttemptInterval", 10_000L);
 
 	/**
-	 * Defines how long the service-lease-manager will wait between consecutive lease renewals
+	 * Defines how long to wait between consecutive lease renewals
 	 * for a service bean that is in BOUND sate.
 	 */
 	public static final LongSetting SERVICE_LEASE_RENEW_INTERVAL = LongSetting.create("AstrixServiceLeaseManager.leaseRenewInterval", 30_000L);
