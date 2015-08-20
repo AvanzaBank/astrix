@@ -81,7 +81,6 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		this.beanKey = Objects.requireNonNull(beanKey);
 		this.serviceComponents = Objects.requireNonNull(serviceComponents);
 		this.currentState = new Unbound();
-		log.info(String.format("Start managing service bean. currentState=%s bean=%s astrixBeanId=%s", currentState.name(), beanKey, id));
 	}
 	
 	public static <T> ServiceBeanInstance<T> create(ServiceDefinition<T> serviceDefinition, 
@@ -194,6 +193,10 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	
 	public AstrixBeanKey<T> getBeanKey() {
 		return beanKey;
+	}
+	
+	String getBeanId() {
+		return this.id;
 	}
 
 	@Override
@@ -342,4 +345,9 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 			return "IllegalServiceMetadata";
 		}
 	}
+
+	String getState() {
+		return this.currentState.name();
+	}
+
 }

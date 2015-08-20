@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.util.AstrixFrameworkThread;
-import com.avanza.astrix.config.DynamicConfig;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -52,6 +51,7 @@ public class ServiceLeaseManager {
 				start();
 			}
 		}
+		log.info(String.format("Start managing service bean. currentState=%s bean=%s astrixBeanId=%s", serviceBeanInstance.getState(), serviceBeanInstance.getBeanKey(), serviceBeanInstance.getBeanId()));
 		leasedServices.add(serviceBeanInstance);
 	}
 	
@@ -89,7 +89,6 @@ public class ServiceLeaseManager {
 					}
 				}
 				try {
-//					Thread.sleep(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL.getFrom(config).get());
 					Thread.sleep(config.get(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL).get());
 				} catch (InterruptedException e) {
 					interrupt();
@@ -100,7 +99,7 @@ public class ServiceLeaseManager {
 		
 		private void bind(ServiceBeanInstance<?> leasedService) {
 			try {
-				log.debug("Attempting to bind service={}", leasedService.getBeanKey());
+				log.debug("Attempting to bind service={} beanId={}", leasedService.getBeanKey(), leasedService.getBeanId());
 				leasedService.bind();
 			} catch (Exception e) {
 				log.warn("Failed to bind service: " + leasedService.getBeanKey(), e);
@@ -121,7 +120,6 @@ public class ServiceLeaseManager {
 					renewLease(leasedService);
 				}
 				try {
-//					Thread.sleep(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL.getFrom(config).get());
 					Thread.sleep(config.get(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL).get());
 				} catch (InterruptedException e) {
 					interrupt();
