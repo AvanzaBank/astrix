@@ -21,8 +21,8 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.ft.IsolationStrategy;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.ft.IsolationStrategy;
 import com.google.common.base.Throwables;
 
 public class FaultToleranceThreadIsolationIntegrationTest extends FaultToleranceIntegrationTest {

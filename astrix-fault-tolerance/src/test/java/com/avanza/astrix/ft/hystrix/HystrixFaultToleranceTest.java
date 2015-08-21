@@ -24,15 +24,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.ft.CheckedCommand;
+import com.avanza.astrix.beans.ft.CommandSettings;
+import com.avanza.astrix.beans.ft.IsolationStrategy;
 import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
-import com.avanza.astrix.ft.CheckedCommand;
-import com.avanza.astrix.ft.CommandSettings;
-import com.avanza.astrix.ft.IsolationStrategy;
 import com.avanza.astrix.ft.hystrix.HystrixFaultTolerance;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;

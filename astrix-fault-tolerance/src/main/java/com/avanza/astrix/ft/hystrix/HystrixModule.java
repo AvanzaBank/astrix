@@ -17,9 +17,9 @@ package com.avanza.astrix.ft.hystrix;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.beans.ft.FaultToleranceSpi;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
-import com.avanza.astrix.ft.FaultToleranceSpi;
 import com.avanza.astrix.modules.ModuleContext;
 
 @MetaInfServices(AstrixContextPlugin.class)

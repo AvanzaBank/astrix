@@ -31,11 +31,11 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.core.BasicFuture;
 import com.avanza.astrix.beans.factory.CircularDependency;
+import com.avanza.astrix.beans.ft.CheckedCommand;
+import com.avanza.astrix.beans.ft.CommandSettings;
+import com.avanza.astrix.beans.ft.FaultToleranceSpi;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.core.function.Supplier;
-import com.avanza.astrix.ft.CheckedCommand;
-import com.avanza.astrix.ft.CommandSettings;
-import com.avanza.astrix.ft.FaultToleranceSpi;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 

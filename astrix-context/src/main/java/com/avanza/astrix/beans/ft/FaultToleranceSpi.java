@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft;
+package com.avanza.astrix.beans.ft;
 
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface HystrixCommandNamingStrategy {
-	
-	// TODO: Rename this abstraction
-	
-	String getCommandKeyName(PublishedAstrixBean<?> beanDefinition);
-	
-	String getGroupKeyName(PublishedAstrixBean<?> beanDefinition);
+import com.avanza.astrix.core.function.Supplier;
+
+import rx.Observable;
+
+public interface FaultToleranceSpi {
+
+	<T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings);
+
+	<T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable;
 	
 }

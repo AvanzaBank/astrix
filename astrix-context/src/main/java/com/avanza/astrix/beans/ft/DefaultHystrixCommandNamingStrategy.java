@@ -13,8 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft;
+package com.avanza.astrix.beans.ft;
 
-public interface Command<T> extends CheckedCommand<T> {
-	T call();
+import com.avanza.astrix.beans.publish.PublishedAstrixBean;
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public class DefaultHystrixCommandNamingStrategy implements HystrixCommandNamingStrategy {
+	@Override
+	public String getCommandKeyName(PublishedAstrixBean<?> beanDefinition) {
+		return beanDefinition.getDefiningApi().getName()
+				+ "_" + beanDefinition.getBeanKey().getBeanType().getName();
+	}
+	@Override
+	public String getGroupKeyName(PublishedAstrixBean<?> beanDefinition) {
+		return beanDefinition.getDefiningApi().getName();
+	}
 }

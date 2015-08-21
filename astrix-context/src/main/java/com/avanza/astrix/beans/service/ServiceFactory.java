@@ -23,7 +23,7 @@ import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.DynamicFactoryBean;
 import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.ft.BeanFaultToleranceFactory;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 
 /**
  * 

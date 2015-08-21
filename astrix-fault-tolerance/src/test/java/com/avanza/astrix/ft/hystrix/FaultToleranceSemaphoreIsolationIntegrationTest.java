@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import com.avanza.astrix.ft.IsolationStrategy;
+import com.avanza.astrix.beans.ft.IsolationStrategy;
 
 public class FaultToleranceSemaphoreIsolationIntegrationTest extends FaultToleranceIntegrationTest {
 

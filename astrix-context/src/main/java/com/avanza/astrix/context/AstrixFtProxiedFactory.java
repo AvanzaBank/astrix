@@ -18,9 +18,9 @@ package com.avanza.astrix.context;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
+import com.avanza.astrix.beans.ft.CommandSettings;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-import com.avanza.astrix.ft.BeanFaultToleranceFactory;
-import com.avanza.astrix.ft.CommandSettings;
 
 public class AstrixFtProxiedFactory<T> implements StandardFactoryBean<T> {
 	

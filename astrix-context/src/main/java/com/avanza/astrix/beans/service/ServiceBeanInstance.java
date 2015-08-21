@@ -30,11 +30,11 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
+import com.avanza.astrix.beans.ft.CommandSettings;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.ft.BeanFaultToleranceFactory;
-import com.avanza.astrix.ft.CommandSettings;
 
 /**
  * 

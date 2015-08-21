@@ -13,9 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft;
+package com.avanza.astrix.beans.ft;
 
-public enum IsolationStrategy {
-	THREAD,
-	SEMAPHORE
+import com.avanza.astrix.core.function.Supplier;
+
+import rx.Observable;
+
+public class NoFaultTolerance implements FaultToleranceSpi {
+
+	@Override
+	public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
+		return observable.get();
+	}
+
+	@Override
+	public <T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable {
+		return command.call();
+	}
+
 }

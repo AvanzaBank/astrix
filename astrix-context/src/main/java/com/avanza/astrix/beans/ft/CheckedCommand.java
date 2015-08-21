@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft;
+package com.avanza.astrix.beans.ft;
 
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-
-public interface BeanFaultToleranceFactory {
-
-	<T> T addFaultToleranceProxy(PublishedAstrixBean<T> beanDefinition, T target, CommandSettings commandSettings);
-
+public interface CheckedCommand<T> {
+	T call() throws Throwable;
 }

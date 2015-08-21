@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.beans.service;
 
-import com.avanza.astrix.ft.CommandSettings;
+import com.avanza.astrix.beans.ft.CommandSettings;
 
 public interface FaultToleranceConfigurator {
 	

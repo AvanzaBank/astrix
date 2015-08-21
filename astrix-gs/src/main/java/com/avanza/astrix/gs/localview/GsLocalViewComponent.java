@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.ft.CommandSettings;
+import com.avanza.astrix.beans.ft.IsolationStrategy;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.FaultToleranceConfigurator;
 import com.avanza.astrix.beans.service.ServiceComponent;
@@ -35,8 +37,6 @@ import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicIntProperty;
 import com.avanza.astrix.config.DynamicLongProperty;
 import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.ft.CommandSettings;
-import com.avanza.astrix.ft.IsolationStrategy;
 import com.avanza.astrix.gs.ClusteredProxyBinder;
 import com.avanza.astrix.gs.GigaSpaceProxy;
 import com.avanza.astrix.gs.GsBinder;

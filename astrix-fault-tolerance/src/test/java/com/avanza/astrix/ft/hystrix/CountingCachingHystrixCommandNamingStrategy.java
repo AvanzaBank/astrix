@@ -19,8 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-import com.avanza.astrix.ft.HystrixCommandNamingStrategy;
 
 public class CountingCachingHystrixCommandNamingStrategy implements HystrixCommandNamingStrategy {
 

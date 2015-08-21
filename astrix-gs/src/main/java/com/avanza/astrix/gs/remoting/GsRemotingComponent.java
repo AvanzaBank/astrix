@@ -17,14 +17,14 @@ package com.avanza.astrix.gs.remoting;
 
 import org.openspaces.core.GigaSpace;
 
+import com.avanza.astrix.beans.ft.CommandSettings;
+import com.avanza.astrix.beans.ft.IsolationStrategy;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.FaultToleranceConfigurator;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.ft.CommandSettings;
-import com.avanza.astrix.ft.IsolationStrategy;
 import com.avanza.astrix.gs.BoundProxyServiceBeanInstance;
 import com.avanza.astrix.gs.ClusteredProxyCache;
 import com.avanza.astrix.gs.ClusteredProxyCacheImpl.GigaSpaceInstance;

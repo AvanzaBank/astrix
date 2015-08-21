@@ -16,12 +16,12 @@
 package com.avanza.astrix.context;
 
 import com.avanza.astrix.beans.factory.FactoryBean;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
 import com.avanza.astrix.beans.service.ServiceFactory;
 import com.avanza.astrix.beans.service.ServiceLeaseManager;
-import com.avanza.astrix.ft.BeanFaultToleranceFactory;
 /**
  * 
  * @author Elias Lindholm (elilin)
