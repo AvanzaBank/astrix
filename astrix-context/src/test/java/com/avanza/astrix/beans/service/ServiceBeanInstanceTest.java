@@ -19,15 +19,18 @@ import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationExcept
 import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationResult;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.ft.CheckedCommand;
+import com.avanza.astrix.beans.ft.CommandSettings;
+import com.avanza.astrix.beans.ft.FaultToleranceSpi;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixContext;
@@ -41,6 +44,11 @@ import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
+import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
+import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
+
+import rx.Observable;
 
 public class ServiceBeanInstanceTest {
 	
@@ -51,6 +59,73 @@ public class ServiceBeanInstanceTest {
 		if (astrixContext != null) {
 			astrixContext.destroy();
 		}
+	}
+	
+	@Test
+	public void addsFtProxyToServiceBean() throws Exception {
+		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
+		serviceRegistry.registerProvider(Ping.class, new PingImpl());
+		
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(PingApiProvider.class);
+		astrixConfigurer.enableFaultTolerance(true);
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		final AtomicBoolean ftApplied = new AtomicBoolean(false);
+		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, new FaultToleranceSpi() {
+			@Override
+			public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
+				ftApplied.set(true);
+				return observable.get();
+			}
+			@Override
+			public <T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable {
+				ftApplied.set(true);
+				return command.call();
+			}
+		});
+		astrixContext = astrixConfigurer.configure();
+		
+		Ping ping = astrixContext.getBean(Ping.class);
+		
+		ftApplied.set(false);
+		assertEquals("foo", ping.ping("foo"));
+		assertTrue("Fault tolerance proxy should be applied to service beans", ftApplied.get());
+	}
+	
+	@Test
+	public void ftProxyCanBeDisabledByServiceComponent() throws Exception {
+		DisabledFtComponent component = new DisabledFtComponent();
+		
+		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
+		serviceRegistry.registerProvider(Ping.class, component.registerAndGetServiceProperties(Ping.class, new PingImpl()));
+		
+		
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(PingApiProvider.class);
+		astrixConfigurer.enableFaultTolerance(true);
+		astrixConfigurer.registerPlugin(ServiceComponent.class, component);
+		
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		final AtomicBoolean ftApplied = new AtomicBoolean(false);
+		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, new FaultToleranceSpi() {
+			@Override
+			public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
+				ftApplied.set(true);
+				return observable.get();
+			}
+			@Override
+			public <T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable {
+				ftApplied.set(true);
+				return command.call();
+			}
+		});
+		astrixContext = astrixConfigurer.configure();
+		
+		Ping ping = astrixContext.getBean(Ping.class);
+		
+		ftApplied.set(false);
+		assertEquals("foo", ping.ping("foo"));
+		assertFalse("Fault tolerance can be disabled by ServiceComponent", ftApplied.get());
 	}
 	
 	@Test
@@ -306,6 +381,65 @@ public class ServiceBeanInstanceTest {
 	
 	public interface Ping {
 		String ping(String msg);
+	}
+	
+	
+	
+	public static class DisabledFtComponent implements ServiceComponent, FaultToleranceConfigurator {
+		
+		private final DirectComponent directComponent = new DirectComponent(new ObjectSerializerFactory() {
+			@Override
+			public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
+				return new AstrixObjectSerializer.NoVersioningSupport();
+			}
+		});
+		
+		@Override
+		public FtProxySetting configure(CommandSettings commandSettings) {
+			return FtProxySetting.DISABLED;
+		}
+		
+		public <T> ServiceProperties registerAndGetServiceProperties(Class<T> bean, T provider) {
+			ServiceProperties result = DirectComponent.registerAndGetProperties(bean, provider);
+			result.setComponent(getName());
+			return result;
+		}
+
+		@Override
+		public String getName() {
+			return "NO_FT_DIRECT_COMPONENT";
+		}
+
+		@Override
+		public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
+			return directComponent.bind(serviceDefinition, serviceProperties);
+		}
+
+		@Override
+		public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
+			ServiceProperties serviceProperties = directComponent.parseServiceProviderUri(serviceProviderUri);
+			serviceProperties.setComponent(getName());
+			return serviceProperties;
+		}
+
+		@Override
+		public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> exportedServiceDefinition) {
+			return null;
+		}
+
+		@Override
+		public boolean canBindType(Class<?> type) {
+			return true;
+		}
+
+		@Override
+		public <T> void exportService(Class<T> providedApi, T provider, ServiceDefinition<T> serviceDefinition) {
+		}
+
+		@Override
+		public boolean requiresProviderInstance() {
+			return false;
+		}
 	}
 	
 	public static class PingImpl implements Ping {

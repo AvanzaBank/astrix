@@ -108,9 +108,11 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	}
 	
 	@Override
-	public void configure(CommandSettings commandSettings) {
-		commandSettings.setExecutionIsolationStrategy(IsolationStrategy.SEMAPHORE);
-		commandSettings.setSemaphoreMaxConcurrentRequests(Integer.MAX_VALUE);
+	public FtProxySetting configure(CommandSettings commandSettings) {
+		if (disableLocalView.get()) {
+			return FtProxySetting.ENABLED; // Apply faultTolerance proxy if local-view is disabled
+		}
+		return FtProxySetting.DISABLED;
 	}
 
 	@Override

@@ -19,6 +19,11 @@ import com.avanza.astrix.beans.ft.CommandSettings;
 
 public interface FaultToleranceConfigurator {
 	
-	void configure(CommandSettings commandSettings);
+	enum FtProxySetting {
+		ENABLED,
+		DISABLED
+	}
+	
+	FtProxySetting configure(CommandSettings commandSettings);
 
 }

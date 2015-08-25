@@ -123,8 +123,9 @@ public class GsRemotingComponent implements ServiceComponent, FaultToleranceConf
 	}
 
 	@Override
-	public void configure(CommandSettings commandSettings) {
+	public FtProxySetting configure(CommandSettings commandSettings) {
 		commandSettings.setExecutionIsolationStrategy(IsolationStrategy.SEMAPHORE);
+		return FtProxySetting.ENABLED;
 	}
 	
 }

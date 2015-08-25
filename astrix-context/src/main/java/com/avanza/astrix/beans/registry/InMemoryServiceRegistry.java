@@ -129,9 +129,18 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 		registerProvider(AstrixBeanKey.create(api), provider, subsystem);
 	}
 	
+	public <T> void registerProvider(Class<T> api, ServiceProperties serviceProperties) {
+		// TODO: remove this method?
+		registerServiceProvider(AstrixBeanKey.create(api), "default", serviceProperties);
+	}
+	
 	private <T> void registerProvider(AstrixBeanKey<T> beanKey, T provider, String subsystem) {
-		ServiceRegistryExporterClient serviceRegistryClient = new ServiceRegistryExporterClient(this.serviceRegistry, subsystem, beanKey.toString());
 		ServiceProperties serviceProperties = DirectComponent.registerAndGetProperties(beanKey.getBeanType(), provider);
+		registerServiceProvider(beanKey, subsystem, serviceProperties);
+	}
+
+	private <T> void registerServiceProvider(AstrixBeanKey<T> beanKey, String subsystem, ServiceProperties serviceProperties) {
+		ServiceRegistryExporterClient serviceRegistryClient = new ServiceRegistryExporterClient(this.serviceRegistry, subsystem, beanKey.toString());
 		serviceProperties.setQualifier(beanKey.getQualifier());
 		serviceRegistryClient.register(beanKey.getBeanType(), serviceProperties, 60_000);
 	}

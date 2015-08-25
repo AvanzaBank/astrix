@@ -32,6 +32,7 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.ft.CommandSettings;
+import com.avanza.astrix.beans.service.FaultToleranceConfigurator.FtProxySetting;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.util.ReflectionUtil;
@@ -245,10 +246,17 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 
 		private T addFaultTolerance(ServiceComponent serviceComponent, T instance) {
 			CommandSettings faultToleranceSettings = new CommandSettings();
+			FtProxySetting ftProxySetting = FtProxySetting.ENABLED;
 			if (serviceComponent instanceof FaultToleranceConfigurator) {
-				FaultToleranceConfigurator.class.cast(serviceComponent).configure(faultToleranceSettings);
+				 ftProxySetting = FaultToleranceConfigurator.class.cast(serviceComponent).configure(faultToleranceSettings);
 			}
-			return beanFaultToleranceFactory.addFaultToleranceProxy(serviceDefinition, instance, faultToleranceSettings);
+			if (ftProxySetting == FtProxySetting.ENABLED) {
+				return beanFaultToleranceFactory.addFaultToleranceProxy(serviceDefinition, instance, faultToleranceSettings);
+			} else {
+				log.info("Fault tolerance proxy is disabled by ServiceComponent. componentName={}, beanKey={}", 
+						serviceComponent.getName(), getBeanKey().toString());
+				return instance;
+			}
 		}
 
 		protected final void transitionToUnboundState() {
