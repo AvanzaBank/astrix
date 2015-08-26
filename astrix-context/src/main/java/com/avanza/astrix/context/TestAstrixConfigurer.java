@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanSettings.BooleanBeanSetting;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
@@ -158,6 +159,10 @@ public class TestAstrixConfigurer {
 
 	public <T> void registerStrategy(Class<T> strategyInterface, T strategyInstance) {
 		this.configurer.registerStrategy(strategyInterface, strategyInstance);
+	}
+
+	public void set(BooleanBeanSetting setting, AstrixBeanKey<?> beanKey, boolean value) {
+		this.configurer.set(setting.nameFor(beanKey), Boolean.toString(value));
 	}
 
 }

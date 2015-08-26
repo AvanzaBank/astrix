@@ -19,7 +19,11 @@ import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationExcept
 import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationResult;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -27,6 +31,8 @@ import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Test;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.ft.CheckedCommand;
 import com.avanza.astrix.beans.ft.CommandSettings;
@@ -42,6 +48,7 @@ import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
+import com.avanza.astrix.test.util.AstrixTestUtil;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
@@ -126,6 +133,28 @@ public class ServiceBeanInstanceTest {
 		ftApplied.set(false);
 		assertEquals("foo", ping.ping("foo"));
 		assertFalse("Fault tolerance can be disabled by ServiceComponent", ftApplied.get());
+	}
+	
+	@Test
+	public void itsPossibleToSetBeanInInactiveStateUsingBeanSettings() throws Exception {
+		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
+		serviceRegistry.registerProvider(Ping.class, new PingImpl());
+		
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(PingApiProvider.class);
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+
+		astrixContext = astrixConfigurer.configure();
+		
+		final Ping ping = astrixContext.getBean(Ping.class);
+		assertEquals("foo", ping.ping("foo"));
+		astrixConfigurer.set(AstrixBeanSettings.AVAILABLE, AstrixBeanKey.create(Ping.class), false);
+		AstrixTestUtil.assertThrows(ServiceUnavailableException.class, new Runnable() {
+			@Override
+			public void run() {
+				ping.ping("foo");
+			}
+		});
 	}
 	
 	@Test

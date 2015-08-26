@@ -64,4 +64,8 @@ public final class BeanConfiguration {
 		}
 		return config.getBooleanProperty(setting.nameFor(beanKey), setting.defaultValue());
 	}
+	
+	public AstrixBeanKey<?> getBeanKey() {
+		return beanKey;
+	}
 }

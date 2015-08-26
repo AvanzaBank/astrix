@@ -23,7 +23,6 @@ import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.DynamicFactoryBean;
 import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 
 /**
  * 
@@ -33,29 +32,24 @@ import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
  */
 public class ServiceFactory<T> implements DynamicFactoryBean<T> {
 
-	private final ServiceComponentRegistry serviceComponents;
-	private final ServiceDiscoveryFactory<?> serviceDiscoveryFactory;
-	private final ServiceLeaseManager leaseManager;
 	private final ServiceDefinition<T> serviceDefinition;
-	private final BeanFaultToleranceFactory beanFaultToleranceFactory;
+	private final ServiceBeanContext serviceBeanContext;
+	private final ServiceDiscoveryFactory<?> serviceDiscoveryFactory;
+	
 
 	public ServiceFactory(ServiceDefinition<T> serviceDefinition, 
-						  ServiceDiscoveryFactory<?> serviceDiscoveryFactory, 
-						  ServiceComponentRegistry serviceComponents, 
-						  ServiceLeaseManager leaseManager,
-						  BeanFaultToleranceFactory beanFaultToleranceFactory) {
-		this.serviceDefinition = Objects.requireNonNull(serviceDefinition);
+						  ServiceBeanContext serviceBeanContext, ServiceDiscoveryFactory<?> serviceDiscoveryFactory) {
 		this.serviceDiscoveryFactory = Objects.requireNonNull(serviceDiscoveryFactory);
-		this.serviceComponents = Objects.requireNonNull(serviceComponents);
-		this.leaseManager = Objects.requireNonNull(leaseManager);
-		this.beanFaultToleranceFactory = Objects.requireNonNull(beanFaultToleranceFactory);
+		this.serviceDefinition = Objects.requireNonNull(serviceDefinition);
+		this.serviceBeanContext = Objects.requireNonNull(serviceBeanContext);
 	}
 
 	public T create(AstrixBeanKey<T> beanKey) {
 		ServiceDiscovery serviceDiscovery = serviceDiscoveryFactory.create(beanKey.getQualifier());
-		ServiceBeanInstance<T> serviceBeanInstance = ServiceBeanInstance.create(serviceDefinition, beanKey, serviceDiscovery, serviceComponents, beanFaultToleranceFactory);
+		ServiceBeanInstance<T> serviceBeanInstance = ServiceBeanInstance.create(serviceDefinition, beanKey, serviceDiscovery, serviceBeanContext);
 		serviceBeanInstance.bind();
-		leaseManager.startManageLease(serviceBeanInstance);
+		serviceBeanContext.getLeaseManager().startManageLease(serviceBeanInstance);
+		serviceBeanContext.getServiceMbeanExporter().register(serviceBeanInstance);
 		return beanKey.getBeanType().cast(
 				Proxy.newProxyInstance(beanKey.getBeanType().getClassLoader(), 
 									   new Class[]{beanKey.getBeanType(), StatefulAstrixBean.class}, 
@@ -67,21 +61,17 @@ public class ServiceFactory<T> implements DynamicFactoryBean<T> {
 		return serviceDefinition.getServiceType();
 	}
 
-	public static <T> FactoryBean<T> dynamic(ServiceDefinition<T> serviceDefinition, 
-													ServiceDiscoveryFactory<?> serviceDiscovery, 
-													ServiceComponentRegistry serviceComponents, 
-													ServiceLeaseManager leaseManager,
-													BeanFaultToleranceFactory beanFaultToleranceFactory) {
-		return new ServiceFactory<T>(serviceDefinition, serviceDiscovery, serviceComponents, leaseManager, beanFaultToleranceFactory);
+	public static <T> FactoryBean<T> dynamic(ServiceDefinition<T> serviceDefinition,
+								     ServiceDiscoveryFactory<?> serviceDiscoveryFactory,
+									 ServiceBeanContext serviceBeanContext) {
+		return new ServiceFactory<T>(serviceDefinition, serviceBeanContext, serviceDiscoveryFactory);
 	}
 	
 	public static <T> FactoryBean<T> standard(ServiceDefinition<T> serviceDefinition, 
 													AstrixBeanKey<T> beanType, 
-													ServiceDiscoveryFactory<?> serviceDiscoveryFactory, 
-													ServiceComponentRegistry serviceComponents, 
-													ServiceLeaseManager leaseManager,
-													 BeanFaultToleranceFactory beanFaultToleranceFactory) {
-		ServiceFactory<T> serviceFactory = new ServiceFactory<T>(serviceDefinition, serviceDiscoveryFactory, serviceComponents, leaseManager, beanFaultToleranceFactory);
+												    ServiceDiscoveryFactory<?> serviceDiscoveryFactory,
+													ServiceBeanContext serviceBeanContext) {
+		ServiceFactory<T> serviceFactory = new ServiceFactory<T>(serviceDefinition, serviceBeanContext, serviceDiscoveryFactory);
 		return new FactoryBeanAdapter<T>(serviceFactory, beanType);
 	}
 	

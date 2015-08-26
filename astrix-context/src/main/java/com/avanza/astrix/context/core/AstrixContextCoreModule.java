@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package runners;
+package com.avanza.astrix.context.core;
 
-import com.avanza.astrix.config.GlobalConfigSourceRegistry;
-import com.avanza.astrix.config.MapConfigSource;
-import com.avanza.astrix.gs.test.util.PuApp;
+import com.avanza.astrix.beans.config.AstrixConfig;
+import com.avanza.astrix.modules.ModuleContext;
+import com.avanza.astrix.modules.NamedModule;
 
-public class LunchGraderPuRunner {
-	
-	public static void main(String[] args) {
-		MapConfigSource settings = new MapConfigSource();
-		System.setProperty("com.gs.jini_lus.groups", Config.LOOKUP_GROUP_NAME);
-		System.setProperty("configSourceId", GlobalConfigSourceRegistry.register(settings));
-		PuApp.run("classpath:/META-INF/spring/lunch-grader-pu.xml");
+public class AstrixContextCoreModule implements NamedModule {
+
+	@Override
+	public void prepare(ModuleContext moduleContext) {
+		moduleContext.bind(AstrixMBeanExporter.class, AstrixMBeanExporterImpl.class);
+		
+		moduleContext.importType(AstrixConfig.class);
+		
+		moduleContext.export(AstrixMBeanExporter.class);
+	}
+
+	@Override
+	public String name() {
+		return getClass().getPackage().getName();
 	}
 
 }

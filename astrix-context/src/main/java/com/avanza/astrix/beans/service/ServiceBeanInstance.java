@@ -29,10 +29,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.factory.BeanConfiguration;
+import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.ft.CommandSettings;
 import com.avanza.astrix.beans.service.FaultToleranceConfigurator.FtProxySetting;
+import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.util.ReflectionUtil;
@@ -62,6 +66,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	
 	private final ServiceDiscovery serviceDiscovery;
 	private final BeanFaultToleranceFactory beanFaultToleranceFactory;
+	private final DynamicBooleanProperty available;
 	
 	/*
 	 * Guards the state of this service bean instance.
@@ -75,9 +80,11 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 								AstrixBeanKey<T> beanKey, 
 								ServiceDiscovery serviceDiscovery, 
 								ServiceComponentRegistry serviceComponents,
-								BeanFaultToleranceFactory beanFaultToleranceFactory) {
+								BeanFaultToleranceFactory beanFaultToleranceFactory,
+								DynamicBooleanProperty available) {
 		this.serviceDiscovery = serviceDiscovery;
 		this.beanFaultToleranceFactory = beanFaultToleranceFactory;
+		this.available = available;
 		this.serviceDefinition = Objects.requireNonNull(serviceDefinition);
 		this.beanKey = Objects.requireNonNull(beanKey);
 		this.serviceComponents = Objects.requireNonNull(serviceComponents);
@@ -87,9 +94,14 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	public static <T> ServiceBeanInstance<T> create(ServiceDefinition<T> serviceDefinition, 
 													AstrixBeanKey<T> beanKey, 
 													ServiceDiscovery serviceDiscovery, 
-													ServiceComponentRegistry serviceComponents,
-													BeanFaultToleranceFactory beanFaultToleranceFactory) {
-		return new ServiceBeanInstance<T>(serviceDefinition, beanKey, serviceDiscovery, serviceComponents, beanFaultToleranceFactory);
+													ServiceBeanContext serviceBeanContext) {
+		BeanConfiguration beanConfiguration = serviceBeanContext.getBeanConfigurations().getBeanConfiguration(beanKey);
+		return new ServiceBeanInstance<T>(serviceDefinition, 
+				beanKey, 
+				serviceDiscovery, 
+				serviceBeanContext.getServiceComponents(), 
+				serviceBeanContext.getBeanFaultToleranceFactory(), 
+				beanConfiguration.get(AstrixBeanSettings.AVAILABLE));
 	}
 	
 	public void renewLease() {
@@ -212,6 +224,9 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		}
 		if (method.getDeclaringClass().equals(Object.class)) {
 			return method.invoke(this, args);
+		}
+		if (!this.available.get()) {
+			throw new ServiceUnavailableException("Service is explicitly set in unavailable state");
 		}
 		return this.currentState.invoke(proxy, method, args);
 	}

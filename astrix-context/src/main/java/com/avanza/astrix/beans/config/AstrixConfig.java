@@ -39,5 +39,20 @@ public interface AstrixConfig {
 	
 	DynamicStringProperty getStringProperty(String name, String defaultValue);
 	
+	/**
+	 * Returns the DynamicConfig instance used by the current AstrixContext. <p>
+	 * @return
+	 */
 	DynamicConfig getConfig();
+	
+	/**
+	 * Allows providing programmatic settings after the AstrixContext is created,
+	 * i.e the same type of settings that can be set on a AstrixConfigurer. Note
+	 * that this settings might be overridden by other ConfigSources in the DynamicConfig
+	 * instance used by the current AstrixContext.
+	 * 
+	 * @param setting
+	 * @param value
+	 */
+	void set(String setting, String value);
 }	

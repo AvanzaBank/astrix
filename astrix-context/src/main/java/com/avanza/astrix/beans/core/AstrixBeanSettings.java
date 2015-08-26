@@ -17,6 +17,7 @@ package com.avanza.astrix.beans.core;
 
 import java.util.Objects;
 
+import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.DefaultBeanSettings;
 
 /**
@@ -42,6 +43,14 @@ public final class AstrixBeanSettings {
 	 */
 	public static final IntBeanSetting INITIAL_TIMEOUT = 
 			new IntBeanSetting("faultTolerance.timeout", DefaultBeanSettings.DEFAULT_INITIAL_TIMEOUT);
+	
+	/**
+	 * Its possible to set service-beans in unavailable state, in which it throws
+	 * a {@link ServiceUnavailableException} on each invocation. <p>
+	 */
+	public static final BooleanBeanSetting AVAILABLE = 
+			new BooleanBeanSetting("available", true);
+
 	
 	private AstrixBeanSettings() {
 	}

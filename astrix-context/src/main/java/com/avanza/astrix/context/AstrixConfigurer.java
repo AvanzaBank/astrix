@@ -60,6 +60,7 @@ import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.SystemPropertiesConfigSource;
+import com.avanza.astrix.context.core.AstrixContextCoreModule;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.modules.ModuleInstancePostProcessor;
@@ -104,7 +105,6 @@ public class AstrixConfigurer {
 	 * @return
 	 */
 	public AstrixContext configure() {
-		DynamicConfig config = createDynamicConfig();
 		
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.registerDefault(StrategyProvider.create(HystrixCommandNamingStrategy.class, DefaultHystrixCommandNamingStrategy.class));
@@ -120,14 +120,16 @@ public class AstrixConfigurer {
 			modulesConfigurer.register(strategyProvider);
 		}
 		
+		DynamicConfig config = createDynamicConfig();
+		modulesConfigurer.register(new AstrixConfigModule(config, this.settings));
 		modulesConfigurer.register(new DirectComponentModule());
+		modulesConfigurer.register(new AstrixContextCoreModule());
 		modulesConfigurer.register(new ServiceRegistryDiscoveryModule());
 		modulesConfigurer.register(new ConfigDiscoveryModule());
 		modulesConfigurer.register(new BeansPublishModule());
 		modulesConfigurer.register(new ServiceModule());
 		modulesConfigurer.register(new ObjectSerializerModule());
 		modulesConfigurer.register(new Jackson1SerializerModule());
-		modulesConfigurer.register(new AstrixConfigModule(config));
 		modulesConfigurer.register(new GenericAstrixApiProviderModule());
 		modulesConfigurer.register(new FaultToleranceModule());
 		

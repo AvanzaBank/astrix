@@ -16,6 +16,7 @@
 package com.avanza.astrix.beans.config;
 
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.modules.NamedModule;
 
@@ -27,14 +28,16 @@ import com.avanza.astrix.modules.NamedModule;
 public class AstrixConfigModule implements NamedModule {
 	
 	private DynamicConfig dynamicConfig;
+	private MapConfigSource settings;
 	
-	public AstrixConfigModule(DynamicConfig dynamicConfig) {
+	public AstrixConfigModule(DynamicConfig dynamicConfig, MapConfigSource settings) {
 		this.dynamicConfig = dynamicConfig;
+		this.settings = settings;
 	}
-
+	
 	@Override
 	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(AstrixConfig.class, AstrixConfigImpl.class);
+		moduleContext.bind(AstrixConfig.class, new AstrixConfigImpl(dynamicConfig, settings));
 		moduleContext.bind(DynamicConfig.class, dynamicConfig);
 		
 		moduleContext.export(AstrixConfig.class);
@@ -44,4 +47,5 @@ public class AstrixConfigModule implements NamedModule {
 	public String name() {
 		return getClass().getPackage().getName();
 	}
+	
 }	

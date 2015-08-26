@@ -15,12 +15,10 @@
  */
 package com.avanza.astrix.test.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Assert;
 
 import com.avanza.astrix.core.function.Supplier;
 
@@ -140,6 +138,15 @@ public class AstrixTestUtil {
 			autoClosable.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	public static void assertThrows(Class<? extends RuntimeException> expectedExceptionType, Runnable command) {
+		try {
+			command.run();
+			Assert.fail("Expected exception of type " + expectedExceptionType.getName() + " to be thrown");
+		} catch (RuntimeException e) {
+			Assert.assertEquals("Thrown type: ", expectedExceptionType, e.getClass());
 		}
 	}
 

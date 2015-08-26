@@ -23,6 +23,7 @@ import com.avanza.astrix.config.DynamicLongProperty;
 import com.avanza.astrix.config.DynamicStringProperty;
 import com.avanza.astrix.config.IntSetting;
 import com.avanza.astrix.config.LongSetting;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.StringSetting;
 
 /**
@@ -33,9 +34,11 @@ import com.avanza.astrix.config.StringSetting;
 final class AstrixConfigImpl implements AstrixConfig {
 	
 	private final DynamicConfig config;
+	private final MapConfigSource settings;
 
-	public AstrixConfigImpl(DynamicConfig config) {
+	public AstrixConfigImpl(DynamicConfig config, MapConfigSource settings) {
 		this.config = config;
+		this.settings = settings;
 	}
 
 	@Override
@@ -67,6 +70,11 @@ final class AstrixConfigImpl implements AstrixConfig {
 	@Override
 	public DynamicConfig getConfig() {
 		return this.config;
+	}
+	
+	@Override
+	public void set(String setting, String value) {
+		this.settings.set(setting, value);
 	}
 	
 }	

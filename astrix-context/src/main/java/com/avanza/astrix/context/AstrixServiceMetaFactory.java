@@ -16,36 +16,28 @@
 package com.avanza.astrix.context;
 
 import com.avanza.astrix.beans.factory.FactoryBean;
-import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
-import com.avanza.astrix.beans.service.ServiceComponentRegistry;
+import com.avanza.astrix.beans.service.ServiceBeanContext;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
 import com.avanza.astrix.beans.service.ServiceFactory;
-import com.avanza.astrix.beans.service.ServiceLeaseManager;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public final class AstrixServiceMetaFactory {
-
-	private ServiceComponentRegistry serviceComponents;
-	private ServiceLeaseManager leaseManager;
-	private BeanFaultToleranceFactory beanFaultToleranceFactory;
 	
-	public AstrixServiceMetaFactory(ServiceComponentRegistry serviceComponents,
-									ServiceLeaseManager leaseManager,
-									BeanFaultToleranceFactory beanFaultToleranceFactory) {
-		this.serviceComponents = serviceComponents;
-		this.leaseManager = leaseManager;
-		this.beanFaultToleranceFactory = beanFaultToleranceFactory;
+	private final ServiceBeanContext serviceBeanContext;
+	
+	public AstrixServiceMetaFactory(ServiceBeanContext serviceBeanContext) {
+		this.serviceBeanContext = serviceBeanContext;
 	}
 
 	public <T> FactoryBean<T> createServiceFactory(ServiceDefinition<T> serviceDefinition, ServiceDiscoveryFactory<?> serviceDiscoveryFactory) {
 		if (serviceDefinition.isDynamicQualified()) {
-			return ServiceFactory.dynamic(serviceDefinition, serviceDiscoveryFactory, serviceComponents, leaseManager, beanFaultToleranceFactory);
+			return ServiceFactory.dynamic(serviceDefinition, serviceDiscoveryFactory, serviceBeanContext);
 		}
-		return ServiceFactory.standard(serviceDefinition, serviceDefinition.getBeanKey(), serviceDiscoveryFactory, serviceComponents, leaseManager, beanFaultToleranceFactory);
+		return ServiceFactory.standard(serviceDefinition, serviceDefinition.getBeanKey(), serviceDiscoveryFactory, serviceBeanContext);
 	}
 	
 	public Class<?> loadInterfaceIfExists(String interfaceName) {

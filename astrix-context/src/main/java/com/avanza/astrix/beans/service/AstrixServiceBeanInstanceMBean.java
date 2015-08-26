@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package runners;
+package com.avanza.astrix.beans.service;
 
-import com.avanza.astrix.config.GlobalConfigSourceRegistry;
-import com.avanza.astrix.config.MapConfigSource;
-import com.avanza.astrix.gs.test.util.PuApp;
+public interface AstrixServiceBeanInstanceMBean {
 
-public class LunchGraderPuRunner {
+	boolean isAvailable();
+
+	void setAvailable(boolean available);
+
+	boolean isFaultToleranceEnabled();
 	
-	public static void main(String[] args) {
-		MapConfigSource settings = new MapConfigSource();
-		System.setProperty("com.gs.jini_lus.groups", Config.LOOKUP_GROUP_NAME);
-		System.setProperty("configSourceId", GlobalConfigSourceRegistry.register(settings));
-		PuApp.run("classpath:/META-INF/spring/lunch-grader-pu.xml");
-	}
-
+	String getState();
+	
 }

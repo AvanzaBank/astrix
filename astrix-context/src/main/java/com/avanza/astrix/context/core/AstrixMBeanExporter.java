@@ -13,19 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package runners;
+package com.avanza.astrix.context.core;
 
-import com.avanza.astrix.config.GlobalConfigSourceRegistry;
-import com.avanza.astrix.config.MapConfigSource;
-import com.avanza.astrix.gs.test.util.PuApp;
+public interface AstrixMBeanExporter {
 
-public class LunchGraderPuRunner {
+	void registerMBean(Object mbean, String folder, String name);
 	
-	public static void main(String[] args) {
-		MapConfigSource settings = new MapConfigSource();
-		System.setProperty("com.gs.jini_lus.groups", Config.LOOKUP_GROUP_NAME);
-		System.setProperty("configSourceId", GlobalConfigSourceRegistry.register(settings));
-		PuApp.run("classpath:/META-INF/spring/lunch-grader-pu.xml");
-	}
-
 }
