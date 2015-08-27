@@ -24,10 +24,13 @@ public class AstrixContextCoreModule implements NamedModule {
 	@Override
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(AstrixMBeanExporter.class, AstrixMBeanExporterImpl.class);
+		moduleContext.bind(AsyncTypeConverter.class, AsyncTypeConverterImpl.class);
 		
 		moduleContext.importType(AstrixConfig.class);
+		moduleContext.importType(AsyncTypeConverterPlugin.class);
 		
 		moduleContext.export(AstrixMBeanExporter.class);
+		moduleContext.export(AsyncTypeConverter.class);
 	}
 
 	@Override

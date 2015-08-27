@@ -20,6 +20,7 @@ import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.factory.BeanConfiguration;
 import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
+import com.avanza.astrix.context.core.AsyncTypeConverter;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -31,12 +32,16 @@ final class BeanFaultToleranceFactoryImpl implements BeanFaultToleranceFactory {
 	private final AstrixConfig astrixConfig;
 	private final FaultToleranceSpi faultTolerance;
 	private final HystrixCommandNamingStrategy commandNamingStrategy;
+	private final AsyncTypeConverter asyncTypeAdapter;
 	
-	public BeanFaultToleranceFactoryImpl(BeanConfigurations beanConfigurations, AstrixConfig astrixConfig, FaultToleranceSpi faultTolerance, HystrixCommandNamingStrategy commandNamingStrategy) {
+	public BeanFaultToleranceFactoryImpl(BeanConfigurations beanConfigurations, AstrixConfig astrixConfig,
+			FaultToleranceSpi faultTolerance, HystrixCommandNamingStrategy commandNamingStrategy,
+			AsyncTypeConverter asyncTypeAdapter) {
 		this.beanConfigurations = beanConfigurations;
 		this.astrixConfig = astrixConfig;
 		this.faultTolerance = faultTolerance;
 		this.commandNamingStrategy = commandNamingStrategy;
+		this.asyncTypeAdapter = asyncTypeAdapter;
 	}
 
 	public <T> T addFaultToleranceProxy(PublishedAstrixBean<T> serviceDefinition, T target, CommandSettings commandSettings) {
@@ -48,7 +53,7 @@ final class BeanFaultToleranceFactoryImpl implements BeanFaultToleranceFactory {
 		commandSettings.setCommandName(commandNamingStrategy.getCommandKeyName(serviceDefinition));
 		commandSettings.setGroupName(commandNamingStrategy.getGroupKeyName(serviceDefinition));
 		commandSettings.setInitialTimeoutInMilliseconds(beanConfiguration.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
-		return new BeanFaultTolerance(beanConfiguration, astrixConfig.getConfig(), faultTolerance, commandSettings);
+		return new BeanFaultTolerance(beanConfiguration, astrixConfig.getConfig(), faultTolerance, commandSettings, asyncTypeAdapter);
 	}
 	
 	

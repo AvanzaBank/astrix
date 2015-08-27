@@ -17,15 +17,14 @@ package com.avanza.astrix.beans.ft;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.core.FutureAdapter;
 import com.avanza.astrix.beans.factory.BeanConfiguration;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
@@ -41,11 +40,13 @@ final class BeanFaultTolerance {
 	private final DynamicBooleanProperty faultToleranceEnabled;
 	private final FaultToleranceSpi beanFaultToleranceSpi;
 	private final CommandSettings commandSettings;
+	private final AsyncTypeConverter asyncTypeConverter;
 	
 	BeanFaultTolerance(BeanConfiguration beanConfiguration, DynamicConfig config, FaultToleranceSpi beanFaultToleranceSpi,
-			CommandSettings commandSettings) {
+			CommandSettings commandSettings, AsyncTypeConverter asyncTypeAdapter) {
 		this.beanFaultToleranceSpi = beanFaultToleranceSpi;
 		this.commandSettings = commandSettings;
+		this.asyncTypeConverter = asyncTypeAdapter;
 		this.faultToleranceEnabledForBean = beanConfiguration.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED);
 		this.faultToleranceEnabled = AstrixSettings.ENABLE_FAULT_TOLERANCE.getFrom(config);
 	}
@@ -57,7 +58,7 @@ final class BeanFaultTolerance {
 				if (!faultToleranceEnabled()) {
 					return ReflectionUtil.invokeMethod(method, target, args);
 				}
-				if (isObservableType(method.getReturnType()) || isFutureType(method.getReturnType())) {
+				if (isObservableType(method.getReturnType()) || isAsyncType(method.getReturnType())) {
 					return observe(target, method, args);
 				}
 				return execute(target, method, args);
@@ -83,20 +84,21 @@ final class BeanFaultTolerance {
 					if (isObservableType(method.getReturnType())) {
 						return (Observable<Object>) asyncResult;
 					}
-					return Observable.<Object>from((Future) asyncResult, commandSettings.getInitialTimeoutInMilliseconds(), TimeUnit.MILLISECONDS);
+					return asyncTypeConverter.toObservable(method.getReturnType(), asyncResult,
+							commandSettings.getInitialTimeoutInMilliseconds(), TimeUnit.MILLISECONDS);
 				} catch (Throwable e) {
 					return Observable.error(e);
 				}
 			}
 		}, commandSettings);
-		if (isFutureType(method.getReturnType())) {
-			return new FutureAdapter<>(result);
+		if (isAsyncType(method.getReturnType())) {
+			return this.asyncTypeConverter.toAsyncType(method.getReturnType(), result);
 		}
 		return result;
 	}
 	
-	private boolean isFutureType(Class<?> type) {
-		return Future.class.isAssignableFrom(type);
+	private boolean isAsyncType(Class<?> type) {
+		return this.asyncTypeConverter.canAdaptToType(type);
 	}
 
 	private boolean isObservableType(Class<?> type) {

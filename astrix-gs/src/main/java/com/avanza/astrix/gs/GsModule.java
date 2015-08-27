@@ -19,11 +19,16 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
-import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.AstrixContextPlugin;
+import com.avanza.astrix.context.AstrixStrategiesConfig;
+import com.avanza.astrix.context.core.AsyncTypeConverterPlugin;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
-
+/**
+ * 
+ * @author Elias Lindholm
+ *
+ */
 @MetaInfServices(AstrixContextPlugin.class)
 public class GsModule implements AstrixContextPlugin {
 
@@ -32,6 +37,7 @@ public class GsModule implements AstrixContextPlugin {
 		moduleContext.bind(ServiceComponent.class, GsComponent.class);
 		moduleContext.bind(ClusteredProxyBinder.class, GsComponent.class);
 		moduleContext.bind(ClusteredProxyCache.class, ClusteredProxyCacheImpl.class);
+		moduleContext.bind(AsyncTypeConverterPlugin.class, GsAsyncFutureTypeAdapter.class);
 		
 		moduleContext.importType(AstrixSpringContext.class);
 		moduleContext.importType(BeanFaultToleranceFactory.class);
@@ -39,6 +45,7 @@ public class GsModule implements AstrixContextPlugin {
 		moduleContext.export(ServiceComponent.class);
 		moduleContext.export(ClusteredProxyBinder.class);
 		moduleContext.export(ClusteredProxyCache.class);
+		moduleContext.export(AsyncTypeConverterPlugin.class);
 	}
 
 	@Override

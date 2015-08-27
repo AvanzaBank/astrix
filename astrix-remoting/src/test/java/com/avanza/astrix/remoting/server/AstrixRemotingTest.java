@@ -27,6 +27,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -39,10 +40,10 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import rx.Observable;
-import rx.Subscriber;
-
 import com.avanza.astrix.context.JavaSerializationSerializer;
+import com.avanza.astrix.context.core.AsyncTypeConverter;
+import com.avanza.astrix.context.core.AsyncTypeConverterImpl;
+import com.avanza.astrix.context.core.AsyncTypeConverterPlugin;
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
 import com.avanza.astrix.core.AstrixRemoteResult;
@@ -63,6 +64,9 @@ import com.avanza.astrix.remoting.client.RoutingKey;
 import com.avanza.astrix.remoting.client.RoutingStrategy;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 
+import rx.Observable;
+import rx.Subscriber;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -72,6 +76,7 @@ public class AstrixRemotingTest {
 
 	AstrixObjectSerializer objectSerializer = new JavaSerializationSerializer(1);
 	AstrixServiceActivatorImpl partition1 = new AstrixServiceActivatorImpl();
+	AsyncTypeConverter asyncTypeConverter = new AsyncTypeConverterImpl(Collections.<AsyncTypeConverterPlugin>emptyList());
 	
 	private static class NoRoutingStrategy implements RoutingStrategy {
 		@Override
@@ -108,7 +113,7 @@ public class AstrixRemotingTest {
 		};
 		partition1.register(impl, objectSerializer, TestService.class);
 		
-		TestService testService = RemotingProxy.create(TestService.class, TestService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
+		TestService testService = createRemotingProxy(TestService.class, TestService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 
 		HelloRequest request = new HelloRequest("kalle");
 		HelloResponse reply = testService.hello(request);
@@ -137,7 +142,7 @@ public class AstrixRemotingTest {
 		
 		partition1.register(impl, objectSerializer, TestService.class);
 		
-		TestService testService = RemotingProxy.create(TestService.class, TestService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
+		TestService testService = createRemotingProxy(TestService.class, TestService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 
 		HelloRequest request = new HelloRequest("kalle");
 		String reply = testService.hello(request, "replyTo-");
@@ -157,7 +162,7 @@ public class AstrixRemotingTest {
 		};
 		partition1.register(serviceProvider, objectSerializer, AnnotatedArgumentTestService.class);
 		
-		AnnotatedArgumentTestService serviceProxy = RemotingProxy.create(AnnotatedArgumentTestService.class, AnnotatedArgumentTestService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
+		AnnotatedArgumentTestService serviceProxy = createRemotingProxy(AnnotatedArgumentTestService.class, AnnotatedArgumentTestService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 
 		String reply = serviceProxy.hello("kalle", "hello-");
 		assertEquals("hello-kalle", reply);
@@ -178,7 +183,7 @@ public class AstrixRemotingTest {
 			};
 			partition1.register(impl, objectSerializer, TestService.class);
 
-			TestService testService = RemotingProxy.create(TestService.class, TestService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
+			TestService testService = createRemotingProxy(TestService.class, TestService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 			testService.hello(new HelloRequest("foo"));
 			fail("Expected remote service exception to be thrown");
 		} catch (RemoteServiceInvocationException e) {
@@ -202,7 +207,7 @@ public class AstrixRemotingTest {
 			};
 			partition1.register(impl, objectSerializer, TestService.class);
 
-			TestService testService = RemotingProxy.create(TestService.class, TestService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
+			TestService testService = createRemotingProxy(TestService.class, TestService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 			testService.hello(new HelloRequest("foo"));
 			fail("Expected remote service exception to be thrown");
 		} catch (MyCustomServiceException e) {
@@ -226,7 +231,7 @@ public class AstrixRemotingTest {
 		partition1.register(impl, objectSerializer, PingService.class);
 		partition2.register(impl, objectSerializer, PingService.class);
 
-		PingService broadcastService = RemotingProxy.create(PingService.class, PingService.class, directTransport(partition1, partition2), objectSerializer, new NoRoutingStrategy());
+		PingService broadcastService = createRemotingProxy(PingService.class, PingService.class, directTransport(partition1, partition2), objectSerializer, new NoRoutingStrategy());
 		List<String> replys = broadcastService.ping("foo");
 		assertEquals(2, replys.size());
 		assertEquals("foo", replys.get(0));
@@ -267,7 +272,7 @@ public class AstrixRemotingTest {
 		evenPartition.register(eventPartitionCalculator, objectSerializer, CalculatorListService.class);
 		oddPartition.register(oddPartitionCalculator, objectSerializer, CalculatorListService.class);
 
-		CalculatorListService calculatorService = RemotingProxy.create(CalculatorListService.class, CalculatorListService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		CalculatorListService calculatorService = createRemotingProxy(CalculatorListService.class, CalculatorListService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
 		int squareSum = calculatorService.squareSum(Arrays.asList(1, 2, 3, 4, 5));
 		assertEquals(1 + 4 + 9 + 16 + 25, squareSum);
 	}
@@ -282,7 +287,7 @@ public class AstrixRemotingTest {
 		evenPartition.register(eventPartitionPing, objectSerializer, PartitionedPingService.class);
 		oddPartition.register(oddPartitionPing, objectSerializer, PartitionedPingService.class);
 
-		PartitionedPingService partitionedPing = RemotingProxy.create(PartitionedPingService.class, PartitionedPingService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		PartitionedPingService partitionedPing = createRemotingProxy(PartitionedPingService.class, PartitionedPingService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
 		assertThat(partitionedPing.ping(new double[]{1d, 2d, 3d}), containsInAnyOrder(1d, 2d, 3d));
 		assertThat(partitionedPing.ping(new int[]{1, 2, 3}), containsInAnyOrder(1, 2, 3));
 		assertThat(partitionedPing.ping(new float[]{1f, 2f, 3f}), containsInAnyOrder(1f, 2f, 3f));
@@ -301,7 +306,7 @@ public class AstrixRemotingTest {
 		evenPartition.register(eventPartitionPing, objectSerializer, PartitionedPingService.class);
 		oddPartition.register(oddPartitionPing, objectSerializer, PartitionedPingService.class);
 
-		PartitionedPingService partitionedPing = RemotingProxy.create(PartitionedPingService.class, PartitionedPingService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		PartitionedPingService partitionedPing = createRemotingProxy(PartitionedPingService.class, PartitionedPingService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
 		partitionedPing.pingVoid(new String[]{"1", "2", "3"});
 	}
 	
@@ -315,7 +320,7 @@ public class AstrixRemotingTest {
 		evenPartition.register(evenPartitionPing, objectSerializer, PartitionedPingService.class);
 		oddPartition.register(oddPartitionPing, objectSerializer, PartitionedPingService.class);
 
-		PartitionedPingService partitionedPing = RemotingProxy.create(PartitionedPingService.class, PartitionedPingService.class, 
+		PartitionedPingService partitionedPing = createRemotingProxy(PartitionedPingService.class, PartitionedPingService.class, 
 				directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
 		partitionedPing.pingVoid(new String[]{});
 		Mockito.verifyZeroInteractions(evenPartitionPing, oddPartitionPing);
@@ -336,7 +341,7 @@ public class AstrixRemotingTest {
 		evenPartition.register(evenPartitionPing, objectSerializer, PartitionedPingService.class);
 		oddPartition.register(oddPartitionPing, objectSerializer, PartitionedPingService.class);
 
-		PartitionedPingService partitionedPing = RemotingProxy.create(PartitionedPingService.class, PartitionedPingService.class,
+		PartitionedPingService partitionedPing = createRemotingProxy(PartitionedPingService.class, PartitionedPingService.class,
 				directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
 		partitionedPing.ping(new String[]{"1", "2", "3", "4", "5"});
 	}
@@ -378,7 +383,7 @@ public class AstrixRemotingTest {
 		evenPartition.register(eventPartitionCalculator, objectSerializer, CalculatorArrayPojoService.class);
 		oddPartition.register(oddPartitionCalculator, objectSerializer, CalculatorArrayPojoService.class);
 
-		CalculatorArrayPojoService calculatorService = RemotingProxy.create(CalculatorArrayPojoService.class, CalculatorArrayPojoService.class,
+		CalculatorArrayPojoService calculatorService = createRemotingProxy(CalculatorArrayPojoService.class, CalculatorArrayPojoService.class,
 				directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
 		int squareSum = calculatorService.squareSum(new NumPojo(1), new NumPojo(2), new NumPojo(3), new NumPojo(4), new NumPojo(5));
 		assertEquals(1 + 4 + 9 + 16 + 25, squareSum);
@@ -394,7 +399,7 @@ public class AstrixRemotingTest {
 		evenPartition.register(eventPartitionCalculator, objectSerializer, CalculatorListPojoService.class);
 		oddPartition.register(oddPartitionCalculator, objectSerializer, CalculatorListPojoService.class);
 
-		CalculatorListPojoService calculatorService = RemotingProxy.create(CalculatorListPojoService.class, CalculatorListPojoService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		CalculatorListPojoService calculatorService = createRemotingProxy(CalculatorListPojoService.class, CalculatorListPojoService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
 		int squareSum = calculatorService.squareSum(Arrays.asList(new NumPojo(1), new NumPojo(2), new NumPojo(3), new NumPojo(4), new NumPojo(5)));
 		assertEquals(1 + 4 + 9 + 16 + 25, squareSum);
 	}
@@ -402,14 +407,14 @@ public class AstrixRemotingTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void partitionedRequest_routingOnProperty_throwsExceptionForRawTypes() throws Exception {
 		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
-		RemotingProxy.create(ServiceWithRawListRoutingArgument.class, ServiceWithRawListRoutingArgument.class, 
+		createRemotingProxy(ServiceWithRawListRoutingArgument.class, ServiceWithRawListRoutingArgument.class, 
 				directTransport(evenPartition), objectSerializer, new DefaultAstrixRoutingStrategy());
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void partitionedRequest_routingOnProperty_throwsExceptionForMissingMethods() throws Exception {
 		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
-		RemotingProxy.create(ServiceWithListMissingRoutingPropertyMethod.class, ServiceWithListMissingRoutingPropertyMethod.class,
+		createRemotingProxy(ServiceWithListMissingRoutingPropertyMethod.class, ServiceWithListMissingRoutingPropertyMethod.class,
 				directTransport(evenPartition), objectSerializer, new DefaultAstrixRoutingStrategy());
 	}
 	
@@ -424,14 +429,14 @@ public class AstrixRemotingTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void partitionedService_IncompatibleCollectionType_throwsException() throws Exception {
 		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
-		RemotingProxy.create(InvalidCollectionTypePartitionedService.class, InvalidCollectionTypePartitionedService.class, 
+		createRemotingProxy(InvalidCollectionTypePartitionedService.class, InvalidCollectionTypePartitionedService.class, 
 				directTransport(evenPartition), objectSerializer, new NoRoutingStrategy());
 	}
 	
 	@Test(expected = IncompatibleRemoteResultReducerException.class)
 	public void partitionedService_IncompatibleReducer_throwsException() throws Exception {
 		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl();
-		RemotingProxy.create(InvalidReducerPartitionedService.class, InvalidReducerPartitionedService.class,
+		createRemotingProxy(InvalidReducerPartitionedService.class, InvalidReducerPartitionedService.class,
 				directTransport(evenPartition), objectSerializer, new NoRoutingStrategy());
 	}
 	
@@ -447,7 +452,7 @@ public class AstrixRemotingTest {
 		
 		evenPartition.register(sevenPartitionService, objectSerializer, PartitionedServiceUsingSet.class);
 
-		PartitionedServiceUsingSet calculatorService = RemotingProxy.create(PartitionedServiceUsingSet.class, PartitionedServiceUsingSet.class, 
+		PartitionedServiceUsingSet calculatorService = createRemotingProxy(PartitionedServiceUsingSet.class, PartitionedServiceUsingSet.class, 
 				directTransport(evenPartition), objectSerializer, new NoRoutingStrategy());
 		assertEquals(setOf(1,2,3), calculatorService.ping(setOf(1,2,3)));
 	}
@@ -467,7 +472,7 @@ public class AstrixRemotingTest {
 			};
 			partition1.register(impl, objectSerializer, BroadcastService.class);
 
-			BroadcastService broadcastService = RemotingProxy.create(BroadcastService.class, BroadcastService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
+			BroadcastService broadcastService = createRemotingProxy(BroadcastService.class, BroadcastService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 			broadcastService.broadcast(new BroadcastRequest("foo"));
 			fail("Expected remote service exception to be thrown");
 		} catch (RemoteServiceInvocationException e) {
@@ -501,9 +506,9 @@ public class AstrixRemotingTest {
 		partition1.register(provider, objectSerializer, BroadcastService.class);
 		partition1.register(provider, objectSerializer, TestService.class);
 
-		BroadcastService broadcastService = RemotingProxy.create(BroadcastService.class, BroadcastService.class,
+		BroadcastService broadcastService = createRemotingProxy(BroadcastService.class, BroadcastService.class,
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
-		TestService testService = RemotingProxy.create(TestService.class, TestService.class,
+		TestService testService = createRemotingProxy(TestService.class, TestService.class,
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 		
 		assertEquals(provider.hello(new HelloRequest("kalle")), testService.hello(new HelloRequest("kalle")));
@@ -512,7 +517,7 @@ public class AstrixRemotingTest {
 	
 	@Test(expected = ServiceUnavailableException.class)
 	public void request_NoCorrespondingServiceRegisteredInServiceActivator_throwsServiceUnavailableException() throws Exception {
-		TestService missingRemoteService = RemotingProxy.create(TestService.class, TestService.class,
+		TestService missingRemoteService = createRemotingProxy(TestService.class, TestService.class,
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 		missingRemoteService.hello(new HelloRequest("foo"));
 	}
@@ -531,7 +536,7 @@ public class AstrixRemotingTest {
 		};
 		partition1.register(impl, objectSerializer, TestService.class);
 		
-		ObservableTestService service = RemotingProxy.create(ObservableTestService.class, TestService.class,
+		ObservableTestService service = createRemotingProxy(ObservableTestService.class, TestService.class,
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 		Observable<HelloResponse> message = service.hello(new HelloRequest("kalle"));
 		assertEquals("reply-kalle", message.toBlocking().first().getGreeting());
@@ -551,7 +556,7 @@ public class AstrixRemotingTest {
 		};
 		partition1.register(impl, objectSerializer, TestService.class);
 		
-		TestServiceAsync service = RemotingProxy.create(TestServiceAsync.class, TestService.class,
+		TestServiceAsync service = createRemotingProxy(TestServiceAsync.class, TestService.class,
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 		Future<HelloResponse> response = service.hello(new HelloRequest("kalle"));
 		assertEquals("reply-kalle", response.get().getGreeting());
@@ -585,7 +590,7 @@ public class AstrixRemotingTest {
 		partition1.register(impl, objectSerializer, TestService.class);
 		
 		
-		ObservableTestService service = RemotingProxy.create(ObservableTestService.class, TestService.class, 
+		ObservableTestService service = createRemotingProxy(ObservableTestService.class, TestService.class, 
 				directTransport(partition1), corruptDeserializer, new NoRoutingStrategy());
 		Observable<HelloResponse> message = service.hello(new HelloRequest("kalle"));
 		message.toBlocking().first();
@@ -605,7 +610,7 @@ public class AstrixRemotingTest {
 		};
 		partition1.register(impl, objectSerializer, GenericReturnTypeService.class);
 		
-		GenericReturnTypeService testService = RemotingProxy.create(GenericReturnTypeService.class, GenericReturnTypeService.class,
+		GenericReturnTypeService testService = createRemotingProxy(GenericReturnTypeService.class, GenericReturnTypeService.class,
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 
 		HelloRequest request = new HelloRequest("kalle");
@@ -628,7 +633,7 @@ public class AstrixRemotingTest {
 		};
 		partition1.register(impl, objectSerializer, BroadcastingGenericReturnTypeService.class);
 		
-		BroadcastingGenericReturnTypeService testService = RemotingProxy.create(BroadcastingGenericReturnTypeService.class, BroadcastingGenericReturnTypeService.class, 
+		BroadcastingGenericReturnTypeService testService = createRemotingProxy(BroadcastingGenericReturnTypeService.class, BroadcastingGenericReturnTypeService.class, 
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 
 		HelloRequest request = new HelloRequest("kalle");
@@ -647,7 +652,7 @@ public class AstrixRemotingTest {
 		};
 		partition1.register(impl, objectSerializer, NoArgumentService.class);
 		
-		NoArgumentService testService = RemotingProxy.create(NoArgumentService.class, NoArgumentService.class,
+		NoArgumentService testService = createRemotingProxy(NoArgumentService.class, NoArgumentService.class,
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 
 		List<String> reply = testService.hello();
@@ -666,7 +671,7 @@ public class AstrixRemotingTest {
 		};
 		partition1.register(impl, objectSerializer, VoidService.class);
 		
-		VoidService testService = RemotingProxy.create(VoidService.class, VoidService.class,
+		VoidService testService = createRemotingProxy(VoidService.class, VoidService.class,
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 
 		testService.hello("kalle");
@@ -685,7 +690,7 @@ public class AstrixRemotingTest {
 		};
 		partition1.register(impl, objectSerializer, BroadcastVoidService.class);
 		
-		BroadcastVoidService testService = RemotingProxy.create(BroadcastVoidService.class, BroadcastVoidService.class,
+		BroadcastVoidService testService = createRemotingProxy(BroadcastVoidService.class, BroadcastVoidService.class,
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 
 		testService.hello("kalle");
@@ -710,7 +715,7 @@ public class AstrixRemotingTest {
 			}
 		}, objectSerializer, VoidService.class);
 		
-		VoidService testService = RemotingProxy.create(VoidService.class, VoidService.class,
+		VoidService testService = createRemotingProxy(VoidService.class, VoidService.class,
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 		assertEquals("RemotingProxy[" + VoidService.class.getName() + "]", testService.toString());
 	}
@@ -725,7 +730,7 @@ public class AstrixRemotingTest {
 			
 		}, objectSerializer, BroadcastingGenericReturnTypeService.class);
 		
-		BroadcastingGenericReturnTypeServiceAsync service = RemotingProxy.create(BroadcastingGenericReturnTypeServiceAsync.class,
+		BroadcastingGenericReturnTypeServiceAsync service = createRemotingProxy(BroadcastingGenericReturnTypeServiceAsync.class,
 				BroadcastingGenericReturnTypeService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 		Future<List<HelloResponse>> resultFuture = service.hello(Arrays.asList(new HelloRequest("foo")));
 		List<HelloResponse> result = resultFuture.get();
@@ -734,13 +739,13 @@ public class AstrixRemotingTest {
 	
 	@Test(expected = IncompatibleRemoteResultReducerException.class)
 	public void throwsExceptionOnProxyCreationIfRemoteResultReducerDoesNotHaveAMethodSignatureCompatibleWithServiceMethodSignature() throws Exception {
-		RemotingProxy.create(BroadcastServiceWithIllegalReducer.class, BroadcastServiceWithIllegalReducer.class, 
+		createRemotingProxy(BroadcastServiceWithIllegalReducer.class, BroadcastServiceWithIllegalReducer.class, 
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 	}
 	
 //	@Test(expected = IncompatibleRemoteResultReducerException.class)
 //	public void throwsExceptionOnProxyCreationIfRemoteResultReducerDoesNotHaveAMethodSignatureCompatibleWithServiceMethodSignature_2() throws Exception {
-//		RemotingProxy.create(IllegalReducerHelloService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
+//		createRemotingProxy2(IllegalReducerHelloService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 //	}
 	
 	@Test(expected = IllegalStateException.class)
@@ -751,7 +756,7 @@ public class AstrixRemotingTest {
 			}
 		}, objectSerializer, VoidService.class);
 		
-		VoidService voidService = RemotingProxy.create(VoidService.class, VoidService.class, directTransport(partition1), objectSerializer, new RoutingStrategy() {
+		VoidService voidService = createRemotingProxy(VoidService.class, VoidService.class, directTransport(partition1), objectSerializer, new RoutingStrategy() {
 			@Override
 			public Router create(Method serviceMethod) {
 				return new Router() {
@@ -765,6 +770,11 @@ public class AstrixRemotingTest {
 		voidService.hello("foo");
 	}
 	
+	private <T> T createRemotingProxy(Class<T> proxyApi, Class<?> targetApi,
+		RemotingTransport transport, AstrixObjectSerializer objectSerializer, RoutingStrategy routingStrategy) {
+		return RemotingProxy.create(proxyApi, targetApi, transport, objectSerializer, routingStrategy, asyncTypeConverter);
+	}
+
 	@SuppressWarnings("serial")
 	public static class HelloRequest implements Serializable {
 		private String messsage;

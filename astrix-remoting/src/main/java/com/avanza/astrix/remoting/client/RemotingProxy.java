@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 
 import com.avanza.astrix.beans.core.FutureAdapter;
+import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
@@ -41,9 +42,10 @@ public class RemotingProxy implements InvocationHandler {
 	private final String serviceApi;
 	private final ConcurrentMap<Method, RemoteServiceMethod> remoteServiceMethodByMethod = new ConcurrentHashMap<>();
 	private final RemoteServiceMethodFactory remoteServiceMethodFactory;
+	private final AsyncTypeConverter asyncTypeConverter;
 
-	public static <T> T create(Class<T> proxyApi, Class<?> targetApi, RemotingTransport transport, AstrixObjectSerializer objectSerializer, RoutingStrategy routingStrategy) {
-		RemotingProxy handler = new RemotingProxy(proxyApi, targetApi, objectSerializer, transport, routingStrategy);
+	public static <T> T create(Class<T> proxyApi, Class<?> targetApi, RemotingTransport transport, AstrixObjectSerializer objectSerializer, RoutingStrategy routingStrategy, AsyncTypeConverter asyncTypeConverter) {
+		RemotingProxy handler = new RemotingProxy(proxyApi, targetApi, objectSerializer, transport, routingStrategy, asyncTypeConverter);
 		T serviceProxy = (T) Proxy.newProxyInstance(RemotingProxy.class.getClassLoader(), new Class[]{proxyApi}, handler);
 		return serviceProxy;
 	}
@@ -52,7 +54,9 @@ public class RemotingProxy implements InvocationHandler {
 						  Class<?> targetServiceApi,
 							    AstrixObjectSerializer objectSerializer,
 							    RemotingTransport AstrixServiceTransport,
-							    RoutingStrategy routingStrategy) {
+							    RoutingStrategy routingStrategy,
+							    AsyncTypeConverter asyncTypeConverter) {
+		this.asyncTypeConverter = asyncTypeConverter;
 		this.serviceApi = targetServiceApi.getName();
 		this.apiVersion = objectSerializer.version();
 		RemotingEngine remotingEngine = new RemotingEngine(AstrixServiceTransport, objectSerializer, apiVersion);
@@ -93,8 +97,8 @@ public class RemotingProxy implements InvocationHandler {
 		if (isObservableType(method.getReturnType())) {
 			return result;
 		}
-		if (isFutureType(method.getReturnType())) {
-			return new FutureAdapter<>(result);
+		if (isAsyncType(method.getReturnType())) {
+			return asyncTypeConverter.toAsyncType(method.getReturnType(), (Observable<Object>) result);
 		}
 		try {
 			return result.toBlocking().first();
@@ -114,22 +118,22 @@ public class RemotingProxy implements InvocationHandler {
 	}
 	
 	private Type getReturnType(Method method) {
-		if (isObservableOrFutureType(method.getReturnType())) {
+		if (isObservableOrAsyncType(method.getReturnType())) {
 			return ParameterizedType.class.cast(method.getGenericReturnType()).getActualTypeArguments()[0];
 		}
 		return method.getGenericReturnType();
 	}
 
-	private boolean isObservableOrFutureType(Class<?> returnType) {
-		return isFutureType(returnType) || isObservableType(returnType);
+	private boolean isObservableOrAsyncType(Class<?> returnType) {
+		return isAsyncType(returnType) || isObservableType(returnType);
 	}
 
 	private boolean isObservableType(Class<?> returnType) {
 		return Observable.class.isAssignableFrom(returnType);
 	}
 
-	private boolean isFutureType(Class<?> returnType) {
-		return Future.class.isAssignableFrom(returnType);
+	private boolean isAsyncType(Class<?> asyncType) {
+		return this.asyncTypeConverter.canAdaptToType(asyncType);
 	}
 	
 }
