@@ -15,6 +15,9 @@
  */
 package com.avanza.astrix.beans.service;
 
+import java.util.Collections;
+import java.util.Map;
+
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.factory.BeanConfiguration;
@@ -49,6 +52,15 @@ public class AstrixServiceBeanInstance implements AstrixServiceBeanInstanceMBean
 	@Override
 	public String getState() {
 		return instance.getState();
+	}
+	
+	@Override
+	public Map<String, String> getServiceProperties() {
+		ServiceProperties currentProperties = this.instance.getCurrentProperties();
+		if (currentProperties == null) {
+			return Collections.emptyMap();
+		}
+		return currentProperties.getProperties();
 	}
 	
 	

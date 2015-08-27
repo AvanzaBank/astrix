@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.beans.service;
 
+import java.util.Map;
+
 public interface AstrixServiceBeanInstanceMBean {
 
 	boolean isAvailable();
@@ -24,5 +26,7 @@ public interface AstrixServiceBeanInstanceMBean {
 	boolean isFaultToleranceEnabled();
 	
 	String getState();
+	
+	Map<String, String> getServiceProperties();
 	
 }

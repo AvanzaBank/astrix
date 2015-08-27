@@ -372,5 +372,9 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	String getState() {
 		return this.currentState.name();
 	}
+	
+	ServiceProperties getCurrentProperties() {
+		return currentProperties;
+	}
 
 }
