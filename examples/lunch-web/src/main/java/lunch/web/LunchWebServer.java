@@ -19,12 +19,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
+import com.avanza.astrix.beans.core.AstrixSettings;
+
 @EnableAutoConfiguration
 @ComponentScan("lunch.web")
 public class LunchWebServer {
 
 	public static void main(String[] args) {
 		System.setProperty("server.port", "9112");
+		System.setProperty(AstrixSettings.EXPORT_ASTRIX_MBEANS.name(), "false");
 		SpringApplication.run(LunchWebServer.class, args);
 	}
 

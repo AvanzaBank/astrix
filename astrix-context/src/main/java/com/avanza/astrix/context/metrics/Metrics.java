@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.service;
+package com.avanza.astrix.context.metrics;
 
-import com.avanza.astrix.beans.ft.CommandSettings;
+import com.avanza.astrix.beans.ft.Command;
+import com.avanza.astrix.core.function.CheckedCommand;
+import com.avanza.astrix.core.function.Supplier;
 
-public interface FaultToleranceConfigurator {
+import rx.Observable;
+
+public interface Metrics {
 	
-	enum FtProxySetting {
-		ENABLED,
-		DISABLED
-	}
+	<T> CheckedCommand<T> timeExecution(CheckedCommand<T> execution, String group, String name);
 	
-	FtProxySetting configure(CommandSettings commandSettings);
+	<T> Command<T> timeExecution(Command<T> execution, String group, String name);
+	
+	<T> Supplier<Observable<T>> timeObservable(Supplier<Observable<T>> observableFactory, String group, String name);
 
 }

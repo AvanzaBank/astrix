@@ -61,6 +61,9 @@ import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.SystemPropertiesConfigSource;
 import com.avanza.astrix.context.core.AstrixContextCoreModule;
+import com.avanza.astrix.context.metrics.DefaultMetricSpi;
+import com.avanza.astrix.context.metrics.MetricsModule;
+import com.avanza.astrix.context.metrics.MetricsSpi;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.modules.ModuleInstancePostProcessor;
@@ -109,6 +112,7 @@ public class AstrixConfigurer {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.registerDefault(StrategyProvider.create(HystrixCommandNamingStrategy.class, DefaultHystrixCommandNamingStrategy.class));
 		modulesConfigurer.registerDefault(StrategyProvider.create(FaultToleranceSpi.class, NoFaultTolerance.class));
+		modulesConfigurer.registerDefault(StrategyProvider.create(MetricsSpi.class, DefaultMetricSpi.class));
 		
 		for (Module plugin : customModules) {
 			modulesConfigurer.register(plugin);
@@ -123,6 +127,7 @@ public class AstrixConfigurer {
 		DynamicConfig config = createDynamicConfig();
 		modulesConfigurer.register(new AstrixConfigModule(config, this.settings));
 		modulesConfigurer.register(new DirectComponentModule());
+		modulesConfigurer.register(new MetricsModule());
 		modulesConfigurer.register(new AstrixContextCoreModule());
 		modulesConfigurer.register(new ServiceRegistryDiscoveryModule());
 		modulesConfigurer.register(new ConfigDiscoveryModule());

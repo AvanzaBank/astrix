@@ -15,8 +15,6 @@
  */
 package com.avanza.astrix.gs;
 
-import java.util.concurrent.TimeUnit;
-
 import com.avanza.astrix.context.core.AsyncTypeConverterPlugin;
 import com.avanza.astrix.remoting.util.GsUtil;
 import com.gigaspaces.async.AsyncFuture;
@@ -31,7 +29,7 @@ public class GsAsyncFutureTypeAdapter implements AsyncTypeConverterPlugin {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Observable<Object> toObservable(Object asyncResult, int timeout, TimeUnit unit) {
+	public Observable<Object> toObservable(Object asyncResult) {
 		return GsUtil.toObservable((AsyncFuture<Object>) asyncResult);
 	}
 

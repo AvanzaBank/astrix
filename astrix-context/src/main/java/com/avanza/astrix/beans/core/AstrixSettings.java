@@ -88,7 +88,16 @@ public final class AstrixSettings {
 	
 	public static final BooleanSetting ENABLE_FAULT_TOLERANCE = BooleanSetting.create("AstrixContext.enableFaultTolerance", true);
 	
+	/**
+	 * Whether Astrix should export MBEANS
+	 */
 	public static final BooleanSetting EXPORT_ASTRIX_MBEANS = BooleanSetting.create("com.avanza.astrix.exportAstrixMBeans", false);
+	
+	/**
+	 * Whether Astrix should collect statistics about each bean invocation.
+	 */
+	public static final BooleanSetting ENABLE_BEAN_METRICS_PROXY = BooleanSetting.create("com.avanza.astrix.enableBeanMetrics", true);
+	
 	
 	public static final StringSetting GIGA_SPACE_BEAN_NAME = StringSetting.create("AstrixGsComponent.gigaSpaceBeanName", null);
 	public static final StringSetting DYNAMIC_CONFIG_FACTORY = StringSetting.create("com.avanza.astrix.context.AstrixDynamicConfigFactory", null);

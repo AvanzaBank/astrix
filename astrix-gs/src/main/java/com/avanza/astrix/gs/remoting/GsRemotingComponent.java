@@ -18,9 +18,9 @@ package com.avanza.astrix.gs.remoting;
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.ft.CommandSettings;
+import com.avanza.astrix.beans.ft.FaultToleranceConfigurator;
 import com.avanza.astrix.beans.ft.IsolationStrategy;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
-import com.avanza.astrix.beans.service.FaultToleranceConfigurator;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;

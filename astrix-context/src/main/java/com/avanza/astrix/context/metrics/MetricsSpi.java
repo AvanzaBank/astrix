@@ -13,8 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.ft;
+package com.avanza.astrix.context.metrics;
 
-public interface CheckedCommand<T> {
-	T call() throws Throwable;
+import com.avanza.astrix.core.function.CheckedCommand;
+import com.avanza.astrix.core.function.Supplier;
+
+import rx.Observable;
+
+public interface MetricsSpi {
+	
+	<T> CheckedCommand<T> timeExecution(CheckedCommand<T> execution, String group, String name);
+	
+	<T> Supplier<Observable<T>> timeObservable(Supplier<Observable<T>> observableFactory, String group, String name);
 }

@@ -16,32 +16,29 @@
 package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.beans.factory.BeanConfigurations;
-import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 
 public final class ServiceBeanContext {
 
 	private final ServiceComponentRegistry serviceComponents;
 	private final ServiceLeaseManager leaseManager;
-	private final BeanFaultToleranceFactory beanFaultToleranceFactory;
 	private final BeanConfigurations beanConfigurations;
 	private final AstrixServiceBeanInstanceMbeanExporter serviceMbeanExporter;
+	private final ServiceBeanProxyInvocationDispatcherFactory serviceBeanInvocationDispatcherFactory;
+	
 	
 	public ServiceBeanContext(ServiceComponentRegistry serviceComponents, ServiceLeaseManager leaseManager,
-			BeanFaultToleranceFactory beanFaultToleranceFactory, BeanConfigurations beanConfigurations,
-			AstrixServiceBeanInstanceMbeanExporter serviceMbeanExporter) {
+			BeanConfigurations beanConfigurations,
+			AstrixServiceBeanInstanceMbeanExporter serviceMbeanExporter,
+			ServiceBeanProxyInvocationDispatcherFactory serviceBeanInvocationDispatcherFactory) {
 		this.serviceComponents = serviceComponents;
 		this.leaseManager = leaseManager;
-		this.beanFaultToleranceFactory = beanFaultToleranceFactory;
 		this.beanConfigurations = beanConfigurations;
 		this.serviceMbeanExporter = serviceMbeanExporter;
+		this.serviceBeanInvocationDispatcherFactory = serviceBeanInvocationDispatcherFactory;
 	}
 
 	public BeanConfigurations getBeanConfigurations() {
 		return beanConfigurations;
-	}
-
-	public BeanFaultToleranceFactory getBeanFaultToleranceFactory() {
-		return beanFaultToleranceFactory;
 	}
 
 	public ServiceLeaseManager getLeaseManager() {
@@ -54,6 +51,10 @@ public final class ServiceBeanContext {
 	
 	public AstrixServiceBeanInstanceMbeanExporter getServiceMbeanExporter() {
 		return serviceMbeanExporter;
+	}
+	
+	public ServiceBeanProxyInvocationDispatcherFactory getServiceBeanInvocationDispatcherFactory() {
+		return serviceBeanInvocationDispatcherFactory;
 	}
 	
 }

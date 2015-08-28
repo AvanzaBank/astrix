@@ -19,9 +19,11 @@ import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
+import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
 import com.avanza.astrix.context.core.AstrixMBeanExporter;
+import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.modules.NamedModule;
 
@@ -42,6 +44,8 @@ public class GenericAstrixApiProviderModule implements NamedModule {
 		moduleContext.importType(BeanFaultToleranceFactory.class);
 		moduleContext.importType(BeanConfigurations.class);
 		moduleContext.importType(AstrixMBeanExporter.class);
+		moduleContext.importType(AsyncTypeConverter.class);
+		moduleContext.importType(ServiceBeanProxyFactory.class);
 		
 		
 		moduleContext.export(ApiProviderPlugin.class);

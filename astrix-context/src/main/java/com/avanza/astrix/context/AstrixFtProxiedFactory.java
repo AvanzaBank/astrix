@@ -15,31 +15,41 @@
  */
 package com.avanza.astrix.context;
 
+import java.util.Arrays;
+
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.factory.AstrixBeans;
+import com.avanza.astrix.beans.factory.BeanProxy;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
-import com.avanza.astrix.beans.ft.CommandSettings;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
+import com.avanza.astrix.context.core.AsyncTypeConverter;
+import com.avanza.astrix.context.core.BeanInvocationDispatcher;
+import com.avanza.astrix.core.util.ReflectionUtil;
 
 public class AstrixFtProxiedFactory<T> implements StandardFactoryBean<T> {
 	
-	private StandardFactoryBean<T> target;
-	private BeanFaultToleranceFactory faultToleranceProxyFactory;
-	private PublishedAstrixBean<T> beanDefinition;
+	private final StandardFactoryBean<T> target;
+	private final BeanFaultToleranceFactory faultToleranceProxyFactory;
+	private final PublishedAstrixBean<T> beanDefinition;
+	private final AsyncTypeConverter asyncTypeConverter;
 
 	public AstrixFtProxiedFactory(StandardFactoryBean<T> target,
 								  BeanFaultToleranceFactory faultToleranceProxyFactory,
-								  PublishedAstrixBean<T> beanDefinition) {
+								  PublishedAstrixBean<T> beanDefinition,
+								  AsyncTypeConverter asyncTypeConverter) {
 		this.target = target;
 		this.faultToleranceProxyFactory = faultToleranceProxyFactory;
 		this.beanDefinition = beanDefinition;
+		this.asyncTypeConverter = asyncTypeConverter;
 	}
 
 	@Override
 	public T create(AstrixBeans beans) {
 		T rawBean = target.create(beans);
-		return faultToleranceProxyFactory.addFaultToleranceProxy(beanDefinition, rawBean, new CommandSettings());
+		BeanProxy ftProxy = faultToleranceProxyFactory.createFaultToleranceProxy(beanDefinition);
+		BeanInvocationDispatcher beanProxyDispather = new BeanInvocationDispatcher(Arrays.asList(ftProxy), asyncTypeConverter, rawBean);
+		return ReflectionUtil.newProxy(getBeanKey().getBeanType(), beanProxyDispather);
 	}
 
 	@Override

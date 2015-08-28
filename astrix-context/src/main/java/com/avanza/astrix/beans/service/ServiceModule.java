@@ -27,6 +27,7 @@ public class ServiceModule implements NamedModule {
 		
 		moduleContext.importType(ObjectSerializerFactory.class);
 		moduleContext.importType(ServiceComponent.class);
+		moduleContext.importType(ServiceBeanProxyFactory.class);
 		
 		moduleContext.export(ServiceComponentRegistry.class);
 	}

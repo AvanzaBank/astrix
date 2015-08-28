@@ -18,6 +18,7 @@ package com.avanza.astrix.context.core;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.slf4j.Logger;
@@ -48,15 +49,29 @@ public class AstrixMBeanExporterImpl implements AstrixMBeanExporter {
 
 	@Override
 	public void registerMBean(Object mbean, String folder, String name) {
-		if (!astrixConfig.get(AstrixSettings.EXPORT_ASTRIX_MBEANS).get()) {
+		if (!exportMBeans()) {
 			logger.debug("Exporting of Astrix MBeans is disabled, won't export mbean with name={}",name.toString());
 			return;
 		}
 		try {
-			ManagementFactory.getPlatformMBeanServer().registerMBean(mbean, new ObjectName(domain + ":00=" + folder + ",name=" + name));
+			ManagementFactory.getPlatformMBeanServer().registerMBean(mbean, getObjectName(folder, name));
 		} catch (Exception e) {
 			logger.warn(String.format("Failed to export mbean: type=%s name=%s", mbean.getClass().getName(), name.toString()), e);
 		}
+	}
+
+	@Override
+	public ObjectName getObjectName(String folder, String name) {
+		try {
+			return new ObjectName(domain + ":00=" + folder + ",name=" + name);
+		} catch (MalformedObjectNameException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@Override
+	public boolean exportMBeans() {
+		return astrixConfig.get(AstrixSettings.EXPORT_ASTRIX_MBEANS).get();
 	}
 	
 }

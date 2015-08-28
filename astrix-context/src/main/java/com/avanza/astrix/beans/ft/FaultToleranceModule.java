@@ -17,6 +17,7 @@ package com.avanza.astrix.beans.ft;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.factory.BeanConfigurations;
+import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
 import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.modules.NamedModule;
@@ -25,7 +26,8 @@ public class FaultToleranceModule implements NamedModule {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(BeanFaultToleranceFactory.class, BeanFaultToleranceFactoryImpl.class);
+		moduleContext.bind(BeanFaultToleranceFactory.class, BeanFaultToleranceProxyFactory.class);
+		moduleContext.bind(ServiceBeanProxyFactory.class, BeanFaultToleranceProxyFactory.class);
 		
 		moduleContext.importType(FaultToleranceSpi.class);
 		moduleContext.importType(HystrixCommandNamingStrategy.class);
@@ -34,6 +36,7 @@ public class FaultToleranceModule implements NamedModule {
 		moduleContext.importType(AsyncTypeConverter.class);
 		
 		moduleContext.export(BeanFaultToleranceFactory.class);
+		moduleContext.export(ServiceBeanProxyFactory.class);
 	}
 
 	@Override

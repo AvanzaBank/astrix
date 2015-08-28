@@ -28,6 +28,8 @@ import java.util.concurrent.ConcurrentMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.beans.ft.Command;
+import com.avanza.astrix.context.metrics.Metrics;
 import com.avanza.astrix.core.ServiceInvocationException;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
@@ -44,7 +46,12 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AstrixServiceActivatorImpl.class);
 	private final ConcurrentMap<String, PublishedService<?>> serviceByType = new ConcurrentHashMap<>();
+	private final Metrics metrics;
 	
+	public AstrixServiceActivatorImpl(Metrics metrics) {
+		this.metrics = metrics;
+	}
+
 	static class PublishedService<T> {
 
 		private final T service;
@@ -125,11 +132,10 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 	 * @return
 	 */
 	@Override
-	public AstrixServiceInvocationResponse invokeService(AstrixServiceInvocationRequest request) {
-		PublishedService<?> publishedService = null;
-		int version = Integer.parseInt(request.getHeader("apiVersion"));
-		String serviceApi = request.getHeader("serviceApi");
-		publishedService = this.serviceByType.get(serviceApi);
+	public AstrixServiceInvocationResponse invokeService(final AstrixServiceInvocationRequest request) {
+		final int version = Integer.parseInt(request.getHeader("apiVersion"));
+		final String serviceApi = request.getHeader("serviceApi");
+		final PublishedService<?> publishedService = this.serviceByType.get(serviceApi);
 		if (publishedService == null) {
 			/*
 			 * Service not available. This might happen in rare conditions when a processing unit
@@ -142,7 +148,12 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 			logger.info(String.format("Service not available. request=%s correlationId=%s", request, invocationResponse.getCorrelationId()));
 			return invocationResponse;
 		}
-		return publishedService.invoke(request, version, serviceApi);
+		return this.metrics.timeExecution(new Command<AstrixServiceInvocationResponse>() {
+			@Override
+			public AstrixServiceInvocationResponse call() {
+				return publishedService.invoke(request, version, serviceApi);
+			}
+		}, "ServiceActivator", serviceApi).call();
 	}
 
 	private static Throwable resolveException(Exception e) {

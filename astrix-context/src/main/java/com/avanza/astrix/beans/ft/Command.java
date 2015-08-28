@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.beans.ft;
 
+import com.avanza.astrix.core.function.CheckedCommand;
+
 public interface Command<T> extends CheckedCommand<T> {
 	T call();
 }

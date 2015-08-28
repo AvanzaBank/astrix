@@ -32,14 +32,10 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.BeanConfiguration;
-import com.avanza.astrix.beans.factory.BeanConfigurations;
-import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
-import com.avanza.astrix.beans.ft.CommandSettings;
-import com.avanza.astrix.beans.service.FaultToleranceConfigurator.FtProxySetting;
 import com.avanza.astrix.config.DynamicBooleanProperty;
+import com.avanza.astrix.context.core.BeanInvocationDispatcher;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.core.util.ReflectionUtil;
 
 /**
  * 
@@ -65,7 +61,6 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	
 	
 	private final ServiceDiscovery serviceDiscovery;
-	private final BeanFaultToleranceFactory beanFaultToleranceFactory;
 	private final DynamicBooleanProperty available;
 	
 	/*
@@ -76,14 +71,16 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	private volatile ServiceProperties currentProperties;
 	private volatile BeanState currentState;
 
+	private final ServiceBeanProxyInvocationDispatcherFactory serviceBeanInvocationDispatcherFactory;
+
 	private ServiceBeanInstance(ServiceDefinition<T> serviceDefinition, 
 								AstrixBeanKey<T> beanKey, 
 								ServiceDiscovery serviceDiscovery, 
 								ServiceComponentRegistry serviceComponents,
-								BeanFaultToleranceFactory beanFaultToleranceFactory,
+								ServiceBeanProxyInvocationDispatcherFactory serviceBeanInvocationDispatcherFactory,
 								DynamicBooleanProperty available) {
 		this.serviceDiscovery = serviceDiscovery;
-		this.beanFaultToleranceFactory = beanFaultToleranceFactory;
+		this.serviceBeanInvocationDispatcherFactory = serviceBeanInvocationDispatcherFactory;
 		this.available = available;
 		this.serviceDefinition = Objects.requireNonNull(serviceDefinition);
 		this.beanKey = Objects.requireNonNull(beanKey);
@@ -100,7 +97,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 				beanKey, 
 				serviceDiscovery, 
 				serviceBeanContext.getServiceComponents(), 
-				serviceBeanContext.getBeanFaultToleranceFactory(), 
+				serviceBeanContext.getServiceBeanInvocationDispatcherFactory(),
 				beanConfiguration.get(AstrixBeanSettings.AVAILABLE));
 	}
 	
@@ -248,29 +245,14 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 					throw new UnsupportedTargetTypeException(serviceComponent.getName(), beanKey.getBeanType());
 				}
 				BoundServiceBeanInstance<T> boundInstance = serviceComponent.bind(serviceDefinition, serviceProperties);
-				T faultToleranceProtectedInstance = addFaultTolerance(serviceComponent, boundInstance.get());
-				setState(new Bound(boundInstance, faultToleranceProtectedInstance));
+				BeanInvocationDispatcher serviceBeanInvocationDispatcher = serviceBeanInvocationDispatcherFactory.create(serviceDefinition, serviceComponent, boundInstance.get());
+				setState(new Bound(boundInstance, serviceBeanInvocationDispatcher));
 				currentProperties = serviceProperties;
 			} catch (IllegalServiceMetadataException e) {
 				setState(new IllegalServiceMetadataState(e.getMessage()));
 			} catch (Exception e) {
 				log.warn(String.format("Failed to bind service bean: %s", getBeanKey()), e);
 				setState(new Unbound());
-			}
-		}
-
-		private T addFaultTolerance(ServiceComponent serviceComponent, T instance) {
-			CommandSettings faultToleranceSettings = new CommandSettings();
-			FtProxySetting ftProxySetting = FtProxySetting.ENABLED;
-			if (serviceComponent instanceof FaultToleranceConfigurator) {
-				 ftProxySetting = FaultToleranceConfigurator.class.cast(serviceComponent).configure(faultToleranceSettings);
-			}
-			if (ftProxySetting == FtProxySetting.ENABLED) {
-				return beanFaultToleranceFactory.addFaultToleranceProxy(serviceDefinition, instance, faultToleranceSettings);
-			} else {
-				log.info("Fault tolerance proxy is disabled by ServiceComponent. componentName={}, beanKey={}", 
-						serviceComponent.getName(), getBeanKey().toString());
-				return instance;
 			}
 		}
 
@@ -305,16 +287,16 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	private class Bound extends BeanState {
 
 		private final BoundServiceBeanInstance<T> serviceBeanInstance;
-		private final T faultToleranceProtectedInstance;
+		private final BeanInvocationDispatcher serviceBeanInvocationDispatcher;
 		
-		public Bound(BoundServiceBeanInstance<T> bean, T faultToleranceProtectedInstance) {
+		public Bound(BoundServiceBeanInstance<T> bean, BeanInvocationDispatcher serviceBeanInvocationDispatcher) {
 			this.serviceBeanInstance = bean;
-			this.faultToleranceProtectedInstance = faultToleranceProtectedInstance;
+			this.serviceBeanInvocationDispatcher = serviceBeanInvocationDispatcher;
 		}
 
 		@Override
 		public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
-			return ReflectionUtil.invokeMethod(method, faultToleranceProtectedInstance, args);
+			return serviceBeanInvocationDispatcher.invoke(proxy, method, args);
 		}
 
 		@Override

@@ -25,5 +25,10 @@
 			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-service-registry-pu</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>${astrix.groupId}</groupId>
+			<artifactId>astrix-metrics</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

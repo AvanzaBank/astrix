@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import com.avanza.astrix.beans.core.FutureAdapter;
 
@@ -37,8 +36,8 @@ public final class AsyncTypeConverterImpl implements AsyncTypeConverter {
 	}
 
 	@Override
-	public Observable<Object> toObservable(Class<?> fromType, Object asyncTypeInstance, int timeout, TimeUnit unit) {
-		return getPlugin(fromType).toObservable(asyncTypeInstance, timeout, unit);
+	public Observable<Object> toObservable(Class<?> fromType, Object asyncTypeInstance) {
+		return getPlugin(fromType).toObservable(asyncTypeInstance);
 	}
 
 	@Override
@@ -63,8 +62,8 @@ public final class AsyncTypeConverterImpl implements AsyncTypeConverter {
 	private static class FutureTypeConverter implements AsyncTypeConverterPlugin {
 		
 		@Override
-		public Observable<Object> toObservable(Object asyncResult, int timeout, TimeUnit unit) {
-			return Observable.from((Future<?>) asyncResult, timeout, unit);
+		public Observable<Object> toObservable(Object asyncResult) {
+			return Observable.from((Future<?>) asyncResult);
 		}
 		
 		@Override

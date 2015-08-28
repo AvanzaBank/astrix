@@ -32,6 +32,7 @@ import com.avanza.astrix.beans.publish.PublishedBean;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
+import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.modules.ObjectCache;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -52,16 +53,19 @@ final class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 	private final ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory;
 	private final BeanFaultToleranceFactory faultToleranceFactory;
 	private final AstrixConfig config;
+	private final AsyncTypeConverter asyncTypeConverter;
 	
 	public GenericAstrixApiProviderPlugin(
 			AstrixServiceMetaFactory serviceMetaFactory,
 			ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory,
 			BeanFaultToleranceFactory faultToleranceFactory,
-			AstrixConfig config) {
+			AstrixConfig config,
+			AsyncTypeConverter asyncTypeConverter) {
 		this.serviceMetaFactory = serviceMetaFactory;
 		this.serviceDiscoveryMetaFactory = serviceDiscoveryMetaFactory;
 		this.faultToleranceFactory = faultToleranceFactory;
 		this.config = config;
+		this.asyncTypeConverter = asyncTypeConverter;
 	}
 
 	@Override
@@ -96,7 +100,7 @@ final class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 		Object libraryProviderInstance = getApiProviderInstance(apiProviderClass.getProviderClass());
 		StandardFactoryBean<T> libraryFactory = new AstrixLibraryFactory<>(libraryProviderInstance, astrixBeanDefinitionMethod, beanDefinition.getQualifier());
 		if (beanDefinition.applyFtProxy()) {
-			libraryFactory = new AstrixFtProxiedFactory<T>(libraryFactory, faultToleranceFactory, beanDefinition);
+			libraryFactory = new AstrixFtProxiedFactory<T>(libraryFactory, faultToleranceFactory, beanDefinition, asyncTypeConverter);
 		}
 		return libraryFactory;
 	}

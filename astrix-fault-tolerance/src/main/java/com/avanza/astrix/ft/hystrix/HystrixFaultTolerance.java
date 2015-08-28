@@ -15,10 +15,10 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import com.avanza.astrix.beans.ft.CheckedCommand;
 import com.avanza.astrix.beans.ft.CommandSettings;
 import com.avanza.astrix.beans.ft.FaultToleranceSpi;
 import com.avanza.astrix.beans.ft.IsolationStrategy;
+import com.avanza.astrix.core.function.CheckedCommand;
 import com.avanza.astrix.core.function.Supplier;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;

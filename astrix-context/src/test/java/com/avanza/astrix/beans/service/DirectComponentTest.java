@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.Future;
 
+import org.junit.After;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
@@ -27,9 +28,14 @@ import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
+import com.avanza.astrix.test.util.AstrixTestUtil;
+
+import junit.extensions.TestSetup;
 
 public class DirectComponentTest {
 	
+	private AstrixContext astrixContext;
+
 	@Test
 	public void itsPossibleToStubAsyncServiceUsingDirectComponent() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
@@ -37,7 +43,7 @@ public class DirectComponentTest {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		AstrixContext astrixContext = astrixConfigurer.configure();
+		astrixContext = astrixConfigurer.configure();
 		
 		PingAsync ping = astrixContext.getBean(PingAsync.class);
 		assertEquals("foo", ping.ping("foo").get());
@@ -56,6 +62,11 @@ public class DirectComponentTest {
 		public String ping(String msg) {
 			return msg;
 		}
+	}
+	
+	@After
+	public void after() {
+		AstrixTestUtil.closeSafe(astrixContext);
 	}
 	
 	@AstrixApiProvider

@@ -15,8 +15,6 @@
  */
 package com.avanza.astrix.context.core;
 
-import java.util.concurrent.TimeUnit;
-
 import rx.Observable;
 /**
  * 
@@ -25,7 +23,7 @@ import rx.Observable;
  */
 public interface AsyncTypeConverter {
 
-	Observable<Object> toObservable(Class<?> fromType, Object asyncTypeInstance, int timeout, TimeUnit unit);
+	Observable<Object> toObservable(Class<?> fromType, Object asyncTypeInstance);
 
 	Object toAsyncType(Class<?> targetType, Observable<Object> observable);
 
