@@ -46,6 +46,7 @@ public class StringSetting implements Setting<String> {
 		return name;
 	}
 	
+	@Override
 	public String defaultValue() {
 		return defaultValue;
 	}

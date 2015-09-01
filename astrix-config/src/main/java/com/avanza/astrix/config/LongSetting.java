@@ -44,8 +44,9 @@ public class LongSetting implements Setting<Long> {
 		return name;
 	}
 	
-	public long defaultValue() {
-		return defaultValue;
+	@Override
+	public Long defaultValue() {
+		return Long.valueOf(defaultValue);
 	}
 
 

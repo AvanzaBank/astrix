@@ -26,4 +26,14 @@ public interface Setting<T> {
 	
 	DynamicProperty<T> getFrom(DynamicConfig config);
 	
+	/**
+	 * Returns the default value for this setting.
+	 * 
+	 * For settings of primitive types this method
+	 * returns the boxed version of the given type,
+	 * and never returns null.
+	 * @return
+	 */
+	T defaultValue();
+	
 }

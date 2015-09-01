@@ -44,9 +44,8 @@ public class IntSetting implements Setting<Integer> {
 		return name;
 	}
 	
-	public int defaultValue() {
-		return defaultValue;
+	public Integer defaultValue() {
+		return Integer.valueOf(this.defaultValue);
 	}
-
 
 }

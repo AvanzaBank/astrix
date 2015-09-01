@@ -41,8 +41,9 @@ public class BooleanSetting implements Setting<Boolean> {
 		return name;
 	}
 	
-	public boolean defaultValue() {
-		return defaultValue;
+	@Override
+	public Boolean defaultValue() {
+		return Boolean.valueOf(defaultValue);
 	}
 	
 
