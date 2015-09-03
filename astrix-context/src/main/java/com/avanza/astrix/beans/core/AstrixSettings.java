@@ -96,7 +96,7 @@ public final class AstrixSettings {
 	/**
 	 * Whether Astrix should collect statistics about each bean invocation.
 	 */
-	public static final BooleanSetting ENABLE_BEAN_METRICS_PROXY = BooleanSetting.create("com.avanza.astrix.enableBeanMetrics", true);
+	public static final BooleanSetting ENABLE_BEAN_METRICS = BooleanSetting.create("com.avanza.astrix.enableBeanMetrics", true);
 	
 	
 	public static final StringSetting GIGA_SPACE_BEAN_NAME = StringSetting.create("AstrixGsComponent.gigaSpaceBeanName", null);

@@ -23,6 +23,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.junit.After;
 import org.junit.Test;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanSettings;
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.core.BasicFuture;
 import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.context.AstrixContext;
@@ -82,6 +85,48 @@ public class BeanMetricsTest {
 		assertEquals(2, fakeTimer.getLastTimedObservableExecutionTime());
 	}
 	
+	@Test
+	public void itsPossibleToDisableBeanMetrics() throws Exception {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		final AtomicLong fakeClock = new AtomicLong(0);
+		FakeTimer fakeTimer = new FakeTimer(fakeClock);
+		astrixConfigurer.registerStrategy(MetricsSpi.class, fakeTimer);
+		astrixConfigurer.registerApiProvider(PingApi.class);
+		astrixConfigurer.set(AstrixBeanSettings.BEAN_METRICS_ENABLED.nameFor(AstrixBeanKey.create(Ping.class)), false);
+		astrixConfigurer.set("ping", DirectComponent.registerAndGetUri(Ping.class, new TwoClockTickPing(fakeClock)));
+		this.astrixContext = astrixConfigurer.configure();
+		
+		Ping ping = this.astrixContext.getBean(Ping.class);
+
+		assertEquals(-1L, fakeTimer.getLastTimedObservableExecutionTime());
+		assertEquals("foo", ping.pingAsync("foo").get());
+		assertEquals(-1L, fakeTimer.getLastTimedObservableExecutionTime());
+		
+		assertEquals("foo", ping.ping("foo"));
+		assertEquals(-1L, fakeTimer.getLastTimedObservableExecutionTime());
+	}
+	
+	@Test
+	public void itsPossibleToDisableBeanMetricsGlobally() throws Exception {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		final AtomicLong fakeClock = new AtomicLong(0);
+		FakeTimer fakeTimer = new FakeTimer(fakeClock);
+		astrixConfigurer.registerStrategy(MetricsSpi.class, fakeTimer);
+		astrixConfigurer.registerApiProvider(PingApi.class);
+		astrixConfigurer.set(AstrixSettings.ENABLE_BEAN_METRICS, false);
+		astrixConfigurer.set("ping", DirectComponent.registerAndGetUri(Ping.class, new TwoClockTickPing(fakeClock)));
+		this.astrixContext = astrixConfigurer.configure();
+		
+		Ping ping = this.astrixContext.getBean(Ping.class);
+
+		assertEquals(-1L, fakeTimer.getLastTimedObservableExecutionTime());
+		assertEquals("foo", ping.pingAsync("foo").get());
+		assertEquals(-1L, fakeTimer.getLastTimedObservableExecutionTime());
+		
+		assertEquals("foo", ping.ping("foo"));
+		assertEquals(-1L, fakeTimer.getLastTimedObservableExecutionTime());
+	}
+	
 	
 	private static final class TwoClockTickPing implements Ping {
 		private final AtomicLong fakeClock;
@@ -105,11 +150,14 @@ public class BeanMetricsTest {
 
 		@Override
 		public Future<String> pingAsync(String msg) {
-			BasicFuture<String> future = new BasicFuture<>();
+			return new BasicFuture<>(ping(msg));
+		}
+		
+		@Override
+		public String ping(String msg) {
 			fakeClock.incrementAndGet();
 			fakeClock.incrementAndGet();
-			future.set(msg);
-			return future;
+			return msg;
 		}
 	}
 
@@ -156,6 +204,7 @@ public class BeanMetricsTest {
 	public interface Ping {
 		Observable<String> observePing(String msg);
 		Future<String> pingAsync(String msg);
+		String ping(String msg);
 	}
 	
 	@AstrixApiProvider

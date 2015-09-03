@@ -54,4 +54,5 @@ public final class DynamicBooleanProperty implements DynamicProperty<Boolean> {
 	public void removeListener(DynamicPropertyListener<Boolean> listener) {
 		listenerSupport.removeListener(listener);
 	}
+	
 }

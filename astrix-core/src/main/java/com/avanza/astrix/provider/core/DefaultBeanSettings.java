@@ -53,20 +53,22 @@ public @interface DefaultBeanSettings {
 	
 	int DEFAULT_INITIAL_TIMEOUT = 1000;
 	boolean DEFAULT_FAULT_TOLERANCE_ENABLED = true;
+	boolean DEFAULT_BEAN_METRICS_ENABLED = true;
 	
 	/**
 	 * See AstrixBeanSettings#INITIAL_TIMEOUT
-	 * 
-	 * @return
 	 */
 	int initialTimeout() default DEFAULT_INITIAL_TIMEOUT;
 	
 	
 	/**
 	 * See AstrixBeanSettings#INITIAL_TIMEOUT
-	 * 
-	 * @return
 	 */
 	boolean faultToleranceEnabled() default DEFAULT_FAULT_TOLERANCE_ENABLED;
+	
+	/**
+	 * See AstrixBeanSettings#BEAN_METRICS_ENABLED
+	 */
+	boolean beanMetricsEnabled() default DEFAULT_BEAN_METRICS_ENABLED;
 	
 }

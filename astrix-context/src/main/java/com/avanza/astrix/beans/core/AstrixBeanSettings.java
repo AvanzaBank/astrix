@@ -33,6 +33,13 @@ public final class AstrixBeanSettings {
 	 */
 	public static final BooleanBeanSetting FAULT_TOLERANCE_ENABLED = 
 			new BooleanBeanSetting("faultTolerance.enabled", DefaultBeanSettings.DEFAULT_FAULT_TOLERANCE_ENABLED);
+	
+	/**
+	 * Determines whether statistics should be collected for each invocation on the associated
+	 * Astrix bean.
+	 */
+	public static final BooleanBeanSetting BEAN_METRICS_ENABLED = 
+			new BooleanBeanSetting("beanMetrics.enabled", DefaultBeanSettings.DEFAULT_BEAN_METRICS_ENABLED);
 
 	/**
 	 * When fault tolerance is enabled this setting defines the initial timeout used

@@ -16,7 +16,9 @@
 package com.avanza.astrix.context.metrics;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
+import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.factory.BeanProxy;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.config.DynamicBooleanProperty;
@@ -29,17 +31,19 @@ class BeanMetricsProxy implements BeanProxy {
 
 	private final PublishedAstrixBean<?> beanDefinition;
 	private final MetricsSpi metrics;
-	private final DynamicBooleanProperty enableBeanMetricsProxy;
+	private final DynamicBooleanProperty beanMetricsEnabledGlobally;
+	private final DynamicBooleanProperty beanMetricsEnabled;
 	
-	public BeanMetricsProxy(PublishedAstrixBean<?> beanDefinition, MetricsSpi metrics, AstrixConfig astrixConfig) {
+	public BeanMetricsProxy(PublishedAstrixBean<?> beanDefinition, MetricsSpi metrics, AstrixConfig astrixConfig, BeanConfigurations beanConfigurations) {
 		this.beanDefinition = beanDefinition;
 		this.metrics = metrics;
-		this.enableBeanMetricsProxy = astrixConfig.get(AstrixSettings.ENABLE_BEAN_METRICS_PROXY);
+		this.beanMetricsEnabledGlobally = astrixConfig.get(AstrixSettings.ENABLE_BEAN_METRICS);
+		this.beanMetricsEnabled = beanConfigurations.getBeanConfiguration(beanDefinition.getBeanKey()).get(AstrixBeanSettings.BEAN_METRICS_ENABLED);
 	}
 
 	@Override
 	public <T> CheckedCommand<T> proxyInvocation(CheckedCommand<T> command) {
-		if (!enableBeanMetricsProxy.get()) {
+		if (!beanMetricsEnabled()) {
 			return command;
 		}
 		return metrics.timeExecution(command, "ServiceBeanMetrics", getServiceBeanName());
@@ -47,10 +51,14 @@ class BeanMetricsProxy implements BeanProxy {
 
 	@Override
 	public <T> Supplier<Observable<T>> proxyAsyncInvocation(Supplier<Observable<T>> command) {
-		if (!enableBeanMetricsProxy.get()) {
+		if (!beanMetricsEnabled()) {
 			return command;
 		}
 		return metrics.timeObservable(command, "ServiceBeanMetrics", getServiceBeanName());
+	}
+
+	private boolean beanMetricsEnabled() {
+		return beanMetricsEnabledGlobally.get() && beanMetricsEnabled.get();
 	}
 	
 	private String getServiceBeanName() {
