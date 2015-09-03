@@ -19,6 +19,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 import com.avanza.astrix.core.AstrixRouting;
+import com.avanza.astrix.core.remoting.Router;
+import com.avanza.astrix.core.remoting.RoutingStrategy;
 import com.avanza.astrix.remoting.util.RoutingKeyMethodCache;
 /**
  * 

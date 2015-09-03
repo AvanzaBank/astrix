@@ -17,6 +17,9 @@ package com.avanza.astrix.remoting.client;
 
 import java.lang.reflect.Method;
 
+import com.avanza.astrix.core.remoting.Router;
+import com.avanza.astrix.core.remoting.RoutingKey;
+
 public class AnnotatedArgumentInstanceRouter implements Router {
 	
 	private int argumentIndex;

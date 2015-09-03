@@ -28,5 +28,23 @@ public interface Metrics {
 	<T> Command<T> timeExecution(Command<T> execution, String group, String name);
 	
 	<T> Supplier<Observable<T>> timeObservable(Supplier<Observable<T>> observableFactory, String group, String name);
+	
+	public static class NoMetrics implements Metrics {
+		@Override
+		public <T> CheckedCommand<T> timeExecution(CheckedCommand<T> execution, String group, String name) {
+			return execution;
+		}
+
+		@Override
+		public <T> Command<T> timeExecution(Command<T> execution, String group, String name) {
+			return execution;
+		}
+
+		@Override
+		public <T> Supplier<Observable<T>> timeObservable(Supplier<Observable<T>> observableFactory, String group, String name) {
+			return observableFactory; 
+		}
+		
+	}
 
 }

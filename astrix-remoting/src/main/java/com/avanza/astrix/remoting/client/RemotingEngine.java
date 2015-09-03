@@ -24,6 +24,7 @@ import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.CorrelationId;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
 import com.avanza.astrix.core.ServiceInvocationException;
+import com.avanza.astrix.core.remoting.RoutingKey;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 
 public final class RemotingEngine {

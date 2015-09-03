@@ -18,6 +18,8 @@ package com.avanza.astrix.remoting.client;
 import java.util.Collection;
 import java.util.List;
 
+import com.avanza.astrix.core.remoting.RoutingKey;
+
 import rx.Observable;
 /**
  * SPI for implementing a RemotingTransport. <p>

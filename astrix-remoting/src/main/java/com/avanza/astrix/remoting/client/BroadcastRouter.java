@@ -15,6 +15,9 @@
  */
 package com.avanza.astrix.remoting.client;
 
+import com.avanza.astrix.core.remoting.Router;
+import com.avanza.astrix.core.remoting.RoutingKey;
+
 public class BroadcastRouter implements Router {
 	@Override
 	public RoutingKey getRoutingKey(Object[] args) {

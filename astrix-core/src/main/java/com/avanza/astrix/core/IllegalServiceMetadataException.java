@@ -29,4 +29,8 @@ public class IllegalServiceMetadataException extends RuntimeException {
 		super(msg);
 	}
 
+	public IllegalServiceMetadataException(String msg, Exception e) {
+		super(msg, e);
+	}
+
 }

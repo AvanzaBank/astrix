@@ -21,9 +21,9 @@ import org.junit.Test;
 import org.openspaces.remoting.Routing;
 
 import com.avanza.astrix.core.AstrixRouting;
+import com.avanza.astrix.core.remoting.Router;
+import com.avanza.astrix.core.remoting.RoutingKey;
 import com.avanza.astrix.remoting.client.AmbiguousRoutingException;
-import com.avanza.astrix.remoting.client.Router;
-import com.avanza.astrix.remoting.client.RoutingKey;
 
 public class GsRoutingStrategyTest {
 	

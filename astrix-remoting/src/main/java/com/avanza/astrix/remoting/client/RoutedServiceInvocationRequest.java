@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package com.avanza.astrix.remoting.client;
+
+import com.avanza.astrix.core.remoting.RoutingKey;
+
 /**
  * 
  * @author Elias Lindholm (elilin)

@@ -20,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import com.avanza.astrix.core.AstrixRouting;
+import com.avanza.astrix.core.remoting.Router;
+import com.avanza.astrix.core.remoting.RoutingKey;
 
 public class DefaultAstrixRoutingStrategyTest {
 	

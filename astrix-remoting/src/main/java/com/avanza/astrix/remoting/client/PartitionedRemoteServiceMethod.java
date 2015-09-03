@@ -34,6 +34,7 @@ import com.avanza.astrix.core.AstrixPartitionedRouting;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.RemoteResultReducer;
 import com.avanza.astrix.core.function.Consumer;
+import com.avanza.astrix.core.remoting.RoutingKey;
 import com.avanza.astrix.core.util.ReflectionUtil;
 /**
  * 

@@ -13,8 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.remoting.client;
+package com.avanza.astrix.core.remoting;
 
+/**
+ * Used to route remote service invocations by extracting a RoutingKey
+ * from the arguments to a remote service method. <p>
+ * 
+ * @author Elias Lindholm
+ *
+ */
 public interface Router {
+	
+	/**
+	 * Calculates the RoutingKey for a given remote service invocation. <p>
+	 * 
+	 * This method must return a non-null value.
+	 * 
+	 * @param args
+	 * @return
+	 * @throws Exception
+	 */
 	RoutingKey getRoutingKey(Object... args) throws Exception;
 }

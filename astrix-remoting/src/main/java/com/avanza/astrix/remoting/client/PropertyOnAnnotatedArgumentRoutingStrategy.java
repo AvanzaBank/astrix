@@ -18,6 +18,9 @@ package com.avanza.astrix.remoting.client;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import com.avanza.astrix.core.remoting.Router;
+import com.avanza.astrix.core.remoting.RoutingKey;
+
 public class PropertyOnAnnotatedArgumentRoutingStrategy implements Router {
 	
 	private final int argumentIndex;

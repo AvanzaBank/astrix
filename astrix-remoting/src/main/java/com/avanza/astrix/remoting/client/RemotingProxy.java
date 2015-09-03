@@ -27,6 +27,7 @@ import java.util.concurrent.Future;
 import com.avanza.astrix.beans.core.FutureAdapter;
 import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.core.AstrixCallStackTrace;
+import com.avanza.astrix.core.remoting.RoutingStrategy;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 
@@ -44,8 +45,8 @@ public class RemotingProxy implements InvocationHandler {
 	private final RemoteServiceMethodFactory remoteServiceMethodFactory;
 	private final AsyncTypeConverter asyncTypeConverter;
 
-	public static <T> T create(Class<T> proxyApi, Class<?> targetApi, RemotingTransport transport, AstrixObjectSerializer objectSerializer, RoutingStrategy routingStrategy, AsyncTypeConverter asyncTypeConverter) {
-		RemotingProxy handler = new RemotingProxy(proxyApi, targetApi, objectSerializer, transport, routingStrategy, asyncTypeConverter);
+	public static <T> T create(Class<T> proxyApi, Class<?> targetApi, RemotingTransport transport, AstrixObjectSerializer objectSerializer, RoutingStrategy defaultRoutingStrategy, AsyncTypeConverter asyncTypeConverter) {
+		RemotingProxy handler = new RemotingProxy(proxyApi, targetApi, objectSerializer, transport, defaultRoutingStrategy, asyncTypeConverter);
 		T serviceProxy = (T) Proxy.newProxyInstance(RemotingProxy.class.getClassLoader(), new Class[]{proxyApi}, handler);
 		return serviceProxy;
 	}
@@ -54,13 +55,13 @@ public class RemotingProxy implements InvocationHandler {
 						  Class<?> targetServiceApi,
 							    AstrixObjectSerializer objectSerializer,
 							    RemotingTransport AstrixServiceTransport,
-							    RoutingStrategy routingStrategy,
+							    RoutingStrategy defaultRoutingStrategy,
 							    AsyncTypeConverter asyncTypeConverter) {
 		this.asyncTypeConverter = asyncTypeConverter;
 		this.serviceApi = targetServiceApi.getName();
 		this.apiVersion = objectSerializer.version();
 		RemotingEngine remotingEngine = new RemotingEngine(AstrixServiceTransport, objectSerializer, apiVersion);
-		this.remoteServiceMethodFactory = new RemoteServiceMethodFactory(remotingEngine, routingStrategy);
+		this.remoteServiceMethodFactory = new RemoteServiceMethodFactory(remotingEngine, defaultRoutingStrategy);
 		/*
 		 * For each of the following services the "targetServiceType" resolves to MyService:
 		 *  - MyService

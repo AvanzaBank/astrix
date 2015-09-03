@@ -40,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.avanza.astrix.beans.ft.Command;
 import com.avanza.astrix.context.JavaSerializationSerializer;
 import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.context.core.AsyncTypeConverterImpl;
@@ -49,12 +48,14 @@ import com.avanza.astrix.context.metrics.Metrics;
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
 import com.avanza.astrix.core.AstrixRemoteResult;
+import com.avanza.astrix.core.AstrixRouter;
 import com.avanza.astrix.core.RemoteResultReducer;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
 import com.avanza.astrix.core.ServiceInvocationException;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.core.function.CheckedCommand;
-import com.avanza.astrix.core.function.Supplier;
+import com.avanza.astrix.core.remoting.Router;
+import com.avanza.astrix.core.remoting.RoutingKey;
+import com.avanza.astrix.core.remoting.RoutingStrategy;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.client.DefaultAstrixRoutingStrategy;
@@ -63,9 +64,6 @@ import com.avanza.astrix.remoting.client.RemotingProxy;
 import com.avanza.astrix.remoting.client.RemotingTransport;
 import com.avanza.astrix.remoting.client.RemotingTransportSpi;
 import com.avanza.astrix.remoting.client.RoutedServiceInvocationRequest;
-import com.avanza.astrix.remoting.client.Router;
-import com.avanza.astrix.remoting.client.RoutingKey;
-import com.avanza.astrix.remoting.client.RoutingStrategy;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 
 import rx.Observable;
@@ -79,20 +77,7 @@ import rx.Subscriber;
 public class AstrixRemotingTest {
 
 	AstrixObjectSerializer objectSerializer = new JavaSerializationSerializer(1);
-	Metrics metrics = new Metrics() {
-		@Override
-		public <T> Supplier<Observable<T>> timeObservable(Supplier<Observable<T>> observableFactory, String group, String name) {
-			return observableFactory;
-		}
-		@Override
-		public <T> Command<T> timeExecution(Command<T> execution, String group, String name) {
-			return execution;
-		}
-		@Override
-		public <T> CheckedCommand<T> timeExecution(CheckedCommand<T> execution, String group, String name) {
-			return execution;
-		}
-	};
+	Metrics metrics = new Metrics.NoMetrics();
 	AstrixServiceActivatorImpl partition1 = new AstrixServiceActivatorImpl(metrics);
 	AsyncTypeConverter asyncTypeConverter = new AsyncTypeConverterImpl(Collections.<AsyncTypeConverterPlugin>emptyList());
 	
@@ -291,6 +276,35 @@ public class AstrixRemotingTest {
 		oddPartition.register(oddPartitionCalculator, objectSerializer, CalculatorListService.class);
 
 		CalculatorListService calculatorService = createRemotingProxy(CalculatorListService.class, CalculatorListService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		int squareSum = calculatorService.squareSum(Arrays.asList(1, 2, 3, 4, 5));
+		assertEquals(1 + 4 + 9 + 16 + 25, squareSum);
+	}
+	
+	@Test
+	public void customRoutingRequest() throws Exception {
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl(metrics);
+		AstrixServiceActivatorImpl oddPartition = new AstrixServiceActivatorImpl(metrics);
+		CustomRoutedCalc eventPartitionCalculator = new CustomRoutedCalc() {
+			@Override
+			public int squareSum(Collection<Integer> nums) {
+				int squareSum = 0;
+				for (int num : nums) {
+					squareSum += num * num;
+				}
+				return squareSum;
+			}
+		};
+		CustomRoutedCalc oddPartitionCalculator = new CustomRoutedCalc() {
+			@Override
+			public int squareSum(Collection<Integer> nums) {
+				throw new AssertionError("All request should be statically routed to even partition using custom router");
+			}
+		};
+		
+		evenPartition.register(eventPartitionCalculator, objectSerializer, CustomRoutedCalc.class);
+		oddPartition.register(oddPartitionCalculator, objectSerializer, CustomRoutedCalc.class);
+
+		CustomRoutedCalc calculatorService = createRemotingProxy(CustomRoutedCalc.class, CustomRoutedCalc.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
 		int squareSum = calculatorService.squareSum(Arrays.asList(1, 2, 3, 4, 5));
 		assertEquals(1 + 4 + 9 + 16 + 25, squareSum);
 	}
@@ -1060,6 +1074,24 @@ public class AstrixRemotingTest {
 	interface TestService {
 		HelloResponse hello(HelloRequest message);
 		String hello(HelloRequest message, String greeting);
+	}
+	
+	public static class StaticRouting implements RoutingStrategy {
+		@Override
+		public Router create(Method serviceMethod) {
+			return new Router() {
+				@Override
+				public RoutingKey getRoutingKey(Object... args) throws Exception {
+					return RoutingKey.create(0);
+				}
+			};
+		}
+		
+	}
+	
+	interface CustomRoutedCalc {
+		@AstrixRouter(StaticRouting.class)
+		int squareSum(Collection<Integer> nums);
 	}
 	
 	interface VoidService {

@@ -13,12 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.remoting.client;
+package com.avanza.astrix.core;
 
-import java.lang.reflect.Method;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface RoutingStrategy {
-	
-	Router create(Method serviceMethod);
+import com.avanza.astrix.core.remoting.RoutingStrategy;
 
+
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+@Target(value={ElementType.PARAMETER, ElementType.METHOD})
+@Retention(value=RetentionPolicy.RUNTIME)
+@Documented
+public @interface AstrixRouter {
+    Class<? extends RoutingStrategy> value();
 }

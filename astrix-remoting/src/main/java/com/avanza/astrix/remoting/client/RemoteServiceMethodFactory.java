@@ -21,7 +21,10 @@ import java.lang.reflect.Type;
 
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
+import com.avanza.astrix.core.AstrixRouter;
+import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.RemoteResultReducer;
+import com.avanza.astrix.core.remoting.RoutingStrategy;
 import com.avanza.astrix.core.util.ReflectionUtil;
 /**
  * 
@@ -31,12 +34,12 @@ import com.avanza.astrix.core.util.ReflectionUtil;
 public class RemoteServiceMethodFactory {
 
 	private final RemotingEngine remotingEngine;
-	private final RoutingStrategy routingStrategy;
+	private final RoutingStrategy defaultRoutingStrategy;
 	
 	public RemoteServiceMethodFactory(RemotingEngine remotingEngine,
-			RoutingStrategy routingStrategy) {
+			RoutingStrategy defaultRoutingStrategy) {
 		this.remotingEngine = remotingEngine;
-		this.routingStrategy = routingStrategy;
+		this.defaultRoutingStrategy = defaultRoutingStrategy;
 	}
 
 	public RemoteServiceMethod createRemoteServiceMethod(
@@ -51,7 +54,21 @@ public class RemoteServiceMethodFactory {
 		if (partitionedByArgumentIndex >= 0) {
 			return new PartitionedRemoteServiceMethod(partitionedByArgumentIndex, proxiedMethod, methodSignature, remotingEngine, targetReturnType);
 		}
-		return new RoutedRemoteServiceMethod(methodSignature, routingStrategy.create(proxiedMethod), remotingEngine, targetReturnType);
+		if (proxiedMethod.isAnnotationPresent(AstrixRouter.class)) {
+			RoutingStrategy routingStrategy = createRoutingStrategy(proxiedMethod);
+			return new RoutedRemoteServiceMethod(methodSignature, routingStrategy.create(proxiedMethod), remotingEngine, targetReturnType);
+		}
+		return new RoutedRemoteServiceMethod(methodSignature, defaultRoutingStrategy.create(proxiedMethod), remotingEngine, targetReturnType);
+	}
+
+	private RoutingStrategy createRoutingStrategy(Method proxiedMethod) {
+		AstrixRouter router = proxiedMethod.getAnnotation(AstrixRouter.class);
+		Class<? extends RoutingStrategy> routingStrategyClass = router.value();
+		try {
+			return ReflectionUtil.newInstance(routingStrategyClass);
+		} catch (Exception e) {
+			throw new IllegalServiceMetadataException("Failed to create RoutingStrategy", e);
+		}
 	}
 	
 	public static int getPartitionedByAnnotation(Method m) {

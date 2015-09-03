@@ -21,14 +21,14 @@ import java.lang.reflect.Method;
 import org.openspaces.remoting.Routing;
 
 import com.avanza.astrix.core.AstrixBroadcast;
+import com.avanza.astrix.core.remoting.Router;
+import com.avanza.astrix.core.remoting.RoutingStrategy;
 import com.avanza.astrix.remoting.client.AmbiguousRoutingException;
 import com.avanza.astrix.remoting.client.AnnotatedArgumentInstanceRouter;
 import com.avanza.astrix.remoting.client.AnnotatedArgumentRouter;
 import com.avanza.astrix.remoting.client.BroadcastRouter;
 import com.avanza.astrix.remoting.client.DefaultAstrixRoutingStrategy;
 import com.avanza.astrix.remoting.client.PropertyOnAnnotatedArgumentRoutingStrategy;
-import com.avanza.astrix.remoting.client.Router;
-import com.avanza.astrix.remoting.client.RoutingStrategy;
 import com.avanza.astrix.remoting.util.RoutingKeyMethodCache;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 /**

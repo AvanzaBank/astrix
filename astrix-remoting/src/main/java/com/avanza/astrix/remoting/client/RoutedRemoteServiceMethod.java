@@ -17,6 +17,9 @@ package com.avanza.astrix.remoting.client;
 
 import java.lang.reflect.Type;
 
+import com.avanza.astrix.core.remoting.Router;
+import com.avanza.astrix.core.remoting.RoutingKey;
+
 import rx.Observable;
 import rx.functions.Func1;
 
