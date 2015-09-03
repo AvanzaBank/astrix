@@ -32,6 +32,6 @@ import com.avanza.astrix.core.remoting.RoutingStrategy;
 @Target(value={ElementType.PARAMETER, ElementType.METHOD})
 @Retention(value=RetentionPolicy.RUNTIME)
 @Documented
-public @interface AstrixRouter {
+public @interface AstrixRoutingStrategy {
     Class<? extends RoutingStrategy> value();
 }

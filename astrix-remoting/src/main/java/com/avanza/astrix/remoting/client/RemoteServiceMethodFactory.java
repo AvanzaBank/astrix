@@ -21,7 +21,7 @@ import java.lang.reflect.Type;
 
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
-import com.avanza.astrix.core.AstrixRouter;
+import com.avanza.astrix.core.AstrixRoutingStrategy;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.RemoteResultReducer;
 import com.avanza.astrix.core.remoting.RoutingStrategy;
@@ -54,7 +54,7 @@ public class RemoteServiceMethodFactory {
 		if (partitionedByArgumentIndex >= 0) {
 			return new PartitionedRemoteServiceMethod(partitionedByArgumentIndex, proxiedMethod, methodSignature, remotingEngine, targetReturnType);
 		}
-		if (proxiedMethod.isAnnotationPresent(AstrixRouter.class)) {
+		if (proxiedMethod.isAnnotationPresent(AstrixRoutingStrategy.class)) {
 			RoutingStrategy routingStrategy = createRoutingStrategy(proxiedMethod);
 			return new RoutedRemoteServiceMethod(methodSignature, routingStrategy.create(proxiedMethod), remotingEngine, targetReturnType);
 		}
@@ -62,7 +62,7 @@ public class RemoteServiceMethodFactory {
 	}
 
 	private RoutingStrategy createRoutingStrategy(Method proxiedMethod) {
-		AstrixRouter router = proxiedMethod.getAnnotation(AstrixRouter.class);
+		AstrixRoutingStrategy router = proxiedMethod.getAnnotation(AstrixRoutingStrategy.class);
 		Class<? extends RoutingStrategy> routingStrategyClass = router.value();
 		try {
 			return ReflectionUtil.newInstance(routingStrategyClass);

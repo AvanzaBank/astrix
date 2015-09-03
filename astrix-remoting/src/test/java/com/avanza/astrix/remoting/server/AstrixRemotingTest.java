@@ -48,7 +48,7 @@ import com.avanza.astrix.context.metrics.Metrics;
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
 import com.avanza.astrix.core.AstrixRemoteResult;
-import com.avanza.astrix.core.AstrixRouter;
+import com.avanza.astrix.core.AstrixRoutingStrategy;
 import com.avanza.astrix.core.RemoteResultReducer;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
 import com.avanza.astrix.core.ServiceInvocationException;
@@ -1090,8 +1090,9 @@ public class AstrixRemotingTest {
 	}
 	
 	interface CustomRoutedCalc {
-		@AstrixRouter(StaticRouting.class)
+		@AstrixRoutingStrategy(StaticRouting.class)
 		int squareSum(Collection<Integer> nums);
+		
 	}
 	
 	interface VoidService {
