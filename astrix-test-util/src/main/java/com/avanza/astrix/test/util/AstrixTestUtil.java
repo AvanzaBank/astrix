@@ -15,12 +15,12 @@
  */
 package com.avanza.astrix.test.util;
 
+import java.util.function.Supplier;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Assert;
-
-import com.avanza.astrix.core.function.Supplier;
 
 public class AstrixTestUtil {
 	

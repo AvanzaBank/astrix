@@ -22,6 +22,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.function.Supplier;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +31,6 @@ import org.junit.Test;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;

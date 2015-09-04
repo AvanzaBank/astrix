@@ -26,16 +26,16 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-
-import rx.Observable;
-import rx.functions.Func1;
+import java.util.function.Consumer;
 
 import com.avanza.astrix.core.AstrixPartitionedRouting;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.RemoteResultReducer;
-import com.avanza.astrix.core.function.Consumer;
 import com.avanza.astrix.core.remoting.RoutingKey;
 import com.avanza.astrix.core.util.ReflectionUtil;
+
+import rx.Observable;
+import rx.functions.Func1;
 /**
  * 
  * @author Elias Lindholm (elilin)

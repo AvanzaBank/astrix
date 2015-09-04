@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.context.metrics;
 
+import java.util.function.Supplier;
+
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
@@ -23,7 +25,6 @@ import com.avanza.astrix.beans.factory.BeanProxy;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.core.function.CheckedCommand;
-import com.avanza.astrix.core.function.Supplier;
 
 import rx.Observable;
 

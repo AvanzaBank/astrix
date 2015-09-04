@@ -15,9 +15,10 @@
  */
 package com.avanza.astrix.context.metrics;
 
+import java.util.function.Supplier;
+
 import com.avanza.astrix.beans.ft.Command;
 import com.avanza.astrix.core.function.CheckedCommand;
-import com.avanza.astrix.core.function.Supplier;
 
 import rx.Observable;
 

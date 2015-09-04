@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 import org.junit.After;
 import org.junit.Test;
@@ -31,7 +32,6 @@ import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.function.CheckedCommand;
-import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;

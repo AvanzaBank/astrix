@@ -18,6 +18,8 @@ package com.avanza.astrix.metrics;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.function.Supplier;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +28,6 @@ import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.context.metrics.MetricsSpi;
 import com.avanza.astrix.core.function.CheckedCommand;
-import com.avanza.astrix.core.function.Supplier;
 import com.codahale.metrics.Timer;
 
 import rx.Observable;

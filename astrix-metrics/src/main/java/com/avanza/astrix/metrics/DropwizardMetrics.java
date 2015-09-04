@@ -16,6 +16,7 @@
 package com.avanza.astrix.metrics;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -27,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import com.avanza.astrix.context.core.AstrixMBeanExporter;
 import com.avanza.astrix.context.metrics.MetricsSpi;
 import com.avanza.astrix.core.function.CheckedCommand;
-import com.avanza.astrix.core.function.Supplier;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ObjectNameFactory;

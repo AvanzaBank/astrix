@@ -20,22 +20,21 @@ import static org.junit.Assert.fail;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import org.junit.Test;
 
-import rx.Observable;
-import rx.Observable.OnSubscribe;
-import rx.Subscriber;
-
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.core.function.Supplier;
-import com.avanza.astrix.ft.hystrix.HystrixObservableCommandFacade;
 import com.avanza.astrix.test.util.AstrixTestUtil;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
 import com.netflix.hystrix.HystrixObservableCommand.Setter;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
+
+import rx.Observable;
+import rx.Observable.OnSubscribe;
+import rx.Subscriber;
 
 
 public class HystrixObservableCommandFacadeTest {

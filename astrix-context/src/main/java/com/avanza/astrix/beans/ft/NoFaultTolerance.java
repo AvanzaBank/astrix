@@ -15,8 +15,9 @@
  */
 package com.avanza.astrix.beans.ft;
 
+import java.util.function.Supplier;
+
 import com.avanza.astrix.core.function.CheckedCommand;
-import com.avanza.astrix.core.function.Supplier;
 
 import rx.Observable;
 

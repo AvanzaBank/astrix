@@ -18,6 +18,7 @@ package com.avanza.astrix.ft;
 import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import org.junit.After;
 import org.junit.Before;
@@ -32,7 +33,6 @@ import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.core.function.CheckedCommand;
-import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;

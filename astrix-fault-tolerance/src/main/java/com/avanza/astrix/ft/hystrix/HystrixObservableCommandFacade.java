@@ -15,14 +15,15 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import rx.Observable;
-import rx.functions.Func1;
+import java.util.function.Supplier;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.core.function.Supplier;
 import com.netflix.hystrix.HystrixObservableCommand;
 import com.netflix.hystrix.HystrixObservableCommand.Setter;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
+
+import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * @author Elias Lindholm (elilin)

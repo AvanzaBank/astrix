@@ -22,19 +22,18 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.function.Supplier;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.Poller;

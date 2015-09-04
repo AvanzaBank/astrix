@@ -17,6 +17,8 @@ package com.avanza.astrix.integration.tests;
 
 import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
 
+import java.util.function.Supplier;
+
 import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,7 +31,6 @@ import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.core.function.Supplier;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
