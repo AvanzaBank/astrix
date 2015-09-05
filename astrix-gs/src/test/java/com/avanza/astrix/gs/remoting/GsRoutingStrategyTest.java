@@ -30,11 +30,12 @@ public class GsRoutingStrategyTest {
 	@Test
 	public void astrixRoutingTakesPrecedence() throws Exception {
 		class Service {
+			@SuppressWarnings("unused")
 			public void hello(@Routing String routingArg, @AstrixRouting String anotherArg) {
 			}
 		}
 		Router router = new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
-		RoutingKey routingKey = router.getRoutingKey("ignored-arg", "second-arg");
+		RoutingKey routingKey = router.getRoutingKey(new Object[]{"ignored-arg", "second-arg"});
 		assertEquals(RoutingKey.create("second-arg"), routingKey);
 	}
 	
@@ -42,29 +43,32 @@ public class GsRoutingStrategyTest {
 	@Test
 	public void routesOnRoutingAnnotatedArgument() throws Exception {
 		class Service {
+			@SuppressWarnings("unused")
 			public void hello(@Routing String routingArg, String anotherArg) {
 			}
 		}
 		Router router = new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
-		RoutingKey routingKey = router.getRoutingKey("routing-arg", "another-arg");
+		RoutingKey routingKey = router.getRoutingKey(new Object[]{"routing-arg", "another-arg"});
 		assertEquals(RoutingKey.create("routing-arg"), routingKey);
 	}
 	
 	@Test
 	public void routesOnRoutingAnnotatedArgumentPropertyIfDefined() throws Exception {
 		class Service {
+			@SuppressWarnings("unused")
 			public void hello(@Routing("getRouting") ProperRoutingMethod routingArg) {
 			}
 		}
 		
 		Router router = new GsRoutingStrategy().create(Service.class.getMethod("hello", ProperRoutingMethod.class));
-		RoutingKey routingKey = router.getRoutingKey(new ProperRoutingMethod());
+		RoutingKey routingKey = router.getRoutingKey(new Object[]{new ProperRoutingMethod()});
 		assertEquals(RoutingKey.create("routing-arg"), routingKey);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void missingPropertyMethod_throwsIllegalArgumentException() throws Exception {
 		class Service {
+			@SuppressWarnings("unused")
 			public void hello(@Routing("getRouting") MissingRoutingMethod routingArg) {
 			}
 		}
@@ -74,6 +78,7 @@ public class GsRoutingStrategyTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void invalidPropertyMethod_throwsIllegalArgumentException() throws Exception {
 		class Service {
+			@SuppressWarnings("unused")
 			public void hello(@Routing("getRouting") IllegalRoutingMethod routingArg) {
 			}
 		}
@@ -84,6 +89,7 @@ public class GsRoutingStrategyTest {
 	@Test(expected = AmbiguousRoutingException.class)
 	public void multipleRoutingAnnotations_throwsAmbiguousRoutingException() throws Exception {
 		class Service {
+			@SuppressWarnings("unused")
 			public void hello(@Routing String routingArg, @Routing String routingArg2) {
 			}
 		}
@@ -93,6 +99,7 @@ public class GsRoutingStrategyTest {
 	@Test(expected = AmbiguousRoutingException.class)
 	public void noRoutingArgument_throwsAmbiguousRoutingException() throws Exception {
 		class Service {
+			@SuppressWarnings("unused")
 			public void hello(String routingArg, String routingArg2) {
 			}
 		}

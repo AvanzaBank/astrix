@@ -39,24 +39,14 @@ public interface RoutingStrategy {
 		private final AtomicInteger next = new AtomicInteger();
 		@Override
 		public Router create(Method serviceMethod) {
-			return new Router() {
-				@Override
-				public RoutingKey getRoutingKey(Object... args) throws Exception {
-					return RoutingKey.create(next.incrementAndGet());
-				}
-			};
+			return args -> RoutingKey.create(next.incrementAndGet());
 		}
 	}
 	
 	public static class Static implements RoutingStrategy {
 		@Override
 		public Router create(Method serviceMethod) {
-			return new Router() {
-				@Override
-				public RoutingKey getRoutingKey(Object... args) throws Exception {
-					return RoutingKey.create(0);
-				}
-			};
+			return args -> RoutingKey.create(0);
 		}
 	}
 

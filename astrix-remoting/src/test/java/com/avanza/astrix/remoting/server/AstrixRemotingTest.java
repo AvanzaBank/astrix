@@ -87,14 +87,14 @@ public class AstrixRemotingTest {
 			if (serviceMethod.isAnnotationPresent(AstrixBroadcast.class)) {
 				return new Router() {
 					@Override
-					public RoutingKey getRoutingKey(Object... args) throws Exception {
+					public RoutingKey getRoutingKey(Object[] args) throws Exception {
 						return null; // Broadcast
 					}
 				};
 			}
 			return new Router() {
 				@Override
-				public RoutingKey getRoutingKey(Object... args) throws Exception {
+				public RoutingKey getRoutingKey(Object[] args) throws Exception {
 					return RoutingKey.create(1); // Constant routing
 				}
 				
@@ -451,6 +451,7 @@ public class AstrixRemotingTest {
 	}
 	
 	public interface ServiceWithRawListRoutingArgument {
+		@SuppressWarnings("rawtypes")
 		List<Integer> foo(@AstrixPartitionedRouting(routingMethod = "getRoutingKey") List list);
 	}
 	
@@ -775,11 +776,6 @@ public class AstrixRemotingTest {
 				directTransport(partition1), objectSerializer, new NoRoutingStrategy());
 	}
 	
-//	@Test(expected = IncompatibleRemoteResultReducerException.class)
-//	public void throwsExceptionOnProxyCreationIfRemoteResultReducerDoesNotHaveAMethodSignatureCompatibleWithServiceMethodSignature_2() throws Exception {
-//		createRemotingProxy2(IllegalReducerHelloService.class, directTransport(partition1), objectSerializer, new NoRoutingStrategy());
-//	}
-	
 	@Test(expected = IllegalStateException.class)
 	public void throwsIllegalStateExceptionIfRoutingStrategyReturnsNull() throws Exception {
 		partition1.register(new VoidService() {
@@ -791,12 +787,7 @@ public class AstrixRemotingTest {
 		VoidService voidService = createRemotingProxy(VoidService.class, VoidService.class, directTransport(partition1), objectSerializer, new RoutingStrategy() {
 			@Override
 			public Router create(Method serviceMethod) {
-				return new Router() {
-					@Override
-					public RoutingKey getRoutingKey(Object... args) throws Exception {
-						return null;
-					}
-				};
+				return args -> null;
 			}
 		});
 		voidService.hello("foo");
@@ -1081,7 +1072,7 @@ public class AstrixRemotingTest {
 		public Router create(Method serviceMethod) {
 			return new Router() {
 				@Override
-				public RoutingKey getRoutingKey(Object... args) throws Exception {
+				public RoutingKey getRoutingKey(Object[] args) throws Exception {
 					return RoutingKey.create(0);
 				}
 			};

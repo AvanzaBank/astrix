@@ -31,7 +31,7 @@ public class AnnotatedArgumentInstanceRouter implements Router {
 	}
 
 	@Override
-	public RoutingKey getRoutingKey(Object... args) throws Exception {
+	public RoutingKey getRoutingKey(Object[] args) throws Exception {
 		return RoutingKey.create(routingKeyMethod.invoke(args[argumentIndex]));
 	}
 }

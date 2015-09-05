@@ -27,7 +27,7 @@ public class AnnotatedArgumentRouter implements Router {
 	}
 
 	@Override
-	public RoutingKey getRoutingKey(Object... args) {
+	public RoutingKey getRoutingKey(Object[] args) {
 		return RoutingKey.create(args[argumentIndex]);
 	}
 }

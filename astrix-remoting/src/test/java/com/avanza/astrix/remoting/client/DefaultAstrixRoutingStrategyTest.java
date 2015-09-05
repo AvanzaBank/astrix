@@ -32,25 +32,27 @@ public class DefaultAstrixRoutingStrategyTest {
 			}
 		}
 		Router router = new DefaultAstrixRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
-		RoutingKey routingKey = router.getRoutingKey("routing-arg", "another-arg");
+		RoutingKey routingKey = router.getRoutingKey(new Object[]{"routing-arg", "another-arg"});
 		assertEquals(RoutingKey.create("routing-arg"), routingKey);
 	}
 	
 	@Test
 	public void routesOnRoutingAnnotatedArgumentPropertyIfDefined() throws Exception {
 		class Service {
+			@SuppressWarnings("unused")
 			public void hello(@AstrixRouting("getRouting") ProperRoutingMethod routingArg) {
 			}
 		}
 		
 		Router router = new DefaultAstrixRoutingStrategy().create(Service.class.getMethod("hello", ProperRoutingMethod.class));
-		RoutingKey routingKey = router.getRoutingKey(new ProperRoutingMethod());
+		RoutingKey routingKey = router.getRoutingKey(new Object[]{new ProperRoutingMethod()});
 		assertEquals(RoutingKey.create("routing-arg"), routingKey);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void missingPropertyMethod_throwsIllegalArgumentException() throws Exception {
 		class Service {
+			@SuppressWarnings("unused")
 			public void hello(@AstrixRouting("getRouting") MissingRoutingMethod routingArg) {
 			}
 		}
@@ -60,6 +62,7 @@ public class DefaultAstrixRoutingStrategyTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void invalidPropertyMethod_throwsIllegalArgumentException() throws Exception {
 		class Service {
+			@SuppressWarnings("unused")
 			public void hello(@AstrixRouting("getRouting") IllegalRoutingMethod routingArg) {
 			}
 		}
@@ -70,6 +73,7 @@ public class DefaultAstrixRoutingStrategyTest {
 	@Test(expected = AmbiguousRoutingException.class)
 	public void multipleRoutingAnnotations_throwsAmbiguousRoutingException() throws Exception {
 		class Service {
+			@SuppressWarnings("unused")
 			public void hello(@AstrixRouting String routingArg, @AstrixRouting String routingArg2) {
 			}
 		}

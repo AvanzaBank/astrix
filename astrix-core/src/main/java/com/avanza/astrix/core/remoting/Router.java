@@ -22,6 +22,7 @@ package com.avanza.astrix.core.remoting;
  * @author Elias Lindholm
  *
  */
+@FunctionalInterface
 public interface Router {
 	
 	/**
@@ -33,5 +34,5 @@ public interface Router {
 	 * @return
 	 * @throws Exception
 	 */
-	RoutingKey getRoutingKey(Object... args) throws Exception;
+	RoutingKey getRoutingKey(Object[] args) throws Exception;
 }
