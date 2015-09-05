@@ -35,19 +35,19 @@ import com.avanza.astrix.provider.core.AstrixServiceExport;
  */
 class ServiceExporterImpl implements ServiceExporter {
 	
-	private ServiceComponentRegistry serviceComponents;
-	private AstrixApplicationDescriptor applicationDescriptor;
-	private final Collection<ExportedServiceBeanDefinition<?>> serviceBeanDefinitions = new CopyOnWriteArrayList<>();
+	private final ServiceComponentRegistry serviceComponents;
+	private final AstrixApplicationDescriptor applicationDescriptor;
+	private final Collection<ExportedServiceBeanDefinition<?>> exportedServices = new CopyOnWriteArrayList<>();
 	private final ServiceRegistryExporter serviceRegistryExporter;
 	private final ConcurrentMap<Class<?>, Object> serviceProviderByType = new ConcurrentHashMap<>();
-	private final ServiceProviderPlugins serviceProviderPlugins;
 	
-	
-	
-	public ServiceExporterImpl(ServiceComponentRegistry serviceComponents, ServiceRegistryExporter serviceRegistryExporter, ServiceProviderPlugins serviceProviderPlugins) {
+	public ServiceExporterImpl(ServiceComponentRegistry serviceComponents, ServiceRegistryExporter serviceRegistryExporter, ServiceProviderPlugins serviceProviderPlugins, AstrixApplicationDescriptor applicationDescriptor) {
 		this.serviceComponents = serviceComponents;
 		this.serviceRegistryExporter = serviceRegistryExporter;
-		this.serviceProviderPlugins = serviceProviderPlugins;
+		this.applicationDescriptor = applicationDescriptor;
+		for (ApiProviderClass api : applicationDescriptor.exportsRemoteServicesFor()) {
+			this.exportedServices.addAll(serviceProviderPlugins.getExportedServices(api));
+		}
 	}
 
 	public void addServiceProvider(Object bean) {
@@ -67,22 +67,13 @@ class ServiceExporterImpl implements ServiceExporter {
 	}
 
 	@Override
-	public void setServiceDescriptor(AstrixApplicationDescriptor applicationDescriptor) {
-		this.applicationDescriptor = applicationDescriptor;		// TODO: How to inject application descriptor??? Create server module
-		for (ApiProviderClass api : applicationDescriptor.exportsRemoteServicesFor()) {
-			this.serviceBeanDefinitions.addAll(serviceProviderPlugins.getExportedServices(api));
-		}
-	}
-	
-	@Override
 	public void exportService(ExportedServiceBeanDefinition<?> definition) {
-		this.serviceBeanDefinitions.add(definition);
+		this.exportedServices.add(definition);
 	}
 	
 
-	@Override
-	public void exportProvidedServices() {
-		for (ExportedServiceBeanDefinition<?> serviceBeanDefintion : serviceBeanDefinitions) {
+	private void exportProvidedServices() {
+		for (ExportedServiceBeanDefinition<?> serviceBeanDefintion : exportedServices) {
 			export(serviceBeanDefintion);
 		}
 	}
@@ -102,6 +93,7 @@ class ServiceExporterImpl implements ServiceExporter {
 	
 	@Override
 	public void startPublishServices() {
+		exportProvidedServices();
 		this.serviceRegistryExporter.startPublishServices();
 	}
 

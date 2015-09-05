@@ -24,4 +24,6 @@ public interface AstrixApplicationContext extends AstrixContext {
 
 	DynamicConfig getConfig();
 
+	void startServicePublisher();
+
 }

@@ -21,12 +21,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -40,21 +37,12 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.core.Ordered;
 
-import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.publish.ApiProvider;
-import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.Astrix;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
-import com.avanza.astrix.serviceunit.ExportedServiceBeanDefinition;
-import com.avanza.astrix.serviceunit.ServiceAdministrator;
-import com.avanza.astrix.serviceunit.ServiceAdministratorVersioningConfigurer;
-import com.avanza.astrix.serviceunit.ServiceExporter;
-import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 
 /**
  * 
@@ -87,13 +75,12 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	 * 
 	 */
 	
-	private static final Logger log = LoggerFactory.getLogger(AstrixFrameworkBean.class);
 	private List<Class<?>> consumedAstrixBeans = new ArrayList<>();
 	private String subsystem;
 	private Map<String, String> settings = new HashMap<>();
 	private AstrixApplicationDescriptor applicationDescriptor;
 	private AstrixApplicationContext astrixContext;
-	private volatile boolean serviceExporterStarted = false;
+	private volatile boolean servicePublisherStarted = false;
 	private ApplicationContext applicationContext;
 	private final AstrixConfigurer configurer = new AstrixConfigurer();
 	
@@ -102,10 +89,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		astrixContext = createAsterixContext(getDynamicConfig(applicationContext));
-		if (isServer()) {
-			setupApplicationInstanceId();
-		}
+		astrixContext = createAstrixContext(getDynamicConfig(applicationContext));
 		astrixContext.getInstance(AstrixSpringContext.class).setApplicationContext(applicationContext);
 		astrixContext.getInstance(AstrixSpringContext.class).setAstrixContext(astrixContext);
 		for (Class<?> consumedAstrixBean : this.consumedAstrixBeans) {
@@ -166,11 +150,11 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	}
 	
 	/**
-	 * If an application descriptor is provided, then the service exporting part of the framework
+	 * If an application descriptor is set, then the service exporting part of the framework
 	 * will be loaded with all required components to provide the services defined in
-	 * the api's provided by the given applicatinDescriptor.
+	 * the api's referred to by the given applicatinDescriptor.
 	 * 
-	 * @param serviceDescriptor
+	 * @param applicationDescriptorHolder
 	 */
 	public void setApplicationDescriptor(Class<?> applicationDescriptorHolder) {
 		this.applicationDescriptor = AstrixApplicationDescriptor.create(applicationDescriptorHolder);
@@ -209,7 +193,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		throw new IllegalArgumentException("Multiple DynamicConfig instances found in ApplicationContext");
 	}
 	
-	private AstrixApplicationContext createAsterixContext(DynamicConfig optionalConfig) {
+	private AstrixApplicationContext createAstrixContext(DynamicConfig optionalConfig) {
 		configurer.setSettings(this.settings);
 		if (optionalConfig != null) {
 			configurer.setConfig(optionalConfig);
@@ -217,15 +201,20 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		if (this.subsystem != null) {
 			configurer.setSubsystem(this.subsystem);
 		}
+		if (this.applicationDescriptor != null) {
+			configurer.setApplicationDescriptor(applicationDescriptor);
+		}
 		return (AstrixApplicationContext) configurer.configure();
 	}
 
 	@Override
 	public void onApplicationEvent(ApplicationContextEvent event) {
-		if (event instanceof ContextRefreshedEvent && !serviceExporterStarted) {
+		if (event instanceof ContextRefreshedEvent && !servicePublisherStarted) {
 			// Application initialization complete. Export astrix-services.
-			exportAllProvidedServices();
-			serviceExporterStarted = true;
+			if (isServer()) {
+				this.astrixContext.startServicePublisher();
+			}
+			servicePublisherStarted = true;
 		} else if (event instanceof ContextClosedEvent || event instanceof ContextStoppedEvent) {
 			/*
 			 * What's the difference between the "stopped" and "closed" event? In our embedded
@@ -239,50 +228,8 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		this.astrixContext.destroy();
 	}
 
-	private void exportAllProvidedServices() {
-		if (!isServer()) {
-			return; // current application exports no services
-		}
-		String applicationInstanceId = getApplicationInstanceId();
-		ServiceExporter serviceExporter = astrixContext.getInstance(ServiceExporter.class);
-		
-		serviceExporter.addServiceProvider(astrixContext.getInstance(ServiceAdministrator.class));
-		ObjectSerializerDefinition serializer = ObjectSerializerDefinition.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
-		ServiceDefinition<ServiceAdministrator> serviceDefinition = new ServiceDefinition<>(ApiProvider.create("FrameworkServices"),
-																							AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
-																							serializer, true);
-		ExportedServiceBeanDefinition<ServiceAdministrator> serviceAdminDefintion = new ExportedServiceBeanDefinition<>(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
-																			    serviceDefinition, 
-																			    true, // isVersioned  
-																			    true, // alwaysActive
-																			    AstrixSettings.SERVICE_ADMINISTRATOR_COMPONENT.getFrom(this.astrixContext.getConfig()).get());
-		serviceExporter.exportService(serviceAdminDefintion);
-		
-		serviceExporter.setServiceDescriptor(applicationDescriptor); // TODO This is a hack. Avoid setting serviceDescriptor explicitly here
-		serviceExporter.exportProvidedServices();
-		serviceExporter.startPublishServices();
-	}
-
 	private boolean isServer() {
 		return applicationDescriptor != null;
-	}
-	
-	
-
-	private void setupApplicationInstanceId() {
-		String applicationInstanceId = AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(this.astrixContext.getConfig()).get();
-		if (applicationInstanceId == null) {
-			applicationInstanceId = this.applicationDescriptor.toString();
-			configurer.set(AstrixSettings.APPLICATION_INSTANCE_ID, this.applicationDescriptor.toString());
-			log.info("No applicationInstanceId set, using name of ApplicationDescriptor as applicationInstanceId: {}", applicationInstanceId);
-			Objects.requireNonNull(AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(this.astrixContext.getConfig()).get());
-		} else {
-			log.info("Current applicationInstanceId={}", applicationInstanceId);
-		}
-	}
-	
-	private String getApplicationInstanceId() {
-		return AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(this.astrixContext.getConfig()).get();
 	}
 
 	public void setConsumedAstrixBeans(Class<?>... consumedAstrixBeans) {

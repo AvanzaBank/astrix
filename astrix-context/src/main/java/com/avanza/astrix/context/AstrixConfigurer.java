@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -74,6 +75,7 @@ import com.avanza.astrix.modules.StrategyProvider;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
+import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
 import com.avanza.astrix.serviceunit.ServiceUnitModule;
 import com.avanza.astrix.versioning.core.ObjectSerializerModule;
 import com.avanza.astrix.versioning.jackson1.Jackson1SerializerModule;
@@ -98,8 +100,13 @@ public class AstrixConfigurer {
 	private DynamicConfig customConfig = null;
 	private final DynamicConfig wellKnownConfigSources = DynamicConfig.create(new SystemPropertiesConfigSource(), settings, PropertiesConfigSource.optionalClasspathPropertiesFile(CLASSPATH_OVERRIDE_SETTINGS));
 	private final Set<String> activeProfiles = new HashSet<>();
+	private AstrixApplicationDescriptor applicationDescriptor;
 	
 	public AstrixConfigurer() {
+	}
+	
+	public void setApplicationDescriptor(AstrixApplicationDescriptor applicationDescriptor) {
+		this.applicationDescriptor = applicationDescriptor;
 	}
 	
 	/**
@@ -108,7 +115,7 @@ public class AstrixConfigurer {
 	 * @return
 	 */
 	public AstrixContext configure() {
-		
+		DynamicConfig config = createDynamicConfig();
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.registerDefault(StrategyProvider.create(HystrixCommandNamingStrategy.class, DefaultHystrixCommandNamingStrategy.class));
 		modulesConfigurer.registerDefault(StrategyProvider.create(FaultToleranceSpi.class, NoFaultTolerance.class));
@@ -124,7 +131,6 @@ public class AstrixConfigurer {
 			modulesConfigurer.register(strategyProvider);
 		}
 		
-		DynamicConfig config = createDynamicConfig();
 		modulesConfigurer.register(new AstrixConfigModule(config, this.settings));
 		modulesConfigurer.register(new DirectComponentModule());
 		modulesConfigurer.register(new MetricsModule());
@@ -137,14 +143,18 @@ public class AstrixConfigurer {
 		modulesConfigurer.register(new Jackson1SerializerModule());
 		modulesConfigurer.register(new GenericAstrixApiProviderModule());
 		modulesConfigurer.register(new FaultToleranceModule());
-		modulesConfigurer.register(new ServiceUnitModule()); // TODO: this module should be registerd by AstrixFrameworkBean
+		if (this.applicationDescriptor != null) {
+			// Init server parts
+			setupApplicationInstanceId(config);
+			modulesConfigurer.register(new ServiceUnitModule(this.applicationDescriptor));
+		}
 		
 		AstrixAwareInjector awareInjector = new AstrixAwareInjector(config);
 		modulesConfigurer.registerBeanPostProcessor(awareInjector);
 		Modules modules = modulesConfigurer.configure();
 		awareInjector.setModules(modules);
 
-		final AstrixContextImpl context = new AstrixContextImpl(modules);
+		final AstrixContextImpl context = new AstrixContextImpl(modules, this.applicationDescriptor);
 		ApiProviders apiProviders = new FilteredApiProviders(getApiProviders(modules, config), activeProfiles);
 		for (ApiProviderClass apiProvider : apiProviders.getAll()) {
 			context.register(apiProvider);
@@ -156,6 +166,18 @@ public class AstrixConfigurer {
 			context.registerBeanFactory(beanFactory);
 		}
 		return context;
+	}
+	
+	private void setupApplicationInstanceId(DynamicConfig config) {
+		String applicationInstanceId = AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(config).get();
+		if (applicationInstanceId == null) {
+			applicationInstanceId = this.applicationDescriptor.toString();
+			set(AstrixSettings.APPLICATION_INSTANCE_ID, this.applicationDescriptor.toString());
+			log.info("No applicationInstanceId set, using name of ApplicationDescriptor as applicationInstanceId: {}", applicationInstanceId);
+			Objects.requireNonNull(AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(config).get());
+		} else {
+			log.info("Current applicationInstanceId={}", applicationInstanceId);
+		}
 	}
 
 	private void loadAstrixContextPlugins(final ModulesConfigurer modulesConfigurer) {

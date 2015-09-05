@@ -17,14 +17,23 @@ package com.avanza.astrix.context;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.BeanConfiguration;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
+import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.BeanPublisher;
 import com.avanza.astrix.beans.publish.PublishedBeanFactory;
+import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.StatefulAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.modules.Modules;
+import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
+import com.avanza.astrix.serviceunit.ExportedServiceBeanDefinition;
+import com.avanza.astrix.serviceunit.ServiceAdministrator;
+import com.avanza.astrix.serviceunit.ServiceAdministratorVersioningConfigurer;
+import com.avanza.astrix.serviceunit.ServiceExporter;
+import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 /**
  * An AstrixContextImpl is the runtime-environment for the astrix-framework. It is used
  * both by consuming applications as well as server applications. AstrixContextImpl providers access
@@ -38,9 +47,11 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	private final BeanPublisher beanPublisher;
 	private final DynamicConfig dynamicConfig;
 	private final Modules modules;
+	private final AstrixApplicationDescriptor applicationDescriptor;
 	
-	public AstrixContextImpl(Modules modules) {
+	public AstrixContextImpl(Modules modules, AstrixApplicationDescriptor applicationDescriptor) {
 		this.modules = modules;
+		this.applicationDescriptor = applicationDescriptor;
 		this.dynamicConfig = modules.getInstance(AstrixConfig.class).getConfig();
 		this.beanPublisher = modules.getInstance(BeanPublisher.class);
 		this.publishedBeanFactory = modules.getInstance(PublishedBeanFactory.class);
@@ -118,6 +129,34 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	@Override
 	public DynamicConfig getConfig() {
 		return dynamicConfig;
+	}
+	
+	@Override
+	public void startServicePublisher() {
+		if (!isServer()) {
+			throw new IllegalStateException("Server part not configured. Set AstrixConfigurer.setApplicationDescriptor to load server part of framework");
+		}
+		String applicationInstanceId = AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(dynamicConfig).get();
+		ServiceExporter serviceExporter = getInstance(ServiceExporter.class);
+		
+		serviceExporter.addServiceProvider(getInstance(ServiceAdministrator.class));
+		ObjectSerializerDefinition serializer = ObjectSerializerDefinition.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
+		ServiceDefinition<ServiceAdministrator> serviceDefinition = new ServiceDefinition<>(ApiProvider.create("FrameworkServices"),
+																							AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
+																							serializer, true);
+		ExportedServiceBeanDefinition<ServiceAdministrator> serviceAdminDefintion = new ExportedServiceBeanDefinition<>(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
+																			    serviceDefinition, 
+																			    true, // isVersioned  
+																			    true, // alwaysActive
+																			    AstrixSettings.SERVICE_ADMINISTRATOR_COMPONENT.getFrom(getConfig()).get());
+		serviceExporter.exportService(serviceAdminDefintion);
+		
+		serviceExporter.startPublishServices();
+	}
+
+
+	private boolean isServer() {
+		return this.applicationDescriptor != null;
 	}
 	
 }

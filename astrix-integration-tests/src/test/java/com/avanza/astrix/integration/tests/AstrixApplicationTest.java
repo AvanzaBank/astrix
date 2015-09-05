@@ -36,7 +36,7 @@ public class AstrixApplicationTest {
 		AstrixTestUtil.closeSafe(appContext);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = RuntimeException.class)
 	public void throwsExceptionIfExportedRemoteServiceDoesNotPointToAnApiProvider() throws Exception {
 		appContext = new AnnotationConfigApplicationContext();
 		appContext.register(MyAppConfig.class);

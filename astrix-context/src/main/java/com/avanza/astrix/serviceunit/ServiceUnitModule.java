@@ -22,10 +22,17 @@ import com.avanza.astrix.modules.ModuleContext;
 
 public class ServiceUnitModule implements Module {
 
+	private final AstrixApplicationDescriptor applicationDescriptor;
+	
+	public ServiceUnitModule(AstrixApplicationDescriptor applicationDescriptor) {
+		this.applicationDescriptor = applicationDescriptor;
+	}
+
 	@Override
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(ServiceExporter.class, ServiceExporterImpl.class);
 		moduleContext.bind(ServiceAdministrator.class, ServiceAdministratorImpl.class);
+		moduleContext.bind(AstrixApplicationDescriptor.class, applicationDescriptor);
 		moduleContext.bind(ServiceProviderPlugin.class, GenericServiceProviderPlugin.class); // TODO: Should ServiceProviderPlugin be a plugin?
 		
 		moduleContext.importType(ServiceComponentRegistry.class);

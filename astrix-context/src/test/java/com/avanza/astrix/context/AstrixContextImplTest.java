@@ -26,7 +26,6 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.factory.MissingBeanDependencyException;
 import com.avanza.astrix.beans.factory.MissingBeanProviderException;
-import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
 
@@ -112,6 +111,13 @@ public class AstrixContextImplTest {
 		
 		context2.destroy();
 		assertTrue(helloBean2.destroyed);
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void throwsIllegalStateExceptionWhenStartingServicePublisherForNonServer() throws Exception {
+		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
+		AstrixApplicationContext context = (AstrixApplicationContext) AstrixConfigurer.configure();
+		context.startServicePublisher();
 	}
 	
 	@AstrixApiProvider

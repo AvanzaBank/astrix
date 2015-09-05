@@ -21,10 +21,6 @@ public interface ServiceExporter {
 
 	void exportService(ExportedServiceBeanDefinition<?> definition);
 
-	void exportProvidedServices();
-
-	void setServiceDescriptor(AstrixApplicationDescriptor applicationDescriptor);
-
 	void startPublishServices();
 
 }
