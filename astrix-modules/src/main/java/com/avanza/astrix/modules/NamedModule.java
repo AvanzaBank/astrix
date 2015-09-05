@@ -17,6 +17,8 @@ package com.avanza.astrix.modules;
 
 public interface NamedModule extends Module {
 	
+	// TODO: Remove this interface
+	
 	String name();
 
 }

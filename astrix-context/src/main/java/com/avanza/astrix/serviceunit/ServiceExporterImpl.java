@@ -68,7 +68,7 @@ class ServiceExporterImpl implements ServiceExporter {
 
 	@Override
 	public void setServiceDescriptor(AstrixApplicationDescriptor applicationDescriptor) {
-		this.applicationDescriptor = applicationDescriptor;		// TODO: How to inject application descriptor??? 
+		this.applicationDescriptor = applicationDescriptor;		// TODO: How to inject application descriptor??? Create server module
 		for (ApiProviderClass api : applicationDescriptor.exportsRemoteServicesFor()) {
 			this.serviceBeanDefinitions.addAll(serviceProviderPlugins.getExportedServices(api));
 		}

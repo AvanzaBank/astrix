@@ -15,16 +15,12 @@
  */
 package com.avanza.astrix.serviceunit;
 
-import org.kohsuke.MetaInfServices;
-
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
-import com.avanza.astrix.context.AstrixStrategiesConfig;
-import com.avanza.astrix.context.AstrixContextPlugin;
+import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 
-@MetaInfServices(AstrixContextPlugin.class)
-public class ServiceUnitModule implements AstrixContextPlugin {
+public class ServiceUnitModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
@@ -37,15 +33,6 @@ public class ServiceUnitModule implements AstrixContextPlugin {
 		
 		moduleContext.export(ServiceAdministrator.class);
 		moduleContext.export(ServiceExporter.class);
-	}
-
-	@Override
-	public String name() {
-		return getClass().getPackage().getName();
-	}
-
-	@Override
-	public void registerStrategies(AstrixStrategiesConfig astrixContextConfig) {
 	}
 
 }

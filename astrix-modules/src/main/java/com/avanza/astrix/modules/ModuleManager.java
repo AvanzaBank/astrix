@@ -110,10 +110,7 @@ class ModuleManager implements Modules {
 		}
 
 		private String getModuleName(Module module) {
-			if (module instanceof NamedModule) {
-				return NamedModule.class.cast(module).name();
-			}
-			return module.getClass().getName();
+			return module.name();
 		}
 
 		public String getName() {

@@ -19,4 +19,16 @@ public interface Module {
 	
 	void prepare(ModuleContext moduleContext);
 	
+	/**
+	 * The name of this module.
+	 * 
+	 * The default implementations returns the
+	 * fully qualified classname of the module.
+	 * 
+	 * @return
+	 */
+	default String name() {
+		return getClass().getName();
+	}
+	
 }

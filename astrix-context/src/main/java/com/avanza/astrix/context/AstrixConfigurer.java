@@ -75,6 +75,7 @@ import com.avanza.astrix.modules.StrategyProvider;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
+import com.avanza.astrix.serviceunit.ServiceUnitModule;
 import com.avanza.astrix.versioning.core.ObjectSerializerModule;
 import com.avanza.astrix.versioning.jackson1.Jackson1SerializerModule;
 /**
@@ -137,6 +138,7 @@ public class AstrixConfigurer {
 		modulesConfigurer.register(new Jackson1SerializerModule());
 		modulesConfigurer.register(new GenericAstrixApiProviderModule());
 		modulesConfigurer.register(new FaultToleranceModule());
+		modulesConfigurer.register(new ServiceUnitModule()); // TODO: this module should be registerd by AstrixFrameworkBean
 		
 		AstrixAwareInjector awareInjector = new AstrixAwareInjector(config);
 		modulesConfigurer.registerBeanPostProcessor(awareInjector);
