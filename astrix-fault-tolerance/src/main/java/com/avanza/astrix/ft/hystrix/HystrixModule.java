@@ -26,11 +26,6 @@ import com.avanza.astrix.modules.ModuleContext;
 public class HystrixModule implements AstrixContextPlugin {
 	
 	@Override
-	public String name() {
-		return getClass().getPackage().getName() + ".hystrix"; // TODO: rename this package and remove suffix
-	}
-	
-	@Override
 	public void registerStrategies(AstrixStrategiesConfig strategiesConfig) {
 		strategiesConfig.registerStrategy(FaultToleranceSpi.class, HystrixFaultTolerance.class);
 	}
