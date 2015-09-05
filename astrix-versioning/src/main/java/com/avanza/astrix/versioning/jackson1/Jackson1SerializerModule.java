@@ -15,11 +15,11 @@
  */
 package com.avanza.astrix.versioning.jackson1;
 
+import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 
-public class Jackson1SerializerModule implements NamedModule {
+public class Jackson1SerializerModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
@@ -27,11 +27,5 @@ public class Jackson1SerializerModule implements NamedModule {
 		
 		moduleContext.export(ObjectSerializerFactoryPlugin.class);
 	}
-
-	@Override
-	public String name() {
-		return getClass().getPackage().getName();
-	}
-
 
 }

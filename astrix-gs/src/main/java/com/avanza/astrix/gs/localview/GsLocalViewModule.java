@@ -19,8 +19,8 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
-import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.AstrixContextPlugin;
+import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.gs.ClusteredProxyBinder;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
@@ -37,11 +37,6 @@ public class GsLocalViewModule implements AstrixContextPlugin  {
 		moduleContext.importType(ClusteredProxyBinder.class);
 		
 		moduleContext.export(ServiceComponent.class);
-	}
-
-	@Override
-	public String name() {
-		return getClass().getPackage().getName();
 	}
 
 	@Override

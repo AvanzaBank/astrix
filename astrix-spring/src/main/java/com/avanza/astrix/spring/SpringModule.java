@@ -18,8 +18,8 @@ package com.avanza.astrix.spring;
 import org.kohsuke.MetaInfServices;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
-import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.AstrixContextPlugin;
+import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.serviceunit.ServiceExporter;
 @MetaInfServices(AstrixContextPlugin.class)
@@ -34,11 +34,6 @@ public class SpringModule implements AstrixContextPlugin {
 		
 		moduleContext.export(AstrixSpringContext.class);
 		moduleContext.export(BeanPostProcessor.class); // TODO: this is only exported in order to read it from AstrixFrameworkBean. Can we avoid exporting it?
-	}
-
-	@Override
-	public String name() {
-		return getClass().getPackage().getName();
 	}
 
 	@Override

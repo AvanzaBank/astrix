@@ -15,11 +15,11 @@
  */
 package com.avanza.astrix.beans.service;
 
+import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
 
-public class DirectComponentModule implements NamedModule {
+public class DirectComponentModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
@@ -28,11 +28,6 @@ public class DirectComponentModule implements NamedModule {
 		moduleContext.importType(ObjectSerializerFactory.class);
 		
 		moduleContext.export(ServiceComponent.class);
-	}
-
-	@Override
-	public String name() {
-		return "direct-component";
 	}
 
 }

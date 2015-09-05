@@ -49,11 +49,6 @@ public class GsModule implements AstrixContextPlugin {
 	}
 
 	@Override
-	public String name() {
-		return getClass().getPackage().getName();
-	}
-
-	@Override
 	public void registerStrategies(AstrixStrategiesConfig astrixContextConfig) {
 	}
 

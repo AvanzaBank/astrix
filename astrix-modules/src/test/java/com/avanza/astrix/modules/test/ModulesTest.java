@@ -42,7 +42,6 @@ import com.avanza.astrix.modules.ModuleInstancePostProcessor;
 import com.avanza.astrix.modules.ModuleNameConflict;
 import com.avanza.astrix.modules.Modules;
 import com.avanza.astrix.modules.ModulesConfigurer;
-import com.avanza.astrix.modules.NamedModule;
 import com.avanza.astrix.modules.StrategyProvider;
 
 
@@ -135,7 +134,7 @@ public class ModulesTest {
 	@Test(expected = ModuleNameConflict.class)
 	public void itsNotAllowedToRegisterMultipleModulesWithSameName() throws Exception {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
-		modulesConfigurer.register(new NamedModule() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext context) {
 			}
@@ -144,7 +143,7 @@ public class ModulesTest {
 				return "a";
 			}
 		});
-		modulesConfigurer.register(new NamedModule() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext context) {
 			}
@@ -368,7 +367,7 @@ public class ModulesTest {
 	@Test
 	public void setterInjectedDependencies() throws Exception {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
-		modulesConfigurer.register(new NamedModule() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(AType.class, A.class);
@@ -382,7 +381,7 @@ public class ModulesTest {
 				return "A";
 			}
 		});
-		modulesConfigurer.register(new NamedModule() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(BType.class, B.class);
@@ -394,7 +393,7 @@ public class ModulesTest {
 				return "B";
 			}
 		});
-		modulesConfigurer.register(new NamedModule() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(CType.class, C.class);
@@ -432,7 +431,7 @@ public class ModulesTest {
 	@Test
 	public void exportingMultipleInterfaceFromSameInstance() throws Exception {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
-		modulesConfigurer.register(new NamedModule() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(Ping.class, SuperPing.class);
@@ -527,7 +526,7 @@ public class ModulesTest {
 		 * ModuleD -> ModuleB
 		 */
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
-		modulesConfigurer.register(new NamedModule() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(AType.class, A.class);
@@ -543,7 +542,7 @@ public class ModulesTest {
 				return "ModuleA";
 			}
 		});
-		modulesConfigurer.register(new NamedModule() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(BType.class, B.class);
@@ -570,7 +569,7 @@ public class ModulesTest {
 		 * 
 		 */
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
-		modulesConfigurer.register(new NamedModule() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(AType.class, A.class);
@@ -584,7 +583,7 @@ public class ModulesTest {
 				return "ModuleA";
 			}
 		});
-		modulesConfigurer.register(new NamedModule() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(BType.class, CircularB.class);
@@ -611,7 +610,7 @@ public class ModulesTest {
 		 * 
 		 */
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
-		modulesConfigurer.register(new NamedModule() {
+		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
 				moduleContext.bind(AType.class, A.class);

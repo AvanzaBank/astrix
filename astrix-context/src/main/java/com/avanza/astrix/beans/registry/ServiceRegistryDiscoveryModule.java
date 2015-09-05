@@ -17,10 +17,10 @@ package com.avanza.astrix.beans.registry;
 
 import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
+import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
 
-public class ServiceRegistryDiscoveryModule implements NamedModule {
+public class ServiceRegistryDiscoveryModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
@@ -29,11 +29,6 @@ public class ServiceRegistryDiscoveryModule implements NamedModule {
 		moduleContext.importType(AstrixPublishedBeans.class);
 		
 		moduleContext.export(ServiceDiscoveryMetaFactoryPlugin.class);
-	}
-
-	@Override
-	public String name() {
-		return "service-registry-discovery";
 	}
 
 }

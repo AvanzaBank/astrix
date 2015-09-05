@@ -19,9 +19,9 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
+import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.core.AsyncTypeConverter;
-import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.gs.ClusteredProxyCache;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
@@ -46,11 +46,6 @@ public class GsRemotingModule implements AstrixContextPlugin {
 		moduleContext.importType(AsyncTypeConverter.class);
 		
 		moduleContext.export(ServiceComponent.class);
-	}
-
-	@Override
-	public String name() {
-		return getClass().getPackage().getName();
 	}
 
 }

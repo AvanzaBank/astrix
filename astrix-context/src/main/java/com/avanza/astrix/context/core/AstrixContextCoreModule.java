@@ -16,10 +16,10 @@
 package com.avanza.astrix.context.core;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
+import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
 
-public class AstrixContextCoreModule implements NamedModule {
+public class AstrixContextCoreModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
@@ -31,11 +31,6 @@ public class AstrixContextCoreModule implements NamedModule {
 		
 		moduleContext.export(AstrixMBeanExporter.class);
 		moduleContext.export(AsyncTypeConverter.class);
-	}
-
-	@Override
-	public String name() {
-		return getClass().getPackage().getName();
 	}
 
 }

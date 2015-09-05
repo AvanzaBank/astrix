@@ -19,10 +19,10 @@ import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
 import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.factory.BeanConfigurationsImpl;
 import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
+import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
 
-public class BeansPublishModule implements NamedModule {
+public class BeansPublishModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
@@ -40,11 +40,6 @@ public class BeansPublishModule implements NamedModule {
 		moduleContext.export(ApiProviderPlugins.class);
 		moduleContext.export(BeanPublisher.class);
 		moduleContext.export(BeanConfigurations.class); // TODO; should BeanConfigurations be exported from this module?
-	}
-
-	@Override
-	public String name() {
-		return getClass().getPackage().getName();
 	}
 
 }

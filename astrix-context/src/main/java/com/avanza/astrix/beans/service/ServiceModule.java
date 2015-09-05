@@ -15,11 +15,11 @@
  */
 package com.avanza.astrix.beans.service;
 
+import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
 
-public class ServiceModule implements NamedModule {
+public class ServiceModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
@@ -30,11 +30,6 @@ public class ServiceModule implements NamedModule {
 		moduleContext.importType(ServiceBeanProxyFactory.class);
 		
 		moduleContext.export(ServiceComponentRegistry.class);
-	}
-
-	@Override
-	public String name() {
-		return "service";
 	}
 
 }

@@ -24,15 +24,15 @@ import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
 import com.avanza.astrix.context.core.AstrixMBeanExporter;
 import com.avanza.astrix.context.core.AsyncTypeConverter;
+import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
 
 /**
  * 
  * @author Elias Lindholm
  *
  */
-public class GenericAstrixApiProviderModule implements NamedModule {
+public class GenericAstrixApiProviderModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
@@ -49,11 +49,6 @@ public class GenericAstrixApiProviderModule implements NamedModule {
 		
 		
 		moduleContext.export(ApiProviderPlugin.class);
-	}
-
-	@Override
-	public String name() {
-		return getClass().getPackage().getName();
 	}
 
 }

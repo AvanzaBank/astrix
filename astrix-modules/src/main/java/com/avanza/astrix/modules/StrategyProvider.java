@@ -16,7 +16,7 @@
 package com.avanza.astrix.modules;
 
 
-public class StrategyProvider<T> implements NamedModule {
+public class StrategyProvider<T> implements Module {
 
 	private static final StrategyContextPreparer NO_PREPARER = new StrategyContextPreparer() {
 		@Override
@@ -56,6 +56,7 @@ public class StrategyProvider<T> implements NamedModule {
 		return this.strategyImpl;
 	}
 
+	@Override
 	public final String name() {
 		if (strategyInstance != null) {
 			return this.strategyInstance.getClass().getName();

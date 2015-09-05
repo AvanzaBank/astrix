@@ -69,7 +69,6 @@ import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.modules.ModuleInstancePostProcessor;
 import com.avanza.astrix.modules.Modules;
 import com.avanza.astrix.modules.ModulesConfigurer;
-import com.avanza.astrix.modules.NamedModule;
 import com.avanza.astrix.modules.StrategyContextPreparer;
 import com.avanza.astrix.modules.StrategyProvider;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -318,7 +317,7 @@ public class AstrixConfigurer {
 	
 	// package private. Used for internal testing only
 	<T> AstrixConfigurer registerPlugin(final Class<T> type, final T provider) {
-		customModules.add(new NamedModule() {
+		customModules.add(new Module() {
 			@Override
 			public void prepare(ModuleContext pluginContext) {
 				pluginContext.bind(type, provider);

@@ -43,9 +43,4 @@ public class DropwizardPlugin implements AstrixContextPlugin {
 		});
 	}
 	
-	@Override
-	public String name() {
-		return getClass().getPackage().getName();
-	}
-
 }

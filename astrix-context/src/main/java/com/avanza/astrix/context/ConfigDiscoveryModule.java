@@ -18,10 +18,10 @@ package com.avanza.astrix.context;
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
+import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
 
-public class ConfigDiscoveryModule implements NamedModule {
+public class ConfigDiscoveryModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
@@ -31,11 +31,6 @@ public class ConfigDiscoveryModule implements NamedModule {
 		moduleContext.importType(AstrixConfig.class);
 		
 		moduleContext.export(ServiceDiscoveryMetaFactoryPlugin.class);
-	}
-
-	@Override
-	public String name() {
-		return "config-discovery";
 	}
 
 }

@@ -15,9 +15,9 @@
  */
 package com.avanza.astrix.context;
 
-import com.avanza.astrix.modules.NamedModule;
+import com.avanza.astrix.modules.Module;
 
-public interface AstrixContextPlugin extends NamedModule {
+public interface AstrixContextPlugin extends Module {
 
 	void registerStrategies(AstrixStrategiesConfig strategiesConfig);
 

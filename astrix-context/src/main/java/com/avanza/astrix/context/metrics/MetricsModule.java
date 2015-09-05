@@ -18,10 +18,10 @@ package com.avanza.astrix.context.metrics;
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
+import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.NamedModule;
 
-public class MetricsModule implements NamedModule {
+public class MetricsModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
@@ -34,11 +34,6 @@ public class MetricsModule implements NamedModule {
 		
 		moduleContext.export(ServiceBeanProxyFactory.class);
 		moduleContext.export(Metrics.class);
-	}
-
-	@Override
-	public String name() {
-		return getClass().getPackage().getName();
 	}
 
 }
