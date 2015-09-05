@@ -22,18 +22,16 @@ import com.avanza.astrix.beans.service.ServiceDefinition;
  * @author Elias Lindholm (elilin)
  *
  */
-public class ExportedServiceBeanDefinition {
+public class ExportedServiceBeanDefinition<T> {
 
-	// TODO: Make this class generic
-	
-	private AstrixBeanKey<?> beanKey;
+	private AstrixBeanKey<T> beanKey;
 	private String componentName;
 	private boolean usesServiceRegistry;
 	private boolean alwaysActive;
-	private ServiceDefinition<?> serviceDefinition;
+	private ServiceDefinition<T> serviceDefinition;
 	
-	public ExportedServiceBeanDefinition(AstrixBeanKey<?> beanKey,
-								 ServiceDefinition<?> serviceDefinition,
+	public ExportedServiceBeanDefinition(AstrixBeanKey<T> beanKey,
+								 ServiceDefinition<T> serviceDefinition,
 							     boolean usesServiceRegistry,
 								 String componentName) {
 		this.beanKey = beanKey;
@@ -43,8 +41,8 @@ public class ExportedServiceBeanDefinition {
 		this.componentName = componentName;
 	}
 	
-	public ExportedServiceBeanDefinition(AstrixBeanKey<?> beanKey,
-			 ServiceDefinition<?> serviceDefinition,
+	public ExportedServiceBeanDefinition(AstrixBeanKey<T> beanKey,
+			 ServiceDefinition<T> serviceDefinition,
 		     boolean usesServiceRegistry,
 		     boolean alwaysActive,
 			 String componentName) {
@@ -66,7 +64,7 @@ public class ExportedServiceBeanDefinition {
 		return alwaysActive;
 	}
 	
-	public AstrixBeanKey<?> getBeanKey() {
+	public AstrixBeanKey<T> getBeanKey() {
 		return this.beanKey;
 	}
 	
@@ -74,11 +72,11 @@ public class ExportedServiceBeanDefinition {
 		return componentName;
 	}
 
-	public ServiceDefinition<?> getServiceDefinition() {
+	public ServiceDefinition<T> getServiceDefinition() {
 		return serviceDefinition;
 	}
 
-	public Class<?> getBeanType() {
+	public Class<T> getBeanType() {
 		return beanKey.getBeanType();
 	}
 	

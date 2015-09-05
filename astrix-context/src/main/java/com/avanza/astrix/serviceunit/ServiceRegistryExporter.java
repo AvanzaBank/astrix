@@ -37,7 +37,7 @@ public class ServiceRegistryExporter implements AstrixConfigAware {
 		this.exporterWorker = exporterWorker;
 	}
 
-	public <T> void addExportedService(ExportedServiceBeanDefinition serviceBeanDefinition, ServiceComponent serviceComponent) {
+	public <T> void addExportedService(ExportedServiceBeanDefinition<?> serviceBeanDefinition, ServiceComponent serviceComponent) {
 		boolean publishServices = AstrixSettings.PUBLISH_SERVICES.getFrom(config).get();
 		exportedServices.add(new ServiceRegistryExportedService(serviceComponent, serviceBeanDefinition, publishServices));
 	}

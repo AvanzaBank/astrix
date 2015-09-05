@@ -16,6 +16,9 @@
 package com.avanza.astrix.beans.publish;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 /**
  * 
@@ -73,6 +76,14 @@ public final class ApiProviderClass {
 	@Override
 	public final String toString() {
 		return getProviderClassName();
+	}
+
+	public List<BeanDefinitionMethod<?>> getBeanDefinitionMethods() {
+		List<BeanDefinitionMethod<?>> result = new LinkedList<>();
+		for (Method astrixBeanDefinitionMethod : getProviderClass().getMethods()) {
+			result.add(BeanDefinitionMethod.create(astrixBeanDefinitionMethod));
+		}
+		return result;
 	}
 	
 }

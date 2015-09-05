@@ -28,6 +28,7 @@ import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviderPlugin;
+import com.avanza.astrix.beans.publish.BeanDefinitionMethod;
 import com.avanza.astrix.beans.publish.PublishedBean;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
@@ -73,7 +74,7 @@ final class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 		List<PublishedBean> result = new ArrayList<>();
 		// Create factory for each exported bean in api.
 		for (Method astrixBeanDefinitionMethod : apiProviderClass.getProviderClass().getMethods()) {
-			AstrixBeanDefinitionMethod<?> beanDefinition = AstrixBeanDefinitionMethod.create(astrixBeanDefinitionMethod);
+			BeanDefinitionMethod<?> beanDefinition = BeanDefinitionMethod.create(astrixBeanDefinitionMethod);
 			if (beanDefinition.isLibrary()) {
 				result.add(new PublishedBean(createLibraryFactory(apiProviderClass, astrixBeanDefinitionMethod, beanDefinition), beanDefinition.getDefaultBeanSettings()));
 				continue;
@@ -96,7 +97,7 @@ final class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 	private <T> StandardFactoryBean<T> createLibraryFactory(
 			ApiProviderClass apiProviderClass,
 			Method astrixBeanDefinitionMethod,
-			AstrixBeanDefinitionMethod<T> beanDefinition) {
+			BeanDefinitionMethod<T> beanDefinition) {
 		Object libraryProviderInstance = getApiProviderInstance(apiProviderClass.getProviderClass());
 		StandardFactoryBean<T> libraryFactory = new AstrixLibraryFactory<>(libraryProviderInstance, astrixBeanDefinitionMethod, beanDefinition.getQualifier());
 		if (beanDefinition.applyFtProxy()) {
@@ -105,7 +106,7 @@ final class GenericAstrixApiProviderPlugin implements ApiProviderPlugin {
 		return libraryFactory;
 	}
 	
-	private ServiceDefinition<?> createServiceDefinition(ApiProviderClass apiProviderClass, AstrixBeanDefinitionMethod<?> serviceDefinitionMethod) {
+	private ServiceDefinition<?> createServiceDefinition(ApiProviderClass apiProviderClass, BeanDefinitionMethod<?> serviceDefinitionMethod) {
 		Class<?> declaringApi = getDeclaringApi(apiProviderClass, serviceDefinitionMethod.getBeanType());
 		if (!(declaringApi.isAnnotationPresent(Versioned.class) || serviceDefinitionMethod.isVersioned())) {
 			return ServiceDefinition.create(serviceDefinitionMethod.getDefiningApi(), serviceDefinitionMethod.getBeanKey(), 

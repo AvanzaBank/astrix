@@ -13,18 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.publish;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
-import com.avanza.astrix.beans.publish.ApiProvider;
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.provider.core.AstrixDynamicQualifier;
 import com.avanza.astrix.provider.core.AstrixQualifier;
@@ -34,11 +31,11 @@ import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.provider.core.ServiceConfig;
 import com.avanza.astrix.versioning.core.Versioned;
 
-public class AstrixBeanDefinitionMethod<T> implements PublishedAstrixBean<T> {
+public class BeanDefinitionMethod<T> implements PublishedAstrixBean<T> {
 	
 	private final Method method;
 	
-	private AstrixBeanDefinitionMethod(Method method) {
+	private BeanDefinitionMethod(Method method) {
 		this.method = method;
 	}
 
@@ -55,6 +52,10 @@ public class AstrixBeanDefinitionMethod<T> implements PublishedAstrixBean<T> {
 			return method.getAnnotation(AstrixQualifier.class).value();
 		}
 		return null;
+	}
+	
+	public Method getMethod() {
+		return method;
 	}
 	
 	public boolean isDynamicQualified() {
@@ -76,8 +77,8 @@ public class AstrixBeanDefinitionMethod<T> implements PublishedAstrixBean<T> {
 		return method.isAnnotationPresent(Versioned.class);
 	}
 
-	public static AstrixBeanDefinitionMethod<?> create(Method astrixBeanDefinition) {
-		return new AstrixBeanDefinitionMethod<>(astrixBeanDefinition);
+	public static BeanDefinitionMethod<?> create(Method astrixBeanDefinition) {
+		return new BeanDefinitionMethod<>(astrixBeanDefinition);
 	}
 
 	public Class<T> getBeanType() {

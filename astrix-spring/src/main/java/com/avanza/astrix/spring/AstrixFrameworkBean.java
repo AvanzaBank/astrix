@@ -251,7 +251,7 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		ServiceDefinition<ServiceAdministrator> serviceDefinition = new ServiceDefinition<>(ApiProvider.create("FrameworkServices"),
 																							AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
 																							serializer, true);
-		ExportedServiceBeanDefinition serviceAdminDefintion = new ExportedServiceBeanDefinition(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
+		ExportedServiceBeanDefinition<ServiceAdministrator> serviceAdminDefintion = new ExportedServiceBeanDefinition<>(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
 																			    serviceDefinition, 
 																			    true, // isVersioned  
 																			    true, // alwaysActive

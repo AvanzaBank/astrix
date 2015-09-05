@@ -19,7 +19,7 @@ public interface ServiceExporter {
 
 	void addServiceProvider(Object bean);
 
-	void exportService(ExportedServiceBeanDefinition definition);
+	void exportService(ExportedServiceBeanDefinition<?> definition);
 
 	void exportProvidedServices();
 

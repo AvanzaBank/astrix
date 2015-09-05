@@ -16,16 +16,15 @@
 package com.avanza.astrix.serviceunit;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
+import com.avanza.astrix.beans.publish.BeanDefinitionMethod;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
-import com.avanza.astrix.context.AstrixBeanDefinitionMethod;
 import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixServiceRegistryDiscovery;
@@ -43,22 +42,25 @@ public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	private ServiceDiscoveryMetaFactory serviceLookupFactory;
 
 	@Override
-	public List<ExportedServiceBeanDefinition> getExportedServices(ApiProviderClass apiProvider) {
-		List<ExportedServiceBeanDefinition> result = new ArrayList<>();
-		for (Method astrixBeanDefinitionMethod : apiProvider.getProviderClass().getMethods()) {
-			AstrixBeanDefinitionMethod beanDefinition = AstrixBeanDefinitionMethod.create(astrixBeanDefinitionMethod);
+	public List<ExportedServiceBeanDefinition<?>> getExportedServices(ApiProviderClass apiProvider) {
+		List<ExportedServiceBeanDefinition<?>> result = new ArrayList<>();
+		for (BeanDefinitionMethod<?> beanDefinition : apiProvider.getBeanDefinitionMethods()) {
 			if (!beanDefinition.isService()) {
 				continue;
 			}
-			boolean usesServiceRegistry = this.serviceLookupFactory.getLookupStrategy(astrixBeanDefinitionMethod).equals(AstrixServiceRegistryDiscovery.class);
-			ServiceDefinition<?> serviceDefinition = createServiceDefinition(apiProvider, beanDefinition, beanDefinition.getBeanKey());
-			result.add(new ExportedServiceBeanDefinition(beanDefinition.getBeanKey(), serviceDefinition, usesServiceRegistry, beanDefinition.getServiceComponentName()));
+			result.add(createExportedServiceBeanDefinition(beanDefinition, apiProvider));
 		}
 		return result;
 	}
 	
+	private <T> ExportedServiceBeanDefinition<T> createExportedServiceBeanDefinition(BeanDefinitionMethod<T> beanDefinitionMethod, ApiProviderClass apiProvider) {
+		boolean usesServiceRegistry = this.serviceLookupFactory.getLookupStrategy(beanDefinitionMethod.getMethod()).equals(AstrixServiceRegistryDiscovery.class);
+		ServiceDefinition<T> serviceDefinition = createServiceDefinition(apiProvider, beanDefinitionMethod, beanDefinitionMethod.getBeanKey());
+		return new ExportedServiceBeanDefinition<T>(beanDefinitionMethod.getBeanKey(), serviceDefinition, usesServiceRegistry, beanDefinitionMethod.getServiceComponentName());
+	}
+	
 
-	private <T> ServiceDefinition<T> createServiceDefinition(ApiProviderClass apiProvider, AstrixBeanDefinitionMethod serviceDefinitionMethod, AstrixBeanKey<T> beanKey) {
+	private <T> ServiceDefinition<T> createServiceDefinition(ApiProviderClass apiProvider, BeanDefinitionMethod<T> serviceDefinitionMethod, AstrixBeanKey<T> beanKey) {
 		Class<?> declaringApi = apiProvider.getProviderClass();
 		if (!(declaringApi.isAnnotationPresent(Versioned.class) || serviceDefinitionMethod.isVersioned())) {
 			return ServiceDefinition.create(ApiProvider.create(apiProvider.getName()), 

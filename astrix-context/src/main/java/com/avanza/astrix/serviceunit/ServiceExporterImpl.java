@@ -37,7 +37,7 @@ class ServiceExporterImpl implements ServiceExporter {
 	
 	private ServiceComponentRegistry serviceComponents;
 	private AstrixApplicationDescriptor applicationDescriptor;
-	private final Collection<ExportedServiceBeanDefinition> serviceBeanDefinitions = new CopyOnWriteArrayList<>();
+	private final Collection<ExportedServiceBeanDefinition<?>> serviceBeanDefinitions = new CopyOnWriteArrayList<>();
 	private final ServiceRegistryExporter serviceRegistryExporter;
 	private final ConcurrentMap<Class<?>, Object> serviceProviderByType = new ConcurrentHashMap<>();
 	private final ServiceProviderPlugins serviceProviderPlugins;
@@ -68,31 +68,35 @@ class ServiceExporterImpl implements ServiceExporter {
 
 	@Override
 	public void setServiceDescriptor(AstrixApplicationDescriptor applicationDescriptor) {
-		this.applicationDescriptor = applicationDescriptor;		// TODO: How to inject service descriptor??? 
+		this.applicationDescriptor = applicationDescriptor;		// TODO: How to inject application descriptor??? 
 		for (ApiProviderClass api : applicationDescriptor.exportsRemoteServicesFor()) {
 			this.serviceBeanDefinitions.addAll(serviceProviderPlugins.getExportedServices(api));
 		}
 	}
 	
 	@Override
-	public void exportService(ExportedServiceBeanDefinition definition) {
+	public void exportService(ExportedServiceBeanDefinition<?> definition) {
 		this.serviceBeanDefinitions.add(definition);
 	}
 	
 
 	@Override
 	public void exportProvidedServices() {
-		for (ExportedServiceBeanDefinition serviceBeanDefintion : serviceBeanDefinitions) {
-			ServiceDefinition versioningContext = serviceBeanDefintion.getServiceDefinition();
-			ServiceComponent serviceComponent = getServiceComponent(serviceBeanDefintion);
-			Object provider = null;
-			if (serviceComponent.requiresProviderInstance()) {
-				provider = getProvider(serviceBeanDefintion);
-			}
-			exportService(serviceBeanDefintion.getBeanType(), provider, versioningContext, serviceComponent); 
-			if (serviceBeanDefintion.usesServiceRegistry()) {
-				serviceRegistryExporter.addExportedService(serviceBeanDefintion, serviceComponent);
-			}
+		for (ExportedServiceBeanDefinition<?> serviceBeanDefintion : serviceBeanDefinitions) {
+			export(serviceBeanDefintion);
+		}
+	}
+
+	private <T> void export(ExportedServiceBeanDefinition<T> exportedServiceBeanDefinition) {
+		ServiceDefinition<T> serviceDefinition = exportedServiceBeanDefinition.getServiceDefinition();
+		ServiceComponent serviceComponent = getServiceComponent(exportedServiceBeanDefinition);
+		Object provider = null;
+		if (serviceComponent.requiresProviderInstance()) {
+			provider = getProvider(exportedServiceBeanDefinition);
+		}
+		exportService(exportedServiceBeanDefinition.getBeanType(), provider, serviceDefinition, serviceComponent); 
+		if (exportedServiceBeanDefinition.usesServiceRegistry()) {
+			serviceRegistryExporter.addExportedService(exportedServiceBeanDefinition, serviceComponent);
 		}
 	}
 	
@@ -101,7 +105,7 @@ class ServiceExporterImpl implements ServiceExporter {
 		this.serviceRegistryExporter.startPublishServices();
 	}
 
-	private Object getProvider(ExportedServiceBeanDefinition serviceBeanDefintion) {
+	private Object getProvider(ExportedServiceBeanDefinition<?> serviceBeanDefintion) {
 		Object provider = serviceProviderByType.get(serviceBeanDefintion.getBeanKey().getBeanType());
 		if (provider == null) {
 			throw new IllegalStateException(String.format(
@@ -113,11 +117,11 @@ class ServiceExporterImpl implements ServiceExporter {
 		return provider;
 	}
 	
-	private <T> void exportService(Class<T> providedApi, Object provider, ServiceDefinition versioningContext, ServiceComponent serviceComponent) {
+	private <T> void exportService(Class<T> providedApi, Object provider, ServiceDefinition<T> versioningContext, ServiceComponent serviceComponent) {
 		serviceComponent.exportService(providedApi, providedApi.cast(provider), versioningContext);
 	}
 
-	private ServiceComponent getServiceComponent(ExportedServiceBeanDefinition serviceBeanDefinition) {
+	private ServiceComponent getServiceComponent(ExportedServiceBeanDefinition<?> serviceBeanDefinition) {
 		if (serviceBeanDefinition.getComponentName() != null) {
 			return this.serviceComponents.getComponent(serviceBeanDefinition.getComponentName());
 		}

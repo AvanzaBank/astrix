@@ -23,9 +23,9 @@ class ServiceRegistryExportedService {
 	
 	private final ServiceComponent serviceComponent;
 	private volatile boolean publishServices;
-	private final ExportedServiceBeanDefinition serviceBeanDefinition;
+	private final ExportedServiceBeanDefinition<?> serviceBeanDefinition;
 	
-	public ServiceRegistryExportedService(ServiceComponent serviceComponent, ExportedServiceBeanDefinition serviceBeanDefinition, boolean publishServices) {
+	public ServiceRegistryExportedService(ServiceComponent serviceComponent, ExportedServiceBeanDefinition<?> serviceBeanDefinition, boolean publishServices) {
 		this.serviceBeanDefinition = serviceBeanDefinition;
 		this.publishServices = publishServices;
 		if (!serviceComponent.canBindType(serviceBeanDefinition.getBeanType())) {
