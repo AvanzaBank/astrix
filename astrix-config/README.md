@@ -1,3 +1,5 @@
+# DynamicConfig
+
 The DynamicConfig framework provides core abstractions for configuration property lookup and dynamic update of such properties. It was first designed as a simple facade on top of archaius due to its shortcoming when it comes to unit testing. Archaius provides no way to decouple the different configuration properties required by the application from the actual configuration source, making unit testing of classes consuming dynamic configuration parameters hard. DynamicConfig can be seen as a slf4j counterpart for configuration lookup.
 
 ### Example: DynamicConfig setup and usage
