@@ -1,11 +1,12 @@
 # Astrix Modules
 
-Astrix Modules is a simple dependency injection (DI) framework. In addition to allowing simple DI it also allows modularising a code base by breaking it up into multiple modules. A module has an explicit boundary:
+Astrix Modules is a simple dependency injection (DI) framework. In addition to allowing simple DI it also supports modularising a code base by breaking it up into multiple modules. Each module has an explicit boundary:
 
 * All type bindings are internal to the module only
 * A module can export a type which makes it available to other Modules
 * A module can also import types that are exported by other modules, thereby making that type available internally in the module
 
+Astrix Modules is used internally by the Astrix Framework to keep distinct parts of the framework isolated. Its also used to support a plugin architecture for all extension points in the framework. Astrix Modules have no dependencies to the Astrix Framework, and might therefore be used as a general purpose DI framework without using the Astrix framework.
 
 ### Example Usage
 
