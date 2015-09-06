@@ -81,7 +81,7 @@ modulesConfigurer.register(new PingUiModule());
 // Create Modules instance
 Modules modules = modulesConfigurer.configure();
 
-// Use Modules to create PingApp. Only exported types can created explicitly
+// Use Modules to create PingApp. Only exported types can be created explicitly
 PingApp pingApp = modules.getInstance(PingApp.class); 
 pingApp.run();
 ```
