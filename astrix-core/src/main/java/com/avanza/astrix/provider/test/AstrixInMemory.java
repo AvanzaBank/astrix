@@ -21,6 +21,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * @deprecated Never had any effect
+ */
+@Deprecated
 @Target(value={ElementType.TYPE})
 @Retention(value=RetentionPolicy.RUNTIME)
 @Documented

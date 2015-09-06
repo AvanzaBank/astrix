@@ -23,15 +23,14 @@ import java.lang.annotation.Target;
 
 
 /**
- * @author Elias Lindholm (elilin)
+ * @deprecated Never had any effect
  */
+@Deprecated
 @Target(value = { ElementType.TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
 public @interface AstrixSubscriberApiDescriptor {
 	
 	Class<?>[] exportedApis();
-
-//	String targetSpaceName();
 
 }
