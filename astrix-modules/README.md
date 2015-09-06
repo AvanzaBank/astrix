@@ -6,7 +6,7 @@ Astrix Modules is a simple dependency injection (DI) framework. In addition to a
 * A module can export a type which makes it available to other Modules
 * A module can also import types that are exported by other modules, thereby making that type available internally in the module
 
-Astrix Modules is used internally by the Astrix Framework to keep distinct parts of the framework isolated. Its also used to support a plugin architecture for all extension points in the framework. Astrix Modules have no dependencies to the Astrix Framework, and might therefore be used as a general purpose DI framework without using the Astrix framework.
+Astrix Modules is used internally by the Astrix framework to keep distinct parts of the framework isolated. Its also used to support a plugin architecture for all extension points in the framework.
 
 ### Example Usage
 
@@ -88,3 +88,6 @@ Modules modules = modulesConfigurer.configure();
 PingApp pingApp = modules.getInstance(PingApp.class); 
 pingApp.run();
 ```
+
+### A note on compatibility
+Although Astrix Modules is designed as a standalone framework without any dependencies to the other parts of the Astrix framework, it's still in an experimental state where compatibility breaking changes are almost certain to occur. Therefore the current version of Astrix Modules is not intended to be reused outside the Astrix framework. However, in the future when the framework becomes more stable it will be usable in its own right, without usage of the rest of the framework.
