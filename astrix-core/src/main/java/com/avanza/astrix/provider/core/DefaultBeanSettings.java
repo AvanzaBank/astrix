@@ -54,12 +54,17 @@ public @interface DefaultBeanSettings {
 	int DEFAULT_INITIAL_TIMEOUT = 1000;
 	boolean DEFAULT_FAULT_TOLERANCE_ENABLED = true;
 	boolean DEFAULT_BEAN_METRICS_ENABLED = true;
+	int DEFAULT_INITIAL_MAX_CONCURRENT_REQUESTS = 20;
 	
 	/**
 	 * See AstrixBeanSettings#INITIAL_TIMEOUT
 	 */
 	int initialTimeout() default DEFAULT_INITIAL_TIMEOUT;
-	
+
+	/**
+	 * See AstrixBeanSettings#MAX_CONCURRENT_REQUESTS
+	 */
+	int initialMaxConcurrentRequests() default DEFAULT_INITIAL_MAX_CONCURRENT_REQUESTS;
 	
 	/**
 	 * See AstrixBeanSettings#INITIAL_TIMEOUT

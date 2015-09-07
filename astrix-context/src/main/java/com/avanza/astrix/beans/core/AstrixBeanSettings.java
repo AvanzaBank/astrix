@@ -52,6 +52,14 @@ public final class AstrixBeanSettings {
 			new IntBeanSetting("faultTolerance.timeout", DefaultBeanSettings.DEFAULT_INITIAL_TIMEOUT);
 	
 	/**
+	 * Defines the default "maxConcurrentRequests" when semaphore isolation is used to protect invocations 
+	 * to the associated bean, i.e. the maximum number of concurrent requests before the 
+	 * fault-tolerance layer starts rejecting invocations (by throwing ServiceUnavailableException)
+	 */
+	public static final IntBeanSetting INITIAL_MAX_CONCURRENT_REQUESTS = 
+			new IntBeanSetting("faultTolerance.initialMaxConcurrentRequests", DefaultBeanSettings.DEFAULT_INITIAL_MAX_CONCURRENT_REQUESTS);
+	
+	/**
 	 * Its possible to set service-beans in unavailable state, in which it throws
 	 * a {@link ServiceUnavailableException} on each invocation. <p>
 	 */

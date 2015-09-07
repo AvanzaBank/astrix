@@ -64,6 +64,7 @@ public class BeanFaultToleranceProxyFactory implements ServiceBeanProxyFactory, 
 		ftSettings.setCommandName(commandNamingStrategy.getCommandKeyName(serviceDefinition));
 		ftSettings.setGroupName(commandNamingStrategy.getGroupKeyName(serviceDefinition));
 		ftSettings.setInitialTimeoutInMilliseconds(beanConfiguration.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
+		ftSettings.setSemaphoreMaxConcurrentRequests(beanConfiguration.get(AstrixBeanSettings.INITIAL_MAX_CONCURRENT_REQUESTS).get());
 		return new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultToleranceSpi, ftSettings);
 	}
 	
@@ -74,6 +75,7 @@ public class BeanFaultToleranceProxyFactory implements ServiceBeanProxyFactory, 
 		ftSettings.setCommandName(commandNamingStrategy.getCommandKeyName(serviceDefinition));
 		ftSettings.setGroupName(commandNamingStrategy.getGroupKeyName(serviceDefinition));
 		ftSettings.setInitialTimeoutInMilliseconds(beanConfiguration.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
+		ftSettings.setSemaphoreMaxConcurrentRequests(beanConfiguration.get(AstrixBeanSettings.INITIAL_MAX_CONCURRENT_REQUESTS).get());
 		return new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultToleranceSpi, ftSettings);
 	}
 	
