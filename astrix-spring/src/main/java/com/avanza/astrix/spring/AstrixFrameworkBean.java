@@ -26,7 +26,6 @@ import javax.annotation.PreDestroy;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -43,6 +42,7 @@ import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
+import com.avanza.astrix.serviceunit.ServiceExporter;
 
 /**
  * 
@@ -97,7 +97,9 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 		}
 		beanFactory.registerSingleton(AstrixSpringContext.class.getName(), astrixContext.getInstance(AstrixSpringContext.class));
 		beanFactory.registerSingleton(AstrixContext.class.getName(), astrixContext);
-		beanFactory.addBeanPostProcessor(astrixContext.getInstance(BeanPostProcessor.class));
+		if (isServer()) {
+			beanFactory.addBeanPostProcessor(new AstrixBeanPostProcessor(astrixContext.getInstance(ServiceExporter.class)));
+		}
 	}
 
 	/**
