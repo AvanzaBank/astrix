@@ -38,9 +38,6 @@ import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.AstrixTestUtil;
 
 import rx.Observable;
-import rx.Observable.OnSubscribe;
-import rx.Subscriber;
-import rx.functions.Func1;
 
 public class BeanMetricsTest {
 	
@@ -137,14 +134,11 @@ public class BeanMetricsTest {
 
 		@Override
 		public Observable<String> observePing(final String msg) {
-			return Observable.create(new OnSubscribe<String>() {
-				@Override
-				public void call(Subscriber<? super String> t) {
-					fakeClock.incrementAndGet(); // Simulate 2 ms execution time by ticking clock
-					fakeClock.incrementAndGet();
-					t.onNext(msg);
-					t.onCompleted();
-				}
+			return Observable.create(t -> {
+				fakeClock.incrementAndGet(); // Simulate 2 ms execution time by ticking clock
+				fakeClock.incrementAndGet();
+				t.onNext(msg);
+				t.onCompleted();
 			});
 		}
 
@@ -174,30 +168,16 @@ public class BeanMetricsTest {
 		}
 
 		@Override
-		public <T> Supplier<Observable<T>> timeObservable(final Supplier<Observable<T>> targetObservable, String group, String name) {
-			return new Supplier<Observable<T>>() {
-				@Override
-				public Observable<T> get() {
-					final long start = fakeClock.get(); // Set time before execution
-					return targetObservable.get().map(new Func1<T, T>() {
-						@Override
-						public T call(T t) {
-							lastTimedObservableTime = fakeClock.get() - start;
-							return t;
-						}
-					});
-				}
+		public <T> Supplier<Observable<T>> timeObservable(Supplier<Observable<T>> targetObservable, String group, String name) {
+			return () -> {
+				long start = fakeClock.get(); // Set time before execution
+				return targetObservable.get().doOnTerminate(() -> lastTimedObservableTime = fakeClock.get() - start);
 			};
 		}
 
 		@Override
 		public <T> CheckedCommand<T> timeExecution(final CheckedCommand<T> execution, final String group, final String name) {
-			return new CheckedCommand<T>() {
-				@Override
-				public T call() throws Throwable {
-					return execution.call();
-				}
-			};
+			return () -> execution.call();
 		}
 	}
 

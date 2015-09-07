@@ -173,12 +173,7 @@ public class HystrixObservableCommandFacadeTest {
 		// No need to subscribe to any of the above Observables. 
 		// Execution is started eagerly by HystrixObservableCommandFacade.observe
 		assertEquals(1, supplierInvocationCount.get());
-		AstrixTestUtil.serviceInvocationException(new Supplier<String>() {
-			@Override
-			public String get() {
-				return ftObservable2.toBlocking().first();
-			}
-		}, AstrixTestUtil.isExceptionOfType(ServiceUnavailableException.class));
+		AstrixTestUtil.serviceInvocationException(() -> ftObservable2.toBlocking().first(), AstrixTestUtil.isExceptionOfType(ServiceUnavailableException.class));
 	}
 	
 	private int getEventCountForCommand(HystrixRollingNumberEvent hystrixRollingNumberEvent, String commandKey) {

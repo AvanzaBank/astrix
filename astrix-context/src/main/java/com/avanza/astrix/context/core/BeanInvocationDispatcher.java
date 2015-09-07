@@ -48,12 +48,7 @@ public final class BeanInvocationDispatcher implements InvocationHandler {
 	}
 	
 	private Object proxyInvocation(final Method method, final Object[] args) throws Throwable {
-		CheckedCommand<Object> serviceInvocation = new CheckedCommand<Object>() {
-			@Override
-			public Object call() throws Throwable {
-				return ReflectionUtil.invokeMethod(method, targetBean, args);
-			}
-		};
+		CheckedCommand<Object> serviceInvocation = () -> ReflectionUtil.invokeMethod(method, targetBean, args);
 		for (BeanProxy proxy : proxys) {
 			serviceInvocation = proxy.proxyInvocation(serviceInvocation);
 		}
@@ -61,18 +56,15 @@ public final class BeanInvocationDispatcher implements InvocationHandler {
 	}
 
 	private Object proxyAsyncInvocation(final Method method, final Object[] args) {
-		Supplier<Observable<Object>> serviceInvocation = new Supplier<Observable<Object>>() {
-			@Override
-			public Observable<Object> get() {
-				try {
-					Object asyncResult = ReflectionUtil.invokeMethod(method, targetBean, args);
-					if (isObservableType(method.getReturnType())) {
-						return (Observable<Object>) asyncResult;
-					}
-					return asyncTypeConverter.toObservable(method.getReturnType(), asyncResult);
-				} catch (Throwable e) {
-					return Observable.error(e);
+		Supplier<Observable<Object>> serviceInvocation = () -> {
+			try {
+				Object asyncResult = ReflectionUtil.invokeMethod(method, targetBean, args);
+				if (isObservableType(method.getReturnType())) {
+					return (Observable<Object>) asyncResult;
 				}
+				return asyncTypeConverter.toObservable(method.getReturnType(), asyncResult);
+			} catch (Throwable e) {
+				return Observable.error(e);
 			}
 		};
 		for (BeanProxy proxy : proxys) {

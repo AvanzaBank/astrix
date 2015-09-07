@@ -148,12 +148,8 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 			logger.info(String.format("Service not available. request=%s correlationId=%s", request, invocationResponse.getCorrelationId()));
 			return invocationResponse;
 		}
-		return this.metrics.timeExecution(new Command<AstrixServiceInvocationResponse>() {
-			@Override
-			public AstrixServiceInvocationResponse call() {
-				return publishedService.invoke(request, version, serviceApi);
-			}
-		}, "ServiceActivator", serviceApi).call();
+		return this.metrics.timeExecution(
+				(Command<AstrixServiceInvocationResponse>) () -> publishedService.invoke(request, version, serviceApi), "ServiceActivator", serviceApi).call();
 	}
 
 	private static Throwable resolveException(Exception e) {

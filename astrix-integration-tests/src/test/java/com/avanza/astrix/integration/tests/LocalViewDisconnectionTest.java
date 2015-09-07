@@ -17,8 +17,6 @@ package com.avanza.astrix.integration.tests;
 
 import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
 
-import java.util.function.Supplier;
-
 import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Rule;
@@ -85,12 +83,8 @@ public class LocalViewDisconnectionTest {
 		stopPu();
 		
 		assertEventually(AstrixTestUtil.serviceInvocationException(
-				new Supplier<Integer>() {
-					@Override
-					public Integer get() {
-						return localView.count(LunchRestaurant.template());
-					}
-				}, AstrixTestUtil.isExceptionOfType(ServiceUnavailableException.class)));
+				() -> localView.count(LunchRestaurant.template()), 
+				AstrixTestUtil.isExceptionOfType(ServiceUnavailableException.class)));
 
 
 		startPu();

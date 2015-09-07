@@ -38,16 +38,13 @@ final class MetricsImpl implements Metrics {
 	@Override
 	public <T> Command<T> timeExecution(final Command<T> execution, final String group, final String name) {
 		final CheckedCommand<T> command = metricsSpi.timeExecution(execution, group, name);
-		return new Command<T>() {
-			@Override
-			public T call() {
-				try {
-					return command.call();
-				} catch (RuntimeException e) {
-					throw e;
-				} catch (Throwable e) {
-					throw new RuntimeException(e);
-				}
+		return () -> {
+			try {
+				return command.call();
+			} catch (RuntimeException e1) {
+				throw e1;
+			} catch (Throwable e2) {
+				throw new RuntimeException(e2);
 			}
 		};
 	}

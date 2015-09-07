@@ -116,12 +116,7 @@ public class ServiceRegistryApiTest {
 		
 		serviceRegistry.clear(); // Simulate lease expiry
 		
-		assertEventually(serviceInvocationException(new Supplier<String>() {
-			@Override
-			public String get() {
-				return dummyService.hello("kalle");
-			}
-		}, isExceptionOfType(ServiceUnavailableException.class)));
+		assertEventually(serviceInvocationException(() -> dummyService.hello("kalle"), isExceptionOfType(ServiceUnavailableException.class)));
 	}
 	
 	private void assertEventually(Probe probe) throws InterruptedException {

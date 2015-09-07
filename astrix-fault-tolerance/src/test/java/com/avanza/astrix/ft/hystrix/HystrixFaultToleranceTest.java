@@ -78,12 +78,9 @@ public class HystrixFaultToleranceTest {
 		final long invokingThreadId = Thread.currentThread().getId();
 		final AtomicLong runningThreadId = new AtomicLong();
 		
-		faultTolerance.execute(new CheckedCommand<String>() {
-			@Override
-			public String call() throws Throwable {
-				runningThreadId.set(Thread.currentThread().getId());
-				return "foo";
-			}
+		faultTolerance.execute(() -> {
+			runningThreadId.set(Thread.currentThread().getId());
+			return "foo";
 		}, commandSettings);
 		
 		assertEquals("Expecting SEMAPHORE protected calls to be executed on same thread", invokingThreadId, runningThreadId.get());

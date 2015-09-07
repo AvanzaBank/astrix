@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.core.function;
 
+@FunctionalInterface
 public interface CheckedCommand<T> {
 	T call() throws Throwable;
 }

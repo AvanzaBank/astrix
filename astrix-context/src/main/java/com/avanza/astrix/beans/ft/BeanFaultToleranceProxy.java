@@ -50,12 +50,7 @@ final class BeanFaultToleranceProxy implements BeanProxy {
 		if (!faultToleranceEnabled()) {
 			return command;
 		}
-		return new CheckedCommand<T>() {
-			@Override
-			public T call() throws Throwable {
-				return beanFaultToleranceSpi.execute(command, commandSettings);
-			}
-		};
+		return () -> beanFaultToleranceSpi.execute(command, commandSettings);
 	}
 
 	@Override
@@ -63,12 +58,7 @@ final class BeanFaultToleranceProxy implements BeanProxy {
 		if (!faultToleranceEnabled()) {
 			return command;
 		}
-		return new Supplier<Observable<T>>() {
-			@Override
-			public Observable<T> get() {
-				return beanFaultToleranceSpi.observe(command, commandSettings);
-			};
-		};
+		return () -> beanFaultToleranceSpi.observe(command, commandSettings);
 	}
 	
 	private <T> boolean faultToleranceEnabled() {

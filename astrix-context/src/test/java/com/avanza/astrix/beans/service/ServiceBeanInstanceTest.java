@@ -254,12 +254,7 @@ public class ServiceBeanInstanceTest {
 		assertEquals(2, directComponent.getBoundServices().size());
 		
 		serviceRegistry.clear();
-		assertEventually(serviceInvocationException(new Supplier<String>() {
-			@Override
-			public String get() {
-				return ping.ping("foo");
-			}
-		}, CoreMatchers.any(ServiceUnavailableException.class)));
+		assertEventually(serviceInvocationException(() -> ping.ping("foo"), CoreMatchers.any(ServiceUnavailableException.class)));
 		
 		assertEquals(1, directComponent.getBoundServices().size());
 	}

@@ -23,7 +23,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +39,6 @@ import org.junit.Test;
 import com.avanza.astrix.beans.ft.CommandSettings;
 import com.avanza.astrix.beans.ft.IsolationStrategy;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.core.function.CheckedCommand;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.service.SimpleService;
 import com.avanza.astrix.ft.service.SimpleServiceException;
@@ -73,16 +71,7 @@ public abstract class FaultToleranceIntegrationTest {
 		return ReflectionUtil.newProxy(type, new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
-				return faultTolerance.execute(new CheckedCommand<Object>() {
-					@Override
-					public Object call() throws Throwable {
-						try {
-							return method.invoke(provider, args);
-						} catch (InvocationTargetException e) {
-							throw e.getTargetException();
-						}
-					}
-				}, settings);
+				return faultTolerance.execute(() -> ReflectionUtil.invokeMethod(method, provider, args), settings);
 			}
 		});
 	}

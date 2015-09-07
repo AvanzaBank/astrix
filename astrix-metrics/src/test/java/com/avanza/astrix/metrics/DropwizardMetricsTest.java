@@ -58,12 +58,9 @@ public class DropwizardMetricsTest {
 	@Test
 	public void timeExecution() throws Throwable {
 		
-		CheckedCommand<String> execution = dropwizardMetrics.timeExecution(new CheckedCommand<String>() {
-			@Override
-			public String call() throws Throwable {
-				Thread.sleep(2);
-				return "foo";
-			}
+		CheckedCommand<String> execution = dropwizardMetrics.timeExecution(() -> {
+			Thread.sleep(2);
+			return "foo";
 		}, "bar-group", "foo-metrics");
 		
 		assertEquals("foo", execution.call());
