@@ -15,8 +15,7 @@
  */
 package com.avanza.astrix.beans.service;
 
-import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationException;
-import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationResult;
+import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
@@ -29,7 +28,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matcher;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
@@ -52,6 +53,7 @@ import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.AstrixTestUtil;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
+import com.avanza.astrix.test.util.Probes;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
@@ -150,12 +152,7 @@ public class ServiceBeanInstanceTest {
 		final Ping ping = astrixContext.getBean(Ping.class);
 		assertEquals("foo", ping.ping("foo"));
 		astrixConfigurer.set(AstrixBeanSettings.AVAILABLE, AstrixBeanKey.create(Ping.class), false);
-		AstrixTestUtil.assertThrows(ServiceUnavailableException.class, new Runnable() {
-			@Override
-			public void run() {
-				ping.ping("foo");
-			}
-		});
+		AstrixTestUtil.assertThrows(() -> ping.ping("foo"), ServiceUnavailableException.class);
 	}
 	
 	@Test
@@ -202,12 +199,7 @@ public class ServiceBeanInstanceTest {
 		
 		DirectComponent.register(Ping.class, new PingImpl(), serviceId);
 
-		assertEventually(serviceInvocationResult(new Supplier<String>() {
-			@Override
-			public String get() {
-				return ping.ping("foo");
-			}
-		}, equalTo("foo")));
+		assertEventually(() -> ping.ping("foo"), equalTo("foo"));
 		
 	}
 	
@@ -254,17 +246,12 @@ public class ServiceBeanInstanceTest {
 		assertEquals(2, directComponent.getBoundServices().size());
 		
 		serviceRegistry.clear();
-		assertEventually(serviceInvocationException(() -> ping.ping("foo"), CoreMatchers.any(ServiceUnavailableException.class)));
+		
+		assertEventuallyThrows(() -> ping.ping("foo"), any(ServiceUnavailableException.class));
 		
 		assertEquals(1, directComponent.getBoundServices().size());
 	}
-	
-	
-	private void assertEventually(Probe serviceInvocationException)
-			throws InterruptedException {
-		new Poller(100, 1).check(serviceInvocationException);
-	}
-	
+
 	@Test
 	public void serviceBeanInstanceUsesDefaultSubsystemNameWhenNoSubsystemIsSetInServiceProperties() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
@@ -347,6 +334,14 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.set("pingUri", "test:");
 		
 		astrixContext.waitForBean(Ping.class, 100);
+	}
+	
+	private <T extends Exception> void assertEventuallyThrows(Supplier<?> invocation, Matcher<T> returnValueMatcher) throws InterruptedException {
+		new Poller(100, 1).check(Probes.expectThrows(invocation, returnValueMatcher));		
+	}
+	
+	private <T> void assertEventually(Supplier<T> invocation, Matcher<T> returnValueMatcher) throws InterruptedException {
+		new Poller(100, 1).check(Probes.returnValue(invocation, returnValueMatcher));		
 	}
 	
 	static class FakeComponent implements ServiceComponent {

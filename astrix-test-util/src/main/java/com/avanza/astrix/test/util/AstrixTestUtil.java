@@ -141,7 +141,7 @@ public class AstrixTestUtil {
 		}
 	}
 
-	public static void assertThrows(Class<? extends RuntimeException> expectedExceptionType, Runnable command) {
+	public static void assertThrows(Runnable command, Class<? extends RuntimeException> expectedExceptionType) {
 		try {
 			command.run();
 			Assert.fail("Expected exception of type " + expectedExceptionType.getName() + " to be thrown");
