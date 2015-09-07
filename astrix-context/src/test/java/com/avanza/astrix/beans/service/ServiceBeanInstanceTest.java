@@ -30,7 +30,6 @@ import java.util.function.Supplier;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
@@ -52,8 +51,6 @@ import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.AstrixTestUtil;
 import com.avanza.astrix.test.util.Poller;
-import com.avanza.astrix.test.util.Probe;
-import com.avanza.astrix.test.util.Probes;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
@@ -337,11 +334,11 @@ public class ServiceBeanInstanceTest {
 	}
 	
 	private <T extends Exception> void assertEventuallyThrows(Supplier<?> invocation, Matcher<T> returnValueMatcher) throws InterruptedException {
-		new Poller(100, 1).check(Probes.expectThrows(invocation, returnValueMatcher));		
+		new Poller(1000, 1).check(AstrixTestUtil.serviceInvocationException(invocation, returnValueMatcher));
 	}
 	
 	private <T> void assertEventually(Supplier<T> invocation, Matcher<T> returnValueMatcher) throws InterruptedException {
-		new Poller(100, 1).check(Probes.returnValue(invocation, returnValueMatcher));		
+		new Poller(1000, 1).check(AstrixTestUtil.serviceInvocationResult(invocation, returnValueMatcher));		
 	}
 	
 	static class FakeComponent implements ServiceComponent {

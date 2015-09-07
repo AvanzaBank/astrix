@@ -117,12 +117,14 @@ public class BeanDefinitionMethod<T> implements PublishedAstrixBean<T> {
 			DefaultBeanSettings defaultBeanSettingsOnApi = getBeanType().getAnnotation(DefaultBeanSettings.class);
 			defaultSettings.put(AstrixBeanSettings.INITIAL_TIMEOUT, defaultBeanSettingsOnApi.initialTimeout());
 			defaultSettings.put(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED, defaultBeanSettingsOnApi.faultToleranceEnabled());
+			defaultSettings.put(AstrixBeanSettings.BEAN_METRICS_ENABLED, defaultBeanSettingsOnApi.beanMetricsEnabled());
 		}
 		if (this.method.isAnnotationPresent(DefaultBeanSettings.class)) {
 			// Default settings defined on service definition
 			DefaultBeanSettings defaultBeanSettingsInDefinition = this.method.getAnnotation(DefaultBeanSettings.class);
 			defaultSettings.put(AstrixBeanSettings.INITIAL_TIMEOUT, defaultBeanSettingsInDefinition.initialTimeout());
 			defaultSettings.put(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED, defaultBeanSettingsInDefinition.faultToleranceEnabled());
+			defaultSettings.put(AstrixBeanSettings.BEAN_METRICS_ENABLED, defaultBeanSettingsInDefinition.beanMetricsEnabled());
 		}
 		return defaultSettings;
 	}

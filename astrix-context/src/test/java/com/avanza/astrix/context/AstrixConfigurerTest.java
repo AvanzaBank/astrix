@@ -84,6 +84,7 @@ public class AstrixConfigurerTest {
 
 		assertEquals(2000, pingConfig.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
 		assertEquals(false, pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
+		assertEquals(false, pingConfig.get(AstrixBeanSettings.BEAN_METRICS_ENABLED).get());
 	}
 	
 	@Test
@@ -101,6 +102,7 @@ public class AstrixConfigurerTest {
 
 		assertEquals(3000, pingConfig.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
 		assertEquals(true, pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
+		assertEquals(false, pingConfig.get(AstrixBeanSettings.BEAN_METRICS_ENABLED).get());
 	}
 	
 	@Test
@@ -121,7 +123,8 @@ public class AstrixConfigurerTest {
 	
 	@DefaultBeanSettings(
 		initialTimeout = 2000,
-		faultToleranceEnabled = false
+		faultToleranceEnabled = false,
+		beanMetricsEnabled = false
 	)
 	public interface Ping {
 	}
@@ -139,7 +142,8 @@ public class AstrixConfigurerTest {
 	public interface PingApiProviderWithOverridingDefault {
 		@DefaultBeanSettings(
 			initialTimeout=3000,
-			faultToleranceEnabled = true
+			faultToleranceEnabled = true,
+			beanMetricsEnabled = false
 		)
 		@Service
 		Ping ping();

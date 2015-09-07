@@ -24,7 +24,7 @@ import org.junit.Assert;
 
 public class AstrixTestUtil {
 	
-	public static <T> Probe serviceInvocationResult(final Supplier<T> serviceInvocation, final Matcher<T> matcher) {
+	public static <T> Probe serviceInvocationResult(final Supplier<T> serviceInvocation, final Matcher<? super T> matcher) {
 		return new Probe() {
 			
 			private T lastResult;
