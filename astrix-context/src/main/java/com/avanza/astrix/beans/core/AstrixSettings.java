@@ -91,7 +91,7 @@ public final class AstrixSettings {
 	/**
 	 * Whether Astrix should export MBEANS
 	 */
-	public static final BooleanSetting EXPORT_ASTRIX_MBEANS = BooleanSetting.create("com.avanza.astrix.exportAstrixMBeans", false);
+	public static final BooleanSetting EXPORT_ASTRIX_MBEANS = BooleanSetting.create("com.avanza.astrix.exportAstrixMBeans", true);
 	
 	/**
 	 * Whether Astrix should collect statistics about each bean invocation.
