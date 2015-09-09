@@ -24,6 +24,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
@@ -42,6 +43,7 @@ import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
+import com.avanza.astrix.context.core.AsyncTypeConverterImpl;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.function.CheckedCommand;
@@ -409,7 +411,7 @@ public class ServiceBeanInstanceTest {
 			public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
 				return new AstrixObjectSerializer.NoVersioningSupport();
 			}
-		});
+		}, new AsyncTypeConverterImpl(Collections.emptyList()));
 		
 		@Override
 		public FtProxySetting configure(CommandSettings commandSettings) {

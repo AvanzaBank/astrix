@@ -15,6 +15,9 @@
  */
 package com.avanza.astrix.context;
 
+import java.util.Collections;
+
+import com.avanza.astrix.context.core.AsyncTypeConverterImpl;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
@@ -33,7 +36,7 @@ public class DirectComponent extends com.avanza.astrix.beans.service.DirectCompo
 			public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
 				return new AstrixObjectSerializer.NoVersioningSupport();
 			}
-		});
+		}, new AsyncTypeConverterImpl(Collections.emptyList()));
 	}
 
 }

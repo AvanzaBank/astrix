@@ -24,16 +24,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.BasicFuture;
+import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
+
+import rx.Observable;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -47,9 +48,11 @@ public class DirectComponent implements ServiceComponent {
 	private final ObjectSerializerFactory objectSerializerFactory;
 	private final List<DirectBoundServiceBeanInstance<?>> nonReleasedInstances = new ArrayList<>();
 	private final ConcurrentMap<AstrixBeanKey<?>, String> idByExportedBean = new ConcurrentHashMap<>();
+	private final AsyncTypeConverter asyncTypeConverter;
 	
-	public DirectComponent(ObjectSerializerFactory objectSerializerFactory) {
+	public DirectComponent(ObjectSerializerFactory objectSerializerFactory, AsyncTypeConverter asyncTypeConverter) {
 		this.objectSerializerFactory = objectSerializerFactory;
+		this.asyncTypeConverter = asyncTypeConverter;
 	}
 
 	public List<? extends BoundServiceBeanInstance<?>> getBoundServices() {
@@ -68,6 +71,7 @@ public class DirectComponent implements ServiceComponent {
 		if (serviceDefinition.getBeanKey().getBeanType().isAssignableFrom(targetProvider.getClass())) {
 			provider = serviceDefinition.getServiceType().cast(targetProvider);
 		} else {
+			// Async return type
 			provider = createProxy(serviceDefinition.getBeanKey().getBeanType(), targetProvider);
 		}
 		DirectBoundServiceBeanInstance<T> directServiceBeanInstance = new DirectBoundServiceBeanInstance<T>(provider);
@@ -81,10 +85,19 @@ public class DirectComponent implements ServiceComponent {
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				try {
 					Method targetMethod = targetProvider.getClass().getMethod(method.getName(), method.getParameterTypes());
-					if (method.getReturnType().isAssignableFrom(Future.class)) {
-						return new BasicFuture<>(targetMethod.invoke(targetProvider, args));
+					Observable<Object> observableResult = Observable.create((s) -> {
+						try {
+							Object result = ReflectionUtil.invokeMethod(targetMethod, targetProvider, args);
+							s.onNext(result);
+							s.onCompleted();
+						} catch (Throwable e) {
+							s.onError(e);
+						}
+					});
+					if (method.getReturnType().equals(Observable.class)) {
+						return observableResult;
 					}
-					return new BasicFuture<>(targetMethod.invoke(targetProvider, args));
+					return asyncTypeConverter.toAsyncType(method.getReturnType(), observableResult);
 				} catch (NoSuchMethodException e) {
 					throw new RuntimeException("Target service does not contain method: " + e.getMessage());
 				}

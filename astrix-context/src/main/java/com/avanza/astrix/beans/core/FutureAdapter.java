@@ -21,32 +21,20 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import rx.Observable;
-import rx.functions.Action1;
 
 public class FutureAdapter<T> implements Future<T> {
 	
 	private final CountDownLatch done = new CountDownLatch(1);
 	private volatile T result;
 	private volatile Throwable exception;
+	private final Observable<T> obs;
+	private final AtomicBoolean subscribed = new AtomicBoolean(false);
 	
 	public FutureAdapter(Observable<T> obs) {
-		obs.subscribe(new Action1<T>() {
-			@Override
-			public void call(T t1) {
-				result = t1;
-				done.countDown();
-			}
-		}, new Action1<Throwable>() {
-
-			@Override
-			public void call(Throwable t1) {
-				exception = t1;
-				done.countDown();
-			}
-			
-		});
+		this.obs = obs;
 	}
 
 	@Override
@@ -66,12 +54,27 @@ public class FutureAdapter<T> implements Future<T> {
 
 	@Override
 	public T get() throws InterruptedException, ExecutionException {
+		verifySubscribed();
 		done.await();
 		return getResult();
+	}
+	
+	private void verifySubscribed() {
+		boolean doSubscribe = this.subscribed.compareAndSet(false, true);
+		if (doSubscribe) {
+			obs.subscribe(e -> {
+				result = e;
+				done.countDown();
+			}, t1 -> {
+				exception = t1;
+				done.countDown();
+			});
+		}
 	}
 
 	@Override
 	public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+		verifySubscribed();
 		if (!done.await(timeout, unit)) {
 			throw new TimeoutException();
 		}
@@ -83,6 +86,10 @@ public class FutureAdapter<T> implements Future<T> {
 			throw new ExecutionException(exception);
 		}
 		return result;		
+	}
+
+	public Observable<T> asObservable() {
+		return this.obs;
 	}
 	
 }

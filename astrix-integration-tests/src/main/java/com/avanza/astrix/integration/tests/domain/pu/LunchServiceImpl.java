@@ -17,6 +17,8 @@ package com.avanza.astrix.integration.tests.domain.pu;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -45,6 +47,42 @@ public class LunchServiceImpl implements LunchService, InternalLunchFeeder {
 	@Override
 	public void addLunchRestaurant(LunchRestaurant restaurant) {
 		this.repo.writeLunchRestaurant(restaurant);
+	}
+	
+	@Override
+	public LunchRestaurant waitForLunchRestaurant(String name, int duration, TimeUnit unit) throws TimeoutException {
+		Timeout timeout = new Timeout(unit.toMillis(duration));
+		while(!timeout.hasTimeout()) {
+			LunchRestaurant result = repo.getByName(name);
+			if (result != null) {
+				return result;
+			}
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				throw new TimeoutException("Received interrupt before reading restaurant: " + name);
+			}
+		}
+		throw new TimeoutException("Failed to read restaurant before timeout: " + name);
+	}
+	
+	private static class Timeout {
+
+		private long endTimeMillis;
+
+		public Timeout(long timeoutMillis) {
+			this.endTimeMillis = currentTimeMillis() + timeoutMillis;
+		}
+
+		public boolean hasTimeout() {
+			return currentTimeMillis() >= endTimeMillis;
+		}
+
+		// test hook
+		long currentTimeMillis() {
+			return System.currentTimeMillis();
+		}
+		
 	}
 
 	@Override

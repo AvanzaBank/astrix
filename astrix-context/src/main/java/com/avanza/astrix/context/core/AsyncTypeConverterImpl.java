@@ -62,7 +62,11 @@ public final class AsyncTypeConverterImpl implements AsyncTypeConverter {
 	private static class FutureTypeConverter implements AsyncTypeConverterPlugin {
 		
 		@Override
+		@SuppressWarnings("unchecked")
 		public Observable<Object> toObservable(Object asyncResult) {
+			if (asyncResult instanceof FutureAdapter) {
+				return ((FutureAdapter<Object>) asyncResult).asObservable();
+			}
 			return Observable.from((Future<?>) asyncResult);
 		}
 		

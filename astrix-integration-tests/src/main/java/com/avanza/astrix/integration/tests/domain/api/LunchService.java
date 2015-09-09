@@ -16,9 +16,12 @@
 package com.avanza.astrix.integration.tests.domain.api;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
+import com.avanza.astrix.core.AstrixRouting;
 
 
 
@@ -30,6 +33,8 @@ public interface LunchService {
 	void addLunchRestaurant(LunchRestaurant restaurant);
 	
 	LunchRestaurant getLunchRestaurant(GetLunchRestaurantRequest request); 
+	
+	LunchRestaurant waitForLunchRestaurant(@AstrixRouting String name, int timeout, TimeUnit unit) throws TimeoutException;
 
 	List<LunchRestaurant> getLunchRestaurants(@AstrixPartitionedRouting String... restaurantNames);
 }

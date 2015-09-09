@@ -15,10 +15,10 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
@@ -143,12 +143,30 @@ public class HystrixObservableCommandFacadeTest {
 		};
 		Observable<String> ftObservable1 = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
 		Observable<String> ftObservable2 = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
-		
-		// No need to subscribe to any of the above Observables. 
-		// Execution is started eagerly by HystrixObservableCommandFacade.observe
+
+		ftObservable1.subscribe();
+		ftObservable2.subscribe();
 		
 		assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, this.commandKey));
 		assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SEMAPHORE_REJECTED, this.commandKey));
+	}
+	
+	@Test
+	public void subscribesLazilyToCreatedObserver() throws Exception {
+		AtomicBoolean subscribed = new AtomicBoolean(false);
+		Supplier<Observable<String>> timeoutCommandSupplier = new Supplier<Observable<String>>() {
+			@Override
+			public Observable<String> get() {
+				return Observable.create(t1 -> {
+					subscribed.set(true);
+				});
+			}
+		};
+		Observable<String> ftObservable1 = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
+		assertFalse(subscribed.get());
+
+		ftObservable1.subscribe();
+		assertTrue(subscribed.get());
 	}
 	
 	
@@ -170,10 +188,11 @@ public class HystrixObservableCommandFacadeTest {
 		Observable<String> ftObservable1 = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
 		final Observable<String> ftObservable2 = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
 		
-		// No need to subscribe to any of the above Observables. 
-		// Execution is started eagerly by HystrixObservableCommandFacade.observe
+		ftObservable1.subscribe(); // Ignore
+		
 		assertEquals(1, supplierInvocationCount.get());
 		AstrixTestUtil.serviceInvocationException(() -> ftObservable2.toBlocking().first(), AstrixTestUtil.isExceptionOfType(ServiceUnavailableException.class));
+		assertEquals(1, supplierInvocationCount.get());
 	}
 	
 	private int getEventCountForCommand(HystrixRollingNumberEvent hystrixRollingNumberEvent, String commandKey) {

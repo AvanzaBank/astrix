@@ -92,7 +92,7 @@ class HystrixObservableCommandFacade<T> {
 															"UNKNOWN", getCommandKey().name()));
 			}
 			
-		}.observe(); // Eagerly start execution of underlying observable
+		}.toObservable(); // Lazy start execution of underlying observable
 		return faultToleranceProtectedObservable.flatMap(new Func1<Result<T>, Observable<T>>() {
 			@Override
 			public Observable<T> call(Result<T> t1) {

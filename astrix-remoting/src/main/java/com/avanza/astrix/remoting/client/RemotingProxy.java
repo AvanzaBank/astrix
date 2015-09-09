@@ -22,9 +22,7 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Future;
 
-import com.avanza.astrix.beans.core.FutureAdapter;
 import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.remoting.RoutingStrategy;
@@ -32,6 +30,7 @@ import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 
 import rx.Observable;
+import rx.subjects.ReplaySubject;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -99,7 +98,12 @@ public class RemotingProxy implements InvocationHandler {
 			return result;
 		}
 		if (isAsyncType(method.getReturnType())) {
-			return asyncTypeConverter.toAsyncType(method.getReturnType(), (Observable<Object>) result);
+			ReplaySubject<Object> subject = ReplaySubject.create();
+	        // eagerly kick off subscription
+	        result.subscribe(subject);
+	        // return the subject that can be subscribed to later while the execution has already started
+			return asyncTypeConverter.toAsyncType(method.getReturnType(), subject);
+//			return asyncTypeConverter.toAsyncType(method.getReturnType(), (Observable<Object>) result);
 		}
 		try {
 			return result.toBlocking().first();
