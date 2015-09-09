@@ -95,7 +95,7 @@ public class AsyncRemoteServiceTest {
 	 * The tests in this class are to ensure a asynchronous model for gs-remoting. 
 	 */
 	
-	@Test
+	@Test(timeout=1000)
 	public void serviceInvocationsReturningFutureDoesRunAsynchronously() throws Exception {
 		GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
 		request.setName("Martins Green Room");
@@ -105,7 +105,7 @@ public class AsyncRemoteServiceTest {
 		assertNotNull(lunchRestaurant.get());
 	}
 	
-	@Test
+	@Test(timeout=1000)
 	public void asyncInvocationsAreStartedAsynchronouslynServiceInvocation() throws Exception {
 		GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
 		request.setName("Martins Green Room");

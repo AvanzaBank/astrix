@@ -103,7 +103,6 @@ public class RemotingProxy implements InvocationHandler {
 	        result.subscribe(subject);
 	        // return the subject that can be subscribed to later while the execution has already started
 			return asyncTypeConverter.toAsyncType(method.getReturnType(), subject);
-//			return asyncTypeConverter.toAsyncType(method.getReturnType(), (Observable<Object>) result);
 		}
 		try {
 			return result.toBlocking().first();

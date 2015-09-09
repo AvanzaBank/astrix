@@ -17,13 +17,13 @@ package com.avanza.astrix.remoting.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.openspaces.remoting.SpaceRemotingResult;
 
+import com.avanza.astrix.beans.core.ListenableFutureAdapter;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.CorrelationId;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
@@ -65,6 +65,9 @@ public class GsUtil {
 	}
 	
 	public static <T> Observable<T> toObservable(final AsyncFuture<T> response) {
+		if (AsyncFutureAdapter.class.equals(response.getClass())) {
+			return ((AsyncFutureAdapter<T>) response).asObservable();
+		}
 		return Observable.create(new Observable.OnSubscribe<T>() {
 			@Override
 			public void call(final Subscriber<? super T> t1) {
@@ -123,45 +126,47 @@ public class GsUtil {
 	
 	public static class AsyncFutureAdapter<T> implements AsyncFuture<T> {
 		
-		private volatile T result;
-		private volatile Throwable error;
-		private final CountDownLatch done = new CountDownLatch(1);
-		private volatile AsyncFutureListener<T> listener;
+		private final ListenableFutureAdapter<T> listenableFuture;
 		
+		public AsyncFutureAdapter(Observable<T> observable) {
+			this.listenableFuture = new ListenableFutureAdapter<>(observable);
+		}
 		
 		static <T> AsyncFutureAdapter<T> create(Observable<T> observable) {
-			AsyncFutureAdapter<T> result = new AsyncFutureAdapter<>();
-			result.subscribeTo(observable);
-			return result;
+			return new AsyncFutureAdapter<>(observable);
 		}
 		
-		private void subscribeTo(Observable<T> observable) {
-			observable.subscribe(new Subscriber<T>() {
-				@Override
-				public void onCompleted() {
-					done.countDown();
-					notifyDone();
-				}
-				@Override
-				public void onError(Throwable e) {
-					error = e;
-					done.countDown();
-					notifyDone();
-				}
-				@Override
-				public void onNext(T t) {
-					result = t;
-				}
-			});
+		@Override
+		public boolean cancel(boolean mayInterruptIfRunning) {
+			return listenableFuture.cancel(mayInterruptIfRunning);
 		}
 
-		private void notifyDone() {
-			if (this.listener == null) {
-				return;
-			}
-			this.listener.onResult(new DefaultAsyncResult<T>(result, asException(error)));
+		@Override
+		public boolean isCancelled() {
+			return listenableFuture.isCancelled();
 		}
 
+		@Override
+		public boolean isDone() {
+			return listenableFuture.isDone();
+		}
+
+		@Override
+		public T get() throws InterruptedException, ExecutionException {
+			return listenableFuture.get();
+		}
+
+		@Override
+		public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+			return this.listenableFuture.get(timeout, unit);
+		}
+
+		@Override
+		public void setListener(AsyncFutureListener<T> listener) {
+			this.listenableFuture.setFutureListener((futureResult) -> listener.onResult(
+					new DefaultAsyncResult<T>(futureResult.getResult(), asException(futureResult.getException()))));
+		}
+		
 		private static Exception asException(Throwable error) {
 			if (error instanceof Exception) {
 				return (Exception) error;
@@ -169,47 +174,9 @@ public class GsUtil {
 			return new RuntimeException(error);
 		}
 
-		@Override
-		public boolean cancel(boolean mayInterruptIfRunning) {
-			return false;
+		public Observable<T> asObservable() {
+			return this.listenableFuture.asObservable();
 		}
-
-		@Override
-		public boolean isCancelled() {
-			return false;
-		}
-
-		@Override
-		public boolean isDone() {
-			return this.done.getCount() == 0;
-		}
-
-		@Override
-		public T get() throws InterruptedException, ExecutionException {
-			this.done.await();
-			return getResult();
-		}
-
-		@Override
-		public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-			if (this.done.await(timeout, unit)) {
-				return getResult();
-			}
-			throw new TimeoutException();
-		}
-		
-		private T getResult() throws ExecutionException {
-			if (this.error != null) {
-				throw new ExecutionException(this.error);
-			}
-			return this.result;
-		}
-
-		@Override
-		public void setListener(AsyncFutureListener<T> listener) {
-			this.listener = listener;
-		}
-		
 	}
 	
 }

@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 
-import com.avanza.astrix.beans.core.FutureAdapter;
+import com.avanza.astrix.beans.core.ListenableFutureAdapter;
 
 import rx.Observable;
 
@@ -64,17 +64,16 @@ public final class AsyncTypeConverterImpl implements AsyncTypeConverter {
 		@Override
 		@SuppressWarnings("unchecked")
 		public Observable<Object> toObservable(Object asyncResult) {
-			if (asyncResult instanceof FutureAdapter) {
-				return ((FutureAdapter<Object>) asyncResult).asObservable();
+			if (asyncResult instanceof ListenableFutureAdapter) {
+				return ((ListenableFutureAdapter<Object>) asyncResult).asObservable();
 			}
 			return Observable.from((Future<?>) asyncResult);
 		}
 		
 		@Override
 		public Object fromObservable(Observable<Object> asyncResult) {
-			return new FutureAdapter<>(asyncResult);
+			return new ListenableFutureAdapter<>(asyncResult);
 		}
-
 
 		@Override
 		public Class<?> asyncType() {

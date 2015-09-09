@@ -69,11 +69,18 @@ public class AsyncTypeConverterTest {
 	public void futureToObservableAndBackToFuture() throws Exception {
 		AsyncTypeConverterImpl asyncTypeConverterImpl = new AsyncTypeConverterImpl(Collections.emptyList());
 		BasicFuture<Object> future = new BasicFuture<>();
-		
-		
 		Observable<Object> observable = asyncTypeConverterImpl.toObservable(Future.class, future);
 		Future<Object> converted= (Future<Object>) asyncTypeConverterImpl.toAsyncType(Future.class, observable);
 		future.set("foo");
 		assertEquals("foo", converted.get());
+	}
+	
+	@Test
+	public void observableToFutureAndBackReturnsSameObservable() throws Exception {
+		AsyncTypeConverterImpl asyncTypeConverterImpl = new AsyncTypeConverterImpl(Collections.emptyList());
+		Observable<Object> observable = Observable.just("");
+		Future<Object> future = (Future<Object>) asyncTypeConverterImpl.toAsyncType(Future.class, observable);
+		Observable<Object> convertedObservable = asyncTypeConverterImpl.toObservable(Future.class, future);
+		assertSame(observable, convertedObservable);
 	}
 }

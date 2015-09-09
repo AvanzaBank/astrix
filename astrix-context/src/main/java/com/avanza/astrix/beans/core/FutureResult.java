@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.integration.tests.domain.api;
+package com.avanza.astrix.beans.core;
 
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
-import com.avanza.astrix.core.AstrixRouting;
-import com.gigaspaces.async.AsyncFuture;
-
-public interface LunchServiceAsync {
-
-	// This interface intentionally mixes Future / AsyncFuture representation 
+public final class FutureResult<T> {
 	
-	Future<LunchRestaurant> getLunchRestaurant(GetLunchRestaurantRequest request);
+	private final T result;
+	private final Throwable exception;
 	
-	Future<LunchRestaurant> waitForLunchRestaurant(@AstrixRouting String name, int duration, TimeUnit unit);
+	public FutureResult(T result, Throwable exception) {
+		this.result = result;
+		this.exception = exception;
+	}
 	
-	AsyncFuture<Void> addLunchRestaurant(LunchRestaurant restaurant);
+	public Throwable getException() {
+		return exception;
+	}
+	
+	public T getResult() {
+		return result;
+	}
+
 }

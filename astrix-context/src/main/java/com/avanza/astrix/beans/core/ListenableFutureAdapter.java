@@ -22,18 +22,38 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import rx.Observable;
 
-public class FutureAdapter<T> implements Future<T> {
+public final class ListenableFutureAdapter<T> implements Future<T> {
 	
 	private final CountDownLatch done = new CountDownLatch(1);
 	private volatile T result;
 	private volatile Throwable exception;
 	private final Observable<T> obs;
 	private final AtomicBoolean subscribed = new AtomicBoolean(false);
+	private volatile FutureListenerNotifier futureListener;
 	
-	public FutureAdapter(Observable<T> obs) {
+	private class FutureListenerNotifier {
+		
+		private final Consumer<FutureResult<T>> futureListener;
+		private final AtomicBoolean notified = new AtomicBoolean(false);
+		
+		public FutureListenerNotifier(Consumer<FutureResult<T>> futureListener) {
+			this.futureListener = futureListener;
+		}
+		
+		public void ensureNotified() {
+			boolean doNotify = notified.compareAndSet(false, true);
+			if (doNotify) {
+				futureListener.accept(new FutureResult<T>(result, exception));
+			}
+		}
+		
+	}
+	
+	public ListenableFutureAdapter(Observable<T> obs) {
 		this.obs = obs;
 	}
 
@@ -49,36 +69,57 @@ public class FutureAdapter<T> implements Future<T> {
 
 	@Override
 	public boolean isDone() {
+		ensureSubscribed();
 		return done.getCount() == 0;
 	}
 
 	@Override
 	public T get() throws InterruptedException, ExecutionException {
-		verifySubscribed();
+		ensureSubscribed();
 		done.await();
 		return getResult();
-	}
-	
-	private void verifySubscribed() {
-		boolean doSubscribe = this.subscribed.compareAndSet(false, true);
-		if (doSubscribe) {
-			obs.subscribe(e -> {
-				result = e;
-				done.countDown();
-			}, t1 -> {
-				exception = t1;
-				done.countDown();
-			});
-		}
 	}
 
 	@Override
 	public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-		verifySubscribed();
+		ensureSubscribed();
 		if (!done.await(timeout, unit)) {
 			throw new TimeoutException();
 		}
 		return getResult();
+	}
+	
+	public void setFutureListener(Consumer<FutureResult<T>> futureListener) {
+		ensureSubscribed();
+		this.futureListener = new FutureListenerNotifier(futureListener);
+		if (isDone()) {
+			this.futureListener.ensureNotified();
+		}
+	}
+	
+	private void ensureSubscribed() {
+		boolean doSubscribe = this.subscribed.compareAndSet(false, true);
+		if (doSubscribe) {
+			obs.subscribe(this::setResult, this::setError);
+		}
+	}
+
+	private void setError(Throwable t1) {
+		exception = t1;
+		done.countDown();
+		notifyListener();
+	}
+
+	private void setResult(T e) {
+		result = e;
+		done.countDown();
+		notifyListener();
+	}
+
+	private void notifyListener() {
+		if (this.futureListener != null) {
+			this.futureListener.ensureNotified();
+		}
 	}
 
 	private T getResult() throws ExecutionException {
