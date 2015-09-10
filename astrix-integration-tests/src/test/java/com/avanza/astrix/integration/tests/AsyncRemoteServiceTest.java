@@ -47,8 +47,6 @@ import com.avanza.astrix.test.util.AutoCloseableRule;
  *
  */
 public class AsyncRemoteServiceTest {
-	
-	
 
 	private static InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 	
@@ -79,8 +77,8 @@ public class AsyncRemoteServiceTest {
 		proxy.clear(null);
 		
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.enableFaultTolerance(false);
-		configurer.set(AstrixSettings.ENABLE_BEAN_METRICS, false);
+		configurer.enableFaultTolerance(true);
+		configurer.set(AstrixSettings.ENABLE_BEAN_METRICS, true);
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
 		configurer.setConfig(DynamicConfig.create(config));
 		configurer.setSubsystem("test-sub-system");
@@ -90,9 +88,10 @@ public class AsyncRemoteServiceTest {
 	}
 	
 	/* NOTE: Since Astrix converts between Future/Observable internally its easy
-	 * to run into a state where asynchronous calls becomes efectively synchronous.
+	 * to run into a state where asynchronous calls becomes effectively synchronous.
 	 * 
-	 * The tests in this class are to ensure a asynchronous model for gs-remoting. 
+	 * The tests in this class are to ensure an asynchronous model for gs-remoting, as
+	 * well as the full stack with proxies on each service-bean. 
 	 */
 	
 	@Test(timeout=1000)

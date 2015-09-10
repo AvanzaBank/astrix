@@ -91,8 +91,7 @@ class HystrixObservableCommandFacade<T> {
 				return new ServiceUnavailableException(String.format("cause=%s service=%s", 
 															"UNKNOWN", getCommandKey().name()));
 			}
-			
-		}.toObservable(); // Lazy start execution of underlying observable
+		}.observe(); // Eagerly start execution of underlying observable to fulfill contract of BeanProxy.proxyAsyncInvocation
 		return faultToleranceProtectedObservable.flatMap(new Func1<Result<T>, Observable<T>>() {
 			@Override
 			public Observable<T> call(Result<T> t1) {

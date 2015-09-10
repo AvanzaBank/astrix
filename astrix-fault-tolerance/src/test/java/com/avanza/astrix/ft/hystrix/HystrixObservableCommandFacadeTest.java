@@ -144,15 +144,16 @@ public class HystrixObservableCommandFacadeTest {
 		Observable<String> ftObservable1 = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
 		Observable<String> ftObservable2 = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
 
-		ftObservable1.subscribe();
-		ftObservable2.subscribe();
+		// Subscribe to observables, ignore emitted items/errors
+		ftObservable1.subscribe((item) -> {}, (exception) -> {});
+		ftObservable2.subscribe((item) -> {}, (exception) -> {});
 		
 		assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, this.commandKey));
 		assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SEMAPHORE_REJECTED, this.commandKey));
 	}
 	
 	@Test
-	public void subscribesLazilyToCreatedObserver() throws Exception {
+	public void subscribesEagerlyToCreatedObserver() throws Exception {
 		AtomicBoolean subscribed = new AtomicBoolean(false);
 		Supplier<Observable<String>> timeoutCommandSupplier = new Supplier<Observable<String>>() {
 			@Override
@@ -163,9 +164,6 @@ public class HystrixObservableCommandFacadeTest {
 			}
 		};
 		Observable<String> ftObservable1 = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
-		assertFalse(subscribed.get());
-
-		ftObservable1.subscribe();
 		assertTrue(subscribed.get());
 	}
 	

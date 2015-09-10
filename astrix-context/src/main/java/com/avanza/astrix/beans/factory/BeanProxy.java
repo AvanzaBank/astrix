@@ -33,11 +33,14 @@ public interface BeanProxy {
 	/**
 	 * Proxy an asynchronous invocation. The invocation is represented by
 	 * an Observable, although the underlying service method invocation can
-	 * use some other representation for the asynchrounous result. 
+	 * use some other representation for the asynchronous result. 
 	 * 
 	 * 
 	 * @param command
-	 * @return
+	 * 
+	 * @return A Proxied Supplier for the underlying invocation. Note
+	 * that the underlying (argument) supplier MUST be called synchronously
+	 * when invoking "get" on the returned Supplier.
 	 */
 	<T> Supplier<Observable<T>> proxyAsyncInvocation(Supplier<Observable<T>> command);
 	

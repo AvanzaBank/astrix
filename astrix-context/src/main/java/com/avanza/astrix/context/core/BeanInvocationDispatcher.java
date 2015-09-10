@@ -26,6 +26,7 @@ import com.avanza.astrix.core.function.CheckedCommand;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
 import rx.Observable;
+import rx.subjects.ReplaySubject;
 
 public final class BeanInvocationDispatcher implements InvocationHandler {
 	
@@ -70,10 +71,14 @@ public final class BeanInvocationDispatcher implements InvocationHandler {
 		for (BeanProxy proxy : proxys) {
 			serviceInvocation = proxy.proxyAsyncInvocation(serviceInvocation);
 		}
-		Observable<Object> asyncResult = serviceInvocation.get();
+		
 		if (isObservableType(method.getReturnType())) {
-			return asyncResult;
+			return serviceInvocation.get(); 
+//			return Observable.create((s) -> {
+//				serviceInvocation.get().subscribe(s);
+//			});
 		}
+		Observable<Object> asyncResult = serviceInvocation.get();
 		return this.asyncTypeConverter.toAsyncType(method.getReturnType(), asyncResult);
 	}
 	
