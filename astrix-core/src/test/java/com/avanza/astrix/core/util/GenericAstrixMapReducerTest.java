@@ -58,16 +58,12 @@ public class GenericAstrixMapReducerTest {
 	
 	private static final class MyRuntimeException extends ServiceInvocationException {
 		private static final long serialVersionUID = 1L;
-		public MyRuntimeException(CorrelationId correlationId) {
-			super(correlationId);
-		}
 		public MyRuntimeException() {
-			super(UNDEFINED_CORRELATION_ID);
+			super();
 		}
-
 		@Override
-		public ServiceInvocationException reCreateOnClientSide(CorrelationId correlationId) {
-			return new MyRuntimeException(correlationId);
+		public ServiceInvocationException recreateOnClientSide() {
+			return new MyRuntimeException();
 		}
 	}
 	

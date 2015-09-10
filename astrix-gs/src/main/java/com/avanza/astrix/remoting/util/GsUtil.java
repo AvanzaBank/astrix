@@ -60,7 +60,7 @@ public class GsUtil {
 		if (exception instanceof RuntimeException) {
 			return (ServiceInvocationException) exception;
 		} else {
-			return new RemoteServiceInvocationException("Remote service threw exception: " + exception.getMessage(), exception.getClass().getName(), ServiceInvocationException.UNDEFINED_CORRELATION_ID);
+			return new RemoteServiceInvocationException("Remote service threw exception: " + exception.getMessage(), exception.getClass().getName());
 		}
 	}
 	

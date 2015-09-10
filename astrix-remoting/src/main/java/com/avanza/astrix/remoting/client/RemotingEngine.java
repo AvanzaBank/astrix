@@ -79,7 +79,7 @@ public final class RemotingEngine {
 																		version);
 			return exception;
 		} 
-		return new RemoteServiceInvocationException(response.getExceptionMsg(), response.getThrownExceptionType(), null);			
+		return new RemoteServiceInvocationException(response.getExceptionMsg(), response.getThrownExceptionType());			
 	}
 	
 	final Observable<AstrixServiceInvocationResponse> submitRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey) {

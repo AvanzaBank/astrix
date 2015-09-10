@@ -20,13 +20,13 @@ import java.util.List;
 import java.util.Set;
 
 import com.avanza.astrix.core.AstrixRemoteResult;
-import com.avanza.astrix.core.AstrixRemoteResultReducer;
+import com.avanza.astrix.core.RemoteResultReducer;
 
 /**
  * Reduce {@link Set}s into one {@link Set} containing the union of all unique input data.
  * 
  */
-public class GenericAstrixSetReducer<T> implements AstrixRemoteResultReducer<Set<T>, Set<T>> {
+public class GenericAstrixSetReducer<T> implements RemoteResultReducer<Set<T>> {
 
 	@Override
 	public Set<T> reduce(List<AstrixRemoteResult<Set<T>>> results) {

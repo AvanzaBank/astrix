@@ -15,21 +15,20 @@
  */
 package com.avanza.astrix.core.util;
 
-import com.avanza.astrix.core.AstrixRemoteResult;
-import com.avanza.astrix.core.CorrelationId;
-import com.avanza.astrix.core.ServiceInvocationException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.avanza.astrix.core.AstrixRemoteResult;
+import com.avanza.astrix.core.CorrelationId;
+import com.avanza.astrix.core.ServiceInvocationException;
 
 
 public class GenericAstrixSetReducerTest {
@@ -65,5 +64,6 @@ public class GenericAstrixSetReducerTest {
 	}
 
 	private static class MyRuntimeException extends ServiceInvocationException {
+		private static final long serialVersionUID = 1L;
 	}
 }

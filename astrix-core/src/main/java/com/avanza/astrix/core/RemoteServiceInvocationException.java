@@ -31,13 +31,12 @@ public class RemoteServiceInvocationException extends ServiceInvocationException
 
 	/**
 	 * 
-	 * @param msg - 
 	 * @param serviceExceptionMessage - the message from the exception thrown 
 	 * @param serviceExceptionType - the type of the thrown exception
-	 * @param correlationId - a correlation id to identify the exception in server side logs.
+	 * @param msg - 
 	 */
-	public RemoteServiceInvocationException(String serviceExceptionMessage, String serviceExceptionType, CorrelationId correlationId) {
-		super(correlationId, "Remote service threw exception, see server log for details. [" + serviceExceptionType + ": " + serviceExceptionMessage + "] correlationId=" + correlationId);
+	public RemoteServiceInvocationException(String serviceExceptionMessage, String serviceExceptionType) {
+		super("Remote service threw exception, see server log for details. [" + serviceExceptionType + ": " + serviceExceptionMessage + "]");
 		this.serviceExceptionMessage = serviceExceptionMessage;
 		this.exceptionType = serviceExceptionType;
 	}
@@ -51,8 +50,8 @@ public class RemoteServiceInvocationException extends ServiceInvocationException
 	}
 	
 	@Override
-	public ServiceInvocationException reCreateOnClientSide(CorrelationId correlationId) {
-		return new RemoteServiceInvocationException(getServiceExceptionMessage(), getExceptionType(), correlationId);
+	protected ServiceInvocationException recreateOnClientSide() {
+		return new RemoteServiceInvocationException(getServiceExceptionMessage(), getExceptionType());
 	}
 	
 }
