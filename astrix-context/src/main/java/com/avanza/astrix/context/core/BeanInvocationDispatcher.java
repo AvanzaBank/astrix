@@ -26,7 +26,6 @@ import com.avanza.astrix.core.function.CheckedCommand;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
 import rx.Observable;
-import rx.subjects.ReplaySubject;
 
 public final class BeanInvocationDispatcher implements InvocationHandler {
 	
@@ -56,6 +55,7 @@ public final class BeanInvocationDispatcher implements InvocationHandler {
 		return serviceInvocation.call();
 	}
 
+	@SuppressWarnings("unchecked")
 	private Object proxyAsyncInvocation(final Method method, final Object[] args) {
 		Supplier<Observable<Object>> serviceInvocation = () -> {
 			try {

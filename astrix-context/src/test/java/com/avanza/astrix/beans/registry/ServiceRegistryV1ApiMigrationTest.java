@@ -25,7 +25,6 @@ import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
-import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 
 
 public class ServiceRegistryV1ApiMigrationTest {

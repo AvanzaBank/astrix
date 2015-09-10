@@ -69,6 +69,7 @@ public class AsyncServiceTest {
 	public void asyncServiceInvocationShouldStartSynchronouslyWithMethodCalll() throws Exception {
 		PingAsync ping = context.getBean(PingAsync.class);
 
+		@SuppressWarnings("unused")
 		Future<String> response = ping.ping("foo");
 		assertEquals("Service invocation should be started synchronously with method call. Last server invocation: ", 
 					 "foo", server.pingRequests.poll(1, TimeUnit.SECONDS));
@@ -129,6 +130,7 @@ public class AsyncServiceTest {
 			this.instance = instance;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
 			return new SimpleBoundServiceBeanInstance<T>((T) instance);

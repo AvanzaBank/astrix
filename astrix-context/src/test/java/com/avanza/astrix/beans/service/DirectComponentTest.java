@@ -30,8 +30,6 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.AstrixTestUtil;
 
-import junit.extensions.TestSetup;
-
 public class DirectComponentTest {
 	
 	private AstrixContext astrixContext;

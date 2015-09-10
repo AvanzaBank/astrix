@@ -34,12 +34,11 @@ import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
  *
  */
 public final class JavaSerializationSerializer implements AstrixObjectSerializer {
-	private int version;
 	
 	public JavaSerializationSerializer(int version) {
-		this.version = version;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T deserialize(Object element, Type type, int version) {
 		try {

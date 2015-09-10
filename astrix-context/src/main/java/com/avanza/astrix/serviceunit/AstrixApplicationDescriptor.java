@@ -55,6 +55,7 @@ public class AstrixApplicationDescriptor {
 		return new AstrixApplicationDescriptor(applicationDescriptorHolder, defaultServiceComponent, exportsRemoteServicesForApis);
 	}
 
+	@SuppressWarnings("deprecation")
 	private static String getDefaultServiceComponent(
 			AstrixApplication astrixApplication, Class<?> applicationDescriptorHolder) {
 		if (astrixApplication.defaultServiceComponent().isEmpty() && 
@@ -73,6 +74,7 @@ public class AstrixApplicationDescriptor {
 				" descriptor must define the 'defaultComponentName' property");
 	}
 
+	@SuppressWarnings("deprecation")
 	private static Class<?>[] getExportedRemoteServiceEndpoints(AstrixApplication astrixApplication, Class<?> applicationDescriptorHolder) {
 		if (astrixApplication.apiDescriptors().length > 0 && 
 				astrixApplication.exportsRemoteServicesFor().length > 0) {

@@ -17,7 +17,6 @@ package com.avanza.astrix.beans.service;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -214,7 +213,7 @@ public class DirectComponent implements ServiceComponent {
 														  serializerDefinition.version(), 
 														  objectSerializerFactory.create(serializerDefinition), 
 														  objectSerializerFactory.create(serverSerializerDefinition));
-				return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[]{type}, serializationHandlingProxy);
+				return ReflectionUtil.newProxy(type, serializationHandlingProxy);
 			}
 			return provider;
 		}

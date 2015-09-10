@@ -81,6 +81,7 @@ public class BeanDefinitionMethod<T> implements PublishedAstrixBean<T> {
 		return new BeanDefinitionMethod<>(astrixBeanDefinition);
 	}
 
+	@SuppressWarnings("unchecked")
 	public Class<T> getBeanType() {
 		return (Class<T>) method.getReturnType();
 	}

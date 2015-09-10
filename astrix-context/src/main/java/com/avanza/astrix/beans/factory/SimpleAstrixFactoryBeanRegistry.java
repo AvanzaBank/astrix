@@ -50,6 +50,7 @@ public class SimpleAstrixFactoryBeanRegistry implements AstrixFactoryBeanRegistr
 		throw new MissingBeanProviderException(beanKey);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
 		Set<AstrixBeanKey<T>> result = new HashSet<>();

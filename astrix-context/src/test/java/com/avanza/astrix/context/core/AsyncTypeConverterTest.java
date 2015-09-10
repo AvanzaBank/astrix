@@ -15,7 +15,8 @@
  */
 package com.avanza.astrix.context.core;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
@@ -26,7 +27,6 @@ import java.util.concurrent.TimeoutException;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.BasicFuture;
-import com.avanza.astrix.context.core.AsyncTypeConverterImpl;
 
 import rx.Observable;
 
@@ -50,7 +50,8 @@ public class AsyncTypeConverterTest {
 		});
 		
 		
-		Future<String> future = (Future<String>)asyncTypeConverterImpl.toAsyncType(Future.class, obs);
+		@SuppressWarnings("unchecked")
+		Future<String> future = (Future<String>) asyncTypeConverterImpl.toAsyncType(Future.class, obs);
 		latch.countDown();
 		assertEquals("SUCCESS", future.get());
 	}
@@ -66,16 +67,19 @@ public class AsyncTypeConverterTest {
 	}
 
 	@Test(timeout=1000)
+	@SuppressWarnings("unchecked")
 	public void futureToObservableAndBackToFuture() throws Exception {
 		AsyncTypeConverterImpl asyncTypeConverterImpl = new AsyncTypeConverterImpl(Collections.emptyList());
 		BasicFuture<Object> future = new BasicFuture<>();
 		Observable<Object> observable = asyncTypeConverterImpl.toObservable(Future.class, future);
+		
 		Future<Object> converted= (Future<Object>) asyncTypeConverterImpl.toAsyncType(Future.class, observable);
 		future.set("foo");
 		assertEquals("foo", converted.get());
 	}
 	
 	@Test
+	@SuppressWarnings("unchecked")
 	public void observableToFutureAndBackReturnsSameObservable() throws Exception {
 		AsyncTypeConverterImpl asyncTypeConverterImpl = new AsyncTypeConverterImpl(Collections.emptyList());
 		Observable<Object> observable = Observable.just("");

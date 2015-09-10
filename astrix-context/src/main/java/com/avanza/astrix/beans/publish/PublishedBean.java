@@ -46,6 +46,7 @@ public final class PublishedBean {
 		return defaultBeanSettingsOverride;
 	}
 
+	@SuppressWarnings("unchecked")
 	public AstrixBeanKey<?> getBeanKey() {
 		if (factory instanceof StandardFactoryBean) {
 			return StandardFactoryBean.class.cast(factory).getBeanKey();
