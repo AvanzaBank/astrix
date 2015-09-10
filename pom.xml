@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.avanza.astrix</groupId>
 	<artifactId>astrix-parent</artifactId>
-	<version>0.35.1</version>
+	<version>MASTER-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>astrix-core</module>
