@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 package com.avanza.astrix.beans.core;
-
+/**
+ * Holds the result from the completion of
+ * a ListenableFutureAdapter. <p>
+ * 
+ * @author Elias Lindholm
+ *
+ * @param <T>
+ */
 public final class FutureResult<T> {
 	
 	private final T result;
@@ -24,11 +31,23 @@ public final class FutureResult<T> {
 		this.result = result;
 		this.exception = exception;
 	}
-	
+
+	/**
+	 * If the underlying computation ended with an error, then
+	 * this method returns the given Throwable.
+	 * 
+	 * @return A Throwable if the underlying computation ended with an error, null otherwise
+	 */
 	public Throwable getException() {
 		return exception;
 	}
 	
+	/**
+	 * If the underlying computation ended successfully, then
+	 * this method returns the result (possibly null).
+	 * 
+	 * @return
+	 */
 	public T getResult() {
 		return result;
 	}

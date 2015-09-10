@@ -89,6 +89,20 @@ public final class ListenableFutureAdapter<T> implements Future<T> {
 		return getResult();
 	}
 	
+	/**
+	 * Sets a listener for the result of this future. The listener is guaranteed to be invoked exactly
+	 * one time when this future completes.
+	 * 
+	 * If this Future is already completed then the listener will be invoked on the same thread
+	 * that invokes this method. Otherwise the listener will be invoked on the
+	 * thread that completes the computation of this future.
+	 * 
+	 * If this method is invoked multiple times, then only the last listener set is guaranteed
+	 * to receive a callback with the result.
+	 *  
+	 *  
+	 * @param futureListener
+	 */
 	public void setFutureListener(Consumer<FutureResult<T>> futureListener) {
 		ensureSubscribed();
 		this.futureListener = new FutureListenerNotifier(futureListener);
