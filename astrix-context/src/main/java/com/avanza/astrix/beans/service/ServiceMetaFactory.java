@@ -15,28 +15,9 @@
  */
 package com.avanza.astrix.beans.service;
 
-import com.avanza.astrix.beans.core.AstrixBeanKey;
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- * @param <T>
- */
-public final class ServiceDiscoveryFactory<T> {
-	
-	private final ServiceDiscoveryMetaFactoryPlugin<T> factory;
-	private final T config;
-	private final Class<?> beanType;
-	
-	public ServiceDiscoveryFactory(ServiceDiscoveryMetaFactoryPlugin<T> factory, T annotation, Class<?> serviceBeanType) {
-		this.factory = factory;
-		this.config = annotation;
-		this.beanType = serviceBeanType;
-	}
+public interface ServiceMetaFactory {
 
-	public ServiceDiscovery create(String beanQualifier) {
-		return factory.create(AstrixBeanKey.create(this.beanType, beanQualifier), config);
-	}
-	
+	<T> ServiceFactory<T> createServiceFactory(ServiceDefinition<T> serviceDefinition,
+			ServiceDiscoveryFactory<?> serviceDiscoveryFactory);
 
 }

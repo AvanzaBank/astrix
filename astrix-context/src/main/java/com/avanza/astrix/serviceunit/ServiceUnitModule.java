@@ -16,6 +16,7 @@
 package com.avanza.astrix.serviceunit;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryFactory;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
@@ -36,6 +37,7 @@ public class ServiceUnitModule implements Module {
 		moduleContext.bind(ServiceProviderPlugin.class, GenericServiceProviderPlugin.class); // TODO: Should ServiceProviderPlugin be a plugin?
 		
 		moduleContext.importType(ServiceComponentRegistry.class);
+		moduleContext.importType(AstrixServiceRegistryFactory.class);
 		moduleContext.importType(AstrixConfig.class);
 		
 		moduleContext.export(ServiceAdministrator.class);

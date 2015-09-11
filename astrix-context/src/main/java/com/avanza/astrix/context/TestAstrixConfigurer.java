@@ -27,8 +27,6 @@ import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviders;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.Setting;
 
@@ -48,8 +46,6 @@ public class TestAstrixConfigurer {
 		});
 		configurer.enableFaultTolerance(false);
 		configurer.set(AstrixSettings.ENFORCE_SUBSYSTEM_BOUNDARIES, false);
-		registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
-		registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 	}
 
 	public AstrixContext configure() {

@@ -28,10 +28,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.beans.config.BeanConfiguration;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.BeanConfiguration;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.context.core.BeanInvocationDispatcher;
 import com.avanza.astrix.core.IllegalServiceMetadataException;

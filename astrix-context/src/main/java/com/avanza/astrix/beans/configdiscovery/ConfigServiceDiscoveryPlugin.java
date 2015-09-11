@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.configdiscovery;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
@@ -22,14 +22,13 @@ import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDiscovery;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
 import com.avanza.astrix.beans.service.ServiceProperties;
-import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactoryPlugin<AstrixConfigDiscovery> {
-
+public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactoryPlugin<ConfigDiscoveryProperties> {
+	
 	private ServiceComponentRegistry serviceComponents;
 	private AstrixConfig config;
 	
@@ -39,13 +38,13 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactory
 	}
 
 	@Override
-	public ServiceDiscovery create(AstrixBeanKey<?> key, AstrixConfigDiscovery lookupAnnotation) {
-		return new ConfigDiscovery(serviceComponents, config, lookupAnnotation.value(), key);
+	public ServiceDiscovery create(AstrixBeanKey<?> key, ConfigDiscoveryProperties configDiscoveryProperties) {
+		return new ConfigDiscovery(serviceComponents, config, configDiscoveryProperties.getConfigEntryName(), key);
 	}
 	
 	@Override
-	public Class<AstrixConfigDiscovery> getDiscoveryAnnotationType() {
-		return AstrixConfigDiscovery.class;
+	public Class<ConfigDiscoveryProperties> getDiscoveryPropertiesType() {
+		return ConfigDiscoveryProperties.class;
 	}
 
 	private static class ConfigDiscovery implements ServiceDiscovery {

@@ -39,8 +39,10 @@ public class AstrixConfigModule implements Module {
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(AstrixConfig.class, new AstrixConfigImpl(dynamicConfig, settings));
 		moduleContext.bind(DynamicConfig.class, dynamicConfig);
+		moduleContext.bind(BeanConfigurations.class, BeanConfigurationsImpl.class);
 		
 		moduleContext.export(AstrixConfig.class);
+		moduleContext.export(BeanConfigurations.class);
 	}
 
 }	

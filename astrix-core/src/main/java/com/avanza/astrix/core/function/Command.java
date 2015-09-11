@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.service;
+package com.avanza.astrix.core.function;
 
-public interface ServiceDiscoveryMetaFactory {
-
-	<T> ServiceDiscoveryFactory<T> createServiceDiscoveryFactory(Class<?> beanTypeToDiscovery, T discoveryProperties);
-
+public interface Command<T> extends CheckedCommand<T> {
+	T call();
 }

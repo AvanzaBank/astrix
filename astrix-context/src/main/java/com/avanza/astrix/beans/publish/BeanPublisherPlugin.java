@@ -16,29 +16,29 @@
 package com.avanza.astrix.beans.publish;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
 
-import com.avanza.astrix.beans.factory.FactoryBean;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 
 
 /**
- * An ApiProviderPlugin is responsible for creating a {@link FactoryBean} for
- * all parts of a given "type" of api. By "type" in this context, we don't mean the
- * different api's that are hooked into Astrix for consumption, but rather a mechanism
- * for an api-provider to publish the different part's of the api, thereby allowing it
- * to be consumed using Astrix.<p>
+ * A BeanPublisherPlugin is responsible for creating a PublishedBeanDefinition for
+ * all published types in an api (represented by a ApiProviderClass). 
  * 
- * Astrix comes with the {@link GenericAstrixApiProviderPlugin} which handles api-providers
+ * Astrix comes with the {@link ApiProviderBeanPublisherPlugin} which handles api-providers
  * annotated with {@link AstrixApiProvider}, see {@link AstrixApiProvider} for more information.<p> 
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public interface ApiProviderPlugin {
+public interface BeanPublisherPlugin {
 	
-	List<PublishedBean> createFactoryBeans(ApiProviderClass apiProviderClass);
+	void publishBeans(BeanPublisher p, ApiProviderClass apiProviderClass);
 	
 	Class<? extends Annotation> getProviderAnnotationType();
+	
+	public static interface BeanPublisher {
+		<T> void publishLibrary(LibraryBeanDefinition<T> libraryDefinition);
+		<T> void publishService(ServiceBeanDefinition<T> serviceDefinition);
+	}
 	
 }

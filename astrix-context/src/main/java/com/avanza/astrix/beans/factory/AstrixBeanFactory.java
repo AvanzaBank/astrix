@@ -15,10 +15,8 @@
  */
 package com.avanza.astrix.beans.factory;
 
-import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.PreDestroy;
 
@@ -29,16 +27,12 @@ import com.avanza.astrix.modules.ObjectCache;
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixBeanFactory {
+final class AstrixBeanFactory implements BeanFactory {
 	
-	private final AstrixFactoryBeanRegistry registry;
+	private final SimpleAstrixFactoryBeanRegistry registry = new SimpleAstrixFactoryBeanRegistry();
 	private final ObjectCache beanInstanceCache = new ObjectCache();
-	private final List<AstrixBeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
 	
-	public AstrixBeanFactory(AstrixFactoryBeanRegistry registry) {
-		this.registry = registry;
-	}
-	
+	@Override
 	public <T> T getBean(final AstrixBeanKey<T> key) {
 		return new CircularDependencyAwareAstrixBeanInstances().getBean(key);
 	}
@@ -57,6 +51,7 @@ public class AstrixBeanFactory {
 	 * @param beanKey
 	 * @return
 	 */
+	@Override
 	public Set<AstrixBeanKey<? extends Object>> getDependencies(AstrixBeanKey<? extends Object> beanKey) {
 		return new CircularDependencyAwareAstrixBeanInstances().getBeanInstance(beanKey).getDependencies();
 	}
@@ -103,9 +98,6 @@ public class AstrixBeanFactory {
 			constructionStack.add(beanKey);
 			StandardFactoryBean<? extends T> factoryBean = registry.getFactoryBean(beanKey);
 			AstrixBeanInstance<? extends T> instance = createBeanInstance(factoryBean);
-			for (AstrixBeanPostProcessor beanPostProcessor : beanPostProcessors) {
-				instance.postProcess(beanPostProcessor, this);
-			}
 			constructionStack.pop();
 			return instance;
 		}
@@ -121,7 +113,13 @@ public class AstrixBeanFactory {
 		
 	}
 
-	public void registerBeanPostProcessor(AstrixBeanPostProcessor beanPostProcessor) {
-		this.beanPostProcessors.add(beanPostProcessor);
+	@Override
+	public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
+		return this.registry.getBeansOfType(type);
+	}
+
+	@Override
+	public void registerFactory(FactoryBean<?> factory) {
+		this.registry.registerFactory(factory);
 	}
 }

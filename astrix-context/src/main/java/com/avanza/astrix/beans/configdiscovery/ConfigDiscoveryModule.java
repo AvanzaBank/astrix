@@ -13,42 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.configdiscovery;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
-import com.avanza.astrix.beans.factory.BeanConfigurations;
-import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
-import com.avanza.astrix.beans.publish.ApiProviderPlugin;
-import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
-import com.avanza.astrix.context.core.AstrixMBeanExporter;
-import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 
-/**
- * 
- * @author Elias Lindholm
- *
- */
-public class GenericAstrixApiProviderModule implements Module {
+public class ConfigDiscoveryModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(ApiProviderPlugin.class, GenericAstrixApiProviderPlugin.class);
+		moduleContext.bind(ServiceDiscoveryMetaFactoryPlugin.class, ConfigServiceDiscoveryPlugin.class);
 		
 		moduleContext.importType(ServiceComponentRegistry.class);
 		moduleContext.importType(AstrixConfig.class);
-		moduleContext.importType(ServiceDiscoveryMetaFactoryPlugin.class);
-		moduleContext.importType(BeanFaultToleranceFactory.class);
-		moduleContext.importType(BeanConfigurations.class);
-		moduleContext.importType(AstrixMBeanExporter.class);
-		moduleContext.importType(AsyncTypeConverter.class);
-		moduleContext.importType(ServiceBeanProxyFactory.class);
 		
-		
-		moduleContext.export(ApiProviderPlugin.class);
+		moduleContext.export(ServiceDiscoveryMetaFactoryPlugin.class);
 	}
 
 }

@@ -38,6 +38,7 @@ public class DirectComponentTest {
 	public void itsPossibleToStubAsyncServiceUsingDirectComponent() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		serviceRegistry.registerProvider(Ping.class, new PingImpl());
+		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());

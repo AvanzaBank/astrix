@@ -29,7 +29,7 @@ import com.avanza.astrix.modules.ObjectCache;
  *
  * @param <T>
  */
-public class AstrixBeanInstance<T> {
+final class AstrixBeanInstance<T> {
 	
 	private final T instance;
 	private final AstrixBeanKey<?> beanKey;
@@ -102,8 +102,4 @@ public class AstrixBeanInstance<T> {
 		return this.beanKey.toString();
 	}
 
-	public void postProcess(AstrixBeanPostProcessor beanPostProcessor, AstrixBeans astrixBeans) {
-		beanPostProcessor.postProcess(get(), astrixBeans);
-	}
-	
 }

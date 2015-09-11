@@ -23,6 +23,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -73,6 +75,10 @@ public class HystrixFaulttoleranceIntegrationTest {
 		astrixConfigurer.registerStrategy(HystrixCommandNamingStrategy.class, commandNamingStrategy);
 		context = (AstrixApplicationContext) astrixConfigurer.configure();
 		ping = context.getBean(Ping.class);
+	}
+	
+	static {
+		Logger.getLogger("com.avanza.astrix").setLevel(Level.DEBUG); // TODO: REMOVE DEBUG LOG
 	}
 	
 	@Test

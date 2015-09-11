@@ -27,7 +27,7 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
  * @author Elias Lindholm (elilin)
  *
  */
-public class SimpleAstrixFactoryBeanRegistry implements AstrixFactoryBeanRegistry {
+final class SimpleAstrixFactoryBeanRegistry {
 	
 	private final ConcurrentMap<AstrixBeanKey<?>, StandardFactoryBean<?>> factoryByBeanKey = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Class<?>, DynamicFactoryBean<?>> dynamicFactoryByBeanType = new ConcurrentHashMap<>();
@@ -36,7 +36,6 @@ public class SimpleAstrixFactoryBeanRegistry implements AstrixFactoryBeanRegistr
 	/* (non-Javadoc)
 	 * @see com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry#getFactoryBean(com.avanza.astrix.beans.factory.AstrixBeanKey)
 	 */
-	@Override
 	@SuppressWarnings("unchecked")
 	public <T> StandardFactoryBean<T> getFactoryBean(AstrixBeanKey<T>  beanKey) {
 		StandardFactoryBean<T> factoryBean = (StandardFactoryBean<T>) this.factoryByBeanKey.get(beanKey);
@@ -51,7 +50,6 @@ public class SimpleAstrixFactoryBeanRegistry implements AstrixFactoryBeanRegistr
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Override
 	public <T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type) {
 		Set<AstrixBeanKey<T>> result = new HashSet<>();
 		for (AstrixBeanKey<?> key : this.factoryByBeanKey.keySet()) {
@@ -89,7 +87,6 @@ public class SimpleAstrixFactoryBeanRegistry implements AstrixFactoryBeanRegistr
 		}
 	}
 
-	@Override
 	public <T> AstrixBeanKey<? extends T> resolveBean(AstrixBeanKey<T> beanKey) {
 		return beanKey;
 	}

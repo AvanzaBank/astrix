@@ -25,12 +25,12 @@ import java.util.Collections;
 import org.junit.Rule;
 import org.junit.Test;
 
+import com.avanza.astrix.beans.config.BeanConfiguration;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.BooleanBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.IntBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.LongBeanSetting;
-import com.avanza.astrix.beans.factory.BeanConfiguration;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviders;
 import com.avanza.astrix.provider.core.AstrixApiProvider;

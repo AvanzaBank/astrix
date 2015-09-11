@@ -15,25 +15,14 @@
  */
 package com.avanza.astrix.beans.registry;
 
-import java.util.Arrays;
-import java.util.List;
+public final class ServiceRegistryDiscoveryProperties {
 
-import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
-import com.avanza.astrix.versioning.jackson1.Jackson1ObjectSerializerConfigurer;
-import com.avanza.astrix.versioning.jackson1.JacksonObjectMapperBuilder;
-
-public class ServiceRegistryObjectSerializerConfigurer implements Jackson1ObjectSerializerConfigurer {
+	private static final ServiceRegistryDiscoveryProperties INSTANCE = new ServiceRegistryDiscoveryProperties();
 	
-	public static final int VERSION = 2;
-
-	@Override
-	public List<? extends AstrixJsonApiMigration> apiMigrations() {
-		return Arrays.asList(new ServiceRegistryV1ApiMigration());
+	private ServiceRegistryDiscoveryProperties() {
 	}
 	
-	@Override
-	public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {
+	public static ServiceRegistryDiscoveryProperties get() {
+		return INSTANCE;
 	}
-
-
 }

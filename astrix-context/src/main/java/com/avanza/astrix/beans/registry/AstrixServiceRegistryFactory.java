@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.publish;
+package com.avanza.astrix.beans.registry;
 
-import com.avanza.astrix.beans.core.AstrixBeanKey;
+/**
+ * 
+ * @author Elias Lindholm (elilin)
+ *
+ */
+public interface AstrixServiceRegistryFactory {
 
-
-public interface AstrixPublishedBeans {
-
-	<T> T getBean(AstrixBeanKey<T> beanKey);
-
+	AstrixServiceRegistry createServiceRegistry();
+	
 }

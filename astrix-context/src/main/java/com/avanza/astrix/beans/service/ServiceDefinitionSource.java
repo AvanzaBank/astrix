@@ -13,20 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.publish;
+package com.avanza.astrix.beans.service;
 
-
-
-/**
- * The published bean aware interface allows internal astrix classed to depend on
- * api's published using Astrix, ie api-elements hooked into Astrix. <p> 
- * 
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface AstrixPublishedBeansAware {
+public final class ServiceDefinitionSource {
 	
-	void setAstrixBeans(AstrixPublishedBeans beans);
+	// TODO: Is this a good abstraction? This class was introduces to break cyclic dependency between beans.service and beans.publish package
+	// 
+	private final String name;
+	
+	private ServiceDefinitionSource(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public static ServiceDefinitionSource create(String name) {
+		return new ServiceDefinitionSource(name);
+	}
 
 }

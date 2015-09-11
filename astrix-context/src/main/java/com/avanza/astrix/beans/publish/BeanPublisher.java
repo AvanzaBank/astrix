@@ -15,8 +15,8 @@
  */
 package com.avanza.astrix.beans.publish;
 
-import com.avanza.astrix.beans.factory.StandardFactoryBean;
-
+import com.avanza.astrix.beans.factory.BeanFactory;
+import com.avanza.astrix.context.AstrixContext;
 
 /**
  * 
@@ -25,7 +25,14 @@ import com.avanza.astrix.beans.factory.StandardFactoryBean;
  */
 public interface BeanPublisher {
 	
-	void register(ApiProviderClass apiProvider);
-
-	<T> void registerFactoryBean(StandardFactoryBean<T> beanFactory);
+	/**
+	 * Publishes a given API.
+	 * 
+	 * A Published API is available in the {@link BeanFactory} handled
+	 * by a {@link AstrixContext}. <p>
+	 * 
+	 * @param apiProvider
+	 */
+	void publish(ApiProviderClass apiProvider);
+	
 }

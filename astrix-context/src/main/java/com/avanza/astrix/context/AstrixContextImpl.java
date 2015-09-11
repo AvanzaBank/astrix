@@ -16,15 +16,16 @@
 package com.avanza.astrix.context;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
+import com.avanza.astrix.beans.config.BeanConfiguration;
+import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.BeanConfiguration;
+import com.avanza.astrix.beans.factory.BeanFactory;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.BeanPublisher;
-import com.avanza.astrix.beans.publish.PublishedBeanFactory;
 import com.avanza.astrix.beans.service.ServiceDefinition;
+import com.avanza.astrix.beans.service.ServiceDefinitionSource;
 import com.avanza.astrix.beans.service.StatefulAstrixBean;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.modules.Modules;
@@ -43,7 +44,8 @@ import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
  */
 final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	
-	private final PublishedBeanFactory publishedBeanFactory;
+	private final BeanFactory beanFactory;
+	private final BeanConfigurations beanConfigurations;
 	private final BeanPublisher beanPublisher;
 	private final DynamicConfig dynamicConfig;
 	private final Modules modules;
@@ -54,16 +56,17 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 		this.applicationDescriptor = applicationDescriptor;
 		this.dynamicConfig = modules.getInstance(AstrixConfig.class).getConfig();
 		this.beanPublisher = modules.getInstance(BeanPublisher.class);
-		this.publishedBeanFactory = modules.getInstance(PublishedBeanFactory.class);
+		this.beanFactory = modules.getInstance(BeanFactory.class);
+		this.beanConfigurations = modules.getInstance(BeanConfigurations.class);
 	}
 	
 
 	void register(ApiProviderClass apiProvider) {
-		this.beanPublisher.register(apiProvider);		
+		this.beanPublisher.publish(apiProvider);		
 	}
 
 	<T> void registerBeanFactory(StandardFactoryBean<T> beanFactory) {
-		this.beanPublisher.registerFactoryBean(beanFactory);
+		this.beanFactory.registerFactory(beanFactory);
 	}
 	
 	@Override
@@ -77,7 +80,7 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	}
 	
 	public BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey) {
-		return this.publishedBeanFactory.getBeanConfiguration(beanKey);
+		return this.beanConfigurations.getBeanConfiguration(beanKey);
 	}
 	
 	@Override
@@ -87,11 +90,11 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	
 	@Override
 	public <T> T getBean(Class<T> beanType, String qualifier) {
-		return publishedBeanFactory.getBean(AstrixBeanKey.create(beanType, qualifier));
+		return beanFactory.getBean(AstrixBeanKey.create(beanType, qualifier));
 	}
 	
 	public <T> T getBean(AstrixBeanKey<T> beanKey) {
-		return publishedBeanFactory.getBean(beanKey);
+		return beanFactory.getBean(beanKey);
 	}
 	
 
@@ -103,9 +106,9 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	@Override
 	public <T> T waitForBean(Class<T> beanType, String qualifier, long timeoutMillis) throws InterruptedException {
 		AstrixBeanKey<T> beanKey = AstrixBeanKey.create(beanType, qualifier);
-		T bean = publishedBeanFactory.getBean(beanKey);
-		for (AstrixBeanKey<?> dependencyKey : publishedBeanFactory.getDependencies(beanKey)) {
-			Object dependency = publishedBeanFactory.getBean(dependencyKey);
+		T bean = beanFactory.getBean(beanKey);
+		for (AstrixBeanKey<?> dependencyKey : beanFactory.getDependencies(beanKey)) {
+			Object dependency = beanFactory.getBean(dependencyKey);
 			waitForBeanToBeBound(dependency, timeoutMillis);
 		}
 		waitForBeanToBeBound(bean, timeoutMillis);
@@ -141,7 +144,7 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 		
 		serviceExporter.addServiceProvider(getInstance(ServiceAdministrator.class));
 		ObjectSerializerDefinition serializer = ObjectSerializerDefinition.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
-		ServiceDefinition<ServiceAdministrator> serviceDefinition = new ServiceDefinition<>(ApiProvider.create("FrameworkServices"),
+		ServiceDefinition<ServiceAdministrator> serviceDefinition = new ServiceDefinition<>(ServiceDefinitionSource.create("FrameworkServices"),
 																							AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
 																							serializer, true);
 		ExportedServiceBeanDefinition<ServiceAdministrator> serviceAdminDefintion = new ExportedServiceBeanDefinition<>(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 

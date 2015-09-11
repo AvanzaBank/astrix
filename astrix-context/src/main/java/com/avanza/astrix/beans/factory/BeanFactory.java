@@ -15,10 +15,18 @@
  */
 package com.avanza.astrix.beans.factory;
 
+import java.util.Set;
+
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-/**
- * @author Elias Lindholm (elilin)
- */
-public interface BeanConfigurations {
-	BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey);
+
+public interface BeanFactory {
+
+	<T> T getBean(AstrixBeanKey<T> key);
+
+	<T> Set<AstrixBeanKey<T>> getBeansOfType(Class<T> type);
+
+	Set<AstrixBeanKey<? extends Object>> getDependencies(AstrixBeanKey<? extends Object> beanKey);
+
+	void registerFactory(FactoryBean<?> factory);
+
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ListenableFutureAdapter;
+package com.avanza.astrix.beans.core;
 
 import static org.junit.Assert.*;
 

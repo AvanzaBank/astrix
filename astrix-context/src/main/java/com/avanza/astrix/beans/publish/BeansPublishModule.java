@@ -15,10 +15,10 @@
  */
 package com.avanza.astrix.beans.publish;
 
-import com.avanza.astrix.beans.factory.AstrixFactoryBeanRegistry;
-import com.avanza.astrix.beans.factory.BeanConfigurations;
-import com.avanza.astrix.beans.factory.BeanConfigurationsImpl;
-import com.avanza.astrix.beans.factory.SimpleAstrixFactoryBeanRegistry;
+import com.avanza.astrix.beans.config.BeanConfigurations;
+import com.avanza.astrix.beans.factory.BeanFactory;
+import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
+import com.avanza.astrix.beans.service.ServiceMetaFactory;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 
@@ -26,20 +26,18 @@ public class BeansPublishModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(PublishedBeanFactory.class, PublishedBeanFactoryImpl.class);
 		moduleContext.bind(BeanPublisher.class, BeanPublisherImpl.class);
 		moduleContext.bind(ApiProviderPlugins.class, ApiProviderPluginsImpl.class);
 		
-		moduleContext.bind(AstrixFactoryBeanRegistry.class, SimpleAstrixFactoryBeanRegistry.class);
-		moduleContext.bind(BeanConfigurations.class, BeanConfigurationsImpl.class);
+		moduleContext.importType(BeanFactory.class);
+		moduleContext.importType(BeanConfigurations.class);
+		moduleContext.importType(BeanPublisherPlugin.class);
+		moduleContext.importType(ServiceDiscoveryMetaFactory.class);
+		moduleContext.importType(ServiceMetaFactory.class);
 		
-		moduleContext.importType(ApiProviderPlugin.class);
-		
-		moduleContext.export(PublishedBeanFactory.class);
-		moduleContext.export(AstrixPublishedBeans.class);
 		moduleContext.export(ApiProviderPlugins.class);
 		moduleContext.export(BeanPublisher.class);
-		moduleContext.export(BeanConfigurations.class); // TODO; should BeanConfigurations be exported from this module?
 	}
 
 }
+

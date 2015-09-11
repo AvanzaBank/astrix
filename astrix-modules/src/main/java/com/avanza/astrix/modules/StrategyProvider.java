@@ -15,9 +15,13 @@
  */
 package com.avanza.astrix.modules;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StrategyProvider<T> implements Module {
 
+	private final static Logger log = LoggerFactory.getLogger(StrategyProvider.class);
+	
 	private static final StrategyContextPreparer NO_PREPARER = new StrategyContextPreparer() {
 		@Override
 		public void prepare(StrategyContext context) {
@@ -82,8 +86,10 @@ public class StrategyProvider<T> implements Module {
 			}
 		});
 		if (this.strategyInstance != null) {
+			log.debug("Exporting strategy. type={} provider={}", strategyType.getName(), strategyInstance.getClass().getName());
 			moduleContext.bind(strategyType, strategyInstance);
 		} else if (this.strategyImpl != null) {
+			log.debug("Exporting strategy. type={} provider={}", strategyType.getName(), strategyImpl.getName());
 			moduleContext.bind(strategyType, strategyImpl);
 		}
 		moduleContext.export(strategyType);

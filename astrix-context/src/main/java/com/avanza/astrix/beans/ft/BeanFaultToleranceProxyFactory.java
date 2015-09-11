@@ -19,12 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
+import com.avanza.astrix.beans.config.BeanConfiguration;
+import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
-import com.avanza.astrix.beans.factory.BeanConfiguration;
-import com.avanza.astrix.beans.factory.BeanConfigurations;
 import com.avanza.astrix.beans.factory.BeanProxy;
 import com.avanza.astrix.beans.ft.FaultToleranceConfigurator.FtProxySetting;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
+import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
@@ -61,8 +62,9 @@ public class BeanFaultToleranceProxyFactory implements ServiceBeanProxyFactory, 
 			return BeanProxy.NoProxy.create();
 		}
 		BeanConfiguration beanConfiguration = beanConfigurations.getBeanConfiguration(serviceDefinition.getBeanKey());
-		ftSettings.setCommandName(commandNamingStrategy.getCommandKeyName(serviceDefinition));
-		ftSettings.setGroupName(commandNamingStrategy.getGroupKeyName(serviceDefinition));
+		PublishedAstrixBean<?> publishedBeanInfo = SimplePublishedAstrixBean.from(serviceDefinition);
+		ftSettings.setCommandName(commandNamingStrategy.getCommandKeyName(publishedBeanInfo));
+		ftSettings.setGroupName(commandNamingStrategy.getGroupKeyName(publishedBeanInfo));
 		ftSettings.setInitialTimeoutInMilliseconds(beanConfiguration.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
 		ftSettings.setSemaphoreMaxConcurrentRequests(beanConfiguration.get(AstrixBeanSettings.INITIAL_MAX_CONCURRENT_REQUESTS).get());
 		return new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultToleranceSpi, ftSettings);
@@ -83,5 +85,6 @@ public class BeanFaultToleranceProxyFactory implements ServiceBeanProxyFactory, 
 	public int order() {
 		return 1;
 	}
+	
 	
 }

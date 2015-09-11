@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
+import com.avanza.astrix.beans.config.BeanConfiguration;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
-import com.avanza.astrix.beans.factory.BeanConfiguration;
 
 public class AstrixServiceBeanInstance implements AstrixServiceBeanInstanceMBean {
 	

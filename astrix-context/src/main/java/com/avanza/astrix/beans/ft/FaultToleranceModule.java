@@ -16,7 +16,7 @@
 package com.avanza.astrix.beans.ft;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
-import com.avanza.astrix.beans.factory.BeanConfigurations;
+import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
 import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.modules.Module;

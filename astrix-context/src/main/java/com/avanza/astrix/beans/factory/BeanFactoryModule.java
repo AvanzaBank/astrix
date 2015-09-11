@@ -13,24 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.publish;
+package com.avanza.astrix.beans.factory;
 
-import java.util.Set;
+import com.avanza.astrix.modules.Module;
+import com.avanza.astrix.modules.ModuleContext;
 
-import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.factory.BeanConfiguration;
-
-
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public interface PublishedBeanFactory {
-
-	BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey);
-	
-	<T> T getBean(AstrixBeanKey<T> beanKey);
-	
-	Set<AstrixBeanKey<? extends Object>> getDependencies(AstrixBeanKey<? extends Object> beanKey);
+public class BeanFactoryModule implements Module {
+	@Override
+	public void prepare(ModuleContext moduleContext) {
+		moduleContext.bind(BeanFactory.class, AstrixBeanFactory.class);
+		
+		moduleContext.export(BeanFactory.class);
+	}
 }

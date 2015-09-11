@@ -24,11 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
-import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
-import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryFactory;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.util.AstrixFrameworkThread;
@@ -41,7 +38,7 @@ import com.avanza.astrix.core.ServiceUnavailableException;
  * @author Elias Lindholm (elilin)
  * 
  */
-public class ServiceRegistryExporterWorker extends AstrixFrameworkThread implements AstrixPublishedBeansAware {
+public class ServiceRegistryExporterWorker extends AstrixFrameworkThread {
 	
 	private final List<ServiceRegistryExportedService> exportedServices = new CopyOnWriteArrayList<>();
 	private ServiceRegistryExporterClient serviceRegistryProviderClient;
@@ -51,11 +48,12 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread impleme
 	private final DynamicLongProperty retryIntervallMillis;
 	private final AstrixConfig config;
 	private final Timer timer = new Timer();
-	private AstrixPublishedBeans beans;
+	private final AstrixServiceRegistryFactory serviceRegistryFactory;
 
-	public ServiceRegistryExporterWorker(AstrixConfig config) {
+	public ServiceRegistryExporterWorker(AstrixConfig config, AstrixServiceRegistryFactory serviceRegistryFactory) {
 		super("ServiceRegistryExporter");
 		this.config = config;
+		this.serviceRegistryFactory = serviceRegistryFactory;
 		this.exportIntervallMillis = config.get(AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL);
 		this.retryIntervallMillis = config.get(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL);
 		this.serviceLeaseTimeMillis = config.get(AstrixSettings.SERVICE_REGISTRY_LEASE);
@@ -83,8 +81,9 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread impleme
 		if (applicationTag != null) {
 			zone = subsystem + "#"  + applicationTag;
 		}
-		AstrixServiceRegistry serviceRegistry= beans.getBean(AstrixBeanKey.create(AstrixServiceRegistry.class));
-		this.serviceRegistryProviderClient = new ServiceRegistryExporterClient(serviceRegistry, subsystem, applicationInstanceId, zone);
+//		AstrixServiceRegistry serviceRegistry= beans.getBean(AstrixBeanKey.create(AstrixServiceRegistry.class));
+		
+		this.serviceRegistryProviderClient = new ServiceRegistryExporterClient(serviceRegistryFactory.createServiceRegistry(), subsystem, applicationInstanceId, zone);
 	}
 	
 	@PreDestroy
@@ -131,11 +130,6 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread impleme
 		this.exportedServices.add(serviceRegistryExportedService);
 	}
 
-	@Override
-	public void setAstrixBeans(AstrixPublishedBeans beans) {
-		this.beans = beans;
-	}
-	
 	private static class Timer {
 		
 		private final Object monitor = new Object();

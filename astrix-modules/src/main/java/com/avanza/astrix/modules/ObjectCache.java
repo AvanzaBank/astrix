@@ -97,6 +97,7 @@ public final class ObjectCache {
 		List<Method> methods = getMethodsAnnotatedWith(object.getClass(), PostConstruct.class);
 		for (Method m : methods) {
 			try {
+				m.setAccessible(true);
 				m.invoke(object);
 			} catch (Exception e) {
 				logger.error(String.format("Failed to invoke init method. methodName=%s objectType=%s", m.getName(), object.getClass().getName()), e);

@@ -18,29 +18,15 @@ package com.avanza.astrix.gs;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.openspaces.core.GigaSpace;
 
-import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.factory.BeanConfigurationsImpl;
-import com.avanza.astrix.config.DynamicConfig;
-import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.gigaspaces.internal.client.cache.SpaceCacheException;
 
 
 public class GigaSpaceProxyTest {
-	
-	@Before
-	public void setup() {
-		MapConfigSource configSource = new MapConfigSource();
-		configSource.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
-		DynamicConfig config = DynamicConfig.create(configSource);
-		BeanConfigurationsImpl beanConfigurations = new BeanConfigurationsImpl();
-		beanConfigurations.setConfig(config);
-	}
 	
 	@Test
 	public void proxiesInvocations() throws Exception {

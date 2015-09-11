@@ -16,48 +16,45 @@
 package com.avanza.astrix.beans.registry;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
-import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
 import com.avanza.astrix.beans.service.ServiceDiscovery;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
 import com.avanza.astrix.beans.service.ServiceProperties;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryDiscovery;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class ServiceRegistryDiscoveryPluginImpl implements ServiceDiscoveryMetaFactoryPlugin<AstrixServiceRegistryDiscovery>, AstrixPublishedBeansAware {
-
-	private AstrixPublishedBeans beans;
+public class ServiceRegistryDiscoveryPluginImpl implements ServiceDiscoveryMetaFactoryPlugin<ServiceRegistryDiscoveryProperties> {
 	
-	@Override
-	public Class<AstrixServiceRegistryDiscovery> getDiscoveryAnnotationType() {
-		return AstrixServiceRegistryDiscovery.class;
+	private ServiceRegistryClientFactory serviceRegistryClientFactory;
+	
+	public ServiceRegistryDiscoveryPluginImpl(ServiceRegistryClientFactory serviceRegistryClientFactory) {
+		this.serviceRegistryClientFactory = serviceRegistryClientFactory;
 	}
 
 	@Override
-	public ServiceDiscovery create(AstrixBeanKey<?> key, AstrixServiceRegistryDiscovery lookupAnnotation) {
-		return new ServiceRegistryDiscovery(key, beans);
+	public Class<ServiceRegistryDiscoveryProperties> getDiscoveryPropertiesType() {
+		return ServiceRegistryDiscoveryProperties.class;
+	}
+
+	@Override
+	public ServiceDiscovery create(AstrixBeanKey<?> key, ServiceRegistryDiscoveryProperties lookupAnnotation) {
+		return new ServiceRegistryDiscovery(key, serviceRegistryClientFactory.createServiceRegistryClient());
 	}
 	
 	private static class ServiceRegistryDiscovery implements ServiceDiscovery {
-	
 		/*
 		 * IMPLEMENTATION NOTE:
-		 * 
-		 * This class requires an ServiceRegistryClient. Since we can't make sure that
-		 * a service-factory for ServiceRegistryClient is registered in the bean factory
-		 * (behind the AstrixPublishedBeansAware interface) before an instance of ServiceRegistryDiscovery
-		 * is created, we have to inject the AstrixPublishedBeans here and query it for an instance
-		 * on each invocation.
+		 * To avoid that the service-registry it creating an instance of AstrixServiceRegistry against
+		 * itself we create the ServiceRegistryClient lazily
 		 */
-		private AstrixPublishedBeans beans;
+		
 		private AstrixBeanKey<?> beanKey;
+		private ServiceRegistryClient serviceRegistryClient;
 
-		public ServiceRegistryDiscovery(AstrixBeanKey<?> key, AstrixPublishedBeans beans) {
+		public ServiceRegistryDiscovery(AstrixBeanKey<?> key, ServiceRegistryClient serviceRegistryClient) {
 			this.beanKey = key;
-			this.beans = beans;
+			this.serviceRegistryClient = serviceRegistryClient;
 		}
 		
 		@Override
@@ -67,14 +64,9 @@ public class ServiceRegistryDiscoveryPluginImpl implements ServiceDiscoveryMetaF
 
 		@Override
 		public ServiceProperties run() {
-			return beans.getBean(AstrixBeanKey.create(ServiceRegistryClient.class, null)).lookup(beanKey);
+			return serviceRegistryClient.lookup(beanKey);
 		}
 		
-	}
-
-	@Override
-	public void setAstrixBeans(AstrixPublishedBeans beans) {
-		this.beans = beans;
 	}
 
 }

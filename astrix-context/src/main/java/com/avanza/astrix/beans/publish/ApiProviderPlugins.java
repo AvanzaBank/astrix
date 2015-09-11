@@ -18,5 +18,5 @@ package com.avanza.astrix.beans.publish;
 import java.util.Collection;
 
 public interface ApiProviderPlugins {
-	Collection<ApiProviderPlugin> getAll();
+	Collection<BeanPublisherPlugin> getAll();
 }

@@ -16,6 +16,7 @@
 package com.avanza.astrix.beans.publish;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.service.ServiceDefinition;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -32,6 +33,12 @@ public final class SimplePublishedAstrixBean<T> implements PublishedAstrixBean<T
 		this.apiProvider = apiProvider;
 		this.beanKey = beanKey;
 	}
+	
+	public static <T> SimplePublishedAstrixBean<T> from(ServiceDefinition<T> serviceDefinition) {
+		return new SimplePublishedAstrixBean<>(ApiProvider.create(serviceDefinition.getServiceDefinitionSource().getName()), 
+											   serviceDefinition.getBeanKey());
+	}
+	
 
 	@Override
 	public AstrixBeanKey<T> getBeanKey() {

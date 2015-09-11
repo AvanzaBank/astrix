@@ -32,12 +32,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.config.AstrixConfigModule;
+import com.avanza.astrix.beans.configdiscovery.ConfigDiscoveryModule;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.BooleanBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.IntBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.LongBeanSetting;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.factory.BeanFactoryModule;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.ft.DefaultHystrixCommandNamingStrategy;
 import com.avanza.astrix.beans.ft.FaultToleranceModule;
@@ -45,13 +47,10 @@ import com.avanza.astrix.beans.ft.FaultToleranceSpi;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.beans.ft.NoFaultTolerance;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
-import com.avanza.astrix.beans.publish.ApiProviderPlugin;
 import com.avanza.astrix.beans.publish.ApiProviderPlugins;
 import com.avanza.astrix.beans.publish.ApiProviders;
-import com.avanza.astrix.beans.publish.AstrixPublishedBeans;
-import com.avanza.astrix.beans.publish.AstrixPublishedBeansAware;
+import com.avanza.astrix.beans.publish.BeanPublisherPlugin;
 import com.avanza.astrix.beans.publish.BeansPublishModule;
-import com.avanza.astrix.beans.publish.PublishedBeanFactory;
 import com.avanza.astrix.beans.registry.ServiceRegistryDiscoveryModule;
 import com.avanza.astrix.beans.service.DirectComponentModule;
 import com.avanza.astrix.beans.service.ServiceModule;
@@ -141,18 +140,17 @@ public class AstrixConfigurer {
 		modulesConfigurer.register(new ServiceModule());
 		modulesConfigurer.register(new ObjectSerializerModule());
 		modulesConfigurer.register(new Jackson1SerializerModule());
-		modulesConfigurer.register(new GenericAstrixApiProviderModule());
+		modulesConfigurer.register(new ApiProviderBeanPublisherModule());
 		modulesConfigurer.register(new FaultToleranceModule());
+		modulesConfigurer.register(new BeanFactoryModule());
 		if (this.applicationDescriptor != null) {
 			// Init server parts
 			setupApplicationInstanceId(config);
 			modulesConfigurer.register(new ServiceUnitModule(this.applicationDescriptor));
 		}
 		
-		AstrixAwareInjector awareInjector = new AstrixAwareInjector(config);
-		modulesConfigurer.registerBeanPostProcessor(awareInjector);
+		modulesConfigurer.registerBeanPostProcessor(new AstrixAwareInjector(config));
 		Modules modules = modulesConfigurer.configure();
-		awareInjector.setModules(modules);
 
 		final AstrixContextImpl context = new AstrixContextImpl(modules, this.applicationDescriptor);
 		ApiProviders apiProviders = new FilteredApiProviders(getApiProviders(modules, config), activeProfiles);
@@ -228,28 +226,20 @@ public class AstrixConfigurer {
 		}
 	}
 	
+	/*
+	 * Allows api's published using astrix (using @AstrixApiProvider) to have the
+	 * DynamicConfig instance associated with the current AstrixContext injected
+	 */
 	private final class AstrixAwareInjector implements ModuleInstancePostProcessor {
-		private Modules modules;
-		private DynamicConfig config;
-
+		
+		private final DynamicConfig config;
+		
 		public AstrixAwareInjector(DynamicConfig config) {
 			this.config = config;
 		}
 
-		public void setModules(Modules modules) {
-			this.modules = modules;
-		}
-		
 		@Override
 		public void postProcess(Object bean) {
-			if (bean instanceof AstrixPublishedBeansAware) {
-				AstrixPublishedBeansAware.class.cast(bean).setAstrixBeans(new AstrixPublishedBeans() {
-					@Override
-					public <T> T getBean(AstrixBeanKey<T> beanKey) {
-						return modules.getInstance(PublishedBeanFactory.class).getBean(beanKey);
-					}
-				});
-			}
 			if (bean instanceof AstrixConfigAware) {
 				AstrixConfigAware.class.cast(bean).setConfig(config); // TODO: config
 			}
@@ -310,7 +300,7 @@ public class AstrixConfigurer {
 	
 	private List<Class<? extends Annotation>> getAllApiProviderAnnotationsTypes(Modules modules) {
 		List<Class<? extends Annotation>> result = new ArrayList<>();
-		for (ApiProviderPlugin plugin : modules.getInstance(ApiProviderPlugins.class).getAll()) {
+		for (BeanPublisherPlugin plugin : modules.getInstance(ApiProviderPlugins.class).getAll()) {
 			result.add(plugin.getProviderAnnotationType());
 		}
 		return result;

@@ -13,10 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.ft;
+package com.avanza.astrix.beans.config;
 
-import com.avanza.astrix.core.function.CheckedCommand;
+import java.util.Map;
 
-public interface Command<T> extends CheckedCommand<T> {
-	T call();
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
+/**
+ * @author Elias Lindholm (elilin)
+ */
+public interface BeanConfigurations {
+	
+	BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey);
+
+	void setDefaultBeanConfig(AstrixBeanKey<?> beanKey, Map<BeanSetting<?>, Object> defaultBeanSettingsOverride);
 }

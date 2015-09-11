@@ -55,12 +55,11 @@ public class AstrixBeanFactoryTest {
 			}
 		};
 		
-		SimpleAstrixFactoryBeanRegistry registry = new SimpleAstrixFactoryBeanRegistry();
-		registry.registerFactory(pingFactory);
-		registry.registerFactory(pongFactory);
-		registry.registerFactory(pingpongFactory);
+		AstrixBeanFactory beanFactory = new AstrixBeanFactory();
+		beanFactory.registerFactory(pingFactory);
+		beanFactory.registerFactory(pongFactory);
+		beanFactory.registerFactory(pingpongFactory);
 		
-		AstrixBeanFactory beanFactory = new AstrixBeanFactory(registry);
 		beanFactory.getBean(beanKey(Ping.class));
 	}
 	
@@ -95,12 +94,11 @@ public class AstrixBeanFactoryTest {
 			}
 		};
 		
-		SimpleAstrixFactoryBeanRegistry registry = new SimpleAstrixFactoryBeanRegistry();
-		registry.registerFactory(pingFactory);
-		registry.registerFactory(pongFactory);
-		registry.registerFactory(pingpongFactory);
+		AstrixBeanFactory beanFactory = new AstrixBeanFactory();
+		beanFactory.registerFactory(pingFactory);
+		beanFactory.registerFactory(pongFactory);
+		beanFactory.registerFactory(pingpongFactory);
 		
-		AstrixBeanFactory beanFactory = new AstrixBeanFactory(registry);
 		beanFactory.getBean(beanKey(Ping.class));
 	}
 	
@@ -134,12 +132,11 @@ public class AstrixBeanFactoryTest {
 			}
 		};
 		
-		SimpleAstrixFactoryBeanRegistry registry = new SimpleAstrixFactoryBeanRegistry();
-		registry.registerFactory(pingFactory);
-		registry.registerFactory(pongFactory);
-		registry.registerFactory(pingpongFactory);
 		
-		AstrixBeanFactory beanFactory = new AstrixBeanFactory(registry);
+		AstrixBeanFactory beanFactory = new AstrixBeanFactory();
+		beanFactory.registerFactory(pingFactory);
+		beanFactory.registerFactory(pongFactory);
+		beanFactory.registerFactory(pingpongFactory);
 		beanFactory.getBean(beanKey(Ping.class));
 	}
 	
@@ -174,45 +171,17 @@ public class AstrixBeanFactoryTest {
 			}
 		};
 		
-		SimpleAstrixFactoryBeanRegistry registry = new SimpleAstrixFactoryBeanRegistry();
-		registry.registerFactory(pingFactory);
-		registry.registerFactory(pongFactory);
-		registry.registerFactory(pingpongFactory);
+		AstrixBeanFactory beanFactory = new AstrixBeanFactory();
+		beanFactory.registerFactory(pingFactory);
+		beanFactory.registerFactory(pongFactory);
+		beanFactory.registerFactory(pingpongFactory);
 		
-		AstrixBeanFactory beanFactory = new AstrixBeanFactory(registry);
 		beanFactory.getBean(beanKey(Ping.class));
 		
 		assertEquals(1, pingpongFactory.creationCount);
 	}
 	
-	@Test
-	public void appliesBeanPostProcessorToCreatedBeans() throws Exception {
-		SimpleAstrixFactoryBean<Ping> pingFactory = new SimpleAstrixFactoryBean<Ping>(Ping.class) {
-			@Override
-			public Ping create(AstrixBeans context) {
-				return new Ping();
-			}
-		};
-		SimpleAstrixFactoryBeanRegistry registry = new SimpleAstrixFactoryBeanRegistry();
-		registry.registerFactory(pingFactory);
-		
-		AstrixBeanFactory beanFactory = new AstrixBeanFactory(registry);
-		beanFactory.registerBeanPostProcessor(new AstrixBeanPostProcessor() {
-			@Override
-			public void postProcess(Object bean, AstrixBeans beans) {
-				if (bean instanceof Ping) {
-					Ping.class.cast(bean).initValue = "post-processor-run";
-				}
-			}
-		});
-		
-		Ping ping = beanFactory.getBean(beanKey(Ping.class));
-		assertEquals("post-processor-run", ping.initValue);
-	}
-	
 	static class Ping {
-		
-		private String initValue;
 	}
 	
 	static class Pong {
@@ -224,7 +193,6 @@ public class AstrixBeanFactoryTest {
 	static <T> AstrixBeanKey<T> beanKey(Class<T> type) {
 		return AstrixBeanKey.create(type, null);
 	}
-	
 	
 	
 	static abstract class SimpleAstrixFactoryBean<T> implements StandardFactoryBean<T> {

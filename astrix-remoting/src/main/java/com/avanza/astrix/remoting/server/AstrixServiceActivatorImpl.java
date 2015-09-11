@@ -28,9 +28,9 @@ import java.util.concurrent.ConcurrentMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.beans.ft.Command;
 import com.avanza.astrix.context.metrics.Metrics;
 import com.avanza.astrix.core.ServiceInvocationException;
+import com.avanza.astrix.core.function.Command;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;

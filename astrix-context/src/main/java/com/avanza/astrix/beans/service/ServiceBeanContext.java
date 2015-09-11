@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.beans.service;
 
-import com.avanza.astrix.beans.factory.BeanConfigurations;
+import com.avanza.astrix.beans.config.BeanConfigurations;
 
 public final class ServiceBeanContext {
 

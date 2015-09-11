@@ -16,21 +16,28 @@
 package com.avanza.astrix.context;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
-import com.avanza.astrix.beans.service.ServiceComponentRegistry;
-import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
+import com.avanza.astrix.beans.publish.BeanPublisherPlugin;
+import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 
-public class ConfigDiscoveryModule implements Module {
+/**
+ * 
+ * @author Elias Lindholm
+ *
+ */
+public class ApiProviderBeanPublisherModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(ServiceDiscoveryMetaFactoryPlugin.class, ConfigServiceDiscoveryPlugin.class);
+		moduleContext.bind(BeanPublisherPlugin.class, ApiProviderBeanPublisherPlugin.class);
 		
-		moduleContext.importType(ServiceComponentRegistry.class);
 		moduleContext.importType(AstrixConfig.class);
+		moduleContext.importType(BeanFaultToleranceFactory.class);
+		moduleContext.importType(AsyncTypeConverter.class);
 		
-		moduleContext.export(ServiceDiscoveryMetaFactoryPlugin.class);
+		moduleContext.export(BeanPublisherPlugin.class);
 	}
 
 }

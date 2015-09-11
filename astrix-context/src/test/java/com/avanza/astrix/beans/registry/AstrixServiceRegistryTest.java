@@ -21,6 +21,8 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
@@ -37,17 +39,25 @@ import com.avanza.astrix.test.util.AstrixTestUtil;
 public class AstrixServiceRegistryTest {
 	
 	InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
+	TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 	AstrixContext clientContext;
+
+	@Before
+	public void setup() {
+		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
+		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
+	}
 	
-	public void after() {
+	@After
+	public void cleanup() {
 		AstrixTestUtil.closeSafe(clientContext);
 	}
+	
 	
 	@Test
 	public void serviceRegsistrySupportsMultipleProvidersOfSameService() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.setSubsystem("default");
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
@@ -73,7 +83,6 @@ public class AstrixServiceRegistryTest {
 	public void doesNotBindToNonPublishedProvidersInOtherZones() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.setSubsystem("default");
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
@@ -103,7 +112,6 @@ public class AstrixServiceRegistryTest {
 	public void bindsToNonPublishedProvidersInSameZone() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.setSubsystem("my-subsystem");
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
@@ -127,7 +135,6 @@ public class AstrixServiceRegistryTest {
 	public void usesRoundRobinToDistributeConsumers() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		clientContext = astrixConfigurer.configure();

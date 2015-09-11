@@ -27,11 +27,11 @@ import java.util.concurrent.ConcurrentMap;
  */
 final class ApiProviderPluginsImpl implements ApiProviderPlugins {
 	
-	private final ConcurrentMap<Class<? extends Annotation>, ApiProviderPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Class<? extends Annotation>, BeanPublisherPlugin> pluginByAnnotationType = new ConcurrentHashMap<>();
 	
-	ApiProviderPluginsImpl(Collection<ApiProviderPlugin> apiProviderPlugins) {
-		for (ApiProviderPlugin plugin : apiProviderPlugins) {
-			ApiProviderPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
+	ApiProviderPluginsImpl(Collection<BeanPublisherPlugin> apiProviderPlugins) {
+		for (BeanPublisherPlugin plugin : apiProviderPlugins) {
+			BeanPublisherPlugin previous = this.pluginByAnnotationType.putIfAbsent(plugin.getProviderAnnotationType(), plugin);
 			if (previous != null) {
 				throw new IllegalArgumentException(String.format("Multiple ApiProviderPlugin's found for providerAnnotationType=%s. p1=%s p2=%s", 
 						plugin.getProviderAnnotationType().getName(), plugin.getClass().getName(), previous.getClass().getName()));
@@ -39,8 +39,8 @@ final class ApiProviderPluginsImpl implements ApiProviderPlugins {
 		}
 	}
 	
-	ApiProviderPlugin getProviderPlugin(ApiProviderClass apiProvider) {
-		for (ApiProviderPlugin plugin : pluginByAnnotationType.values()) {
+	BeanPublisherPlugin getProviderPlugin(ApiProviderClass apiProvider) {
+		for (BeanPublisherPlugin plugin : pluginByAnnotationType.values()) {
 			if (apiProvider.isAnnotationPresent(plugin.getProviderAnnotationType())) {
 				return plugin;
 			}
@@ -48,7 +48,7 @@ final class ApiProviderPluginsImpl implements ApiProviderPlugins {
 		throw new IllegalArgumentException("No plugin registered that can handle apiProvider: " + apiProvider);
 	}
 
-	public Collection<ApiProviderPlugin> getAll() {
+	public Collection<BeanPublisherPlugin> getAll() {
 		return this.pluginByAnnotationType.values();
 	}
 	

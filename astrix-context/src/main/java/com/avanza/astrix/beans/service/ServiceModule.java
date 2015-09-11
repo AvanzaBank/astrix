@@ -15,6 +15,10 @@
  */
 package com.avanza.astrix.beans.service;
 
+import com.avanza.astrix.beans.config.AstrixConfig;
+import com.avanza.astrix.beans.config.BeanConfigurations;
+import com.avanza.astrix.context.core.AstrixMBeanExporter;
+import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
@@ -24,11 +28,23 @@ public class ServiceModule implements Module {
 	@Override
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(ServiceComponentRegistry.class, ServiceComponents.class);
-		
-		moduleContext.importType(ObjectSerializerFactory.class);
+		moduleContext.bind(ServiceDiscoveryMetaFactory.class, ServiceDiscoveryMetaFactoryImpl.class);
+		moduleContext.bind(ServiceMetaFactory.class, ServiceMetaFactoryImpl.class);
+
+		// Extension points		
 		moduleContext.importType(ServiceComponent.class);
+		moduleContext.importType(ServiceDiscoveryMetaFactoryPlugin.class);  	  
 		moduleContext.importType(ServiceBeanProxyFactory.class);
 		
+		// Dependencies
+		moduleContext.importType(ObjectSerializerFactory.class);
+		moduleContext.importType(AstrixConfig.class); 			  
+		moduleContext.importType(AstrixMBeanExporter.class);  	  
+		moduleContext.importType(AsyncTypeConverter.class);  	  
+		moduleContext.importType(BeanConfigurations.class);
+		
+		moduleContext.export(ServiceDiscoveryMetaFactory.class);
+		moduleContext.export(ServiceMetaFactory.class);
 		moduleContext.export(ServiceComponentRegistry.class);
 	}
 

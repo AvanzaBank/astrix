@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.factory;
+package com.avanza.astrix.beans.config;
 
 import java.util.Collections;
 import java.util.Map;
@@ -26,7 +26,7 @@ import com.avanza.astrix.config.DynamicConfig;
 /**
  * @author Elias Lindholm (elilin)
  */
-public final class BeanConfigurationsImpl implements AstrixConfigAware, BeanConfigurations {
+final class BeanConfigurationsImpl implements AstrixConfigAware, BeanConfigurations {
 	
 	private DynamicConfig config;
 	private final Map<AstrixBeanKey<?>, Map<BeanSetting<?>, Object>> beanSettingByType = new ConcurrentHashMap<>();
@@ -44,6 +44,7 @@ public final class BeanConfigurationsImpl implements AstrixConfigAware, BeanConf
 		this.config = config;
 	}
 
+	@Override
 	public void setDefaultBeanConfig(AstrixBeanKey<?> beanKey,
 			Map<BeanSetting<?>, Object> defaultBeanSettingsOverride) {
 		this.beanSettingByType.put(beanKey, defaultBeanSettingsOverride);

@@ -15,13 +15,11 @@
  */
 package com.avanza.astrix.beans.service;
 
-import java.lang.annotation.Annotation;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-public interface ServiceDiscoveryMetaFactoryPlugin<T extends Annotation> {
+public interface ServiceDiscoveryMetaFactoryPlugin<T> {
 	
-	ServiceDiscovery create(AstrixBeanKey<?> beanKey, T lookupAnnotation); 
+	ServiceDiscovery create(AstrixBeanKey<?> beanKey, T discoveryProperties); 
 	
-	Class<T> getDiscoveryAnnotationType();
+	Class<T> getDiscoveryPropertiesType();
 	
 }

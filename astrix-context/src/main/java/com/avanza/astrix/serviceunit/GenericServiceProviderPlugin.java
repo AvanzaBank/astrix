@@ -20,14 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.publish.ApiProvider;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.BeanDefinitionMethod;
 import com.avanza.astrix.beans.service.ServiceDefinition;
-import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
-import com.avanza.astrix.modules.AstrixInject;
+import com.avanza.astrix.beans.service.ServiceDefinitionSource;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
-import com.avanza.astrix.provider.core.AstrixServiceRegistryDiscovery;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfig;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.Versioned;
@@ -39,8 +36,6 @@ import com.avanza.astrix.versioning.core.Versioned;
  */
 public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	
-	private ServiceDiscoveryMetaFactory serviceLookupFactory;
-
 	@Override
 	public List<ExportedServiceBeanDefinition<?>> getExportedServices(ApiProviderClass apiProvider) {
 		List<ExportedServiceBeanDefinition<?>> result = new ArrayList<>();
@@ -54,7 +49,7 @@ public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	}
 	
 	private <T> ExportedServiceBeanDefinition<T> createExportedServiceBeanDefinition(BeanDefinitionMethod<T> beanDefinitionMethod, ApiProviderClass apiProvider) {
-		boolean usesServiceRegistry = this.serviceLookupFactory.getLookupStrategy(beanDefinitionMethod.getMethod()).equals(AstrixServiceRegistryDiscovery.class);
+		boolean usesServiceRegistry = beanDefinitionMethod.usesServiceRegistry();
 		ServiceDefinition<T> serviceDefinition = createServiceDefinition(apiProvider, beanDefinitionMethod, beanDefinitionMethod.getBeanKey());
 		return new ExportedServiceBeanDefinition<T>(beanDefinitionMethod.getBeanKey(), serviceDefinition, usesServiceRegistry, beanDefinitionMethod.getServiceComponentName());
 	}
@@ -63,7 +58,7 @@ public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	private <T> ServiceDefinition<T> createServiceDefinition(ApiProviderClass apiProvider, BeanDefinitionMethod<T> serviceDefinitionMethod, AstrixBeanKey<T> beanKey) {
 		Class<?> declaringApi = apiProvider.getProviderClass();
 		if (!(declaringApi.isAnnotationPresent(Versioned.class) || serviceDefinitionMethod.isVersioned())) {
-			return ServiceDefinition.create(ApiProvider.create(apiProvider.getName()), 
+			return ServiceDefinition.create(ServiceDefinitionSource.create(apiProvider.getName()), 
 											beanKey, 
 											serviceDefinitionMethod.getServiceConfigClass(), 
 											ObjectSerializerDefinition.nonVersioned(), 
@@ -74,7 +69,7 @@ public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 					" providedService=" + serviceDefinitionMethod.getBeanType().getName() + ", provider=" + apiProvider.getProviderClassName());
 		} 
 		AstrixObjectSerializerConfig serializerConfig = apiProvider.getAnnotation(AstrixObjectSerializerConfig.class);
-		return ServiceDefinition.create(ApiProvider.create(apiProvider.getName()),
+		return ServiceDefinition.create(ServiceDefinitionSource.create(apiProvider.getName()),
 									  beanKey, 
 									  serviceDefinitionMethod.getServiceConfigClass(), 
 									  ObjectSerializerDefinition.versionedService(serializerConfig.version(), serializerConfig.objectSerializerConfigurer()),
@@ -84,11 +79,6 @@ public class GenericServiceProviderPlugin implements ServiceProviderPlugin {
 	@Override
 	public Class<? extends Annotation> getProviderAnnotationType() {
 		return AstrixApiProvider.class;
-	}
-	
-	@AstrixInject
-	public void setServiceLookupFactory(ServiceDiscoveryMetaFactory serviceLookupFactory) {
-		this.serviceLookupFactory = serviceLookupFactory;
 	}
 	
 }

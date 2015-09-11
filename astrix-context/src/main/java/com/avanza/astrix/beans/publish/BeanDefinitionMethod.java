@@ -19,10 +19,13 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.avanza.astrix.beans.configdiscovery.ConfigDiscoveryProperties;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
+import com.avanza.astrix.beans.registry.ServiceRegistryDiscoveryProperties;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
+import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.AstrixDynamicQualifier;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.DefaultBeanSettings;
@@ -84,6 +87,27 @@ public class BeanDefinitionMethod<T> implements PublishedAstrixBean<T> {
 	@SuppressWarnings("unchecked")
 	public Class<T> getBeanType() {
 		return (Class<T>) method.getReturnType();
+	}
+	
+	
+	// TODO: the definition of usesServiceRegistry and usesConfigDiscovery here is a temporal step
+	// in refactoring towards a step where an ApiProviderPlugin only defines what an api looks like 
+	public boolean usesServiceRegistry() {
+		return isService() && !usesConfigDiscovery();
+	}
+	
+	public boolean usesConfigDiscovery() {
+		return method.isAnnotationPresent(AstrixConfigDiscovery.class);
+	}
+	
+	public Object getServiceDiscoveryProperties() {
+		if (usesServiceRegistry()) {
+			return ServiceRegistryDiscoveryProperties.get();
+		}
+		if (usesConfigDiscovery()) {
+			return new ConfigDiscoveryProperties(method.getAnnotation(AstrixConfigDiscovery.class).value());
+		}
+		throw new IllegalStateException("Bean does not define service discovery");
 	}
 	
 	/**

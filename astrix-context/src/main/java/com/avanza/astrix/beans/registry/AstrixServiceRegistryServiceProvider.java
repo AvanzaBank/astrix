@@ -31,7 +31,7 @@ import com.avanza.astrix.versioning.core.Versioned;
  *
  */
 @AstrixObjectSerializerConfig (
-	version = 2,
+	version = ServiceRegistryObjectSerializerConfigurer.VERSION,
 	objectSerializerConfigurer = ServiceRegistryObjectSerializerConfigurer.class
 )
 @AstrixApiProvider
