@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.api;
 
 import java.util.Arrays;
 
@@ -27,7 +27,7 @@ import com.avanza.astrix.context.core.AsyncTypeConverter;
 import com.avanza.astrix.context.core.BeanInvocationDispatcher;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
-public class AstrixFtProxiedFactory<T> implements StandardFactoryBean<T> {
+final class AstrixFtProxiedFactory<T> implements StandardFactoryBean<T> {
 	
 	private final StandardFactoryBean<T> target;
 	private final BeanFaultToleranceFactory faultToleranceProxyFactory;

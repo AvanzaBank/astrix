@@ -31,6 +31,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.beans.api.ApiProviderBeanPublisherModule;
 import com.avanza.astrix.beans.config.AstrixConfigModule;
 import com.avanza.astrix.beans.configdiscovery.ConfigDiscoveryModule;
 import com.avanza.astrix.beans.core.AstrixBeanKey;

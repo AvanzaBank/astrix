@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.beans.api;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -25,7 +25,7 @@ import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 
-public class AstrixLibraryFactory<T> implements StandardFactoryBean<T> {
+final class AstrixLibraryFactory<T> implements StandardFactoryBean<T> {
 
 	private Object factoryInstance;
 	private Method factoryMethod;
