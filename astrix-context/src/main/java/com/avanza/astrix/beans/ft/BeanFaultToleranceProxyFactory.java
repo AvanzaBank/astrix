@@ -54,7 +54,7 @@ public class BeanFaultToleranceProxyFactory implements ServiceBeanProxyFactory, 
 		CommandSettings ftSettings = new CommandSettings();
 		FtProxySetting ftProxySetting = FtProxySetting.ENABLED;
 		if (serviceComponent instanceof FaultToleranceConfigurator) {
-			 ftProxySetting = FaultToleranceConfigurator.class.cast(serviceComponent).configure(ftSettings);
+			 ftProxySetting = FaultToleranceConfigurator.class.cast(serviceComponent).configure();
 		}
 		if (ftProxySetting != FtProxySetting.ENABLED) {
 			log.info("Fault tolerance proxy is disabled by ServiceComponent. componentName={}, beanKey={}", 

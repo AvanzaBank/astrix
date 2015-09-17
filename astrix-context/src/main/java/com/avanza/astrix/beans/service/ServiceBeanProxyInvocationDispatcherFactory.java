@@ -21,16 +21,16 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.avanza.astrix.beans.factory.BeanProxy;
-import com.avanza.astrix.context.core.AsyncTypeConverter;
+import com.avanza.astrix.context.core.ReactiveTypeConverter;
 import com.avanza.astrix.context.core.BeanInvocationDispatcher;
 
 final class ServiceBeanProxyInvocationDispatcherFactory {
 	
 	private List<ServiceBeanProxyFactory> proxyFactories;
-	private AsyncTypeConverter asyncTypeConverter;
+	private ReactiveTypeConverter reactiveTypeConverter;
 	
-	public ServiceBeanProxyInvocationDispatcherFactory(List<ServiceBeanProxyFactory> proxyFactories, AsyncTypeConverter asyncTypeConverter) {
-		this.asyncTypeConverter = asyncTypeConverter;
+	public ServiceBeanProxyInvocationDispatcherFactory(List<ServiceBeanProxyFactory> proxyFactories, ReactiveTypeConverter reactiveTypeConverter) {
+		this.reactiveTypeConverter = reactiveTypeConverter;
 		this.proxyFactories = new ArrayList<>(proxyFactories);
 		Collections.sort(proxyFactories, new Comparator<ServiceBeanProxyFactory>() {
 
@@ -46,7 +46,7 @@ final class ServiceBeanProxyInvocationDispatcherFactory {
 		for (ServiceBeanProxyFactory factory : proxyFactories) {
 			proxies.add(factory.create(serviceDefinition, binder));
 		}
-		return new BeanInvocationDispatcher(proxies, asyncTypeConverter, boundService);
+		return new BeanInvocationDispatcher(proxies, reactiveTypeConverter, boundService);
 	}
 
 }

@@ -32,7 +32,7 @@ import com.avanza.astrix.beans.publish.ServiceBeanDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinitionSource;
 import com.avanza.astrix.beans.service.ServiceDiscoveryDefinition;
-import com.avanza.astrix.context.core.AsyncTypeConverter;
+import com.avanza.astrix.context.core.ReactiveTypeConverter;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.modules.ObjectCache;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -51,15 +51,15 @@ final class ApiProviderBeanPublisherPlugin implements BeanPublisherPlugin {
 	private final ObjectCache provideInstanceCache = new ObjectCache();
 	private final BeanFaultToleranceFactory faultToleranceFactory;
 	private final AstrixConfig config;
-	private final AsyncTypeConverter asyncTypeConverter;
+	private final ReactiveTypeConverter reactiveTypeConverter;
 	
 	public ApiProviderBeanPublisherPlugin(
 			BeanFaultToleranceFactory faultToleranceFactory,
 			AstrixConfig config,
-			AsyncTypeConverter asyncTypeConverter) {
+			ReactiveTypeConverter reactiveTypeConverter) {
 		this.faultToleranceFactory = faultToleranceFactory;
 		this.config = config;
-		this.asyncTypeConverter = asyncTypeConverter;
+		this.reactiveTypeConverter = reactiveTypeConverter;
 	}
 	
 	@Override
@@ -107,7 +107,7 @@ final class ApiProviderBeanPublisherPlugin implements BeanPublisherPlugin {
 		Object libraryProviderInstance = getApiProviderInstance(apiProviderClass.getProviderClass());
 		StandardFactoryBean<T> libraryFactory = new AstrixLibraryFactory<>(libraryProviderInstance, astrixBeanDefinitionMethod, beanDefinition.getQualifier());
 		if (beanDefinition.applyFtProxy()) {
-			libraryFactory = new AstrixFtProxiedFactory<T>(libraryFactory, faultToleranceFactory, beanDefinition, asyncTypeConverter);
+			libraryFactory = new AstrixFtProxiedFactory<T>(libraryFactory, faultToleranceFactory, beanDefinition, reactiveTypeConverter);
 		}
 		return libraryFactory;
 	}

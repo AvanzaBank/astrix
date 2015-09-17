@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.gs;
-
-import com.avanza.astrix.context.core.AsyncTypeConverterPlugin;
-import com.avanza.astrix.remoting.util.GsUtil;
-import com.gigaspaces.async.AsyncFuture;
+package com.avanza.astrix.context.core;
 
 import rx.Observable;
 /**
@@ -25,22 +21,27 @@ import rx.Observable;
  * @author Elias Lindholm
  *
  */
-public class GsAsyncFutureTypeAdapter implements AsyncTypeConverterPlugin {
+public interface ReactiveTypeConverter {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Observable<Object> toObservable(Object asyncResult) {
-		return GsUtil.toObservable((AsyncFuture<Object>) asyncResult);
-	}
+	/**
+	 * Converts a custom reactive type to an Observable. <p>
+	 * 
+	 * @param fromType
+	 * @param asyncTypeInstance
+	 * @return
+	 */
+	<T> Observable<Object> toObservable(Class<T> fromType, T asyncTypeInstance);
 
-	@Override
-	public Object fromObservable(Observable<Object> asyncResult) {
-		return GsUtil.toAsyncFuture(asyncResult);
-	}
+	/**
+	 * Converts an Observable to a custom reactive type. This transformation will
+	 * eagerly subscribe the custom reactive type to the converted observable.
+	 *   
+	 * @param targetType
+	 * @param observable
+	 * @return
+	 */
+	<T> T toCustomReactiveType(Class<T> targetType, Observable<Object> observable);
 
-	@Override
-	public Class<?> asyncType() {
-		return AsyncFuture.class;
-	}
+	boolean isReactiveType(Class<?> type);
 
 }

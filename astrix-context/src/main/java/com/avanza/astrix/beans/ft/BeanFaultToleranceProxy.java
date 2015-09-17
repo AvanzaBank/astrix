@@ -54,7 +54,7 @@ final class BeanFaultToleranceProxy implements BeanProxy {
 	}
 
 	@Override
-	public <T> Supplier<Observable<T>> proxyAsyncInvocation(final Supplier<Observable<T>> command) {
+	public <T> Supplier<Observable<T>> proxyReactiveInvocation(final Supplier<Observable<T>> command) {
 		if (!faultToleranceEnabled()) {
 			return command;
 		}

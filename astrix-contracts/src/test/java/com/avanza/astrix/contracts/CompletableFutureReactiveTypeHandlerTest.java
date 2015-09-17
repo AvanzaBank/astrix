@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.core;
+package com.avanza.astrix.contracts;
 
-import rx.Observable;
+import java.util.concurrent.CompletableFuture;
 
-public interface AsyncTypeConverterPlugin {
-	
-	Observable<Object> toObservable(Object asyncResult);
-	
-	Object fromObservable(Observable<Object> asyncResult);
-	
-	Class<?> asyncType();
+import com.avanza.astrix.context.core.CompletableFutureTypeHandlerPlugin;
+import com.avanza.astrix.context.core.ReactiveTypeHandlerPlugin;
 
+public class CompletableFutureReactiveTypeHandlerTest extends ReactiveTypeHandlerContract<CompletableFuture<Object>> {
+	@Override
+	protected ReactiveTypeHandlerPlugin<CompletableFuture<Object>> newReactiveTypeHandler() {
+		return new CompletableFutureTypeHandlerPlugin(); 
+	}
+	
 }

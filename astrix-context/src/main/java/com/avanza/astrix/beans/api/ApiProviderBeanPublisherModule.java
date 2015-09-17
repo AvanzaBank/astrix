@@ -18,7 +18,7 @@ package com.avanza.astrix.beans.api;
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.publish.BeanPublisherPlugin;
-import com.avanza.astrix.context.core.AsyncTypeConverter;
+import com.avanza.astrix.context.core.ReactiveTypeConverter;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 
@@ -35,7 +35,7 @@ public class ApiProviderBeanPublisherModule implements Module {
 		
 		moduleContext.importType(AstrixConfig.class);
 		moduleContext.importType(BeanFaultToleranceFactory.class);
-		moduleContext.importType(AsyncTypeConverter.class);
+		moduleContext.importType(ReactiveTypeConverter.class);
 		
 		moduleContext.export(BeanPublisherPlugin.class);
 	}

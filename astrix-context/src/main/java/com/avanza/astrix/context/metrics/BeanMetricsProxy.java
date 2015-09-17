@@ -51,7 +51,7 @@ class BeanMetricsProxy implements BeanProxy {
 	}
 
 	@Override
-	public <T> Supplier<Observable<T>> proxyAsyncInvocation(Supplier<Observable<T>> command) {
+	public <T> Supplier<Observable<T>> proxyReactiveInvocation(Supplier<Observable<T>> command) {
 		if (!beanMetricsEnabled()) {
 			return command;
 		}

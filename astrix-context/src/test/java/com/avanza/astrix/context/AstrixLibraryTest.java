@@ -141,9 +141,9 @@ public class AstrixLibraryTest {
 		assertEquals("hello: bar", helloBean.hello("bar"));
 		assertEquals(1, appliedExecuteCount.get());
 		
-		assertEquals(0, appliedOberveCount.get());
+		assertEquals(1, appliedExecuteCount.get());
 		assertEquals("hello: bar", helloBean.asyncHello("bar").get());
-		assertEquals(1, appliedOberveCount.get());
+		assertEquals(2, appliedExecuteCount.get());
 	}
 	
 	@Test

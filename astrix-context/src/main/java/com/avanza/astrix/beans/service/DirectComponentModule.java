@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.beans.service;
 
-import com.avanza.astrix.context.core.AsyncTypeConverter;
+import com.avanza.astrix.context.core.ReactiveTypeConverter;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
@@ -27,7 +27,7 @@ public class DirectComponentModule implements Module {
 		moduleContext.bind(ServiceComponent.class, DirectComponent.class);
 
 		moduleContext.importType(ObjectSerializerFactory.class);
-		moduleContext.importType(AsyncTypeConverter.class);
+		moduleContext.importType(ReactiveTypeConverter.class);
 		
 		moduleContext.export(ServiceComponent.class);
 	}

@@ -27,6 +27,7 @@
 		<module>astrix-all</module>
 		<module>astrix-modules</module>
 		<module>astrix-metrics</module>
+		<module>astrix-contracts</module>
 	</modules>
 
 	<scm>

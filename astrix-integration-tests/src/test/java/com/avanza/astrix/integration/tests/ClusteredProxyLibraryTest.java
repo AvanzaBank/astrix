@@ -16,7 +16,8 @@
 package com.avanza.astrix.integration.tests;
 
 import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.hamcrest.Description;
 import org.junit.Before;
@@ -31,12 +32,12 @@ import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.gs.AsyncFutureTypeHandler.AsyncFutureImpl;
 import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.api.LunchStatistics;
-import com.avanza.astrix.remoting.util.GsUtil.AsyncFutureAdapter;
 import com.avanza.astrix.test.util.AutoCloseableRule;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
@@ -92,7 +93,7 @@ public class ClusteredProxyLibraryTest {
 		astrix = autoClosables.add(configurer.configure());
 		GigaSpace gigaSpace = astrix.waitForBean(GigaSpace.class, "lunch-space", 10000);
 		AsyncFuture<LunchRestaurant> future = gigaSpace.asyncRead(LunchRestaurant.template());
-		assertEquals(AsyncFutureAdapter.class, future.getClass());
+		assertEquals(AsyncFutureImpl.class, future.getClass());
 	}
 	
 	@Test(expected = ServiceUnavailableException.class)

@@ -41,9 +41,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.avanza.astrix.context.JavaSerializationSerializer;
-import com.avanza.astrix.context.core.AsyncTypeConverter;
-import com.avanza.astrix.context.core.AsyncTypeConverterImpl;
-import com.avanza.astrix.context.core.AsyncTypeConverterPlugin;
+import com.avanza.astrix.context.core.ReactiveTypeConverter;
+import com.avanza.astrix.context.core.ReactiveTypeConverterImpl;
+import com.avanza.astrix.context.core.ReactiveTypeHandlerPlugin;
 import com.avanza.astrix.context.metrics.Metrics;
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
@@ -79,7 +79,7 @@ public class AstrixRemotingTest {
 	AstrixObjectSerializer objectSerializer = new JavaSerializationSerializer(1);
 	Metrics metrics = new Metrics.NoMetrics();
 	AstrixServiceActivatorImpl partition1 = new AstrixServiceActivatorImpl(metrics);
-	AsyncTypeConverter asyncTypeConverter = new AsyncTypeConverterImpl(Collections.<AsyncTypeConverterPlugin>emptyList());
+	ReactiveTypeConverter reactiveTypeConverter = new ReactiveTypeConverterImpl(Collections.<ReactiveTypeHandlerPlugin<?>>emptyList());
 	
 	private static class NoRoutingStrategy implements RoutingStrategy {
 		@Override
@@ -795,7 +795,7 @@ public class AstrixRemotingTest {
 	
 	private <T> T createRemotingProxy(Class<T> proxyApi, Class<?> targetApi,
 		RemotingTransport transport, AstrixObjectSerializer objectSerializer, RoutingStrategy routingStrategy) {
-		return RemotingProxy.create(proxyApi, targetApi, transport, objectSerializer, routingStrategy, asyncTypeConverter);
+		return RemotingProxy.create(proxyApi, targetApi, transport, objectSerializer, routingStrategy, reactiveTypeConverter);
 	}
 
 	@SuppressWarnings("serial")

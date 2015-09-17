@@ -31,9 +31,9 @@ public interface BeanProxy {
 	<T> CheckedCommand<T> proxyInvocation(CheckedCommand<T> command);
 	
 	/**
-	 * Proxy an asynchronous invocation. The invocation is represented by
+	 * Proxy a reactive invocation. The invocation is represented by
 	 * an Observable, although the underlying service method invocation can
-	 * use some other representation for the asynchronous result. 
+	 * use some other representation for the reactive result. 
 	 * 
 	 * 
 	 * @param command
@@ -42,7 +42,7 @@ public interface BeanProxy {
 	 * that the underlying (argument) supplier MUST be called synchronously
 	 * when invoking "get" on the returned Supplier.
 	 */
-	<T> Supplier<Observable<T>> proxyAsyncInvocation(Supplier<Observable<T>> command);
+	<T> Supplier<Observable<T>> proxyReactiveInvocation(Supplier<Observable<T>> command);
 	
 	public static class NoProxy implements BeanProxy {
 
@@ -52,7 +52,7 @@ public interface BeanProxy {
 		}
 
 		@Override
-		public <T> Supplier<Observable<T>> proxyAsyncInvocation(Supplier<Observable<T>> command) {
+		public <T> Supplier<Observable<T>> proxyReactiveInvocation(Supplier<Observable<T>> command) {
 			return command;
 		}
 

@@ -13,15 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.ft;
+package com.avanza.astrix.context.core;
 
-public interface FaultToleranceConfigurator {
-	
-	enum FtProxySetting {
-		ENABLED,
-		DISABLED
-	}
-	
-	FtProxySetting configure();
-
+public interface ReactiveExecutionListener {
+	void onError(Throwable t);
+	void onResult(Object result);
 }

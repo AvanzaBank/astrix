@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.context.core.AsyncTypeConverter;
+import com.avanza.astrix.context.core.ReactiveTypeConverter;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
@@ -47,11 +47,11 @@ public class DirectComponent implements ServiceComponent {
 	private final ObjectSerializerFactory objectSerializerFactory;
 	private final List<DirectBoundServiceBeanInstance<?>> nonReleasedInstances = new ArrayList<>();
 	private final ConcurrentMap<AstrixBeanKey<?>, String> idByExportedBean = new ConcurrentHashMap<>();
-	private final AsyncTypeConverter asyncTypeConverter;
+	private final ReactiveTypeConverter reactiveTypeConverter;
 	
-	public DirectComponent(ObjectSerializerFactory objectSerializerFactory, AsyncTypeConverter asyncTypeConverter) {
+	public DirectComponent(ObjectSerializerFactory objectSerializerFactory, ReactiveTypeConverter reactiveTypeConverter) {
 		this.objectSerializerFactory = objectSerializerFactory;
-		this.asyncTypeConverter = asyncTypeConverter;
+		this.reactiveTypeConverter = reactiveTypeConverter;
 	}
 
 	public List<? extends BoundServiceBeanInstance<?>> getBoundServices() {
@@ -96,7 +96,7 @@ public class DirectComponent implements ServiceComponent {
 					if (method.getReturnType().equals(Observable.class)) {
 						return observableResult;
 					}
-					return asyncTypeConverter.toAsyncType(method.getReturnType(), observableResult);
+					return reactiveTypeConverter.toCustomReactiveType(method.getReturnType(), observableResult);
 				} catch (NoSuchMethodException e) {
 					throw new RuntimeException("Target service does not contain method: " + e.getMessage());
 				}

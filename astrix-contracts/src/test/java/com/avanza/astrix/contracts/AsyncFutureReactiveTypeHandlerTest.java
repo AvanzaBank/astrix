@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.core;
+package com.avanza.astrix.contracts;
 
-import rx.Observable;
-/**
- * 
- * @author Elias Lindholm
- *
- */
-public interface AsyncTypeConverter {
+import com.avanza.astrix.context.core.ReactiveTypeHandlerPlugin;
+import com.avanza.astrix.gs.AsyncFutureTypeHandler;
+import com.avanza.astrix.gs.AsyncFutureTypeHandler.AsyncFutureImpl;
 
-	Observable<Object> toObservable(Class<?> fromType, Object asyncTypeInstance);
+public class AsyncFutureReactiveTypeHandlerTest extends ReactiveTypeHandlerContract<AsyncFutureImpl<Object>> {
 
-	Object toAsyncType(Class<?> targetType, Observable<Object> observable);
-
-	boolean canAdaptToType(Class<?> type);
+	@Override
+	protected ReactiveTypeHandlerPlugin<AsyncFutureImpl<Object>> newReactiveTypeHandler() {
+		return new AsyncFutureTypeHandler();
+	}
 
 }

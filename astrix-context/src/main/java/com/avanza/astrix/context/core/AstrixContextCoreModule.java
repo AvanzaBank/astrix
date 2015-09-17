@@ -24,13 +24,13 @@ public class AstrixContextCoreModule implements Module {
 	@Override
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(AstrixMBeanExporter.class, AstrixMBeanExporterImpl.class);
-		moduleContext.bind(AsyncTypeConverter.class, AsyncTypeConverterImpl.class);
+		moduleContext.bind(ReactiveTypeConverter.class, ReactiveTypeConverterImpl.class);
 		
 		moduleContext.importType(AstrixConfig.class);
-		moduleContext.importType(AsyncTypeConverterPlugin.class);
+		moduleContext.importType(ReactiveTypeHandlerPlugin.class);
 		
 		moduleContext.export(AstrixMBeanExporter.class);
-		moduleContext.export(AsyncTypeConverter.class);
+		moduleContext.export(ReactiveTypeConverter.class);
 	}
 
 }

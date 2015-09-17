@@ -23,7 +23,7 @@ import com.avanza.astrix.beans.factory.BeanProxy;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-import com.avanza.astrix.context.core.AsyncTypeConverter;
+import com.avanza.astrix.context.core.ReactiveTypeConverter;
 import com.avanza.astrix.context.core.BeanInvocationDispatcher;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
@@ -32,12 +32,12 @@ final class AstrixFtProxiedFactory<T> implements StandardFactoryBean<T> {
 	private final StandardFactoryBean<T> target;
 	private final BeanFaultToleranceFactory faultToleranceProxyFactory;
 	private final PublishedAstrixBean<T> beanDefinition;
-	private final AsyncTypeConverter asyncTypeConverter;
+	private final ReactiveTypeConverter asyncTypeConverter;
 
 	public AstrixFtProxiedFactory(StandardFactoryBean<T> target,
 								  BeanFaultToleranceFactory faultToleranceProxyFactory,
 								  PublishedAstrixBean<T> beanDefinition,
-								  AsyncTypeConverter asyncTypeConverter) {
+								  ReactiveTypeConverter asyncTypeConverter) {
 		this.target = target;
 		this.faultToleranceProxyFactory = faultToleranceProxyFactory;
 		this.beanDefinition = beanDefinition;

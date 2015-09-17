@@ -33,7 +33,6 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.Timer.Context;
 
 import rx.Observable;
-import rx.functions.Action0;
 
 public class DropwizardMetrics implements MetricsSpi {
 
@@ -91,12 +90,7 @@ public class DropwizardMetrics implements MetricsSpi {
 		return () -> {
 			Timer timer = metrics.timer(group + "#" + name);
 			final Context context = timer.time();
-			return observableFactory.get().doOnTerminate(new Action0() {
-				@Override
-				public void call() {
-					context.stop();
-				}
-			});
+			return observableFactory.get().doOnTerminate(() -> context.stop());
 		};
 	}
 	

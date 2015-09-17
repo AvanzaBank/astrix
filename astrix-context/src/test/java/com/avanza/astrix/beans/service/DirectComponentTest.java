@@ -17,6 +17,7 @@ package com.avanza.astrix.beans.service;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import org.junit.After;
@@ -35,7 +36,7 @@ public class DirectComponentTest {
 	private AstrixContext astrixContext;
 
 	@Test
-	public void itsPossibleToStubAsyncServiceUsingDirectComponent() throws Exception {
+	public void itsPossibleToStubReactiveServiceUsingDirectComponent() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		serviceRegistry.registerProvider(Ping.class, new PingImpl());
 		
@@ -53,8 +54,8 @@ public class DirectComponentTest {
 	}
 	
 	public interface PingAsync {
-		Future<String> ping(String msg);
-		Future<String> missingPing(String msg);
+		CompletableFuture<String> ping(String msg);
+		CompletableFuture<String> missingPing(String msg);
 	}
 	
 	public class PingImpl implements Ping {

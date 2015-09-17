@@ -17,14 +17,11 @@ package com.avanza.astrix.gs.remoting;
 
 import org.openspaces.core.GigaSpace;
 
-import com.avanza.astrix.beans.ft.CommandSettings;
-import com.avanza.astrix.beans.ft.FaultToleranceConfigurator;
-import com.avanza.astrix.beans.ft.IsolationStrategy;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
-import com.avanza.astrix.context.core.AsyncTypeConverter;
+import com.avanza.astrix.context.core.ReactiveTypeConverter;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.gs.BoundProxyServiceBeanInstance;
 import com.avanza.astrix.gs.ClusteredProxyCache;
@@ -44,15 +41,26 @@ import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
  * @author Elias Lindholm
  *
  */
-public class GsRemotingComponent implements ServiceComponent, FaultToleranceConfigurator {
+public class GsRemotingComponent implements ServiceComponent {
 
-	private GsBinder gsBinder;
-	private AstrixSpringContext astrixSpringContext;
-	private AstrixServiceActivator serviceActivator;
-	private ObjectSerializerFactory objectSerializerFactory;
-	private ClusteredProxyCache proxyCache;
-	private AsyncTypeConverter asyncTypeConverter;
+	private final GsBinder gsBinder;
+	private final AstrixSpringContext astrixSpringContext;
+	private final AstrixServiceActivator serviceActivator;
+	private final ObjectSerializerFactory objectSerializerFactory;
+	private final ClusteredProxyCache proxyCache;
+	private final ReactiveTypeConverter reactiveTypeConverter;
 	
+	public GsRemotingComponent(GsBinder gsBinder, AstrixSpringContext astrixSpringContext,
+			AstrixServiceActivator serviceActivator, ObjectSerializerFactory objectSerializerFactory,
+			ClusteredProxyCache proxyCache, ReactiveTypeConverter reactiveTypeConverter) {
+		this.gsBinder = gsBinder;
+		this.astrixSpringContext = astrixSpringContext;
+		this.serviceActivator = serviceActivator;
+		this.objectSerializerFactory = objectSerializerFactory;
+		this.proxyCache = proxyCache;
+		this.reactiveTypeConverter = reactiveTypeConverter;
+	}
+
 	@Override
 	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
 		AstrixObjectSerializer objectSerializer = objectSerializerFactory.create(serviceDefinition.getObjectSerializerDefinition());
@@ -61,7 +69,7 @@ public class GsRemotingComponent implements ServiceComponent, FaultToleranceConf
 		GsRemotingTransport gsRemotingTransport = new GsRemotingTransport(proxyInstance.getSpaceTaskDispatcher());
 		RemotingTransport remotingTransport = RemotingTransport.create(gsRemotingTransport);
 		T proxy = RemotingProxy.create(serviceDefinition.getServiceType(), ReflectionUtil.classForName(serviceProperties.getProperty(ServiceProperties.API))
-				, remotingTransport, objectSerializer, new GsRoutingStrategy(), asyncTypeConverter);
+				, remotingTransport, objectSerializer, new GsRoutingStrategy(), reactiveTypeConverter);
 		return BoundProxyServiceBeanInstance.create(proxy, proxyInstance);
 	}
 	
@@ -96,43 +104,6 @@ public class GsRemotingComponent implements ServiceComponent, FaultToleranceConf
 	@Override
 	public boolean requiresProviderInstance() {
 		return true;
-	}
-	
-	
-	@AstrixInject
-	public void setGsBinder(GsBinder gsBinder) {
-		this.gsBinder = gsBinder;
-	}
-	
-	@AstrixInject
-	public void setProxyCache(ClusteredProxyCache proxyCache) {
-		this.proxyCache = proxyCache;
-	}
-	
-	@AstrixInject
-	public void setAstrixSpringContext(AstrixSpringContext astrixSpringContext) {
-		this.astrixSpringContext = astrixSpringContext;
-	}
-	
-	@AstrixInject
-	public void setServiceActivator(AstrixServiceActivator serviceActivator) {
-		this.serviceActivator = serviceActivator;
-	}
-	
-	@AstrixInject
-	public void setObjectSerializerFactory(ObjectSerializerFactory objectSerializerFactory) {
-		this.objectSerializerFactory = objectSerializerFactory;
-	}
-
-	@AstrixInject
-	public void setAsyncTypeConverter(AsyncTypeConverter asyncTypeConverter) {
-		this.asyncTypeConverter = asyncTypeConverter;
-	}
-
-	@Override
-	public FtProxySetting configure(CommandSettings commandSettings) {
-		commandSettings.setExecutionIsolationStrategy(IsolationStrategy.SEMAPHORE);
-		return FtProxySetting.ENABLED;
 	}
 	
 }

@@ -108,7 +108,7 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	}
 	
 	@Override
-	public FtProxySetting configure(CommandSettings commandSettings) {
+	public FtProxySetting configure() {
 		if (disableLocalView.get()) {
 			return FtProxySetting.ENABLED; // Apply faultTolerance proxy if local-view is disabled
 		}

@@ -49,7 +49,7 @@ public class BeanMetricsTest {
 	}
 	
 	@Test
-	public void timesAsyncInvocationsUsingTimeObservable() throws Exception {
+	public void timesReactiveInvocationsUsingTimeObservable() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		final AtomicLong fakeClock = new AtomicLong(0);
 		FakeTimer fakeTimer = new FakeTimer(fakeClock);
@@ -66,7 +66,7 @@ public class BeanMetricsTest {
 	}
 	
 	@Test
-	public void timesAsyncInvocationsWithFutureReturnType() throws Exception {
+	public void timesAsyncInvocationsWithFutureReturnTypeAsSynchronousInvocation() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		final AtomicLong fakeClock = new AtomicLong(0);
 		FakeTimer fakeTimer = new FakeTimer(fakeClock);
@@ -77,9 +77,9 @@ public class BeanMetricsTest {
 		
 		Ping ping = this.astrixContext.getBean(Ping.class);
 
-		assertEquals(-1L, fakeTimer.getLastTimedObservableExecutionTime());
+		assertEquals(-1L, fakeTimer.getLastTimedExecututionTime());
 		assertEquals("foo", ping.pingAsync("foo").get());
-		assertEquals(2, fakeTimer.getLastTimedObservableExecutionTime());
+		assertEquals(2, fakeTimer.getLastTimedExecututionTime());
 	}
 	
 	@Test
@@ -158,6 +158,7 @@ public class BeanMetricsTest {
 	private static final class FakeTimer implements MetricsSpi {
 		private final AtomicLong fakeClock;
 		private long lastTimedObservableTime = -1L;
+		private long lastTimedExecututionTime = -1L;
 
 		private FakeTimer(AtomicLong fakeClock) {
 			this.fakeClock = fakeClock;
@@ -165,6 +166,10 @@ public class BeanMetricsTest {
 		
 		public long getLastTimedObservableExecutionTime() {
 			return this.lastTimedObservableTime;
+		}
+		
+		public long getLastTimedExecututionTime() {
+			return lastTimedExecututionTime;
 		}
 
 		@Override
@@ -177,7 +182,13 @@ public class BeanMetricsTest {
 
 		@Override
 		public <T> CheckedCommand<T> timeExecution(final CheckedCommand<T> execution, final String group, final String name) {
-			return () -> execution.call();
+			return () -> {
+				long start = fakeClock.get(); // Set time before execution
+				T result = execution.call();
+				lastTimedExecututionTime = fakeClock.get() - start;
+				return result;
+			};
+			
 		}
 	}
 

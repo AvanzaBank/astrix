@@ -30,19 +30,19 @@ import rx.Observable;
 public final class BeanInvocationDispatcher implements InvocationHandler {
 	
 	private final List<BeanProxy> proxys;
-	private final AsyncTypeConverter asyncTypeConverter;
+	private final ReactiveTypeConverter reactiveTypeConverter;
 	private final Object targetBean;
 	
-	public BeanInvocationDispatcher(List<BeanProxy> proxys, AsyncTypeConverter asyncTypeConverter, Object targetBean) {
+	public BeanInvocationDispatcher(List<BeanProxy> proxys, ReactiveTypeConverter reactiveTypeConverter, Object targetBean) {
 		this.proxys = Objects.requireNonNull(proxys);
-		this.asyncTypeConverter = Objects.requireNonNull(asyncTypeConverter);
+		this.reactiveTypeConverter = Objects.requireNonNull(reactiveTypeConverter);
 		this.targetBean = Objects.requireNonNull(targetBean);
 	}
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		if (isObservableType(method.getReturnType()) || isAsyncType(method.getReturnType())) {
-			return proxyAsyncInvocation(method, args);
+		if (isObservableType(method.getReturnType()) || isReactiveType(method.getReturnType())) {
+			return proxyReactiveInvocation(method, args);
 		}
 		return proxyInvocation(method, args);
 	}
@@ -56,20 +56,20 @@ public final class BeanInvocationDispatcher implements InvocationHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Object proxyAsyncInvocation(final Method method, final Object[] args) {
+	private Object proxyReactiveInvocation(final Method method, final Object[] args) {
 		Supplier<Observable<Object>> serviceInvocation = () -> {
 			try {
-				Object asyncResult = ReflectionUtil.invokeMethod(method, targetBean, args);
+				Object reactiveResult = ReflectionUtil.invokeMethod(method, targetBean, args);
 				if (isObservableType(method.getReturnType())) {
-					return (Observable<Object>) asyncResult;
+					return (Observable<Object>) reactiveResult;
 				}
-				return asyncTypeConverter.toObservable(method.getReturnType(), asyncResult);
+				return toObservable(method.getReturnType(), reactiveResult);
 			} catch (Throwable e) {
 				return Observable.error(e);
 			}
 		};
 		for (BeanProxy proxy : proxys) {
-			serviceInvocation = proxy.proxyAsyncInvocation(serviceInvocation);
+			serviceInvocation = proxy.proxyReactiveInvocation(serviceInvocation);
 		}
 		
 		if (isObservableType(method.getReturnType())) {
@@ -79,11 +79,15 @@ public final class BeanInvocationDispatcher implements InvocationHandler {
 //			});
 		}
 		Observable<Object> asyncResult = serviceInvocation.get();
-		return this.asyncTypeConverter.toAsyncType(method.getReturnType(), asyncResult);
+		return this.reactiveTypeConverter.toCustomReactiveType(method.getReturnType(), asyncResult);
+	}
+
+	private <T> Observable<Object> toObservable(Class<T> reactiveType , Object reactiveInstance) {
+		return reactiveTypeConverter.toObservable(reactiveType, reactiveType.cast(reactiveInstance));
 	}
 	
-	private boolean isAsyncType(Class<?> type) {
-		return this.asyncTypeConverter.canAdaptToType(type);
+	private boolean isReactiveType(Class<?> type) {
+		return this.reactiveTypeConverter.isReactiveType(type);
 	}
 
 	private boolean isObservableType(Class<?> type) {

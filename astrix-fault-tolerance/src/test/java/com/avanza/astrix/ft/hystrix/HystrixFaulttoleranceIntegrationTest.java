@@ -77,10 +77,6 @@ public class HystrixFaulttoleranceIntegrationTest {
 		ping = context.getBean(Ping.class);
 	}
 	
-	static {
-		Logger.getLogger("com.avanza.astrix").setLevel(Level.DEBUG); // TODO: REMOVE DEBUG LOG
-	}
-	
 	@Test
 	public void usesHystrixFaultToleranceProxyProviderPluginToApplyFaultToleranceToLibraries() throws Exception {
 		assertEquals(0, getAppliedFaultToleranceCount(Ping.class));
@@ -115,27 +111,35 @@ public class HystrixFaulttoleranceIntegrationTest {
 		CorruptPing ping = context.getBean(CorruptPing.class);
 		for (int i = 0; i < 100; i++) {
 			try {
-				ping.blockingQueue("foo").get();
-			} catch (ExecutionException e) {
-				assertTrue(e.getCause() instanceof ServiceUnavailableException);
+				ping.foreverBlockingQueue("foo");
+			} catch (ServiceUnavailableException e) {
 			}
 		}
 	}
 	
-	@Test(timeout = 2000)
+	/*
+	 * Current design doesn't treat Future as a "reactive" type, meaning that
+	 * we only get fault tolerance protection on the invocation of the method returning
+	 * a future (and not until the Future is completed). Its up to the
+	 * programmer to use Future.get(timeout, unit) to ensure a client does not block
+	 * forever when invoking a service returning a future. 
+	 *
+	 */
+//	@Test(timeout = 2000)
 	public void callingGetOnReturnedFutureShouldNotBlockForever() throws Exception {
 		CorruptPing ping = context.getBean(CorruptPing.class);
+		Future<String> neverEndingFuture = ping.neverEndingFuture("foo");
 		try {
-			ping.neverEndingFuture("foo").get();
-		} catch (Exception e) {
+			neverEndingFuture.get();
+		} catch (ExecutionException e) {
 			assertTrue(e.getCause() instanceof ServiceUnavailableException);
 		}
 	}
 	
-	@DefaultBeanSettings(initialTimeout=1)
+	@DefaultBeanSettings(initialTimeout=10)
 	public interface CorruptPing {
 		Observable<String> blockingObserve(String foo);
-		Future<String> blockingQueue(String foo);
+		Future<String> foreverBlockingQueue(String foo);
 		Future<String> neverEndingFuture(String foo);
 		
 	}
@@ -153,7 +157,7 @@ public class HystrixFaulttoleranceIntegrationTest {
 			}
 		}
 		@Override
-		public Future<String> blockingQueue(String msg) {
+		public Future<String> foreverBlockingQueue(String msg) {
 			block();
 			return new BasicFuture<String>(msg);
 		}
