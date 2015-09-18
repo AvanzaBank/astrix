@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,6 +47,7 @@ import com.avanza.astrix.ft.service.SimpleServiceImpl;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
 import com.google.common.base.Throwables;
+import com.netflix.hystrix.Hystrix;
 
 public abstract class FaultToleranceIntegrationTest {
 
@@ -65,6 +67,11 @@ public abstract class FaultToleranceIntegrationTest {
 	@Before
 	public void createService() {
 		testService = createProxy(api, provider, settings());
+	}
+	
+	@After
+	public void after() {
+		Hystrix.reset();
 	}
 	
 	private <T> T createProxy(Class<T> type, final T provider, final CommandSettings settings) {

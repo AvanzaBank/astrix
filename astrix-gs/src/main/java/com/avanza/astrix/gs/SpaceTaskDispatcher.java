@@ -28,8 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import rx.Observable;
-import rx.Observable.OnSubscribe;
-import rx.Subscriber;
 
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicIntProperty;
@@ -100,43 +98,28 @@ public final class SpaceTaskDispatcher {
 	}
 
 	public <T extends Serializable> Observable<T> observe(final Task<T> task, final Object routingKey) {
-		return Observable.create(new OnSubscribe<T>() {
-			@Override
-			public void call(final Subscriber<? super T> t1) {
-				executorService.execute(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							// Submit task on current thread in executorService
-							AsyncFuture<T> taskResult = gigaSpace.execute(task, routingKey);
-							GsUtil.subscribe(taskResult, t1);
-						} catch (Exception e) {
-							t1.onError(e);
-						}
-					}
-				});
+		// Use ExecutorService to ensure non-blocking programming model when subscribing to create
+		return Observable.create(subscriber -> executorService.execute(() -> {
+			try {
+				// Submit task on current thread in executorService
+				AsyncFuture<T> taskResult = gigaSpace.execute(task, routingKey);
+				GsUtil.subscribe(taskResult, subscriber);
+			} catch (Exception e) {
+				subscriber.onError(e);
 			}
-		});
+		}));
 	}
 
 	public <T extends Serializable, R> Observable<R> observe(final DistributedTask<T, R> distributedTask) {
-		return Observable.create(new OnSubscribe<R>() {
-			@Override
-			public void call(final Subscriber<? super R> t1) {
-				executorService.execute(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							// Submit task on current thread in executorService
-							AsyncFuture<R> taskResult = gigaSpace.execute(distributedTask);
-							GsUtil.subscribe(taskResult, t1);
-						} catch (Exception e) {
-							t1.onError(e);
-						}
-					}
-				});
+		return Observable.create(t1 -> executorService.execute(() -> {
+			try {
+				// Submit task on current thread in executorService
+				AsyncFuture<R> taskResult = gigaSpace.execute(distributedTask);
+				GsUtil.subscribe(taskResult, t1);
+			} catch (Exception e) {
+				t1.onError(e);
 			}
-		});
+		}));
 	}
 	
 	/**
