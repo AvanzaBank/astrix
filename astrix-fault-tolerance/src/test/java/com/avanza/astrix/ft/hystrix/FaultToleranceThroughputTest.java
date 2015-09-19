@@ -39,6 +39,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
@@ -67,6 +69,7 @@ public class FaultToleranceThroughputTest {
 	private Consumer<FailingService> serviceInvocation;
 	private AbstractFailingService server;
 	private EnumSet<Protection> missingProtections;
+	private TestAstrixConfigurer astrixConfigurer;
 	
 	@Parameters(name = "{0}") // Uses first argument in parameters as name in name for test
 	public static Collection<Object[]> testCases() {
@@ -135,7 +138,7 @@ public class FaultToleranceThroughputTest {
 
 	@Before
 	public void setup() {
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.enableFaultTolerance(true);
         astrixConfigurer.set(AstrixSettings.ENABLE_BEAN_METRICS, true);
         astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, registry.getServiceUri());
@@ -209,6 +212,7 @@ public class FaultToleranceThroughputTest {
 		if (missingProtections.contains(TIMEOUT)) {
 			return;
 		}
+		astrixConfigurer.set(AstrixBeanSettings.INITIAL_TIMEOUT, AstrixBeanKey.create(FailingService.class), 50);
 		registry.registerProvider(FailingService.class, new NonRespondingService());
 		FailingService  service = astrixContext.getBean(FailingService.class);
 
@@ -357,7 +361,7 @@ public class FaultToleranceThroughputTest {
 		/**
 		 * The maximum number of concurrent executions into the failing service. 
 		 * 
-		 * This should never be larget than the bulkhead
+		 * This should never be larger than the bulkhead
 		 * @return
 		 */
 		public int getMaxConcurrentExecutions() {
@@ -437,7 +441,7 @@ public class FaultToleranceThroughputTest {
     
     @AstrixApiProvider
     public interface ServiceApi {
-         @DefaultBeanSettings(initialTimeout=250)
+         @DefaultBeanSettings(initialTimeout=2000)
          @com.avanza.astrix.provider.core.Service
          FailingService service();
     }
