@@ -28,7 +28,6 @@ public class CommandSettings {
 	private int initialTimeoutInMilliseconds = 1000;
 	private int metricsRollingStatisticalWindowInMilliseconds = 10_000;
 	private int maxQueueSize = 1_000_000;
-	private IsolationStrategy executionIsolationStrategy = IsolationStrategy.THREAD;
 	private String commandName;
 	private String groupName;
 	
@@ -83,14 +82,6 @@ public class CommandSettings {
 		this.initialTimeoutInMilliseconds = initialTimeoutInMilliseconds;
 	}
 
-	public void setExecutionIsolationStrategy(IsolationStrategy executionIsolationStrategy) {
-		this.executionIsolationStrategy = executionIsolationStrategy;
-	}
-	
-	public IsolationStrategy getExecutionIsolationStrategy() {
-		return executionIsolationStrategy;
-	}
-	
 	public String getCommandName() {
 		return commandName;
 	}

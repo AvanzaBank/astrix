@@ -92,15 +92,29 @@ public class HystrixFaulttoleranceIntegrationTest {
 		assertEquals("foo", ping.ping("foo"));
 		assertEquals(2, getAppliedFaultToleranceCount(Ping.class));
 	}
+	
+	@Test
+	public void observable() throws Exception {
+		assertEquals(0, getAppliedFaultToleranceCount(Ping.class));
+		assertEquals("foo", ping.observePing("foo").toBlocking().first());
+		assertEquals(1, getAppliedFaultToleranceCount(Ping.class));
+	}
 
 	
 	/*
 	 * The following three tests test core abstractions in com.avanza.astrix.ft but uses the
 	 * hystrix-implementation to get a full integration test of the desired behavior.
-	 * (The desired behaviour is that poorly designed code which might block despite returning
-	 * Future/Observable types should not the consumer.
+	 * (The desired behaviour is that the consumer should be protected from poorly designed code
+	 *  which might block despite returning Future/Observable types.
 	 */
-	@Test(timeout = 2000)
+	
+	
+	/*
+	 * New design philosophy always uses SEMAPHORE isolation for reactive return types.
+	 * Methods returning reactive types are expected to be non-blocking (or at least guaranteed
+	 * to return within resonable time) when invoked.
+	 */
+//	@Test(timeout = 2000)
 	public void usesThreadIsolationByDefaultForObservableReturnTypes() throws Exception {
 		CorruptPing ping = context.getBean(CorruptPing.class);
 		for (int i = 0; i < 100; i++) {
@@ -192,12 +206,17 @@ public class HystrixFaulttoleranceIntegrationTest {
 	
 	public interface Ping {
 		String ping(String msg);
+		Observable<String> observePing(String msg);
 	}
 	
 	public static class PingImpl implements Ping {
 		@Override
 		public String ping(String msg) {
 			return msg;
+		}
+		@Override
+		public Observable<String> observePing(String msg) {
+			return Observable.just(msg);
 		}
 	}
 	

@@ -18,24 +18,12 @@ package com.avanza.astrix.ft.hystrix;
 import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.ft.CommandSettings;
-import com.avanza.astrix.beans.ft.IsolationStrategy;
-import com.avanza.astrix.beans.publish.ApiProvider;
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
-import com.avanza.astrix.context.AstrixApplicationContext;
-import com.avanza.astrix.context.TestAstrixConfigurer;
-import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.core.function.CheckedCommand;
-import com.avanza.astrix.ft.hystrix.HystrixFaultTolerance;
-import com.avanza.astrix.provider.core.AstrixApiProvider;
-import com.avanza.astrix.provider.core.Library;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
@@ -68,23 +56,6 @@ public class HystrixFaultToleranceTest {
 		
 		assertEquals("foo", faultTolerance.execute(new PingCommand("foo"), commandSettings));
 		assertEquals(2, getAppliedFaultToleranceCount(commandKey));
-	}
-	
-	@Test
-	public void usesSempahoreRejection() throws Throwable {
-		commandSettings.setExecutionIsolationStrategy(IsolationStrategy.SEMAPHORE);
-		assertEquals(0, getAppliedFaultToleranceCount(commandKey));
-
-		final long invokingThreadId = Thread.currentThread().getId();
-		final AtomicLong runningThreadId = new AtomicLong();
-		
-		faultTolerance.execute(() -> {
-			runningThreadId.set(Thread.currentThread().getId());
-			return "foo";
-		}, commandSettings);
-		
-		assertEquals("Expecting SEMAPHORE protected calls to be executed on same thread", invokingThreadId, runningThreadId.get());
-		
 	}
 	
 	private static class PingCommand implements CheckedCommand<String> {

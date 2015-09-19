@@ -60,10 +60,12 @@
 		<gigaspaces.version>10.1.1-12800-RELEASE</gigaspaces.version>
 		<rxjava.version>1.0.10</rxjava.version>
 		<hystrix.version>1.4.10</hystrix.version>
+<!-- 		<rxjava.version>1.0.13</rxjava.version> -->
+<!-- 		<hystrix.version>1.4.15</hystrix.version> -->
 		<archaius.version>0.4.1</archaius.version>
 		<jackson1.version>1.9.12</jackson1.version>
 		<guava.version>14.0.1</guava.version>
-		<junit.version>4.10</junit.version>
+		<junit.version>4.11</junit.version>
 		<hamcrest.version>1.2.1</hamcrest.version>
 		<mockito.version>1.9.0</mockito.version>
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>

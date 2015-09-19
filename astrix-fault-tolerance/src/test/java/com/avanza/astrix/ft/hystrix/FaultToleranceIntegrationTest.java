@@ -38,7 +38,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.ft.CommandSettings;
-import com.avanza.astrix.beans.ft.IsolationStrategy;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.ft.service.SimpleService;
@@ -49,7 +48,7 @@ import com.avanza.astrix.test.util.Probe;
 import com.google.common.base.Throwables;
 import com.netflix.hystrix.Hystrix;
 
-public abstract class FaultToleranceIntegrationTest {
+public class FaultToleranceIntegrationTest {
 
 	private Class<SimpleService> api = SimpleService.class;
 	private SimpleService provider = new SimpleServiceImpl();
@@ -57,8 +56,6 @@ public abstract class FaultToleranceIntegrationTest {
 	private HystrixFaultTolerance faultTolerance = new HystrixFaultTolerance();
 	private String groupName = UUID.randomUUID().toString();
 	private String commandName = UUID.randomUUID().toString();
-	
-	protected abstract IsolationStrategy isolationStrategy();
 	
 	protected SimpleService testService() {
 		return testService;
@@ -253,7 +250,6 @@ public abstract class FaultToleranceIntegrationTest {
 	private CommandSettings settings() {
 		CommandSettings settings = new CommandSettings();
 		settings.setMetricsRollingStatisticalWindowInMilliseconds(2000);
-		settings.setExecutionIsolationStrategy(isolationStrategy());
 		settings.setCommandName(commandName);
 		settings.setGroupName(groupName);
 		return settings;

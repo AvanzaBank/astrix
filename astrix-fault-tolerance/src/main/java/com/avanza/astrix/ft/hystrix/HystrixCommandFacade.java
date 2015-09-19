@@ -25,6 +25,7 @@ import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.function.CheckedCommand;
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommand.Setter;
+import com.netflix.hystrix.exception.HystrixRuntimeException;
 
 /**
  * @author Elias Lindholm (elilin)
@@ -48,7 +49,13 @@ class HystrixCommandFacade<T> {
 
 	protected T execute() throws Throwable {
 		HystrixCommand<HystrixResult<T>> command = createHystrixCommand();
-		HystrixResult<T> result = command.execute();
+		HystrixResult<T> result;
+		try {
+			result = command.execute();
+		} catch (HystrixRuntimeException e) {
+			// TODO: Add unit test for this case
+			throw new ServiceUnavailableException(e.getFailureType().toString()); 
+		}
 		throwExceptionIfExecutionFailed(result);
 		return result.getResult();
 	}

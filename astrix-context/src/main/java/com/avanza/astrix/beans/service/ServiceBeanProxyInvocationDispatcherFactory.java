@@ -32,7 +32,7 @@ final class ServiceBeanProxyInvocationDispatcherFactory {
 	public ServiceBeanProxyInvocationDispatcherFactory(List<ServiceBeanProxyFactory> proxyFactories, ReactiveTypeConverter reactiveTypeConverter) {
 		this.reactiveTypeConverter = reactiveTypeConverter;
 		this.proxyFactories = new ArrayList<>(proxyFactories);
-		Collections.sort(proxyFactories, new Comparator<ServiceBeanProxyFactory>() {
+		Collections.sort(this.proxyFactories, new Comparator<ServiceBeanProxyFactory>() {
 
 			@Override
 			public int compare(ServiceBeanProxyFactory o1, ServiceBeanProxyFactory o2) {

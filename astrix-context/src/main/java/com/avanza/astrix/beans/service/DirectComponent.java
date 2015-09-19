@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
@@ -93,6 +94,9 @@ public class DirectComponent implements ServiceComponent {
 							s.onError(e);
 						}
 					});
+					if (method.getReturnType().equals(Future.class)) {
+						return observableResult.toBlocking().toFuture();
+					}
 					if (method.getReturnType().equals(Observable.class)) {
 						return observableResult;
 					}

@@ -435,4 +435,8 @@ public class AstrixConfigurer {
 		set(beanSetting.nameFor(beanKey), value);
 	}
 
+	void registerModule(Module module) {
+		this.customModules.add(module);
+	}
+
 }

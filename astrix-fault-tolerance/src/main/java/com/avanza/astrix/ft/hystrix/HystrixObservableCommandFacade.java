@@ -92,20 +92,18 @@ class HystrixObservableCommandFacade<T> {
 															"UNKNOWN", getCommandKey().name()));
 			}
 		}.observe(); // Eagerly start execution of underlying observable to fulfill contract of BeanProxy.proxyAsyncInvocation
-		return faultToleranceProtectedObservable.flatMap(new Func1<Result<T>, Observable<T>>() {
-			@Override
-			public Observable<T> call(Result<T> t1) {
-				return t1.toObservable();
-			}
-		}).onErrorResumeNext(new Func1<Throwable, Observable<? extends T>>() {
-			@Override
-			public Observable<? extends T> call(Throwable t1) {
-				if (t1 instanceof HystrixRuntimeException) {
-					HystrixRuntimeException e = (HystrixRuntimeException) t1;
-					return Observable.error(e.getCause());
-				}
-				return Observable.error(t1);
-			}
+		return faultToleranceProtectedObservable
+								.flatMap(resultWrapper -> resultWrapper.toObservable())
+								.onErrorResumeNext(error -> {
+									if (error instanceof HystrixRuntimeException) {
+										HystrixRuntimeException e = (HystrixRuntimeException) error;
+										if (e.getCause() != null) {
+											// Can this happen?
+											return Observable.error(e.getCause());
+										}
+										return Observable.error(new ServiceUnavailableException(e.getFailureType().toString()));
+									}
+									return Observable.error(error);
 		});
 	}
 	
@@ -139,10 +137,10 @@ class HystrixObservableCommandFacade<T> {
 		}
 		
 		public Observable<T> toObservable() {
-			if (this.value != null) {
-				return Observable.just(this.value);
+			if (this.exception != null) {
+				return Observable.error(this.exception);
 			}
-			return Observable.error(this.exception);
+			return Observable.just(this.value);
 		}
 		
 		

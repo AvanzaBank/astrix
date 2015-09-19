@@ -29,6 +29,7 @@ import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviders;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.Setting;
+import com.avanza.astrix.modules.Module;
 
 public class TestAstrixConfigurer {
 	
@@ -159,6 +160,10 @@ public class TestAstrixConfigurer {
 
 	public void set(BooleanBeanSetting setting, AstrixBeanKey<?> beanKey, boolean value) {
 		this.configurer.set(setting.nameFor(beanKey), Boolean.toString(value));
+	}
+
+	public void registerModule(Module module) {
+		this.configurer.registerModule(module);
 	}
 
 }

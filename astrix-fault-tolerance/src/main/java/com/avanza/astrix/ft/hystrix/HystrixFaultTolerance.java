@@ -19,12 +19,10 @@ import java.util.function.Supplier;
 
 import com.avanza.astrix.beans.ft.CommandSettings;
 import com.avanza.astrix.beans.ft.FaultToleranceSpi;
-import com.avanza.astrix.beans.ft.IsolationStrategy;
 import com.avanza.astrix.core.function.CheckedCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
-import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixObservableCommand.Setter;
 import com.netflix.hystrix.HystrixThreadPoolProperties;
 
@@ -75,7 +73,6 @@ final class HystrixFaultTolerance implements FaultToleranceSpi {
 		HystrixCommandProperties.Setter commandPropertiesDefault =
 				HystrixCommandProperties.Setter()
 						.withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests())
-						.withExecutionIsolationStrategy(getHystrixIsolationStrategy(settings))
 						.withExecutionTimeoutInMilliseconds(settings.getInitialTimeoutInMilliseconds());
 		return commandPropertiesDefault;
 	}
@@ -88,10 +85,4 @@ final class HystrixFaultTolerance implements FaultToleranceSpi {
 		return HystrixCommandKey.Factory.asKey(settings.getCommandName());
 	}
 
-	private ExecutionIsolationStrategy getHystrixIsolationStrategy(CommandSettings settings) {
-		return settings.getExecutionIsolationStrategy() == IsolationStrategy.SEMAPHORE 
-				? ExecutionIsolationStrategy.SEMAPHORE
-				: ExecutionIsolationStrategy.THREAD;
-	}
-	
 }

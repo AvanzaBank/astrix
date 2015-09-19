@@ -31,7 +31,7 @@ import rx.Observable;
  * @author Elias Lindholm (elilin)
  *
  */
-final class BeanFaultToleranceProxy implements BeanProxy {
+public final class BeanFaultToleranceProxy implements BeanProxy {
 
 	private final DynamicBooleanProperty faultToleranceEnabledForBean;
 	private final DynamicBooleanProperty faultToleranceEnabled;
@@ -44,7 +44,7 @@ final class BeanFaultToleranceProxy implements BeanProxy {
 		this.faultToleranceEnabledForBean = beanConfiguration.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED);
 		this.faultToleranceEnabled = AstrixSettings.ENABLE_FAULT_TOLERANCE.getFrom(config);
 	}
-
+	
 	@Override
 	public <T> CheckedCommand<T> proxyInvocation(final CheckedCommand<T> command) {
 		if (!faultToleranceEnabled()) {
