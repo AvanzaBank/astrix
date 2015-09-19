@@ -172,17 +172,18 @@ public class FaultToleranceThroughputTest {
 
 	@Test(timeout = 10000)
 	public void faultToleranceProvidesGoodThoughputWithSlowConsumer() throws Exception {
-		setServer(new SlowService(100, TimeUnit.MILLISECONDS)); // The timeout is set to 250 ms, so this call is not expected to timeout
+		// With a 250 ms response time, it not posible to get more than 1000/250 * 50 = 200 request throughput without bulkhead
+		setServer(new SlowService(250, TimeUnit.MILLISECONDS)); // The timeout is set to 2000 ms, so this call is not expected to timeout
 		FailingService service = astrixContext.getBean(FailingService.class);
 
-		ThroughputTest throughputTest = new ThroughputTest(10_000, 50, simulatedPageViewUsing(service));
+		ThroughputTest throughputTest = new ThroughputTest(1_000, 50, simulatedPageViewUsing(service));
 		throughputTest.run(1, TimeUnit.SECONDS);
 
 		if (!missingProtections.contains(BULK_HEAD)) {
 			assertTrue("Max concurrent server calls: " + server.getMaxConcurrentExecutions(), server.getMaxConcurrentExecutions() <= 20);
 		}
-		// Expect full throughput within 1 second
-		throughputTest.assertThroughputPercentAtLeast(99);
+		// Expect full throughput within 1 second, that is, all but the 20 (bulkhead size) that is still waiting for a response)
+		throughputTest.assertThroughputPercentAtLeast(98);
 	}
 
 	private void setServer(AbstractFailingService server) {
@@ -196,15 +197,15 @@ public class FaultToleranceThroughputTest {
 		FailingService service = astrixContext.getBean(FailingService.class);
 
 		
-		ThroughputTest throughputTest = new ThroughputTest(10_000, 50, simulatedPageViewUsing(service));
+		ThroughputTest throughputTest = new ThroughputTest(1_000, 50, simulatedPageViewUsing(service));
 		throughputTest.run(1, TimeUnit.SECONDS);
 
 		// Expect full througput within 1 second
 		if (!missingProtections.contains(BULK_HEAD)) {
 			assertTrue("Max concurrent server calls: " + server.getMaxConcurrentExecutions(), server.getMaxConcurrentExecutions() <= 20);
 		}
-		
-		throughputTest.assertThroughputPercentAtLeast(99);
+		// Expect full throughput within 1 second, that is, all but the 20 (bulkhead size) that is still waiting for a response)
+		throughputTest.assertThroughputPercentAtLeast(98);
 	}
 
 	@Test(timeout = 2500)
@@ -316,7 +317,7 @@ public class FaultToleranceThroughputTest {
 
 		public void assertThroughputPercentAtLeast(int expectedMinimumThroughput) {
 			assertTrue("Expected mininum throughput: " + expectedMinimumThroughput + "%. Test Result:\n " + statistics.summary(),
-					this.statistics.successfulThroughputPercentage() > expectedMinimumThroughput);
+					this.statistics.successfulThroughputPercentage() >= expectedMinimumThroughput);
 		}
 		
 	}

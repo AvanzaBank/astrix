@@ -46,7 +46,8 @@ public class CompletableFutureTypeHandlerPlugin implements ReactiveTypeHandlerPl
 	}
 
 	@Override
-	public Class<? super CompletableFuture<?>> reactiveTypeHandled() {
-		return CompletableFuture.class;
+	public Class<CompletableFuture<Object>> reactiveTypeHandled() {
+		Class<?> result = CompletableFuture.class;
+		return (Class<CompletableFuture<Object>>) result;
 	}
 }

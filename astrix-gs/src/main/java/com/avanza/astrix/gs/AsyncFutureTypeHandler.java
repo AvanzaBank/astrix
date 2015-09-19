@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.avanza.astrix.context.core.ReactiveExecutionListener;
 import com.avanza.astrix.context.core.ReactiveTypeHandlerPlugin;
-import com.avanza.astrix.gs.AsyncFutureTypeHandler.AsyncFutureImpl;
 import com.gigaspaces.async.AsyncFuture;
 import com.gigaspaces.async.AsyncFutureListener;
 import com.gigaspaces.async.internal.DefaultAsyncResult;
@@ -32,10 +31,10 @@ import com.gigaspaces.async.internal.DefaultAsyncResult;
  * @author Elias Lindholm
  *
  */
-public class AsyncFutureTypeHandler implements ReactiveTypeHandlerPlugin<AsyncFutureImpl<Object>> {
+public class AsyncFutureTypeHandler implements ReactiveTypeHandlerPlugin<AsyncFuture<Object>> {
 
 	@Override
-	public void subscribe(ReactiveExecutionListener listener, AsyncFutureImpl<Object> reactiveType) {
+	public void subscribe(ReactiveExecutionListener listener, AsyncFuture<Object> reactiveType) {
 		reactiveType.setListener(result -> {
 			if (result.getException() != null) {
 				listener.onError(result.getException());
@@ -46,23 +45,25 @@ public class AsyncFutureTypeHandler implements ReactiveTypeHandlerPlugin<AsyncFu
 	}
 
 	@Override
-	public void completeExceptionally(Throwable error, AsyncFutureImpl<Object> reactiveType) {
-		reactiveType.setError(error);
+	public void completeExceptionally(Throwable error, AsyncFuture<Object> reactiveType) {
+		AsyncFutureImpl.class.cast(reactiveType).setError(error);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void complete(Object result, AsyncFuture<Object> reactiveType) {
+		AsyncFutureImpl.class.cast(reactiveType).setResult(result);
 	}
 
 	@Override
-	public void complete(Object result, AsyncFutureImpl<Object> reactiveType) {
-		reactiveType.setResult(result);
-	}
-
-	@Override
-	public AsyncFutureImpl<Object> newReactiveType() {
+	public AsyncFuture<Object> newReactiveType() {
 		return new AsyncFutureImpl<>();
 	}
 	
 	@Override
-	public Class<? super AsyncFutureImpl<Object>> reactiveTypeHandled() {
-		return AsyncFuture.class;
+	public Class<AsyncFuture<Object>> reactiveTypeHandled() {
+		Class<?> class1 = AsyncFuture.class;
+		return (Class<AsyncFuture<Object>>) class1;
 	}
 	
 	public static class AsyncFutureImpl<T> implements AsyncFuture<T> {

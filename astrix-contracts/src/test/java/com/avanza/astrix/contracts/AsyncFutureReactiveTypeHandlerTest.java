@@ -17,12 +17,12 @@ package com.avanza.astrix.contracts;
 
 import com.avanza.astrix.context.core.ReactiveTypeHandlerPlugin;
 import com.avanza.astrix.gs.AsyncFutureTypeHandler;
-import com.avanza.astrix.gs.AsyncFutureTypeHandler.AsyncFutureImpl;
+import com.gigaspaces.async.AsyncFuture;
 
-public class AsyncFutureReactiveTypeHandlerTest extends ReactiveTypeHandlerContract<AsyncFutureImpl<Object>> {
+public class AsyncFutureReactiveTypeHandlerTest extends ReactiveTypeHandlerContract<AsyncFuture<Object>> {
 
 	@Override
-	protected ReactiveTypeHandlerPlugin<AsyncFutureImpl<Object>> newReactiveTypeHandler() {
+	protected ReactiveTypeHandlerPlugin<AsyncFuture<Object>> newReactiveTypeHandler() {
 		return new AsyncFutureTypeHandler();
 	}
 

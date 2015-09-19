@@ -25,6 +25,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
+import org.openspaces.core.executor.Task;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
@@ -112,6 +113,14 @@ public class ClusteredProxyLibraryTest {
 		assertTrue(proxy.getSpace().isOptimisticLockingEnabled());
 	}
 	
+	@Test
+	public void supportsMethodsReturningAsyncFuture() throws Exception {
+		configurer.setSubsystem("lunch-system");
+		astrix = autoClosables.add(configurer.configure());
+		GigaSpace proxy = astrix.waitForBean(GigaSpace.class, "lunch-space", 10000);
+		AsyncFuture<Integer> result = proxy.execute(new ReturnOneTask(), 1);
+		assertEquals(1, (int) result.get());
+	}
 	
 	@Test
 	public void localViewTest() throws Exception {
@@ -157,6 +166,15 @@ public class ClusteredProxyLibraryTest {
 			}
 			
 		};
+	}
+	
+	public static class ReturnOneTask implements Task<Integer> {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Integer execute() throws Exception {
+			return 1;
+		}
 	}
 	
 }

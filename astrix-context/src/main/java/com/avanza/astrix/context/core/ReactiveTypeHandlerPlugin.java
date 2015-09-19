@@ -17,7 +17,7 @@ package com.avanza.astrix.context.core;
 
 public interface ReactiveTypeHandlerPlugin<T> {
 	/**
-	 * Supbscribes a ReactiveExecutionListener to a reactive type. 
+	 * Subscribes a ReactiveExecutionListener to a reactive type. 
 	 * 
 	 * @param listener
 	 * @param reactiveType
@@ -26,6 +26,10 @@ public interface ReactiveTypeHandlerPlugin<T> {
 	
 	/**
 	 * Completes a reactive execution created using {@link #newReactiveType()} with an error.
+	 * 
+	 * This method will only be invoked with instances created using {@link #newReactiveType()},
+	 * so its safe to downcast the reactiveType argument to the type returned by
+	 * {@link #newReactiveType()}
 	 * 
 	 * @param error
 	 * @param reactiveType
@@ -43,5 +47,5 @@ public interface ReactiveTypeHandlerPlugin<T> {
 	
 	T newReactiveType();
 	
-	Class<? super T> reactiveTypeHandled();
+	Class<T> reactiveTypeHandled();
 }
