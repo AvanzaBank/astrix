@@ -16,7 +16,6 @@
 package com.avanza.astrix.integration.tests.domain.api;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import com.avanza.astrix.core.AstrixRouting;
@@ -28,7 +27,7 @@ public interface LunchServiceAsync {
 	
 	CompletableFuture<LunchRestaurant> getLunchRestaurant(GetLunchRestaurantRequest request);
 	
-	Future<LunchRestaurant> waitForLunchRestaurant(@AstrixRouting String name, int duration, TimeUnit unit);
+	CompletableFuture<LunchRestaurant> waitForLunchRestaurant(@AstrixRouting String name, int duration, TimeUnit unit);
 	
 	AsyncFuture<Void> addLunchRestaurant(LunchRestaurant restaurant);
 }

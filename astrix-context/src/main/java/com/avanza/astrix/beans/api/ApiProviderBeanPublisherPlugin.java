@@ -20,6 +20,9 @@ import java.lang.reflect.Method;
 
 import javax.annotation.PreDestroy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
@@ -41,6 +44,8 @@ import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfig;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.Versioned;
 
+import rx.Observable;
+
 /**
  * 
  * @author Elias Lindholm
@@ -48,6 +53,8 @@ import com.avanza.astrix.versioning.core.Versioned;
  */
 final class ApiProviderBeanPublisherPlugin implements BeanPublisherPlugin {
 
+	private static final Logger log = LoggerFactory.getLogger(ApiProviderBeanPublisherPlugin.class);
+	
 	private final ObjectCache provideInstanceCache = new ObjectCache();
 	private final BeanFaultToleranceFactory faultToleranceFactory;
 	private final AstrixConfig config;
@@ -76,18 +83,44 @@ final class ApiProviderBeanPublisherPlugin implements BeanPublisherPlugin {
 				ServiceDefinition<?> serviceDefinition = createServiceDefinition(apiProviderClass, beanDefinitionMethod);
 				ServiceDiscoveryDefinition serviceDiscoveryDefinition = new ServiceDiscoveryDefinition(beanDefinitionMethod.getServiceDiscoveryProperties(), serviceDefinition.getBeanKey());
 				publisher.publishService(new ServiceBeanDefinition<>(beanDefinitionMethod.getDefaultBeanSettings(), serviceDefinition, serviceDiscoveryDefinition));
-				Class<?> asyncInterface = loadInterfaceIfExists(beanDefinitionMethod.getBeanType().getName() + "Async");
-				if (asyncInterface != null) {
-					ServiceDefinition<?> asyncDefinition = serviceDefinition.asyncDefinition(asyncInterface);
+				Class<?> reactiveInterface = loadInterfaceIfExists(beanDefinitionMethod.getBeanType().getName() + "Async");
+				if (reactiveInterface != null && isValidReactiveInterface(beanDefinitionMethod.getBeanType(), reactiveInterface)) {
+					ServiceDefinition<?> asyncDefinition = serviceDefinition.asyncDefinition(reactiveInterface);
 					publisher.publishService(new ServiceBeanDefinition<>(beanDefinitionMethod.getDefaultBeanSettings(), 
-																		 asyncDefinition, 
-																		 serviceDiscoveryDefinition)); // Use same discovery as for sync version
+							asyncDefinition, 
+							serviceDiscoveryDefinition)); // Use same discovery as for sync version
 				}
 				continue;
 			}
 		}
 	}
 	
+	private boolean isValidReactiveInterface(Class<?> targetServiceApi, Class<?> reactiveInterface) {
+		for (Method reactiveMethod : reactiveInterface.getMethods()) {
+			if (!reactiveMethod.getReturnType().equals(Observable.class) && !this.reactiveTypeConverter.isReactiveType(reactiveMethod.getReturnType())) {
+				log.warn("Found reactive interface that contains non-reactive methods and will therefore not be registered in the BeanFactory. nonReactiveReturnType={}, reactiveInterfaceCandidate={}, invalidMethod={}"
+						 , reactiveMethod.getReturnType().getName(), reactiveInterface.getName(), reactiveMethod.getName());
+				return false;
+			}
+			if (!hasMethod(targetServiceApi, reactiveMethod.getName(), reactiveMethod.getParameterTypes())) {
+				log.warn("Found reactive interface that contains methods that does not correpond to a method in the synchronous interface. reactiveInterfaceCandidate={}, invalidMethod={}"
+						, reactiveInterface.getName(), reactiveMethod.getName());
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean hasMethod(Class<?> targetServiceApi, String name, Class<?>[] parameterTypes) {
+		try {
+			targetServiceApi.getMethod(name, parameterTypes);
+			return true;
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	private Class<?> loadInterfaceIfExists(String interfaceName) {
 		try {
 			Class<?> c = Class.forName(interfaceName);

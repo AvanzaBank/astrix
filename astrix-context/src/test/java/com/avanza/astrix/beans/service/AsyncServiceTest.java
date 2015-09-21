@@ -27,6 +27,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.avanza.astrix.beans.factory.MissingBeanProviderException;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -75,13 +76,27 @@ public class AsyncServiceTest {
 					 "foo", server.pingRequests.poll(1, TimeUnit.SECONDS));
 	}
 	
+	@Test(expected = MissingBeanProviderException.class)
+	public void validatesAllThatAllMethodsInReactiveTypeAreReactive() throws Exception {
+		AstrixContext context = new TestAstrixConfigurer().registerApiProvider(BrokenPingApi.class)
+								  .configure();
+		context.getBean(BrokenPingAsync.class);
+	}
+	
+	@Test(expected = MissingBeanProviderException.class)
+	public void validatesAllThatAllMethodsInReactiveTypeCorrespondToSyncVersion() throws Exception {
+		AstrixContext context = new TestAstrixConfigurer().registerApiProvider(InconsistentPingApi.class)
+								  .configure();
+		context.getBean(InconsistentPingAsync.class);
+	}
+	
 	public static final class BlockingPing implements PingAsync {
 		
 		private final BlockingQueue<String> pingResponses = new LinkedBlockingQueue<>();
 		private final BlockingQueue<String> pingRequests = new LinkedBlockingQueue<>();
 
 		@Override
-		public Future<String> ping(String msg) {
+		public CompletableFuture<String> ping(String msg) {
 			pingRequests.add(msg);
 			CompletableFuture<String> result = new CompletableFuture<String>();
 			new Thread(() -> {
@@ -109,7 +124,25 @@ public class AsyncServiceTest {
 	}
 	
 	public interface PingAsync {
-		Future<String> ping(String msg);
+		CompletableFuture<String> ping(String msg);
+	}
+	
+	public interface BrokenPing {
+		String invalidPing(String msg);
+		String validPing(String msg);
+	}
+	
+	public interface BrokenPingAsync {
+		Future<String> invalidPing(String msg); // Future is not a reactive type
+		CompletableFuture<String> validPing(String msg);
+	}
+	
+	public interface InconsistentPing {
+		String ping(String msg);
+	}
+	
+	public interface InconsistentPingAsync {
+		CompletableFuture<String> inconsistendPingMethod(String msg);
 	}
 	
 	@AstrixApiProvider
@@ -117,6 +150,20 @@ public class AsyncServiceTest {
 		@AstrixConfigDiscovery("pingUri")
 		@Service
 		Ping ping();
+	}
+	
+	@AstrixApiProvider
+	public static interface BrokenPingApi {
+		@AstrixConfigDiscovery("pingUri")
+		@Service
+		BrokenPing ping();
+	}
+	
+	@AstrixApiProvider
+	public static interface InconsistentPingApi {
+		@AstrixConfigDiscovery("pingUri")
+		@Service
+		InconsistentPing ping();
 	}
 	
 	private static class SingleServiceComponent implements ServiceComponent {

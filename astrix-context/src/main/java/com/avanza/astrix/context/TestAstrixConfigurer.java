@@ -73,11 +73,13 @@ public class TestAstrixConfigurer {
 	 * should be removed in the future.
 	 * 
 	 * @param provider
+	 * @return 
 	 */
-	public void registerApiProvider(Class<?>... providers) {
+	public TestAstrixConfigurer registerApiProvider(Class<?>... providers) {
 		for (Class<?> provider : providers) {
 			apiProviders.add(ApiProviderClass.create(provider));
 		}
+		return this;
 	}
 
 	public <T> void registerAstrixBean(Class<T> beanType, T provider) {
@@ -93,8 +95,9 @@ public class TestAstrixConfigurer {
 		configurer.registerPlugin(c, provider);
 	}
 	
-	public void enableFaultTolerance(boolean enabled) {
+	public TestAstrixConfigurer enableFaultTolerance(boolean enabled) {
 		configurer.enableFaultTolerance(enabled);
+		return this;
 	}
 
 	public void set(String name, long value) {
@@ -109,8 +112,9 @@ public class TestAstrixConfigurer {
 		configurer.set(name, value);
 	}
 
-	public final <T> void set(Setting<T> setting, T value) {
+	public final <T> TestAstrixConfigurer set(Setting<T> setting, T value) {
 		this.configurer.set(setting, value);
+		return this;
 	}
 	
 	public final void set(LongSetting setting, long value) {
@@ -155,8 +159,9 @@ public class TestAstrixConfigurer {
 		this.configurer.activateProfile(profile);
 	}
 
-	public <T> void registerStrategy(Class<T> strategyInterface, T strategyInstance) {
+	public <T> TestAstrixConfigurer registerStrategy(Class<T> strategyInterface, T strategyInstance) {
 		this.configurer.registerStrategy(strategyInterface, strategyInstance);
+		return this;
 	}
 
 	public void set(BooleanBeanSetting setting, AstrixBeanKey<?> beanKey, boolean value) {

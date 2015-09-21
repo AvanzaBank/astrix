@@ -32,7 +32,7 @@ import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class ServiceDefinition<T> /*implements PublishedAstrixBean<T>*/ {
+public final class ServiceDefinition<T> {
 	
 	private final Class<?> serviceConfigClass;
 	private final ObjectSerializerDefinition objectSerializerDefinition;
@@ -80,11 +80,6 @@ public final class ServiceDefinition<T> /*implements PublishedAstrixBean<T>*/ {
 		return serviceDefinitionSource;
 	}
 	
-//	@Override
-//	public ApiProvider getDefiningApi() {
-//		return definingApi;
-//	}
-
 	public boolean isVersioned() {
 		return objectSerializerDefinition.isVersioned();
 	}
@@ -108,7 +103,6 @@ public final class ServiceDefinition<T> /*implements PublishedAstrixBean<T>*/ {
 		return this.objectSerializerDefinition;
 	}
 
-//	@Override
 	public AstrixBeanKey<T> getBeanKey() {
 		return this.beanKey;
 	}

@@ -18,7 +18,6 @@ package com.avanza.astrix.beans.service;
 import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 import org.junit.After;
 import org.junit.Test;
@@ -55,7 +54,6 @@ public class DirectComponentTest {
 	
 	public interface PingAsync {
 		CompletableFuture<String> ping(String msg);
-		CompletableFuture<String> missingPing(String msg);
 	}
 	
 	public class PingImpl implements Ping {
