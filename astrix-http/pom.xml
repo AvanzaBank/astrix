@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.avanza.astrix</groupId>
 		<artifactId>astrix-parent</artifactId>
-		<version>MASTER-SNAPSHOT</version>
+		<version>0.37.2</version>
 	</parent>
 	<artifactId>astrix-http</artifactId>
 	<dependencies>
