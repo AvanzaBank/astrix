@@ -64,15 +64,15 @@ final class HystrixFaultTolerance implements FaultToleranceSpi {
 		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =
 				HystrixThreadPoolProperties.Setter()
 						.withMaxQueueSize(settings.getMaxQueueSize())
-						.withQueueSizeRejectionThreshold(settings.getQueueSizeRejectionThreshold())
-						.withCoreSize(settings.getCoreSize());
+						.withQueueSizeRejectionThreshold(settings.getInitialQueueSizeRejectionThreshold())
+						.withCoreSize(settings.getInitialCoreSize());
 		return threadPoolPropertiesDefaults;
 	}
 
 	private HystrixCommandProperties.Setter createCommandProperties(CommandSettings settings) {
 		HystrixCommandProperties.Setter commandPropertiesDefault =
 				HystrixCommandProperties.Setter()
-						.withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getSemaphoreMaxConcurrentRequests())
+						.withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getInitialSemaphoreMaxConcurrentRequests())
 						.withExecutionTimeoutInMilliseconds(settings.getInitialTimeoutInMilliseconds());
 		return commandPropertiesDefault;
 	}

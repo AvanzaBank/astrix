@@ -22,9 +22,9 @@ package com.avanza.astrix.beans.ft;
  */
 public class CommandSettings {
 	
-	private int queueSizeRejectionThreshold = 10;
-	private int coreSize = 10;
-	private int semaphoreMaxConcurrentRequests = 20;
+	private int initialQueueSizeRejectionThreshold = 10;
+	private int initialCoreSize = 10;
+	private int initialSemaphoreMaxConcurrentRequests = 20;
 	private int initialTimeoutInMilliseconds = 1000;
 	private int metricsRollingStatisticalWindowInMilliseconds = 10_000;
 	private int maxQueueSize = 1_000_000;
@@ -50,28 +50,28 @@ public class CommandSettings {
 		this.metricsRollingStatisticalWindowInMilliseconds = metricsRollingStatisticalWindowInMilliseconds;
 	}
 
-	public int getQueueSizeRejectionThreshold() {
-		return queueSizeRejectionThreshold;
+	public int getInitialQueueSizeRejectionThreshold() {
+		return initialQueueSizeRejectionThreshold;
 	}
 
-	public void setQueueSizeRejectionThreshold(int queueSizeRejectionThreshold) {
-		this.queueSizeRejectionThreshold = queueSizeRejectionThreshold;
+	public void setInitialQueueSizeRejectionThreshold(int queueSizeRejectionThreshold) {
+		this.initialQueueSizeRejectionThreshold = queueSizeRejectionThreshold;
 	}
 
-	public int getCoreSize() {
-		return coreSize;
+	public int getInitialCoreSize() {
+		return initialCoreSize;
 	}
 
-	public void setCoreSize(int coreSize) {
-		this.coreSize = coreSize;
+	public void setInitialCoreSize(int coreSize) {
+		this.initialCoreSize = coreSize;
 	}
 	
-	public int getSemaphoreMaxConcurrentRequests() {
-		return semaphoreMaxConcurrentRequests;
+	public int getInitialSemaphoreMaxConcurrentRequests() {
+		return initialSemaphoreMaxConcurrentRequests;
 	}
 
-	public void setSemaphoreMaxConcurrentRequests(int semaphoreMaxConcurrentRequests) {
-		this.semaphoreMaxConcurrentRequests = semaphoreMaxConcurrentRequests;
+	public void setInitialSemaphoreMaxConcurrentRequests(int initialSemaphoreMaxConcurrentRequests) {
+		this.initialSemaphoreMaxConcurrentRequests = initialSemaphoreMaxConcurrentRequests;
 	}
 
 	public int getInitialTimeoutInMilliseconds() {

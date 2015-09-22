@@ -55,6 +55,8 @@ public @interface DefaultBeanSettings {
 	boolean DEFAULT_FAULT_TOLERANCE_ENABLED = true;
 	boolean DEFAULT_BEAN_METRICS_ENABLED = true;
 	int DEFAULT_INITIAL_MAX_CONCURRENT_REQUESTS = 20;
+	int DEFAULT_INITIAL_CORE_SIZE = 10;
+	int DEFAULT_INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD = 10;
 	
 	/**
 	 * See AstrixBeanSettings#INITIAL_TIMEOUT
@@ -65,6 +67,16 @@ public @interface DefaultBeanSettings {
 	 * See AstrixBeanSettings#MAX_CONCURRENT_REQUESTS
 	 */
 	int initialMaxConcurrentRequests() default DEFAULT_INITIAL_MAX_CONCURRENT_REQUESTS;
+	
+	/**
+	 * See AstrixBeanSettings#
+	 */
+	int initialCoreSize() default DEFAULT_INITIAL_CORE_SIZE;
+	
+	/**
+	 * See AstrixBeanSettings#
+	 */
+	int initialQueueSizeRejectionThreshold() default DEFAULT_INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD;
 	
 	/**
 	 * See AstrixBeanSettings#INITIAL_TIMEOUT

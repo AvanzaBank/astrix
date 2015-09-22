@@ -164,10 +164,10 @@ public class FaultToleranceIntegrationTest {
 	@Test
 	public void rejectsWhenPoolIsFull() throws Exception {
 		CommandSettings settings = settings();
-		settings.setCoreSize(3);
+		settings.setInitialCoreSize(3);
 		settings.setMaxQueueSize(-1); // sync queue
 //		config.set(AstrixBeanSettings.INITIAL_TIMEOUT.nameFor(AstrixBeanKey.create(SimpleService.class)), "5000");
-		settings.setSemaphoreMaxConcurrentRequests(3);
+		settings.setInitialSemaphoreMaxConcurrentRequests(3);
 		settings.setInitialTimeoutInMilliseconds(5000);
 		SimpleService serviceWithFt = createProxy(api, provider, settings);
 		ExecutorService pool = Executors.newCachedThreadPool();

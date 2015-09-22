@@ -29,8 +29,12 @@ import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
-
-public class BeanFaultToleranceProxyFactory implements ServiceBeanProxyFactory, BeanFaultToleranceFactory {
+/**
+ * 
+ * @author Elias Lindholm
+ *
+ */
+final class BeanFaultToleranceProxyFactory implements ServiceBeanProxyFactory, BeanFaultToleranceFactory {
 	
 	private static final Logger log = LoggerFactory.getLogger(BeanFaultToleranceProxyFactory.class);
 
@@ -51,7 +55,6 @@ public class BeanFaultToleranceProxyFactory implements ServiceBeanProxyFactory, 
 
 	@Override
 	public BeanProxy create(ServiceDefinition<?> serviceDefinition, ServiceComponent serviceComponent) {
-		CommandSettings ftSettings = new CommandSettings();
 		FtProxySetting ftProxySetting = FtProxySetting.ENABLED;
 		if (serviceComponent instanceof FaultToleranceConfigurator) {
 			 ftProxySetting = FaultToleranceConfigurator.class.cast(serviceComponent).configure();
@@ -63,28 +66,31 @@ public class BeanFaultToleranceProxyFactory implements ServiceBeanProxyFactory, 
 		}
 		BeanConfiguration beanConfiguration = beanConfigurations.getBeanConfiguration(serviceDefinition.getBeanKey());
 		PublishedAstrixBean<?> publishedBeanInfo = SimplePublishedAstrixBean.from(serviceDefinition);
+		CommandSettings ftSettings = createCommandSettingsSettings(beanConfiguration, publishedBeanInfo);
+		return new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultToleranceSpi, ftSettings);
+	}
+
+	@Override
+	public BeanProxy createFaultToleranceProxy(PublishedAstrixBean<?> serviceDefinition) {
+		BeanConfiguration beanConfiguration = beanConfigurations.getBeanConfiguration(serviceDefinition.getBeanKey());
+		return new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), 
+				beanFaultToleranceSpi, createCommandSettingsSettings(beanConfiguration, serviceDefinition));
+	}
+
+	private CommandSettings createCommandSettingsSettings(BeanConfiguration beanConfiguration, PublishedAstrixBean<?> publishedBeanInfo) {
+		CommandSettings ftSettings = new CommandSettings();
 		ftSettings.setCommandName(commandNamingStrategy.getCommandKeyName(publishedBeanInfo));
 		ftSettings.setGroupName(commandNamingStrategy.getGroupKeyName(publishedBeanInfo));
 		ftSettings.setInitialTimeoutInMilliseconds(beanConfiguration.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
-		ftSettings.setSemaphoreMaxConcurrentRequests(beanConfiguration.get(AstrixBeanSettings.INITIAL_MAX_CONCURRENT_REQUESTS).get());
-		return new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultToleranceSpi, ftSettings);
-	}
-	
-	@Override
-	public BeanProxy createFaultToleranceProxy(PublishedAstrixBean<?> serviceDefinition) {
-		CommandSettings ftSettings = new CommandSettings();
-		BeanConfiguration beanConfiguration = beanConfigurations.getBeanConfiguration(serviceDefinition.getBeanKey());
-		ftSettings.setCommandName(commandNamingStrategy.getCommandKeyName(serviceDefinition));
-		ftSettings.setGroupName(commandNamingStrategy.getGroupKeyName(serviceDefinition));
-		ftSettings.setInitialTimeoutInMilliseconds(beanConfiguration.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
-		ftSettings.setSemaphoreMaxConcurrentRequests(beanConfiguration.get(AstrixBeanSettings.INITIAL_MAX_CONCURRENT_REQUESTS).get());
-		return new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultToleranceSpi, ftSettings);
+		ftSettings.setInitialSemaphoreMaxConcurrentRequests(beanConfiguration.get(AstrixBeanSettings.INITIAL_MAX_CONCURRENT_REQUESTS).get());
+		ftSettings.setInitialCoreSize(beanConfiguration.get(AstrixBeanSettings.INITIAL_CORE_SIZE).get());
+		ftSettings.setInitialQueueSizeRejectionThreshold(beanConfiguration.get(AstrixBeanSettings.INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD).get());
+		return ftSettings;
 	}
 	
 	@Override
 	public int order() {
 		return 1;
 	}
-	
 	
 }

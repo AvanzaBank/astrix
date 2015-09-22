@@ -85,6 +85,8 @@ public class AstrixConfigurerTest {
 		assertEquals(false, pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
 		assertEquals(false, pingConfig.get(AstrixBeanSettings.BEAN_METRICS_ENABLED).get());
 		assertEquals(1, pingConfig.get(AstrixBeanSettings.INITIAL_MAX_CONCURRENT_REQUESTS).get());
+		assertEquals(2, pingConfig.get(AstrixBeanSettings.INITIAL_CORE_SIZE).get());
+		assertEquals(3, pingConfig.get(AstrixBeanSettings.INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD).get());
 	}
 	
 	@Test
@@ -104,6 +106,8 @@ public class AstrixConfigurerTest {
 		assertEquals(true, pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
 		assertEquals(false, pingConfig.get(AstrixBeanSettings.BEAN_METRICS_ENABLED).get());
 		assertEquals(2, pingConfig.get(AstrixBeanSettings.INITIAL_MAX_CONCURRENT_REQUESTS).get());
+		assertEquals(5, pingConfig.get(AstrixBeanSettings.INITIAL_CORE_SIZE).get());
+		assertEquals(6, pingConfig.get(AstrixBeanSettings.INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD).get());
 	}
 	
 	@Test
@@ -126,7 +130,9 @@ public class AstrixConfigurerTest {
 		initialTimeout = 2000,
 		faultToleranceEnabled = false,
 		beanMetricsEnabled = false,
-		initialMaxConcurrentRequests = 1
+		initialMaxConcurrentRequests = 1,
+		initialCoreSize = 2,
+		initialQueueSizeRejectionThreshold = 3
 	)
 	public interface Ping {
 	}
@@ -146,7 +152,9 @@ public class AstrixConfigurerTest {
 			initialTimeout=3000,
 			faultToleranceEnabled = true,
 			beanMetricsEnabled = false,
-			initialMaxConcurrentRequests = 2
+			initialMaxConcurrentRequests = 2,
+			initialCoreSize = 5,
+			initialQueueSizeRejectionThreshold = 6
 		)
 		@Service
 		Ping ping();

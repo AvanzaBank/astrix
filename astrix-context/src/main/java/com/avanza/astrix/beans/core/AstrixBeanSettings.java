@@ -60,6 +60,23 @@ public final class AstrixBeanSettings {
 			new IntBeanSetting("faultTolerance.initialMaxConcurrentRequests", DefaultBeanSettings.DEFAULT_INITIAL_MAX_CONCURRENT_REQUESTS);
 	
 	/**
+	 * Defines the default "coreSize" when thread isolation is used to protect invocations 
+	 * to the associated bean, i.e. the number of threads in the bulkhead associated with a
+	 * synchronous service invocation.
+	 */
+	public static final IntBeanSetting INITIAL_CORE_SIZE = 
+			new IntBeanSetting("faultTolerance.initialCoreSize", DefaultBeanSettings.DEFAULT_INITIAL_CORE_SIZE);
+	
+	/**
+	 * Defines the default "queueSizeRejectionThreshold" for the queue when thread isolation 
+	 * is used to protect invocations to the associated bean, i.e. number of pending service invocations
+	 * allowed in the queue to a thread-pool (bulk-head) before starting to throw {@link ServiceUnavailableException}.
+	 */
+	public static final IntBeanSetting INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD = 
+			new IntBeanSetting("faultTolerance.initialQueueSizeRejectionThreshold", DefaultBeanSettings.DEFAULT_INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD);
+
+	
+	/**
 	 * Its possible to set service-beans in unavailable state, in which it throws
 	 * a {@link ServiceUnavailableException} on each invocation. <p>
 	 */

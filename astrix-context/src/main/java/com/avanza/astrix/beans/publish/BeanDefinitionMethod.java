@@ -144,6 +144,8 @@ public class BeanDefinitionMethod<T> implements PublishedAstrixBean<T> {
 			defaultSettings.put(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED, defaultBeanSettingsOnApi.faultToleranceEnabled());
 			defaultSettings.put(AstrixBeanSettings.BEAN_METRICS_ENABLED, defaultBeanSettingsOnApi.beanMetricsEnabled());
 			defaultSettings.put(AstrixBeanSettings.INITIAL_MAX_CONCURRENT_REQUESTS, defaultBeanSettingsOnApi.initialMaxConcurrentRequests());
+			defaultSettings.put(AstrixBeanSettings.INITIAL_CORE_SIZE, defaultBeanSettingsOnApi.initialCoreSize());
+			defaultSettings.put(AstrixBeanSettings.INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD, defaultBeanSettingsOnApi.initialQueueSizeRejectionThreshold());
 		}
 		if (this.method.isAnnotationPresent(DefaultBeanSettings.class)) {
 			// Default settings defined on service definition
@@ -152,6 +154,8 @@ public class BeanDefinitionMethod<T> implements PublishedAstrixBean<T> {
 			defaultSettings.put(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED, defaultBeanSettingsInDefinition.faultToleranceEnabled());
 			defaultSettings.put(AstrixBeanSettings.BEAN_METRICS_ENABLED, defaultBeanSettingsInDefinition.beanMetricsEnabled());
 			defaultSettings.put(AstrixBeanSettings.INITIAL_MAX_CONCURRENT_REQUESTS, defaultBeanSettingsInDefinition.initialMaxConcurrentRequests());
+			defaultSettings.put(AstrixBeanSettings.INITIAL_CORE_SIZE, defaultBeanSettingsInDefinition.initialCoreSize());
+			defaultSettings.put(AstrixBeanSettings.INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD, defaultBeanSettingsInDefinition.initialQueueSizeRejectionThreshold());
 		}
 		return defaultSettings;
 	}
