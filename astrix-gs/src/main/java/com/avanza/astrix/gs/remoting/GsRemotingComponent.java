@@ -27,7 +27,6 @@ import com.avanza.astrix.gs.BoundProxyServiceBeanInstance;
 import com.avanza.astrix.gs.ClusteredProxyCache;
 import com.avanza.astrix.gs.ClusteredProxyCacheImpl.GigaSpaceInstance;
 import com.avanza.astrix.gs.GsBinder;
-import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.remoting.client.RemotingProxy;
 import com.avanza.astrix.remoting.client.RemotingTransport;

@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context;
+package com.avanza.astrix.remoting.client;
 
-import com.avanza.astrix.modules.Module;
+import com.avanza.astrix.beans.service.ServiceDefinition;
+import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.core.remoting.RoutingStrategy;
 
-public interface AstrixContextPlugin extends Module {
+public interface RemotingProxyFactory {
 
-	default void registerStrategies(AstrixStrategiesConfig strategiesConfig) {
-	}
+	<T> T create(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties, 
+				RemotingTransportSpi remotingTransportSpi, RoutingStrategy routingStrategy);
 
 }

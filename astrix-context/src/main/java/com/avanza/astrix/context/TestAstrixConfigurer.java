@@ -28,9 +28,11 @@ import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviders;
+import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.modules.Module;
+import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
 
 public class TestAstrixConfigurer {
 	
@@ -117,8 +119,9 @@ public class TestAstrixConfigurer {
 		return this;
 	}
 	
-	public final void set(LongSetting setting, long value) {
+	public final TestAstrixConfigurer set(LongSetting setting, long value) {
 		this.configurer.set(setting, value);
+		return this;
 	}
 	
 	/*
@@ -174,6 +177,11 @@ public class TestAstrixConfigurer {
 
 	public void set(IntBeanSetting setting, AstrixBeanKey<?> beanKey, int value) {
 		this.configurer.set(setting, beanKey, value);
+	}
+
+	public TestAstrixConfigurer setApplicationDescriptor(Class<?> applicationDescriptor) {
+		this.configurer.setApplicationDescriptor(AstrixApplicationDescriptor.create(applicationDescriptor));
+		return this;
 	}
 
 }

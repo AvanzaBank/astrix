@@ -28,6 +28,7 @@
 		<module>astrix-modules</module>
 		<module>astrix-metrics</module>
 		<module>astrix-contracts</module>
+		<module>astrix-netty-remoting</module>
 	</modules>
 
 	<scm>
@@ -70,6 +71,7 @@
 		<mockito.version>1.9.0</mockito.version>
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 		<dropwizard.version>3.1.2</dropwizard.version>
+		<netty.version>4.0.31.Final</netty.version>
 	</properties>
 
 	<dependencyManagement>
@@ -191,6 +193,12 @@
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-log4j12</artifactId>
 				<version>${slf4j.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-all</artifactId>
+				<version>${netty.version}</version>
 			</dependency>
 
 			<dependency>
