@@ -34,11 +34,13 @@ import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.MutableConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.astrix.provider.core.AstrixServiceExport;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
+@AstrixServiceExport(AstrixServiceRegistry.class)
 public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServiceRegistry, MutableConfigSource {
 	
 	private final MapConfigSource configSource = new MapConfigSource();

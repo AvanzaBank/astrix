@@ -15,10 +15,13 @@
  */
 package com.avanza.astrix.netty.client;
 
+import java.util.concurrent.TimeUnit;
+
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
@@ -51,8 +54,17 @@ public final class NettyRemotingClient {
          });
 
         // Start the connection attempt.
-        b.connect(host, port);
-//        b.connect(host, port).sync().channel().closeFuture().sync();
+        ChannelFuture channel = b.connect(host, port);
+        try {
+			if (channel.await(1, TimeUnit.SECONDS)) {
+				if (channel.isSuccess()) {
+					return;
+				}
+			}
+		} catch (InterruptedException e) {
+		}
+        destroy();
+        throw new IllegalArgumentException(String.format("Failed to connect to remoting server: %s:%d", host, port));
     }
     
     public Observable<AstrixServiceInvocationResponse> invokeService(AstrixServiceInvocationRequest request) {

@@ -76,7 +76,11 @@ public class NettyRemotingComponent implements ServiceComponent {
 
 	@Override
 	public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
-		return new ServiceProperties(); // TODO: support uri
+		String[] hostAndPort = serviceProviderUri.split(":");
+		ServiceProperties result = new ServiceProperties();
+		result.getProperties().put(NETTY_HOST, hostAndPort[0]);
+		result.getProperties().put(NETTY_PORT, hostAndPort[1]);
+		return result;
 	}
 
 	@Override
