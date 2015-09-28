@@ -84,7 +84,9 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		Class<LocalViewConfigurer> serviceConfigClass = serviceDefinition.getServiceConfigClass(LocalViewConfigurer.class);	
 		LocalViewConfigurer localViewConfigurer = ReflectionUtil.newInstance(serviceConfigClass);
 		UrlSpaceConfigurer gsSpaceConfigurer = new UrlSpaceConfigurer(serviceProperties.getProperty(GsBinder.SPACE_URL_PROPERTY));
-		IJSpace space = gsSpaceConfigurer.lookupTimeout(this.lookupTimeout.get()).create();
+		IJSpace space = gsSpaceConfigurer.lookupTimeout(this.lookupTimeout.get())
+				// Disable memory shortage check for local view clients
+				.addParameter("space-config.engine.memory_usage.enabled", "false").create();
 		
 		LocalViewSpaceConfigurer gslocalViewSpaceConfigurer = new LocalViewSpaceConfigurer(space);
 		gslocalViewSpaceConfigurer.maxDisconnectionDuration(this.maxDisonnectionTime.get());
