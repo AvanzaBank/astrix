@@ -9,7 +9,7 @@ Astrix is used by service consumers to:
 
 Astrix is used by service providers to:
 * Define the api exported by a given microservice
-* Make those services available at runtime ("service registration") 
+* Make those services available at runtime ("self service registration") 
 * Version the provided services to allow an independent release cycle from its consumers
 * Temporarily stop exporting its services at runtime to allow for blue green deployment 
 
