@@ -32,9 +32,9 @@
 	</modules>
 
 	<scm>
-		<connection>scm:git:git@git01.test.aza.se:asterix/astrix.git</connection>
-		<url>http://http://git01.test.aza.se/asterix/astrix/tree/master</url>
-		<tag>HEAD</tag>
+	  <connection>scm:git:git@github.com:AvanzaBank/astrix.git</connection>
+	  <developerConnection>scm:git:git@github.com:AvanzaBank/astrix.git</developerConnection>
+	  <url>git@github.com:AvanzaBank/astrix.git</url>
 	</scm>
 	<repositories>
 		<repository>
