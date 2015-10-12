@@ -297,7 +297,7 @@ public class ServiceBeanInstanceTest {
 			astrixContext.waitForBean(Ping.class, 1);
 			fail("Expected exception when bean can't be bound before timeout");
 		} catch (ServiceUnavailableException e) {
-			assertThat("Expected ServiceUnavailableException when bean timeout occurs:", e.getMessage().toLowerCase(), CoreMatchers.containsString("bean was not bound before timeout"));
+			assertThat("Root cause for waitForBean", e.getCause(), CoreMatchers.instanceOf(NoServiceProviderFound.class));
 		}
 	}
 	

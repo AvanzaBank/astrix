@@ -16,7 +16,20 @@
 package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
-
+/**
+ * Thrown when service binding fails.
+ * 
+ * This means that service discovery was successful, but that
+ * binding fails using the {@link ServiceComponent} defined
+ * in the service properties returned from service discovery.
+ * 
+ * See the associated cause for more details about the failure.
+ * 
+ * 
+ * 
+ * @author Elias Lindholm
+ *
+ */
 final class ServiceBindError extends ServiceUnavailableException {
 	private static final long serialVersionUID = 1L;
 	public ServiceBindError(String msg) {

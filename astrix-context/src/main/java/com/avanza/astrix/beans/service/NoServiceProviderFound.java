@@ -17,6 +17,17 @@ package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
 
+/**
+ * Thrown when a service discovery attempt does not find a provider for the given service.
+ * 
+ * Some possible causes:
+ * 
+ * 1. The server has not yet registered in the service-registry.
+ * 2. The server is miss-configured and does not "know" where the service registry is located.
+ * 
+ * @author Elias Lindholm
+ *
+ */
 final class NoServiceProviderFound extends ServiceUnavailableException {
 	private static final long serialVersionUID = 1L;
 	public NoServiceProviderFound(String msg) {

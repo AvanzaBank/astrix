@@ -80,8 +80,12 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactory
 		// A serviceUri has the format [component-name:service-provider-properties]
 		// Example: gs-remoting:jini://customer-space?groups=my-group
 		private ServiceProperties buildServiceProperties(String serviceUri) {
-			String component = serviceUri.substring(0, serviceUri.indexOf(":"));
-			String serviceProviderUri = serviceUri.substring(serviceUri.indexOf(":") + 1);
+			int componentNameEndIndex = serviceUri.indexOf(":");
+			if (componentNameEndIndex < 0) {
+				throw new IllegalArgumentException("Illegal serviceUri: \"" + serviceUri + "\". A serviceUri should have the form [componentName]:[componentSpecificPart]");
+			}
+			String component = serviceUri.substring(0, componentNameEndIndex);
+			String serviceProviderUri = serviceUri.substring(componentNameEndIndex + 1);
 			ServiceComponent serviceComponent = getServiceComponent(component);
 			ServiceProperties serviceProperties = serviceComponent.parseServiceProviderUri(serviceProviderUri);
 			serviceProperties.setComponent(serviceComponent.getName());

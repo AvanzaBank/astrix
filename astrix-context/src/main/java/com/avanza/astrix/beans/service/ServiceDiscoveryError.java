@@ -16,7 +16,16 @@
 package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.core.ServiceUnavailableException;
-
+/**
+ * Thrown when a service discovery attempt ends with an exception. <p>
+ * 
+ * A common cause is failure to find ("discover") the
+ * service registry itself, thereby causing errors when attempting to
+ * discovery other Astrix beans.
+ * 
+ * @author Elias Lindholm
+ *
+ */
 final class ServiceDiscoveryError extends ServiceUnavailableException {
 	private static final long serialVersionUID = 1L;
 	public ServiceDiscoveryError(String msg) {

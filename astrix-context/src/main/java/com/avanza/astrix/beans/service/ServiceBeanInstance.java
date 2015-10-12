@@ -235,7 +235,8 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		try {
 			if (!isBound()) {
 				if (!boundCondition.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
-					throw new ServiceUnavailableException("Service bean was not bound before timeout. bean=" + beanKey);
+					this.currentState.verifyBound(); // Let current state throw exception describing cause
+//					throw new ServiceUnavailableException("Service bean was not bound before timeout. bean=" + beanKey);
 				}
 			}
 		} finally {
@@ -307,6 +308,8 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 			}
 		}
 
+		protected abstract void verifyBound();
+
 		protected final void setState(BeanState newState) {
 			if (!currentState.getClass().equals(newState.getClass())) {
 				log.info(String.format("Service bean entering new state. newState=%s bean=%s id=%s", newState.name(), beanKey, id));
@@ -352,6 +355,10 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		protected String name() {
 			return "Bound";
 		}
+
+		@Override
+		protected void verifyBound() {
+		}
 	}
 	
 	private class Unbound extends BeanState {
@@ -372,11 +379,28 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			ServiceUnavailableException exception = exceptionFactory.getConstructor(String.class).newInstance(message + " astrixBeanId=" + id + " bean=" + beanKey);
+			throw createServiceUnavailableException();
+		}
+
+		private ServiceUnavailableException createServiceUnavailableException() {
+			ServiceUnavailableException exception = initException();
 			if (discoveryFailure != null) {
 				exception.initCause(discoveryFailure);
 			}
-			throw exception;
+			return exception;
+		}
+
+		private ServiceUnavailableException initException() {
+			try {
+				return exceptionFactory.getConstructor(String.class).newInstance(message + " astrixBeanId=" + id + " bean=" + beanKey);
+			} catch (Exception e) {
+				return new ServiceUnavailableException(message);
+			}
+		}
+		
+		@Override
+		protected void verifyBound() {
+			throw createServiceUnavailableException();
 		}
 		
 		@Override
@@ -403,6 +427,11 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		
 		@Override
 		protected void releaseInstance() {
+		}
+		
+		@Override
+		protected void verifyBound() {
+			throw new IllegalServiceMetadataException(String.format("bean=%s astrixBeanId=%s message=%s", beanKey, id, message));
 		}
 		
 		@Override
