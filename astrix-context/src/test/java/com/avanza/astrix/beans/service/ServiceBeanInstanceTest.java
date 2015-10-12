@@ -335,6 +335,48 @@ public class ServiceBeanInstanceTest {
 		astrixContext.waitForBean(Ping.class, 100);
 	}
 	
+	
+	@Test
+	public void throwsServiceDiscoveryErrorWhenServiceDiscoveryThrowsAnException() throws Exception {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(PingApiProvider.class);
+		astrixConfigurer.registerPlugin(ServiceComponent.class, new FakeComponent());
+		astrixContext = astrixConfigurer.configure();
+
+		try {
+			astrixContext.waitForBean(Ping.class, 1).ping("foo");
+		} catch (ServiceDiscoveryError e) {
+			assertThat("Root cause for ServiceDiscoveryError", e.getCause(), CoreMatchers.instanceOf(NoServiceProviderFound.class));
+		}
+	}
+	
+	@Test
+	public void throwsNoServiceProviderFoundWhenNoServiceProviderFound() throws Exception {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(PingApiProviderUsingConfigLookup.class);
+		astrixConfigurer.registerPlugin(ServiceComponent.class, new FakeComponent());
+		// No serviceUri for Ping in configuration => NoProviderFound
+		astrixContext = astrixConfigurer.configure();
+		try {
+			astrixContext.waitForBean(Ping.class, 1).ping("foo");
+		} catch (NoServiceProviderFound e) {
+		}
+	}
+	
+	
+	@Test
+	public void throwsServiceBindErrorWhenBindingADiscoveredServiceFails() throws Exception {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(PingApiProviderUsingConfigLookup.class);
+		astrixConfigurer.registerPlugin(ServiceComponent.class, new FakeComponent());
+		astrixConfigurer.set("pingUri", "direct:-21"); // DirectComponent will not find the associated provider (since it does not exist)
+		astrixContext = astrixConfigurer.configure();
+		try {
+			astrixContext.waitForBean(Ping.class, 1).ping("foo");
+		} catch (ServiceBindError e) {
+		}
+	}
+	
 	private <T extends Exception> void assertEventuallyThrows(Supplier<?> invocation, Matcher<T> returnValueMatcher) throws InterruptedException {
 		new Poller(1000, 1).check(AstrixTestUtil.serviceInvocationException(invocation, returnValueMatcher));
 	}
