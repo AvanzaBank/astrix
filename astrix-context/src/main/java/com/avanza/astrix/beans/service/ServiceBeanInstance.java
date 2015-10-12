@@ -236,7 +236,6 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 			if (!isBound()) {
 				if (!boundCondition.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
 					this.currentState.verifyBound(); // Let current state throw exception describing cause
-//					throw new ServiceUnavailableException("Service bean was not bound before timeout. bean=" + beanKey);
 				}
 			}
 		} finally {

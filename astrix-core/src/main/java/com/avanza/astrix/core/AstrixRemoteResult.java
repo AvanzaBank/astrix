@@ -64,6 +64,11 @@ public abstract class AstrixRemoteResult<T> {
 			return Objects.hash(exception, correlationId);
 		}
 		
+		@Override
+		public Exception getThrownException() {
+			return this.exception;
+		}
+		
 	}
 	
 	private static class SuccessfulResult<T> extends AstrixRemoteResult<T> {
@@ -102,6 +107,11 @@ public abstract class AstrixRemoteResult<T> {
 		public int hashCode() {
 			return Objects.hash(result);
 		}
+		
+		@Override
+		public Exception getThrownException() {
+			return null;
+		}
 	}
 	
 	private static class ServiceUnavailableResult<T> extends AstrixRemoteResult<T> {
@@ -115,7 +125,7 @@ public abstract class AstrixRemoteResult<T> {
 		}
 
 		public T getResult() {
-			throw new ServiceUnavailableException(msg + " correlationId=" + correlationId);
+			throw getThrownException();
 		}
 		
 		public boolean hasThrownException() {
@@ -143,6 +153,11 @@ public abstract class AstrixRemoteResult<T> {
 		public int hashCode() {
 			return Objects.hash(msg, correlationId);
 		}
+		
+		@Override
+		public ServiceUnavailableException getThrownException() {
+			return new ServiceUnavailableException(msg + " correlationId=" + correlationId);
+		}
 	}
 	
 	private AstrixRemoteResult() {
@@ -164,8 +179,24 @@ public abstract class AstrixRemoteResult<T> {
 		return new ServiceUnavailableResult<T>(msg, correlationId);
 	}
 	
+	/**
+	 * Returns the result from the underlying service invocation.
+	 * 
+	 * @throws Exception - If the underlying service invocation threw an exception. 
+	 * 
+	 * @return
+	 */
 	public abstract T getResult();
 
+	/**
+	 * 
+	 * @return
+	 */
 	public abstract boolean hasThrownException();
+	
+	/**
+	 * @return The exception if the underlying service invocation threw an exception.   
+	 */
+	public abstract Exception getThrownException();
 
 }

@@ -345,6 +345,7 @@ public class ServiceBeanInstanceTest {
 
 		try {
 			astrixContext.waitForBean(Ping.class, 1).ping("foo");
+			fail("Expected ServiceDiscoveryError");
 		} catch (ServiceDiscoveryError e) {
 			assertThat("Root cause for ServiceDiscoveryError", e.getCause(), CoreMatchers.instanceOf(NoServiceProviderFound.class));
 		}
@@ -359,6 +360,7 @@ public class ServiceBeanInstanceTest {
 		astrixContext = astrixConfigurer.configure();
 		try {
 			astrixContext.waitForBean(Ping.class, 1).ping("foo");
+			fail("Expected NoServiceProviderFound");
 		} catch (NoServiceProviderFound e) {
 		}
 	}
@@ -373,6 +375,7 @@ public class ServiceBeanInstanceTest {
 		astrixContext = astrixConfigurer.configure();
 		try {
 			astrixContext.waitForBean(Ping.class, 1).ping("foo");
+			fail("Expected ServiceBindError");
 		} catch (ServiceBindError e) {
 		}
 	}
