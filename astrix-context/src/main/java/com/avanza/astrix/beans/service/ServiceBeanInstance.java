@@ -85,7 +85,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		this.serviceDefinition = Objects.requireNonNull(serviceDefinition);
 		this.beanKey = Objects.requireNonNull(beanKey);
 		this.serviceComponents = Objects.requireNonNull(serviceComponents);
-		this.currentState = new Unbound();
+		this.currentState = new Unbound(ServiceUnavailableException.class, "No bind attempt run yet");
 	}
 	
 	public static <T> ServiceBeanInstance<T> create(ServiceDefinition<T> serviceDefinition, 
@@ -104,9 +104,13 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	public void renewLease() {
 		beanStateLock.lock();
 		try {
-			ServiceProperties serviceProperties = serviceDiscovery.run();
-			if (serviceHasChanged(serviceProperties)) {
-				bind(serviceProperties);
+			ServiceDiscoveryResult serviceDiscoveryResult = runServiceDiscovery();
+			if (!serviceDiscoveryResult.isSuccessful()) {
+				log.warn(String.format("Failed to renew lease, service discovery failure. bean=%s astrixBeanId=%s", getBeanKey(), id), serviceDiscoveryResult.getError());
+				return;
+			}
+			if (serviceHasChanged(serviceDiscoveryResult.getResult())) {
+				bind(serviceDiscoveryResult.getResult());
 			} else {
 				log.debug("Service properties have not changed. No need to bind bean=" + getBeanKey());
 			}
@@ -127,20 +131,67 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 			if (isBound()) {
 				return;
 			}
-			ServiceProperties serviceProperties = serviceDiscovery.run();
-			if (serviceProperties == null) {
+			ServiceDiscoveryResult serviceDiscoveryResult = runServiceDiscovery();
+			if (!serviceDiscoveryResult.isSuccessful()) {
+				log.warn(String.format("Service discovery failure. bean=%s astrixBeanId=%s", getBeanKey(), id), serviceDiscoveryResult.getError());
+				currentState.setState(new Unbound(ServiceDiscoveryError.class, "An error occured during last service discovery attempt, see cause for details.", serviceDiscoveryResult.getError()));
+				return;
+				
+			}
+			if (serviceDiscoveryResult.getResult() == null) {
 				log.info(String.format(
-					"Failed to discover service using %s. bean=%s astrixBeanId=%s", 
+					"Did not discover a service provider using %s. bean=%s astrixBeanId=%s", 
 						serviceDiscovery.description(), getBeanKey(), id));
+				currentState.setState(new Unbound(NoServiceProviderFound.class, "Did not discover a service provider for " + getBeanKey().getBeanType().getSimpleName() + " on last service discovery attempt. discoveryStrategy=" + serviceDiscovery.description()));
 				return;
 			}
-			bind(serviceProperties);
+			bind(serviceDiscoveryResult.getResult());
 		} catch (Exception e) {
 			log.warn(String.format("Failed to bind service bean. bean=%s astrixBeanId=%s", getBeanKey(), id), e);
 		} finally {
 			beanStateLock.unlock();
 		}
 	}
+	
+	private ServiceDiscoveryResult runServiceDiscovery() {
+		try {
+			return ServiceDiscoveryResult.successful(serviceDiscovery.run());
+		} catch (Exception e) {
+			return ServiceDiscoveryResult.failure(e);
+		}
+	}
+	
+	static class ServiceDiscoveryResult {
+		final ServiceProperties serviceProperties;
+		final Exception discoveryError;
+		
+		ServiceDiscoveryResult(ServiceProperties serviceProperties, Exception discoveryError) {
+			this.serviceProperties = serviceProperties;
+			this.discoveryError = discoveryError;
+		}
+
+		static ServiceDiscoveryResult failure(Exception e) {
+			return new ServiceDiscoveryResult(null, e);
+		}
+		
+		static ServiceDiscoveryResult successful(ServiceProperties serviceProperties) {
+			return new ServiceDiscoveryResult(serviceProperties, null);
+		}
+		
+		boolean isSuccessful() {
+			return discoveryError == null;
+		}
+		
+		public ServiceProperties getResult() {
+			return serviceProperties;
+		}
+		
+		public Exception getError() {
+			return discoveryError;
+		}
+		
+	}
+	
 	
 	/**
 	 * Attempts to bind this bean with the latest serviceProperties, or null if serviceLookup
@@ -232,7 +283,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 
 		protected void bindTo(ServiceProperties serviceProperties) {
 			if (serviceProperties == null) {
-				transitionToUnboundState();
+				setState(new Unbound(NoServiceProviderFound.class, "No service provider found"));
 				return;
 			}
 			String providerSubsystem = serviceProperties.getProperty(ServiceProperties.SUBSYSTEM);
@@ -252,17 +303,10 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 				setState(new IllegalServiceMetadataState(e.getMessage()));
 			} catch (Exception e) {
 				log.warn(String.format("Failed to bind service bean: %s", getBeanKey()), e);
-				setState(new Unbound());
+				setState(new Unbound(ServiceBindError.class, "Failed to bind " + getBeanKey().getBeanType().getSimpleName() + " using serviceProperties=" + serviceProperties +  ", see cause for details.", e));
 			}
 		}
 
-		protected final void transitionToUnboundState() {
-			if (currentState.getClass().equals(Unbound.class)) {
-				return;
-			}
-			setState(new Unbound());
-		}
-		
 		protected final void setState(BeanState newState) {
 			if (!currentState.getClass().equals(newState.getClass())) {
 				log.info(String.format("Service bean entering new state. newState=%s bean=%s id=%s", newState.name(), beanKey, id));
@@ -311,21 +355,37 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	}
 	
 	private class Unbound extends BeanState {
-
+		
+		private final Class<? extends ServiceUnavailableException> exceptionFactory;
+		private final String message;
+		private final Exception discoveryFailure;
+		
+		public Unbound(Class<? extends ServiceUnavailableException> exceptionFactory, String message) {
+			this(exceptionFactory, message, null);
+		}
+		
+		public Unbound(Class<? extends ServiceUnavailableException> exceptionFactory, String message, Exception discoveryFailureCause) {
+			this.exceptionFactory = exceptionFactory;
+			this.discoveryFailure = discoveryFailureCause;
+			this.message = message;
+		}
+		
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			throw new ServiceUnavailableException("astrixBeanId=" + id + " bean="+ beanKey);
+			ServiceUnavailableException exception = exceptionFactory.getConstructor(String.class).newInstance(message + " astrixBeanId=" + id + " bean=" + beanKey);
+			if (discoveryFailure != null) {
+				exception.initCause(discoveryFailure);
+			}
+			throw exception;
 		}
 		
 		@Override
 		protected void releaseInstance() {
 		}
-		
 		@Override
 		protected String name() {
 			return "Unbound";
 		}
-		
 	}
 	
 	private class IllegalServiceMetadataState extends BeanState {

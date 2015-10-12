@@ -30,7 +30,7 @@ public class MissingBeanProviderException extends RuntimeException {
 	private AstrixBeanKey<? extends Object> beanType;
 	
 	public MissingBeanProviderException(AstrixBeanKey<? extends Object> beanType) {
-		super(String.format("No provider found for bean: %s. Do you have an ApiProvider on the classpath that exports the given bean?", beanType));
+		super(String.format("No provider found\n bean: %s \n Do you have an ApiProvider on the classpath that exports the given bean?", beanType));
 		this.beanType = beanType;
 	}
 	

@@ -29,7 +29,7 @@ import com.avanza.astrix.modules.ObjectCache;
  */
 final class AstrixBeanFactory implements BeanFactory {
 	
-	private final SimpleAstrixFactoryBeanRegistry registry = new SimpleAstrixFactoryBeanRegistry();
+	private final AstrixFactoryBeanRegistry registry = new AstrixFactoryBeanRegistry();
 	private final ObjectCache beanInstanceCache = new ObjectCache();
 	
 	@Override

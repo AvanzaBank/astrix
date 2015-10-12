@@ -27,7 +27,7 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
  * @author Elias Lindholm (elilin)
  *
  */
-final class SimpleAstrixFactoryBeanRegistry {
+final class AstrixFactoryBeanRegistry {
 	
 	private final ConcurrentMap<AstrixBeanKey<?>, StandardFactoryBean<?>> factoryByBeanKey = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Class<?>, DynamicFactoryBean<?>> dynamicFactoryByBeanType = new ConcurrentHashMap<>();

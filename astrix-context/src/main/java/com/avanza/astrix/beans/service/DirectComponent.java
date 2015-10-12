@@ -64,7 +64,7 @@ public class DirectComponent implements ServiceComponent {
 		String providerId = serviceProperties.getProperty("providerId");
 		ServiceProvider<?> serviceProvider = providerById.get(providerId);
 		if (serviceProvider == null) {
-			throw new IllegalStateException("Cant find provider for with id="  + providerId + " and type=" + serviceDefinition.getServiceType());
+			throw new IllegalStateException("No service provider is registered in the DirectComponent with the given serviceUri. id="  + providerId + ", type=" + serviceDefinition.getServiceType());
 		}
 		Object targetProvider = serviceProvider.getProvider(objectSerializerFactory, serviceDefinition.getObjectSerializerDefinition());
 		T provider;

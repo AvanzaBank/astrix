@@ -103,7 +103,7 @@ class ServiceExporterImpl implements ServiceExporter {
 			throw new IllegalStateException(String.format(
 					"Couldn't find service provider (@AstrixServiceExport annotated bean) for " +
 					"services exported by service descriptor. Missing provider for: %s. Verify that " +
-					"current application-context defines a bean providing the given service that is annotated with @AstrixServiceExport",
+					"current ApplicationContext defines a bean providing the given service that is annotated with @AstrixServiceExport",
 					serviceBeanDefintion.getBeanType().getName()));
 		}
 		return provider;

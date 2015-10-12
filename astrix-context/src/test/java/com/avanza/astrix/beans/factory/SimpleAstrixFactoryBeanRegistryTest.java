@@ -25,7 +25,7 @@ public class SimpleAstrixFactoryBeanRegistryTest {
 	
 	@Test
 	public void synthesizesFactoryBeanUsingDynamicFactoryBean() throws Exception {
-		SimpleAstrixFactoryBeanRegistry registry = new SimpleAstrixFactoryBeanRegistry();
+		AstrixFactoryBeanRegistry registry = new AstrixFactoryBeanRegistry();
 		registry.registerFactory(new DynamicFactoryBean<Ping>() {
 			@Override
 			public Ping create(AstrixBeanKey<Ping> astrixBeanKey) {
