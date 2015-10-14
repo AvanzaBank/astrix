@@ -42,12 +42,14 @@ public class NettyRemotingTransport implements RemotingTransportSpi {
 
 	@Override
 	public Observable<List<AstrixServiceInvocationResponse>> submitRoutedRequests(Collection<RoutedServiceInvocationRequest> requests) {
-		throw new UnsupportedOperationException();
+		Observable<AstrixServiceInvocationResponse> result = submitRoutedRequest(requests.iterator().next().getRequest(), null);
+		return result.toList();
 	}
 
 	@Override
 	public Observable<List<AstrixServiceInvocationResponse>> submitBroadcastRequest(AstrixServiceInvocationRequest request) {
-		throw new UnsupportedOperationException(); 
+		Observable<AstrixServiceInvocationResponse> result = submitRoutedRequest(request, null);
+		return result.toList();
 	}
 
 	@Override
