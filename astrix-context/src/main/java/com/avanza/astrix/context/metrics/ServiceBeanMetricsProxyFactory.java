@@ -17,11 +17,11 @@ package com.avanza.astrix.context.metrics;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.BeanConfigurations;
-import com.avanza.astrix.beans.factory.BeanProxy;
 import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
+import com.avanza.astrix.context.core.BeanProxy;
 
 public class ServiceBeanMetricsProxyFactory implements ServiceBeanProxyFactory {
 

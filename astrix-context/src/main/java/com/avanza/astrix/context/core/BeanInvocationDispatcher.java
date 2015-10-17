@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import com.avanza.astrix.beans.factory.BeanProxy;
 import com.avanza.astrix.core.function.CheckedCommand;
 import com.avanza.astrix.core.util.ReflectionUtil;
 

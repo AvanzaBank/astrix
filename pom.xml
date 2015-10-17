@@ -599,7 +599,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
 					<failOnError>false</failOnError>
-					<excludePackageNames>lunch*:se*:tutorial*:runners*</excludePackageNames>
+					<excludePackageNames>lunch*:se*:tutorial*:runners*:com.avanza.astrix.integration.tests*</excludePackageNames>
 					<aggregate>true</aggregate>
 					<show>public</show>
 					<nohelp>true</nohelp>

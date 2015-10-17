@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.beans.service;
 
-import com.avanza.astrix.beans.factory.BeanProxy;
+import com.avanza.astrix.context.core.BeanProxy;
 
 public interface ServiceBeanProxyFactory {
 	BeanProxy create(ServiceDefinition<?> serviceDefinition, ServiceComponent serviceComponent);

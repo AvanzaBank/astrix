@@ -15,8 +15,8 @@
  */
 package com.avanza.astrix.beans.ft;
 
-import com.avanza.astrix.beans.factory.BeanProxy;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
+import com.avanza.astrix.context.core.BeanProxy;
 
 public interface BeanFaultToleranceFactory {
 
