@@ -39,14 +39,6 @@ com.avanza.astrix.service.registry.util
 com.avanza.astrix.metrics
 com.avanza.astrix.service.registry.pu
 com.avanza.astrix.gs.test.util
-com.avanza.astrix.integration.tests.common
-com.avanza.astrix.integration.tests.domain.api
-com.avanza.astrix.integration.tests.domain.apiruntime.feeder
-com.avanza.astrix.integration.tests.domain.apiruntime
-com.avanza.astrix.integration.tests.domain.pu
-com.avanza.astrix.integration.tests.domain2.api
-com.avanza.astrix.integration.tests.domain2.apiruntime
-com.avanza.astrix.integration.tests.domain2.pu
 com.avanza.astrix.http
 com.avanza.astrix.netty.client
 com.avanza.astrix.netty
