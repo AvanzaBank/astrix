@@ -18,8 +18,8 @@ package com.avanza.astrix.remoting.client;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.context.AstrixContextPlugin;
-import com.avanza.astrix.context.core.ReactiveTypeConverter;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
 

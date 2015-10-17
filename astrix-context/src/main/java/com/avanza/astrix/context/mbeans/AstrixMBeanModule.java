@@ -13,24 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.core;
+package com.avanza.astrix.context.mbeans;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 
-public class AstrixContextCoreModule implements Module {
+public class AstrixMBeanModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(AstrixMBeanExporter.class, AstrixMBeanExporterImpl.class);
-		moduleContext.bind(ReactiveTypeConverter.class, ReactiveTypeConverterImpl.class);
 		
 		moduleContext.importType(AstrixConfig.class);
-		moduleContext.importType(ReactiveTypeHandlerPlugin.class);
 		
 		moduleContext.export(AstrixMBeanExporter.class);
-		moduleContext.export(ReactiveTypeConverter.class);
 	}
 
 }

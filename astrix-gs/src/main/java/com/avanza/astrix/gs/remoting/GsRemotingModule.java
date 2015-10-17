@@ -17,11 +17,11 @@ package com.avanza.astrix.gs.remoting;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
-import com.avanza.astrix.context.core.ReactiveTypeConverter;
 import com.avanza.astrix.gs.ClusteredProxyCache;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;

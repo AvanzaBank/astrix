@@ -13,9 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.core;
+package com.avanza.astrix.context.mbeans;
 
-public interface ReactiveExecutionListener {
-	void onError(Throwable t);
-	void onResult(Object result);
+import javax.management.ObjectName;
+
+public interface AstrixMBeanExporter {
+
+	void registerMBean(Object mbean, String folder, String name);
+
+	ObjectName getObjectName(String subDomain, String name);
+	
+	boolean exportMBeans();
+	
 }

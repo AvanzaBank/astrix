@@ -19,7 +19,7 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
-import com.avanza.astrix.context.core.AstrixMBeanExporter;
+import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
 import com.avanza.astrix.context.metrics.MetricsSpi;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.modules.StrategyContext;

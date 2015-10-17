@@ -18,13 +18,13 @@ package com.avanza.astrix.beans.api;
 import java.util.Arrays;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.BeanInvocationDispatcher;
+import com.avanza.astrix.beans.core.BeanProxy;
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.factory.AstrixBeans;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-import com.avanza.astrix.context.core.ReactiveTypeConverter;
-import com.avanza.astrix.context.core.BeanInvocationDispatcher;
-import com.avanza.astrix.context.core.BeanProxy;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
 final class AstrixFtProxiedFactory<T> implements StandardFactoryBean<T> {

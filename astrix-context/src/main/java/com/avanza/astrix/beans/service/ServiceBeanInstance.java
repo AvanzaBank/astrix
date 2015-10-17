@@ -32,8 +32,8 @@ import com.avanza.astrix.beans.config.BeanConfiguration;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.core.BeanInvocationDispatcher;
 import com.avanza.astrix.config.DynamicBooleanProperty;
-import com.avanza.astrix.context.core.BeanInvocationDispatcher;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
 

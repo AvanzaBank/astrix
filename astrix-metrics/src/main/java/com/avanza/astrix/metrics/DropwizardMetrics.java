@@ -24,7 +24,7 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.context.core.AstrixMBeanExporter;
+import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
 import com.avanza.astrix.context.metrics.MetricsSpi;
 import com.avanza.astrix.core.function.CheckedCommand;
 import com.codahale.metrics.JmxReporter;

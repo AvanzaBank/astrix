@@ -28,10 +28,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.avanza.astrix.context.core.ReactiveExecutionListener;
-import com.avanza.astrix.context.core.ReactiveTypeConverter;
-import com.avanza.astrix.context.core.ReactiveTypeConverterImpl;
-import com.avanza.astrix.context.core.ReactiveTypeHandlerPlugin;
+import com.avanza.astrix.beans.core.ReactiveExecutionListener;
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
+import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
+import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
 
 import rx.Observable;
 import rx.Subscriber;

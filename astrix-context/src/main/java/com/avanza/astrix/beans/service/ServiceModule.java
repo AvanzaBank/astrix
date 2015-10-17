@@ -17,8 +17,8 @@ package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.BeanConfigurations;
-import com.avanza.astrix.context.core.AstrixMBeanExporter;
-import com.avanza.astrix.context.core.ReactiveTypeConverter;
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
+import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;

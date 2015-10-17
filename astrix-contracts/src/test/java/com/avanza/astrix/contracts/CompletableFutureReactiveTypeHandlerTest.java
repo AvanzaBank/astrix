@@ -17,8 +17,8 @@ package com.avanza.astrix.contracts;
 
 import java.util.concurrent.CompletableFuture;
 
-import com.avanza.astrix.context.core.CompletableFutureTypeHandlerPlugin;
-import com.avanza.astrix.context.core.ReactiveTypeHandlerPlugin;
+import com.avanza.astrix.beans.core.CompletableFutureTypeHandlerPlugin;
+import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
 
 public class CompletableFutureReactiveTypeHandlerTest extends ReactiveTypeHandlerContract<CompletableFuture<Object>> {
 	@Override

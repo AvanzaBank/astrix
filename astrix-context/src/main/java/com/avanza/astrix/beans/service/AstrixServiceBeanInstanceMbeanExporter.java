@@ -18,7 +18,7 @@ package com.avanza.astrix.beans.service;
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.BeanConfiguration;
 import com.avanza.astrix.beans.config.BeanConfigurations;
-import com.avanza.astrix.context.core.AstrixMBeanExporter;
+import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
 
 public class AstrixServiceBeanInstanceMbeanExporter {
 

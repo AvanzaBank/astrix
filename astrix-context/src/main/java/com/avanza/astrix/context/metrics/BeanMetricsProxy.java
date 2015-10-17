@@ -21,9 +21,9 @@ import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.core.BeanProxy;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.config.DynamicBooleanProperty;
-import com.avanza.astrix.context.core.BeanProxy;
 import com.avanza.astrix.core.function.CheckedCommand;
 
 import rx.Observable;

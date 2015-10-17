@@ -22,13 +22,13 @@ import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.BeanConfiguration;
 import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
+import com.avanza.astrix.beans.core.BeanProxy;
 import com.avanza.astrix.beans.ft.FaultToleranceConfigurator.FtProxySetting;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
-import com.avanza.astrix.context.core.BeanProxy;
 /**
  * 
  * @author Elias Lindholm

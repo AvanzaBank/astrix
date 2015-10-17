@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.ft;
+package com.avanza.astrix.beans.core;
 
-import com.avanza.astrix.beans.core.BeanProxy;
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-
-public interface BeanFaultToleranceFactory {
-
-	BeanProxy createFaultToleranceProxy(PublishedAstrixBean<?> serviceDefinition);
-
+public interface ReactiveExecutionListener {
+	void onError(Throwable t);
+	void onResult(Object result);
 }

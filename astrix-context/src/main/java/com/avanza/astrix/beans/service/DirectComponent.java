@@ -27,7 +27,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.context.core.ReactiveTypeConverter;
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;

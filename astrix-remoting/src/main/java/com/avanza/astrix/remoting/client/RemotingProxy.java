@@ -28,7 +28,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.avanza.astrix.context.core.ReactiveTypeConverter;
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.remoting.RoutingStrategy;
 import com.avanza.astrix.core.util.ReflectionUtil;

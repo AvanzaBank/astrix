@@ -20,9 +20,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.avanza.astrix.context.core.ReactiveTypeConverter;
-import com.avanza.astrix.context.core.BeanInvocationDispatcher;
-import com.avanza.astrix.context.core.BeanProxy;
+import com.avanza.astrix.beans.core.BeanInvocationDispatcher;
+import com.avanza.astrix.beans.core.BeanProxy;
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 
 final class ServiceBeanProxyInvocationDispatcherFactory {
 	

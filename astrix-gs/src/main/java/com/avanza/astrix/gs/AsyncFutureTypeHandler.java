@@ -21,8 +21,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.avanza.astrix.context.core.ReactiveExecutionListener;
-import com.avanza.astrix.context.core.ReactiveTypeHandlerPlugin;
+import com.avanza.astrix.beans.core.ReactiveExecutionListener;
+import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
 import com.gigaspaces.async.AsyncFuture;
 import com.gigaspaces.async.AsyncFutureListener;
 import com.gigaspaces.async.internal.DefaultAsyncResult;

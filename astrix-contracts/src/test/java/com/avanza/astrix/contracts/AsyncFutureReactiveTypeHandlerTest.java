@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.contracts;
 
-import com.avanza.astrix.context.core.ReactiveTypeHandlerPlugin;
+import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
 import com.avanza.astrix.gs.AsyncFutureTypeHandler;
 import com.gigaspaces.async.AsyncFuture;
 

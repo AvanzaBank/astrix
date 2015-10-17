@@ -17,7 +17,7 @@ package com.avanza.astrix.context;
 
 import java.util.Collections;
 
-import com.avanza.astrix.context.core.ReactiveTypeConverterImpl;
+import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;

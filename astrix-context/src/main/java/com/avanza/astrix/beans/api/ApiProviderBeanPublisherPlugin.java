@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
@@ -35,7 +36,6 @@ import com.avanza.astrix.beans.publish.ServiceBeanDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinitionSource;
 import com.avanza.astrix.beans.service.ServiceDiscoveryDefinition;
-import com.avanza.astrix.context.core.ReactiveTypeConverter;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.modules.ObjectCache;
 import com.avanza.astrix.provider.core.AstrixApiProvider;

@@ -40,10 +40,10 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
+import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
+import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
 import com.avanza.astrix.context.JavaSerializationSerializer;
-import com.avanza.astrix.context.core.ReactiveTypeConverter;
-import com.avanza.astrix.context.core.ReactiveTypeConverterImpl;
-import com.avanza.astrix.context.core.ReactiveTypeHandlerPlugin;
 import com.avanza.astrix.context.metrics.Metrics;
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixPartitionedRouting;

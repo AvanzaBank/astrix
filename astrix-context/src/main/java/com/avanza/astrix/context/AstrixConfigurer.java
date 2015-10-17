@@ -38,6 +38,7 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.BooleanBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.IntBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.LongBeanSetting;
+import com.avanza.astrix.beans.core.AstrixBeansCoreModule;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.BeanFactoryModule;
@@ -61,7 +62,7 @@ import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.SystemPropertiesConfigSource;
-import com.avanza.astrix.context.core.AstrixContextCoreModule;
+import com.avanza.astrix.context.mbeans.AstrixMBeanModule;
 import com.avanza.astrix.context.metrics.DefaultMetricSpi;
 import com.avanza.astrix.context.metrics.MetricsModule;
 import com.avanza.astrix.context.metrics.MetricsSpi;
@@ -133,8 +134,9 @@ public class AstrixConfigurer {
 		
 		modulesConfigurer.register(new AstrixConfigModule(config, this.settings));
 		modulesConfigurer.register(new DirectComponentModule());
+		modulesConfigurer.register(new AstrixBeansCoreModule());
 		modulesConfigurer.register(new MetricsModule());
-		modulesConfigurer.register(new AstrixContextCoreModule());
+		modulesConfigurer.register(new AstrixMBeanModule());
 		modulesConfigurer.register(new ServiceRegistryDiscoveryModule());
 		modulesConfigurer.register(new ConfigDiscoveryModule());
 		modulesConfigurer.register(new BeansPublishModule());
