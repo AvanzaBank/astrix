@@ -69,5 +69,5 @@ The Astrix Framework is released under version 2.0 of the [Apache License](http:
 [travis]:https://travis-ci.org/AvanzaBank/astrix
 [travis img]:https://api.travis-ci.org/AvanzaBank/astrix.svg
 
-[license]:LICENSE.txt
+[license]:LICENSE
 [license img]:https://img.shields.io/badge/License-Apache%202-blue.svg
