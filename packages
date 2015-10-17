@@ -23,7 +23,7 @@ com.avanza.astrix.beans.registry
 com.avanza.astrix.beans.service
 com.avanza.astrix.beans.util
 com.avanza.astrix.context
-com.avanza.astrix.context.core
+com.avanza.astrix.context.mbeans
 com.avanza.astrix.context.metrics
 com.avanza.astrix.serviceunit
 com.avanza.astrix.spring
