@@ -1,4 +1,7 @@
 # Astrix Framework
+[![][travis img]][travis]
+[![][license img]][license]
+
 Astrix is a Java framework designed to simplify development and maintenance of microservices. At Avanza we use Astrix to run around hundered microservices collaborating to provide the services required by the backend applications for the Avanza web site and our mobile applications.
 
 Astrix is used by service consumers to:
@@ -61,3 +64,10 @@ The Astrix Framework has bean under rapid development for almost a year by now. 
 
 ## License
 The Astrix Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+
+
+[travis]:https://travis-ci.org/AvanzaBank/astrix
+[travis img]:https://api.travis-ci.org/AvanzaBank/astrix.svg
+
+[license]:LICENSE.txt
+[license img]:https://img.shields.io/badge/License-Apache%202-blue.svg
