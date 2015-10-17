@@ -1,6 +1,9 @@
 # Astrix Framework
 [![][travis img]][travis]
 [![][license img]][license]
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/AvanzaBank/Astrix.svg)](http://isitmaintained.com/project/AvanzaBank/Astrix "Average time to resolve an issue")
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/AvanzaBank/Astrix.svg)](http://isitmaintained.com/project/AvanzaBank/Astrix "Percentage of issues still open")
+
 
 Astrix is a Java framework designed to simplify development and maintenance of microservices. At Avanza we use Astrix to run around hundered microservices collaborating to provide the services required by the backend applications for the Avanza web site and our mobile applications.
 
