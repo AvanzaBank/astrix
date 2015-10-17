@@ -20,18 +20,19 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDiscovery;
-import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
+import com.avanza.astrix.beans.service.ServiceDiscoveryFactoryPlugin;
 import com.avanza.astrix.beans.service.ServiceProperties;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactoryPlugin<ConfigDiscoveryProperties> {
-	
+public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryFactoryPlugin<ConfigDiscoveryProperties> {
+
 	private ServiceComponentRegistry serviceComponents;
 	private AstrixConfig config;
-	
+
 	public ConfigServiceDiscoveryPlugin(ServiceComponentRegistry serviceComponents, AstrixConfig config) {
 		this.serviceComponents = serviceComponents;
 		this.config = config;
@@ -41,7 +42,7 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactory
 	public ServiceDiscovery create(AstrixBeanKey<?> key, ConfigDiscoveryProperties configDiscoveryProperties) {
 		return new ConfigDiscovery(serviceComponents, config, configDiscoveryProperties.getConfigEntryName(), key);
 	}
-	
+
 	@Override
 	public Class<ConfigDiscoveryProperties> getDiscoveryPropertiesType() {
 		return ConfigDiscoveryProperties.class;
@@ -53,10 +54,9 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactory
 		private AstrixConfig config;
 		private String configEntryName;
 		private AstrixBeanKey<?> beanKey;
-		
-		
-		public ConfigDiscovery(ServiceComponentRegistry serviceComponents,
-				AstrixConfig config, String configEntryName, AstrixBeanKey<?> beanKey) {
+
+		public ConfigDiscovery(ServiceComponentRegistry serviceComponents, AstrixConfig config, String configEntryName,
+				AstrixBeanKey<?> beanKey) {
 			this.serviceComponents = serviceComponents;
 			this.config = config;
 			this.configEntryName = configEntryName;
@@ -71,18 +71,20 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactory
 			}
 			return buildServiceProperties(serviceUri);
 		}
-		
+
 		@Override
 		public String description() {
 			return "ConfigDiscovery[" + configEntryName + "]";
 		}
-		
-		// A serviceUri has the format [component-name:service-provider-properties]
+
+		// A serviceUri has the format
+		// [component-name:service-provider-properties]
 		// Example: gs-remoting:jini://customer-space?groups=my-group
 		private ServiceProperties buildServiceProperties(String serviceUri) {
 			int componentNameEndIndex = serviceUri.indexOf(":");
 			if (componentNameEndIndex < 0) {
-				throw new IllegalArgumentException("Illegal serviceUri: \"" + serviceUri + "\". A serviceUri should have the form [componentName]:[componentSpecificPart]");
+				throw new IllegalArgumentException("Illegal serviceUri: \"" + serviceUri
+						+ "\". A serviceUri should have the form [componentName]:[componentSpecificPart]");
 			}
 			String component = serviceUri.substring(0, componentNameEndIndex);
 			String serviceProviderUri = serviceUri.substring(componentNameEndIndex + 1);
@@ -93,7 +95,7 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryMetaFactory
 			serviceProperties.setQualifier(this.beanKey.getQualifier());
 			return serviceProperties;
 		}
-		
+
 		private ServiceComponent getServiceComponent(String componentName) {
 			return serviceComponents.getComponent(componentName);
 		}

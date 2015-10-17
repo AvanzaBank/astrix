@@ -33,7 +33,7 @@ public class ServiceModule implements Module {
 
 		// Extension points		
 		moduleContext.importType(ServiceComponent.class);
-		moduleContext.importType(ServiceDiscoveryMetaFactoryPlugin.class);  	  
+		moduleContext.importType(ServiceDiscoveryFactoryPlugin.class);  	  
 		moduleContext.importType(ServiceBeanProxyFactory.class);
 		
 		// Dependencies

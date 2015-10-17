@@ -26,30 +26,30 @@ import java.util.concurrent.ConcurrentMap;
  */
 final class ServiceDiscoveryMetaFactoryImpl implements ServiceDiscoveryMetaFactory {
 	
-	private final ConcurrentMap<Class<?>, ServiceDiscoveryMetaFactoryPlugin<?>> discoveryStrategyByPropertiesType = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Class<?>, ServiceDiscoveryFactoryPlugin<?>> discoveryStrategyByPropertiesType = new ConcurrentHashMap<>();
 	
-	public ServiceDiscoveryMetaFactoryImpl(List<ServiceDiscoveryMetaFactoryPlugin<?>> serviceDiscoveryPlugins) {
-		for (ServiceDiscoveryMetaFactoryPlugin<?> discoveryPlugin : serviceDiscoveryPlugins) {
+	public ServiceDiscoveryMetaFactoryImpl(List<ServiceDiscoveryFactoryPlugin<?>> serviceDiscoveryPlugins) {
+		for (ServiceDiscoveryFactoryPlugin<?> discoveryPlugin : serviceDiscoveryPlugins) {
 			this.discoveryStrategyByPropertiesType.put(discoveryPlugin.getDiscoveryPropertiesType(), discoveryPlugin);
 		}
 	}
 	
 	@Override
 	public <T> ServiceDiscoveryFactory<T> createServiceDiscoveryFactory(Class<?> beanTypeToDiscovery, T discoveryProperties) {
-		ServiceDiscoveryMetaFactoryPlugin<T> servcieLookupPlugin = getServiceDiscoveryPlugin(discoveryProperties);
+		ServiceDiscoveryFactoryPlugin<T> servcieLookupPlugin = getServiceDiscoveryPlugin(discoveryProperties);
 		if (servcieLookupPlugin != null) {
 			return create(beanTypeToDiscovery, discoveryProperties, servcieLookupPlugin);
 		}
 		throw new IllegalArgumentException("Can't identify what discovery-strategy to use for discovery properties type: " + discoveryProperties.getClass().getName());
 	}
 	
-	private <T> ServiceDiscoveryFactory<T> create(Class<?> lookupBeanType, T discoveryProperties, ServiceDiscoveryMetaFactoryPlugin<T> discoveryPlugin) {
+	private <T> ServiceDiscoveryFactory<T> create(Class<?> lookupBeanType, T discoveryProperties, ServiceDiscoveryFactoryPlugin<T> discoveryPlugin) {
 		return new ServiceDiscoveryFactory<>(discoveryPlugin, discoveryProperties, lookupBeanType);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private <T> ServiceDiscoveryMetaFactoryPlugin<T> getServiceDiscoveryPlugin(T discoveryProperties) {
-		return (ServiceDiscoveryMetaFactoryPlugin<T>) discoveryStrategyByPropertiesType.get(discoveryProperties.getClass());
+	private <T> ServiceDiscoveryFactoryPlugin<T> getServiceDiscoveryPlugin(T discoveryProperties) {
+		return (ServiceDiscoveryFactoryPlugin<T>) discoveryStrategyByPropertiesType.get(discoveryProperties.getClass());
 	}
 
 }

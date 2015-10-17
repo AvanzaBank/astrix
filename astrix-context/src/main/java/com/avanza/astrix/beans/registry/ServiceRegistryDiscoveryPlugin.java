@@ -17,18 +17,18 @@ package com.avanza.astrix.beans.registry;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.service.ServiceDiscovery;
-import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactoryPlugin;
+import com.avanza.astrix.beans.service.ServiceDiscoveryFactoryPlugin;
 import com.avanza.astrix.beans.service.ServiceProperties;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class ServiceRegistryDiscoveryPluginImpl implements ServiceDiscoveryMetaFactoryPlugin<ServiceRegistryDiscoveryProperties> {
+public class ServiceRegistryDiscoveryPlugin implements ServiceDiscoveryFactoryPlugin<ServiceRegistryDiscoveryProperties> {
 	
 	private ServiceRegistryClientFactory serviceRegistryClientFactory;
 	
-	public ServiceRegistryDiscoveryPluginImpl(ServiceRegistryClientFactory serviceRegistryClientFactory) {
+	public ServiceRegistryDiscoveryPlugin(ServiceRegistryClientFactory serviceRegistryClientFactory) {
 		this.serviceRegistryClientFactory = serviceRegistryClientFactory;
 	}
 

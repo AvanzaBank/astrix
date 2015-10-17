@@ -24,11 +24,11 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
  */
 public final class ServiceDiscoveryFactory<T> {
 	
-	private final ServiceDiscoveryMetaFactoryPlugin<T> factory;
+	private final ServiceDiscoveryFactoryPlugin<T> factory;
 	private final T config;
 	private final Class<?> beanType;
 	
-	public ServiceDiscoveryFactory(ServiceDiscoveryMetaFactoryPlugin<T> factory, T annotation, Class<?> serviceBeanType) {
+	public ServiceDiscoveryFactory(ServiceDiscoveryFactoryPlugin<T> factory, T annotation, Class<?> serviceBeanType) {
 		this.factory = factory;
 		this.config = annotation;
 		this.beanType = serviceBeanType;

@@ -16,7 +16,7 @@
 package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-public interface ServiceDiscoveryMetaFactoryPlugin<T> {
+public interface ServiceDiscoveryFactoryPlugin<T> {
 	
 	ServiceDiscovery create(AstrixBeanKey<?> beanKey, T discoveryProperties); 
 	
