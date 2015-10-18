@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * {@link ConfigSource} implementation delegating all property lookup to a {@link Properties} instance. <p>
  * 
  * @author Elias Lindholm (elilin)
  *

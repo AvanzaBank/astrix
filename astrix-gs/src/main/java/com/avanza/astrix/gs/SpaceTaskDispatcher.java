@@ -31,7 +31,6 @@ import rx.Observable;
 
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicIntProperty;
-import com.avanza.astrix.config.DynamicPropertyListener;
 import com.avanza.astrix.core.util.NamedThreadFactory;
 import com.avanza.astrix.remoting.util.GsUtil;
 import com.gigaspaces.async.AsyncFuture;
@@ -72,15 +71,12 @@ public final class SpaceTaskDispatcher {
 											 TimeUnit.SECONDS,
 											 new LinkedBlockingQueue<Runnable>(),
 											 new NamedThreadFactory(String.format("SpaceTaskDispatcher[%s]", spaceInstanceName)));
-		poolSize.addListener(new DynamicPropertyListener<Integer>() {
-			@Override
-			public void propertyChanged(Integer newValue) {
-				log.info(String.format("Changing pool-size for SpaceTaskDistpatcher. space=%s newSize=%s, oldSize=%s", 
-										SpaceTaskDispatcher.this.gigaSpace.getName(), 
-										newValue, executorService.getMaximumPoolSize()));
-				executorService.setCorePoolSize(newValue);
-				executorService.setMaximumPoolSize(newValue);
-			}
+		poolSize.addListener(newValue -> {
+			log.info(String.format("Changing pool-size for SpaceTaskDistpatcher. space=%s newSize=%s, oldSize=%s", 
+									SpaceTaskDispatcher.this.gigaSpace.getName(), 
+									newValue, executorService.getMaximumPoolSize()));
+			executorService.setCorePoolSize(newValue);
+			executorService.setMaximumPoolSize(newValue);
 		});
 	}
 

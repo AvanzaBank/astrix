@@ -15,12 +15,22 @@
  */
 package com.avanza.astrix.config;
 /**
+ * The SPI used to plug in a configuration source into a {@link DynamicConfig} instance.
+ * 
+ * NOTE: Dynamic configuration sources should implement the {@link DynamicConfigSource} interface
+ * rather than this one. 
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public interface ConfigSource {
 	
+	/**
+	 * Reads a property from this ConfigSource.
+	 *  
+	 * @param propertyName - The name of the property to read
+	 * @return The value of the given property, or null if this ConfigSource does not contain a value for the tiven property
+	 */
 	String get(String propertyName);
 	
 }

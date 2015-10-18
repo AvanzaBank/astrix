@@ -18,8 +18,9 @@ package com.avanza.astrix.config;
 import java.util.Objects;
 
 /**
+ * A Setting of String type, see {@link Setting} <p>
  * 
- * @author Elias Lindholm (elilin)
+ * @author "Elias Lindholm"
  *
  */
 public class StringSetting implements Setting<String> {

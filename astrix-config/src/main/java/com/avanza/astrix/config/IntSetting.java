@@ -16,9 +16,9 @@
 package com.avanza.astrix.config;
 
 /**
+ * A Setting of int type, see {@link Setting} <p>
  * 
- * @author Elias Lindholm (elilin)
- *
+ * @author "Elias Lindholm"
  */
 public class IntSetting implements Setting<Integer> {
 	

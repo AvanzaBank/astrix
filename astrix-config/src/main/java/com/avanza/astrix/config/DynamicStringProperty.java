@@ -17,6 +17,7 @@ package com.avanza.astrix.config;
 
 
 /**
+ * DynamicProperty of String type, see {@link DynamicProperty}. <p>
  * 
  * @author Elias Lindholm (elilin)
  *

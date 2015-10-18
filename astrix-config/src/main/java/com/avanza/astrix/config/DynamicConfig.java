@@ -23,6 +23,8 @@ import java.util.List;
 import com.avanza.astrix.config.ObjectCache.ObjectFactory;
 
 /**
+ * This is an abstraction for a hierarchical set of configuration sources. Each property is resolved
+ * by querying each ConfigurationSource in turn until the property is resolved. <p>
  * 
  * @author Elias Lindholm (elilin)
  *
@@ -36,6 +38,14 @@ public final class DynamicConfig {
 		this(Arrays.asList(configSource));
 	}
 	
+	/**
+	 * Creates a {@link DynamicConfig} instance resolving configuration properties using
+	 * the defined set of {@link ConfigSource}'s (possibly {@link DynamicConfigSource}). <p>
+	 * 
+	 * @param first
+	 * @param other
+	 * @return
+	 */
 	public static DynamicConfig create(ConfigSource first, ConfigSource... other) {
 		List<ConfigSource> sources = new LinkedList<>();
 		sources.add(first);
@@ -76,6 +86,12 @@ public final class DynamicConfig {
 		
 	}
 
+	/**
+	 * Reads a property of String type.
+	 * 
+	 * @param name
+	 * @return
+	 */
 	public DynamicStringProperty getStringProperty(final String name, final String defaultValue) {
 		return this.configCache.getInstance("string." + name, new ObjectFactory<DynamicStringProperty>() {
 

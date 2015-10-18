@@ -15,12 +15,23 @@
  */
 package com.avanza.astrix.config;
 /**
+ * Listener interface for subscribing to a {@link DynamicProperty} instance.<p>
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public interface DynamicPropertyListener<T> {
 	
+	/**
+	 * Invoked each time the value of a {@link DynamicProperty} instance
+	 * changes.
+	 * 
+	 * This method will be invoked on the same thread that changes the state
+	 * of the {@link DynamicProperty}, typically some thread internal to a
+	 * {@link DynamicConfigSource} implementation.
+	 * 
+	 * @param newValue
+	 */
 	void propertyChanged(T newValue);
 
 }

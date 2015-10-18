@@ -15,6 +15,12 @@
  */
 package com.avanza.astrix.config;
 /**
+ * A property that can change state even after it is read
+ * from a {@link DynamicConfigSource}. <p>
+ * 
+ * DynamicProperty instances are designed to be lightweight with no dependencies
+ * to the underlying configuration sources, thereby keeping consumers of DynamicProperty
+ * instances decoupled from the underlying configuration sources. <p>
  * 
  * @author Elias Lindholm (elilin)
  *

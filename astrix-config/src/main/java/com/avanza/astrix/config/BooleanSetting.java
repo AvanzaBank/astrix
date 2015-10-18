@@ -17,6 +17,13 @@ package com.avanza.astrix.config;
 
 import java.util.Objects;
 
+/**
+ * A Setting of boolean type, see {@link Setting} <p>
+ * 
+ * 
+ * @author "Elias Lindholm"
+ *
+ */
 public class BooleanSetting implements Setting<Boolean> {
 	
 	private final String name;

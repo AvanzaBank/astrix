@@ -15,11 +15,13 @@
  */
 package com.avanza.astrix.config;
 /**
+ * A {@link ConfigSource} that resolves a property by reading system properties. <p>
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public class SystemPropertiesConfigSource implements ConfigSource {
+	
 	@Override
 	public String get(String propertyName) {
 		return System.getProperty(propertyName);

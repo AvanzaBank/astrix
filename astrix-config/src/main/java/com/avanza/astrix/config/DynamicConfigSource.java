@@ -15,12 +15,25 @@
  */
 package com.avanza.astrix.config;
 /**
+ * The SPI used to plug in a dynamic configuration source into a {@link DynamicConfig} instance. <p>
+ * 
+ * A dynamic configuration source allows the client to listen for updates in the underlying configuration 
+ * source.
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public interface DynamicConfigSource extends ConfigSource {
 	
+	
+	/**
+	 * Returns a configuration property from this configuration source. The {@link DynamicPropertyListener} 
+	 * will be updated about all changes to the underlying property. <p>
+	 * 
+	 * @param propertyName
+	 * @param propertyChangeListener - A listener that receives callback for each change in the underlying property value.
+	 * @return The current value of the given property, or null if no value exists right now
+	 */
 	String get(String propertyName, DynamicPropertyListener<String> propertyChangeListener);
 
 }

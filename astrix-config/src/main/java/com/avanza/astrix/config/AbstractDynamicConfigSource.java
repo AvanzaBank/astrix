@@ -15,17 +15,14 @@
  */
 package com.avanza.astrix.config;
 /**
+ * Skeleton implementation of a {@link DynamicConfigSource}. <p>
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public abstract class AbstractDynamicConfigSource implements DynamicConfigSource {
 
-	private static final DynamicPropertyListener<String> NO_LISTENER = new DynamicPropertyListener<String>() {
-		@Override
-		public void propertyChanged(String newValue) {
-		}
-	};
+	private static final DynamicPropertyListener<String> NO_LISTENER = (newValue) -> {};
 	
 	@Override
 	public String get(String propertyName) {
