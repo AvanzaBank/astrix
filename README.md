@@ -64,6 +64,7 @@ The Astrix Framework has bean under rapid development for almost a year by now. 
 
 ## Documentation
 [Wiki](https://github.com/AvanzaBank/astrix/wiki)
+
 [JavaDoc](http://avanzabank.github.io/astrix/)
 
 ## License
