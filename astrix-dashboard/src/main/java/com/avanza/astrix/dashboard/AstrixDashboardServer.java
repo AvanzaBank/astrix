@@ -28,7 +28,7 @@ public class AstrixDashboardServer {
 
 	public static void main(String[] args) {
 		System.setProperty("server.port", "9111");
-//		System.setProperty(AstrixSettings.SERVICE_REGISTRY_URI.name(), AstrixServiceComponentNames.GS_REMOTING + 
+//		System.setProperty(AstrixSettings.SERVICE_REGISTRY_URI.name(), AstrixServiceCopmonentNames.GS_REMOTING + 
 //					":jini://*/*/service-registry-space?groups=astrix-demo-apps");
 		System.setProperty(AstrixSettings.SERVICE_REGISTRY_URI.name(), "netty-remoting:localhost:12005");
 		SpringApplication.run(AstrixDashboardServer.class, args);

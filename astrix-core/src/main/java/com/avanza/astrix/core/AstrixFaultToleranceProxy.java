@@ -35,10 +35,9 @@ import java.lang.annotation.Target;
 public @interface AstrixFaultToleranceProxy {
 	/**
 	 * Command key name for the hystrix command that will protect
-	 * the target method. 
+	 * the target method.
 	 * 
-	 * @return
-	 * @Deprecated - Not read, uses bean type as command key
+	 * @deprecated - Not read, uses bean type as command key
 	 */
 	@Deprecated
 	String commandKey() default "";
@@ -47,8 +46,7 @@ public @interface AstrixFaultToleranceProxy {
 	 * Command group name for the hystrix command that will
 	 * protect the target method.
 	 * 
-	 * @return
-	 * @Deprecated - Not read, uses @AstrixApiProvider annotated class-name as group key
+	 * @deprecated - Not read, uses @AstrixApiProvider annotated class-name as group key
 	 */
 	@Deprecated
 	String groupKey() default "";
