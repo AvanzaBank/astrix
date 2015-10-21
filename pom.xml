@@ -60,11 +60,6 @@
 		</repository>
 	</repositories>
 	<distributionManagement>
-<!-- 		<repository> -->
-<!-- 			<id>aza.nexus</id> -->
-<!-- 			<layout>default</layout> -->
-<!-- 			<url>http://nexus.aza.se/content/repositories/releases</url> -->
-<!-- 		</repository> -->
 		<snapshotRepository>
 			<id>ossrh</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -95,21 +90,8 @@
 						</execution>
 					</executions>
 				</plugin>
-	
-				<!-- Plugin for deploying to the central repository -->
-				<plugin>
-					<groupId>org.sonatype.plugins</groupId>
-					<artifactId>nexus-staging-maven-plugin</artifactId>
-					<version>1.6.3</version>
-					<extensions>true</extensions>
-					<configuration>
-						<serverId>ossrh</serverId>
-						<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-						<autoReleaseAfterClose>true</autoReleaseAfterClose>
-					</configuration>
-				</plugin>
 				
-							<!-- This plugin makes sure that a source jar is always built together 
+				<!-- This plugin makes sure that a source jar is always built together 
 					with the binary jar -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -690,6 +672,19 @@
 					<skipDeletedFiles>true</skipDeletedFiles>
 					<pubScmUrl>scm:git:git@github.com:AvanzaBank/astrix.git</pubScmUrl>
 					<scmBranch>gh-pages</scmBranch> <!-- branch with static site -->
+				</configuration>
+			</plugin>
+				
+			<!-- Plugin for deploying to the central repository -->
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.3</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>false</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
 		</plugins>
