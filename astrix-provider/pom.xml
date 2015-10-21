@@ -7,11 +7,12 @@
 	</parent>
 	<artifactId>astrix-provider</artifactId>
 	<name>${project.artifactId}</name>
-	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>astrix-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
+	<distributionManagement>
+    	<relocation>
+    		<artifactId>astrix-core</artifactId>
+    		<message>
+			The content of this artifact has moved to astrix-core, thus com.avanza.astrix:astrix-provider has become obsolete.
+			</message>
+    	</relocation>
+  	</distributionManagement>
 </project>
