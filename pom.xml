@@ -59,6 +59,21 @@
 			<url>http://maven-repository.openspaces.org/</url>
 		</repository>
 	</repositories>
+	<distributionManagement>
+<!-- 		<repository> -->
+<!-- 			<id>aza.nexus</id> -->
+<!-- 			<layout>default</layout> -->
+<!-- 			<url>http://nexus.aza.se/content/repositories/releases</url> -->
+<!-- 		</repository> -->
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 	<profiles>
 		<profile>
 			<id>release</id>
@@ -134,22 +149,6 @@
 			</build>
 		</profile>
 	</profiles>
-	<distributionManagement>
-		<repository>
-			<id>aza.nexus</id>
-			<layout>default</layout>
-			<url>http://nexus.aza.se/content/repositories/releases</url>
-		</repository>
-<!-- 		<snapshotRepository> -->
-<!-- 			<id>ossrh</id> -->
-<!-- 			<url>https://oss.sonatype.org/content/repositories/snapshots</url> -->
-<!-- 		</snapshotRepository> -->
-<!-- 		<repository> -->
-<!-- 			<id>ossrh</id> -->
-<!-- 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url> -->
-<!-- 		</repository> -->
-	</distributionManagement>
-
 
 	<properties>
 		<!-- -Xdoclint:NONE ignores validation errors in javadoc -->
