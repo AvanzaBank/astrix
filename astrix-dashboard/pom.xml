@@ -6,6 +6,7 @@
 		<version>MASTER-SNAPSHOT</version>
 	</parent>
 	<artifactId>astrix-dashboard</artifactId>
+	<name>${project.artifactId}</name>
 
 	<properties>
 		<spring.boot.version>1.2.1.RELEASE</spring.boot.version>

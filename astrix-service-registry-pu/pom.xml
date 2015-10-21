@@ -6,6 +6,7 @@
 	<version>MASTER-SNAPSHOT</version>
   </parent>
   <artifactId>astrix-service-registry-pu</artifactId>
+  <name>${project.artifactId}</name>
   <dependencies>
   	<!-- TODO: use asterix-remoting for service registry???? -->
   	<dependency>

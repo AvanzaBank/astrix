@@ -1,13 +1,25 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.avanza.astrix</groupId>
-    <artifactId>astrix-parent</artifactId>
-    <version>MASTER-SNAPSHOT</version>
-  </parent>
-  <artifactId>tutorial</artifactId>
-  <packaging>pom</packaging>
-  <modules>
-  	<module>trading-api-parent</module>
-  </modules>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.avanza.astrix</groupId>
+		<artifactId>astrix-parent</artifactId>
+		<version>MASTER-SNAPSHOT</version>
+	</parent>
+	<artifactId>tutorial</artifactId>
+	<packaging>pom</packaging>
+	<modules>
+		<module>trading-api-parent</module>
+	</modules>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

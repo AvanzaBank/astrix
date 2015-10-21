@@ -6,6 +6,7 @@
 		<version>MASTER-SNAPSHOT</version>
 	</parent>
 	<artifactId>astrix-core</artifactId>
+	<name>${project.artifactId}</name>
 	<dependencies>
 	
 		<!-- Test -->
