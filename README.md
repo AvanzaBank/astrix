@@ -1,5 +1,6 @@
 # Astrix Framework
 [![][travis img]][travis]
+[![][maven img]][maven]
 [![][license img]][license]
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/AvanzaBank/Astrix.svg)](http://isitmaintained.com/project/AvanzaBank/Astrix "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/AvanzaBank/Astrix.svg)](http://isitmaintained.com/project/AvanzaBank/Astrix "Percentage of issues still open")
@@ -79,3 +80,6 @@ The Astrix Framework is released under version 2.0 of the [Apache License](http:
 
 [license]:LICENSE
 [license img]:https://img.shields.io/badge/License-Apache%202-blue.svg
+
+[maven]:http://search.maven.org/#search|gav|1|g:"com.avanza.astrix"
+[maven img]:https://maven-badges.herokuapp.com/maven-central/com.avanza.astrix/astrix-core/badge.svg
