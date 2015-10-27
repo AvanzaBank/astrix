@@ -139,22 +139,30 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 		if (!isServer()) {
 			throw new IllegalStateException("Server part not configured. Set AstrixConfigurer.setApplicationDescriptor to load server part of framework");
 		}
-		String applicationInstanceId = AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(dynamicConfig).get();
 		ServiceExporter serviceExporter = getInstance(ServiceExporter.class);
 		
+		if (AstrixSettings.SERVICE_ADMINISTRATOR_EXPORTED.getFrom(dynamicConfig).get()) {
+			exportServiceAdministrator(serviceExporter);
+		}
+		
+		serviceExporter.startPublishServices();
+	}
+
+
+	private void exportServiceAdministrator(ServiceExporter serviceExporter) {
+		String applicationInstanceId = AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(dynamicConfig).get();
 		serviceExporter.addServiceProvider(getInstance(ServiceAdministrator.class));
 		ObjectSerializerDefinition serializer = ObjectSerializerDefinition.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
 		ServiceDefinition<ServiceAdministrator> serviceDefinition = new ServiceDefinition<>(ServiceDefinitionSource.create("FrameworkServices"),
-																							AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
-																							serializer, true);
+				AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
+				serializer, 
+				true); // isDynamicQualified
 		ExportedServiceBeanDefinition<ServiceAdministrator> serviceAdminDefintion = new ExportedServiceBeanDefinition<>(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
-																			    serviceDefinition, 
-																			    true, // isVersioned  
-																			    true, // alwaysActive
-																			    AstrixSettings.SERVICE_ADMINISTRATOR_COMPONENT.getFrom(getConfig()).get());
+				serviceDefinition, 
+				true, // isVersioned  
+				true, // alwaysActive
+				AstrixSettings.SERVICE_ADMINISTRATOR_COMPONENT.getFrom(getConfig()).get());
 		serviceExporter.exportService(serviceAdminDefintion);
-		
-		serviceExporter.startPublishServices();
 	}
 
 

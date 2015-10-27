@@ -19,6 +19,7 @@ import com.avanza.astrix.config.BooleanSetting;
 import com.avanza.astrix.config.IntSetting;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.StringSetting;
+import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 /**
  * 
@@ -114,6 +115,12 @@ public final class AstrixSettings {
 	public static final StringSetting APPLICATION_TAG =  StringSetting.create("astrix.application.tag", null);
 	public static final StringSetting APPLICATION_INSTANCE_ID =  StringSetting.create("astrix.application.instanceid", null);
 	public static final BooleanSetting PUBLISH_SERVICES = BooleanSetting.create("astrix.application.publishServices", true);
+	
+	/**
+	 * Decides whether a ServiceAdministrator service should be exported from a given application. Only applies when the server part of the framework 
+	 * is loaded (by setting an "@AstrixApplication" descriptor)
+	 */
+	public static final BooleanSetting SERVICE_ADMINISTRATOR_EXPORTED = BooleanSetting.create("astrix.service.administrator.exported", true);
 
 	/**
 	 * Service component used to export ServiceAdministrator api.
