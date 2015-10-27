@@ -7,7 +7,6 @@
 <script type="text/javascript" src="script/angular.min.js"></script>
 <script type="text/javascript" src="app.js"></script>
 </head>
-
 	<body>
 		<div class="container-fluid" ng-controller="ServiceRegistryController">
 			<h1>Astrix Service Registry</h1>
@@ -15,15 +14,16 @@
 				<thead>
 					<tr>
 						<th style="width: 350px;">Provided Api</th>
-						<th style="width: 300px;">Component</th>
 						<th>Service Properties</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr ng-repeat="service in services | orderBy: 'providedApi'">
-						<td>{{service.providedApi | StringReplace: "se.avanzabank.":"" }}</td>
-						<td><pre style="max-width: 500px;">{{service.serviceMetadata | json}}</td>
-						<td><pre style="max-width: 500px;">{{service.serviceProperties | json}}</pre></td>
+						<td>{{service.providedApi}}</td>
+						<td>
+							<pre style="max-width: 500px;">{{service.serviceMetadata | json}}</pre>
+							<pre style="max-width: 500px;">{{service.serviceProperties | json}}</pre>
+						</td>
 					</tr>
 				</tbody>
 			</table>
