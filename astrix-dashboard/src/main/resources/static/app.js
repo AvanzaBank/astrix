@@ -29,7 +29,7 @@ AstrixDashboard.controller("ServiceRegistryController", ["$scope", "ServiceRegis
 	}
 	var init = function() {
 		getServices();
-		$interval(getServices, 2000);
+		$interval(getServices, 1000);
 		
 	}
 	init();

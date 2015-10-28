@@ -15,6 +15,9 @@
  */
 package com.avanza.astrix.context;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.BeanConfiguration;
 import com.avanza.astrix.beans.config.BeanConfigurations;
@@ -44,6 +47,7 @@ import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
  */
 final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	
+	private final Logger log = LoggerFactory.getLogger(AstrixContextImpl.class);
 	private final BeanFactory beanFactory;
 	private final BeanConfigurations beanConfigurations;
 	private final BeanPublisher beanPublisher;
@@ -143,6 +147,8 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 		
 		if (AstrixSettings.SERVICE_ADMINISTRATOR_EXPORTED.getFrom(dynamicConfig).get()) {
 			exportServiceAdministrator(serviceExporter);
+		} else {
+			log.info("Export of ServiceAdministrator service explicitly disabled. Won't export ServiceAdministrator service.");
 		}
 		
 		serviceExporter.startPublishServices();
@@ -153,16 +159,19 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 		String applicationInstanceId = AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(dynamicConfig).get();
 		serviceExporter.addServiceProvider(getInstance(ServiceAdministrator.class));
 		ObjectSerializerDefinition serializer = ObjectSerializerDefinition.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
+		AstrixBeanKey<ServiceAdministrator> serviceAdministratorQualifier = AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId);
 		ServiceDefinition<ServiceAdministrator> serviceDefinition = new ServiceDefinition<>(ServiceDefinitionSource.create("FrameworkServices"),
-				AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
+				serviceAdministratorQualifier, 
 				serializer, 
 				true); // isDynamicQualified
-		ExportedServiceBeanDefinition<ServiceAdministrator> serviceAdminDefintion = new ExportedServiceBeanDefinition<>(AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId), 
+		String serviceAdministratorComponent = AstrixSettings.SERVICE_ADMINISTRATOR_COMPONENT.getFrom(getConfig()).get();
+		ExportedServiceBeanDefinition<ServiceAdministrator> serviceAdminDefintion = new ExportedServiceBeanDefinition<>(serviceAdministratorQualifier, 
 				serviceDefinition, 
 				true, // isVersioned  
 				true, // alwaysActive
-				AstrixSettings.SERVICE_ADMINISTRATOR_COMPONENT.getFrom(getConfig()).get());
+				serviceAdministratorComponent);
 		serviceExporter.exportService(serviceAdminDefintion);
+		log.info("Exported ServiceAdministrator service. component={} qualifier={}", serviceAdministratorComponent, serviceAdministratorQualifier);
 	}
 
 

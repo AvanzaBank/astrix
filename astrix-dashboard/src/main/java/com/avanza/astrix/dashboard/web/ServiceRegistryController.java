@@ -16,6 +16,7 @@
 package com.avanza.astrix.dashboard.web;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -48,7 +49,16 @@ public class ServiceRegistryController {
 			ServiceData s = new ServiceData();
 			s.setProvidedApi(entry.getServiceBeanType());
 			s.setServiceMetadata(entry.getServiceMetadata());
-			s.setServiceProperties(entry.getServiceProperties());
+			Map<String, String> serviceProperties = new HashMap<>();
+			for (Map.Entry<String, String> prop : entry.getServiceProperties().entrySet()) {
+				if (prop.getKey().startsWith("_")) {
+					continue;
+				}
+				serviceProperties.put(prop.getKey(), prop.getValue());
+			}
+			serviceProperties.put(ServiceProperties.COMPONENT, 
+					entry.getServiceProperties().get(ServiceProperties.COMPONENT));
+			s.setServiceProperties(serviceProperties);
 			result.add(s);
 		}
 		return result;
