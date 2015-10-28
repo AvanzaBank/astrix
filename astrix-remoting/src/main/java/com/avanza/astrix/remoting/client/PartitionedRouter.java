@@ -18,6 +18,7 @@ package com.avanza.astrix.remoting.client;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
+import com.avanza.astrix.core.remoting.RoutingKey;
 import com.avanza.astrix.core.util.ReflectionUtil;
 
 /**
@@ -30,7 +31,7 @@ abstract class PartitionedRouter {
 	private PartitionedRouter() {
 	}
 	
-	abstract Object getRoutingKey(Object element);
+	abstract RoutingKey getRoutingKey(Object element);
 	
 	/**
 	 * Uses the given argument as routing key.<p>
@@ -47,8 +48,8 @@ abstract class PartitionedRouter {
 	
 	private static class Identity extends PartitionedRouter {
 		@Override
-		Object getRoutingKey(Object element) {
-			return element;
+		RoutingKey getRoutingKey(Object element) {
+			return RoutingKey.create(element);
 		}
 	}
 	private static class RoutingMethod extends PartitionedRouter {
@@ -57,9 +58,10 @@ abstract class PartitionedRouter {
 			this.method = Objects.requireNonNull(method);
 		}
 		@Override
-		Object getRoutingKey(Object element) {
+		RoutingKey getRoutingKey(Object element) {
 			try {
-				return ReflectionUtil.invokeMethod(method, element, null);
+				Object result = ReflectionUtil.invokeMethod(method, element, null);
+				return RoutingKey.create(result);
 			} catch (Throwable e) {
 				throw new RuntimeException("Failed to invoke routing Method on: " + element, e);
 			}

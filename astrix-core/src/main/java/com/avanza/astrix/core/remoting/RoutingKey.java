@@ -28,9 +28,20 @@ public final class RoutingKey implements Serializable {
 	private final int hash;
 
 	private RoutingKey(int hash) {
-		this.hash = hash;
+		this.hash = safeAbsoluteValue(hash);
 	}
 	
+	private static final int safeAbsoluteValue(int hashcode){
+		return hashcode == Integer.MIN_VALUE ? Integer.MAX_VALUE : Math.abs(hashcode);
+	}
+	
+	/**
+	 * Creates a RoutingKey by invoking hashCode on a given object. The
+	 * absolute value of the hashCode() will be used.
+	 * 
+	 * @param object
+	 * @return
+	 */
 	public static RoutingKey create(Object object) {
 		return new RoutingKey(object.hashCode());
 	}
@@ -39,6 +50,9 @@ public final class RoutingKey implements Serializable {
 		return new RoutingKey(hash);
 	}
 	
+	/**
+	 * Returns the hash used for routing. Never negative.
+	 */
 	@Override
 	public int hashCode() {
 		return this.hash;

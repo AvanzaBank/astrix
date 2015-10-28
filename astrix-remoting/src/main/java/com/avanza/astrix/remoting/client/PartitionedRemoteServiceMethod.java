@@ -224,8 +224,8 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		}
 
 		public void addElement(Object element) {
-			Object routingKey = router.getRoutingKey(element);
-			int targetPartition = safeAbsoluteValue(routingKey.hashCode()) % requests.length;
+			RoutingKey routingKey = router.getRoutingKey(element);
+			int targetPartition = routingKey.hashCode() % requests.length;
 			RoutedServiceInvocationRequestBuilder invocationRequestBuilderForPartition = this.requests[targetPartition];
 			if (invocationRequestBuilderForPartition == null) {
 				invocationRequestBuilderForPartition = new RoutedServiceInvocationRequestBuilder(newCollectionInstance(), targetPartition);
@@ -233,10 +233,6 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 				
 			}
 			invocationRequestBuilderForPartition.addKey(element);
-		}
-
-		private int safeAbsoluteValue(int hashcode){
-			return hashcode == Integer.MIN_VALUE ? Integer.MAX_VALUE : Math.abs(hashcode);
 		}
 
 	}
