@@ -28,6 +28,8 @@ import com.avanza.astrix.test.util.AstrixTestUtil;
 
 public class AstrixApplicationTest {
 	
+	// TODO: Convert to unit test using AstrixConfigurer?
+	
 	
 	private AnnotationConfigApplicationContext appContext;
 	

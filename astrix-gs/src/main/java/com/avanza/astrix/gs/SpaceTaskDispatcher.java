@@ -20,6 +20,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.executor.DistributedTask;
@@ -27,15 +29,17 @@ import org.openspaces.core.executor.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import rx.Observable;
-
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicIntProperty;
+import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.util.NamedThreadFactory;
 import com.avanza.astrix.remoting.util.GsUtil;
 import com.gigaspaces.async.AsyncFuture;
 import com.gigaspaces.internal.client.spaceproxy.SpaceProxyImpl;
 import com.j_spaces.core.IJSpace;
+
+import rx.Observable;
+import rx.Subscriber;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -92,31 +96,77 @@ public final class SpaceTaskDispatcher {
 		}
 		throw new IllegalStateException("Cant decide cluster topology on clustered proxy: " + this.gigaSpace.getName());
 	}
-
+	
+	/**
+	 * Creates a lazy Observable that will execute a given Task asynchronously once subscribed to.
+	 * 
+	 * @param task
+	 * @param routingKey
+	 * @return
+	 */
 	public <T extends Serializable> Observable<T> observe(final Task<T> task, final Object routingKey) {
-		// Use ExecutorService to ensure non-blocking programming model when subscribing to create
-		return Observable.create(subscriber -> executorService.execute(() -> {
-			try {
-				// Submit task on current thread in executorService
-				AsyncFuture<T> taskResult = gigaSpace.execute(task, routingKey);
-				GsUtil.subscribe(taskResult, subscriber);
-			} catch (Exception e) {
-				subscriber.onError(e);
-			}
-		}));
+		return Observable.create(subscriber -> {
+			usingErrorReporter(subscriber, serviceUnavailable()).accept(() -> {
+				// Use ExecutorService to ensure non-blocking programming model when subscribing to remote task invocation
+				executorService.execute(() -> {
+					submitRoutedTaskExecution(subscriber, task, routingKey);
+				});
+			});
+		});
 	}
 
-	public <T extends Serializable, R> Observable<R> observe(final DistributedTask<T, R> distributedTask) {
-		return Observable.create(t1 -> executorService.execute(() -> {
-			try {
-				// Submit task on current thread in executorService
-				AsyncFuture<R> taskResult = gigaSpace.execute(distributedTask);
-				GsUtil.subscribe(taskResult, t1);
-			} catch (Exception e) {
-				t1.onError(e);
-			}
-		}));
+	private <T extends Serializable> void submitRoutedTaskExecution(Subscriber<? super T> subscriber, final Task<T> task, final Object routingKey) {
+		usingErrorReporter(subscriber, serviceUnavailable()).accept(() -> {
+			// Submit task on current thread in executorService
+			AsyncFuture<T> taskResult = gigaSpace.execute(task, routingKey);
+			GsUtil.subscribe(taskResult, subscriber);
+		});
 	}
+	
+
+	/**
+	 * Creates a lazy Observable that will execute a given DistributedTask asynchronously once subscribed to.
+	 * 
+	 * @param task
+	 * @param routingKey
+	 * @return
+	 */
+	public <T extends Serializable, R> Observable<R> observe(final DistributedTask<T, R> distributedTask) {
+		return Observable.create(t1 -> {
+			usingErrorReporter(t1, serviceUnavailable()).accept(() -> {
+				executorService.execute(() -> {
+					submitDistributedTaskExecution(distributedTask, t1);
+				});
+			});
+		});
+	}
+	
+	private <R, T extends Serializable> void submitDistributedTaskExecution(final DistributedTask<T, R> distributedTask, Subscriber<? super R> t1) {
+		usingErrorReporter(t1, serviceUnavailable()).accept(() -> {
+			// Submit task on current thread in executorService
+			AsyncFuture<R> taskResult = gigaSpace.execute(distributedTask);
+			GsUtil.subscribe(taskResult, t1);
+		});
+	}
+	
+	private Consumer<Runnable> usingErrorReporter(Subscriber<?> subscriber, UnaryOperator<Exception> exceptionTranslator) {
+		return command -> {
+			try {
+				command.run();
+			} catch (Exception e) {
+				subscriber.onError(exceptionTranslator.apply(e));
+			}
+		};
+	}
+
+
+	private UnaryOperator<Exception> serviceUnavailable() {
+		return e -> new ServiceUnavailableException("Failed to submit remote invocation task", e);
+	}
+
+
+
+
 	
 	/**
 	 * Destroys the {@link SpaceTaskDispatcher} by shutting down the underlying
