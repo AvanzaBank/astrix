@@ -114,9 +114,9 @@
 						<aggregate>true</aggregate>
 						<show>public</show>
 						<nohelp>true</nohelp>
-						<header>Astrix Framework, ${project.version}</header>
-						<footer>Astrix Framework, ${project.version}</footer>
-						<doctitle>Astrix Framework, ${project.version}</doctitle>
+						<header>Astrix Framework ${project.version}</header>
+						<footer>Astrix Framework ${project.version}</footer>
+						<doctitle>Astrix Framework ${project.version}</doctitle>
 					</configuration>
 					<executions>
 						<execution>
