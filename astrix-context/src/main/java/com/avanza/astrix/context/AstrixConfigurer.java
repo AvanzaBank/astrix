@@ -383,6 +383,27 @@ public class AstrixConfigurer {
 		return this;
 	}
 	
+	/**
+	 * Sets the custom configuration sources that should be used by the AstrixContext. 
+	 * 
+	 * When set, then the given DynamicConfig instance will take precedence over all well-known configuration
+	 * sources, see list below. When this property is set, Astrix will NOT look for a {@link AstrixDynamicConfigFactory}
+	 * to create the custom configuration. If NOT set, then astrix will query all well-known configuration sources
+	 * for a AstrixDynamicConfigFactory. It one is found, than that factory will be used to create a DynamicConfig instance
+	 * for the custom configuration sources, otherwise no custom configuration sources will be used by the 
+	 * created AstrixContext (that is, only well-known configuration sources will be used). 
+	 * 
+	 * <h6>List of well-known configuration sources</h6>
+	 * <ol>
+	 * <li>System Properties</li>
+	 * <li>Programmatic configuration set on this instance</li>
+	 * <li>META-INF/astrix/settings.properties</li>
+	 * <li>default values</li>
+	 * </ol>
+	 * 
+	 * @param config custom DynamicConfig to use 
+	 * @return
+	 */
 	public AstrixConfigurer setConfig(DynamicConfig config) {
 		this.customConfig = config;
 		return this;

@@ -16,7 +16,26 @@
 package com.avanza.astrix.context;
 
 import com.avanza.astrix.config.DynamicConfig;
-
+/**
+ * Used by {@link AstrixConfigurer} to create a {@link DynamicConfig} instance with all custom configuration sources
+ * that should be used by a given AstrixContext.
+ * 
+ * A AstrixDynamicConfigFactory must have a zero-argument constructor.
+ * 
+ * This factory is located by querying all well-known configuration sources for an property named 
+ * "com.avanza.astrix.context.AstrixDynamicConfigFactory" which should point to the class-name of
+ * the desired AstrixDynamicConfigFactory to be used by the given AstrixContext, see {@link AstrixConfigurer#setConfig(DynamicConfig)}.
+ * 
+ *
+ * 
+ * @author "Elias Lindholm"
+ *
+ */
 public interface AstrixDynamicConfigFactory {
+	/**
+	 * Creates a {@link DynamicConfig} instance with all custom configuration sources.
+	 * 
+	 * @return
+	 */
 	DynamicConfig create();
 }
