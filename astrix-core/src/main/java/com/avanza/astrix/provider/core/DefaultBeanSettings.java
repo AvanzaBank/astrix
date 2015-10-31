@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * 
  * Example usage 1, in service-interface definition:
  * <pre>
- * {@literal @}DefaultBeanSettings(initialTimeout = 2000)
+ *{@literal @}DefaultBeanSettings(initialTimeout = 2000)
  * public interface TradingService {
  *    // Method definitions
  * }
@@ -37,8 +37,8 @@ import java.lang.annotation.Target;
  * Example usage 2, in Astrix bean definition:
  * <pre>
  * 
- * {@literal @}DefaultBeanSettings(initialTimeout = 3000)
- * {@literal @}Service
+ *{@literal @}DefaultBeanSettings(initialTimeout = 3000)
+ *{@literal @}Service
  * public AccountService accountService();
  * </pre>
  * 
