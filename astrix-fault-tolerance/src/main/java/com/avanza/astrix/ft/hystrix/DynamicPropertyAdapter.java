@@ -13,13 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft.service;
+package com.avanza.astrix.ft.hystrix;
 
-@SuppressWarnings("serial")
-public class SimpleServiceException extends RuntimeException {
+import java.util.Objects;
 
-	public SimpleServiceException() {
-		super();
+import com.avanza.astrix.config.DynamicProperty;
+import com.netflix.hystrix.strategy.properties.HystrixProperty;
+
+final class DynamicPropertyAdapter<T> implements HystrixProperty<T> {
+	private final DynamicProperty<T> dynamicProperty;
+	
+	public DynamicPropertyAdapter(DynamicProperty<T> dynamicProperty) {
+		this.dynamicProperty = Objects.requireNonNull(dynamicProperty);
 	}
-
+	
+	@Override
+	public T get() {
+		return dynamicProperty.getCurrentValue();
+	}
 }

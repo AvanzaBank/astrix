@@ -16,31 +16,25 @@
 package com.avanza.astrix.ft.hystrix;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.BasicFuture;
-import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
-import com.avanza.astrix.beans.publish.ApiProvider;
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
-import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
+import com.avanza.astrix.beans.ft.FaultToleranceSpi;
 import com.avanza.astrix.context.AstrixApplicationContext;
+import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.DefaultBeanSettings;
 import com.avanza.astrix.provider.core.Library;
-import com.netflix.hystrix.Hystrix;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
@@ -54,32 +48,15 @@ public class HystrixFaulttoleranceIntegrationTest {
 	private AstrixApplicationContext context;
 	private TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 	private Ping ping;
-	private HystrixCommandNamingStrategy commandNamingStrategy;
-
+	
 	@Before
 	public void setup() {
 		counter.incrementAndGet();
-		commandNamingStrategy = new HystrixCommandNamingStrategy() {
-			@Override
-			public String getGroupKeyName(PublishedAstrixBean<?> beanDefinition) {
-				return "BeanFaultToleranceTestKey-" + counter.get();
-			}
-			@Override
-			public String getCommandKeyName(PublishedAstrixBean<?> beanDefinition) {
-				return "BeanFaultToleranceTestGroup-" + counter.get();
-			}
-		};
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		astrixConfigurer.registerApiProvider(CorruptPingApiProvider.class);
 		astrixConfigurer.enableFaultTolerance(true);
-		astrixConfigurer.registerStrategy(HystrixCommandNamingStrategy.class, commandNamingStrategy);
 		context = (AstrixApplicationContext) astrixConfigurer.configure();
 		ping = context.getBean(Ping.class);
-	}
-	
-	@After
-	public void cleanup() {
-		Hystrix.reset();
 	}
 	
 	@Test
@@ -109,22 +86,6 @@ public class HystrixFaulttoleranceIntegrationTest {
 	 */
 	
 	
-	/*
-	 * New design philosophy always uses SEMAPHORE isolation for reactive return types.
-	 * Methods returning reactive types are expected to be non-blocking (or at least guaranteed
-	 * to return within resonable time) when invoked.
-	 */
-//	@Test(timeout = 2000)
-	public void usesThreadIsolationByDefaultForObservableReturnTypes() throws Exception {
-		CorruptPing ping = context.getBean(CorruptPing.class);
-		for (int i = 0; i < 100; i++) {
-			try {
-				ping.blockingObserve("foo").toBlocking().first();
-			} catch (ServiceUnavailableException e) {
-			}
-		}
-	}
-	
 	@Test(timeout = 2000)
 	public void usesThreadIsolationByDefaultForFutureReturnTypes() throws Exception {
 		CorruptPing ping = context.getBean(CorruptPing.class);
@@ -136,22 +97,16 @@ public class HystrixFaulttoleranceIntegrationTest {
 		}
 	}
 	
-	/*
-	 * Current design doesn't treat Future as a "reactive" type, meaning that
-	 * we only get fault tolerance protection on the invocation of the method returning
-	 * a future (and not until the Future is completed). Its up to the
-	 * programmer to use Future.get(timeout, unit) to ensure a client does not block
-	 * forever when invoking a service returning a future. 
-	 *
-	 */
-//	@Test(timeout = 2000)
-	public void callingGetOnReturnedFutureShouldNotBlockForever() throws Exception {
+
+	
+	@Test(timeout = 2000)
+	public void excpetionsOfTypesOtherThanServiceUnavailableExceptionDoesNotCountAsFailure() throws Exception {
 		CorruptPing ping = context.getBean(CorruptPing.class);
-		Future<String> neverEndingFuture = ping.neverEndingFuture("foo");
-		try {
-			neverEndingFuture.get();
-		} catch (ExecutionException e) {
-			assertTrue(e.getCause() instanceof ServiceUnavailableException);
+		for (int i = 0; i < 100; i++) {
+			try {
+				ping.foreverBlockingQueue("foo");
+			} catch (ServiceUnavailableException e) {
+			}
 		}
 	}
 	
@@ -187,16 +142,18 @@ public class HystrixFaulttoleranceIntegrationTest {
 	}
 	
 	private int getAppliedFaultToleranceCount(Class<?> beanType) {
-		return getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, getCommandKey(AstrixBeanKey.create(beanType)));
+		HystrixCommandKey commandKey = getFaultTolerance(context).getCommandKey(AstrixBeanKey.create(beanType));
+		return getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, commandKey);
 	}
 	
-	private <T> String getCommandKey(AstrixBeanKey<T> beanKey) {
-		SimplePublishedAstrixBean<T> beanDefinition = new SimplePublishedAstrixBean<>(ApiProvider.create(PingApiProvider.class.getName()), beanKey);
-		return commandNamingStrategy.getCommandKeyName(beanDefinition);
+	private static HystrixFaultTolerance getFaultTolerance(AstrixContext astrixContext) {
+		FaultToleranceSpi ftStrategy = AstrixApplicationContext.class.cast(astrixContext).getInstance(FaultToleranceSpi.class);
+		assertEquals(HystrixFaultTolerance.class, ftStrategy.getClass());
+		return (HystrixFaultTolerance) ftStrategy;
 	}
 	
-	private int getEventCountForCommand(HystrixRollingNumberEvent hystrixRollingNumberEvent, String commandKey) {
-		HystrixCommandMetrics metrics = HystrixCommandMetrics.getInstance(HystrixCommandKey.Factory.asKey(commandKey));
+	private int getEventCountForCommand(HystrixRollingNumberEvent hystrixRollingNumberEvent, HystrixCommandKey commandKey) {
+		HystrixCommandMetrics metrics = HystrixCommandMetrics.getInstance(commandKey);
 		if (metrics == null) {
 			return 0;
 		}

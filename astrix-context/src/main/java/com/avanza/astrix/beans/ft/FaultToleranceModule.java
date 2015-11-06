@@ -30,7 +30,6 @@ public class FaultToleranceModule implements Module {
 		moduleContext.bind(ServiceBeanProxyFactory.class, BeanFaultToleranceProxyFactory.class);
 		
 		moduleContext.importType(FaultToleranceSpi.class);
-		moduleContext.importType(HystrixCommandNamingStrategy.class);
 		moduleContext.importType(BeanConfigurations.class);
 		moduleContext.importType(AstrixConfig.class);
 		moduleContext.importType(ReactiveTypeConverter.class);

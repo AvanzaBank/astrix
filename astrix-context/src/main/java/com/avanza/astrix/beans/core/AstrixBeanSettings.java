@@ -15,8 +15,6 @@
  */
 package com.avanza.astrix.beans.core;
 
-import java.util.Objects;
-
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.DefaultBeanSettings;
 
@@ -40,41 +38,62 @@ public final class AstrixBeanSettings {
 	 */
 	public static final BooleanBeanSetting BEAN_METRICS_ENABLED = 
 			new BooleanBeanSetting("beanMetrics.enabled", DefaultBeanSettings.DEFAULT_BEAN_METRICS_ENABLED);
+	
 
 	/**
-	 * When fault tolerance is enabled this setting defines the initial timeout used
-	 * for invocations on the associated bean. This setting is named "initial" to
-	 * reflect the fact that updates to this bean settings at runtime will not have
-	 * any effect. All runtime changes to the timeout for the associated Astrix bean
-	 * should be done using the archaius configuration.    
+	 * When fault tolerance is enabled this setting defines the timeout 
+	 * for invocations on the associated bean. 
 	 */
-	public static final IntBeanSetting INITIAL_TIMEOUT = 
-			new IntBeanSetting("faultTolerance.timeout", DefaultBeanSettings.DEFAULT_INITIAL_TIMEOUT);
+	public static final IntBeanSetting TIMEOUT = 
+			new IntBeanSetting("faultTolerance.timeout", DefaultBeanSettings.DEFAULT_TIMEOUT);
 	
 	/**
-	 * Defines the default "maxConcurrentRequests" when semaphore isolation is used to protect invocations 
+	 * Defines the "maxConcurrentRequests" when semaphore isolation is used to protect invocations 
 	 * to the associated bean, i.e. the maximum number of concurrent requests before the 
 	 * fault-tolerance layer starts rejecting invocations (by throwing ServiceUnavailableException)
 	 */
-	public static final IntBeanSetting INITIAL_MAX_CONCURRENT_REQUESTS = 
-			new IntBeanSetting("faultTolerance.initialMaxConcurrentRequests", DefaultBeanSettings.DEFAULT_INITIAL_MAX_CONCURRENT_REQUESTS);
+	public static final IntBeanSetting MAX_CONCURRENT_REQUESTS = 
+			new IntBeanSetting("faultTolerance.maxConcurrentRequests", DefaultBeanSettings.DEFAULT_MAX_CONCURRENT_REQUESTS);
 	
 	/**
-	 * Defines the default "coreSize" when thread isolation is used to protect invocations 
+	 * Defines the "coreSize" when thread isolation is used to protect invocations 
 	 * to the associated bean, i.e. the number of threads in the bulkhead associated with a
 	 * synchronous service invocation.
 	 */
-	public static final IntBeanSetting INITIAL_CORE_SIZE = 
-			new IntBeanSetting("faultTolerance.initialCoreSize", DefaultBeanSettings.DEFAULT_INITIAL_CORE_SIZE);
+	public static final IntBeanSetting CORE_SIZE = 
+			new IntBeanSetting("faultTolerance.coreSize", DefaultBeanSettings.DEFAULT_CORE_SIZE);
 	
 	/**
-	 * Defines the default "queueSizeRejectionThreshold" for the queue when thread isolation 
+	 * Defines the "queueSizeRejectionThreshold" when thread isolation 
 	 * is used to protect invocations to the associated bean, i.e. number of pending service invocations
 	 * allowed in the queue to a thread-pool (bulk-head) before starting to throw {@link ServiceUnavailableException}.
 	 */
-	public static final IntBeanSetting INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD = 
-			new IntBeanSetting("faultTolerance.initialQueueSizeRejectionThreshold", DefaultBeanSettings.DEFAULT_INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD);
-
+	public static final IntBeanSetting QUEUE_SIZE_REJECTION_THRESHOLD = 
+			new IntBeanSetting("faultTolerance.initialQueueSizeRejectionThreshold", DefaultBeanSettings.DEFAULT_QUEUE_SIZE_REJECTION_THRESHOLD);
+	
+	/**
+	 * @deprecated Replaced by {@link #TIMEOUT}
+	 */
+	@Deprecated
+	public static final IntBeanSetting INITIAL_TIMEOUT = TIMEOUT;
+	
+	/**
+	 * @deprecated Replaced by {@link #MAX_CONCURRENT_REQUESTS}
+	 */
+	@Deprecated
+	public static final IntBeanSetting INITIAL_MAX_CONCURRENT_REQUESTS = MAX_CONCURRENT_REQUESTS;
+	
+	/**
+	 * @deprecated Replaced by {@link #CORE_SIZE}
+	 */
+	@Deprecated
+	public static final IntBeanSetting INITIAL_CORE_SIZE = CORE_SIZE; 
+	
+	/**
+	 * @deprecated Replaced by {@link #QUEUE_SIZE_REJECTION_THRESHOLD}
+	 */
+	@Deprecated
+	public static final IntBeanSetting INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD = QUEUE_SIZE_REJECTION_THRESHOLD;
 	
 	/**
 	 * Its possible to set service-beans in unavailable state, in which it throws
@@ -93,7 +112,7 @@ public final class AstrixBeanSettings {
 
 		private BeanSetting(String name, T defaultValue) {
 			this.name = name;
-			this.defaultValue = Objects.requireNonNull(defaultValue);
+			this.defaultValue = defaultValue;
 		}
 
 		public String nameFor(AstrixBeanKey<?> beanKey) {
@@ -128,6 +147,12 @@ public final class AstrixBeanSettings {
 
 	public static class IntBeanSetting extends BeanSetting<Integer> {
 		public IntBeanSetting(String name, int defaultValue) {
+			super(name, defaultValue);
+		}
+	}
+
+	public static class StringBeanSetting extends BeanSetting<String> {
+		public StringBeanSetting(String name, String defaultValue) {
 			super(name, defaultValue);
 		}
 	}

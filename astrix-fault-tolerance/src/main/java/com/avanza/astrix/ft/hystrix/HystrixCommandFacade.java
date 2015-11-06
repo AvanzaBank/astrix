@@ -46,7 +46,7 @@ class HystrixCommandFacade<T> {
 	public static <T> T execute(CheckedCommand<T> command, Setter settings) throws Throwable {
 		return new HystrixCommandFacade<>(command, settings).execute();
 	}
-
+	
 	protected T execute() throws Throwable {
 		HystrixCommand<HystrixResult<T>> command = createHystrixCommand();
 		HystrixResult<T> result;
@@ -54,6 +54,7 @@ class HystrixCommandFacade<T> {
 			result = command.execute();
 		} catch (HystrixRuntimeException e) {
 			// TODO: Add unit test for this case
+			e.printStackTrace();
 			throw new ServiceUnavailableException(e.getFailureType().toString()); 
 		}
 		throwExceptionIfExecutionFailed(result);

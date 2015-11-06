@@ -29,9 +29,9 @@ import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.BasicFuture;
 import com.avanza.astrix.beans.factory.CircularDependency;
-import com.avanza.astrix.beans.ft.CommandSettings;
 import com.avanza.astrix.beans.ft.FaultToleranceSpi;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.core.function.CheckedCommand;
@@ -122,13 +122,13 @@ public class AstrixLibraryTest {
 		final AtomicInteger appliedExecuteCount = new AtomicInteger(0);
 		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, new FaultToleranceSpi() {
 			@Override
-			public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
+			public <T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey) {
 				appliedOberveCount.incrementAndGet();
 				return observable.get();
 			}
 			
 			@Override
-			public <T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable {
+			public <T> T execute(CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable {
 				appliedExecuteCount.incrementAndGet();
 				return command.call();
 			}
@@ -155,13 +155,13 @@ public class AstrixLibraryTest {
 		final AtomicInteger appliedExecuteCount = new AtomicInteger(0);
 		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, new FaultToleranceSpi() {
 			@Override
-			public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
+			public <T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey) {
 				appliedOberveCount.incrementAndGet();
 				return observable.get();
 			}
 			
 			@Override
-			public <T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable {
+			public <T> T execute(CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable {
 				appliedExecuteCount.incrementAndGet();
 				return command.call();
 			}

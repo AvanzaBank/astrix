@@ -17,7 +17,9 @@ package com.avanza.astrix.ft.hystrix;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.ft.FaultToleranceSpi;
+import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.modules.ModuleContext;
@@ -27,7 +29,10 @@ public class HystrixModule implements AstrixContextPlugin {
 	
 	@Override
 	public void registerStrategies(AstrixStrategiesConfig strategiesConfig) {
-		strategiesConfig.registerStrategy(FaultToleranceSpi.class, HystrixFaultTolerance.class);
+		strategiesConfig.registerStrategy(FaultToleranceSpi.class, HystrixFaultTolerance.class, (context) -> {
+			context.importType(BeanConfigurations.class);
+			context.importType(HystrixCommandNamingStrategy.class);
+		});
 	}
 
 	@Override

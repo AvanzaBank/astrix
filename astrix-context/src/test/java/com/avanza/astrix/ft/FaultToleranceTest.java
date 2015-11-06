@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.ft;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -27,7 +27,6 @@ import org.junit.Test;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.ft.CommandSettings;
 import com.avanza.astrix.beans.ft.FaultToleranceSpi;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixContext;
@@ -79,6 +78,7 @@ public class FaultToleranceTest {
 		astrixConfigurer.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
 
 		assertEquals("bar", ping.ping("bar"));
+		assertEquals(AstrixBeanKey.create(Ping.class), faultTolerance.lastAppliedBeanKey);
 		assertEquals(1, getAppliedFaultToleranceCount());
 	}
 	
@@ -98,23 +98,6 @@ public class FaultToleranceTest {
 		assertEquals(2, getAppliedFaultToleranceCount());
 	}
 	
-	@Test
-	public void readsDefaultBeanSettingsFromBeanConfiguration() throws Throwable {
-		astrixConfigurer.set(AstrixBeanSettings.INITIAL_CORE_SIZE, AstrixBeanKey.create(Ping.class, "configured-ping"), 4);
-		astrixConfigurer.set(AstrixBeanSettings.INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD, AstrixBeanKey.create(Ping.class, "configured-ping"), 6);
-		astrixConfigurer.set(AstrixBeanSettings.INITIAL_TIMEOUT, AstrixBeanKey.create(Ping.class, "configured-ping"), 100);
-		astrixConfigurer.set(AstrixBeanSettings.INITIAL_MAX_CONCURRENT_REQUESTS, AstrixBeanKey.create(Ping.class, "configured-ping"), 21);
-		astrixConfigurer.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
-		
-		astrixContext.getBean(Ping.class, "configured-ping").ping("foo");
-		CommandSettings appliedSettings = faultTolerance.lastAppliedCommandSettings;
-		assertNotNull(appliedSettings);
-		assertEquals(4, appliedSettings.getInitialCoreSize());
-		assertEquals(6, appliedSettings.getInitialQueueSizeRejectionThreshold());
-		assertEquals(100, appliedSettings.getInitialTimeoutInMilliseconds());
-		assertEquals(21, appliedSettings.getInitialSemaphoreMaxConcurrentRequests());
-	}
-
 	public interface Ping {
 		String ping(String msg);
 	}
@@ -159,17 +142,17 @@ public class FaultToleranceTest {
 	
 	private static class FakeFaultTolerance implements FaultToleranceSpi {
 		private final AtomicInteger appliedFaultToleranceCount = new AtomicInteger(0);
-		private CommandSettings lastAppliedCommandSettings;
+		private AstrixBeanKey<?> lastAppliedBeanKey;
 		@Override
-		public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
-			lastAppliedCommandSettings = settings;
+		public <T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey) {
+			lastAppliedBeanKey = beanKey;
 			appliedFaultToleranceCount.incrementAndGet();
 			return observable.get();
 		}
 
 		@Override
-		public <T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable {
-			lastAppliedCommandSettings = settings;
+		public <T> T execute(CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable {
+			lastAppliedBeanKey = beanKey;
 			appliedFaultToleranceCount.incrementAndGet();
 			return command.call();
 		}

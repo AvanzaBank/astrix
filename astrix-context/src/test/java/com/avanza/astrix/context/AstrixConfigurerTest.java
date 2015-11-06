@@ -81,12 +81,12 @@ public class AstrixConfigurerTest {
 		AstrixContextImpl astrixContext = autoClosables.add((AstrixContextImpl) configurer.configure());
 		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
 
-		assertEquals(2000, pingConfig.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
+		assertEquals(2000, pingConfig.get(AstrixBeanSettings.TIMEOUT).get());
 		assertEquals(false, pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
 		assertEquals(false, pingConfig.get(AstrixBeanSettings.BEAN_METRICS_ENABLED).get());
-		assertEquals(1, pingConfig.get(AstrixBeanSettings.INITIAL_MAX_CONCURRENT_REQUESTS).get());
-		assertEquals(2, pingConfig.get(AstrixBeanSettings.INITIAL_CORE_SIZE).get());
-		assertEquals(3, pingConfig.get(AstrixBeanSettings.INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD).get());
+		assertEquals(1, pingConfig.get(AstrixBeanSettings.MAX_CONCURRENT_REQUESTS).get());
+		assertEquals(2, pingConfig.get(AstrixBeanSettings.CORE_SIZE).get());
+		assertEquals(3, pingConfig.get(AstrixBeanSettings.QUEUE_SIZE_REJECTION_THRESHOLD).get());
 	}
 	
 	@Test
@@ -102,12 +102,12 @@ public class AstrixConfigurerTest {
 		AstrixContextImpl astrixContext = autoClosables.add((AstrixContextImpl) configurer.configure());
 		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
 
-		assertEquals(3000, pingConfig.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
+		assertEquals(3000, pingConfig.get(AstrixBeanSettings.TIMEOUT).get());
 		assertEquals(true, pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
 		assertEquals(false, pingConfig.get(AstrixBeanSettings.BEAN_METRICS_ENABLED).get());
-		assertEquals(2, pingConfig.get(AstrixBeanSettings.INITIAL_MAX_CONCURRENT_REQUESTS).get());
-		assertEquals(5, pingConfig.get(AstrixBeanSettings.INITIAL_CORE_SIZE).get());
-		assertEquals(6, pingConfig.get(AstrixBeanSettings.INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD).get());
+		assertEquals(2, pingConfig.get(AstrixBeanSettings.MAX_CONCURRENT_REQUESTS).get());
+		assertEquals(5, pingConfig.get(AstrixBeanSettings.CORE_SIZE).get());
+		assertEquals(6, pingConfig.get(AstrixBeanSettings.QUEUE_SIZE_REJECTION_THRESHOLD).get());
 	}
 	
 	@Test
@@ -123,7 +123,7 @@ public class AstrixConfigurerTest {
 		AstrixContextImpl astrixContext = autoClosables.add((AstrixContextImpl) configurer.configure());
 		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(PingAsync.class));
 
-		assertEquals(2000, pingConfig.get(AstrixBeanSettings.INITIAL_TIMEOUT).get());
+		assertEquals(2000, pingConfig.get(AstrixBeanSettings.TIMEOUT).get());
 	}
 	
 	@DefaultBeanSettings(

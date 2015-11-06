@@ -44,10 +44,6 @@ public class LunchIntegrationTest {
 	@Rule
 	public AutoCloseableRule autoClosables = new AutoCloseableRule(); 
 	
-	static {
-		Logger.getLogger("com.avanza").setLevel(Level.DEBUG);
-	}
-	
 	@Test
 	public void testName() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();

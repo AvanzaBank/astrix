@@ -32,6 +32,11 @@ public final class DynamicIntProperty implements DynamicProperty<Integer> {
 		this.value = initialValue;
 	}
 	
+	@Override
+	public Integer getCurrentValue() {
+		return value;
+	}
+	
 	public int get() {
 		return value;
 	}

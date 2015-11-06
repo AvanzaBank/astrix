@@ -32,6 +32,11 @@ public final class DynamicBooleanProperty implements DynamicProperty<Boolean> {
 		this.value = value;
 	}
 	
+	@Override
+	public Boolean getCurrentValue() {
+		return value;
+	}
+	
 	public boolean get() {
 		return value;
 	}

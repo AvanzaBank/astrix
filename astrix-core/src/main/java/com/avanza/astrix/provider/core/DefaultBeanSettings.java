@@ -51,35 +51,35 @@ import java.lang.annotation.Target;
 @Documented
 public @interface DefaultBeanSettings {
 	
-	int DEFAULT_INITIAL_TIMEOUT = 1000;
+	int DEFAULT_TIMEOUT = 1000;
 	boolean DEFAULT_FAULT_TOLERANCE_ENABLED = true;
 	boolean DEFAULT_BEAN_METRICS_ENABLED = true;
-	int DEFAULT_INITIAL_MAX_CONCURRENT_REQUESTS = 20;
-	int DEFAULT_INITIAL_CORE_SIZE = 10;
-	int DEFAULT_INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD = 10;
+	int DEFAULT_MAX_CONCURRENT_REQUESTS = 20;
+	int DEFAULT_CORE_SIZE = 10;
+	int DEFAULT_QUEUE_SIZE_REJECTION_THRESHOLD = 10;
 	
 	/**
-	 * See AstrixBeanSettings#INITIAL_TIMEOUT
+	 * See AstrixBeanSettings#TIMEOUT
 	 */
-	int initialTimeout() default DEFAULT_INITIAL_TIMEOUT;
+	int initialTimeout() default DEFAULT_TIMEOUT;
 
 	/**
 	 * See AstrixBeanSettings#MAX_CONCURRENT_REQUESTS
 	 */
-	int initialMaxConcurrentRequests() default DEFAULT_INITIAL_MAX_CONCURRENT_REQUESTS;
+	int initialMaxConcurrentRequests() default DEFAULT_MAX_CONCURRENT_REQUESTS;
 	
 	/**
-	 * See AstrixBeanSettings#
+	 * See AstrixBeanSettings#CORE_SIZE
 	 */
-	int initialCoreSize() default DEFAULT_INITIAL_CORE_SIZE;
+	int initialCoreSize() default DEFAULT_CORE_SIZE;
 	
 	/**
-	 * See AstrixBeanSettings#
+	 * See AstrixBeanSettings#QUEUE_SIZE_REJECTION_THRESHOLD
 	 */
-	int initialQueueSizeRejectionThreshold() default DEFAULT_INITIAL_QUEUE_SIZE_REJECTION_THRESHOLD;
+	int initialQueueSizeRejectionThreshold() default DEFAULT_QUEUE_SIZE_REJECTION_THRESHOLD;
 	
 	/**
-	 * See AstrixBeanSettings#INITIAL_TIMEOUT
+	 * See AstrixBeanSettings#FAULT_TOLERANCE_ENABLED
 	 */
 	boolean faultToleranceEnabled() default DEFAULT_FAULT_TOLERANCE_ENABLED;
 	

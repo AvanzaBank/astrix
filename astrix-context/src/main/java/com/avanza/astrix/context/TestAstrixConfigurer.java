@@ -106,8 +106,9 @@ public class TestAstrixConfigurer {
 		configurer.set(name, value);
 	}
 	
-	public void set(String name, String value) {
+	public TestAstrixConfigurer set(String name, String value) {
 		configurer.set(name, value);
+		return this;
 	}
 
 	public void set(String name, boolean value) {
@@ -175,8 +176,9 @@ public class TestAstrixConfigurer {
 		this.configurer.registerModule(module);
 	}
 
-	public void set(IntBeanSetting setting, AstrixBeanKey<?> beanKey, int value) {
+	public TestAstrixConfigurer set(IntBeanSetting setting, AstrixBeanKey<?> beanKey, int value) {
 		this.configurer.set(setting, beanKey, value);
+		return this;
 	}
 
 	public TestAstrixConfigurer setApplicationDescriptor(Class<?> applicationDescriptor) {

@@ -15,20 +15,10 @@
  */
 package com.avanza.astrix.beans.ft;
 
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public class DefaultHystrixCommandNamingStrategy implements HystrixCommandNamingStrategy {
-	@Override
-	public String getCommandKeyName(PublishedAstrixBean<?> beanDefinition) {
-		return beanDefinition.getDefiningApi().getName()
-				+ "_" + beanDefinition.getBeanKey().getBeanType().getName();
-	}
-	@Override
-	public String getGroupKeyName(PublishedAstrixBean<?> beanDefinition) {
-		return beanDefinition.getDefiningApi().getName();
-	}
 }

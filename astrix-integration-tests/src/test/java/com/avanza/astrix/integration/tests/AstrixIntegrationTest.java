@@ -91,7 +91,7 @@ public class AstrixIntegrationTest {
 	private static MapConfigSource config = new MapConfigSource() {{
 		set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
 		set(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
-		set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
+		set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 250);
 	}};
 	
 	@ClassRule
@@ -132,8 +132,7 @@ public class AstrixIntegrationTest {
 		
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.enableFaultTolerance(true);
-		AstrixConfigurer enableVersioning = configurer;
-		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
+		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 250);
 		configurer.setConfig(DynamicConfig.create(config));
 		configurer.setSubsystem("test-sub-system");
 		astrix = autoClosables.add(configurer.configure());
