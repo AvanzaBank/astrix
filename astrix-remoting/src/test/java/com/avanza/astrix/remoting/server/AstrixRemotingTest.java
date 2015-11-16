@@ -17,55 +17,30 @@ package com.avanza.astrix.remoting.server;
 
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
-import org.mockito.Mockito;
 
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
 import com.avanza.astrix.context.JavaSerializationSerializer;
 import com.avanza.astrix.context.metrics.Metrics;
-import com.avanza.astrix.core.AstrixBroadcast;
-import com.avanza.astrix.core.AstrixPartitionedRouting;
-import com.avanza.astrix.core.AstrixRemoteResult;
-import com.avanza.astrix.core.AstrixRoutingStrategy;
-import com.avanza.astrix.core.RemoteResultReducer;
-import com.avanza.astrix.core.RemoteServiceInvocationException;
-import com.avanza.astrix.core.ServiceInvocationException;
-import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.core.*;
 import com.avanza.astrix.core.remoting.Router;
 import com.avanza.astrix.core.remoting.RoutingKey;
 import com.avanza.astrix.core.remoting.RoutingStrategy;
-import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
-import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
-import com.avanza.astrix.remoting.client.DefaultAstrixRoutingStrategy;
-import com.avanza.astrix.remoting.client.IncompatibleRemoteResultReducerException;
-import com.avanza.astrix.remoting.client.RemotingProxy;
-import com.avanza.astrix.remoting.client.RemotingTransport;
-import com.avanza.astrix.remoting.client.RemotingTransportSpi;
-import com.avanza.astrix.remoting.client.RoutedServiceInvocationRequest;
+import com.avanza.astrix.remoting.client.*;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
-
+import org.junit.Test;
+import org.mockito.Mockito;
 import rx.Observable;
 import rx.Subscriber;
 
@@ -342,6 +317,20 @@ public class AstrixRemotingTest {
 		partitionedPing.pingVoid(new String[]{"1", "2", "3"});
 	}
 	
+	@Test
+	public void asyncPartitionedRequest_voidReturnType() throws Exception {
+		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl(metrics);
+		AstrixServiceActivatorImpl oddPartition = new AstrixServiceActivatorImpl(metrics);
+		PartitionedPingService eventPartitionPing = new PartitionedPingServiceImpl();
+		PartitionedPingService oddPartitionPing = new PartitionedPingServiceImpl();
+
+		evenPartition.register(eventPartitionPing, objectSerializer, PartitionedPingService.class);
+		oddPartition.register(oddPartitionPing, objectSerializer, PartitionedPingService.class);
+
+		PartitionedPingServiceAsync partitionedPing = createRemotingProxy(PartitionedPingServiceAsync.class, PartitionedPingService.class, directTransport(evenPartition, oddPartition), objectSerializer, new NoRoutingStrategy());
+		partitionedPing.pingVoid(new String[]{"1", "2", "3"}).subscribe();
+	}
+
 	@Test
 	public void partitionedRequest_emptyArgument() throws Exception {
 		AstrixServiceActivatorImpl evenPartition = new AstrixServiceActivatorImpl(metrics);
@@ -730,7 +719,27 @@ public class AstrixRemotingTest {
 		String lastReceivedRequest = receivedRequest.poll(0, TimeUnit.SECONDS);
 		assertEquals("kalle", lastReceivedRequest);
 	}
-	
+
+	@Test
+	public void supportsAsyncBroadcastedServicesWithVoidReturnType() throws Exception {
+		final BlockingQueue<String> receivedRequest = new LinkedBlockingQueue<>();
+		BroadcastVoidService impl = new BroadcastVoidService() {
+			@Override
+			public void hello(String message) {
+				receivedRequest.add(message);
+			}
+		};
+		partition1.register(impl, objectSerializer, BroadcastVoidService.class);
+
+		BroadcastVoidServiceAsync testService = createRemotingProxy(BroadcastVoidServiceAsync.class, BroadcastVoidService.class,
+																	directTransport(partition1), objectSerializer, new NoRoutingStrategy());
+
+		testService.hello("kalle").subscribe();
+		String lastReceivedRequest = receivedRequest.poll(0, TimeUnit.SECONDS);
+		assertEquals("kalle", lastReceivedRequest);
+	}
+
+
 	@Test(expected = IllegalArgumentException.class)
 	public void throwsExceptionWhenRegisteringProviderForNonImplementedInterface() throws Exception {
 		partition1.register(new Object(), objectSerializer, TestService.class);
@@ -934,7 +943,10 @@ public class AstrixRemotingTest {
 		void pingVoid(@AstrixPartitionedRouting String... nums);
 	}
 	
-	
+	interface PartitionedPingServiceAsync {
+		Observable<Void> pingVoid(@AstrixPartitionedRouting String... nums);
+	}
+
 	public static class NumPojo implements Serializable {
 		private static final long serialVersionUID = 1L;
 		private int num;
@@ -1094,7 +1106,12 @@ public class AstrixRemotingTest {
 		@AstrixBroadcast
 		void hello(String message);
 	}
-	
+
+	interface BroadcastVoidServiceAsync {
+		@AstrixBroadcast
+		Observable<Void> hello(String message);
+	}
+
 	interface AnnotatedArgumentTestService {
 		String hello(String message, String greeting);
 	}
