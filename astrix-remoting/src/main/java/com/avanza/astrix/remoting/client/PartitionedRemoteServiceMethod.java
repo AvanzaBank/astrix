@@ -20,12 +20,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 
 import com.avanza.astrix.core.AstrixPartitionedRouting;
@@ -33,7 +28,6 @@ import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.RemoteResultReducer;
 import com.avanza.astrix.core.remoting.RoutingKey;
 import com.avanza.astrix.core.util.ReflectionUtil;
-
 import rx.Observable;
 import rx.functions.Func1;
 /**
@@ -54,17 +48,18 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 
 	public PartitionedRemoteServiceMethod(int partitionedArgumentIndex,
 										  Method proxiedMethod,
-										  String methodSignature, 
+										  String methodSignature,
 										  RemotingEngine remotingEngine,
-										  Type targetReturnType) {
+										  Type targetReturnType,
+										  Method targetServiceMethod) {
 		this.partitionedArgumentIndex = partitionedArgumentIndex;
 		this.proxiedMethod = proxiedMethod;
 		this.methodSignature = methodSignature;
 		this.remotingEngine = remotingEngine;
 		this.targetReturnType = targetReturnType;
 		AstrixPartitionedRouting partitionedRouting = getPartitionedRoutingAnnotation(proxiedMethod, partitionedArgumentIndex);
-		this.reducerType = getReducer(partitionedRouting, proxiedMethod);
-		this.partitionedArgumentContainerType = getPartititonedArgumentContainerType(proxiedMethod, partitionedRouting);
+		this.reducerType = getReducer(partitionedRouting, targetServiceMethod);
+		this.partitionedArgumentContainerType = getPartitionedArgumentContainerType(proxiedMethod, partitionedRouting);
 		this.router = createRouter(partitionedRouting);
 	}
 
@@ -84,7 +79,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		return PartitionedRouter.identity();
 	}
 
-	private ContainerType getPartititonedArgumentContainerType(Method proxiedMethod, AstrixPartitionedRouting partitionBy) {
+	private ContainerType getPartitionedArgumentContainerType(Method proxiedMethod, AstrixPartitionedRouting partitionBy) {
 		Class<?> partitionedArgumentType = proxiedMethod.getParameterTypes()[partitionedArgumentIndex];
 		if (partitionedArgumentType.isArray()) {
 			return new ArrayContainerType(partitionedArgumentType.getComponentType());
@@ -104,8 +99,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		return new CollectionContainerType(collectionFactory, (Class<?>)partitionedArgumentTypeParameters.getActualTypeArguments()[0]);
 	}
 
-	private Class<? extends RemoteResultReducer<?>> getReducer(
-			AstrixPartitionedRouting partitionBy, Method targetServiceMethod) {
+	private Class<? extends RemoteResultReducer<?>> getReducer(AstrixPartitionedRouting partitionBy, Method targetServiceMethod) {
 		Class<? extends RemoteResultReducer<?>> reducerType = (Class<? extends RemoteResultReducer<?>>) partitionBy.reducer();
 		RemotingProxyUtil.validateRemoteResultReducer(targetServiceMethod, reducerType);
 		return reducerType;
@@ -139,7 +133,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 	}
 
 	private <T> Observable<T> reduce(Observable<List<AstrixServiceInvocationResponse>> responses) {
-		if (targetReturnType.equals(Void.TYPE)) {
+		if (targetReturnType.equals(Void.TYPE) || targetReturnType.equals(Void.class)) {
 			return responses.map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
 				@Override
 				public T call(List<AstrixServiceInvocationResponse> t1) {

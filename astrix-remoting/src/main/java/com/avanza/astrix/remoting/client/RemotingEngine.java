@@ -49,7 +49,7 @@ public final class RemotingEngine {
 			CorrelationId correlationId = CorrelationId.valueOf(response.getCorrelationId());
 			return AstrixRemoteResult.failure(createClientSideException(response, apiVersion), correlationId);
 		}
-		if (returnType.equals(Void.TYPE)) {
+		if (returnType.equals(Void.TYPE) || returnType.equals(Void.class)) {
 			return AstrixRemoteResult.voidResult();
 		}
 		T result = unmarshall(response, returnType, apiVersion);

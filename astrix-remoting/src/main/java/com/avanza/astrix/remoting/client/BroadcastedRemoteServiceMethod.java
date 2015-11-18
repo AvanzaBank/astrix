@@ -68,7 +68,7 @@ public class BroadcastedRemoteServiceMethod implements RemoteServiceMethod {
 		request.setArguments(remotingEngine.marshall(args));
 		final RemoteResultReducer<T> reducer = (RemoteResultReducer<T>) newReducer();
 		Observable<List<AstrixServiceInvocationResponse>> responesObservable = remotingEngine.submitBroadcastRequest(request);
-		if (returnType.equals(Void.TYPE)) {
+		if (returnType.equals(Void.TYPE) || returnType.equals(Void.class)) {
 			return responesObservable.map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
 				@Override
 				public T call(List<AstrixServiceInvocationResponse> t1) {
