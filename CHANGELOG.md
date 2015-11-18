@@ -6,7 +6,7 @@
 
 #### Changes (Compatibility breaking)
 * [#23](https://github.com/AvanzaBank/astrix/issues/23) Change in Design for BeanFaultTolerance. Each bean has a dedicated Hystrix thread pool.
-  * Astrix uses custom strategy to read Hystrix configuration. All Hystrix settings is treaed asa `AstrixBeanSetting`
+  * Astrix uses custom strategy to read Hystrix configuration. All Hystrix settings are treated as a `AstrixBeanSetting`
   * Hystrix thread pool is configured on a "per bean" basis rather than on a "per ApiProvider" basis
   * `HystrixCommandNamingStrategy` introduces non-backwards-compatible change, see javadoc
 
