@@ -1,4 +1,4 @@
-## Version 0.39.0-SNAPSHOT
+## Version 0.39.0
 #### Fixes
 * [#18](https://github.com/AvanzaBank/astrix/issues/18) GS_REMOTING throws ServiceUnavailableException when space proxy is closed
 * [#20](https://github.com/AvanzaBank/astrix/issues/20) Broadcast remote service invocation supports async methods with void return type
