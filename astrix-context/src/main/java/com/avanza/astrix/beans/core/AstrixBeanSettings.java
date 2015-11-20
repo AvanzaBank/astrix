@@ -120,12 +120,7 @@ public final class AstrixBeanSettings {
 		}
 
 		private String resolveSettingName(AstrixBeanKey<?> beanKey) {
-			if (beanKey.isQualified()) {
-				return "astrix.bean." + beanKey.getBeanType().getName() + "."
-						+ beanKey.getQualifier() + "." + name;
-			}
-			return "astrix.bean." + beanKey.getBeanType().getName() + "."
-					+ name;
+			return "astrix.bean." + beanKey.toString() + "." + name;
 		}
 		
 		public T defaultValue() {
