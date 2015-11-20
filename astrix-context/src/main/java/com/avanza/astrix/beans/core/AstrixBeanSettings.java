@@ -69,7 +69,7 @@ public final class AstrixBeanSettings {
 	 * allowed in the queue to a thread-pool (bulk-head) before starting to throw {@link ServiceUnavailableException}.
 	 */
 	public static final IntBeanSetting QUEUE_SIZE_REJECTION_THRESHOLD = 
-			new IntBeanSetting("faultTolerance.initialQueueSizeRejectionThreshold", DefaultBeanSettings.DEFAULT_QUEUE_SIZE_REJECTION_THRESHOLD);
+			new IntBeanSetting("faultTolerance.queueSizeRejectionThreshold", DefaultBeanSettings.DEFAULT_QUEUE_SIZE_REJECTION_THRESHOLD);
 	
 	/**
 	 * @deprecated Replaced by {@link #TIMEOUT}
