@@ -23,7 +23,7 @@ import com.netflix.hystrix.strategy.HystrixPlugins;
 
 final class HystrixStrategyDispatcher {
 	
-	private static final Logger log = LoggerFactory.getLogger(HystrixFaultTolerance.class);
+	private static final Logger log = LoggerFactory.getLogger(HystrixStrategyDispatcher.class);
 	private static final HystrixStrategyMapping strategyMapping = new HystrixStrategyMapping();
 	
 	static {

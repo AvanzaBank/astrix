@@ -32,7 +32,7 @@ import rx.Observable;
  *
  */
 public final class BeanFaultToleranceProxy implements BeanProxy {
-
+	
 	private final DynamicBooleanProperty faultToleranceEnabledForBean;
 	private final DynamicBooleanProperty faultToleranceEnabled;
 	private final FaultToleranceSpi beanFaultToleranceSpi;

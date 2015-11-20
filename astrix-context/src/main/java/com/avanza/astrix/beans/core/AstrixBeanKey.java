@@ -87,3 +87,4 @@ public final class AstrixBeanKey<T> {
 	}
 
 }
+	

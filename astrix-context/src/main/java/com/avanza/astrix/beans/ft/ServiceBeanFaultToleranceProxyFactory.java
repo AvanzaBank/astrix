@@ -18,12 +18,8 @@ package com.avanza.astrix.beans.ft;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.beans.config.AstrixConfig;
-import com.avanza.astrix.beans.config.BeanConfiguration;
-import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.core.BeanProxy;
 import com.avanza.astrix.beans.ft.FaultToleranceConfigurator.FtProxySetting;
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
@@ -32,20 +28,14 @@ import com.avanza.astrix.beans.service.ServiceDefinition;
  * @author Elias Lindholm
  *
  */
-final class BeanFaultToleranceProxyFactory implements ServiceBeanProxyFactory, BeanFaultToleranceFactory {
+final class ServiceBeanFaultToleranceProxyFactory implements ServiceBeanProxyFactory {
 	
-	private static final Logger log = LoggerFactory.getLogger(BeanFaultToleranceProxyFactory.class);
+	private static final Logger log = LoggerFactory.getLogger(ServiceBeanFaultToleranceProxyFactory.class);
 
-	private final FaultToleranceSpi beanFaultToleranceSpi;
-	private final BeanConfigurations beanConfigurations;
-	private final AstrixConfig config;
+	private final BeanFaultToleranceFactory ftFactory;
 	
-	public BeanFaultToleranceProxyFactory(FaultToleranceSpi beanFaultToleranceSpi,
-									      BeanConfigurations beanConfigurations, 
-									      AstrixConfig config) {
-		this.beanFaultToleranceSpi = beanFaultToleranceSpi;
-		this.beanConfigurations = beanConfigurations;
-		this.config = config;
+	public ServiceBeanFaultToleranceProxyFactory(BeanFaultToleranceFactory ftFactory) {
+		this.ftFactory = ftFactory;
 	}
 
 	@Override
@@ -59,15 +49,7 @@ final class BeanFaultToleranceProxyFactory implements ServiceBeanProxyFactory, B
 					serviceComponent.getName(), serviceDefinition.getBeanKey().toString());
 			return BeanProxy.NoProxy.create();
 		}
-		BeanConfiguration beanConfiguration = beanConfigurations.getBeanConfiguration(serviceDefinition.getBeanKey());
-		return new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultToleranceSpi);
-	}
-
-	@Override
-	public BeanProxy createFaultToleranceProxy(PublishedAstrixBean<?> serviceDefinition) {
-		BeanConfiguration beanConfiguration = beanConfigurations.getBeanConfiguration(serviceDefinition.getBeanKey());
-		return new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), 
-				beanFaultToleranceSpi);
+		return ftFactory.createFaultToleranceProxy(serviceDefinition.getBeanKey());
 	}
 	
 	@Override

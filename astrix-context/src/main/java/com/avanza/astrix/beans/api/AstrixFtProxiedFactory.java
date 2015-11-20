@@ -47,7 +47,7 @@ final class AstrixFtProxiedFactory<T> implements StandardFactoryBean<T> {
 	@Override
 	public T create(AstrixBeans beans) {
 		T rawBean = target.create(beans);
-		BeanProxy ftProxy = faultToleranceProxyFactory.createFaultToleranceProxy(beanDefinition);
+		BeanProxy ftProxy = faultToleranceProxyFactory.createFaultToleranceProxy(beanDefinition.getBeanKey());
 		BeanInvocationDispatcher beanProxyDispather = new BeanInvocationDispatcher(Arrays.asList(ftProxy), asyncTypeConverter, rawBean);
 		return ReflectionUtil.newProxy(getBeanKey().getBeanType(), beanProxyDispather);
 	}
