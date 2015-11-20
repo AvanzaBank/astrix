@@ -1,3 +1,7 @@
+## Version 0.39.2
+#### Fixes
+* [#25](https://github.com/AvanzaBank/astrix/issues/25) AstrixBeanSettings uses a "." for as separator between bean type and qualifier
+
 ## Version 0.39.1
 #### Fixes
 * [#24](https://github.com/AvanzaBank/astrix/issues/24) Inconsistent configuration property name of AstrixBeanSettings.QUEUE_SIZE_REJECTION_THRESHOLD
