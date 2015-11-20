@@ -1,3 +1,7 @@
+## Version 0.39.1
+#### Fixes
+* [#24](https://github.com/AvanzaBank/astrix/issues/24) Inconsistent configuration property name of AstrixBeanSettings.QUEUE_SIZE_REJECTION_THRESHOLD
+
 ## Version 0.39.0
 #### Fixes
 * [#18](https://github.com/AvanzaBank/astrix/issues/18) GS_REMOTING throws ServiceUnavailableException when space proxy is closed
