@@ -31,6 +31,11 @@ public final class DynamicStringProperty implements DynamicProperty<String> {
 		this.value = initialValue;
 	}
 	
+	@Override
+	public String getCurrentValue() {
+		return this.value;
+	}
+	
 	public String get() {
 		return this.value;
 	}

@@ -32,6 +32,11 @@ public final class DynamicLongProperty implements DynamicProperty<Long> {
 		this.value = initialValue;
 	}
 	
+	@Override
+	public Long getCurrentValue() {
+		return value;
+	}
+	
 	public long get() {
 		return value;
 	}

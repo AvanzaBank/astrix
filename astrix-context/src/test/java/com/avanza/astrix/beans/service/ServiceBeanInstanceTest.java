@@ -37,7 +37,6 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
-import com.avanza.astrix.beans.ft.CommandSettings;
 import com.avanza.astrix.beans.ft.FaultToleranceConfigurator;
 import com.avanza.astrix.beans.ft.FaultToleranceSpi;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
@@ -82,12 +81,12 @@ public class ServiceBeanInstanceTest {
 		final AtomicBoolean ftApplied = new AtomicBoolean(false);
 		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, new FaultToleranceSpi() {
 			@Override
-			public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
+			public <T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey) {
 				ftApplied.set(true);
 				return observable.get();
 			}
 			@Override
-			public <T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable {
+			public <T> T execute(CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable {
 				ftApplied.set(true);
 				return command.call();
 			}
@@ -118,12 +117,12 @@ public class ServiceBeanInstanceTest {
 		final AtomicBoolean ftApplied = new AtomicBoolean(false);
 		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, new FaultToleranceSpi() {
 			@Override
-			public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
+			public <T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey) {
 				ftApplied.set(true);
 				return observable.get();
 			}
 			@Override
-			public <T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable {
+			public <T> T execute(CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable {
 				ftApplied.set(true);
 				return command.call();
 			}

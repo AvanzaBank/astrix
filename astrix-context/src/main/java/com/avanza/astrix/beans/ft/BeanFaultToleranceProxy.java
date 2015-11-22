@@ -32,15 +32,15 @@ import rx.Observable;
  *
  */
 public final class BeanFaultToleranceProxy implements BeanProxy {
-
+	
 	private final DynamicBooleanProperty faultToleranceEnabledForBean;
 	private final DynamicBooleanProperty faultToleranceEnabled;
 	private final FaultToleranceSpi beanFaultToleranceSpi;
-	private final CommandSettings commandSettings;
+	private final BeanConfiguration beanConfiguration;
 	
-	BeanFaultToleranceProxy(BeanConfiguration beanConfiguration, DynamicConfig config, FaultToleranceSpi beanFaultToleranceSpi, CommandSettings commandSettings) {
+	BeanFaultToleranceProxy(BeanConfiguration beanConfiguration, DynamicConfig config, FaultToleranceSpi beanFaultToleranceSpi) {
+		this.beanConfiguration = beanConfiguration;
 		this.beanFaultToleranceSpi = beanFaultToleranceSpi;
-		this.commandSettings = commandSettings;
 		this.faultToleranceEnabledForBean = beanConfiguration.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED);
 		this.faultToleranceEnabled = AstrixSettings.ENABLE_FAULT_TOLERANCE.getFrom(config);
 	}
@@ -50,7 +50,7 @@ public final class BeanFaultToleranceProxy implements BeanProxy {
 		if (!faultToleranceEnabled()) {
 			return command;
 		}
-		return () -> beanFaultToleranceSpi.execute(command, commandSettings);
+		return () -> beanFaultToleranceSpi.execute(command, beanConfiguration.getBeanKey());
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public final class BeanFaultToleranceProxy implements BeanProxy {
 		if (!faultToleranceEnabled()) {
 			return command;
 		}
-		return () -> beanFaultToleranceSpi.observe(command, commandSettings);
+		return () -> beanFaultToleranceSpi.observe(command, beanConfiguration.getBeanKey());
 	}
 	
 	private <T> boolean faultToleranceEnabled() {

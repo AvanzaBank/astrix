@@ -82,6 +82,7 @@ public class AstrixServiceBlueGreenDeployTest {
 	static String ACCOUNT_PERFORMANCE_SUBSYSTEM = "account-performance-subsystem";
 	
 	private MapConfigSource accountPerformanceClientConfig = new MapConfigSource() {{
+		set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -89,6 +90,7 @@ public class AstrixServiceBlueGreenDeployTest {
 	}};
 	
 	private MapConfigSource feeder1clientConfig = new MapConfigSource() {{
+		set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -97,6 +99,7 @@ public class AstrixServiceBlueGreenDeployTest {
 	}};
 	
 	private MapConfigSource feeder2clientConfig = new MapConfigSource() {{
+		set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -105,6 +108,7 @@ public class AstrixServiceBlueGreenDeployTest {
 	}};
 	
 	private MapConfigSource server1Config = new MapConfigSource() {{
+		set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -114,6 +118,7 @@ public class AstrixServiceBlueGreenDeployTest {
 	}};
 	
 	private MapConfigSource server2Config = new MapConfigSource() {{
+		set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -123,6 +128,7 @@ public class AstrixServiceBlueGreenDeployTest {
 	}};
 	
 	private MapConfigSource feeder1Config = new MapConfigSource() {{
+		set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -132,6 +138,7 @@ public class AstrixServiceBlueGreenDeployTest {
 	}};
 	
 	private MapConfigSource feeder2Config = new MapConfigSource() {{
+		set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
 		set(SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		set(SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -288,9 +295,9 @@ public class AstrixServiceBlueGreenDeployTest {
 		server2.start();
 		feeder2.start();
 		
-		FeederService feeder1 = feeder1clientContext.waitForBean(FeederService.class, 1000);
-		FeederService feeder2 = feeder2clientContext.waitForBean(FeederService.class, 1000);
-		this.accountPerformance = accountPerformanceClientContext.waitForBean(AccountPerformance.class, 1000);
+		FeederService feeder1 = feeder1clientContext.waitForBean(FeederService.class, 2000);
+		FeederService feeder2 = feeder2clientContext.waitForBean(FeederService.class, 2000);
+		this.accountPerformance = accountPerformanceClientContext.waitForBean(AccountPerformance.class, 2000);
 
 		assertEquals("feeder-server-1", feeder1.getAppInstanceId()); // Verify feeder1 talks to correct instance
 		assertEquals("feeder-server-2", feeder2.getAppInstanceId());
@@ -298,8 +305,8 @@ public class AstrixServiceBlueGreenDeployTest {
 		feeder2.setPerformance("21", 200);
 		assertEquals("server-1", accountPerformance.getAppInstanceId()); // Verify server-1 is published
 		assertEquals(Integer.valueOf(100), accountPerformance.getPerformance("21"));
-		feeder1clientContext.waitForBean(ServiceAdministrator.class, "server-2", 1000).setPublishServices(true);
-		feeder1clientContext.waitForBean(ServiceAdministrator.class, "server-1", 1000).setPublishServices(false);
+		feeder1clientContext.waitForBean(ServiceAdministrator.class, "server-2", 2000).setPublishServices(true);
+		feeder1clientContext.waitForBean(ServiceAdministrator.class, "server-1", 2000).setPublishServices(false);
 		// Verify traffic eventually moves to instance-2
 		assertEventually(new Probe() {
 			Integer lastReply;

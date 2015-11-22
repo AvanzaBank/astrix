@@ -15,11 +15,11 @@
  */
 package com.avanza.astrix.beans.ft;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.BeanProxy;
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 
 public interface BeanFaultToleranceFactory {
 
-	BeanProxy createFaultToleranceProxy(PublishedAstrixBean<?> serviceDefinition);
+	BeanProxy createFaultToleranceProxy(AstrixBeanKey<?> beanKey);
 
 }

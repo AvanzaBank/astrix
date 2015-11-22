@@ -43,14 +43,12 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.DefaultBeanSettings;
-import com.netflix.hystrix.Hystrix;
 
 import rx.Observable;
 
@@ -149,12 +147,8 @@ public class FaultToleranceThroughputTest {
         counter.incrementAndGet();
         astrixConfigurer.registerStrategy(HystrixCommandNamingStrategy.class, new HystrixCommandNamingStrategy() {
 			@Override
-			public String getGroupKeyName(PublishedAstrixBean<?> beanDefinition) {
-				return beanDefinition.getBeanKey().getBeanType().getName() + counter.get();
-			}
-			@Override
-			public String getCommandKeyName(PublishedAstrixBean<?> beanDefinition) {
-				return beanDefinition.getBeanKey().getBeanType().getName() + counter.get();
+			public String getCommandKeyName(AstrixBeanKey<?> astrixBeanKey) {
+				return astrixBeanKey.getBeanType().getName() + counter.get();
 			}
 		});
         astrixConfigurer.registerApiProvider(ServiceApi.class);
@@ -164,7 +158,6 @@ public class FaultToleranceThroughputTest {
 	@After
 	public void after() {
 		astrixContext.destroy();
-		Hystrix.reset();
 		if (server != null) {
 			server.exec.shutdownNow();
 		}
@@ -183,7 +176,7 @@ public class FaultToleranceThroughputTest {
 			assertTrue("Max concurrent server calls: " + server.getMaxConcurrentExecutions(), server.getMaxConcurrentExecutions() <= 20);
 		}
 		// Expect full throughput within 1 second, that is, all but the 20 (bulkhead size) that is still waiting for a response)
-		throughputTest.assertThroughputPercentAtLeast(98);
+		throughputTest.assertThroughputPercentAtLeast(97);
 	}
 
 	private void setServer(AbstractFailingService server) {
@@ -200,12 +193,12 @@ public class FaultToleranceThroughputTest {
 		ThroughputTest throughputTest = new ThroughputTest(1_000, 50, simulatedPageViewUsing(service));
 		throughputTest.run(1, TimeUnit.SECONDS);
 
-		// Expect full througput within 1 second
+		// Expect full throughput within 1 second
 		if (!missingProtections.contains(BULK_HEAD)) {
 			assertTrue("Max concurrent server calls: " + server.getMaxConcurrentExecutions(), server.getMaxConcurrentExecutions() <= 20);
 		}
 		// Expect full throughput within 1 second, that is, all but the 20 (bulkhead size) that is still waiting for a response)
-		throughputTest.assertThroughputPercentAtLeast(98);
+		throughputTest.assertThroughputPercentAtLeast(97); 
 	}
 
 	@Test(timeout = 2500)
@@ -213,7 +206,7 @@ public class FaultToleranceThroughputTest {
 		if (missingProtections.contains(TIMEOUT)) {
 			return;
 		}
-		astrixConfigurer.set(AstrixBeanSettings.INITIAL_TIMEOUT, AstrixBeanKey.create(FailingService.class), 50);
+		astrixConfigurer.set(AstrixBeanSettings.TIMEOUT, AstrixBeanKey.create(FailingService.class), 50);
 		registry.registerProvider(FailingService.class, new NonRespondingService());
 		FailingService  service = astrixContext.getBean(FailingService.class);
 
@@ -243,29 +236,33 @@ public class FaultToleranceThroughputTest {
 	private static class ThroughputStatistics {
 		final int successful;
 		final int failed;
-		final int remaining;
+		final int pending;
 		final int submittedExecutionCount;
-		public ThroughputStatistics(int successful, int failed, int remaining, int totalExecutions) {
+		final int nonFinishedExecutionCount;
+		
+		public ThroughputStatistics(int successful, int failed, int pending, int nonFinishedExecutionCount, int totalExecutions) {
 			this.successful = successful;
 			this.failed = failed;
-			this.remaining = remaining;
+			this.pending = pending;
+			this.nonFinishedExecutionCount = nonFinishedExecutionCount;
 			this.submittedExecutionCount = totalExecutions;
 		}
 		public double successfulThroughputPercentage() {
 			return 100 * successful / (double) submittedExecutionCount;
 		}
 		public String summary() {
-			return String.format("throughput: %2.1f%% \n ssuccessful: %d \n failed: %d \n submittedExecutionCount: %d \n nonStarted: %d", 
+			return String.format("throughput: %2.1f%% \n successful: %d \n failed: %d \n submittedExecutionCount: %d \n pendingExecutionCount: %d \n nonFinishedExecutionCount: %d", 
 					successfulThroughputPercentage(),
 					successful,
 					failed, 
 					submittedExecutionCount,
-					remaining);
+					pending,
+					nonFinishedExecutionCount);
 		}
 	}
 	
 	public static class ThroughputTest {
-		ExecutorService executor;
+		private ExecutorService executor;
 		private int totalExecutions;
 		private Runnable command;
 		private int executionThreadCount;
@@ -280,24 +277,28 @@ public class FaultToleranceThroughputTest {
 		public void run(int maxExecutionTime, TimeUnit unit) throws InterruptedException {
 			AtomicInteger successfulExecutions = new AtomicInteger(0);
 			AtomicInteger failedExecutions = new AtomicInteger(0);
-			AtomicInteger remainingExecutions = new AtomicInteger(totalExecutions);
+			AtomicInteger pendingExecutions = new AtomicInteger();
+			AtomicInteger nonFinishedExecutionCount = new AtomicInteger();
 			executor = Executors.newFixedThreadPool(executionThreadCount);
 			try {
-				for (int i = 0; i < getTotalExecutions(); i++) {
+				for (int i = 0; i < totalExecutions; i++) {
+					pendingExecutions.incrementAndGet();
 					executor.submit(() -> {
+						pendingExecutions.decrementAndGet();
+						nonFinishedExecutionCount.incrementAndGet();
 						try {
 							command.run();
 							successfulExecutions.incrementAndGet();
 						} catch (Exception e) {
 							failedExecutions.incrementAndGet();
 						} finally {
-							remainingExecutions.decrementAndGet();
+							nonFinishedExecutionCount.decrementAndGet();
 						}
 					});
 				}
 				executor.shutdown(); // Allow all jobs left in the queue to terminate
 				executor.awaitTermination(maxExecutionTime, unit);
-				statistics = new ThroughputStatistics(successfulExecutions.get(), failedExecutions.get(), remainingExecutions.get(), totalExecutions);
+				statistics = new ThroughputStatistics(successfulExecutions.get(), failedExecutions.get(), pendingExecutions.get(), nonFinishedExecutionCount.get(), totalExecutions);
 			} finally {
 				executor.shutdownNow(); // Abort any remaining job
 			}
@@ -308,11 +309,6 @@ public class FaultToleranceThroughputTest {
 					statistics.successful,
 					statistics.failed, 
 					statistics.successfulThroughputPercentage());
-		}
-		
-		
-		public int getTotalExecutions() {
-			return totalExecutions;
 		}
 
 		public void assertThroughputPercentAtLeast(int expectedMinimumThroughput) {

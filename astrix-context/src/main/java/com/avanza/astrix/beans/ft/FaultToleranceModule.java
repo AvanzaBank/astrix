@@ -26,11 +26,10 @@ public class FaultToleranceModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(BeanFaultToleranceFactory.class, BeanFaultToleranceProxyFactory.class);
-		moduleContext.bind(ServiceBeanProxyFactory.class, BeanFaultToleranceProxyFactory.class);
+		moduleContext.bind(BeanFaultToleranceFactory.class, BeanFaultToleranceFactoryImpl.class);
+		moduleContext.bind(ServiceBeanProxyFactory.class, ServiceBeanFaultToleranceProxyFactory.class);
 		
 		moduleContext.importType(FaultToleranceSpi.class);
-		moduleContext.importType(HystrixCommandNamingStrategy.class);
 		moduleContext.importType(BeanConfigurations.class);
 		moduleContext.importType(AstrixConfig.class);
 		moduleContext.importType(ReactiveTypeConverter.class);

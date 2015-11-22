@@ -15,16 +15,19 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-import com.avanza.astrix.beans.ft.CommandSettings;
+import com.avanza.astrix.beans.config.BeanConfigurations;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.ft.FaultToleranceSpi;
+import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.core.function.CheckedCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
+import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixObservableCommand.Setter;
-import com.netflix.hystrix.HystrixThreadPoolProperties;
 
 import rx.Observable;
 /**
@@ -33,56 +36,69 @@ import rx.Observable;
  *
  */
 final class HystrixFaultTolerance implements FaultToleranceSpi {
+
+	/*
+	 * Astrix allows multiple AstrixContext within the same JVM, although
+	 * more than one AstrixContext within a single JVM is most often only used during unit testing. However,
+	 * since Astrix allows multiple AstrixContext's we want those to be isolated from each other. Hystrix only 
+	 * allows registering a global strategy for each exposed SPI. Therefore Astrix registers a global "dispatcher"
+	 * strategy (see HystrixPluginDispatcher) that dispatches each invocation to a HystrixPlugin to
+	 * the HystrixPlugin instance associated with a given AstrixContext.
+	 * 
+	 * The "id" property is used by the dispatcher to identify the HystrixPlugin instances associated with a given
+	 * AstrixContext.
+	 */
+	
+	private static final AtomicInteger idGenerator = new AtomicInteger(0);
+	
+	private final BeanMapping beanMapping;
+	private final HystrixCommandKeyFactory hystrixCommandKeyFactory;
+	private final String id;
+	
+	public HystrixFaultTolerance(BeanConfigurations beanConfigurations, 
+								 HystrixCommandNamingStrategy hystrixCommandNamingStrategy,
+								 AstrixConcurrencyStrategy concurrencyStrategy,
+								 BeanConfigurationPropertiesStrategy propertiesStrategy,
+								 BeanMapping beanMapping) {
+		this.id = Integer.toString(idGenerator.incrementAndGet()); 
+		this.beanMapping = beanMapping;
+		HystrixStrategies hystrixStrategies = new HystrixStrategies(propertiesStrategy, 
+																	concurrencyStrategy, 
+																	new FailedServiceInvocationLogger(beanMapping), 
+																	id);
+		HystrixStrategyDispatcher.registerStrategies(hystrixStrategies);
+		this.hystrixCommandKeyFactory = new HystrixCommandKeyFactory(id, hystrixCommandNamingStrategy);
+	}
 	
 	@Override
-	public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
-		Setter setter = Setter.withGroupKey(getGroupKey(settings))
-				  .andCommandKey(getCommandKey(settings))
-				  .andCommandPropertiesDefaults(createCommandProperties(settings));
+	public <T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey) {
+		Setter setter = Setter.withGroupKey(getGroupKey(beanKey))
+				  			  .andCommandKey(getCommandKey(beanKey))
+				  			  .andCommandPropertiesDefaults(
+				  					  HystrixCommandProperties.Setter().withExecutionIsolationStrategy(ExecutionIsolationStrategy.SEMAPHORE));
 		return HystrixObservableCommandFacade.observe(observable, setter);
 	}
 
 	@Override
-	public <T> T execute(final CheckedCommand<T> command, CommandSettings settings) throws Throwable {
-		return HystrixCommandFacade.execute(command, createHystrixConfiguration(settings));
+	public <T> T execute(final CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable {
+		com.netflix.hystrix.HystrixCommand.Setter setter =  
+				com.netflix.hystrix.HystrixCommand.Setter.withGroupKey(getGroupKey(beanKey))
+								.andCommandKey(getCommandKey(beanKey))
+								.andCommandPropertiesDefaults(
+					  					  HystrixCommandProperties.Setter().withExecutionIsolationStrategy(ExecutionIsolationStrategy.THREAD));
+		return HystrixCommandFacade.execute(command, setter);
 	}
 	
-	private com.netflix.hystrix.HystrixCommand.Setter createHystrixConfiguration(CommandSettings settings) {
-		HystrixCommandProperties.Setter commandPropertiesDefault = createCommandProperties(settings);
-						
-		// MaxQueueSize must be set to a non negative value in order for QueueSizeRejectionThreshold to have any effect.
-		// We use a high value for MaxQueueSize in order to allow QueueSizeRejectionThreshold to change dynamically using archaius.
-		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults = createThreadPoolProperties(settings);
-
-		return com.netflix.hystrix.HystrixCommand.Setter.withGroupKey(getGroupKey(settings))
-				.andCommandKey(getCommandKey(settings))
-				.andCommandPropertiesDefaults(commandPropertiesDefault)
-				.andThreadPoolPropertiesDefaults(threadPoolPropertiesDefaults);
+	HystrixCommandGroupKey getGroupKey(AstrixBeanKey<?> beanKey) {
+		HystrixCommandGroupKey result = hystrixCommandKeyFactory.createGroupKey(beanKey);
+		this.beanMapping.registerBeanKey(result.name(), beanKey);
+		return result;
 	}
 
-	private HystrixThreadPoolProperties.Setter createThreadPoolProperties(CommandSettings settings) {
-		HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults =
-				HystrixThreadPoolProperties.Setter()
-						.withMaxQueueSize(settings.getMaxQueueSize())
-						.withQueueSizeRejectionThreshold(settings.getInitialQueueSizeRejectionThreshold())
-						.withCoreSize(settings.getInitialCoreSize());
-		return threadPoolPropertiesDefaults;
-	}
-
-	private HystrixCommandProperties.Setter createCommandProperties(CommandSettings settings) {
-		HystrixCommandProperties.Setter commandPropertiesDefault =
-				HystrixCommandProperties.Setter()
-						.withExecutionIsolationSemaphoreMaxConcurrentRequests(settings.getInitialSemaphoreMaxConcurrentRequests())
-						.withExecutionTimeoutInMilliseconds(settings.getInitialTimeoutInMilliseconds());
-		return commandPropertiesDefault;
-	}
-	
-	private HystrixCommandGroupKey getGroupKey(CommandSettings settings) {
-		return HystrixCommandGroupKey.Factory.asKey(settings.getGroupName());
-	}
-
-	private HystrixCommandKey getCommandKey(CommandSettings settings) {
-		return HystrixCommandKey.Factory.asKey(settings.getCommandName());
+	HystrixCommandKey getCommandKey(AstrixBeanKey<?> beanKey) {
+		HystrixCommandKey result =  hystrixCommandKeyFactory.createCommandKey(beanKey);
+		this.beanMapping.registerBeanKey(result.name(), beanKey);
+		return result;
 	}
 
 }

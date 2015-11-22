@@ -22,10 +22,12 @@ import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.BooleanBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.IntBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.LongBeanSetting;
+import com.avanza.astrix.beans.core.AstrixBeanSettings.StringBeanSetting;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicIntProperty;
 import com.avanza.astrix.config.DynamicLongProperty;
+import com.avanza.astrix.config.DynamicStringProperty;
 /**
  * @author Elias Lindholm (elilin)
  */
@@ -63,6 +65,14 @@ public final class BeanConfiguration {
 			return config.getBooleanProperty(setting.nameFor(beanKey), Boolean.class.cast(defaultOverride).booleanValue());
 		}
 		return config.getBooleanProperty(setting.nameFor(beanKey), setting.defaultValue());
+	}
+	
+	public DynamicStringProperty get(StringBeanSetting setting) {
+		Object defaultOverride = defaultBeanSettingsOverride.get(setting);
+		if (defaultOverride != null) {
+			return config.getStringProperty(setting.nameFor(beanKey), String.class.cast(defaultOverride));
+		}
+		return config.getStringProperty(setting.nameFor(beanKey), setting.defaultValue());
 	}
 	
 	public AstrixBeanKey<?> getBeanKey() {

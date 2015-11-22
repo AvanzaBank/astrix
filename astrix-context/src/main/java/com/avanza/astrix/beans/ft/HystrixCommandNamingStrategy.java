@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.beans.ft;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.publish.PublishedAstrixBean;
 /**
  * 
@@ -23,10 +24,36 @@ import com.avanza.astrix.beans.publish.PublishedAstrixBean;
  */
 public interface HystrixCommandNamingStrategy {
 	
-	// TODO: Rename this abstraction
+	/**
+	 * @deprecated - As of 0.39.X Astrix uses distinct groups for each bean, this method is never invoked
+	 */
+	@Deprecated
+	default String getCommandKeyName(PublishedAstrixBean<?> beanDefinition) {
+		return getCommandKeyName(beanDefinition.getBeanKey());
+	}
 	
-	String getCommandKeyName(PublishedAstrixBean<?> beanDefinition);
+	/**
+	 * @deprecated - As of 0.39.X Astrix uses distinct groups for each bean, this method is never invoked
+	 */
+	@Deprecated
+	default String getGroupKeyName(PublishedAstrixBean<?> beanDefinition) {
+		return getCommandKeyName(beanDefinition.getBeanKey());
+	}
 	
-	String getGroupKeyName(PublishedAstrixBean<?> beanDefinition);
+	/**
+	 * Returns the Hystrix command key name used to protect invocations to a given Astrix bean.
+	 * 
+	 * Default implementation uses the toString() representation of the AstrixBeanKey.
+	 * 
+	 * NOTE: commandKeyNames must be unique, i.e there must be a one-to-one mapping between an AstrixBeanKey and
+	 * the commandKeyName. Otherwise the fault-tolerance layer might behave in
+	 * unexpected ways when different beans are protected by the same HystrixCommand.
+	 * 
+	 * @param astrixBeanKey
+	 * @return
+	 */
+	default String getCommandKeyName(AstrixBeanKey<?> astrixBeanKey) {
+		return astrixBeanKey.toString();
+	}
 	
 }

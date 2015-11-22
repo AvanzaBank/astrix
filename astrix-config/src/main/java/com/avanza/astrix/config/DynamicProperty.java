@@ -51,4 +51,13 @@ public interface DynamicProperty<T> {
 	 */
 	void removeListener(DynamicPropertyListener<T> listener);
 
+	
+	/**
+	 * Returns the current value of this DynamicPropery. For primitive
+	 * types the boxed version is returned (never null).
+	 * 
+	 * @return
+	 */
+	T getCurrentValue();
+
 }

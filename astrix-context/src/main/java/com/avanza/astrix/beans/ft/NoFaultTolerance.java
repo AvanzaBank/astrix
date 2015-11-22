@@ -17,6 +17,7 @@ package com.avanza.astrix.beans.ft;
 
 import java.util.function.Supplier;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.core.function.CheckedCommand;
 
 import rx.Observable;
@@ -24,12 +25,12 @@ import rx.Observable;
 public class NoFaultTolerance implements FaultToleranceSpi {
 
 	@Override
-	public <T> Observable<T> observe(Supplier<Observable<T>> observable, CommandSettings settings) {
+	public <T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey) {
 		return observable.get();
 	}
 
 	@Override
-	public <T> T execute(CheckedCommand<T> command, CommandSettings settings) throws Throwable {
+	public <T> T execute(CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable {
 		return command.call();
 	}
 
