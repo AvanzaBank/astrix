@@ -15,12 +15,9 @@
  */
 package com.avanza.astrix.versioning.jackson2;
 
-import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
-import com.avanza.astrix.versioning.jackson1.AstrixJsonMessageMigration;
-import com.avanza.astrix.versioning.jackson1.VersionedJsonObjectMapper;
-import com.avanza.astrix.versioning.jackson1.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
+import com.avanza.astrix.versioning.jackson2.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.reflect.TypeToken;
-import org.codehaus.jackson.node.ObjectNode;
 import org.junit.Test;
 
 import java.util.ArrayList;
