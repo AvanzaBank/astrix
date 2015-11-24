@@ -24,11 +24,15 @@ package com.avanza.astrix.config;
  */
 public final class DynamicStringProperty implements DynamicProperty<String> {
 
-	private final DynamicPropertyListenerSupport<String> listenerSupport = new DynamicPropertyListenerSupport<>();
+	private final ListenerSupport<DynamicPropertyListener<String>> listenerSupport = new ListenerSupport<>();
 	private volatile String value;
 	
 	public DynamicStringProperty(String initialValue) {
 		this.value = initialValue;
+	}
+	
+	public DynamicStringProperty() {
+		this.value = null;
 	}
 	
 	@Override
@@ -42,7 +46,12 @@ public final class DynamicStringProperty implements DynamicProperty<String> {
 	
 	public void set(String value) {
 		this.value = value;
-		this.listenerSupport.notifyListeners(value);
+		this.listenerSupport.dispatchEvent(l -> l.propertyChanged(value));
+	}
+	
+	@Override
+	public void setValue(String value) {
+		set(value);
 	}
 	
 	@Override

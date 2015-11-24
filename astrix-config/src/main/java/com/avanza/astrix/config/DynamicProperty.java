@@ -59,5 +59,14 @@ public interface DynamicProperty<T> {
 	 * @return
 	 */
 	T getCurrentValue();
-
+	
+	/**
+	 * Sets the value of this DynamicProperty. If the underlying
+	 * property is a primitive type then this method throws 
+	 * {@link NullPointerException} when passing a null argument. All
+	 * other DynamicPropery types accepts null as a value.
+	 * @param value
+	 */
+	void setValue(T value);
+	
 }

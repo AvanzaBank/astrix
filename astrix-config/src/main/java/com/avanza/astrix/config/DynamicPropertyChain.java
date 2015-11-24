@@ -17,59 +17,99 @@ package com.avanza.astrix.config;
 
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
+ * A DynamicPropertyChain is a hierarchical set of properties. A property
+ * is resolved to the first {@link DynamicConfigProperty} in the chain
+ * that have a value set. If no property in the chain has a value then
+ * the default value is used.
+ * 
+ * The {@link DynamicPropertyChainListener} will be notified synchronously
+ * when it is registered by calling {@link #bindTo(DynamicPropertyChainListener)}.
+ * After the initial notification with the current value, the listener is notified 
+ * every time the resolved property changes, for instance when:
+ * 
+ * <ul>
+ *  <li>A property with higher precedence than the current resolved property is set</li>
+ *  <li>The current resolved property is changed. In that case 
+ *  the listener will be notified with the new value</li>
+ *  <li>The current resolved property is cleared. In that case 
+ *  the listener will be notified with the new (possibly default) resolved value</li>
+ * </ul>
+ * 
  * 
  * @author Elias Lindholm (elilin)
  *
  * @param <T>
  */
-final class DynamicPropertyChain<T> implements DynamicPropertyListener<T> {
+final class DynamicPropertyChain<T> implements DynamicPropertyListener<DynamicConfigProperty<T>> {
 
 	private final LinkedList<DynamicConfigProperty<T>> chain = new LinkedList<>();
-	private final DynamicPropertyChainListener<T> propertyListener;
+	private volatile Optional<PropertyChangeEventDispatcher> propertyChainListener;
 	private final PropertyParser<T> parser;
 	private final T defaultValue;
 	
-	public DynamicPropertyChain(T defaultValue, DynamicPropertyChainListener<T> propertyListener, PropertyParser<T> parser) {
+	private DynamicPropertyChain(T defaultValue, PropertyParser<T> parser) {
 		this.defaultValue = defaultValue;
-		this.propertyListener = propertyListener;
 		this.parser = parser;
-	}
-
-	public static <T> DynamicPropertyChain<T> createWithDefaultValue(T defaultValue, DynamicPropertyChainListener<T> listener, PropertyParser<T> parser) {
-		return new DynamicPropertyChain<>(defaultValue, listener, parser);
+		this.propertyChainListener = Optional.empty();
 	}
 	
-	public T get() {
-		for (DynamicConfigProperty<T> prop : chain) {
-			T value = prop.get();
-			if (value != null) {
-				return value;
-			}
-		}
-		return defaultValue;
+	/**
+	 * Binds the resolved value of this chain to a given listener. The listener will be
+	 * notified synchronously with the current resolved value of this property chain, and
+	 * will later receive a notification each time the resolved of this chain changes.
+	 * 
+	 */
+	void bindTo(DynamicPropertyChainListener<T> l) {
+		this.propertyChainListener = Optional.of(new PropertyChangeEventDispatcher(l));
+		this.propertyChainListener.ifPresent(PropertyChangeEventDispatcher::init);
 	}
 
-	public DynamicConfigProperty<T> prependValue() {
-		DynamicConfigProperty<T> property = DynamicConfigProperty.create(this, parser);
-		chain.addFirst(property);
-		return property;
+
+	static <T> DynamicPropertyChain<T> createWithDefaultValue(T defaultValue, PropertyParser<T> parser) {
+		return new DynamicPropertyChain<>(defaultValue, parser);
+	}
+	
+	private T get() {
+		return chain.stream()
+					.filter(DynamicConfigProperty::isSet)
+					.findFirst()
+					.map(DynamicConfigProperty::get)
+					.orElse(defaultValue);
 	}
 
 	@Override
-	public void propertyChanged(T newValue) {
-		T resolvedValue = get();
-		if (Objects.equals(newValue, resolvedValue)) {
-			// Resolved value was updated, fire property change
-			propertyListener.propertyChanged(get());
-		}
+	public void propertyChanged(DynamicConfigProperty<T> updatedProperty) {
+		this.propertyChainListener.ifPresent(PropertyChangeEventDispatcher::propertyChanged);
 	}
-
-	public DynamicConfigProperty<T> appendValue() {
+	
+	DynamicConfigProperty<T> appendValue() {
 		DynamicConfigProperty<T> property = DynamicConfigProperty.create(this, parser);
 		chain.addLast(property);
 		return property;
+	}
+	
+	private class PropertyChangeEventDispatcher {
+		private DynamicPropertyChainListener<T> listener;
+		private T lastNotifiedState;
+		
+		public PropertyChangeEventDispatcher(DynamicPropertyChainListener<T> listener) {
+			this.listener = listener;
+		}
+
+		private void init() {
+			propertyChanged();
+		}
+
+		private void propertyChanged() {
+			T currentResolvedValue = get();
+			if (!Objects.equals(currentResolvedValue, lastNotifiedState)) {
+				listener.propertyChanged(currentResolvedValue);
+				lastNotifiedState = currentResolvedValue;
+			}
+		}
 	}
 	
 }

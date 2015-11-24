@@ -17,6 +17,6 @@ package com.avanza.astrix.config;
 
 interface DynamicPropertyChainListener<T> {
 
-	void propertyChanged(T resolvedValue);
+	void propertyChanged(T newValue);
 
 }

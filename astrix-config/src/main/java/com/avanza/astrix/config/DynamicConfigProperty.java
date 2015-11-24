@@ -27,23 +27,21 @@ import org.slf4j.LoggerFactory;
 final class DynamicConfigProperty<T> implements DynamicPropertyListener<String> {
 	
 	private final Logger logger = LoggerFactory.getLogger(DynamicConfigProperty.class);
-	private final DynamicPropertyListener<T> propertyChangeListener;
+	private final DynamicPropertyListener<DynamicConfigProperty<T>> propertyChangeListener;
 	private final PropertyParser<T> parser;
 	private volatile T value;
 	
-	private DynamicConfigProperty(DynamicPropertyListener<T> propertyChangeListener, PropertyParser<T> propertyParser) {
+	private DynamicConfigProperty(DynamicPropertyListener<DynamicConfigProperty<T>> propertyChangeListener, PropertyParser<T> propertyParser) {
 		this.propertyChangeListener = propertyChangeListener;
-		this.parser = propertyParser;
-	}
-	
-	private DynamicConfigProperty(DynamicPropertyListener<T> propertyChangeListener, T value, PropertyParser<T> propertyParser) {
-		this.propertyChangeListener = propertyChangeListener;
-		this.value = value;
 		this.parser = propertyParser;
 	}
 	
 	public T get() {
 		return this.value;
+	}
+	
+	boolean isSet() {
+		return this.value != null;
 	}
 	
 	public final void set(String value) {
@@ -53,7 +51,7 @@ final class DynamicConfigProperty<T> implements DynamicPropertyListener<String> 
 			} else {
 				this.value = null;
 			}
-			propertyChangeListener.propertyChanged(this.value);
+			propertyChangeListener.propertyChanged(this);
 		} catch (Exception e) {
 			logger.error("Failed to parse: " + value, e);
 		}
@@ -64,7 +62,7 @@ final class DynamicConfigProperty<T> implements DynamicPropertyListener<String> 
 		set(newValue);
 	}
 	
-	public static <T> DynamicConfigProperty<T> create(DynamicPropertyListener<T> propertyChangeListener, PropertyParser<T> propertyParser) {
+	public static <T> DynamicConfigProperty<T> create(DynamicPropertyListener<DynamicConfigProperty<T>> propertyChangeListener, PropertyParser<T> propertyParser) {
 		return new DynamicConfigProperty<>(propertyChangeListener, propertyParser);
 	}
 

@@ -15,13 +15,13 @@
  */
 package com.avanza.astrix.config;
 /**
- * Listener interface for subscribing to a {@link DynamicProperty} instance.<p>
+ * Listener interface for listening to state changes in all {@link DynamicProperty} instances
+ * managed by a single {@link DynamicConfig} instance.
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-@FunctionalInterface
-public interface DynamicPropertyListener<T> {
+public interface DynamicConfigListener {
 	
 	/**
 	 * Invoked each time the value of a {@link DynamicProperty} instance
@@ -31,8 +31,21 @@ public interface DynamicPropertyListener<T> {
 	 * of the {@link DynamicProperty}, typically some thread internal to a
 	 * {@link DynamicConfigSource} implementation.
 	 * 
+	 * Default implementation does nothing
+	 * 
 	 * @param newValue
 	 */
-	void propertyChanged(T newValue);
-
+	default void propertyChanged(String propertyName, Object newValue) {}
+	
+	/**
+	 * Invoked the first time a property with a given name is requested from
+	 * a {@link DynamicConfig} instance, i.e when it is created.
+	 * 
+	 * Default implementation does nothing
+	 * 
+	 * @param propertyName
+	 * @param initialValue
+	 */
+	default void propertyCreated(String propertyName, Object initialValue) {}
+	
 }
