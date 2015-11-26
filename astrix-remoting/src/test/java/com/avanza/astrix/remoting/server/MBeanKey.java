@@ -13,20 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.config;
+package com.avanza.astrix.remoting.server;
 
-import java.util.Map;
+import java.util.Objects;
 
-import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
-/**
- * @author Elias Lindholm (elilin)
- */
-public interface BeanConfigurations {
+class MBeanKey {
+	String folder;
+	String name;
+	public MBeanKey(String folder, String name) {
+		this.folder = folder;
+		this.name = name;
+	}
+	@Override
+	public int hashCode() {
+		return Objects.hash(toString());
+	}
+	@Override
+	public boolean equals(Object obj) {
+		return this.toString().equals(obj.toString());
+	}
+	@Override
+	public String toString() {
+		return "MBeanKey [folder=" + folder + ", name=" + name + "]";
+	}
 	
-	// TODO Move these methods AstrixConfig rand remove this abstraction?
-	
-	BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey);
-
-	void setDefaultBeanConfig(AstrixBeanKey<?> beanKey, Map<BeanSetting<?>, Object> defaultBeanSettingsOverride);
 }

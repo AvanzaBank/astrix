@@ -15,15 +15,7 @@
  */
 package com.avanza.astrix.context.metrics;
 
-import java.util.function.Supplier;
-
-import com.avanza.astrix.core.function.CheckedCommand;
-
-import rx.Observable;
-
 public interface MetricsSpi {
 	
-	<T> CheckedCommand<T> timeExecution(CheckedCommand<T> execution, String group, String name);
-	
-	<T> Supplier<Observable<T>> timeObservable(Supplier<Observable<T>> observableFactory, String group, String name);
+	TimerSpi createTimer();
 }

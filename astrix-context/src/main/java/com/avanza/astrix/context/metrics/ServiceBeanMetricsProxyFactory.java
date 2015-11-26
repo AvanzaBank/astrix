@@ -18,26 +18,31 @@ package com.avanza.astrix.context.metrics;
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.core.BeanProxy;
-import com.avanza.astrix.beans.publish.SimplePublishedAstrixBean;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
+import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
 
 public class ServiceBeanMetricsProxyFactory implements ServiceBeanProxyFactory {
 
-	private final MetricsSpi metrics;
+	private final Metrics metrics;
 	private final AstrixConfig astrixConfig;
 	private final BeanConfigurations beanConfigurations;
+	private final AstrixMBeanExporter mBeanExporter;
 	
-	public ServiceBeanMetricsProxyFactory(MetricsSpi metrics, AstrixConfig astrixConfig, BeanConfigurations beanConfigurations) {
+	public ServiceBeanMetricsProxyFactory(Metrics metrics, AstrixConfig astrixConfig, BeanConfigurations beanConfigurations, AstrixMBeanExporter mbeanExporter) {
 		this.metrics = metrics;
 		this.astrixConfig = astrixConfig;
 		this.beanConfigurations = beanConfigurations;
+		this.mBeanExporter = mbeanExporter;
 	}
 
 	@Override
 	public BeanProxy create(ServiceDefinition<?> serviceDefinition, ServiceComponent serviceComponent) {
-		return new BeanMetricsProxy(SimplePublishedAstrixBean.from(serviceDefinition), metrics, astrixConfig, beanConfigurations);
+		BeanMetricsProxy result = new BeanMetricsProxy(serviceDefinition.getBeanKey(), metrics, astrixConfig, beanConfigurations);
+		BeanMetricsMBean mbean = new BeanMetrics(result.getTimer());
+		this.mBeanExporter.registerMBean(mbean, "ServiceBeanMetrics", serviceDefinition.getBeanKey().toString());
+		return result;
 	}
 
 	@Override

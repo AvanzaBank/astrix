@@ -19,16 +19,21 @@ package com.avanza.astrix.remoting.server;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
 import com.avanza.astrix.context.metrics.Metrics;
+import com.avanza.astrix.context.metrics.Timer;
 import com.avanza.astrix.core.ServiceInvocationException;
 import com.avanza.astrix.core.function.Command;
 import com.avanza.astrix.core.util.ReflectionUtil;
@@ -47,34 +52,52 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 	private static final Logger logger = LoggerFactory.getLogger(AstrixServiceActivatorImpl.class);
 	private final ConcurrentMap<String, PublishedService<?>> serviceByType = new ConcurrentHashMap<>();
 	private final Metrics metrics;
-	
-	public AstrixServiceActivatorImpl(Metrics metrics) {
+	private final AstrixMBeanExporter mbeanExporter;
+	private final ServiceInvocationMonitor allServicesAggregated;
+
+	public AstrixServiceActivatorImpl(Metrics metrics, AstrixMBeanExporter mbeanExporter) {
 		this.metrics = metrics;
+		this.mbeanExporter = mbeanExporter;
+		// Monitor for aggregated stats for all exported services
+		this.allServicesAggregated = new ServiceInvocationMonitor(metrics.createTimer());
+		mbeanExporter.registerMBean(this.allServicesAggregated, "ExportedServices", "AllServicesAggregated");
 	}
+	
+	private static class ServiceInvocationMonitors {
+		private final List<ServiceInvocationMonitor> monitor;
+		
+		public ServiceInvocationMonitors(ServiceInvocationMonitor... monitors) {
+			this.monitor = Arrays.asList(monitors);
+		}
 
-	static class PublishedService<T> {
-
-		private final T service;
-		private final Map<String, Method> methodBySignature = new HashMap<>();
-		private final AstrixObjectSerializer objectSerializer;
-
-		public PublishedService(T service, AstrixObjectSerializer serializer, Class<?>... providedApis) {
-			this.service = service;
-			this.objectSerializer = serializer;
-			for (Class<?> api : providedApis) {
-				for (Method m : api.getMethods()) {
-					methodBySignature.put(ReflectionUtil.methodSignatureWithoutReturnType(m), m);
-				}
+		public Command<AstrixServiceInvocationResponse> monitorServiceInvocation(Command<AstrixServiceInvocationResponse> execution) {
+			for (ServiceInvocationMonitor monitor : monitor) {
+				execution = monitor.monitor(execution);
 			}
+			return execution;
+		}
+	}
+	
+	private static class PublishedServiceMethod<T> {
+		private final ServiceInvocationMonitors serviceInvocationMonitors;
+		private final Method serviceMethod;
+		private final AstrixObjectSerializer objectSerializer;
+		private final T service;
+		
+		public PublishedServiceMethod(ServiceInvocationMonitors serviceInvocationMonitors, Method method, AstrixObjectSerializer objectSerializer, T service) {
+			this.serviceInvocationMonitors = serviceInvocationMonitors;
+			this.serviceMethod = method;
+			this.objectSerializer = objectSerializer;
+			this.service = service;
 		}
 		
-		public T getService() {
-			return service;
+		private AstrixServiceInvocationResponse timeInvocation(AstrixServiceInvocationRequest request, int version) {
+			return serviceInvocationMonitors.monitorServiceInvocation(() -> invoke(request, version)).call();
 		}
 		
-		private AstrixServiceInvocationResponse invoke(AstrixServiceInvocationRequest request, int version, String serviceApi) {
+		private AstrixServiceInvocationResponse invoke(AstrixServiceInvocationRequest request, int version) {
 			try {
-				return invokeService(request, version, serviceApi);
+				return invokeService(request, version);
 			} catch (Exception e) {
 				Throwable exceptionThrownByService = resolveException(e);
 				AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
@@ -90,15 +113,8 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 			}
 		}
 
-		private AstrixServiceInvocationResponse invokeService(
-				AstrixServiceInvocationRequest request, int version,
-				String serviceApi) throws IllegalAccessException,
+		private AstrixServiceInvocationResponse invokeService(AstrixServiceInvocationRequest request, int version) throws IllegalAccessException,
 				InvocationTargetException {
-			String serviceMethodSignature = request.getHeader("serviceMethodSignature");
-			Method serviceMethod = methodBySignature.get(serviceMethodSignature);
-			if (serviceMethod == null) {
-				throw new MissingServiceMethodException(String.format("Missing service method: service=%s method=%s", serviceApi, serviceMethodSignature));
-			}
 			Object[] arguments = unmarshal(request.getArguments(), serviceMethod.getGenericParameterTypes(), version);
 			Object result = serviceMethod.invoke(service, arguments);
 			AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
@@ -114,6 +130,49 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 				result[i] = objectSerializer.deserialize(elements[i], types[i], version);
 			}
 			return result;
+		}
+
+	}
+
+	class PublishedService<T> {
+
+		private final Map<String, PublishedServiceMethod<T>> methodBySignature = new HashMap<>();
+		/*
+		 * Overloaded service methods share the same Metrics
+		 */
+		private final Map<String, ServiceInvocationMonitors> serviceInvocationMonitorsByMethodName = new HashMap<>();
+		private final AstrixObjectSerializer objectSerializer;
+		private Class<?> providedApi;
+		private ServiceInvocationMonitor serviceMonitor;
+
+		public PublishedService(T service, AstrixObjectSerializer serializer, Class<?> providedApi) {
+			this.objectSerializer = serializer;
+			this.providedApi = providedApi;
+			// Monitor for service-level metrics (aggregated stats for all methods)
+			this.serviceMonitor = new ServiceInvocationMonitor(metrics.createTimer());
+			mbeanExporter.registerMBean(this.serviceMonitor, "ExportedServices", providedApi.getName());
+			for (Method m : providedApi.getMethods()) {
+				ServiceInvocationMonitors serviceInvocationMonitors = serviceInvocationMonitorsByMethodName.computeIfAbsent(m.getName(), this::createServiceInvocationMonitors);
+				methodBySignature.put(ReflectionUtil.methodSignatureWithoutReturnType(m), new PublishedServiceMethod<>(serviceInvocationMonitors, m, objectSerializer, service));
+			}
+		}
+
+		private ServiceInvocationMonitors createServiceInvocationMonitors(String methodName) {
+			Timer methodTimer = metrics.createTimer();
+			// Monitor for method level metrics
+			ServiceInvocationMonitor methodMonitor = new ServiceInvocationMonitor(methodTimer);
+			mbeanExporter.registerMBean(methodMonitor, "ExportedServices", providedApi.getName() + "#" + methodName);
+			ServiceInvocationMonitors result = new ServiceInvocationMonitors(methodMonitor, serviceMonitor, allServicesAggregated);
+			return result;
+		}
+		
+		private AstrixServiceInvocationResponse invoke(AstrixServiceInvocationRequest request, int version, String serviceApi) {
+			String serviceMethodSignature = request.getHeader("serviceMethodSignature");
+			PublishedServiceMethod<T> serviceMethod = methodBySignature.get(serviceMethodSignature);
+			if (serviceMethod == null) {
+				throw new MissingServiceMethodException(String.format("Missing service method: service=%s method=%s", serviceApi, serviceMethodSignature));
+			}
+			return serviceMethod.timeInvocation(request, version);
 		}
 		
 	}
@@ -148,8 +207,7 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 			logger.info(String.format("Service not available. request=%s correlationId=%s", request, invocationResponse.getCorrelationId()));
 			return invocationResponse;
 		}
-		return this.metrics.timeExecution(
-				(Command<AstrixServiceInvocationResponse>) () -> publishedService.invoke(request, version, serviceApi), "ServiceActivator", serviceApi).call();
+		return publishedService.invoke(request, version, serviceApi);
 	}
 
 	private static Throwable resolveException(Exception e) {

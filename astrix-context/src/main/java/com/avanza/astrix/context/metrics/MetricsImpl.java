@@ -15,43 +15,21 @@
  */
 package com.avanza.astrix.context.metrics;
 
-import java.util.function.Supplier;
-
-import com.avanza.astrix.core.function.CheckedCommand;
-import com.avanza.astrix.core.function.Command;
-
-import rx.Observable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 final class MetricsImpl implements Metrics {
 
 	private final MetricsSpi metricsSpi;
+	private final ConcurrentMap<String, Timer> timerCache = new ConcurrentHashMap<>();
 	
 	public MetricsImpl(MetricsSpi metricsSpi) {
 		this.metricsSpi = metricsSpi;
 	}
 
 	@Override
-	public <T> CheckedCommand<T> timeExecution(CheckedCommand<T> execution, String group, String name) {
-		return metricsSpi.timeExecution(execution, group, name);
+	public Timer createTimer() {
+		return new Timer(metricsSpi.createTimer());
 	}
-
-	@Override
-	public <T> Command<T> timeExecution(final Command<T> execution, final String group, final String name) {
-		final CheckedCommand<T> command = metricsSpi.timeExecution(execution, group, name);
-		return () -> {
-			try {
-				return command.call();
-			} catch (RuntimeException e1) {
-				throw e1;
-			} catch (Throwable e2) {
-				throw new RuntimeException(e2);
-			}
-		};
-	}
-
-	@Override
-	public <T> Supplier<Observable<T>> timeObservable(Supplier<Observable<T>> observableFactory, String group, String name) {
-		return metricsSpi.timeObservable(observableFactory, group, name);
-	}
-
+	
 }

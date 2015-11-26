@@ -15,8 +15,9 @@
  */
 package com.avanza.astrix.metrics;
 
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 
 import java.util.function.Supplier;
 
@@ -27,12 +28,11 @@ import org.junit.Test;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.context.metrics.MetricsSpi;
+import com.avanza.astrix.context.metrics.TimerSnaphot;
+import com.avanza.astrix.context.metrics.TimerSpi;
 import com.avanza.astrix.core.function.CheckedCommand;
-import com.codahale.metrics.Timer;
 
 import rx.Observable;
-import rx.Observable.OnSubscribe;
-import rx.Subscriber;
 
 public class DropwizardMetricsTest {
 
@@ -57,48 +57,43 @@ public class DropwizardMetricsTest {
 	
 	@Test
 	public void timeExecution() throws Throwable {
+
+		TimerSpi timer = dropwizardMetrics.createTimer();
 		
-		CheckedCommand<String> execution = dropwizardMetrics.timeExecution(() -> {
-			Thread.sleep(2);
-			return "foo";
-		}, "bar-group", "foo-metrics");
+		CheckedCommand<String> execution = timer.timeExecution(() -> {
+			Thread.sleep(10);
+			return "foo-bar";
+		});
 		
-		assertEquals("foo", execution.call());
+		assertEquals("foo-bar", execution.call());
 		
-		Timer fooMetrics = dropwizardMetrics.getMetrics().getTimers().get("bar-group#foo-metrics");
-		assertEquals(1, fooMetrics.getCount());
-		// Should meassure execution time roughly equal to 2000 us
-		assertTrue(fooMetrics.getSnapshot().getMean() > 100_000);
+		// Should meassure execution time roughly equal to 10 ms
+		TimerSnaphot timerSnapshot = timer.getSnapshot();
+		assertEquals(1, timerSnapshot.getCount());
+		assertThat(timerSnapshot.getMax(), greaterThan(8D));
 	}
 	
+
 	@Test
 	public void timeObservable() throws Throwable {
+		TimerSpi timer = dropwizardMetrics.createTimer();
 		
-		Supplier<Observable<String>> observable = dropwizardMetrics.timeObservable(new Supplier<Observable<String>>() {
-			@Override
-			public Observable<String> get() {
-				return Observable.create(new OnSubscribe<String>() {
-					@Override
-					public void call(Subscriber<? super String> t) {
-						try {
-							Thread.sleep(2);
-							t.onNext("foo");
-							t.onCompleted();
-						} catch (InterruptedException e) {
-							t.onError(e);
-						}
-					}
-					
-				});
+		Supplier<Observable<String>> observable = timer.timeObservable(() -> Observable.create(subscriber -> {
+			try {
+				Thread.sleep(10);
+				subscriber.onNext("foo");
+				subscriber.onCompleted();
+			} catch (InterruptedException e) {
+				subscriber.onError(e);
 			}
-		}, "bar-group", "foo-metrics");
+		}));
 		
 		assertEquals("foo", observable.get().toBlocking().first());
-		
-		Timer fooMetrics = dropwizardMetrics.getMetrics().getTimers().get("bar-group#foo-metrics");
-		assertEquals(1, fooMetrics.getCount());
-		// Should meassure execution time roughly equal to 2000 us
-		assertTrue(fooMetrics.getSnapshot().getMean() > 100_000);
+
+		TimerSnaphot timerSnapshot = timer.getSnapshot();
+		assertEquals(1, timerSnapshot.getCount());
+		// Should meassure execution time roughly equal to 10 ms
+		assertThat(timerSnapshot.getMax(), greaterThan(8D));
 	}
 
 }

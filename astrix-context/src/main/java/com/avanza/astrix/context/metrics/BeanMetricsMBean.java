@@ -13,20 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.config;
+package com.avanza.astrix.context.metrics;
 
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
-/**
- * @author Elias Lindholm (elilin)
- */
-public interface BeanConfigurations {
+public interface BeanMetricsMBean {
+
+	TimeUnit getRateUnit();
+
+	TimeUnit getDurationUnit();
+
+	double getOneMinuteRate();
+
+	double getMin();
+
+	double getMean();
+
+	double getMax();
+
+	double get99thPercentile();
+
+	double get50thPercentile();
+
+	long getCount();
 	
-	// TODO Move these methods AstrixConfig rand remove this abstraction?
 	
-	BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey);
 
-	void setDefaultBeanConfig(AstrixBeanKey<?> beanKey, Map<BeanSetting<?>, Object> defaultBeanSettingsOverride);
 }

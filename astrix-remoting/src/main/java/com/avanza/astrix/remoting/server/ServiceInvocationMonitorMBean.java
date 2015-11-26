@@ -13,20 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.config;
+package com.avanza.astrix.remoting.server;
 
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
-/**
- * @author Elias Lindholm (elilin)
- */
-public interface BeanConfigurations {
+public interface ServiceInvocationMonitorMBean {
 	
-	// TODO Move these methods AstrixConfig rand remove this abstraction?
+	long getInvocationCount();
 	
-	BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey);
+	long getErrorCount();
+	
+	double get50thPercentile();
+	
+	double get99thPercentile();
+	
+	double getMax();
+	
+	double getMean();
+	
+	double getMin();
+	
+	double getOneMinuteRate();
+	
+	TimeUnit getRateUnit();
+	
+	TimeUnit getDurationUnit();
+	
 
-	void setDefaultBeanConfig(AstrixBeanKey<?> beanKey, Map<BeanSetting<?>, Object> defaultBeanSettingsOverride);
 }

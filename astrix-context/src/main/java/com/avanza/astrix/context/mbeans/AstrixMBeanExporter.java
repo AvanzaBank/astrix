@@ -15,14 +15,14 @@
  */
 package com.avanza.astrix.context.mbeans;
 
-import javax.management.ObjectName;
-
 public interface AstrixMBeanExporter {
 
 	void registerMBean(Object mbean, String folder, String name);
 
-	ObjectName getObjectName(String subDomain, String name);
-	
-	boolean exportMBeans();
+	public static class NoExporter implements AstrixMBeanExporter {
+		@Override
+		public void registerMBean(Object mbean, String folder, String name) {
+		}
+	}
 	
 }

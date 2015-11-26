@@ -31,7 +31,7 @@ public class MissingBeanProviderException extends RuntimeException {
 	
 	public MissingBeanProviderException(AstrixBeanKey<? extends Object> beanType) {
 		super(String.format("No provider found\n bean: %s \n"
-				  + "Most common cause is that you don't have an ApiProvider on the classpath in any of the scanned packages that exports the given bean"));
+				  + "Most common cause is that you don't have an ApiProvider on the classpath in any of the scanned packages that exports the given bean", beanType));
 		this.beanType = beanType;
 	}
 	

@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.core.function;
 
+@FunctionalInterface
 public interface Command<T> extends CheckedCommand<T> {
 	T call();
 }

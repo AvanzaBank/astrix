@@ -60,8 +60,7 @@ public class AstrixMBeanExporterImpl implements AstrixMBeanExporter {
 		}
 	}
 
-	@Override
-	public ObjectName getObjectName(String folder, String name) {
+	private ObjectName getObjectName(String folder, String name) {
 		try {
 			return new ObjectName(domain + ":00=" + folder + ",name=" + name);
 		} catch (MalformedObjectNameException e) {
@@ -69,8 +68,7 @@ public class AstrixMBeanExporterImpl implements AstrixMBeanExporter {
 		}
 	}
 	
-	@Override
-	public boolean exportMBeans() {
+	private boolean exportMBeans() {
 		return astrixConfig.get(AstrixSettings.EXPORT_ASTRIX_MBEANS).get();
 	}
 	

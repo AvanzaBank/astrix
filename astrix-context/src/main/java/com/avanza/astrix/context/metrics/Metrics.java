@@ -15,35 +15,19 @@
  */
 package com.avanza.astrix.context.metrics;
 
-import java.util.function.Supplier;
-
-import com.avanza.astrix.core.function.CheckedCommand;
-import com.avanza.astrix.core.function.Command;
-
-import rx.Observable;
-
 public interface Metrics {
 	
-	<T> CheckedCommand<T> timeExecution(CheckedCommand<T> execution, String group, String name);
-	
-	<T> Command<T> timeExecution(Command<T> execution, String group, String name);
-	
-	<T> Supplier<Observable<T>> timeObservable(Supplier<Observable<T>> observableFactory, String group, String name);
+	/**
+	 * Returns a timer with a given name. Created timers are cached
+	 * 
+	 * @return
+	 */
+	Timer createTimer();
 	
 	public static class NoMetrics implements Metrics {
 		@Override
-		public <T> CheckedCommand<T> timeExecution(CheckedCommand<T> execution, String group, String name) {
-			return execution;
-		}
-
-		@Override
-		public <T> Command<T> timeExecution(Command<T> execution, String group, String name) {
-			return execution;
-		}
-
-		@Override
-		public <T> Supplier<Observable<T>> timeObservable(Supplier<Observable<T>> observableFactory, String group, String name) {
-			return observableFactory; 
+		public Timer createTimer() {
+			return new Timer(new TimerSpi.NoTimer());
 		}
 		
 	}
