@@ -26,17 +26,20 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avanza.astrix.beans.config.AstrixConfig;
+import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
 import com.avanza.astrix.context.metrics.Metrics;
 import com.avanza.astrix.context.metrics.Timer;
 import com.avanza.astrix.core.ServiceInvocationException;
 import com.avanza.astrix.core.function.Command;
 import com.avanza.astrix.core.util.ReflectionUtil;
+import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.client.MissingServiceMethodException;
@@ -54,8 +57,16 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 	private final Metrics metrics;
 	private final AstrixMBeanExporter mbeanExporter;
 	private final ServiceInvocationMonitor allServicesAggregated;
+	private final DynamicBooleanProperty exportedServiceMetricsEnabled;
 
-	public AstrixServiceActivatorImpl(Metrics metrics, AstrixMBeanExporter mbeanExporter) {
+	@AstrixInject
+	public AstrixServiceActivatorImpl(AstrixConfig astrixConfig, Metrics metrics, AstrixMBeanExporter mbeanExporter) {
+		this(astrixConfig.get(AstrixSettings.EXPORTED_SERVICE_METRICS_ENABLED), metrics, mbeanExporter);
+	}
+	
+	// For testnig
+	AstrixServiceActivatorImpl(DynamicBooleanProperty exportedServiceMetricsEnabled, Metrics metrics, AstrixMBeanExporter mbeanExporter) {
+		this.exportedServiceMetricsEnabled = exportedServiceMetricsEnabled;
 		this.metrics = metrics;
 		this.mbeanExporter = mbeanExporter;
 		// Monitor for aggregated stats for all exported services
@@ -65,12 +76,17 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 	
 	private static class ServiceInvocationMonitors {
 		private final List<ServiceInvocationMonitor> monitor;
+		private final DynamicBooleanProperty serviceMonitorEnabled;
 		
-		public ServiceInvocationMonitors(ServiceInvocationMonitor... monitors) {
+		public ServiceInvocationMonitors(DynamicBooleanProperty serviceMonitorEnabled, ServiceInvocationMonitor... monitors) {
+			this.serviceMonitorEnabled = serviceMonitorEnabled;
 			this.monitor = Arrays.asList(monitors);
 		}
 
 		public Command<AstrixServiceInvocationResponse> monitorServiceInvocation(Command<AstrixServiceInvocationResponse> execution) {
+			if (!serviceMonitorEnabled.get()) {
+				return execution;
+			}
 			for (ServiceInvocationMonitor monitor : monitor) {
 				execution = monitor.monitor(execution);
 			}
@@ -162,7 +178,7 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 			// Monitor for method level metrics
 			ServiceInvocationMonitor methodMonitor = new ServiceInvocationMonitor(methodTimer);
 			mbeanExporter.registerMBean(methodMonitor, "ExportedServices", providedApi.getName() + "#" + methodName);
-			ServiceInvocationMonitors result = new ServiceInvocationMonitors(methodMonitor, serviceMonitor, allServicesAggregated);
+			ServiceInvocationMonitors result = new ServiceInvocationMonitors(exportedServiceMetricsEnabled, methodMonitor, serviceMonitor, allServicesAggregated);
 			return result;
 		}
 		

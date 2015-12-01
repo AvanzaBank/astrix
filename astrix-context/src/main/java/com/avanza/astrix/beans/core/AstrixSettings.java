@@ -99,6 +99,12 @@ public final class AstrixSettings {
 	 */
 	public static final BooleanSetting ENABLE_BEAN_METRICS = BooleanSetting.create("com.avanza.astrix.enableBeanMetrics", true);
 	
+	/**
+	 * Whether Astrix should collect statistics about each exported service. The collected statistics is exported as MBeans (provided
+	 * that {@link #EXPORT_ASTRIX_MBEANS} is true.
+	 */
+	public static final BooleanSetting EXPORTED_SERVICE_METRICS_ENABLED = BooleanSetting.create("com.avanza.astrix.exportedServiceMetricsEnabled", true);
+	
 	
 	public static final StringSetting GIGA_SPACE_BEAN_NAME = StringSetting.create("AstrixGsComponent.gigaSpaceBeanName", null);
 	public static final StringSetting DYNAMIC_CONFIG_FACTORY = StringSetting.create("com.avanza.astrix.context.AstrixDynamicConfigFactory", null);

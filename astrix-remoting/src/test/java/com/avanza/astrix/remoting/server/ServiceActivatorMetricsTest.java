@@ -121,6 +121,31 @@ public class ServiceActivatorMetricsTest {
 		assertEquals(2, pingMonitor.getInvocationCount());
 	}
 	
+	@Test
+	public void itIsPossibleToGloballyDisableAllExportedServiceMetrics() throws Exception {
+		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
+		remotingDriver.registerServer(Ping.class, new Ping() {
+			@Override
+			public String ping(String msg) {
+				return msg;
+			}
+		});
+		
+		Ping ping = remotingDriver.createRemotingProxy(Ping.class);
+		
+		ServiceInvocationMonitorMBean pingMethodMonitor = remotingDriver.hasExportedMbeanOfType(ServiceInvocationMonitorMBean.class, new MBeanKey("ExportedServices", Ping.class.getName() + "#ping"));
+		ServiceInvocationMonitorMBean pingServiceMonitor = remotingDriver.hasExportedMbeanOfType(ServiceInvocationMonitorMBean.class, new MBeanKey("ExportedServices", Ping.class.getName()));
+		ServiceInvocationMonitorMBean aggregatedMonitor = remotingDriver.hasExportedMbeanOfType(ServiceInvocationMonitorMBean.class, new MBeanKey("ExportedServices", "AllServicesAggregated"));
+		
+		remotingDriver.setExportedServiceMetricsEnabled(false);
+		
+		ping.ping("msg");
+		
+		assertEquals(0, pingMethodMonitor.getInvocationCount());
+		assertEquals(0, pingServiceMonitor.getInvocationCount());
+		assertEquals(0, aggregatedMonitor.getInvocationCount());
+	}
+	
 	public interface Ping {
 		String ping(String msg);
 	}

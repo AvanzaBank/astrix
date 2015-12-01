@@ -17,6 +17,7 @@ package com.avanza.astrix.remoting.server;
 
 import org.kohsuke.MetaInfServices;
 
+import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
@@ -31,6 +32,7 @@ public class RemotingServerModule implements AstrixContextPlugin {
 
 		moduleContext.importType(Metrics.class);
 		moduleContext.importType(AstrixMBeanExporter.class);
+		moduleContext.importType(AstrixConfig.class);
 		
 		moduleContext.export(AstrixServiceActivator.class);
 	}

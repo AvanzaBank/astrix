@@ -32,6 +32,7 @@ import org.junit.Assert;
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
+import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.context.JavaSerializationSerializer;
 import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
 import com.avanza.astrix.context.metrics.Metrics;
@@ -71,6 +72,7 @@ public class AstrixRemotingDriver {
 		}
 	};
 	private ReactiveTypeConverter reactiveTypeConverter = new ReactiveTypeConverterImpl(Collections.<ReactiveTypeHandlerPlugin<?>>emptyList());
+	private DynamicBooleanProperty exportedServiceMetricsEnabled = new DynamicBooleanProperty(true);
 	
 	private AstrixServiceActivatorImpl[] partitions;
 	
@@ -80,7 +82,7 @@ public class AstrixRemotingDriver {
 	
 	public AstrixRemotingDriver(int partitionCount) {
 		this.partitions = new AstrixServiceActivatorImpl[partitionCount];
-		IntStream.range(0, partitionCount).forEach(index -> partitions[index] = new AstrixServiceActivatorImpl(metrics, exporter));
+		IntStream.range(0, partitionCount).forEach(index -> partitions[index] = new AstrixServiceActivatorImpl(exportedServiceMetricsEnabled, metrics, exporter));
 	}
 	
 	public <T> T hasExportedMbeanOfType(Class<T> expectedType, MBeanKey key) {
@@ -226,6 +228,10 @@ public class AstrixRemotingDriver {
 			return new TimerSnaphot.Builder().count(invocationCount.get()).build();
 		}
 		
+	}
+
+	public void setExportedServiceMetricsEnabled(boolean enabled) {
+		this.exportedServiceMetricsEnabled.set(enabled);
 	}
 
 }
