@@ -16,7 +16,6 @@
 package com.avanza.astrix.context.metrics;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
-import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
 import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
 import com.avanza.astrix.modules.Module;
@@ -31,7 +30,6 @@ public class MetricsModule implements Module {
 		
 		moduleContext.importType(MetricsSpi.class);
 		moduleContext.importType(AstrixConfig.class);
-		moduleContext.importType(BeanConfigurations.class);
 		moduleContext.importType(AstrixMBeanExporter.class);
 		
 		moduleContext.export(ServiceBeanProxyFactory.class);

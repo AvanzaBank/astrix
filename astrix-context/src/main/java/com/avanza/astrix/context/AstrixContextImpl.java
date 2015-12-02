@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.BeanConfiguration;
-import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.BeanFactory;
@@ -49,19 +48,19 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	
 	private final Logger log = LoggerFactory.getLogger(AstrixContextImpl.class);
 	private final BeanFactory beanFactory;
-	private final BeanConfigurations beanConfigurations;
 	private final BeanPublisher beanPublisher;
 	private final DynamicConfig dynamicConfig;
 	private final Modules modules;
 	private final AstrixApplicationDescriptor applicationDescriptor;
+	private final AstrixConfig config;
 	
 	public AstrixContextImpl(Modules modules, AstrixApplicationDescriptor applicationDescriptor) {
 		this.modules = modules;
 		this.applicationDescriptor = applicationDescriptor;
-		this.dynamicConfig = modules.getInstance(AstrixConfig.class).getConfig();
+		this.config = modules.getInstance(AstrixConfig.class);
+		this.dynamicConfig = config.getConfig();
 		this.beanPublisher = modules.getInstance(BeanPublisher.class);
 		this.beanFactory = modules.getInstance(BeanFactory.class);
-		this.beanConfigurations = modules.getInstance(BeanConfigurations.class);
 	}
 	
 
@@ -84,7 +83,7 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	}
 	
 	public BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey) {
-		return this.beanConfigurations.getBeanConfiguration(beanKey);
+		return this.config.getBeanConfiguration(beanKey);
 	}
 	
 	@Override
@@ -145,7 +144,7 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 		}
 		ServiceExporter serviceExporter = getInstance(ServiceExporter.class);
 		
-		if (AstrixSettings.SERVICE_ADMINISTRATOR_EXPORTED.getFrom(dynamicConfig).get()) {
+		if (config.get(AstrixSettings.SERVICE_ADMINISTRATOR_EXPORTED).get()) {
 			exportServiceAdministrator(serviceExporter);
 		} else {
 			log.info("Export of ServiceAdministrator service explicitly disabled. Won't export ServiceAdministrator service.");
@@ -156,7 +155,7 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 
 
 	private void exportServiceAdministrator(ServiceExporter serviceExporter) {
-		String applicationInstanceId = AstrixSettings.APPLICATION_INSTANCE_ID.getFrom(dynamicConfig).get();
+		String applicationInstanceId = config.get(AstrixSettings.APPLICATION_INSTANCE_ID).get();
 		serviceExporter.addServiceProvider(getInstance(ServiceAdministrator.class));
 		ObjectSerializerDefinition serializer = ObjectSerializerDefinition.versionedService(1, ServiceAdministratorVersioningConfigurer.class);
 		AstrixBeanKey<ServiceAdministrator> serviceAdministratorQualifier = AstrixBeanKey.create(ServiceAdministrator.class, applicationInstanceId);
@@ -164,7 +163,7 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 				serviceAdministratorQualifier, 
 				serializer, 
 				true); // isDynamicQualified
-		String serviceAdministratorComponent = AstrixSettings.SERVICE_ADMINISTRATOR_COMPONENT.getFrom(getConfig()).get();
+		String serviceAdministratorComponent = config.get(AstrixSettings.SERVICE_ADMINISTRATOR_COMPONENT).get();
 		ExportedServiceBeanDefinition<ServiceAdministrator> serviceAdminDefintion = new ExportedServiceBeanDefinition<>(serviceAdministratorQualifier, 
 				serviceDefinition, 
 				true, // isVersioned  

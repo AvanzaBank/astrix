@@ -15,30 +15,31 @@
  */
 package com.avanza.astrix.beans.service;
 
-import com.avanza.astrix.beans.config.BeanConfigurations;
+import com.avanza.astrix.beans.config.AstrixConfig;
 
 public final class ServiceBeanContext {
 
 	private final ServiceComponentRegistry serviceComponents;
 	private final ServiceLeaseManager leaseManager;
-	private final BeanConfigurations beanConfigurations;
 	private final AstrixServiceBeanInstanceMbeanExporter serviceMbeanExporter;
 	private final ServiceBeanProxyInvocationDispatcherFactory serviceBeanInvocationDispatcherFactory;
+	private final AstrixConfig config;
 	
 	
-	public ServiceBeanContext(ServiceComponentRegistry serviceComponents, ServiceLeaseManager leaseManager,
-			BeanConfigurations beanConfigurations,
-			AstrixServiceBeanInstanceMbeanExporter serviceMbeanExporter,
-			ServiceBeanProxyInvocationDispatcherFactory serviceBeanInvocationDispatcherFactory) {
+	public ServiceBeanContext(ServiceComponentRegistry serviceComponents, 
+							  ServiceLeaseManager leaseManager,
+							  AstrixConfig astrixConfig,
+							  AstrixServiceBeanInstanceMbeanExporter serviceMbeanExporter,
+							  ServiceBeanProxyInvocationDispatcherFactory serviceBeanInvocationDispatcherFactory) {
 		this.serviceComponents = serviceComponents;
 		this.leaseManager = leaseManager;
-		this.beanConfigurations = beanConfigurations;
+		this.config = astrixConfig;
 		this.serviceMbeanExporter = serviceMbeanExporter;
 		this.serviceBeanInvocationDispatcherFactory = serviceBeanInvocationDispatcherFactory;
 	}
-
-	public BeanConfigurations getBeanConfigurations() {
-		return beanConfigurations;
+	
+	public AstrixConfig getConfig() {
+		return config;
 	}
 
 	public ServiceLeaseManager getLeaseManager() {

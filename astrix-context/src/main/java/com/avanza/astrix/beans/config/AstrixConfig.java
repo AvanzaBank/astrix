@@ -15,6 +15,10 @@
  */
 package com.avanza.astrix.beans.config;
 
+import java.util.Map;
+
+import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
 import com.avanza.astrix.config.BooleanSetting;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
@@ -55,4 +59,8 @@ public interface AstrixConfig {
 	 * @param value
 	 */
 	void set(String setting, String value);
+	
+	BeanConfiguration getBeanConfiguration(AstrixBeanKey<?> beanKey);
+
+	void setDefaultBeanConfig(AstrixBeanKey<?> beanKey, Map<BeanSetting<?>, Object> defaultBeanSettingsOverride);
 }	

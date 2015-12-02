@@ -18,7 +18,6 @@ package com.avanza.astrix.context.metrics;
 import java.util.function.Supplier;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
-import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
@@ -34,9 +33,9 @@ class BeanMetricsProxy implements BeanProxy {
 	private final DynamicBooleanProperty beanMetricsEnabled;
 	private final Timer timer;
 	
-	public BeanMetricsProxy(AstrixBeanKey<?> beanKey, Metrics metrics, AstrixConfig astrixConfig, BeanConfigurations beanConfigurations) {
+	public BeanMetricsProxy(AstrixBeanKey<?> beanKey, Metrics metrics, AstrixConfig astrixConfig) {
 		this.beanMetricsEnabledGlobally = astrixConfig.get(AstrixSettings.ENABLE_BEAN_METRICS);
-		this.beanMetricsEnabled = beanConfigurations.getBeanConfiguration(beanKey).get(AstrixBeanSettings.BEAN_METRICS_ENABLED);
+		this.beanMetricsEnabled = astrixConfig.getBeanConfiguration(beanKey).get(AstrixBeanSettings.BEAN_METRICS_ENABLED);
 		this.timer = metrics.createTimer();
 	}
 

@@ -17,7 +17,6 @@ package com.avanza.astrix.beans.ft;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.BeanConfiguration;
-import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.BeanProxy;
 /**
@@ -28,20 +27,17 @@ import com.avanza.astrix.beans.core.BeanProxy;
 final class BeanFaultToleranceFactoryImpl implements BeanFaultToleranceFactory {
 	
 	private final FaultToleranceSpi beanFaultToleranceSpi;
-	private final BeanConfigurations beanConfigurations;
 	private final AstrixConfig config;
 	
 	public BeanFaultToleranceFactoryImpl(FaultToleranceSpi beanFaultToleranceSpi,
-									      BeanConfigurations beanConfigurations, 
 									      AstrixConfig config) {
 		this.beanFaultToleranceSpi = beanFaultToleranceSpi;
-		this.beanConfigurations = beanConfigurations;
 		this.config = config;
 	}
 
 	@Override
 	public BeanProxy createFaultToleranceProxy(AstrixBeanKey<?> beanKey) {
-		BeanConfiguration beanConfiguration = beanConfigurations.getBeanConfiguration(beanKey);
+		BeanConfiguration beanConfiguration = config.getBeanConfiguration(beanKey);
 		return new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultToleranceSpi);
 	}
 	

@@ -92,7 +92,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 													AstrixBeanKey<T> beanKey, 
 													ServiceDiscovery serviceDiscovery, 
 													ServiceBeanContext serviceBeanContext) {
-		BeanConfiguration beanConfiguration = serviceBeanContext.getBeanConfigurations().getBeanConfiguration(beanKey);
+		BeanConfiguration beanConfiguration = serviceBeanContext.getConfig().getBeanConfiguration(beanKey);
 		return new ServiceBeanInstance<T>(serviceDefinition, 
 				beanKey, 
 				serviceDiscovery, 
