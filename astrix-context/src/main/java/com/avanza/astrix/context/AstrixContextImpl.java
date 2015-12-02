@@ -133,11 +133,6 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	}
 	
 	@Override
-	public DynamicConfig getConfig() {
-		return dynamicConfig;
-	}
-	
-	@Override
 	public void startServicePublisher() {
 		if (!isServer()) {
 			throw new IllegalStateException("Server part not configured. Set AstrixConfigurer.setApplicationDescriptor to load server part of framework");
