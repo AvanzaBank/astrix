@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.config.DynamicBooleanProperty;
-import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
+import com.avanza.astrix.context.mbeans.MBeanExporter;
 import com.avanza.astrix.context.metrics.Metrics;
 import com.avanza.astrix.context.metrics.Timer;
 import com.avanza.astrix.core.ServiceInvocationException;
@@ -55,17 +55,17 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 	private static final Logger logger = LoggerFactory.getLogger(AstrixServiceActivatorImpl.class);
 	private final ConcurrentMap<String, PublishedService<?>> serviceByType = new ConcurrentHashMap<>();
 	private final Metrics metrics;
-	private final AstrixMBeanExporter mbeanExporter;
+	private final MBeanExporter mbeanExporter;
 	private final ServiceInvocationMonitor allServicesAggregated;
 	private final DynamicBooleanProperty exportedServiceMetricsEnabled;
 
 	@AstrixInject
-	public AstrixServiceActivatorImpl(AstrixConfig astrixConfig, Metrics metrics, AstrixMBeanExporter mbeanExporter) {
+	public AstrixServiceActivatorImpl(AstrixConfig astrixConfig, Metrics metrics, MBeanExporter mbeanExporter) {
 		this(astrixConfig.get(AstrixSettings.EXPORTED_SERVICE_METRICS_ENABLED), metrics, mbeanExporter);
 	}
 	
 	// For testnig
-	AstrixServiceActivatorImpl(DynamicBooleanProperty exportedServiceMetricsEnabled, Metrics metrics, AstrixMBeanExporter mbeanExporter) {
+	AstrixServiceActivatorImpl(DynamicBooleanProperty exportedServiceMetricsEnabled, Metrics metrics, MBeanExporter mbeanExporter) {
 		this.exportedServiceMetricsEnabled = exportedServiceMetricsEnabled;
 		this.metrics = metrics;
 		this.mbeanExporter = mbeanExporter;

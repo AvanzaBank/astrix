@@ -15,37 +15,23 @@
  */
 package com.avanza.astrix.context.mbeans;
 
-import java.lang.management.ManagementFactory;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixSettings;
 
-public class AstrixMBeanExporterImpl implements AstrixMBeanExporter {
+final class MBeanExporterImpl implements MBeanExporter {
 
-	private static final AtomicInteger astrixContextCount = new AtomicInteger(0);
-	
-	private final Logger logger = LoggerFactory.getLogger(AstrixMBeanExporterImpl.class);
+	private final Logger logger = LoggerFactory.getLogger(MBeanExporterImpl.class);
 	
 	private final AstrixConfig astrixConfig;
-	private final String domain;
+	private final MBeanServerFacade mbeanServer;
 	
-	public AstrixMBeanExporterImpl(AstrixConfig astrixConfig) {
+	public MBeanExporterImpl(AstrixConfig astrixConfig, MBeanServerFacade mbeanServer) {
 		this.astrixConfig = astrixConfig;
-		int astrixContextId = astrixContextCount.incrementAndGet();
-		if (astrixContextId != 1) {
-			this.domain = "com.avanza.astrix.context." + astrixContextId;
-		} else {
-			this.domain = "com.avanza.astrix.context";
-		}
+		this.mbeanServer = mbeanServer;
 	}
-
 
 	@Override
 	public void registerMBean(Object mbean, String folder, String name) {
@@ -54,20 +40,12 @@ public class AstrixMBeanExporterImpl implements AstrixMBeanExporter {
 			return;
 		}
 		try {
-			ManagementFactory.getPlatformMBeanServer().registerMBean(mbean, getObjectName(folder, name));
+			mbeanServer.registerMBean(mbean, folder, name);
 		} catch (Exception e) {
 			logger.warn(String.format("Failed to export mbean: type=%s name=%s", mbean.getClass().getName(), name.toString()), e);
 		}
 	}
 
-	private ObjectName getObjectName(String folder, String name) {
-		try {
-			return new ObjectName(domain + ":00=" + folder + ",name=" + name);
-		} catch (MalformedObjectNameException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
 	private boolean exportMBeans() {
 		return astrixConfig.get(AstrixSettings.EXPORT_ASTRIX_MBEANS).get();
 	}

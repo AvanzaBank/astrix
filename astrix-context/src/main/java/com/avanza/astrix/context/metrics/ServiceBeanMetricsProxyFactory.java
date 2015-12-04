@@ -20,15 +20,15 @@ import com.avanza.astrix.beans.core.BeanProxy;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
-import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
+import com.avanza.astrix.context.mbeans.MBeanExporter;
 
 public class ServiceBeanMetricsProxyFactory implements ServiceBeanProxyFactory {
 
 	private final Metrics metrics;
 	private final AstrixConfig astrixConfig;
-	private final AstrixMBeanExporter mBeanExporter;
+	private final MBeanExporter mBeanExporter;
 	
-	public ServiceBeanMetricsProxyFactory(Metrics metrics, AstrixConfig astrixConfig, AstrixMBeanExporter mbeanExporter) {
+	public ServiceBeanMetricsProxyFactory(Metrics metrics, AstrixConfig astrixConfig, MBeanExporter mbeanExporter) {
 		this.metrics = metrics;
 		this.astrixConfig = astrixConfig;
 		this.mBeanExporter = mbeanExporter;

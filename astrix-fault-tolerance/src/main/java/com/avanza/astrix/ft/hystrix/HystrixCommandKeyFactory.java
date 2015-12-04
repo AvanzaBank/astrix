@@ -19,6 +19,7 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
+import com.netflix.hystrix.HystrixThreadPoolKey;
 
 final class HystrixCommandKeyFactory {
 	
@@ -44,6 +45,14 @@ final class HystrixCommandKeyFactory {
 			commandKeyName = commandKeyName + "[" + astrixContextId + "]";
 		}
 		return HystrixCommandGroupKey.Factory.asKey(commandKeyName);
+	}
+	
+	HystrixThreadPoolKey createThreadPoolKey(AstrixBeanKey<?> beanKey) {
+		String commandKeyName = this.commandNamingStrategy.getCommandKeyName(beanKey);
+		if (!astrixContextId.equals("1")) {
+			commandKeyName = commandKeyName + "[" + astrixContextId + "]";
+		}
+		return HystrixThreadPoolKey.Factory.asKey(commandKeyName);
 	}
 
 	

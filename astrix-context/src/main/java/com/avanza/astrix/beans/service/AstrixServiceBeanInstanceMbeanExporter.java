@@ -17,14 +17,14 @@ package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.BeanConfiguration;
-import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
+import com.avanza.astrix.context.mbeans.MBeanExporter;
 
 public class AstrixServiceBeanInstanceMbeanExporter {
 
-	private AstrixMBeanExporter mbeanExporter;
+	private MBeanExporter mbeanExporter;
 	private AstrixConfig astrixConfig;
 	
-	public AstrixServiceBeanInstanceMbeanExporter(AstrixMBeanExporter mbeanExporter, AstrixConfig astrixConfig) {
+	public AstrixServiceBeanInstanceMbeanExporter(MBeanExporter mbeanExporter, AstrixConfig astrixConfig) {
 		this.mbeanExporter = mbeanExporter;
 		this.astrixConfig = astrixConfig;
 	}

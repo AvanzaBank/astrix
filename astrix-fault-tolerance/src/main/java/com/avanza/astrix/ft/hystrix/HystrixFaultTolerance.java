@@ -21,12 +21,14 @@ import java.util.function.Supplier;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.ft.FaultToleranceSpi;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
+import com.avanza.astrix.beans.ft.MonitorableFaultToleranceSpi;
 import com.avanza.astrix.core.function.CheckedCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixObservableCommand.Setter;
+import com.netflix.hystrix.HystrixThreadPoolKey;
 
 import rx.Observable;
 /**
@@ -34,7 +36,7 @@ import rx.Observable;
  * @author Elias Lindholm (elilin)
  *
  */
-final class HystrixFaultTolerance implements FaultToleranceSpi {
+final class HystrixFaultTolerance implements FaultToleranceSpi, MonitorableFaultToleranceSpi {
 
 	/*
 	 * Astrix allows multiple AstrixContext within the same JVM, although
@@ -87,6 +89,11 @@ final class HystrixFaultTolerance implements FaultToleranceSpi {
 		return HystrixCommandFacade.execute(command, setter);
 	}
 	
+	@Override
+	public BeanFaultToleranceMetricsMBean createBeanFaultToleranceMetricsMBean(AstrixBeanKey<?> beanKey) {
+		return new BeanFaultToleranceMetrics(getCommandKey(beanKey), getThreadPoolKey(beanKey));
+	}
+	
 	HystrixCommandGroupKey getGroupKey(AstrixBeanKey<?> beanKey) {
 		HystrixCommandGroupKey result = hystrixCommandKeyFactory.createGroupKey(beanKey);
 		this.beanMapping.registerBeanKey(result.name(), beanKey);
@@ -95,6 +102,12 @@ final class HystrixFaultTolerance implements FaultToleranceSpi {
 
 	HystrixCommandKey getCommandKey(AstrixBeanKey<?> beanKey) {
 		HystrixCommandKey result =  hystrixCommandKeyFactory.createCommandKey(beanKey);
+		this.beanMapping.registerBeanKey(result.name(), beanKey);
+		return result;
+	}
+	
+	HystrixThreadPoolKey getThreadPoolKey(AstrixBeanKey<?> beanKey) {
+		HystrixThreadPoolKey result =  hystrixCommandKeyFactory.createThreadPoolKey(beanKey);
 		this.beanMapping.registerBeanKey(result.name(), beanKey);
 		return result;
 	}

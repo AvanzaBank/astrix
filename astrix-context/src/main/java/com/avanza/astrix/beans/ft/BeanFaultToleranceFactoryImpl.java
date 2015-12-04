@@ -19,6 +19,8 @@ import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.BeanConfiguration;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.BeanProxy;
+import com.avanza.astrix.context.mbeans.MBeanExporter;
+import com.avanza.astrix.context.mbeans.MBeanServerFacade;
 /**
  * 
  * @author Elias Lindholm
@@ -28,17 +30,25 @@ final class BeanFaultToleranceFactoryImpl implements BeanFaultToleranceFactory {
 	
 	private final FaultToleranceSpi beanFaultToleranceSpi;
 	private final AstrixConfig config;
+	private final MBeanExporter mbeanExporter;
 	
 	public BeanFaultToleranceFactoryImpl(FaultToleranceSpi beanFaultToleranceSpi,
-									      AstrixConfig config) {
+									      AstrixConfig config,
+									      MBeanExporter mbeanExporter) {
 		this.beanFaultToleranceSpi = beanFaultToleranceSpi;
 		this.config = config;
+		this.mbeanExporter = mbeanExporter;
 	}
 
 	@Override
 	public BeanProxy createFaultToleranceProxy(AstrixBeanKey<?> beanKey) {
 		BeanConfiguration beanConfiguration = config.getBeanConfiguration(beanKey);
-		return new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultToleranceSpi);
+		BeanFaultToleranceProxy result = new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultToleranceSpi);
+		if (beanFaultToleranceSpi instanceof MonitorableFaultToleranceSpi) {
+			Object mbean = MonitorableFaultToleranceSpi.class.cast(beanFaultToleranceSpi).createBeanFaultToleranceMetricsMBean(beanKey);
+			mbeanExporter.registerMBean(mbean, "BeanFaultToleranceMetrics", beanKey.toString());
+		}
+		return result;
 	}
 	
 }

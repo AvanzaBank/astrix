@@ -27,5 +27,5 @@ public interface FaultToleranceSpi {
 	<T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey);
 
 	<T> T execute(CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable;
-	
+
 }

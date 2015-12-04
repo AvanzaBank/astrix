@@ -13,28 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.remoting.server;
+package com.avanza.astrix.beans.ft;
 
-import java.util.Objects;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 
-class MBeanKey {
-	private final String folder;
-	private final String name;
-	public MBeanKey(String folder, String name) {
-		this.folder = folder;
-		this.name = name;
-	}
-	@Override
-	public int hashCode() {
-		return Objects.hash(toString());
-	}
-	@Override
-	public boolean equals(Object obj) {
-		return this.toString().equals(obj.toString());
-	}
-	@Override
-	public String toString() {
-		return "MBeanKey [folder=" + folder + ", name=" + name + "]";
-	}
+public interface MonitorableFaultToleranceSpi {
 	
+	Object createBeanFaultToleranceMetricsMBean(AstrixBeanKey<?> beanKey);
+
 }

@@ -34,7 +34,7 @@ import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.context.JavaSerializationSerializer;
-import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
+import com.avanza.astrix.context.mbeans.MBeanExporter;
 import com.avanza.astrix.context.metrics.Metrics;
 import com.avanza.astrix.context.metrics.Timer;
 import com.avanza.astrix.context.metrics.TimerSnaphot;
@@ -65,7 +65,7 @@ public class AstrixRemotingDriver {
 			return new Timer(new FakeTimer());
 		}
 	};
-	private AstrixMBeanExporter exporter = new AstrixMBeanExporter() {
+	private MBeanExporter exporter = new MBeanExporter() {
 		@Override
 		public void registerMBean(Object mbean, String folder, String name) {
 			mbeanByKey.putIfAbsent(new MBeanKey(folder, name), mbean);

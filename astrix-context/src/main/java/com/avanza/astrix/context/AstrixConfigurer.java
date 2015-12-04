@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.api.ApiProviderBeanPublisherModule;
+import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.AstrixConfigModule;
 import com.avanza.astrix.beans.configdiscovery.ConfigDiscoveryModule;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
@@ -63,6 +64,8 @@ import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.SystemPropertiesConfigSource;
 import com.avanza.astrix.context.mbeans.AstrixMBeanModule;
+import com.avanza.astrix.context.mbeans.PlatformMBeanServer;
+import com.avanza.astrix.context.mbeans.MBeanServerFacade;
 import com.avanza.astrix.context.metrics.DefaultMetricSpi;
 import com.avanza.astrix.context.metrics.MetricsModule;
 import com.avanza.astrix.context.metrics.MetricsSpi;
@@ -121,6 +124,7 @@ public class AstrixConfigurer {
 		modulesConfigurer.registerDefault(StrategyProvider.create(HystrixCommandNamingStrategy.class, DefaultHystrixCommandNamingStrategy.class));
 		modulesConfigurer.registerDefault(StrategyProvider.create(FaultToleranceSpi.class, NoFaultTolerance.class));
 		modulesConfigurer.registerDefault(StrategyProvider.create(MetricsSpi.class, DefaultMetricSpi.class));
+		modulesConfigurer.registerDefault(StrategyProvider.create(MBeanServerFacade.class, PlatformMBeanServer.class, context -> context.importType(AstrixConfig.class)));
 		
 		for (Module plugin : customModules) {
 			modulesConfigurer.register(plugin);

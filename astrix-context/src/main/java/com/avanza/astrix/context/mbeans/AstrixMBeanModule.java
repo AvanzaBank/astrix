@@ -23,11 +23,12 @@ public class AstrixMBeanModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(AstrixMBeanExporter.class, AstrixMBeanExporterImpl.class);
+		moduleContext.bind(MBeanExporter.class, MBeanExporterImpl.class);
 		
 		moduleContext.importType(AstrixConfig.class);
+		moduleContext.importType(MBeanServerFacade.class);
 		
-		moduleContext.export(AstrixMBeanExporter.class);
+		moduleContext.export(MBeanExporter.class);
 	}
 
 }

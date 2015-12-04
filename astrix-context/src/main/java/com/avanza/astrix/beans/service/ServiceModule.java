@@ -17,7 +17,7 @@ package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
-import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
+import com.avanza.astrix.context.mbeans.MBeanExporter;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
@@ -38,7 +38,7 @@ public class ServiceModule implements Module {
 		// Dependencies
 		moduleContext.importType(ObjectSerializerFactory.class);
 		moduleContext.importType(AstrixConfig.class); 			  
-		moduleContext.importType(AstrixMBeanExporter.class);  	  
+		moduleContext.importType(MBeanExporter.class);  	  
 		moduleContext.importType(ReactiveTypeConverter.class);  	  
 		
 		moduleContext.export(ServiceDiscoveryMetaFactory.class);

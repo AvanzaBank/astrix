@@ -13,28 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.remoting.server;
+package com.avanza.astrix.context.mbeans;
 
-import java.util.Objects;
+public interface MBeanExporter {
 
-class MBeanKey {
-	private final String folder;
-	private final String name;
-	public MBeanKey(String folder, String name) {
-		this.folder = folder;
-		this.name = name;
-	}
-	@Override
-	public int hashCode() {
-		return Objects.hash(toString());
-	}
-	@Override
-	public boolean equals(Object obj) {
-		return this.toString().equals(obj.toString());
-	}
-	@Override
-	public String toString() {
-		return "MBeanKey [folder=" + folder + ", name=" + name + "]";
+	void registerMBean(Object mbean, String folder, String name);
+
+	public static class NoExporter implements MBeanExporter {
+		@Override
+		public void registerMBean(Object mbean, String folder, String name) {
+		}
 	}
 	
 }

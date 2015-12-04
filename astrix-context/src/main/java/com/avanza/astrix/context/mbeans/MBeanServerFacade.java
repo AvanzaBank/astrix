@@ -15,14 +15,10 @@
  */
 package com.avanza.astrix.context.mbeans;
 
-public interface AstrixMBeanExporter {
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.NotCompliantMBeanException;
 
-	void registerMBean(Object mbean, String folder, String name);
-
-	public static class NoExporter implements AstrixMBeanExporter {
-		@Override
-		public void registerMBean(Object mbean, String folder, String name) {
-		}
-	}
-	
+public interface MBeanServerFacade {
+	void registerMBean(Object mbean, String folder, String name) throws InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException;
 }
