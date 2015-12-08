@@ -26,7 +26,8 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.BasicFuture;
-import com.avanza.astrix.beans.ft.FaultToleranceSpi;
+import com.avanza.astrix.beans.ft.BeanFaultTolerance;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -146,10 +147,10 @@ public class HystrixFaulttoleranceIntegrationTest {
 		return getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS, commandKey);
 	}
 	
-	private static HystrixFaultTolerance getFaultTolerance(AstrixContext astrixContext) {
-		FaultToleranceSpi ftStrategy = AstrixApplicationContext.class.cast(astrixContext).getInstance(FaultToleranceSpi.class);
-		assertEquals(HystrixFaultTolerance.class, ftStrategy.getClass());
-		return (HystrixFaultTolerance) ftStrategy;
+	private static HystrixFaultToleranceFactory getFaultTolerance(AstrixContext astrixContext) {
+		BeanFaultToleranceFactorySpi ftStrategy = AstrixApplicationContext.class.cast(astrixContext).getInstance(BeanFaultToleranceFactorySpi.class);
+		assertEquals(HystrixFaultToleranceFactory.class, ftStrategy.getClass());
+		return (HystrixFaultToleranceFactory) ftStrategy;
 	}
 	
 	private int getEventCountForCommand(HystrixRollingNumberEvent hystrixRollingNumberEvent, HystrixCommandKey commandKey) {

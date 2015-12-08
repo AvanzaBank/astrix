@@ -30,15 +30,12 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
-import com.avanza.astrix.beans.ft.FaultToleranceSpi;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.ft.hystrix.HystrixCommandFacadeTest.Ping;
-import com.avanza.astrix.ft.hystrix.HystrixCommandFacadeTest.PingApi;
-import com.avanza.astrix.ft.hystrix.HystrixCommandFacadeTest.PingImpl;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
@@ -204,7 +201,7 @@ public class HystrixObservableCommandFacadeTest {
 	}
 	
 	private int getEventCountForCommand(HystrixRollingNumberEvent hystrixRollingNumberEvent) {
-		HystrixFaultTolerance faultTolerance = (HystrixFaultTolerance) AstrixApplicationContext.class.cast(this.context).getInstance(FaultToleranceSpi.class);
+		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) AstrixApplicationContext.class.cast(this.context).getInstance(BeanFaultToleranceFactorySpi.class);
 		HystrixCommandKey commandKey = faultTolerance.getCommandKey(AstrixBeanKey.create(Ping.class));
 		HystrixCommandMetrics metrics = HystrixCommandMetrics.getInstance(commandKey);
 		int currentConcurrentExecutionCount = (int) metrics.getCumulativeCount(hystrixRollingNumberEvent);

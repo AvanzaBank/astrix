@@ -34,7 +34,7 @@ public class HystrixSpike {
 	public static void main(String[] args) throws Exception {
 		BasicConfigurator.configure();
 		Logger.getRootLogger().setLevel(Level.INFO);
-		Logger.getLogger(HystrixFaultTolerance.class).info("HELL");
+		Logger.getLogger(HystrixBeanFaultTolerance.class).info("HELL");
 		TestAstrixConfigurer astrix = new TestAstrixConfigurer();
 		astrix.enableFaultTolerance(true);
 		astrix.registerApiProvider(PingApi.class);

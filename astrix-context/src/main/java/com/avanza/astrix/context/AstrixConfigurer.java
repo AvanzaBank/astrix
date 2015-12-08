@@ -46,7 +46,8 @@ import com.avanza.astrix.beans.factory.BeanFactoryModule;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
 import com.avanza.astrix.beans.ft.DefaultHystrixCommandNamingStrategy;
 import com.avanza.astrix.beans.ft.FaultToleranceModule;
-import com.avanza.astrix.beans.ft.FaultToleranceSpi;
+import com.avanza.astrix.beans.ft.BeanFaultTolerance;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.beans.ft.NoFaultTolerance;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
@@ -122,7 +123,7 @@ public class AstrixConfigurer {
 		DynamicConfig config = createDynamicConfig();
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.registerDefault(StrategyProvider.create(HystrixCommandNamingStrategy.class, DefaultHystrixCommandNamingStrategy.class));
-		modulesConfigurer.registerDefault(StrategyProvider.create(FaultToleranceSpi.class, NoFaultTolerance.class));
+		modulesConfigurer.registerDefault(StrategyProvider.create(BeanFaultToleranceFactorySpi.class, NoFaultTolerance.class));
 		modulesConfigurer.registerDefault(StrategyProvider.create(MetricsSpi.class, DefaultMetricSpi.class));
 		modulesConfigurer.registerDefault(StrategyProvider.create(MBeanServerFacade.class, PlatformMBeanServer.class, context -> context.importType(AstrixConfig.class)));
 		

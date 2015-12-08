@@ -36,24 +36,22 @@ public final class BeanFaultToleranceProxy implements BeanProxy {
 	
 	private final DynamicBooleanProperty faultToleranceEnabledForBean;
 	private final DynamicBooleanProperty faultToleranceEnabled;
-	private final FaultToleranceSpi beanFaultToleranceSpi;
-	private final BeanConfiguration beanConfiguration;
+	private final BeanFaultTolerance beanFaultTolerance;
 	
-	BeanFaultToleranceProxy(BeanConfiguration beanConfiguration, DynamicConfig config, FaultToleranceSpi beanFaultToleranceSpi) {
-		this.beanConfiguration = beanConfiguration;
-		this.beanFaultToleranceSpi = beanFaultToleranceSpi;
+	BeanFaultToleranceProxy(BeanConfiguration beanConfiguration, DynamicConfig config, BeanFaultTolerance beanFaultToleranceSpi) {
+		this.beanFaultTolerance = beanFaultToleranceSpi;
 		this.faultToleranceEnabledForBean = beanConfiguration.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED);
 		this.faultToleranceEnabled = AstrixSettings.ENABLE_FAULT_TOLERANCE.getFrom(config);
 	}
 	
 	@Override
 	public <T> CheckedCommand<T> proxyInvocation(final CheckedCommand<T> command) {
-		return () -> beanFaultToleranceSpi.execute(command, beanConfiguration.getBeanKey());
+		return () -> beanFaultTolerance.execute(command);
 	}
 
 	@Override
 	public <T> Supplier<Observable<T>> proxyReactiveInvocation(final Supplier<Observable<T>> command) {
-		return () -> beanFaultToleranceSpi.observe(command, beanConfiguration.getBeanKey());
+		return () -> beanFaultTolerance.observe(command);
 	}
 	
 	@Override

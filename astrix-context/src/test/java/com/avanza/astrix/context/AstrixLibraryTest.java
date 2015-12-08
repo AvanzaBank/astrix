@@ -29,10 +29,10 @@ import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
-import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.BasicFuture;
 import com.avanza.astrix.beans.factory.CircularDependency;
-import com.avanza.astrix.beans.ft.FaultToleranceSpi;
+import com.avanza.astrix.beans.ft.BeanFaultTolerance;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.core.function.CheckedCommand;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -120,19 +120,19 @@ public class AstrixLibraryTest {
 		astrixConfigurer.enableFaultTolerance(true);
 		final AtomicInteger appliedOberveCount = new AtomicInteger(0);
 		final AtomicInteger appliedExecuteCount = new AtomicInteger(0);
-		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, new FaultToleranceSpi() {
+		BeanFaultTolerance beanFt = new BeanFaultTolerance() {
 			@Override
-			public <T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey) {
+			public <T> Observable<T> observe(Supplier<Observable<T>> observable) {
 				appliedOberveCount.incrementAndGet();
 				return observable.get();
 			}
-			
 			@Override
-			public <T> T execute(CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable {
+			public <T> T execute(CheckedCommand<T> command) throws Throwable {
 				appliedExecuteCount.incrementAndGet();
 				return command.call();
 			}
-		});
+		};
+		astrixConfigurer.registerStrategy(BeanFaultToleranceFactorySpi.class, beanKey -> beanFt);
 		AstrixContext context = astrixConfigurer.configure();
 		
 		HelloBean helloBean= context.getBean(HelloBean.class);
@@ -153,19 +153,19 @@ public class AstrixLibraryTest {
 		astrixConfigurer.registerApiProvider(MyLibraryProvider.class); // No Fault tolerance
 		final AtomicInteger appliedOberveCount = new AtomicInteger(0);
 		final AtomicInteger appliedExecuteCount = new AtomicInteger(0);
-		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, new FaultToleranceSpi() {
+		BeanFaultTolerance beanFt = new BeanFaultTolerance() {
 			@Override
-			public <T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey) {
+			public <T> Observable<T> observe(Supplier<Observable<T>> observable) {
 				appliedOberveCount.incrementAndGet();
 				return observable.get();
 			}
-			
 			@Override
-			public <T> T execute(CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable {
+			public <T> T execute(CheckedCommand<T> command) throws Throwable {
 				appliedExecuteCount.incrementAndGet();
 				return command.call();
 			}
-		});
+		};
+		astrixConfigurer.registerStrategy(BeanFaultToleranceFactorySpi.class, beanKey -> beanFt);
 		AstrixContext context = astrixConfigurer.configure();
 		
 		HelloBean helloBean= context.getBean(HelloBean.class);

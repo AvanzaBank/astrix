@@ -17,8 +17,18 @@ package com.avanza.astrix.beans.ft;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 
-public interface MonitorableFaultToleranceSpi {
-	
-	Object createBeanFaultToleranceMetricsMBean(AstrixBeanKey<?> beanKey);
+public interface BeanFaultToleranceFactorySpi {
+
+	/**
+	 * Creates a {@link BeanFaultTolerance} instance associated with a given AstrixBeanKey<?>.
+	 * 
+	 * Invocations protected by a BeanFaultTolerance instance with different {@link AstrixBeanKey} should
+	 * be isolated from each other, which typically means that they should have a distinct bulk-head and
+	 * circuit breaker.
+	 * 
+	 * @param beanKey
+	 * @return
+	 */
+	BeanFaultTolerance create(AstrixBeanKey<?> beanKey);
 
 }

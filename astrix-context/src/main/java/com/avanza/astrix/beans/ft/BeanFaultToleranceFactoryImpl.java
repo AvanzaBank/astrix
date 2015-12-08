@@ -27,14 +27,15 @@ import com.avanza.astrix.context.mbeans.MBeanExporter;
  */
 final class BeanFaultToleranceFactoryImpl implements BeanFaultToleranceFactory {
 	
-	private final FaultToleranceSpi beanFaultToleranceSpi;
+	
+	private final BeanFaultToleranceFactorySpi beanFaultToleranceFactorySpi;
 	private final AstrixConfig config;
 	private final MBeanExporter mbeanExporter;
 	
-	public BeanFaultToleranceFactoryImpl(FaultToleranceSpi beanFaultToleranceSpi,
-									      AstrixConfig config,
-									      MBeanExporter mbeanExporter) {
-		this.beanFaultToleranceSpi = beanFaultToleranceSpi;
+	public BeanFaultToleranceFactoryImpl(BeanFaultToleranceFactorySpi beanFaultToleranceFactorySpi,
+									     AstrixConfig config,
+									     MBeanExporter mbeanExporter) {
+		this.beanFaultToleranceFactorySpi = beanFaultToleranceFactorySpi;
 		this.config = config;
 		this.mbeanExporter = mbeanExporter;
 	}
@@ -42,9 +43,10 @@ final class BeanFaultToleranceFactoryImpl implements BeanFaultToleranceFactory {
 	@Override
 	public BeanProxy createFaultToleranceProxy(AstrixBeanKey<?> beanKey) {
 		BeanConfiguration beanConfiguration = config.getBeanConfiguration(beanKey);
-		BeanFaultToleranceProxy result = new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultToleranceSpi);
-		if (beanFaultToleranceSpi instanceof MonitorableFaultToleranceSpi) {
-			Object mbean = MonitorableFaultToleranceSpi.class.cast(beanFaultToleranceSpi).createBeanFaultToleranceMetricsMBean(beanKey);
+		BeanFaultTolerance beanFaultTolerance = beanFaultToleranceFactorySpi.create(beanKey);
+		BeanFaultToleranceProxy result = new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultTolerance);
+		if (beanFaultToleranceFactorySpi instanceof MonitorableFaultToleranceSpi) {
+			Object mbean = MonitorableFaultToleranceSpi.class.cast(beanFaultToleranceFactorySpi).createBeanFaultToleranceMetricsMBean(beanKey);
 			mbeanExporter.registerMBean(mbean, "BeanFaultToleranceMetrics", beanKey.toString());
 		}
 		return result;
