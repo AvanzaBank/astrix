@@ -15,9 +15,10 @@
  */
 package com.avanza.astrix.beans.service;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.BeanProxy;
 
 public interface ServiceBeanProxyFactory {
-	BeanProxy create(ServiceDefinition<?> serviceDefinition);
+	BeanProxy create(AstrixBeanKey<?> astrixBeanKey);
 	int order();
 }

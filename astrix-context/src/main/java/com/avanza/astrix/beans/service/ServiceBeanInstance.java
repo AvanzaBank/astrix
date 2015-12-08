@@ -87,7 +87,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 								ReactiveTypeConverter reactiveTypeConverter, DynamicBooleanProperty available) {
 		this.serviceDiscovery = serviceDiscovery;
 		this.reactiveTypeConverter = reactiveTypeConverter;
-		this.beanProxies = beanProxies.create(serviceDefinition);
+		this.beanProxies = beanProxies.create(beanKey);
 		this.available = available;
 		this.serviceDefinition = Objects.requireNonNull(serviceDefinition);
 		this.beanKey = Objects.requireNonNull(beanKey);

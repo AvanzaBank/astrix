@@ -15,9 +15,9 @@
  */
 package com.avanza.astrix.beans.ft;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.BeanProxy;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
-import com.avanza.astrix.beans.service.ServiceDefinition;
 /**
  * 
  * @author Elias Lindholm
@@ -32,8 +32,8 @@ final class FaultToleranceServiceBeanProxyFactory implements ServiceBeanProxyFac
 	}
 
 	@Override
-	public BeanProxy create(ServiceDefinition<?> serviceDefinition) {
-		return ftFactory.createFaultToleranceProxy(serviceDefinition.getBeanKey());
+	public BeanProxy create(AstrixBeanKey<?> beanKey) {
+		return ftFactory.createFaultToleranceProxy(beanKey);
 	}
 	
 	@Override

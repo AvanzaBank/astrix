@@ -19,6 +19,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.BeanProxy;
 
 final class ServiceBeanProxies {
@@ -31,9 +32,9 @@ final class ServiceBeanProxies {
 											.collect(toList());
 	}
 
-	public List<BeanProxy> create(ServiceDefinition<?> serviceDefinition) {
+	public List<BeanProxy> create(AstrixBeanKey<?> beanKey) {
 		return proxyFactories.stream()
-							 .map(factory -> factory.create(serviceDefinition))
+							 .map(factory -> factory.create(beanKey))
 							 .collect(toList());
 	}
 

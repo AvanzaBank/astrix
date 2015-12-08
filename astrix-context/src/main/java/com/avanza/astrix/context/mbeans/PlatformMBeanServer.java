@@ -30,7 +30,7 @@ public class PlatformMBeanServer implements MBeanServerFacade {
 
 	private static final AtomicInteger astrixContextCount = new AtomicInteger(0);
 	
-	private final Logger logger = LoggerFactory.getLogger(MBeanExporterImpl.class);
+	private final Logger logger = LoggerFactory.getLogger(PlatformMBeanServer.class);
 	private final String domain;
 	
 	public PlatformMBeanServer(AstrixConfig astrixConfig) {
