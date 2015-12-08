@@ -18,9 +18,7 @@ package com.avanza.astrix.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.stream.Stream;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,7 +30,6 @@ import com.avanza.astrix.beans.core.AstrixBeanSettings.BooleanBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.IntBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.LongBeanSetting;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
-import com.avanza.astrix.beans.publish.ApiProviders;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.DefaultBeanSettings;
 import com.avanza.astrix.provider.core.Service;
@@ -46,12 +43,7 @@ public class AstrixConfigurerTest {
 	@Test
 	public void passesBeanSettingsToConfiguration() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.setAstrixApiProviders(new ApiProviders() {
-			@Override
-			public Collection<ApiProviderClass> getAll() {
-				return Collections.emptyList();
-			}
-		});
+		configurer.setAstrixApiProviders(() -> Stream.empty());
 		IntBeanSetting intSetting = new IntBeanSetting("intSetting", 1);
 		BooleanBeanSetting aBooleanSetting = new BooleanBeanSetting("booleanSetting", true);
 		LongBeanSetting longSetting = new LongBeanSetting("longSetting", 2);
@@ -71,12 +63,7 @@ public class AstrixConfigurerTest {
 	@Test
 	public void customDefaultBeanSettings() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.setAstrixApiProviders(new ApiProviders() {
-			@Override
-			public Collection<ApiProviderClass> getAll() {
-				return Arrays.asList(ApiProviderClass.create(PingApiProvider.class));
-			}
-		});
+		configurer.setAstrixApiProviders(() -> Stream.of(ApiProviderClass.create(PingApiProvider.class)));
 		
 		AstrixContextImpl astrixContext = autoClosables.add((AstrixContextImpl) configurer.configure());
 		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
@@ -92,12 +79,7 @@ public class AstrixConfigurerTest {
 	@Test
 	public void itsPossibleToOverrideCustomDefaultBeanSettingsOnBeanDefinition() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.setAstrixApiProviders(new ApiProviders() {
-			@Override
-			public Collection<ApiProviderClass> getAll() {
-				return Arrays.asList(ApiProviderClass.create(PingApiProviderWithOverridingDefault.class));
-			}
-		});
+		configurer.setAstrixApiProviders(() -> Stream.of(ApiProviderClass.create(PingApiProviderWithOverridingDefault.class)));
 		
 		AstrixContextImpl astrixContext = autoClosables.add((AstrixContextImpl) configurer.configure());
 		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
@@ -113,12 +95,7 @@ public class AstrixConfigurerTest {
 	@Test
 	public void customDefaultBeanSettingsAppliesToAsyncProxy() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.setAstrixApiProviders(new ApiProviders() {
-			@Override
-			public Collection<ApiProviderClass> getAll() {
-				return Arrays.asList(ApiProviderClass.create(PingApiProvider.class));
-			}
-		});
+		configurer.setAstrixApiProviders(() -> Stream.of(ApiProviderClass.create(PingApiProvider.class)));
 		
 		AstrixContextImpl astrixContext = autoClosables.add((AstrixContextImpl) configurer.configure());
 		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(PingAsync.class));

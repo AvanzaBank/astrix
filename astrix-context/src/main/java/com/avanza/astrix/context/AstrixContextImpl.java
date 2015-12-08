@@ -29,7 +29,6 @@ import com.avanza.astrix.beans.publish.BeanPublisher;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceDefinitionSource;
 import com.avanza.astrix.beans.service.StatefulAstrixBean;
-import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.modules.Modules;
 import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
 import com.avanza.astrix.serviceunit.ExportedServiceBeanDefinition;
@@ -49,7 +48,6 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 	private final Logger log = LoggerFactory.getLogger(AstrixContextImpl.class);
 	private final BeanFactory beanFactory;
 	private final BeanPublisher beanPublisher;
-	private final DynamicConfig dynamicConfig;
 	private final Modules modules;
 	private final AstrixApplicationDescriptor applicationDescriptor;
 	private final AstrixConfig config;
@@ -58,7 +56,6 @@ final class AstrixContextImpl implements Astrix, AstrixApplicationContext {
 		this.modules = modules;
 		this.applicationDescriptor = applicationDescriptor;
 		this.config = modules.getInstance(AstrixConfig.class);
-		this.dynamicConfig = config.getConfig();
 		this.beanPublisher = modules.getInstance(BeanPublisher.class);
 		this.beanFactory = modules.getInstance(BeanFactory.class);
 	}

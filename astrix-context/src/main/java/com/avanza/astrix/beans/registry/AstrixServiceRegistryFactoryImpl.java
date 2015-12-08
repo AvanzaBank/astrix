@@ -15,18 +15,8 @@
  */
 package com.avanza.astrix.beans.registry;
 
-import com.avanza.astrix.beans.config.AstrixConfig;
-import com.avanza.astrix.beans.configdiscovery.ConfigDiscoveryProperties;
-import com.avanza.astrix.beans.configdiscovery.ConfigServiceDiscoveryPlugin;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.service.ServiceComponentRegistry;
-import com.avanza.astrix.beans.service.ServiceDefinition;
-import com.avanza.astrix.beans.service.ServiceDefinitionSource;
-import com.avanza.astrix.beans.service.ServiceDiscoveryFactory;
-import com.avanza.astrix.beans.service.ServiceFactory;
-import com.avanza.astrix.beans.service.ServiceMetaFactory;
-import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
+import com.avanza.astrix.beans.factory.BeanFactory;
 
 /**
  * 
@@ -35,45 +25,15 @@ import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
  */
 public class AstrixServiceRegistryFactoryImpl implements AstrixServiceRegistryFactory {
 
-	private final ServiceMetaFactory serviceMetaFactory;
-	private final AstrixConfig config;
-	private final ServiceComponentRegistry serviceComponents;
-	private volatile AstrixServiceRegistry instance;
+	private final BeanFactory beanFactory;
 
-	public AstrixServiceRegistryFactoryImpl(ServiceMetaFactory serviceMetaFactory, 
-										AstrixConfig config,
-										ServiceComponentRegistry serviceComponents) {
-		this.serviceMetaFactory = serviceMetaFactory;
-		this.config = config;
-		this.serviceComponents = serviceComponents;
+	public AstrixServiceRegistryFactoryImpl(BeanFactory beanFactory) {
+		this.beanFactory = beanFactory;
 	}
 
 	@Override
 	public synchronized AstrixServiceRegistry createServiceRegistry() {
-		if (instance != null) {
-			return instance;
-		}
-		ObjectSerializerDefinition serializer = ObjectSerializerDefinition.versionedService(ServiceRegistryObjectSerializerConfigurer.VERSION, 
-																							ServiceRegistryObjectSerializerConfigurer.class);
-		ServiceDefinition<AstrixServiceRegistry> serviceRegistryDefinition = 
-				new ServiceDefinition<>(
-						ServiceDefinitionSource.create("AstrixServiceRegistry"),
-						AstrixBeanKey.create(AstrixServiceRegistry.class),
-						serializer, 
-						false); // Not dynamic qualified
-		ServiceDiscoveryFactory<?> serviceDiscoveryFactory = createServiceDiscoveryFactory();
-		
-		ServiceFactory<AstrixServiceRegistry> serviceFactory = serviceMetaFactory.createServiceFactory(serviceRegistryDefinition,
-																									   serviceDiscoveryFactory);
-		
-		instance = serviceFactory.create(AstrixBeanKey.create(AstrixServiceRegistry.class));
-		return instance;
-	}
-
-	private ServiceDiscoveryFactory<?> createServiceDiscoveryFactory() {
-		return new ServiceDiscoveryFactory<ConfigDiscoveryProperties>(new ConfigServiceDiscoveryPlugin(serviceComponents, config), 
-				new ConfigDiscoveryProperties(AstrixSettings.SERVICE_REGISTRY_URI_PROPERTY_NAME), 
-				AstrixServiceRegistry.class);
+		return beanFactory.getBean(AstrixBeanKey.create(AstrixServiceRegistry.class));
 	}
 
 }

@@ -81,8 +81,6 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread {
 		if (applicationTag != null) {
 			zone = subsystem + "#"  + applicationTag;
 		}
-//		AstrixServiceRegistry serviceRegistry= beans.getBean(AstrixBeanKey.create(AstrixServiceRegistry.class));
-		
 		this.serviceRegistryProviderClient = new ServiceRegistryExporterClient(serviceRegistryFactory.createServiceRegistry(), subsystem, applicationInstanceId, zone);
 	}
 	

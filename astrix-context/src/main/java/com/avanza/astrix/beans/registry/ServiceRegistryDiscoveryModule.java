@@ -16,9 +16,8 @@
 package com.avanza.astrix.beans.registry;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
-import com.avanza.astrix.beans.service.ServiceComponentRegistry;
+import com.avanza.astrix.beans.factory.BeanFactory;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactoryPlugin;
-import com.avanza.astrix.beans.service.ServiceMetaFactory;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 
@@ -29,9 +28,8 @@ public class ServiceRegistryDiscoveryModule implements Module {
 		moduleContext.bind(ServiceDiscoveryFactoryPlugin.class, ServiceRegistryDiscoveryPlugin.class);
 		moduleContext.bind(AstrixServiceRegistryFactory.class, AstrixServiceRegistryFactoryImpl.class);
 		
-		moduleContext.importType(ServiceMetaFactory.class);
-		moduleContext.importType(ServiceComponentRegistry.class);
 		moduleContext.importType(AstrixConfig.class);
+		moduleContext.importType(BeanFactory.class);
 
 		moduleContext.export(ServiceDiscoveryFactoryPlugin.class);
 		moduleContext.export(AstrixServiceRegistryFactory.class);
