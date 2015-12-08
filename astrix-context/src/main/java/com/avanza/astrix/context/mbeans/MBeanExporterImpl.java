@@ -39,11 +39,7 @@ final class MBeanExporterImpl implements MBeanExporter {
 			logger.debug("Exporting of Astrix MBeans is disabled, won't export mbean with name={}",name.toString());
 			return;
 		}
-		try {
-			mbeanServer.registerMBean(mbean, folder, name);
-		} catch (Exception e) {
-			logger.warn(String.format("Failed to export mbean: type=%s name=%s", mbean.getClass().getName(), name.toString()), e);
-		}
+		mbeanServer.registerMBean(mbean, folder, name);
 	}
 
 	private boolean exportMBeans() {

@@ -20,7 +20,6 @@ import com.avanza.astrix.beans.config.BeanConfiguration;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.BeanProxy;
 import com.avanza.astrix.context.mbeans.MBeanExporter;
-import com.avanza.astrix.context.mbeans.MBeanServerFacade;
 /**
  * 
  * @author Elias Lindholm

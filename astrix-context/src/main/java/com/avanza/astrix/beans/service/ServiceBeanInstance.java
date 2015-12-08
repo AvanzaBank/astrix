@@ -18,12 +18,14 @@ package com.avanza.astrix.beans.service;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,9 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.core.BeanInvocationDispatcher;
+import com.avanza.astrix.beans.core.BeanProxy;
+import com.avanza.astrix.beans.core.BeanProxyFilter;
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.core.IllegalServiceMetadataException;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -71,16 +76,18 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	private volatile ServiceProperties currentProperties;
 	private volatile BeanState currentState;
 
-	private final ServiceBeanProxyInvocationDispatcherFactory serviceBeanInvocationDispatcherFactory;
+	private final List<BeanProxy> beanProxies;
+	private final ReactiveTypeConverter reactiveTypeConverter;
 
 	private ServiceBeanInstance(ServiceDefinition<T> serviceDefinition, 
 								AstrixBeanKey<T> beanKey, 
 								ServiceDiscovery serviceDiscovery, 
 								ServiceComponentRegistry serviceComponents,
-								ServiceBeanProxyInvocationDispatcherFactory serviceBeanInvocationDispatcherFactory,
-								DynamicBooleanProperty available) {
+								ServiceBeanProxies beanProxies,
+								ReactiveTypeConverter reactiveTypeConverter, DynamicBooleanProperty available) {
 		this.serviceDiscovery = serviceDiscovery;
-		this.serviceBeanInvocationDispatcherFactory = serviceBeanInvocationDispatcherFactory;
+		this.reactiveTypeConverter = reactiveTypeConverter;
+		this.beanProxies = beanProxies.create(serviceDefinition);
 		this.available = available;
 		this.serviceDefinition = Objects.requireNonNull(serviceDefinition);
 		this.beanKey = Objects.requireNonNull(beanKey);
@@ -97,7 +104,8 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 				beanKey, 
 				serviceDiscovery, 
 				serviceBeanContext.getServiceComponents(), 
-				serviceBeanContext.getServiceBeanInvocationDispatcherFactory(),
+				serviceBeanContext.getServiceBeanProxies(),
+				serviceBeanContext.getReactiveTypeConverter(),
 				beanConfiguration.get(AstrixBeanSettings.AVAILABLE));
 	}
 	
@@ -296,8 +304,10 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 					throw new UnsupportedTargetTypeException(serviceComponent.getName(), beanKey.getBeanType());
 				}
 				BoundServiceBeanInstance<T> boundInstance = serviceComponent.bind(serviceDefinition, serviceProperties);
-				BeanInvocationDispatcher serviceBeanInvocationDispatcher = serviceBeanInvocationDispatcherFactory.create(serviceDefinition, serviceComponent, boundInstance.get());
-				setState(new Bound(boundInstance, serviceBeanInvocationDispatcher));
+				BeanInvocationDispatcher beanInvocationDispatcher = new BeanInvocationDispatcher(getBeanProxies(serviceComponent)
+																								,reactiveTypeConverter, 
+																								boundInstance.get());
+				setState(new Bound(boundInstance, beanInvocationDispatcher));
 				currentProperties = serviceProperties;
 			} catch (IllegalServiceMetadataException e) {
 				setState(new IllegalServiceMetadataState(e.getMessage()));
@@ -305,6 +315,23 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 				log.warn(String.format("Failed to bind service bean: %s", getBeanKey()), e);
 				setState(new Unbound(ServiceBindError.class, "Failed to bind " + getBeanKey().getBeanType().getSimpleName() + " using serviceProperties=" + serviceProperties +  ", see cause for details.", e));
 			}
+		}
+
+		private List<BeanProxy> getBeanProxies(ServiceComponent serviceComponent) {
+			if (!(serviceComponent instanceof BeanProxyFilter)) {
+				return beanProxies;
+			}
+			BeanProxyFilter filter = BeanProxyFilter.class.cast(serviceComponent);
+			return beanProxies.stream()
+							  .filter(beanProxy -> {
+								  boolean applyBeanProxy = filter.applyBeanProxy(beanProxy);
+								  if (!applyBeanProxy) {
+									  log.info("BeanProxy is disabled by ServiceComponent. beanProxy={} componentName={} beanKey={}", 
+											  beanProxy.name(), serviceComponent.getName(), serviceDefinition.getBeanKey().toString());
+								  }
+								  return applyBeanProxy;
+							  })
+							  .collect(Collectors.toList());
 		}
 
 		protected abstract void verifyBound();

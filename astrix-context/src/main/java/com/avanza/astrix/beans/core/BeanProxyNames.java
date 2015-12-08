@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.ft;
+package com.avanza.astrix.beans.core;
 
-public interface FaultToleranceConfigurator {
+public final class BeanProxyNames {
+
+	public static final String FAULT_TOLERANCE = "faultTolerance";
+	public static final String METRICS = "beanMetrics";
 	
-	enum FtProxySetting {
-		ENABLED,
-		DISABLED
-	}
-	
-	FtProxySetting configure();
+	private BeanProxyNames() {};
 
 }

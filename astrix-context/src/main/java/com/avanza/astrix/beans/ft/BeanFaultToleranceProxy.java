@@ -21,6 +21,7 @@ import com.avanza.astrix.beans.config.BeanConfiguration;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.core.BeanProxy;
+import com.avanza.astrix.beans.core.BeanProxyNames;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.core.function.CheckedCommand;
@@ -47,22 +48,22 @@ public final class BeanFaultToleranceProxy implements BeanProxy {
 	
 	@Override
 	public <T> CheckedCommand<T> proxyInvocation(final CheckedCommand<T> command) {
-		if (!faultToleranceEnabled()) {
-			return command;
-		}
 		return () -> beanFaultToleranceSpi.execute(command, beanConfiguration.getBeanKey());
 	}
 
 	@Override
 	public <T> Supplier<Observable<T>> proxyReactiveInvocation(final Supplier<Observable<T>> command) {
-		if (!faultToleranceEnabled()) {
-			return command;
-		}
 		return () -> beanFaultToleranceSpi.observe(command, beanConfiguration.getBeanKey());
 	}
 	
-	private <T> boolean faultToleranceEnabled() {
+	@Override
+	public String name() {
+		return BeanProxyNames.FAULT_TOLERANCE;
+	}
+	
+	@Override
+	public boolean isEnabled() {
 		return faultToleranceEnabled.get() && faultToleranceEnabledForBean.get();
 	}
-
+	
 }

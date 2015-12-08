@@ -36,8 +36,10 @@ import org.junit.Test;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.core.BeanProxy;
+import com.avanza.astrix.beans.core.BeanProxyFilter;
+import com.avanza.astrix.beans.core.BeanProxyNames;
 import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
-import com.avanza.astrix.beans.ft.FaultToleranceConfigurator;
 import com.avanza.astrix.beans.ft.FaultToleranceSpi;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixApplicationContext;
@@ -448,7 +450,7 @@ public class ServiceBeanInstanceTest {
 	
 	
 	
-	public static class DisabledFtComponent implements ServiceComponent, FaultToleranceConfigurator {
+	public static class DisabledFtComponent implements ServiceComponent, BeanProxyFilter {
 		
 		private final DirectComponent directComponent = new DirectComponent(new ObjectSerializerFactory() {
 			@Override
@@ -458,8 +460,8 @@ public class ServiceBeanInstanceTest {
 		}, new ReactiveTypeConverterImpl(Collections.emptyList()));
 		
 		@Override
-		public FtProxySetting configure() {
-			return FtProxySetting.DISABLED;
+		public boolean applyBeanProxy(BeanProxy beanProxy) {
+			return !BeanProxyNames.FAULT_TOLERANCE.equals(beanProxy.name());
 		}
 		
 		public <T> ServiceProperties registerAndGetServiceProperties(Class<T> bean, T provider) {
@@ -503,6 +505,7 @@ public class ServiceBeanInstanceTest {
 		public boolean requiresProviderInstance() {
 			return false;
 		}
+
 	}
 	
 	public static class PingImpl implements Ping {

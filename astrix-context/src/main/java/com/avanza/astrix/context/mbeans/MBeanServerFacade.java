@@ -15,10 +15,6 @@
  */
 package com.avanza.astrix.context.mbeans;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.NotCompliantMBeanException;
-
 public interface MBeanServerFacade {
-	void registerMBean(Object mbean, String folder, String name) throws InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException;
+	void registerMBean(Object mbean, String folder, String name);
 }

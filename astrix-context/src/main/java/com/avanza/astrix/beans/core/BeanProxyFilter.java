@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.service;
+package com.avanza.astrix.beans.core;
 
-public interface StatefulAstrixBean {
+public interface BeanProxyFilter {
 	
-	// TODO: Remove this abstraction
+	boolean applyBeanProxy(BeanProxy beanProxy);
 
-	void waitUntilBound(long timeoutMillis) throws InterruptedException;
-	
 }

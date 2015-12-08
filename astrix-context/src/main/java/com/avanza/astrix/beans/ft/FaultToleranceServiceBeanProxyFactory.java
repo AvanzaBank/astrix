@@ -15,40 +15,24 @@
  */
 package com.avanza.astrix.beans.ft;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avanza.astrix.beans.core.BeanProxy;
-import com.avanza.astrix.beans.ft.FaultToleranceConfigurator.FtProxySetting;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
-import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 /**
  * 
  * @author Elias Lindholm
  *
  */
-final class ServiceBeanFaultToleranceProxyFactory implements ServiceBeanProxyFactory {
+final class FaultToleranceServiceBeanProxyFactory implements ServiceBeanProxyFactory {
 	
-	private static final Logger log = LoggerFactory.getLogger(ServiceBeanFaultToleranceProxyFactory.class);
-
 	private final BeanFaultToleranceFactory ftFactory;
 	
-	public ServiceBeanFaultToleranceProxyFactory(BeanFaultToleranceFactory ftFactory) {
+	public FaultToleranceServiceBeanProxyFactory(BeanFaultToleranceFactory ftFactory) {
 		this.ftFactory = ftFactory;
 	}
 
 	@Override
-	public BeanProxy create(ServiceDefinition<?> serviceDefinition, ServiceComponent serviceComponent) {
-		FtProxySetting ftProxySetting = FtProxySetting.ENABLED;
-		if (serviceComponent instanceof FaultToleranceConfigurator) {
-			 ftProxySetting = FaultToleranceConfigurator.class.cast(serviceComponent).configure();
-		}
-		if (ftProxySetting != FtProxySetting.ENABLED) {
-			log.info("Fault tolerance proxy is disabled by ServiceComponent. componentName={}, beanKey={}", 
-					serviceComponent.getName(), serviceDefinition.getBeanKey().toString());
-			return BeanProxy.NoProxy.create();
-		}
+	public BeanProxy create(ServiceDefinition<?> serviceDefinition) {
 		return ftFactory.createFaultToleranceProxy(serviceDefinition.getBeanKey());
 	}
 	

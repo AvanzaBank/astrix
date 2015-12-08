@@ -27,7 +27,7 @@ public class FaultToleranceModule implements Module {
 	@Override
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(BeanFaultToleranceFactory.class, BeanFaultToleranceFactoryImpl.class);
-		moduleContext.bind(ServiceBeanProxyFactory.class, ServiceBeanFaultToleranceProxyFactory.class);
+		moduleContext.bind(ServiceBeanProxyFactory.class, FaultToleranceServiceBeanProxyFactory.class);
 		
 		moduleContext.importType(FaultToleranceSpi.class);
 		moduleContext.importType(AstrixConfig.class);

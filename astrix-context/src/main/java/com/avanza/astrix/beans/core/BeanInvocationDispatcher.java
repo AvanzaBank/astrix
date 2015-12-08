@@ -49,7 +49,9 @@ public final class BeanInvocationDispatcher implements InvocationHandler {
 	private Object proxyInvocation(final Method method, final Object[] args) throws Throwable {
 		CheckedCommand<Object> serviceInvocation = () -> ReflectionUtil.invokeMethod(method, targetBean, args);
 		for (BeanProxy proxy : proxys) {
-			serviceInvocation = proxy.proxyInvocation(serviceInvocation);
+			if (proxy.isEnabled()) {
+				serviceInvocation = proxy.proxyInvocation(serviceInvocation);
+			}
 		}
 		return serviceInvocation.call();
 	}
@@ -68,7 +70,9 @@ public final class BeanInvocationDispatcher implements InvocationHandler {
 			}
 		};
 		for (BeanProxy proxy : proxys) {
-			serviceInvocation = proxy.proxyReactiveInvocation(serviceInvocation);
+			if (proxy.isEnabled()) {
+				serviceInvocation = proxy.proxyReactiveInvocation(serviceInvocation);
+			}
 		}
 		
 		if (isObservableType(method.getReturnType())) {

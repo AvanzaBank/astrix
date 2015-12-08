@@ -15,9 +15,26 @@
  */
 package com.avanza.astrix.beans.service;
 
+import static java.util.stream.Collectors.toList;
+
+import java.util.List;
+
 import com.avanza.astrix.beans.core.BeanProxy;
 
-public interface ServiceBeanProxyFactory {
-	BeanProxy create(ServiceDefinition<?> serviceDefinition);
-	int order();
+final class ServiceBeanProxies {
+	
+	private final List<ServiceBeanProxyFactory> proxyFactories;
+	
+	public ServiceBeanProxies(List<ServiceBeanProxyFactory> proxyFactories) {
+		this.proxyFactories = proxyFactories.stream()
+											.sorted((proxy1, proxy2) -> Long.compare(proxy1.order(), proxy2.order()))
+											.collect(toList());
+	}
+
+	public List<BeanProxy> create(ServiceDefinition<?> serviceDefinition) {
+		return proxyFactories.stream()
+							 .map(factory -> factory.create(serviceDefinition))
+							 .collect(toList());
+	}
+
 }

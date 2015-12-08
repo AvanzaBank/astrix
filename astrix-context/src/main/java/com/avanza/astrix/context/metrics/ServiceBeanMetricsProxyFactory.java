@@ -18,7 +18,6 @@ package com.avanza.astrix.context.metrics;
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.BeanProxy;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
-import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.context.mbeans.MBeanExporter;
 
@@ -35,7 +34,7 @@ public class ServiceBeanMetricsProxyFactory implements ServiceBeanProxyFactory {
 	}
 
 	@Override
-	public BeanProxy create(ServiceDefinition<?> serviceDefinition, ServiceComponent serviceComponent) {
+	public BeanProxy create(ServiceDefinition<?> serviceDefinition) {
 		BeanMetricsProxy result = new BeanMetricsProxy(serviceDefinition.getBeanKey(), metrics, astrixConfig);
 		BeanMetricsMBean mbean = new BeanMetrics(result.getTimer());
 		this.mBeanExporter.registerMBean(mbean, "ServiceBeanMetrics", serviceDefinition.getBeanKey().toString());

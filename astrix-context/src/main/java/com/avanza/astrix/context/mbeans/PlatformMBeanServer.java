@@ -47,11 +47,11 @@ public class PlatformMBeanServer implements MBeanServerFacade {
 		try {
 			ObjectName objectName = getObjectName(folder, name);
 			ManagementFactory.getPlatformMBeanServer().registerMBean(mbean, objectName);
-//			logger.warn(String.format("Exported mbean: name=%s", objectName.toString()));
 		} catch (Exception e) {
-			logger.warn(String.format("Failed to export mbean: type=%s name=%s", mbean.getClass().getName(), name.toString()), e);
+			logger.warn(String.format("Failed to export mbean: type=%s domain=%s subdomain=%s name=%s", mbean.getClass().getName(), domain, folder, name.toString()), e);
 		}
 	}
+	
 	
 
 	private ObjectName getObjectName(String folder, String name) {

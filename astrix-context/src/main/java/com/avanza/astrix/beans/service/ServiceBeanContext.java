@@ -16,13 +16,15 @@
 package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 
 public final class ServiceBeanContext {
 
 	private final ServiceComponentRegistry serviceComponents;
 	private final ServiceLeaseManager leaseManager;
 	private final AstrixServiceBeanInstanceMbeanExporter serviceMbeanExporter;
-	private final ServiceBeanProxyInvocationDispatcherFactory serviceBeanInvocationDispatcherFactory;
+	private final ServiceBeanProxies serviceBeanProxies;
+	private final ReactiveTypeConverter reactiveTypeConverter;
 	private final AstrixConfig config;
 	
 	
@@ -30,12 +32,14 @@ public final class ServiceBeanContext {
 							  ServiceLeaseManager leaseManager,
 							  AstrixConfig astrixConfig,
 							  AstrixServiceBeanInstanceMbeanExporter serviceMbeanExporter,
-							  ServiceBeanProxyInvocationDispatcherFactory serviceBeanInvocationDispatcherFactory) {
+							  ServiceBeanProxies serviceBeanProxies,
+							  ReactiveTypeConverter reactiveTypeConverter) {
 		this.serviceComponents = serviceComponents;
 		this.leaseManager = leaseManager;
 		this.config = astrixConfig;
 		this.serviceMbeanExporter = serviceMbeanExporter;
-		this.serviceBeanInvocationDispatcherFactory = serviceBeanInvocationDispatcherFactory;
+		this.serviceBeanProxies = serviceBeanProxies;
+		this.reactiveTypeConverter = reactiveTypeConverter;
 	}
 	
 	public AstrixConfig getConfig() {
@@ -54,8 +58,12 @@ public final class ServiceBeanContext {
 		return serviceMbeanExporter;
 	}
 	
-	public ServiceBeanProxyInvocationDispatcherFactory getServiceBeanInvocationDispatcherFactory() {
-		return serviceBeanInvocationDispatcherFactory;
+	public ServiceBeanProxies getServiceBeanProxies() {
+		return serviceBeanProxies;
+	}
+	
+	public ReactiveTypeConverter getReactiveTypeConverter() {
+		return reactiveTypeConverter;
 	}
 	
 }

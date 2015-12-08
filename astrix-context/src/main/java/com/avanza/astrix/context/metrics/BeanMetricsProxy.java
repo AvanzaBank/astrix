@@ -22,6 +22,7 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.core.BeanProxy;
+import com.avanza.astrix.beans.core.BeanProxyNames;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.core.function.CheckedCommand;
 
@@ -41,26 +42,26 @@ class BeanMetricsProxy implements BeanProxy {
 
 	@Override
 	public <T> CheckedCommand<T> proxyInvocation(CheckedCommand<T> command) {
-		if (!beanMetricsEnabled()) {
-			return command;
-		}
 		return timer.timeCheckedExecution(command);
 	}
 
 	@Override
 	public <T> Supplier<Observable<T>> proxyReactiveInvocation(Supplier<Observable<T>> command) {
-		if (!beanMetricsEnabled()) {
-			return command;
-		}
 		return timer.timeObservable(command);
 	}
 	
 	Timer getTimer() {
 		return timer;
 	}
-
-	private boolean beanMetricsEnabled() {
+	
+	@Override
+	public boolean isEnabled() {
 		return beanMetricsEnabledGlobally.get() && beanMetricsEnabled.get();
+	}
+
+	@Override
+	public String name() {
+		return BeanProxyNames.METRICS;
 	}
 	
 }

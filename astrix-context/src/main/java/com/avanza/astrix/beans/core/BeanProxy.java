@@ -22,6 +22,7 @@ import com.avanza.astrix.core.function.CheckedCommand;
 import rx.Observable;
 
 public interface BeanProxy {
+	
 	/**
 	 * proxy an synchronous invocation. <p>
 	 * 
@@ -44,6 +45,10 @@ public interface BeanProxy {
 	 */
 	<T> Supplier<Observable<T>> proxyReactiveInvocation(Supplier<Observable<T>> command);
 	
+	String name();
+	
+	boolean isEnabled();
+	
 	public static class NoProxy implements BeanProxy {
 
 		@Override
@@ -58,6 +63,16 @@ public interface BeanProxy {
 
 		public static BeanProxy create() {
 			return new NoProxy();
+		}
+		
+		@Override
+		public String name() {
+			return "noProxy";
+		}
+
+		@Override
+		public boolean isEnabled() {
+			return false;
 		}
 	}
 }
