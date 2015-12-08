@@ -45,7 +45,7 @@ public class BeanMetricsTest {
 
 	@After
 	public void after() {
-		AstrixTestUtil.closeSafe(astrixContext);
+		AstrixTestUtil.closeQuiet(astrixContext);
 	}
 	
 	@Test

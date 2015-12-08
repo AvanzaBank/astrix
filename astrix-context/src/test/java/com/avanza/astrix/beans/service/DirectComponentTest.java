@@ -64,7 +64,7 @@ public class DirectComponentTest {
 	
 	@After
 	public void after() {
-		AstrixTestUtil.closeSafe(astrixContext);
+		AstrixTestUtil.closeQuiet(astrixContext);
 	}
 	
 	@AstrixApiProvider

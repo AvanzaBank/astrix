@@ -35,7 +35,7 @@ public class AutoCloseableRule implements TestRule {
 					base.evaluate();
 				} finally {
 					for (AutoCloseable ac : autoClosables) {
-						AstrixTestUtil.closeSafe(ac);
+						AstrixTestUtil.closeQuiet(ac);
 					}
 				}
 			}

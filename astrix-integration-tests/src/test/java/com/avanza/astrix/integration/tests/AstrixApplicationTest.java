@@ -35,7 +35,7 @@ public class AstrixApplicationTest {
 	
 	@After
 	public void after() {
-		AstrixTestUtil.closeSafe(appContext);
+		AstrixTestUtil.closeQuiet(appContext);
 	}
 
 	@Test(expected = RuntimeException.class)
