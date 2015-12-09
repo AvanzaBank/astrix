@@ -16,8 +16,11 @@
 package com.avanza.astrix.context.mbeans;
 
 import java.lang.management.ManagementFactory;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.PreDestroy;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
@@ -32,6 +35,7 @@ public class PlatformMBeanServer implements MBeanServerFacade {
 	
 	private final Logger logger = LoggerFactory.getLogger(PlatformMBeanServer.class);
 	private final String domain;
+	private final ConcurrentMap<ObjectName, ObjectName> exportedMbeans = new ConcurrentHashMap<>();
 	
 	public PlatformMBeanServer(AstrixConfig astrixConfig) {
 		int astrixContextId = astrixContextCount.incrementAndGet();
@@ -46,19 +50,33 @@ public class PlatformMBeanServer implements MBeanServerFacade {
 	public void registerMBean(Object mbean, String folder, String name) {
 		try {
 			ObjectName objectName = getObjectName(folder, name);
+			logger.debug("Register mbean: name={}", objectName);
 			ManagementFactory.getPlatformMBeanServer().registerMBean(mbean, objectName);
+			exportedMbeans.putIfAbsent(objectName, objectName);
 		} catch (Exception e) {
 			logger.warn(String.format("Failed to export mbean: type=%s domain=%s subdomain=%s name=%s", mbean.getClass().getName(), domain, folder, name.toString()), e);
 		}
 	}
-	
-	
 
 	private ObjectName getObjectName(String folder, String name) {
 		try {
 			return new ObjectName(domain + ":00=" + folder + ",name=" + name);
 		} catch (MalformedObjectNameException e) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	@PreDestroy
+	public void destroy() {
+		exportedMbeans.keySet().forEach(this::unregisterMBean);
+	}
+	
+	private void unregisterMBean(ObjectName objectName) {
+		try {
+			logger.debug("Unregister mbean: name={}", objectName);
+			ManagementFactory.getPlatformMBeanServer().unregisterMBean(objectName);
+		} catch (Exception e) {
+			logger.warn("Failed to unregister mbean: name={}", objectName);
 		}
 	}
 	
