@@ -15,13 +15,14 @@
  */
 package com.avanza.astrix.beans.publish;
 
-import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
+@FunctionalInterface
 public interface ApiProviders {
 
 	/**
@@ -30,6 +31,6 @@ public interface ApiProviders {
 	 * 
 	 * @return
 	 */
-	Collection<ApiProviderClass> getAll();
+	Stream<ApiProviderClass> getAll();
 	
 }

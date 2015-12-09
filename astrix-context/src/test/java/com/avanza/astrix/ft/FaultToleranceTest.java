@@ -17,6 +17,8 @@ package com.avanza.astrix.ft;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
@@ -27,7 +29,8 @@ import org.junit.Test;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.ft.FaultToleranceSpi;
+import com.avanza.astrix.beans.ft.BeanFaultTolerance;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -37,17 +40,20 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
+import com.google.common.base.Optional;
 
 import rx.Observable;
 
 public class FaultToleranceTest {
 	
 	private InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
-	private FakeFaultTolerance faultTolerance = new FakeFaultTolerance();
+	private FakeFaultToleranceFactory faultTolerance = new FakeFaultToleranceFactory();
 	private AstrixContext astrixContext;
 	private Ping ping;
+	private AstrixBeanKey<?> pingKey = AstrixBeanKey.create(Ping.class);
 	private TestAstrixConfigurer astrixConfigurer;
 	private Ping anotherPing;
+	private AstrixBeanKey<?> anotherPingKey = AstrixBeanKey.create(Ping.class, "another-ping");
 	
 	@Before
 	public void setup() {
@@ -55,11 +61,11 @@ public class FaultToleranceTest {
 		astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApi.class);
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
-		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, faultTolerance);
+		astrixConfigurer.registerStrategy(BeanFaultToleranceFactorySpi.class, faultTolerance);
 		astrixConfigurer.enableFaultTolerance(true);
 		astrixContext = astrixConfigurer.configure();
 		ping = astrixContext.getBean(Ping.class); 
-		anotherPing = astrixContext.getBean(Ping.class, "another-ping");
+		anotherPing = astrixContext.getBean(Ping.class, anotherPingKey.getQualifier());
 	}
 	
 	@After
@@ -70,32 +76,36 @@ public class FaultToleranceTest {
 	
 	@Test
 	public void itShouldBePossibleToDisableFaultToleranceGloballyAtRuntime() throws Throwable {
-		assertEquals(0, getAppliedFaultToleranceCount());
+		assertEquals(0, getAppliedFaultToleranceCount(pingKey));
 		
 		assertEquals("foo", ping.ping("foo"));
-		assertEquals(1, getAppliedFaultToleranceCount());
+		assertEquals(1, getAppliedFaultToleranceCount(pingKey));
 
 		astrixConfigurer.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false);
 
 		assertEquals("bar", ping.ping("bar"));
-		assertEquals(AstrixBeanKey.create(Ping.class), faultTolerance.lastAppliedBeanKey);
-		assertEquals(1, getAppliedFaultToleranceCount());
+		assertEquals(1, getAppliedFaultToleranceCount(pingKey));
 	}
 	
+	private int getAppliedFaultToleranceCount(AstrixBeanKey<?> pingKey) {
+		return this.faultTolerance.getAppliedFaultToleranceCount(pingKey);
+	}
+
 	@Test
 	public void itShouldBePossibleToDisableFaultToleranceAtRuntimeForAGivenBean() throws Throwable {
 		astrixConfigurer.set(AstrixSettings.ENABLE_FAULT_TOLERANCE, true);
-		assertEquals(0, getAppliedFaultToleranceCount());
+		assertEquals(0, getAppliedFaultToleranceCount(pingKey));
 		assertEquals("foo", ping.ping("foo"));
-		assertEquals(1, getAppliedFaultToleranceCount());
+		assertEquals(1, getAppliedFaultToleranceCount(pingKey));
 
 		astrixConfigurer.set(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED.nameFor(AstrixBeanKey.create(Ping.class)), "false");
 		assertEquals("bar", ping.ping("bar"));
-		assertEquals(1, getAppliedFaultToleranceCount());
+		assertEquals(1, getAppliedFaultToleranceCount(pingKey));
 		
 
+		assertEquals(0, getAppliedFaultToleranceCount(anotherPingKey));
 		assertEquals("bar", anotherPing.ping("bar"));
-		assertEquals(2, getAppliedFaultToleranceCount());
+		assertEquals(1, getAppliedFaultToleranceCount(anotherPingKey));
 	}
 	
 	public interface Ping {
@@ -136,27 +146,39 @@ public class FaultToleranceTest {
 		}
 	}
 	
-	private int getAppliedFaultToleranceCount() {
-		return faultTolerance.appliedFaultToleranceCount.get();
+	private static class FakeFaultToleranceFactory implements BeanFaultToleranceFactorySpi {
+	
+		private Map<AstrixBeanKey<?>, FakeBeanFaultTolerance> ftByBeanKey = new HashMap<>(); 
+		
+		@Override
+		public BeanFaultTolerance create(AstrixBeanKey<?> beanKey) {
+			return this.ftByBeanKey.computeIfAbsent(beanKey, bk -> new FakeBeanFaultTolerance());
+		}
+
+		public int getAppliedFaultToleranceCount(AstrixBeanKey<?> pingKey) {
+			return java.util.Optional.ofNullable(this.ftByBeanKey.get(pingKey))
+									 .map(FakeBeanFaultTolerance::getAppliedFaultToleranceCount)
+									 .orElse(0);
+		}
 	}
 	
-	private static class FakeFaultTolerance implements FaultToleranceSpi {
+	private static class FakeBeanFaultTolerance implements BeanFaultTolerance {
 		private final AtomicInteger appliedFaultToleranceCount = new AtomicInteger(0);
-		private AstrixBeanKey<?> lastAppliedBeanKey;
 		@Override
-		public <T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey) {
-			lastAppliedBeanKey = beanKey;
+		public <T> Observable<T> observe(Supplier<Observable<T>> observable) {
 			appliedFaultToleranceCount.incrementAndGet();
 			return observable.get();
 		}
 
 		@Override
-		public <T> T execute(CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable {
-			lastAppliedBeanKey = beanKey;
+		public <T> T execute(CheckedCommand<T> command) throws Throwable {
 			appliedFaultToleranceCount.incrementAndGet();
 			return command.call();
 		}
 		
+		public int getAppliedFaultToleranceCount() {
+			return this.appliedFaultToleranceCount.get();
+		}
 	}
 
 }

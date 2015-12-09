@@ -16,7 +16,11 @@
 package com.avanza.astrix.config;
 
 interface PropertyParser<T> {
-
+	
+	public static PropertyParser<Boolean> BOOLEAN_PARSER = new BooleanParser();
+	public static PropertyParser<String> STRING_PARSER = new StringParser();
+	public static PropertyParser<Long> LONG_PARSER = new LongParser();
+	public static PropertyParser<Integer> INT_PARSER = new IntParser();
 
 	T parse(String value);
 	

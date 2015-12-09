@@ -16,7 +16,7 @@
 package com.avanza.astrix.core;
 
 /**
- * Exception thrown when a service is unavailable, i.e we failed to invoce the target service. For example if a call to it times out.
+ * Exception thrown when a service is unavailable, i.e we failed to invoke the target service. For example if a call to it times out.
  * 
  * @author Kristoffer Erlandsson (krierl)
  */

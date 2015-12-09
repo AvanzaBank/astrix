@@ -13,16 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.mbeans;
+package com.avanza.astrix.remoting.server;
 
-import javax.management.ObjectName;
+import java.util.concurrent.TimeUnit;
 
-public interface AstrixMBeanExporter {
-
-	void registerMBean(Object mbean, String folder, String name);
-
-	ObjectName getObjectName(String subDomain, String name);
+public interface ServiceInvocationMonitorMBean {
 	
-	boolean exportMBeans();
+	long getInvocationCount();
 	
+	long getErrorCount();
+	
+	double get50thPercentile();
+	
+	double get99thPercentile();
+	
+	double getMax();
+	
+	double getMean();
+	
+	double getMin();
+	
+	double getOneMinuteRate();
+	
+	TimeUnit getRateUnit();
+	
+	TimeUnit getDurationUnit();
+	
+
 }

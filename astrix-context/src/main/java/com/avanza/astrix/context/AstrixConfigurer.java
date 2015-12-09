@@ -27,11 +27,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.api.ApiProviderBeanPublisherModule;
+import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.AstrixConfigModule;
 import com.avanza.astrix.beans.configdiscovery.ConfigDiscoveryModule;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
@@ -43,9 +45,9 @@ import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.BeanFactoryModule;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.beans.ft.DefaultHystrixCommandNamingStrategy;
 import com.avanza.astrix.beans.ft.FaultToleranceModule;
-import com.avanza.astrix.beans.ft.FaultToleranceSpi;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.beans.ft.NoFaultTolerance;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
@@ -53,6 +55,8 @@ import com.avanza.astrix.beans.publish.ApiProviderPlugins;
 import com.avanza.astrix.beans.publish.ApiProviders;
 import com.avanza.astrix.beans.publish.BeanPublisherPlugin;
 import com.avanza.astrix.beans.publish.BeansPublishModule;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
+import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.ServiceRegistryDiscoveryModule;
 import com.avanza.astrix.beans.service.DirectComponentModule;
 import com.avanza.astrix.beans.service.ServiceModule;
@@ -63,6 +67,8 @@ import com.avanza.astrix.config.PropertiesConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.config.SystemPropertiesConfigSource;
 import com.avanza.astrix.context.mbeans.AstrixMBeanModule;
+import com.avanza.astrix.context.mbeans.MBeanServerFacade;
+import com.avanza.astrix.context.mbeans.PlatformMBeanServer;
 import com.avanza.astrix.context.metrics.DefaultMetricSpi;
 import com.avanza.astrix.context.metrics.MetricsModule;
 import com.avanza.astrix.context.metrics.MetricsSpi;
@@ -78,6 +84,7 @@ import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
 import com.avanza.astrix.serviceunit.AstrixApplicationDescriptor;
 import com.avanza.astrix.serviceunit.ServiceUnitModule;
+import com.avanza.astrix.serviceunit.SystemServiceApiProvider;
 import com.avanza.astrix.versioning.core.ObjectSerializerModule;
 import com.avanza.astrix.versioning.jackson1.Jackson1SerializerModule;
 /**
@@ -119,8 +126,9 @@ public class AstrixConfigurer {
 		DynamicConfig config = createDynamicConfig();
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.registerDefault(StrategyProvider.create(HystrixCommandNamingStrategy.class, DefaultHystrixCommandNamingStrategy.class));
-		modulesConfigurer.registerDefault(StrategyProvider.create(FaultToleranceSpi.class, NoFaultTolerance.class));
+		modulesConfigurer.registerDefault(StrategyProvider.create(BeanFaultToleranceFactorySpi.class, NoFaultTolerance.class));
 		modulesConfigurer.registerDefault(StrategyProvider.create(MetricsSpi.class, DefaultMetricSpi.class));
+		modulesConfigurer.registerDefault(StrategyProvider.create(MBeanServerFacade.class, PlatformMBeanServer.class, context -> context.importType(AstrixConfig.class)));
 		
 		for (Module plugin : customModules) {
 			modulesConfigurer.register(plugin);
@@ -156,10 +164,13 @@ public class AstrixConfigurer {
 		Modules modules = modulesConfigurer.configure();
 
 		final AstrixContextImpl context = new AstrixContextImpl(modules, this.applicationDescriptor);
-		ApiProviders apiProviders = new FilteredApiProviders(getApiProviders(modules, config), activeProfiles);
-		for (ApiProviderClass apiProvider : apiProviders.getAll()) {
-			context.register(apiProvider);
-		}
+		Stream<ApiProviderClass> systemApis = 
+				Stream.of(AstrixServiceRegistryServiceProvider.class, AstrixServiceRegistryLibraryProvider.class, SystemServiceApiProvider.class)
+					  .map(ApiProviderClass::create);
+		Stream.concat(systemApis, getApiProviders(modules, config))
+		      .filter(this::isActive)
+		      .distinct()
+		      .forEach(context::register);
 		
 		// TODO: Merge with FilteredApiProviders and create module
 		for (StandardFactoryBean<?> beanFactory : standaloneFactories) {
@@ -248,57 +259,35 @@ public class AstrixConfigurer {
 			}
 		}
 	}
-
-	private static class FilteredApiProviders implements ApiProviders {
-		
-		private ApiProviders apiProviders;
-		private Set<String> activeProfiles;
-		
-		public FilteredApiProviders(ApiProviders apiProviders, Set<String> activeProfiles) {
-			this.apiProviders = apiProviders;
-			this.activeProfiles = activeProfiles;
-		}
-
-		@Override
-		public Collection<ApiProviderClass> getAll() {
-			Set<ApiProviderClass> result = new HashSet<>();
-			for (ApiProviderClass providerClass : apiProviders.getAll()) {
-				if (isActive(providerClass)) {
-					log.debug("Found provider: provider={}", providerClass.getProviderClassName());
-					result.add(providerClass);
-				}
+	
+	private boolean isActive(ApiProviderClass providerClass) {
+		if (providerClass.isAnnotationPresent(AstrixIncludedByProfile.class)) {
+			AstrixIncludedByProfile activatedBy = providerClass.getAnnotation(AstrixIncludedByProfile.class);
+			if (!this.activeProfiles.contains(activatedBy.value())) {
+				log.debug("Rejecting provider, required profile not active. profile={} provider={}", activatedBy.value(), providerClass.getProviderClassName());
+				return false;
 			}
-			return result;
 		}
-		
-		private boolean isActive(ApiProviderClass providerClass) {
-			if (providerClass.isAnnotationPresent(AstrixIncludedByProfile.class)) {
-				AstrixIncludedByProfile activatedBy = providerClass.getAnnotation(AstrixIncludedByProfile.class);
-				if (!this.activeProfiles.contains(activatedBy.value())) {
-					log.debug("Rejecting provider, required profile not active. profile={} provider={}", activatedBy.value(), providerClass.getProviderClassName());
-					return false;
-				}
+		if (providerClass.isAnnotationPresent(AstrixExcludedByProfile.class)) {
+			AstrixExcludedByProfile deactivatedBy = providerClass.getAnnotation(AstrixExcludedByProfile.class);
+			if (this.activeProfiles.contains(deactivatedBy.value())) {
+				log.debug("Rejecting provider, excluded by active profile. profile={} provider={}", deactivatedBy.value(), providerClass.getProviderClassName());
+				return false;
 			}
-			if (providerClass.isAnnotationPresent(AstrixExcludedByProfile.class)) {
-				AstrixExcludedByProfile deactivatedBy = providerClass.getAnnotation(AstrixExcludedByProfile.class);
-				if (this.activeProfiles.contains(deactivatedBy.value())) {
-					log.debug("Rejecting provider, excluded by active profile. profile={} provider={}", deactivatedBy.value(), providerClass.getProviderClassName());
-					return false;
-				}
-			}
-			return true;
 		}
+		log.debug("Found provider: provider={}", providerClass.getProviderClassName());
+		return true;
 	}
 
-	private ApiProviders getApiProviders(Modules modules, DynamicConfig config) {
+	private Stream<ApiProviderClass> getApiProviders(Modules modules, DynamicConfig config) {
 		if (this.astrixApiProviders != null) {
-			return astrixApiProviders;
+			return astrixApiProviders.getAll();
 		}
 		String basePackage = AstrixSettings.API_PROVIDER_SCANNER_BASE_PACKAGE.getFrom(config).get();
 		if (!basePackage.trim().isEmpty()) {
-			return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(modules), "com.avanza.astrix", basePackage.split(",")); // Always scan com.avanza.astrix package
+			return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(modules), "com.avanza.astrix", basePackage.split(",")).getAll(); // Always scan com.avanza.astrix package
 		}
-		return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(modules), "com.avanza.astrix"); 
+		return new AstrixApiProviderClassScanner(getAllApiProviderAnnotationsTypes(modules), "com.avanza.astrix").getAll(); 
 	}
 	
 	private List<Class<? extends Annotation>> getAllApiProviderAnnotationsTypes(Modules modules) {

@@ -45,7 +45,7 @@ public class BeanMetricsTest {
 
 	@After
 	public void after() {
-		AstrixTestUtil.closeSafe(astrixContext);
+		AstrixTestUtil.closeQuiet(astrixContext);
 	}
 	
 	@Test
@@ -173,22 +173,29 @@ public class BeanMetricsTest {
 		}
 
 		@Override
-		public <T> Supplier<Observable<T>> timeObservable(Supplier<Observable<T>> targetObservable, String group, String name) {
-			return () -> {
-				long start = fakeClock.get(); // Set time before execution
-				return targetObservable.get().doOnTerminate(() -> lastTimedObservableTime = fakeClock.get() - start);
+		public TimerSpi createTimer() {
+			return new TimerSpi() {
+				@Override
+				public <T> CheckedCommand<T> timeExecution(CheckedCommand<T> execution) {
+					return () -> {
+						long start = fakeClock.get(); // Set time before execution
+						T result = execution.call();
+						lastTimedExecututionTime = fakeClock.get() - start;
+						return result;
+					};
+				}
+				@Override
+				public <T> Supplier<Observable<T>> timeObservable(Supplier<Observable<T>> targetObservable) {
+					return () -> {
+						long start = fakeClock.get(); // Set time before execution
+						return targetObservable.get().doOnTerminate(() -> lastTimedObservableTime = fakeClock.get() - start);
+					};
+				}
+				@Override
+				public TimerSnaphot getSnapshot() {
+					return TimerSnaphot.empty();
+				}
 			};
-		}
-
-		@Override
-		public <T> CheckedCommand<T> timeExecution(final CheckedCommand<T> execution, final String group, final String name) {
-			return () -> {
-				long start = fakeClock.get(); // Set time before execution
-				T result = execution.call();
-				lastTimedExecututionTime = fakeClock.get() - start;
-				return result;
-			};
-			
 		}
 	}
 

@@ -24,7 +24,9 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.ft.FaultToleranceConfigurator;
+import com.avanza.astrix.beans.core.BeanProxy;
+import com.avanza.astrix.beans.core.BeanProxyFilter;
+import com.avanza.astrix.beans.core.BeanProxyNames;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
@@ -47,7 +49,7 @@ import com.j_spaces.core.IJSpace;
  * @author Elias Lindholm (elilin)
  *
  */
-public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware, FaultToleranceConfigurator {
+public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware, BeanProxyFilter {
 
 	private static Logger log = LoggerFactory.getLogger(GsLocalViewComponent.class);
 	private GsBinder gsBinder;
@@ -108,13 +110,16 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	}
 	
 	@Override
-	public FtProxySetting configure() {
-		if (disableLocalView.get()) {
-			return FtProxySetting.ENABLED; // Apply faultTolerance proxy if local-view is disabled
+	public boolean applyBeanProxy(BeanProxy beanProxy) {
+		if (beanProxy.name().equals(BeanProxyNames.FAULT_TOLERANCE)) {
+			if (disableLocalView.get()) {
+				return true; // Apply faultTolerance proxy if local-view is disabled
+			}
+			return false; 
 		}
-		return FtProxySetting.DISABLED;
+		return true;
 	}
-
+	
 	@Override
 	public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
 		return gsBinder.createServiceProperties(serviceProviderUri);

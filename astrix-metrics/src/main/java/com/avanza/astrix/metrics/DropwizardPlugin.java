@@ -19,11 +19,8 @@ import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
-import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
 import com.avanza.astrix.context.metrics.MetricsSpi;
 import com.avanza.astrix.modules.ModuleContext;
-import com.avanza.astrix.modules.StrategyContext;
-import com.avanza.astrix.modules.StrategyContextPreparer;
 
 @MetaInfServices(AstrixContextPlugin.class)
 public class DropwizardPlugin implements AstrixContextPlugin {
@@ -34,13 +31,7 @@ public class DropwizardPlugin implements AstrixContextPlugin {
 
 	@Override
 	public void registerStrategies(AstrixStrategiesConfig strategiesConfig) {
-		strategiesConfig.registerStrategy(MetricsSpi.class, DropwizardMetrics.class, new StrategyContextPreparer() {
-			@Override
-			public void prepare(StrategyContext context) {
-				context.importType(AstrixMBeanExporter.class);
-				
-			}
-		});
+		strategiesConfig.registerStrategy(MetricsSpi.class, DropwizardMetrics.class);
 	}
 	
 }

@@ -130,14 +130,13 @@ public class AstrixTestUtil {
 		};
 	}
 	
-	public static void closeSafe(AutoCloseable autoClosable) {
+	public static void closeQuiet(AutoCloseable autoClosable) {
 		if (autoClosable == null) {
 			return;
 		}
 		try {
 			autoClosable.close();
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 

@@ -17,15 +17,20 @@ package com.avanza.astrix.beans.ft;
 
 import java.util.function.Supplier;
 
-import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.core.function.CheckedCommand;
 
 import rx.Observable;
+/**
+ * A BeanFaultTolerance instance is used to protect a an Astrix bean invocation
+ * with fault isolation. <p>
+ * 
+ * @author Elias Lindholm
+ *
+ */
+public interface BeanFaultTolerance {
 
-public interface FaultToleranceSpi {
+	<T> Observable<T> observe(Supplier<Observable<T>> observable);
 
-	<T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey);
+	<T> T execute(CheckedCommand<T> command) throws Throwable;
 
-	<T> T execute(CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable;
-	
 }

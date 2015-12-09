@@ -1,3 +1,12 @@
+## Version 0.40.0
+#### Added
+* [#27](https://github.com/AvanzaBank/astrix/issues/27) Adds support to listen for underlying property changes of a DynamicConfig instance
+* [#12](https://github.com/AvanzaBank/astrix/issues/12) More server-side metrics for each exported servcie
+
+#### Changed
+* [#12](https://github.com/AvanzaBank/astrix/issues/12) New design of MetricsSpi
+
+
 ## Version 0.39.2
 #### Fixes
 * [#25](https://github.com/AvanzaBank/astrix/issues/25) AstrixBeanSettings uses a "." for as separator between bean type and qualifier

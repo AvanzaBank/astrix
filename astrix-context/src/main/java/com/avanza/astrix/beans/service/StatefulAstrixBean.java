@@ -16,6 +16,8 @@
 package com.avanza.astrix.beans.service;
 
 public interface StatefulAstrixBean {
+	
+	// TODO: Remove this abstraction
 
 	void waitUntilBound(long timeoutMillis) throws InterruptedException;
 	

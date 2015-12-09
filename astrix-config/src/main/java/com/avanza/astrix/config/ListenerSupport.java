@@ -19,44 +19,42 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  * @param <T>
  */
-final class DynamicPropertyListenerSupport<T> {
+final class ListenerSupport<T> {
 	
-	private final List<SubscribedListener<T>> listeners = new CopyOnWriteArrayList<>();
+	private final List<SubscribedListener> listeners = new CopyOnWriteArrayList<>();
 	
-	void addListener(DynamicPropertyListener<T> l) {
-		listeners.add(new SubscribedListener<>(l));
+	
+	void addListener(T l) {
+		listeners.add(new SubscribedListener(l));
 	}
 	
-	void notifyListeners(T newValue) {
-		for (SubscribedListener<T> subscribedListener : listeners) {
-			subscribedListener.notifyListener(newValue);
+	void dispatchEvent(Consumer<T> eventNotification) {
+		for (SubscribedListener subscribedListener : listeners) {
+			eventNotification.accept(subscribedListener.listener);
 		}
 	}
 	
-	void removeListener(DynamicPropertyListener<T> l) {
-		listeners.removeAll(Arrays.asList(new SubscribedListener<>(l)));
+	void removeListener(T l) {
+		listeners.removeAll(Arrays.asList(new SubscribedListener(l)));
 	}
 	
-	private static class SubscribedListener<T> {
-		private DynamicPropertyListener<T> listener;
+	private class SubscribedListener {
+		private T listener;
 
-		public SubscribedListener(DynamicPropertyListener<T> listener) {
-			this.listener = Objects.requireNonNull(listener);
+		public SubscribedListener(T l) {
+			this.listener = Objects.requireNonNull(l);
 		}
 
-		void notifyListener(T newValue) {
-			this.listener.propertyChanged(newValue);
-		}
-		
 		@Override
 		public boolean equals(Object obj) {
-			if (!(obj instanceof SubscribedListener)) {
+			if (!(obj instanceof ListenerSupport.SubscribedListener)) {
 				return false;
 			}
 			return listener == SubscribedListener.class.cast(obj).listener;
@@ -69,7 +67,7 @@ final class DynamicPropertyListenerSupport<T> {
 		
 		@Override
 		public String toString() {
-			return "DynamicPropertyListener(" + this.listener.toString() + ")";
+			return "DynamicConfigListener(" + this.listener.toString() + ")";
 		}
 	}
 

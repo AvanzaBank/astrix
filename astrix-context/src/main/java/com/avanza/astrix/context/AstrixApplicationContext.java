@@ -15,14 +15,9 @@
  */
 package com.avanza.astrix.context;
 
-import com.avanza.astrix.config.DynamicConfig;
-
-
 public interface AstrixApplicationContext extends AstrixContext {
 
 	<T> T getInstance(Class<T> type);
-
-	DynamicConfig getConfig();
 
 	void startServicePublisher();
 

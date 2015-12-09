@@ -50,7 +50,7 @@ public class AstrixServiceRegistryTest {
 	
 	@After
 	public void cleanup() {
-		AstrixTestUtil.closeSafe(clientContext);
+		AstrixTestUtil.closeQuiet(clientContext);
 	}
 	
 	

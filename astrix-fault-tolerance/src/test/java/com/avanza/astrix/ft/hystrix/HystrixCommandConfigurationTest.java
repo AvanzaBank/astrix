@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
-import com.avanza.astrix.beans.ft.FaultToleranceSpi;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -67,8 +67,8 @@ public class HystrixCommandConfigurationTest {
 		
 		astrixContext.getBean(Ping.class).ping("foo");
 		
-		HystrixFaultTolerance hystrixFaultTolerance = getFaultTolerance(astrixContext);
-		HystrixFaultTolerance hystrixFaultTolerance2 = getFaultTolerance(astrixContext2);
+		HystrixFaultToleranceFactory hystrixFaultTolerance = getFaultTolerance(astrixContext);
+		HystrixFaultToleranceFactory hystrixFaultTolerance2 = getFaultTolerance(astrixContext2);
 		
 		HystrixCommandProperties pingCommandPropertiesContext1 = getHystrixCommandProperties(hystrixFaultTolerance, Ping.class);
 		HystrixCommandProperties pingCommandPropertiesContext2 = getHystrixCommandProperties(hystrixFaultTolerance2, Ping.class);
@@ -86,7 +86,7 @@ public class HystrixCommandConfigurationTest {
 		astrixConfigurer.set(AstrixBeanSettings.MAX_CONCURRENT_REQUESTS, AstrixBeanKey.create(Ping.class), 21);
 		astrixContext.getBean(Ping.class).ping("foo");
 		
-		HystrixFaultTolerance hystrixFaultTolerance = getFaultTolerance(astrixContext);
+		HystrixFaultToleranceFactory hystrixFaultTolerance = getFaultTolerance(astrixContext);
 		HystrixCommandProperties pingCommandProperties = getHystrixCommandProperties(hystrixFaultTolerance, Ping.class);
 		HystrixThreadPoolProperties pingThreadPoolProperties = getThreadPoolProperties(hystrixFaultTolerance, Ping.class);
 		
@@ -100,7 +100,7 @@ public class HystrixCommandConfigurationTest {
 	public void defaultBeanSettingsFromBeanConfiguration() throws Throwable {
 		astrixContext.getBean(Ping.class).ping("foo");
 		
-		HystrixFaultTolerance hystrixFaultTolerance = getFaultTolerance(astrixContext);
+		HystrixFaultToleranceFactory hystrixFaultTolerance = getFaultTolerance(astrixContext);
 		HystrixCommandProperties pingCommandProperties = getHystrixCommandProperties(hystrixFaultTolerance, Ping.class);
 		HystrixThreadPoolProperties pingThreadPoolProperties = getThreadPoolProperties(hystrixFaultTolerance, Ping.class);
 		
@@ -110,23 +110,23 @@ public class HystrixCommandConfigurationTest {
 		assertEquals(DefaultBeanSettings.DEFAULT_MAX_CONCURRENT_REQUESTS, pingCommandProperties.executionIsolationSemaphoreMaxConcurrentRequests().get().intValue());
 	}
 	
-	private static HystrixCommandProperties getHystrixCommandProperties(HystrixFaultTolerance hystrixFaultTolerance, Class<?> api) {
+	private static HystrixCommandProperties getHystrixCommandProperties(HystrixFaultToleranceFactory hystrixFaultTolerance, Class<?> api) {
 		HystrixPropertiesStrategy hystrixPropertiesStrategy = HystrixPlugins.getInstance().getPropertiesStrategy();
 		HystrixCommandKey commandKey = hystrixFaultTolerance.getCommandKey(AstrixBeanKey.create(api));
 		return hystrixPropertiesStrategy.getCommandProperties(commandKey, 
 															  HystrixCommandProperties.Setter());
 	}
 
-	private static HystrixFaultTolerance getFaultTolerance(AstrixContext astrixContext) {
-		FaultToleranceSpi ftStrategy = AstrixApplicationContext.class.cast(astrixContext).getInstance(FaultToleranceSpi.class);
-		assertEquals(HystrixFaultTolerance.class, ftStrategy.getClass());
-		return (HystrixFaultTolerance) ftStrategy;
+	private static HystrixFaultToleranceFactory getFaultTolerance(AstrixContext astrixContext) {
+		BeanFaultToleranceFactorySpi ftStrategy = AstrixApplicationContext.class.cast(astrixContext).getInstance(BeanFaultToleranceFactorySpi.class);
+		assertEquals(HystrixFaultToleranceFactory.class, ftStrategy.getClass());
+		return (HystrixFaultToleranceFactory) ftStrategy;
 	}
 	
-	private static HystrixThreadPoolProperties getThreadPoolProperties(HystrixFaultTolerance hystrixFaultTolerance,
+	private static HystrixThreadPoolProperties getThreadPoolProperties(HystrixFaultToleranceFactory hystrixFaultTolerance,
 			Class<?> api) {
 		HystrixPropertiesStrategy hystrixPropertiesStrategy = HystrixPlugins.getInstance().getPropertiesStrategy();
-		 HystrixCommandGroupKey groupKey = hystrixFaultTolerance.getGroupKey(AstrixBeanKey.create(api));
+		HystrixCommandGroupKey groupKey = hystrixFaultTolerance.getGroupKey(AstrixBeanKey.create(api));
 		return hystrixPropertiesStrategy.getThreadPoolProperties(HystrixThreadPoolKey.Factory.asKey(groupKey.name()), 
 				  HystrixThreadPoolProperties.Setter());
 	}

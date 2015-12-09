@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -49,20 +50,17 @@ public class AstrixApiProviderClassScanner implements ApiProviders {
 	}
 	
 	@Override
-	public List<ApiProviderClass> getAll() {
-		List<ApiProviderClass> result = new ArrayList<>();
-		for (String basePackage : this.basePackages) {
-			result.addAll(scanPackage(basePackage));
-		}
-		return result;
+	public Stream<ApiProviderClass> getAll() {
+		return basePackages.stream()
+						   .flatMap(this::scanPackage);
 	}
 
-	private List<ApiProviderClass> scanPackage(String basePackage) {
+	private Stream<ApiProviderClass> scanPackage(String basePackage) {
 		log.debug("Scanning package for api-providers: package={}", basePackage);
 		List<ApiProviderClass> providerClasses = apiProvidersByBasePackage.get(basePackage);
 		if (providerClasses != null) {
 			log.debug("Returning cached api-providers found on earlier scan types={}", providerClasses);
-			return providerClasses;
+			return providerClasses.stream();
 		}
 		List<Class<? extends Annotation>> allProviderAnnotationTypes = getAllProviderAnnotationTypes();
 		log.debug("Running scan for api-providers of types={}", allProviderAnnotationTypes);
@@ -76,7 +74,7 @@ public class AstrixApiProviderClassScanner implements ApiProviders {
 			}
 		}
 		apiProvidersByBasePackage.put(basePackage, discoveredApiPRoviders);
-		return discoveredApiPRoviders;
+		return discoveredApiPRoviders.stream();
 	}
 	
 	void addBasePackage(String basePackage) {

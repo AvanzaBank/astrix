@@ -15,30 +15,35 @@
  */
 package com.avanza.astrix.beans.service;
 
-import com.avanza.astrix.beans.config.BeanConfigurations;
+import com.avanza.astrix.beans.config.AstrixConfig;
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 
 public final class ServiceBeanContext {
 
 	private final ServiceComponentRegistry serviceComponents;
 	private final ServiceLeaseManager leaseManager;
-	private final BeanConfigurations beanConfigurations;
 	private final AstrixServiceBeanInstanceMbeanExporter serviceMbeanExporter;
-	private final ServiceBeanProxyInvocationDispatcherFactory serviceBeanInvocationDispatcherFactory;
+	private final ServiceBeanProxies serviceBeanProxies;
+	private final ReactiveTypeConverter reactiveTypeConverter;
+	private final AstrixConfig config;
 	
 	
-	public ServiceBeanContext(ServiceComponentRegistry serviceComponents, ServiceLeaseManager leaseManager,
-			BeanConfigurations beanConfigurations,
-			AstrixServiceBeanInstanceMbeanExporter serviceMbeanExporter,
-			ServiceBeanProxyInvocationDispatcherFactory serviceBeanInvocationDispatcherFactory) {
+	public ServiceBeanContext(ServiceComponentRegistry serviceComponents, 
+							  ServiceLeaseManager leaseManager,
+							  AstrixConfig astrixConfig,
+							  AstrixServiceBeanInstanceMbeanExporter serviceMbeanExporter,
+							  ServiceBeanProxies serviceBeanProxies,
+							  ReactiveTypeConverter reactiveTypeConverter) {
 		this.serviceComponents = serviceComponents;
 		this.leaseManager = leaseManager;
-		this.beanConfigurations = beanConfigurations;
+		this.config = astrixConfig;
 		this.serviceMbeanExporter = serviceMbeanExporter;
-		this.serviceBeanInvocationDispatcherFactory = serviceBeanInvocationDispatcherFactory;
+		this.serviceBeanProxies = serviceBeanProxies;
+		this.reactiveTypeConverter = reactiveTypeConverter;
 	}
-
-	public BeanConfigurations getBeanConfigurations() {
-		return beanConfigurations;
+	
+	public AstrixConfig getConfig() {
+		return config;
 	}
 
 	public ServiceLeaseManager getLeaseManager() {
@@ -53,8 +58,12 @@ public final class ServiceBeanContext {
 		return serviceMbeanExporter;
 	}
 	
-	public ServiceBeanProxyInvocationDispatcherFactory getServiceBeanInvocationDispatcherFactory() {
-		return serviceBeanInvocationDispatcherFactory;
+	public ServiceBeanProxies getServiceBeanProxies() {
+		return serviceBeanProxies;
+	}
+	
+	public ReactiveTypeConverter getReactiveTypeConverter() {
+		return reactiveTypeConverter;
 	}
 	
 }

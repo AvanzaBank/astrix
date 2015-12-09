@@ -18,11 +18,11 @@ package com.avanza.astrix.context.metrics;
 import java.util.function.Supplier;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
-import com.avanza.astrix.beans.config.BeanConfigurations;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.core.BeanProxy;
-import com.avanza.astrix.beans.publish.PublishedAstrixBean;
+import com.avanza.astrix.beans.core.BeanProxyNames;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.core.function.CheckedCommand;
 
@@ -30,40 +30,38 @@ import rx.Observable;
 
 class BeanMetricsProxy implements BeanProxy {
 
-	private final PublishedAstrixBean<?> beanDefinition;
-	private final MetricsSpi metrics;
 	private final DynamicBooleanProperty beanMetricsEnabledGlobally;
 	private final DynamicBooleanProperty beanMetricsEnabled;
+	private final Timer timer;
 	
-	public BeanMetricsProxy(PublishedAstrixBean<?> beanDefinition, MetricsSpi metrics, AstrixConfig astrixConfig, BeanConfigurations beanConfigurations) {
-		this.beanDefinition = beanDefinition;
-		this.metrics = metrics;
+	public BeanMetricsProxy(AstrixBeanKey<?> beanKey, Metrics metrics, AstrixConfig astrixConfig) {
 		this.beanMetricsEnabledGlobally = astrixConfig.get(AstrixSettings.ENABLE_BEAN_METRICS);
-		this.beanMetricsEnabled = beanConfigurations.getBeanConfiguration(beanDefinition.getBeanKey()).get(AstrixBeanSettings.BEAN_METRICS_ENABLED);
+		this.beanMetricsEnabled = astrixConfig.getBeanConfiguration(beanKey).get(AstrixBeanSettings.BEAN_METRICS_ENABLED);
+		this.timer = metrics.createTimer();
 	}
 
 	@Override
 	public <T> CheckedCommand<T> proxyInvocation(CheckedCommand<T> command) {
-		if (!beanMetricsEnabled()) {
-			return command;
-		}
-		return metrics.timeExecution(command, "ServiceBeanMetrics", getServiceBeanName());
+		return timer.timeCheckedExecution(command);
 	}
 
 	@Override
 	public <T> Supplier<Observable<T>> proxyReactiveInvocation(Supplier<Observable<T>> command) {
-		if (!beanMetricsEnabled()) {
-			return command;
-		}
-		return metrics.timeObservable(command, "ServiceBeanMetrics", getServiceBeanName());
-	}
-
-	private boolean beanMetricsEnabled() {
-		return beanMetricsEnabledGlobally.get() && beanMetricsEnabled.get();
+		return timer.timeObservable(command);
 	}
 	
-	private String getServiceBeanName() {
-		return beanDefinition.getBeanKey().toString();
+	Timer getTimer() {
+		return timer;
+	}
+	
+	@Override
+	public boolean isEnabled() {
+		return beanMetricsEnabledGlobally.get() && beanMetricsEnabled.get();
 	}
 
+	@Override
+	public String name() {
+		return BeanProxyNames.METRICS;
+	}
+	
 }

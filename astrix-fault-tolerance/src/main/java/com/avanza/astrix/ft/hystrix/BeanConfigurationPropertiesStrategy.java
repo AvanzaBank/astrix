@@ -17,7 +17,7 @@ package com.avanza.astrix.ft.hystrix;
 
 import java.util.Optional;
 
-import com.avanza.astrix.beans.config.BeanConfigurations;
+import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.netflix.hystrix.HystrixCollapserKey;
 import com.netflix.hystrix.HystrixCollapserProperties;
@@ -29,11 +29,11 @@ import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
 
 final class BeanConfigurationPropertiesStrategy extends HystrixPropertiesStrategy {
 	
-	private final BeanConfigurations beanConfigurations;
 	private final BeanMapping beanMapping;
+	private final AstrixConfig config;
 	
-	public BeanConfigurationPropertiesStrategy(BeanConfigurations beanConfigurations, BeanMapping beanMapping) {
-		this.beanConfigurations = beanConfigurations;
+	public BeanConfigurationPropertiesStrategy(AstrixConfig config, BeanMapping beanMapping) {
+		this.config = config;
 		this.beanMapping = beanMapping;
 	}
 
@@ -47,7 +47,7 @@ final class BeanConfigurationPropertiesStrategy extends HystrixPropertiesStrateg
 	
 	private Optional<HystrixCommandProperties> createCommandProperties(AstrixBeanKey<?> beanKey, HystrixCommandKey commandKey,
 																	com.netflix.hystrix.HystrixCommandProperties.Setter builder) {
-		return Optional.ofNullable(beanConfigurations.getBeanConfiguration(beanKey))
+		return Optional.ofNullable(config.getBeanConfiguration(beanKey))
 					   .map(beanConfiguration -> new AstrixCommandProperties(beanConfiguration, commandKey, builder));
 	}
 	
@@ -61,7 +61,7 @@ final class BeanConfigurationPropertiesStrategy extends HystrixPropertiesStrateg
 	
 	private Optional<HystrixThreadPoolProperties> createThreadPoolProperties(AstrixBeanKey<?> beanKey, HystrixThreadPoolKey threadPoolKey, 
 								com.netflix.hystrix.HystrixThreadPoolProperties.Setter builder) {
-		return Optional.ofNullable(beanConfigurations.getBeanConfiguration(beanKey))
+		return Optional.ofNullable(config.getBeanConfiguration(beanKey))
 					    .map(beanConfiguration -> new AstrixThreadPoolProperties(beanConfiguration, threadPoolKey, builder));
 	}
 	

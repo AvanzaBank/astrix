@@ -20,7 +20,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.beans.config.BeanConfigurations;
+import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
 import com.avanza.astrix.beans.factory.AstrixBeans;
@@ -48,16 +48,16 @@ public class BeanPublisherImpl implements BeanPublisher {
 	private final BeanFactory beanFactory;
 	private final ServiceMetaFactory serviceMetaFactory;
 	private final ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory;
-	private final BeanConfigurations beanConfigurations;
+	private final AstrixConfig config;
 	
 	public BeanPublisherImpl(ApiProviderPluginsImpl apiProviderPluginsImpl, BeanFactory beanFactory,
 			ServiceMetaFactory serviceMetaFactory, ServiceDiscoveryMetaFactory serviceDiscoveryMetaFactory,
-			BeanConfigurations beanConfigurations) {
+			AstrixConfig config) {
 		this.apiProviderPluginsImpl = apiProviderPluginsImpl;
 		this.beanFactory = beanFactory;
 		this.serviceMetaFactory = serviceMetaFactory;
 		this.serviceDiscoveryMetaFactory = serviceDiscoveryMetaFactory;
-		this.beanConfigurations = beanConfigurations;
+		this.config = config;
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class BeanPublisherImpl implements BeanPublisher {
 	
 	private void registerBean(FactoryBean<?> factory, Map<BeanSetting<?>, Object> defaultBeanSettingsOverride) {
 		this.beanFactory.registerFactory(factory);
-		this.beanConfigurations.setDefaultBeanConfig(getBeanKey(factory), defaultBeanSettingsOverride);
+		this.config.setDefaultBeanConfig(getBeanKey(factory), defaultBeanSettingsOverride);
 	}
 	
 	@SuppressWarnings("unchecked")

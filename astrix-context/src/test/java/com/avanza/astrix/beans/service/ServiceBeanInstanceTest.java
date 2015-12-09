@@ -36,9 +36,12 @@ import org.junit.Test;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.core.BeanProxy;
+import com.avanza.astrix.beans.core.BeanProxyFilter;
+import com.avanza.astrix.beans.core.BeanProxyNames;
 import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
-import com.avanza.astrix.beans.ft.FaultToleranceConfigurator;
-import com.avanza.astrix.beans.ft.FaultToleranceSpi;
+import com.avanza.astrix.beans.ft.BeanFaultTolerance;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixContext;
@@ -79,18 +82,19 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.enableFaultTolerance(true);
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		final AtomicBoolean ftApplied = new AtomicBoolean(false);
-		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, new FaultToleranceSpi() {
+		BeanFaultTolerance beanFt = new BeanFaultTolerance() {
 			@Override
-			public <T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey) {
+			public <T> Observable<T> observe(Supplier<Observable<T>> observable) {
 				ftApplied.set(true);
 				return observable.get();
 			}
 			@Override
-			public <T> T execute(CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable {
+			public <T> T execute(CheckedCommand<T> command) throws Throwable {
 				ftApplied.set(true);
 				return command.call();
 			}
-		});
+		};
+		astrixConfigurer.registerStrategy(BeanFaultToleranceFactorySpi.class, (beanKey) -> beanFt);
 		astrixContext = astrixConfigurer.configure();
 		
 		Ping ping = astrixContext.getBean(Ping.class);
@@ -115,18 +119,19 @@ public class ServiceBeanInstanceTest {
 		
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		final AtomicBoolean ftApplied = new AtomicBoolean(false);
-		astrixConfigurer.registerStrategy(FaultToleranceSpi.class, new FaultToleranceSpi() {
+		BeanFaultTolerance beanFt = new BeanFaultTolerance() {
 			@Override
-			public <T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey) {
+			public <T> Observable<T> observe(Supplier<Observable<T>> observable) {
 				ftApplied.set(true);
 				return observable.get();
 			}
 			@Override
-			public <T> T execute(CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable {
+			public <T> T execute(CheckedCommand<T> command) throws Throwable {
 				ftApplied.set(true);
 				return command.call();
 			}
-		});
+		};
+		astrixConfigurer.registerStrategy(BeanFaultToleranceFactorySpi.class, beanKey -> beanFt);
 		astrixContext = astrixConfigurer.configure();
 		
 		Ping ping = astrixContext.getBean(Ping.class);
@@ -448,7 +453,7 @@ public class ServiceBeanInstanceTest {
 	
 	
 	
-	public static class DisabledFtComponent implements ServiceComponent, FaultToleranceConfigurator {
+	public static class DisabledFtComponent implements ServiceComponent, BeanProxyFilter {
 		
 		private final DirectComponent directComponent = new DirectComponent(new ObjectSerializerFactory() {
 			@Override
@@ -458,8 +463,8 @@ public class ServiceBeanInstanceTest {
 		}, new ReactiveTypeConverterImpl(Collections.emptyList()));
 		
 		@Override
-		public FtProxySetting configure() {
-			return FtProxySetting.DISABLED;
+		public boolean applyBeanProxy(BeanProxy beanProxy) {
+			return !BeanProxyNames.FAULT_TOLERANCE.equals(beanProxy.name());
 		}
 		
 		public <T> ServiceProperties registerAndGetServiceProperties(Class<T> bean, T provider) {
@@ -503,6 +508,7 @@ public class ServiceBeanInstanceTest {
 		public boolean requiresProviderInstance() {
 			return false;
 		}
+
 	}
 	
 	public static class PingImpl implements Ping {

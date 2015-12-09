@@ -17,9 +17,9 @@ package com.avanza.astrix.beans.ft;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.BeanConfiguration;
-import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.BeanProxy;
+import com.avanza.astrix.context.mbeans.MBeanExporter;
 /**
  * 
  * @author Elias Lindholm
@@ -27,22 +27,29 @@ import com.avanza.astrix.beans.core.BeanProxy;
  */
 final class BeanFaultToleranceFactoryImpl implements BeanFaultToleranceFactory {
 	
-	private final FaultToleranceSpi beanFaultToleranceSpi;
-	private final BeanConfigurations beanConfigurations;
-	private final AstrixConfig config;
 	
-	public BeanFaultToleranceFactoryImpl(FaultToleranceSpi beanFaultToleranceSpi,
-									      BeanConfigurations beanConfigurations, 
-									      AstrixConfig config) {
-		this.beanFaultToleranceSpi = beanFaultToleranceSpi;
-		this.beanConfigurations = beanConfigurations;
+	private final BeanFaultToleranceFactorySpi beanFaultToleranceFactorySpi;
+	private final AstrixConfig config;
+	private final MBeanExporter mbeanExporter;
+	
+	public BeanFaultToleranceFactoryImpl(BeanFaultToleranceFactorySpi beanFaultToleranceFactorySpi,
+									     AstrixConfig config,
+									     MBeanExporter mbeanExporter) {
+		this.beanFaultToleranceFactorySpi = beanFaultToleranceFactorySpi;
 		this.config = config;
+		this.mbeanExporter = mbeanExporter;
 	}
 
 	@Override
 	public BeanProxy createFaultToleranceProxy(AstrixBeanKey<?> beanKey) {
-		BeanConfiguration beanConfiguration = beanConfigurations.getBeanConfiguration(beanKey);
-		return new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultToleranceSpi);
+		BeanConfiguration beanConfiguration = config.getBeanConfiguration(beanKey);
+		BeanFaultTolerance beanFaultTolerance = beanFaultToleranceFactorySpi.create(beanKey);
+		BeanFaultToleranceProxy result = new BeanFaultToleranceProxy(beanConfiguration, config.getConfig(), beanFaultTolerance);
+		if (beanFaultToleranceFactorySpi instanceof MonitorableFaultToleranceSpi) {
+			Object mbean = MonitorableFaultToleranceSpi.class.cast(beanFaultToleranceFactorySpi).createBeanFaultToleranceMetricsMBean(beanKey);
+			mbeanExporter.registerMBean(mbean, "BeanFaultToleranceMetrics", beanKey.toString());
+		}
+		return result;
 	}
 	
 }

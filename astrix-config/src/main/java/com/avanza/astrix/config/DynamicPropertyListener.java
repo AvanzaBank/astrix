@@ -20,6 +20,7 @@ package com.avanza.astrix.config;
  * @author Elias Lindholm (elilin)
  *
  */
+@FunctionalInterface
 public interface DynamicPropertyListener<T> {
 	
 	/**

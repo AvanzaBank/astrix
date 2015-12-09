@@ -21,8 +21,8 @@ package com.avanza.astrix.config;
  *
  */
 public final class DynamicLongProperty implements DynamicProperty<Long> {
-	
-	private final DynamicPropertyListenerSupport<Long> listenerSupport = new DynamicPropertyListenerSupport<>(); 
+
+	private final ListenerSupport<DynamicPropertyListener<Long>> listenerSupport = new ListenerSupport<>();
 	private volatile long value;
 	
 	public DynamicLongProperty() {
@@ -43,7 +43,12 @@ public final class DynamicLongProperty implements DynamicProperty<Long> {
 	
 	public void set(long value) {
 		this.value = value;
-		this.listenerSupport.notifyListeners(value);
+		this.listenerSupport.dispatchEvent(l -> l.propertyChanged(value));
+	}
+	
+	@Override
+	public void setValue(Long value) {
+		set(value);
 	}
 	
 	@Override

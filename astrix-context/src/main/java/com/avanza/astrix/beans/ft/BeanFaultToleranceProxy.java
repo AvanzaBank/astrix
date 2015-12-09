@@ -21,6 +21,7 @@ import com.avanza.astrix.beans.config.BeanConfiguration;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.core.BeanProxy;
+import com.avanza.astrix.beans.core.BeanProxyNames;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.core.function.CheckedCommand;
@@ -35,34 +36,32 @@ public final class BeanFaultToleranceProxy implements BeanProxy {
 	
 	private final DynamicBooleanProperty faultToleranceEnabledForBean;
 	private final DynamicBooleanProperty faultToleranceEnabled;
-	private final FaultToleranceSpi beanFaultToleranceSpi;
-	private final BeanConfiguration beanConfiguration;
+	private final BeanFaultTolerance beanFaultTolerance;
 	
-	BeanFaultToleranceProxy(BeanConfiguration beanConfiguration, DynamicConfig config, FaultToleranceSpi beanFaultToleranceSpi) {
-		this.beanConfiguration = beanConfiguration;
-		this.beanFaultToleranceSpi = beanFaultToleranceSpi;
+	BeanFaultToleranceProxy(BeanConfiguration beanConfiguration, DynamicConfig config, BeanFaultTolerance beanFaultToleranceSpi) {
+		this.beanFaultTolerance = beanFaultToleranceSpi;
 		this.faultToleranceEnabledForBean = beanConfiguration.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED);
 		this.faultToleranceEnabled = AstrixSettings.ENABLE_FAULT_TOLERANCE.getFrom(config);
 	}
 	
 	@Override
 	public <T> CheckedCommand<T> proxyInvocation(final CheckedCommand<T> command) {
-		if (!faultToleranceEnabled()) {
-			return command;
-		}
-		return () -> beanFaultToleranceSpi.execute(command, beanConfiguration.getBeanKey());
+		return () -> beanFaultTolerance.execute(command);
 	}
 
 	@Override
 	public <T> Supplier<Observable<T>> proxyReactiveInvocation(final Supplier<Observable<T>> command) {
-		if (!faultToleranceEnabled()) {
-			return command;
-		}
-		return () -> beanFaultToleranceSpi.observe(command, beanConfiguration.getBeanKey());
+		return () -> beanFaultTolerance.observe(command);
 	}
 	
-	private <T> boolean faultToleranceEnabled() {
+	@Override
+	public String name() {
+		return BeanProxyNames.FAULT_TOLERANCE;
+	}
+	
+	@Override
+	public boolean isEnabled() {
 		return faultToleranceEnabled.get() && faultToleranceEnabledForBean.get();
 	}
-
+	
 }

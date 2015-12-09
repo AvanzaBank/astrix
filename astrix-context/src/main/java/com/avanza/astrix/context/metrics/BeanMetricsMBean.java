@@ -13,15 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.ft;
+package com.avanza.astrix.context.metrics;
 
-public interface FaultToleranceConfigurator {
+import java.util.concurrent.TimeUnit;
+
+public interface BeanMetricsMBean {
+
+	TimeUnit getRateUnit();
+
+	TimeUnit getDurationUnit();
+
+	double getOneMinuteRate();
+
+	double getMin();
+
+	double getMean();
+
+	double getMax();
+
+	double get99thPercentile();
+
+	double get50thPercentile();
+
+	long getCount();
 	
-	enum FtProxySetting {
-		ENABLED,
-		DISABLED
-	}
 	
-	FtProxySetting configure();
 
 }

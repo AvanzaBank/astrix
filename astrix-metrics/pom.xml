@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.avanza.astrix</groupId>
 		<artifactId>astrix-parent</artifactId>
-		<version>0.39.3-SNAPSHOT</version>
+		<version>0.40.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>astrix-metrics</artifactId>
 	<name>${project.artifactId}</name>
@@ -35,6 +35,12 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

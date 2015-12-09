@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.beans.publish;
 
-import com.avanza.astrix.beans.config.BeanConfigurations;
+import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.factory.BeanFactory;
 import com.avanza.astrix.beans.service.ServiceDiscoveryMetaFactory;
 import com.avanza.astrix.beans.service.ServiceMetaFactory;
@@ -30,7 +30,7 @@ public class BeansPublishModule implements Module {
 		moduleContext.bind(ApiProviderPlugins.class, ApiProviderPluginsImpl.class);
 		
 		moduleContext.importType(BeanFactory.class);
-		moduleContext.importType(BeanConfigurations.class);
+		moduleContext.importType(AstrixConfig.class);
 		moduleContext.importType(BeanPublisherPlugin.class);
 		moduleContext.importType(ServiceDiscoveryMetaFactory.class);
 		moduleContext.importType(ServiceMetaFactory.class);

@@ -27,66 +27,65 @@ import org.junit.Test;
 
 public class DynamicPropertyChainTest {
 	
-	private static final DynamicPropertyChainListener<String> DUMMY_LISTENER = new DynamicPropertyChainListener<String>() {
-		@Override
-		public void propertyChanged(String newValue) {
-		}
-	};
+	
+	private static final String DEFAULT_VALUE = "defaultFoo";
+	
+	Queue<String> propertyChanges = new LinkedList<>();
+	DynamicPropertyChainListener<String> listener = propertyChanges::add;
+	DynamicPropertyChain<String> propertyChain = DynamicPropertyChain.createWithDefaultValue(DEFAULT_VALUE, new PropertyParser.StringParser());
 	
 	@Test
-	public void emptyChainReturnsDefaultValue() throws Exception {
-		DynamicPropertyChain<String> propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", DUMMY_LISTENER, new PropertyParser.StringParser());
-		assertEquals("defaultFoo", propertyChain.get());
+	public void listenerIsNotifiedWithDefaultValueWhenRegisteredIfNoPropertiesExistsInChain() throws Exception {
+		propertyChain.bindTo(listener);
+		assertEquals(DEFAULT_VALUE, propertyChanges.poll());
 	}
 	
 	@Test
-	public void chainReturnsDefaultValue() throws Exception {
-		DynamicPropertyChain<String> propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", DUMMY_LISTENER, new PropertyParser.StringParser());
-		DynamicConfigProperty<String> dynamicProperty = propertyChain.prependValue();
-		assertEquals("defaultFoo", propertyChain.get());
+	public void listenerIsRegisteredWithNewValueWhenDynamicPropertyIsSet() throws Exception {
+		DynamicConfigProperty<String> dynamicProperty = propertyChain.appendValue();
+		propertyChain.bindTo(listener);
+		assertEquals(DEFAULT_VALUE, propertyChanges.poll());
 		dynamicProperty.set("Foo");
-		assertEquals("Foo", dynamicProperty.get());
+		assertEquals("Foo", propertyChanges.poll());
 	}
 	
 	@Test
 	public void chainReturnsToDefaultValueWhenAllPropertiesInChainAreNull() throws Exception {
-		DynamicPropertyChain<String> propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", DUMMY_LISTENER, new PropertyParser.StringParser());
-		DynamicConfigProperty<String> dynamicProperty = propertyChain.prependValue();
-		assertEquals("defaultFoo", propertyChain.get());
+		DynamicConfigProperty<String> dynamicProperty = propertyChain.appendValue();
+		propertyChain.bindTo(listener);
+		assertEquals(DEFAULT_VALUE, propertyChanges.poll());
 		
 		dynamicProperty.set("Foo");
-		assertEquals("Foo", dynamicProperty.get());
+		assertEquals("Foo", propertyChanges.poll());
 		
 		dynamicProperty.set(null);
-		assertEquals("defaultFoo", propertyChain.get());
+		assertEquals(DEFAULT_VALUE, propertyChanges.poll());
 	}
 	
 	@Test
 	public void resolvesPropertyInOrder() throws Exception {
-		DynamicPropertyChain<String> propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", DUMMY_LISTENER, new PropertyParser.StringParser());
-		DynamicConfigProperty<String> secondPropertyInChain = propertyChain.prependValue();
-		DynamicConfigProperty<String> firstPropertyInChain = propertyChain.prependValue();
+		DynamicConfigProperty<String> firstPropertyInChain = propertyChain.appendValue();
+		DynamicConfigProperty<String> secondPropertyInChain = propertyChain.appendValue();
+		propertyChain.bindTo(listener);
+		secondPropertyInChain.set("Foo");
+		assertEquals(DEFAULT_VALUE, propertyChanges.poll());
 		
 		secondPropertyInChain.set("Foo");
-		assertEquals("Foo", propertyChain.get());
+		assertEquals("Foo", propertyChanges.poll());
+		
 		firstPropertyInChain.set("Bar");
-		assertEquals("Bar", propertyChain.get());
+		assertEquals("Bar", propertyChanges.poll());
+		
 		secondPropertyInChain.set("Foo2");
-		assertEquals("Bar", propertyChain.get());
+		assertEquals(null, propertyChanges.poll());
 	}
 	
 	@Test
 	public void notifiesListener() throws Exception {
-		final Queue<String> propertyChanges = new LinkedList<>();
-		DynamicPropertyChain<String> propertyChain = DynamicPropertyChain.createWithDefaultValue("defaultFoo", new DynamicPropertyChainListener<String>() {
-			@Override
-			public void propertyChanged(String newValue) {
-				propertyChanges.add(newValue);
-			}
-		}, new PropertyParser.StringParser());
-		
-		DynamicConfigProperty<String> secondPropertyInChain = propertyChain.prependValue();
-		DynamicConfigProperty<String> firstPropertyInChain = propertyChain.prependValue();
+		DynamicConfigProperty<String> firstPropertyInChain = propertyChain.appendValue();
+		DynamicConfigProperty<String> secondPropertyInChain = propertyChain.appendValue();
+		propertyChain.bindTo(listener);
+		assertEquals(DEFAULT_VALUE, propertyChanges.poll());
 		
 		secondPropertyInChain.set("Foo");
 		assertEquals("Foo", propertyChanges.poll());
@@ -96,6 +95,52 @@ public class DynamicPropertyChainTest {
 		secondPropertyInChain.set("Foo2");
 		assertEquals(null, propertyChanges.poll());
 		assertTrue(propertyChanges.isEmpty());
+	}
+	
+	@Test
+	public void listenerShouldOnlyBeNotifiedWhenUnderlyingPropertyActuallyChanges() throws Exception {
+		DynamicConfigProperty<String> firstPropertyInChain = propertyChain.appendValue();
+		DynamicConfigProperty<String> secondPropertyInChain = propertyChain.appendValue();
+		propertyChain.bindTo(listener);
+		assertEquals(DEFAULT_VALUE, propertyChanges.poll());
+		
+		secondPropertyInChain.set("Foo");
+		assertEquals("Foo", propertyChanges.poll());
+		firstPropertyInChain.set("Bar");
+		assertEquals("Bar", propertyChanges.poll());
+		
+		secondPropertyInChain.set("Bar");
+		assertEquals(null, propertyChanges.poll());
+		assertTrue(propertyChanges.isEmpty());
+	}
+	
+	@Test
+	public void listenerShouldBeNotifiedWithNewValueWhenCurrentResolvedConfigurationPropertyIsClearedAndPropertyWithLowerPrecedenceExists() throws Exception {
+		DynamicConfigProperty<String> firstPropertyInChain = propertyChain.appendValue();
+		DynamicConfigProperty<String> secondPropertyInChain = propertyChain.appendValue();
+		propertyChain.bindTo(listener);
+		assertEquals(DEFAULT_VALUE, propertyChanges.poll());
+		
+		// Setting second property should trigger event with new value
+		secondPropertyInChain.set("2");
+		assertEquals("2", propertyChanges.poll());
+		
+		// Setting first property should trigger event with new value
+		firstPropertyInChain.set("1");
+		assertEquals("1", propertyChanges.poll());
+		
+		// Clearing first property should trigger event with value from second prop
+		firstPropertyInChain.set(null);
+		assertEquals("2", propertyChanges.poll());
+	}
+	
+	@Test
+	public void getsNotifiedAboutResolvedValueWhenSetBeforeRegistereingListener() throws Exception {
+		DynamicConfigProperty<String> propertyInChain = propertyChain.appendValue();
+		propertyInChain.set("2");
+		
+		propertyChain.bindTo(propertyChanges::add);
+		assertEquals("2", propertyChanges.poll());
 	}
 	
 

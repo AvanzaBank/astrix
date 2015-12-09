@@ -17,24 +17,20 @@ package com.avanza.astrix.beans.service;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.BeanConfiguration;
-import com.avanza.astrix.beans.config.BeanConfigurations;
-import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
+import com.avanza.astrix.context.mbeans.MBeanExporter;
 
 public class AstrixServiceBeanInstanceMbeanExporter {
 
-	private AstrixMBeanExporter mbeanExporter;
-	private BeanConfigurations beanConfigurations;
+	private MBeanExporter mbeanExporter;
 	private AstrixConfig astrixConfig;
 	
-	public AstrixServiceBeanInstanceMbeanExporter(AstrixMBeanExporter mbeanExporter, BeanConfigurations beanConfigurations,
-			AstrixConfig astrixConfig) {
+	public AstrixServiceBeanInstanceMbeanExporter(MBeanExporter mbeanExporter, AstrixConfig astrixConfig) {
 		this.mbeanExporter = mbeanExporter;
-		this.beanConfigurations = beanConfigurations;
 		this.astrixConfig = astrixConfig;
 	}
 
 	public void register(ServiceBeanInstance<?> instance) {
-		BeanConfiguration beanConfiguration = beanConfigurations.getBeanConfiguration(instance.getBeanKey());
+		BeanConfiguration beanConfiguration = astrixConfig.getBeanConfiguration(instance.getBeanKey());
 		mbeanExporter.registerMBean(new AstrixServiceBeanInstance(beanConfiguration, astrixConfig, instance),
 				"ServiceBeanInstances",
 				instance.getBeanKey().toString());

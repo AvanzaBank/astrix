@@ -16,87 +16,83 @@
 package com.avanza.astrix.metrics;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.avanza.astrix.context.mbeans.AstrixMBeanExporter;
 import com.avanza.astrix.context.metrics.MetricsSpi;
+import com.avanza.astrix.context.metrics.TimerSnaphot;
+import com.avanza.astrix.context.metrics.TimerSpi;
 import com.avanza.astrix.core.function.CheckedCommand;
-import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.Timer.Context;
 
 import rx.Observable;
 
-public class DropwizardMetrics implements MetricsSpi {
+final class DropwizardMetrics implements MetricsSpi {
 
-	private static final Logger log = LoggerFactory.getLogger(DropwizardMetrics.class);
+	private final AtomicInteger nextTimerId = new AtomicInteger(0);
 	private final MetricRegistry metrics = new MetricRegistry();
-	private final AstrixMBeanExporter mbeanExporter;
-	private volatile JmxReporter reporter;
 	
-	public DropwizardMetrics(AstrixMBeanExporter mbeanExporter) {
-		this.mbeanExporter = mbeanExporter;
+	@Override
+	public TimerSpi createTimer() {
+		return new TimerAdapter(metrics.timer("timer-" + nextTimerId.incrementAndGet()));
 	}
 	
-	@PostConstruct
-	public void init() {
-		if (!mbeanExporter.exportMBeans()) {
-			log.info("Exporting of Astrix MBeans is disabled, won't export MBean for metrics");
-			return;
+	static class TimerAdapter implements TimerSpi {
+		private Timer timer;
+		public TimerAdapter(Timer timer) {
+			this.timer = timer;
 		}
-		reporter = JmxReporter.forRegistry(metrics)
-				.inDomain("com.avanza.astrix.context")
-				.convertRatesTo(TimeUnit.SECONDS)
-				.convertDurationsTo(TimeUnit.MILLISECONDS)
-				.createsObjectNamesWith((type, domain, name) -> {
-					int split = name.indexOf("#");
-					String metricGroup = name.substring(0, split);
-					String metricName = name.substring(split + 1, name.length());
-					return mbeanExporter.getObjectName(metricGroup, metricName);
-				})
-				.build();
-		reporter.start();
-	}
 
-	@PreDestroy
-	public void destroy() {
-		if (reporter != null) {
-			reporter.close();
+		@Override
+		public <T> CheckedCommand<T> timeExecution(final CheckedCommand<T> execution) {
+			return () -> {
+				Context context = timer.time();
+				try {
+					return execution.call();
+				} finally {
+					context.stop();
+				}
+			};
 		}
-	}
 
-	@Override
-	public <T> CheckedCommand<T> timeExecution(final CheckedCommand<T> execution, final String group, final String name) {
-		return () -> {
-			Timer timer = metrics.timer(group + "#" + name);
-			Context context = timer.time();
-			try {
-				return execution.call();
-			} finally {
-				context.stop();
-			}
-		};
-	}
+		@Override
+		public <T> Supplier<Observable<T>> timeObservable(final Supplier<Observable<T>> observableFactory) {
+			return () -> {
+				final Context context = timer.time();
+				return observableFactory.get().doOnTerminate(() -> context.stop());
+			};
+		}
 
-	@Override
-	public <T> Supplier<Observable<T>> timeObservable(final Supplier<Observable<T>> observableFactory, final String group, final String name) {
-		return () -> {
-			Timer timer = metrics.timer(group + "#" + name);
-			final Context context = timer.time();
-			return observableFactory.get().doOnTerminate(() -> context.stop());
-		};
+		@Override
+		public TimerSnaphot getSnapshot() {
+			// Rates are are in seconds by default
+			// Duration are in NANO_SECONDS
+			TimeUnit rateUnit = TimeUnit.SECONDS;
+			TimeUnit durationUnit = TimeUnit.MILLISECONDS;
+			double durationFactor = 1.0 / durationUnit.toNanos(1);
+//			double rateFactor = 1.0 / rateUnit.toSeconds(1);
+			Snapshot snapshot = timer.getSnapshot();
+			return TimerSnaphot.builder()
+							   .count(timer.getCount())
+							   .max(snapshot.getMax() * durationFactor)
+							   .mean(timer.getMeanRate()) // No need to convert rate since its already in SECONDS 
+							   .min(snapshot.getMin() * durationFactor)
+							   .oneMinuteRate(timer.getOneMinuteRate()) // No need to convert rate since its already in SECONDS
+							   .set50thPercentile(snapshot.getMedian() * durationFactor)
+							   .set99thPercentile(snapshot.get99thPercentile() * durationFactor)
+							   .rateUnit(rateUnit)
+							   .durationUnit(durationUnit)
+							   .build();
+		}
+		
 	}
 	
 	// For testing
 	MetricRegistry getMetrics() {
 		return metrics;
 	}
-
+	
 }

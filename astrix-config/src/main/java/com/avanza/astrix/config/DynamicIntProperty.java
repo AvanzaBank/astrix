@@ -21,8 +21,8 @@ package com.avanza.astrix.config;
  *
  */
 public final class DynamicIntProperty implements DynamicProperty<Integer> {
-	
-	private final DynamicPropertyListenerSupport<Integer> listenerSupport = new DynamicPropertyListenerSupport<>();
+
+	private final ListenerSupport<DynamicPropertyListener<Integer>> listenerSupport = new ListenerSupport<>();
 	private volatile int value;
 	
 	public DynamicIntProperty() {
@@ -43,7 +43,12 @@ public final class DynamicIntProperty implements DynamicProperty<Integer> {
 	
 	public void set(int value) {
 		this.value = value;
-		listenerSupport.notifyListeners(value);
+		this.listenerSupport.dispatchEvent(l -> l.propertyChanged(value));
+	}
+	
+	@Override
+	public void setValue(Integer value) {
+		set(value);
 	}
 	
 	@Override

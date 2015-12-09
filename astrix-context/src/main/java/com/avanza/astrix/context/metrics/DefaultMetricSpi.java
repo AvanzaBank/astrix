@@ -15,21 +15,10 @@
  */
 package com.avanza.astrix.context.metrics;
 
-import java.util.function.Supplier;
-
-import com.avanza.astrix.core.function.CheckedCommand;
-
-import rx.Observable;
-
 public final class DefaultMetricSpi implements MetricsSpi {
 
 	@Override
-	public <T> CheckedCommand<T> timeExecution(CheckedCommand<T> execution, String group, String name) {
-		return execution;
-	}
-	
-	@Override
-	public <T> Supplier<Observable<T>> timeObservable(Supplier<Observable<T>> observableFactory, String group, String name) {
-		return observableFactory;
+	public TimerSpi createTimer() {
+		return new TimerSpi.NoTimer();
 	}
 }

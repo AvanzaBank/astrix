@@ -16,26 +16,21 @@
 package com.avanza.astrix.ft.hystrix;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
-import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.ft.FaultToleranceSpi;
+import com.avanza.astrix.beans.ft.BeanFaultTolerance;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
-import com.avanza.astrix.core.function.CheckedCommand;
+import com.avanza.astrix.beans.ft.MonitorableFaultToleranceSpi;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
-import com.netflix.hystrix.HystrixCommandProperties;
-import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
-import com.netflix.hystrix.HystrixObservableCommand.Setter;
-
-import rx.Observable;
+import com.netflix.hystrix.HystrixThreadPoolKey;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-final class HystrixFaultTolerance implements FaultToleranceSpi {
+final class HystrixFaultToleranceFactory implements BeanFaultToleranceFactorySpi, MonitorableFaultToleranceSpi {
 
 	/*
 	 * Astrix allows multiple AstrixContext within the same JVM, although
@@ -55,8 +50,12 @@ final class HystrixFaultTolerance implements FaultToleranceSpi {
 	private final HystrixCommandKeyFactory hystrixCommandKeyFactory;
 	private final String id;
 	
-	public HystrixFaultTolerance(BeanConfigurations beanConfigurations, 
-								 HystrixCommandNamingStrategy hystrixCommandNamingStrategy,
+	@Override
+	public BeanFaultTolerance create(AstrixBeanKey<?> beanKey) {
+		return new HystrixBeanFaultTolerance(getCommandKey(beanKey), getGroupKey(beanKey));
+	}
+	
+	public HystrixFaultToleranceFactory(HystrixCommandNamingStrategy hystrixCommandNamingStrategy,
 								 AstrixConcurrencyStrategy concurrencyStrategy,
 								 BeanConfigurationPropertiesStrategy propertiesStrategy,
 								 BeanMapping beanMapping) {
@@ -71,22 +70,8 @@ final class HystrixFaultTolerance implements FaultToleranceSpi {
 	}
 	
 	@Override
-	public <T> Observable<T> observe(Supplier<Observable<T>> observable, AstrixBeanKey<?> beanKey) {
-		Setter setter = Setter.withGroupKey(getGroupKey(beanKey))
-				  			  .andCommandKey(getCommandKey(beanKey))
-				  			  .andCommandPropertiesDefaults(
-				  					  HystrixCommandProperties.Setter().withExecutionIsolationStrategy(ExecutionIsolationStrategy.SEMAPHORE));
-		return HystrixObservableCommandFacade.observe(observable, setter);
-	}
-
-	@Override
-	public <T> T execute(final CheckedCommand<T> command, AstrixBeanKey<?> beanKey) throws Throwable {
-		com.netflix.hystrix.HystrixCommand.Setter setter =  
-				com.netflix.hystrix.HystrixCommand.Setter.withGroupKey(getGroupKey(beanKey))
-								.andCommandKey(getCommandKey(beanKey))
-								.andCommandPropertiesDefaults(
-					  					  HystrixCommandProperties.Setter().withExecutionIsolationStrategy(ExecutionIsolationStrategy.THREAD));
-		return HystrixCommandFacade.execute(command, setter);
+	public BeanFaultToleranceMetricsMBean createBeanFaultToleranceMetricsMBean(AstrixBeanKey<?> beanKey) {
+		return new BeanFaultToleranceMetrics(getCommandKey(beanKey), getThreadPoolKey(beanKey));
 	}
 	
 	HystrixCommandGroupKey getGroupKey(AstrixBeanKey<?> beanKey) {
@@ -97,6 +82,12 @@ final class HystrixFaultTolerance implements FaultToleranceSpi {
 
 	HystrixCommandKey getCommandKey(AstrixBeanKey<?> beanKey) {
 		HystrixCommandKey result =  hystrixCommandKeyFactory.createCommandKey(beanKey);
+		this.beanMapping.registerBeanKey(result.name(), beanKey);
+		return result;
+	}
+	
+	HystrixThreadPoolKey getThreadPoolKey(AstrixBeanKey<?> beanKey) {
+		HystrixThreadPoolKey result =  hystrixCommandKeyFactory.createThreadPoolKey(beanKey);
 		this.beanMapping.registerBeanKey(result.name(), beanKey);
 		return result;
 	}

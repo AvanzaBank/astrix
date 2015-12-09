@@ -16,9 +16,9 @@
 package com.avanza.astrix.beans.ft;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
-import com.avanza.astrix.beans.config.BeanConfigurations;
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.service.ServiceBeanProxyFactory;
+import com.avanza.astrix.context.mbeans.MBeanExporter;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 
@@ -27,12 +27,12 @@ public class FaultToleranceModule implements Module {
 	@Override
 	public void prepare(ModuleContext moduleContext) {
 		moduleContext.bind(BeanFaultToleranceFactory.class, BeanFaultToleranceFactoryImpl.class);
-		moduleContext.bind(ServiceBeanProxyFactory.class, ServiceBeanFaultToleranceProxyFactory.class);
+		moduleContext.bind(ServiceBeanProxyFactory.class, FaultToleranceServiceBeanProxyFactory.class);
 		
-		moduleContext.importType(FaultToleranceSpi.class);
-		moduleContext.importType(BeanConfigurations.class);
+		moduleContext.importType(BeanFaultToleranceFactorySpi.class);
 		moduleContext.importType(AstrixConfig.class);
 		moduleContext.importType(ReactiveTypeConverter.class);
+		moduleContext.importType(MBeanExporter.class);
 		
 		moduleContext.export(BeanFaultToleranceFactory.class);
 		moduleContext.export(ServiceBeanProxyFactory.class);
