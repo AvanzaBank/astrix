@@ -1,3 +1,12 @@
+## Version 0.41.0
+#### Added
+* [#31](https://github.com/AvanzaBank/astrix/issues/31) Relevant Hystrix metrics are exported as mbeans.
+
+#### Changed
+* [#28](https://github.com/AvanzaBank/astrix/issues/28) Merges BeanConfigurations and AstrixConfig abstractions 
+* [#29](https://github.com/AvanzaBank/astrix/issues/29) Removes getConfig from AstrixContext/AstrixApplicationContext
+* [#33](https://github.com/AvanzaBank/astrix/issues/33) New design of FaultToleranceSpi
+
 ## Version 0.40.0
 #### Added
 * [#27](https://github.com/AvanzaBank/astrix/issues/27) Adds support to listen for underlying property changes of a DynamicConfig instance
