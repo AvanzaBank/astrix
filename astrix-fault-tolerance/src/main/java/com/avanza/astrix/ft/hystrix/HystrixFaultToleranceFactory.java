@@ -17,6 +17,7 @@ package com.avanza.astrix.ft.hystrix;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.ft.BeanFaultTolerance;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
@@ -58,12 +59,13 @@ final class HystrixFaultToleranceFactory implements BeanFaultToleranceFactorySpi
 	public HystrixFaultToleranceFactory(HystrixCommandNamingStrategy hystrixCommandNamingStrategy,
 								 AstrixConcurrencyStrategy concurrencyStrategy,
 								 BeanConfigurationPropertiesStrategy propertiesStrategy,
-								 BeanMapping beanMapping) {
+								 BeanMapping beanMapping,
+								 AstrixConfig config) {
 		this.id = Integer.toString(idGenerator.incrementAndGet()); 
 		this.beanMapping = beanMapping;
 		HystrixStrategies hystrixStrategies = new HystrixStrategies(propertiesStrategy, 
 																	concurrencyStrategy, 
-																	new FailedServiceInvocationLogger(beanMapping), 
+																	new FailedServiceInvocationLogger(beanMapping, config), 
 																	id);
 		HystrixStrategyDispatcher.registerStrategies(hystrixStrategies);
 		this.hystrixCommandKeyFactory = new HystrixCommandKeyFactory(id, hystrixCommandNamingStrategy);
