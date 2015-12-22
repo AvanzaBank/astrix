@@ -134,26 +134,25 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 
 	private <T> Observable<T> reduce(Observable<List<AstrixServiceInvocationResponse>> responses) {
 		if (targetReturnType.equals(Void.TYPE) || targetReturnType.equals(Void.class)) {
-			return responses.map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
-				@Override
-				public T call(List<AstrixServiceInvocationResponse> t1) {
-					return null;
-				}
+			return responses.map(responseList -> {
+				readResults(responseList);
+				return null;
 			});
 		}
 		final RemoteResultReducer<T> reducer = newRemoteResultReducer();
-		return responses.map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
-			@Override
-			public T call(List<AstrixServiceInvocationResponse> t1) {
-				List<AstrixRemoteResult<T>> unmarshalledResponses = new ArrayList<>(t1.size());
-				for (AstrixServiceInvocationResponse response : t1) {
-					AstrixRemoteResult<T> result = remotingEngine.toRemoteResult(response, targetReturnType);
-					unmarshalledResponses.add(result);
-				}
-				return reducer.reduce(unmarshalledResponses);
+		return responses.map(responseList -> {
+			List<AstrixRemoteResult<T>> unmarshalledResponses = new ArrayList<>(responseList.size());
+			for (AstrixServiceInvocationResponse response : responseList) {
+				AstrixRemoteResult<T> result = remotingEngine.toRemoteResult(response, targetReturnType);
+				unmarshalledResponses.add(result);
 			}
+			return reducer.reduce(unmarshalledResponses);
 		});
 		
+	}
+
+	private void readResults(List<AstrixServiceInvocationResponse> responseList) {
+		responseList.forEach(res -> remotingEngine.toRemoteResult(res, targetReturnType).getResult());
 	}
 
 	@SuppressWarnings("unchecked")

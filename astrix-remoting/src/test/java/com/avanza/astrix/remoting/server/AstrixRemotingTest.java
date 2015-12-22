@@ -291,6 +291,24 @@ public class AstrixRemotingTest {
 		PartitionedPingService partitionedPing = remotingDriver.createRemotingProxy(PartitionedPingService.class, PartitionedPingService.class);
 		partitionedPing.ping(new String[]{"1", "2", "3", "4", "5"});
 	}
+
+	@Test(expected = MyCustomServiceException.class)
+	public void partitionedRoutingRequest_voidReturnType_throwsException() throws Exception{
+		AstrixRemotingDriver astrixRemotingDriver = new AstrixRemotingDriver(2);
+		PartitionedPingServiceImpl evenPartition = new PartitionedPingServiceImpl() {
+			@Override
+			public void pingVoid(Integer... nums) {
+				throw new MyCustomServiceException();
+			}
+		};
+
+		PartitionedPingServiceImpl oddPartition = new PartitionedPingServiceImpl();
+		astrixRemotingDriver.registerServerPartition(0, PartitionedPingService.class, evenPartition);
+		astrixRemotingDriver.registerServerPartition(1,PartitionedPingService.class, oddPartition);
+		PartitionedPingService partitionedService = astrixRemotingDriver.createRemotingProxy(PartitionedPingService.class);
+		partitionedService.pingVoid(1,2,3,4);
+
+	}
 	
 	@Test
 	public void partitionedRequest_routingOnPropertyOnTargetObject() throws Exception {
@@ -627,6 +645,23 @@ public class AstrixRemotingTest {
 		String lastReceivedRequest = receivedRequest.poll(0, TimeUnit.SECONDS);
 		assertEquals("kalle", lastReceivedRequest);
 	}
+	
+	@Test(expected = MyCustomServiceException.class)
+	public void supports_BroadcastedServicesWithVoidReturnType_throwingExceptions() throws Exception{
+		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
+		BroadcastVoidService impl = new BroadcastVoidService(){
+
+			@Override
+			public void hello(String message) {
+				throw new MyCustomServiceException();
+			}
+		};
+		remotingDriver.registerServer(BroadcastVoidService.class, impl);
+
+		BroadcastVoidService voideService = remotingDriver.createRemotingProxy(BroadcastVoidService.class);
+
+		voideService.hello("test");
+	}
 
 
 	@Test(expected = IllegalArgumentException.class)
@@ -871,7 +906,7 @@ public class AstrixRemotingTest {
 	interface PartitionedServiceUsingSet {
 		Set<Integer> ping(@AstrixPartitionedRouting(reducer = SetReducer.class, collectionFactory = HashSet.class) Set<Integer> nums);
 	}
-	
+
 	public static class SetReducer<T> implements RemoteResultReducer<Set<T>> {
 		@Override
 		public Set<T> reduce(List<AstrixRemoteResult<Set<T>>> results) {
