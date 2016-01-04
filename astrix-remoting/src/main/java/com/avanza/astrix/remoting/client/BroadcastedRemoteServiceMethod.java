@@ -69,24 +69,23 @@ public class BroadcastedRemoteServiceMethod implements RemoteServiceMethod {
 		final RemoteResultReducer<T> reducer = (RemoteResultReducer<T>) newReducer();
 		Observable<List<AstrixServiceInvocationResponse>> responesObservable = remotingEngine.submitBroadcastRequest(request);
 		if (returnType.equals(Void.TYPE) || returnType.equals(Void.class)) {
-			return responesObservable.map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
-				@Override
-				public T call(List<AstrixServiceInvocationResponse> t1) {
-					return null;
-				}
+			return responesObservable.map(responses -> {
+				readResponses(responses);
+				return null;
 			});
 		}
-		return responesObservable.map(new Func1<List<AstrixServiceInvocationResponse>, T>() {
-			@Override
-			public T call(List<AstrixServiceInvocationResponse> t1) {
-				List<AstrixRemoteResult<T>> unmarshalledResponses = new ArrayList<>();
-				for (AstrixServiceInvocationResponse response : t1) {
-					AstrixRemoteResult<T> result = remotingEngine.toRemoteResult(response, returnType);
-					unmarshalledResponses.add(result);
-				}
-				return reducer.reduce(unmarshalledResponses);
+		return responesObservable.map(responses -> {
+			List<AstrixRemoteResult<T>> unmarshalledResponses = new ArrayList<>();
+			for (AstrixServiceInvocationResponse response : responses) {
+				AstrixRemoteResult<T> result = remotingEngine.toRemoteResult(response, returnType);
+				unmarshalledResponses.add(result);
 			}
+			return reducer.reduce(unmarshalledResponses);
 		});
 	}
-	
+
+	private void readResponses(List<AstrixServiceInvocationResponse> responses) {
+		responses.forEach(res -> remotingEngine.toRemoteResult(res, returnType).getResult());
+	}
+
 }
