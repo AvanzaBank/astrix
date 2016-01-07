@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
@@ -729,6 +730,40 @@ public class AstrixRemotingTest {
 		voidService.hello("foo");
 	}
 	
+	@Test
+	public void supportsOptionalReturnType() throws Exception {
+		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
+		remotingDriver.registerServer(OptionalPing.class, new OptionalPing() {
+			@Override
+			public Optional<String> ping(String message) {
+				return Optional.ofNullable(message);
+			}
+		});
+		
+		OptionalPing pingService = remotingDriver.createRemotingProxy(OptionalPing.class);
+
+		assertEquals("foo", pingService.ping("foo").get());
+		assertEquals(Optional.empty(), pingService.ping(null));
+		
+		assertEquals("foo", pingService.broadcastPing("foo").get());
+		assertEquals(Optional.empty(), pingService.broadcastPing(null));
+	}
+	
+	@Test
+	public void supportsOptionalWithNullReturnValue() throws Exception {
+		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
+		remotingDriver.registerServer(OptionalPing.class, new OptionalPing() {
+			@Override
+			public Optional<String> ping(String message) {
+				return null;
+			}
+		});
+		
+		OptionalPing pingService = remotingDriver.createRemotingProxy(OptionalPing.class);
+
+		assertEquals(null, pingService.ping("foo"));
+	}
+	
 	@SuppressWarnings("serial")
 	public static class HelloRequest implements Serializable {
 		private String messsage;
@@ -1036,6 +1071,28 @@ public class AstrixRemotingTest {
 	
 	interface VoidService {
 		void hello(String message);
+	}
+	
+	interface OptionalPing {
+		Optional<String> ping(String message);
+		@AstrixBroadcast(reducer = FirstNonEmpty.class)
+		default Optional<String> broadcastPing(String message) {
+			return ping(message);
+		}
+	}
+	
+	public static class FirstNonEmpty implements RemoteResultReducer<Optional<String>> {
+
+		@Override
+		public Optional<String> reduce(List<AstrixRemoteResult<Optional<String>>> result) {
+			for (AstrixRemoteResult<Optional<String>> r : result) {
+				if (r.getResult().isPresent()) {
+					return r.getResult();
+				}
+			}
+			return Optional.empty();
+		}
+		
 	}
 	
 	interface BroadcastVoidService {

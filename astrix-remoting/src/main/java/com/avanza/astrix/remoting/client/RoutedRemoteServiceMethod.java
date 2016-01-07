@@ -21,7 +21,6 @@ import com.avanza.astrix.core.remoting.Router;
 import com.avanza.astrix.core.remoting.RoutingKey;
 
 import rx.Observable;
-import rx.functions.Func1;
 
 public class RoutedRemoteServiceMethod implements RemoteServiceMethod {
 
@@ -58,12 +57,7 @@ public class RoutedRemoteServiceMethod implements RemoteServiceMethod {
 			RoutingKey routingKey) {
 		Observable<AstrixServiceInvocationResponse> response = remotingEngine.submitRoutedRequest(
 				request, routingKey);
-		return response.map(new Func1<AstrixServiceInvocationResponse, Object>() {
-			@Override
-			public Object call(AstrixServiceInvocationResponse t1) {
-				return remotingEngine.toRemoteResult(t1, returnType).getResult();
-			}
-		});
+		return response.map(t1 -> remotingEngine.toRemoteResult(t1, returnType).getResult());
 	}
 	
 }

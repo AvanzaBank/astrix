@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -42,6 +43,7 @@ import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
+import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponseHeaders;
 import com.avanza.astrix.remoting.client.MissingServiceMethodException;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 /**
@@ -134,7 +136,16 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 			Object[] arguments = unmarshal(request.getArguments(), serviceMethod.getGenericParameterTypes(), version);
 			Object result = serviceMethod.invoke(service, arguments);
 			AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
-			if (!serviceMethod.getReturnType().equals(Void.TYPE)) {
+			if (serviceMethod.getReturnType().equals(Void.TYPE)) {
+				return invocationResponse;
+			}
+			if (serviceMethod.getReturnType().equals(Optional.class)) {
+				if (result == null) {
+					invocationResponse.setHeader(AstrixServiceInvocationResponseHeaders.OPTIONAL_RETURN_VALUE_IS_NULL, "true");
+				} else {
+					invocationResponse.setResponseBody(objectSerializer.serialize(Optional.class.cast(result).orElse(null), version));
+				}
+			} else {
 				invocationResponse.setResponseBody(objectSerializer.serialize(result, version));
 			}
 			return invocationResponse;

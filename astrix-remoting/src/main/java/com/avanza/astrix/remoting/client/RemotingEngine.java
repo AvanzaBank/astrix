@@ -15,10 +15,10 @@
  */
 package com.avanza.astrix.remoting.client;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
-
-import rx.Observable;
+import java.util.Optional;
 
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.CorrelationId;
@@ -26,6 +26,8 @@ import com.avanza.astrix.core.RemoteServiceInvocationException;
 import com.avanza.astrix.core.ServiceInvocationException;
 import com.avanza.astrix.core.remoting.RoutingKey;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
+
+import rx.Observable;
 
 public final class RemotingEngine {
 	
@@ -41,6 +43,7 @@ public final class RemotingEngine {
 		this.apiVersion = apiVersion;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected final <T> AstrixRemoteResult<T> toRemoteResult(AstrixServiceInvocationResponse response, Type returnType) {
 		if (response.isServiceUnavailable()) {
 			return AstrixRemoteResult.unavailable(response.getExceptionMsg(), CorrelationId.valueOf(response.getCorrelationId()));
@@ -52,10 +55,36 @@ public final class RemotingEngine {
 		if (returnType.equals(Void.TYPE) || returnType.equals(Void.class)) {
 			return AstrixRemoteResult.voidResult();
 		}
+		if (isOptionalType(returnType)) {
+			return AstrixRemoteResult.successful(restoreOptional(response, returnType));
+		}
 		T result = unmarshall(response, returnType, apiVersion);
 		return AstrixRemoteResult.successful(result);
 	}
 	
+	private <T> T restoreOptional(AstrixServiceInvocationResponse response, Type returnType) {
+		if (isNullOptionalReturnValue(response)) {
+			return null;
+		}
+		ParameterizedType optionalType = ParameterizedType.class.cast(returnType);
+		Object result = unmarshall(response, optionalType.getActualTypeArguments()[0], apiVersion);
+		return (T) Optional.ofNullable(result);
+	}
+
+	// Defines whether the service invocation returned the value 'null' (as opposed to Optional.empty()).
+	private boolean isNullOptionalReturnValue(AstrixServiceInvocationResponse response) {
+		return "true".equals(response.getHeader(AstrixServiceInvocationResponseHeaders.OPTIONAL_RETURN_VALUE_IS_NULL));
+	}
+	
+	private boolean isOptionalType(Type returnType) {
+		if (!(returnType instanceof ParameterizedType)) {
+			return false;
+		}
+		ParameterizedType parameterizedType = ParameterizedType.class.cast(returnType);
+		Type rawType = parameterizedType.getRawType();
+		return rawType.equals(Optional.class);
+	}
+
 	protected final Object[] marshall(Object[] elements) {
 		if (elements == null) {
 			// No argument method
