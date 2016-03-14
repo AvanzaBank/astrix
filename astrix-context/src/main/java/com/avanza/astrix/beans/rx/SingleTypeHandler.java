@@ -19,18 +19,18 @@ public class SingleTypeHandler implements ReactiveTypeHandlerPlugin<Single<Objec
 
 	@Override
 	public void completeExceptionally(Throwable error, Single<Object> reactiveType) {
-		CompletableSingle.class.cast(reactiveType).completeExceptionally(error);
+		DelayedSingle.class.cast(reactiveType).completableFuture.completeExceptionally(error);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void complete(Object result, Single<Object> reactiveType) {
-		CompletableSingle.class.cast(reactiveType).complete(result);
+		DelayedSingle.class.cast(reactiveType).completableFuture.complete(result);
 	}
 
 	@Override
 	public Single<Object> newReactiveType() {
-		return new CompletableSingle<>();
+		return new DelayedSingle<>();
 	}
 
 	@Override
@@ -40,10 +40,10 @@ public class SingleTypeHandler implements ReactiveTypeHandlerPlugin<Single<Objec
 		return (Class<Single<Object>>) type;
 	}
 
-	private static class CompletableSingle<T> extends Single<T> {
+	private static class DelayedSingle<T> extends Single<T> {
 		private final CompletableFuture<T> completableFuture;
 
-		private CompletableSingle(CompletableFuture<T> completableFuture) {
+		private DelayedSingle(CompletableFuture<T> completableFuture) {
 			super(subscriber -> subscriber.add(Subscriptions.from(completableFuture.whenComplete((value, throwable) -> {
 				if (throwable == null) {
 					subscriber.onSuccess(value);
@@ -55,16 +55,9 @@ public class SingleTypeHandler implements ReactiveTypeHandlerPlugin<Single<Objec
 			this.completableFuture = completableFuture;
 		}
 
-		public CompletableSingle() {
+		public DelayedSingle() {
 			this(new CompletableFuture<>());
 		}
 
-		public void complete(T value) {
-			completableFuture.complete(value);
-		}
-
-		public void completeExceptionally(Throwable error) {
-			completableFuture.completeExceptionally(error);
-		}
 	}
 }
