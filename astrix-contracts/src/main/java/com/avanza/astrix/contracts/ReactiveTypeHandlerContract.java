@@ -15,38 +15,40 @@
  */
 package com.avanza.astrix.contracts;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.ReactiveExecutionListener;
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
-
+import org.junit.Before;
+import org.junit.Test;
 import rx.Observable;
 import rx.Subscriber;
 
 public abstract class ReactiveTypeHandlerContract<T> {
-	
+
+
 	private ReactiveTypeConverter reactiveTypeConverter;
 	private ReactiveTypeHandlerPlugin<T> reactiveTypeHandler;
-	
+	private String value;
+
 	@Before
 	public void setup() {
+		value = valueToTest();
+
 		reactiveTypeHandler = newReactiveTypeHandler();
 		reactiveTypeConverter = new ReactiveTypeConverterImpl(Arrays.asList(reactiveTypeHandler));
 	}
-	
+
+	protected String valueToTest() {
+		return "foo";
+	}
+
 	protected abstract ReactiveTypeHandlerPlugin<T> newReactiveTypeHandler();
 
 	@Test(timeout=2000)
@@ -60,9 +62,9 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		assertNull(resultSpy.error);
 		assertNull(resultSpy.lastElement);
 		
-		reactiveTypeHandler.complete("foo", reactiveType); // Complete reactive execution
+		reactiveTypeHandler.complete(value, reactiveType); // Complete reactive execution
 		assertTrue(resultSpy.isDone());
-		assertEquals("foo", resultSpy.lastElement);
+		assertEquals(value, resultSpy.lastElement);
 		assertNull(resultSpy.error);
 	}
 	
@@ -70,13 +72,13 @@ public abstract class ReactiveTypeHandlerContract<T> {
 	public final void reactiveTypeListenerIsNotifiedSynchronouslyIfReactiveExecutionAlreadyCompleted() throws Exception {
 		T reactiveType = reactiveTypeHandler.newReactiveType();
 
-		reactiveTypeHandler.complete("foo", reactiveType); // Completes reactive execution
+		reactiveTypeHandler.complete(value, reactiveType); // Completes reactive execution
 		
 		ReactiveResultSpy resultSpy = new ReactiveResultSpy();
 		reactiveTypeHandler.subscribe(resultSpy, reactiveType); // Subscribe after execution completes
 		
 		assertTrue(resultSpy.isDone());
-		assertEquals("foo", resultSpy.lastElement);
+		assertEquals(value, resultSpy.lastElement);
 		assertNull(resultSpy.error);
 	}
 	
@@ -91,10 +93,10 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		
 		assertFalse(reactiveResultListener.isDone());
 		
-		reactiveTypeHandler.complete("foo", reactiveType);
+		reactiveTypeHandler.complete(value, reactiveType);
 		
 		assertTrue(reactiveResultListener.isDone());
-		assertEquals("foo", reactiveResultListener.lastElement);
+		assertEquals(value, reactiveResultListener.lastElement);
 		assertNull(reactiveResultListener.error);
 	}
 	
@@ -103,7 +105,7 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		AtomicInteger sourceSubscriptionCount = new AtomicInteger(0);
 		Observable<Object> emitsFoo = Observable.create((s) -> {
 			sourceSubscriptionCount.incrementAndGet();
-			s.onNext("foo");
+			s.onNext(value);
 			s.onCompleted();
 		});
 		
@@ -114,7 +116,7 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		ReactiveResultSpy resultSpy = new ReactiveResultSpy();
 		reactiveTypeHandler.subscribe(resultSpy, reactiveType);
 		
-		assertEquals("foo", resultSpy.lastElement);
+		assertEquals(value, resultSpy.lastElement);
 	}
 	
 	@Test
@@ -122,7 +124,7 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		AtomicInteger sourceSubscriptionCount = new AtomicInteger(0);
 		Observable<Object> emitsFoo = Observable.create((s) -> {
 			sourceSubscriptionCount.incrementAndGet();
-			s.onNext("foo");
+			s.onNext(value);
 			s.onCompleted();
 		});
 		
@@ -134,7 +136,7 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		ReactiveResultSpy resultSpy = new ReactiveResultSpy();
 		reactiveTypeHandler.subscribe(resultSpy, reactiveType);
 		
-		assertEquals("foo", resultSpy.lastElement);
+		assertEquals(value, resultSpy.lastElement);
 	}
 	
 	@Test
@@ -147,11 +149,11 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		assertNull(resultSpy.error);
 		assertNull(resultSpy.lastElement);
 		
-		reactiveTypeHandler.completeExceptionally(new RuntimeException("foo"), reactiveType); // Complete reactive execution
+		reactiveTypeHandler.completeExceptionally(new RuntimeException(value), reactiveType); // Complete reactive execution
 		assertTrue(resultSpy.isDone());
 		assertNull(resultSpy.lastElement);
 		assertNotNull(resultSpy.error);
-		assertEquals("foo", resultSpy.error.getMessage());
+		assertEquals(value, resultSpy.error.getMessage());
 	}
 
 	private T toCustomReactiveType(Observable<Object> emitsFoo) {
