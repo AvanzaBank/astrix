@@ -26,9 +26,11 @@ import org.junit.Test;
 import com.avanza.astrix.beans.config.BeanConfiguration;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
+import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.BooleanBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.IntBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.LongBeanSetting;
+import com.avanza.astrix.beans.core.AstrixBeanSettings.StringBeanSetting;
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.DefaultBeanSettings;
@@ -47,10 +49,12 @@ public class AstrixConfigurerTest {
 		IntBeanSetting intSetting = new IntBeanSetting("intSetting", 1);
 		BooleanBeanSetting aBooleanSetting = new BooleanBeanSetting("booleanSetting", true);
 		LongBeanSetting longSetting = new LongBeanSetting("longSetting", 2);
+		BeanSetting<String> stringSetting = new StringBeanSetting("stringSetting", "foo");
 		
 		configurer.set(aBooleanSetting, AstrixBeanKey.create(Ping.class), false);
 		configurer.set(intSetting, AstrixBeanKey.create(Ping.class), 21);
 		configurer.set(longSetting, AstrixBeanKey.create(Ping.class), 19);
+		configurer.set(stringSetting, AstrixBeanKey.create(Ping.class), "bar");
 		
 		AstrixContextImpl astrixContext = autoClosables.add((AstrixContextImpl) configurer.configure());
 		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
@@ -58,6 +62,7 @@ public class AstrixConfigurerTest {
 		assertEquals(21, pingConfig.get(intSetting).get());
 		assertFalse(pingConfig.get(aBooleanSetting).get());
 		assertEquals(19, pingConfig.get(longSetting).get());
+		assertEquals("bar", pingConfig.get((StringBeanSetting)stringSetting).get());
 	}
 	
 	@Test

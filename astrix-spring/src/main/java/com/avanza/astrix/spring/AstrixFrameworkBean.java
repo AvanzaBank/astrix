@@ -36,6 +36,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.core.Ordered;
 
+import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
+import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.Setting;
@@ -134,6 +136,10 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	
 	public <T> void set(Setting<T> setting, T value) {
 		this.configurer.set(setting, value);
+	}
+	
+	public <T> void set(BeanSetting<T> setting, AstrixBeanKey<?> beanKey, T value) {
+		this.configurer.set(setting, beanKey, value);
 	}
 	
 	public Map<String, String> getSettings() {

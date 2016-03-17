@@ -37,6 +37,7 @@ import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.AstrixConfigModule;
 import com.avanza.astrix.beans.configdiscovery.ConfigDiscoveryModule;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
+import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.BooleanBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.IntBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.LongBeanSetting;
@@ -449,6 +450,17 @@ public class AstrixConfigurer {
 
 	void registerModule(Module module) {
 		this.customModules.add(module);
+	}
+
+	public <T> void set(BeanSetting<T> setting, AstrixBeanKey<?> beanKey, T value) {
+		set(setting.nameFor(beanKey), asString(value));
+	}
+
+	private String asString(Object value) {
+		if (value == null) {
+			return null;
+		}
+		return value.toString();
 	}
 
 }
