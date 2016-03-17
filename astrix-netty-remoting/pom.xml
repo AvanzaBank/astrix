@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.avanza.astrix</groupId>
 		<artifactId>astrix-parent</artifactId>
-		<version>0.41.2-SNAPSHOT</version>
+		<version>0.41.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>astrix-netty-remoting</artifactId>
 	<name>${project.artifactId}</name>
