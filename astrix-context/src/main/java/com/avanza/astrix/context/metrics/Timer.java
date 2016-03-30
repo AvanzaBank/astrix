@@ -52,20 +52,24 @@ public class Timer {
 		return timerSpi.timeObservable(command);
 	}
 	
-	public double get50thPercentile() {
+	public double get50thPercentileLatency() {
 		return timerSpi.getSnapshot().get50thPercentile();
 	}
+	
+	public double get90thPercentileLatency() {
+		return timerSpi.getSnapshot().get90thPercentile();
+	}
 
-	public double get99thPercentile() {
-		return timerSpi.getSnapshot().get99thPercentile();
+	public double get99thPercentileLatency() {
+		return timerSpi.getSnapshot().get99thPercentileLatency();
 	}
 
 	public double getMax() {
 		return timerSpi.getSnapshot().getMax();
 	}
 
-	public double getMean() {
-		return timerSpi.getSnapshot().getMean();
+	public double getMeanRate() {
+		return timerSpi.getSnapshot().getMeanRate();
 	}
 
 	public double getMin() {

@@ -58,12 +58,17 @@ public class ServiceInvocationMonitor implements ServiceInvocationMonitorMBean {
 
 	@Override
 	public double get50thPercentile() {
-		return timer.get50thPercentile();
+		return timer.get50thPercentileLatency();
+	}
+	
+	@Override
+	public double get90thPercentile() {
+		return timer.get90thPercentileLatency();
 	}
 
 	@Override
 	public double get99thPercentile() {
-		return timer.get99thPercentile();
+		return timer.get99thPercentileLatency();
 	}
 
 	@Override
@@ -72,8 +77,8 @@ public class ServiceInvocationMonitor implements ServiceInvocationMonitorMBean {
 	}
 
 	@Override
-	public double getMean() {
-		return timer.getMean();
+	public double getMeanRate() {
+		return timer.getMeanRate();
 	}
 
 	@Override

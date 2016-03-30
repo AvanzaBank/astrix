@@ -77,12 +77,13 @@ final class DropwizardMetrics implements MetricsSpi {
 			Snapshot snapshot = timer.getSnapshot();
 			return TimerSnaphot.builder()
 							   .count(timer.getCount())
-							   .max(snapshot.getMax() * durationFactor)
-							   .mean(timer.getMeanRate()) // No need to convert rate since its already in SECONDS 
-							   .min(snapshot.getMin() * durationFactor)
+							   .meanRate(timer.getMeanRate()) // No need to convert rate since its already in SECONDS 
 							   .oneMinuteRate(timer.getOneMinuteRate()) // No need to convert rate since its already in SECONDS
-							   .set50thPercentile(snapshot.getMedian() * durationFactor)
-							   .set99thPercentile(snapshot.get99thPercentile() * durationFactor)
+							   .maxLatency(snapshot.getMax() * durationFactor)
+							   .minLatency(snapshot.getMin() * durationFactor)
+							   .set50thPercentileLatency(snapshot.getMedian() * durationFactor)
+							   .set90thPercentileLatency(snapshot.getValue(0.9) * durationFactor)
+							   .set99thPercentileLatency(snapshot.get99thPercentile() * durationFactor)
 							   .rateUnit(rateUnit)
 							   .durationUnit(durationUnit)
 							   .build();

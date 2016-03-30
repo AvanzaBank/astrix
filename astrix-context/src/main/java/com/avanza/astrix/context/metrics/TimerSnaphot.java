@@ -20,22 +20,24 @@ import java.util.concurrent.TimeUnit;
 public class TimerSnaphot {
 	
 	private final long count;
-	private final double _99thPercentile;
-	private final double _50thPercentile;
-	private final double max;
-	private final double mean;
-	private final double min;
+	private final double _90thPercentileLatency;
+	private final double _99thPercentileLatency;
+	private final double _50thPercentileLatency;
+	private final double maxLatency;
+	private final double meanRate;
+	private final double minLatency;
 	private final double oneMinuteRate;
 	private final TimeUnit rateUnit;
 	private final TimeUnit durationUnit;
 	
 	private TimerSnaphot(Builder builder) {
 		this.count = builder.count;
-		this._50thPercentile = builder._50thPercentile;
-		this._99thPercentile = builder._99thPercentile;
-		this.max = builder.max;
-		this.mean = builder.mean;
-		this.min = builder.min;
+		this._50thPercentileLatency = builder._50thPercentileLatency;
+		this._99thPercentileLatency = builder._99thPercentileLatency;
+		this._90thPercentileLatency = builder._90thPercentileLatency;
+		this.maxLatency = builder.maxLatency;
+		this.minLatency = builder.minLatency;
+		this.meanRate = builder.meanRate;
 		this.oneMinuteRate = builder.oneMinuteRate;
 		this.rateUnit = builder.rateUnit;
 		this.durationUnit = builder.durationUnit;
@@ -52,33 +54,44 @@ public class TimerSnaphot {
 	 * @return
 	 */
 	public double get50thPercentile() {
-		return this._50thPercentile;
+		return this._50thPercentileLatency;
 	}
 
+	/**
+	 * The 90th percentile execution time response times in {@link #getDurationUnit()} for (roughly)
+	 * the last five minutes
+	 * 
+	 * @return
+	 */
+	public double get90thPercentile() {
+		return _90thPercentileLatency;
+	}
+	
 	/**
 	 * The 99th percentile execution time response times in {@link #getDurationUnit()} for (roughly)
 	 * the last five minutes
 	 * 
 	 * @return
 	 */
-	public double get99thPercentile() {
-		return this._99thPercentile;
+	public double get99thPercentileLatency() {
+		return this._99thPercentileLatency;
 	}
+	
 
 	/**
 	 * The maximum execution time 
 	 * @return
 	 */
 	public double getMax() {
-		return this.max;
+		return this.maxLatency;
 	}
 
-	public double getMean() {
-		return this.mean;
+	public double getMeanRate() {
+		return this.meanRate;
 	}
 
 	public double getMin() {
-		return this.min;
+		return this.minLatency;
 	}
 	
 
@@ -115,11 +128,12 @@ public class TimerSnaphot {
 	public static class Builder {
 		private TimeUnit rateUnit = TimeUnit.MILLISECONDS;
 		private long count;
-		private double _99thPercentile;
-		private double _50thPercentile;
-		private double max;
-		private double mean;
-		private double min;
+		private double _99thPercentileLatency;
+		private double _90thPercentileLatency;
+		private double _50thPercentileLatency;
+		private double maxLatency;
+		private double minLatency;
+		private double meanRate;
 		private double oneMinuteRate;
 		private TimeUnit durationUnit;
 		
@@ -133,28 +147,33 @@ public class TimerSnaphot {
 			return this;
 		}
 
-		public Builder set99thPercentile(double _99thPercentile) {
-			this._99thPercentile = _99thPercentile;
+		public Builder set99thPercentileLatency(double _99thPercentile) {
+			this._99thPercentileLatency = _99thPercentile;
+			return this;
+		}
+		
+		public Builder set90thPercentileLatency(double _90thPercentile) {
+			this._90thPercentileLatency = _90thPercentile;
 			return this;
 		}
 
-		public Builder set50thPercentile(double _50thPercentile) {
-			this._50thPercentile = _50thPercentile;
+		public Builder set50thPercentileLatency(double _50thPercentile) {
+			this._50thPercentileLatency = _50thPercentile;
 			return this;
 		}
 
-		public Builder max(double max) {
-			this.max = max;
+		public Builder maxLatency(double max) {
+			this.maxLatency = max;
 			return this;
 		}
 
-		public Builder mean(double mean) {
-			this.mean = mean;
+		public Builder meanRate(double meanRate) {
+			this.meanRate = meanRate;
 			return this;
 		}
 
-		public Builder min(double min) {
-			this.min = min;
+		public Builder minLatency(double min) {
+			this.minLatency = min;
 			return this;
 		}
 

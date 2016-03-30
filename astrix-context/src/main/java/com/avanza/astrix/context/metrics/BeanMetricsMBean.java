@@ -25,13 +25,15 @@ public interface BeanMetricsMBean {
 
 	double getOneMinuteRate();
 
+	double getMeanRate();
+	
 	double getMin();
-
-	double getMean();
 
 	double getMax();
 
 	double get99thPercentile();
+
+	double get90thPercentile();
 
 	double get50thPercentile();
 

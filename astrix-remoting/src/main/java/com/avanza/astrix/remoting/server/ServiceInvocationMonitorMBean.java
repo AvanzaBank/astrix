@@ -24,12 +24,14 @@ public interface ServiceInvocationMonitorMBean {
 	long getErrorCount();
 	
 	double get50thPercentile();
+
+	double get90thPercentile();
 	
 	double get99thPercentile();
 	
 	double getMax();
 	
-	double getMean();
+	double getMeanRate();
 	
 	double getMin();
 	
