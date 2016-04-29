@@ -27,7 +27,7 @@ import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
  * in the ApiProvider as part of the service definition. 
  * 
  * This is different from the dynamic information stored in 
- * the service registry which is represented by {@link ServiceProperties}.
+ * the service registry which is represented by {@link ServiceProviderInstanceProperties}.
  *  
  * @author Elias Lindholm (elilin)
  *

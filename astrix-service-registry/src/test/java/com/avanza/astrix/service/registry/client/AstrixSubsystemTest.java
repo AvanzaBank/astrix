@@ -25,7 +25,7 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.beans.service.DirectComponent;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -54,8 +54,8 @@ public class AstrixSubsystemTest {
 
 		// Publish non versioned service in contextB
 		ServiceRegistryExporterClient serviceRegistryClientB = new ServiceRegistryExporterClient(serviceRegistry, "B", "FooInstanceId");
-		ServiceProperties serviceProperties = DirectComponent.registerAndGetProperties(GreetingService.class, new GreetingServiceImpl("hello"));
-		serviceProperties.setProperty(ServiceProperties.PUBLISHED, "true");
+		ServiceProviderInstanceProperties serviceProperties = DirectComponent.registerAndGetProperties(GreetingService.class, new GreetingServiceImpl("hello"));
+		serviceProperties.setProperty(ServiceProviderInstanceProperties.PUBLISHED, "true");
 		serviceRegistryClientB.register(GreetingService.class, serviceProperties, 1000);
 		
 		GreetingService greetingServiceB = contextB.getBean(GreetingService.class);

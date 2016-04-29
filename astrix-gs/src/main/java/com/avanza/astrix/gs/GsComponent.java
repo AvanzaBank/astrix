@@ -20,7 +20,7 @@ import org.openspaces.core.GigaSpace;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 import com.avanza.astrix.gs.ClusteredProxyCacheImpl.GigaSpaceInstance;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
@@ -44,7 +44,7 @@ public class GsComponent implements ServiceComponent, ClusteredProxyBinder {
 	}
 
 	@Override
-	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
+	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProviderInstanceProperties serviceProperties) {
 		Class<T> targetType = serviceDefinition.getServiceType();
 		if (!GigaSpace.class.isAssignableFrom(targetType)) {
 			throw new UnsupportedTargetTypeException(getName(), targetType);
@@ -55,7 +55,7 @@ public class GsComponent implements ServiceComponent, ClusteredProxyBinder {
 	}
 	
 	@Override
-	public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
+	public ServiceProviderInstanceProperties parseServiceProviderUri(String serviceProviderUri) {
 		return gsBinder.createServiceProperties(serviceProviderUri);
 	}
 
@@ -81,7 +81,7 @@ public class GsComponent implements ServiceComponent, ClusteredProxyBinder {
 	}
 	
 	@Override
-	public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> definition) {
+	public <T> ServiceProviderInstanceProperties createServiceProperties(ServiceDefinition<T> definition) {
 		if (!definition.getServiceType().equals(GigaSpace.class)) {
 			throw new IllegalArgumentException("Can't export: " + definition.getServiceType());
 		}

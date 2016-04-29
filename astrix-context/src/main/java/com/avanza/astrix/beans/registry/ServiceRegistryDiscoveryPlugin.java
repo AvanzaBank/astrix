@@ -15,10 +15,14 @@
  */
 package com.avanza.astrix.beans.registry;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.service.ServiceDiscovery;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactoryPlugin;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
+import com.avanza.astrix.beans.service.ServiceProviders;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -26,7 +30,7 @@ import com.avanza.astrix.beans.service.ServiceProperties;
  */
 public class ServiceRegistryDiscoveryPlugin implements ServiceDiscoveryFactoryPlugin<ServiceRegistryDiscoveryProperties> {
 	
-	private ServiceRegistryClientFactory serviceRegistryClientFactory;
+	private final ServiceRegistryClientFactory serviceRegistryClientFactory;
 	
 	public ServiceRegistryDiscoveryPlugin(ServiceRegistryClientFactory serviceRegistryClientFactory) {
 		this.serviceRegistryClientFactory = serviceRegistryClientFactory;
@@ -49,8 +53,8 @@ public class ServiceRegistryDiscoveryPlugin implements ServiceDiscoveryFactoryPl
 		 * itself we create the ServiceRegistryClient lazily
 		 */
 		
-		private AstrixBeanKey<?> beanKey;
-		private ServiceRegistryClient serviceRegistryClient;
+		private final AstrixBeanKey<?> beanKey;
+		private final ServiceRegistryClient serviceRegistryClient;
 
 		public ServiceRegistryDiscovery(AstrixBeanKey<?> key, ServiceRegistryClient serviceRegistryClient) {
 			this.beanKey = key;
@@ -63,8 +67,12 @@ public class ServiceRegistryDiscoveryPlugin implements ServiceDiscoveryFactoryPl
 		}
 
 		@Override
-		public ServiceProperties run() {
-			return serviceRegistryClient.lookup(beanKey);
+		public ServiceProviders run() {
+			ServiceProviderInstanceProperties lookup = serviceRegistryClient.lookup(beanKey);
+			if (lookup != null) {
+				return new ServiceProviders(Arrays.asList(lookup));
+			}
+			return new ServiceProviders(Collections.emptyList());
 		}
 		
 	}

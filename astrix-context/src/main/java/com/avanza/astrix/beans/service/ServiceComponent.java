@@ -34,7 +34,7 @@ public interface ServiceComponent {
 	 * @param serviceProperties
 	 * @return
 	 */
-	<T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties);
+	<T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProviderInstanceProperties serviceProperties);
 	
 	/**
 	 * Parses a given servicePropertiesUri.
@@ -42,18 +42,18 @@ public interface ServiceComponent {
 	 * @param serviceProviderUri
 	 * @return
 	 */
-	ServiceProperties parseServiceProviderUri(String serviceProviderUri);
+	ServiceProviderInstanceProperties parseServiceProviderUri(String serviceProviderUri);
 	
 	/**
-	 * Creates {@link ServiceProperties} for a given exportedService. 
+	 * Creates {@link ServiceProviderInstanceProperties} for a given exportedService. 
 	 * 
 	 * Before this method is inoked, the {@link #exportService(Class, Object, ServiceDefinition)} method
 	 * will be invoked with the same exported {@link ServiceDefinition}
 	 * 
-	 * @param exportedServiceDefinition {@link ServiceDefinition} for the service to create {@link ServiceProperties} for.
+	 * @param exportedServiceDefinition {@link ServiceDefinition} for the service to create {@link ServiceProviderInstanceProperties} for.
 	 * @return
 	 */
-	<T> ServiceProperties createServiceProperties(ServiceDefinition<T> exportedServiceDefinition);
+	<T> ServiceProviderInstanceProperties createServiceProperties(ServiceDefinition<T> exportedServiceDefinition);
 	
 	/**
 	 * The name of this component.
@@ -66,7 +66,7 @@ public interface ServiceComponent {
 	 * Defines whether this ServiceComponent can be used to bind a bean of a given type.
 	 * 
 	 * If this ServiceComponent can be used to bind the given type, then {@link #parseServiceProviderUri(Class)}
-	 * should create ServiceProperties that can be passed to {@link #bind(Class, ServiceDefinition, ServiceProperties)}
+	 * should create ServiceProperties that can be passed to {@link #bind(Class, ServiceDefinition, ServiceProviderInstanceProperties)}
 	 * to bind to an instance of the given type.
 	 * 
 	 * @param type
@@ -77,7 +77,7 @@ public interface ServiceComponent {
 	/**
 	 * Exports a given service on the server side. After a service is exported it should be possible to
 	 * call {@link #createServiceProperties(ServiceDefinition)} to receive ServiceProperties for the
-	 * ServiceDefinition, and later to call {@link #bind(ServiceDefinition, ServiceProperties)} to
+	 * ServiceDefinition, and later to call {@link #bind(ServiceDefinition, ServiceProviderInstanceProperties)} to
 	 * get a proxy that can invoke the passied in provider.
 	 * 
 	 * @param providedApi

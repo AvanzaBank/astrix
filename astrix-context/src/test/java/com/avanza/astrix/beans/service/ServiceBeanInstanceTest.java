@@ -395,7 +395,7 @@ public class ServiceBeanInstanceTest {
 	static class FakeComponent implements ServiceComponent {
 		
 		@Override
-		public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> versioningContext, ServiceProperties serviceProperties) {
+		public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> versioningContext, ServiceProviderInstanceProperties serviceProperties) {
 			throw new IllegalServiceMetadataException("Illegal metadata");
 		}
 		
@@ -405,12 +405,12 @@ public class ServiceBeanInstanceTest {
 		}
 
 		@Override
-		public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
-			return new ServiceProperties();
+		public ServiceProviderInstanceProperties parseServiceProviderUri(String serviceProviderUri) {
+			return new ServiceProviderInstanceProperties();
 		}
 
 		@Override
-		public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> exportedServiceDefinition) {
+		public <T> ServiceProviderInstanceProperties createServiceProperties(ServiceDefinition<T> exportedServiceDefinition) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -467,8 +467,8 @@ public class ServiceBeanInstanceTest {
 			return !BeanProxyNames.FAULT_TOLERANCE.equals(beanProxy.name());
 		}
 		
-		public <T> ServiceProperties registerAndGetServiceProperties(Class<T> bean, T provider) {
-			ServiceProperties result = DirectComponent.registerAndGetProperties(bean, provider);
+		public <T> ServiceProviderInstanceProperties registerAndGetServiceProperties(Class<T> bean, T provider) {
+			ServiceProviderInstanceProperties result = DirectComponent.registerAndGetProperties(bean, provider);
 			result.setComponent(getName());
 			return result;
 		}
@@ -479,19 +479,19 @@ public class ServiceBeanInstanceTest {
 		}
 
 		@Override
-		public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
+		public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProviderInstanceProperties serviceProperties) {
 			return directComponent.bind(serviceDefinition, serviceProperties);
 		}
 
 		@Override
-		public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
-			ServiceProperties serviceProperties = directComponent.parseServiceProviderUri(serviceProviderUri);
+		public ServiceProviderInstanceProperties parseServiceProviderUri(String serviceProviderUri) {
+			ServiceProviderInstanceProperties serviceProperties = directComponent.parseServiceProviderUri(serviceProviderUri);
 			serviceProperties.setComponent(getName());
 			return serviceProperties;
 		}
 
 		@Override
-		public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> exportedServiceDefinition) {
+		public <T> ServiceProviderInstanceProperties createServiceProperties(ServiceDefinition<T> exportedServiceDefinition) {
 			return null;
 		}
 

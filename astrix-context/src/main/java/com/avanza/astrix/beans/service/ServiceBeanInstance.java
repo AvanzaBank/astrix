@@ -15,9 +15,12 @@
  */
 package com.avanza.astrix.beans.service;
 
+import static java.util.function.Predicate.isEqual;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +76,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	 */
 	private final Lock beanStateLock = new ReentrantLock();
 	
-	private volatile ServiceProperties currentProperties;
+	private volatile ServiceProviderInstanceProperties currentProperties;
 	private volatile BeanState currentState;
 
 	private final List<BeanProxy> beanProxies;
@@ -129,8 +132,11 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		}
 	}
 	
-	private boolean serviceHasChanged(ServiceProperties serviceProperties) {
-		return !Objects.equals(currentProperties, serviceProperties);
+	private boolean serviceHasChanged(ServiceProviders serviceProviders) {
+		return !serviceProviders.getInstanceProperties().stream()
+				.filter(isEqual(currentProperties))
+				.findAny()
+				.isPresent();
 	}
 	
 	public void bind() {
@@ -146,7 +152,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 				return;
 				
 			}
-			if (serviceDiscoveryResult.getResult() == null) {
+			if (serviceDiscoveryResult.getResult().isEmpty()) {
 				log.info(String.format(
 					"Did not discover a service provider using %s. bean=%s astrixBeanId=%s", 
 						serviceDiscovery.description(), getBeanKey(), id));
@@ -170,28 +176,28 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	}
 	
 	static class ServiceDiscoveryResult {
-		final ServiceProperties serviceProperties;
+		final ServiceProviders serviceProviders;
 		final Exception discoveryError;
 		
-		ServiceDiscoveryResult(ServiceProperties serviceProperties, Exception discoveryError) {
-			this.serviceProperties = serviceProperties;
+		ServiceDiscoveryResult(ServiceProviders serviceProviders, Exception discoveryError) {
+			this.serviceProviders = serviceProviders;
 			this.discoveryError = discoveryError;
 		}
 
 		static ServiceDiscoveryResult failure(Exception e) {
-			return new ServiceDiscoveryResult(null, e);
+			return new ServiceDiscoveryResult(new ServiceProviders(new ArrayList<>()), e);
 		}
 		
-		static ServiceDiscoveryResult successful(ServiceProperties serviceProperties) {
-			return new ServiceDiscoveryResult(serviceProperties, null);
+		static ServiceDiscoveryResult successful(ServiceProviders serviceProviders) {
+			return new ServiceDiscoveryResult(serviceProviders, null);
 		}
 		
 		boolean isSuccessful() {
 			return discoveryError == null;
 		}
 		
-		public ServiceProperties getResult() {
-			return serviceProperties;
+		public ServiceProviders getResult() {
+			return serviceProviders;
 		}
 		
 		public Exception getError() {
@@ -207,8 +213,8 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	 * 
 	 * Throws exception if bind attempt fails.
 	 */
-	private void bind(ServiceProperties serviceProperties) {
-		this.currentState.bindTo(serviceProperties);
+	private void bind(ServiceProviders serviceProperties) {
+		this.currentState.bindTo(serviceProperties.getRandom());
 	}
 	
 	void destroy() {
@@ -230,7 +236,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		}
 	}
 	
-	private ServiceComponent getServiceComponent(ServiceProperties serviceProperties) {
+	private ServiceComponent getServiceComponent(ServiceProviderInstanceProperties serviceProperties) {
 		String componentName = serviceProperties.getComponent();
 		if (componentName == null) {
 			throw new IllegalArgumentException("Expected a componentName to be set on serviceProperties: " + serviceProperties);
@@ -289,12 +295,12 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	
 	private abstract class BeanState implements InvocationHandler {
 
-		protected void bindTo(ServiceProperties serviceProperties) {
+		protected void bindTo(ServiceProviderInstanceProperties serviceProperties) {
 			if (serviceProperties == null) {
 				setState(new Unbound(NoServiceProviderFound.class, "No service provider found"));
 				return;
 			}
-			String providerSubsystem = serviceProperties.getProperty(ServiceProperties.SUBSYSTEM);
+			String providerSubsystem = serviceProperties.getProperty(ServiceProviderInstanceProperties.SUBSYSTEM);
 			if (providerSubsystem == null) {
 				providerSubsystem = AstrixSettings.SUBSYSTEM_NAME.defaultValue();
 			}
@@ -440,7 +446,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	
 	private class IllegalServiceMetadataState extends BeanState {
 		
-		private String message;
+		private final String message;
 
 		public IllegalServiceMetadataState(String message) {
 			this.message = message;
@@ -470,7 +476,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		return this.currentState.name();
 	}
 	
-	ServiceProperties getCurrentProperties() {
+	ServiceProviderInstanceProperties getCurrentProperties() {
 		return currentProperties;
 	}
 

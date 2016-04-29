@@ -25,7 +25,7 @@ import java.util.Objects;
  * @author Elias Lindholm (elilin)
  *
  */
-public final class ServiceProperties implements Serializable {
+public final class ServiceProviderInstanceProperties implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -33,17 +33,21 @@ public final class ServiceProperties implements Serializable {
 	public static final String API = "_api";
 	public static final String COMPONENT = "_component";
 	public static final String SUBSYSTEM = "_subsystem";
+	/** TODO: refactor to remove */
+	@Deprecated
 	public static final String APPLICATION_INSTANCE_ID = "_applicationInstanceId";
 	public static final String PUBLISHED = "_published";
 	public static final String SERVICE_ZONE = "_zone";
 	
+	public static final String SERVICE_PROVIDER_INSTANCE_ID = "_serviceProviderInstanceId";
+	
 	private final Map<String, String> properties = new HashMap<>();
 	
-	public ServiceProperties(Map<String, String> serviceProperties) {
+	public ServiceProviderInstanceProperties(Map<String, String> serviceProperties) {
 		this.properties.putAll(serviceProperties);
 	}
 	
-	public ServiceProperties() {
+	public ServiceProviderInstanceProperties() {
 	}
 
 	public String getProperty(String name) {
@@ -105,7 +109,7 @@ public final class ServiceProperties implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ServiceProperties other = (ServiceProperties) obj;
+		ServiceProviderInstanceProperties other = (ServiceProviderInstanceProperties) obj;
 		return Objects.equals(this.properties, other.properties);
 	}
 

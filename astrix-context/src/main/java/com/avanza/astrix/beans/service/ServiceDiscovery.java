@@ -17,12 +17,12 @@ package com.avanza.astrix.beans.service;
 
 
 /**
- * Strategy for discovering the {@link ServiceProperties} associated
+ * Strategy for discovering the {@link ServiceProviderInstanceProperties} associated
  * with a given Astrix service bean instance. <p>
  * @author Elias Lindholm (elilin)
  *
  */
 public interface ServiceDiscovery {
-	ServiceProperties run();
+	ServiceProviders run();
 	String description();
 }

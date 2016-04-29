@@ -21,7 +21,7 @@ import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.gs.BoundProxyServiceBeanInstance;
 import com.avanza.astrix.gs.ClusteredProxyCache;
@@ -61,26 +61,26 @@ public class GsRemotingComponent implements ServiceComponent {
 	}
 
 	@Override
-	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
+	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProviderInstanceProperties serviceProperties) {
 		AstrixObjectSerializer objectSerializer = objectSerializerFactory.create(serviceDefinition.getObjectSerializerDefinition());
 		
 		GigaSpaceInstance proxyInstance = proxyCache.getProxy(serviceProperties);
 		GsRemotingTransport gsRemotingTransport = new GsRemotingTransport(proxyInstance.getSpaceTaskDispatcher());
 		RemotingTransport remotingTransport = RemotingTransport.create(gsRemotingTransport);
-		T proxy = RemotingProxy.create(serviceDefinition.getServiceType(), ReflectionUtil.classForName(serviceProperties.getProperty(ServiceProperties.API))
+		T proxy = RemotingProxy.create(serviceDefinition.getServiceType(), ReflectionUtil.classForName(serviceProperties.getProperty(ServiceProviderInstanceProperties.API))
 				, remotingTransport, objectSerializer, new GsRoutingStrategy(), reactiveTypeConverter);
 		return BoundProxyServiceBeanInstance.create(proxy, proxyInstance);
 	}
 	
 	@Override
-	public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
+	public ServiceProviderInstanceProperties parseServiceProviderUri(String serviceProviderUri) {
 		return gsBinder.createServiceProperties(serviceProviderUri);
 	}
 
 	@Override
-	public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> serviceDefinition) {
+	public <T> ServiceProviderInstanceProperties createServiceProperties(ServiceDefinition<T> serviceDefinition) {
 		GigaSpace space = gsBinder.getEmbeddedSpace(astrixSpringContext.getApplicationContext());
-		ServiceProperties serviceProperties = gsBinder.createProperties(space);
+		ServiceProviderInstanceProperties serviceProperties = gsBinder.createProperties(space);
 		return serviceProperties;
 	}
 	

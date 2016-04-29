@@ -15,13 +15,17 @@
  */
 package com.avanza.astrix.beans.configdiscovery;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceComponentRegistry;
 import com.avanza.astrix.beans.service.ServiceDiscovery;
 import com.avanza.astrix.beans.service.ServiceDiscoveryFactoryPlugin;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
+import com.avanza.astrix.beans.service.ServiceProviders;
 
 /**
  * 
@@ -30,8 +34,8 @@ import com.avanza.astrix.beans.service.ServiceProperties;
  */
 public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryFactoryPlugin<ConfigDiscoveryProperties> {
 
-	private ServiceComponentRegistry serviceComponents;
-	private AstrixConfig config;
+	private final ServiceComponentRegistry serviceComponents;
+	private final AstrixConfig config;
 
 	public ConfigServiceDiscoveryPlugin(ServiceComponentRegistry serviceComponents, AstrixConfig config) {
 		this.serviceComponents = serviceComponents;
@@ -50,10 +54,10 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryFactoryPlug
 
 	private static class ConfigDiscovery implements ServiceDiscovery {
 
-		private ServiceComponentRegistry serviceComponents;
-		private AstrixConfig config;
-		private String configEntryName;
-		private AstrixBeanKey<?> beanKey;
+		private final ServiceComponentRegistry serviceComponents;
+		private final AstrixConfig config;
+		private final String configEntryName;
+		private final AstrixBeanKey<?> beanKey;
 
 		public ConfigDiscovery(ServiceComponentRegistry serviceComponents, AstrixConfig config, String configEntryName,
 				AstrixBeanKey<?> beanKey) {
@@ -64,12 +68,12 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryFactoryPlug
 		}
 
 		@Override
-		public ServiceProperties run() {
+		public ServiceProviders run() {
 			String serviceUri = config.getStringProperty(configEntryName, null).get();
 			if (serviceUri == null) {
-				return null;
+				return new ServiceProviders(Collections.emptyList());
 			}
-			return buildServiceProperties(serviceUri);
+			return new ServiceProviders(Arrays.asList(buildServiceProperties(serviceUri)));
 		}
 
 		@Override
@@ -80,7 +84,7 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryFactoryPlug
 		// A serviceUri has the format
 		// [component-name:service-provider-properties]
 		// Example: gs-remoting:jini://customer-space?groups=my-group
-		private ServiceProperties buildServiceProperties(String serviceUri) {
+		private ServiceProviderInstanceProperties buildServiceProperties(String serviceUri) {
 			int componentNameEndIndex = serviceUri.indexOf(":");
 			if (componentNameEndIndex < 0) {
 				throw new IllegalArgumentException("Illegal serviceUri: \"" + serviceUri
@@ -89,7 +93,7 @@ public class ConfigServiceDiscoveryPlugin implements ServiceDiscoveryFactoryPlug
 			String component = serviceUri.substring(0, componentNameEndIndex);
 			String serviceProviderUri = serviceUri.substring(componentNameEndIndex + 1);
 			ServiceComponent serviceComponent = getServiceComponent(component);
-			ServiceProperties serviceProperties = serviceComponent.parseServiceProviderUri(serviceProviderUri);
+			ServiceProviderInstanceProperties serviceProperties = serviceComponent.parseServiceProviderUri(serviceProviderUri);
 			serviceProperties.setComponent(serviceComponent.getName());
 			serviceProperties.setApi(this.beanKey.getBeanType());
 			serviceProperties.setQualifier(this.beanKey.getQualifier());

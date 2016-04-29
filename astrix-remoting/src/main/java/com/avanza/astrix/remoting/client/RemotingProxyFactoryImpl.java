@@ -17,7 +17,7 @@ package com.avanza.astrix.remoting.client;
 
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.service.ServiceDefinition;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.core.remoting.RoutingStrategy;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
@@ -34,11 +34,11 @@ public class RemotingProxyFactoryImpl implements RemotingProxyFactory {
 	}
 
 	@Override
-	public <T> T create(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties,
+	public <T> T create(ServiceDefinition<T> serviceDefinition, ServiceProviderInstanceProperties serviceProperties,
 			RemotingTransportSpi remotingTransportSpi, RoutingStrategy routingStrategy) {
 		AstrixObjectSerializer objectSerializer = objectSerializerFactory.create(serviceDefinition.getObjectSerializerDefinition());
 		RemotingTransport remotingTransport = RemotingTransport.create(remotingTransportSpi);
-		return RemotingProxy.create(serviceDefinition.getServiceType(), ReflectionUtil.classForName(serviceProperties.getProperty(ServiceProperties.API))
+		return RemotingProxy.create(serviceDefinition.getServiceType(), ReflectionUtil.classForName(serviceProperties.getProperty(ServiceProviderInstanceProperties.API))
 				, remotingTransport, objectSerializer, routingStrategy, reactiveTypeConverter);
 	}
 

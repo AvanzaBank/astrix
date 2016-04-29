@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 
@@ -55,11 +55,11 @@ public class AstrixServiceRegistryImpl implements AstrixServiceRegistry {
 		List<AstrixServiceRegistryEntry> activeServices = new ArrayList<>(entries.size());
 		String consumerZone = serviceConsumer.getProperty(ServiceConsumerProperties.CONSUMER_ZONE);
 		for (AstrixServiceRegistryEntry entry : entries) {
-			if ("true".equals(entry.getServiceProperties().get(ServiceProperties.PUBLISHED))) {
+			if ("true".equals(entry.getServiceProperties().get(ServiceProviderInstanceProperties.PUBLISHED))) {
 				activeServices.add(entry);
 				continue;
 			}
-			if (!Objects.equals(consumerZone, entry.getServiceProperties().get(ServiceProperties.SERVICE_ZONE))) {
+			if (!Objects.equals(consumerZone, entry.getServiceProperties().get(ServiceProviderInstanceProperties.SERVICE_ZONE))) {
 				log.debug("Discarding service-provider={}, consumer={}", entry.getServiceProperties(), serviceConsumer);
 				continue;
 			}
@@ -79,9 +79,9 @@ public class AstrixServiceRegistryImpl implements AstrixServiceRegistry {
 	}
 	
 	private ServiceProviderKey getServiceProviderKey(AstrixServiceRegistryEntry properties) {
-		String appInstanceId = properties.getServiceProperties().get(ServiceProperties.APPLICATION_INSTANCE_ID);
+		String appInstanceId = properties.getServiceProperties().get(ServiceProviderInstanceProperties.APPLICATION_INSTANCE_ID);
 		String api = properties.getServiceBeanType();
-		String qualifier = properties.getServiceProperties().get(ServiceProperties.QUALIFIER);
+		String qualifier = properties.getServiceProperties().get(ServiceProviderInstanceProperties.QUALIFIER);
 		ServiceProviderKey serviceProviderKey = ServiceProviderKey.create(new ServiceKey(api, qualifier), appInstanceId);
 		return serviceProviderKey;
 	}

@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixConfigAware;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.modules.KeyLock;
 import com.avanza.astrix.modules.ObjectCache;
@@ -61,7 +61,7 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 	 * @return
 	 */
 	@Override
-	public GigaSpaceInstance getProxy(final ServiceProperties serviceProperties) {
+	public GigaSpaceInstance getProxy(final ServiceProviderInstanceProperties serviceProperties) {
 		final String spaceUrl = serviceProperties.getProperty(GsBinder.SPACE_URL_PROPERTY);
 		proxyByUrlLock.lock(spaceUrl);
 		try {

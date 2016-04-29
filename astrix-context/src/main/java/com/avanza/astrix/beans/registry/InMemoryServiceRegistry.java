@@ -24,7 +24,7 @@ import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.config.BooleanSetting;
 import com.avanza.astrix.config.DynamicConfigSource;
 import com.avanza.astrix.config.DynamicPropertyListener;
@@ -131,17 +131,17 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 		registerProvider(AstrixBeanKey.create(api), provider, subsystem);
 	}
 	
-	public <T> void registerProvider(Class<T> api, ServiceProperties serviceProperties) {
+	public <T> void registerProvider(Class<T> api, ServiceProviderInstanceProperties serviceProperties) {
 		// TODO: remove this method?
 		registerServiceProvider(AstrixBeanKey.create(api), "default", serviceProperties);
 	}
 	
 	private <T> void registerProvider(AstrixBeanKey<T> beanKey, T provider, String subsystem) {
-		ServiceProperties serviceProperties = DirectComponent.registerAndGetProperties(beanKey.getBeanType(), provider);
+		ServiceProviderInstanceProperties serviceProperties = DirectComponent.registerAndGetProperties(beanKey.getBeanType(), provider);
 		registerServiceProvider(beanKey, subsystem, serviceProperties);
 	}
 
-	private <T> void registerServiceProvider(AstrixBeanKey<T> beanKey, String subsystem, ServiceProperties serviceProperties) {
+	private <T> void registerServiceProvider(AstrixBeanKey<T> beanKey, String subsystem, ServiceProviderInstanceProperties serviceProperties) {
 		ServiceRegistryExporterClient serviceRegistryClient = new ServiceRegistryExporterClient(this.serviceRegistry, subsystem, beanKey.toString());
 		serviceProperties.setQualifier(beanKey.getQualifier());
 		serviceRegistryClient.register(beanKey.getBeanType(), serviceProperties, 60_000);
@@ -202,13 +202,13 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 		}
 		
 		private ServiceProviderKey getServiceProviderKey(AstrixServiceRegistryEntry properties) {
-			String appInstanceId = properties.getServiceProperties().get(ServiceProperties.APPLICATION_INSTANCE_ID);
+			String appInstanceId = properties.getServiceProperties().get(ServiceProviderInstanceProperties.APPLICATION_INSTANCE_ID);
 			return ServiceProviderKey.create(getServiceKey(properties), appInstanceId);
 		}
 		
 		private ServiceKey getServiceKey(AstrixServiceRegistryEntry properties) {
 			String api = properties.getServiceBeanType();
-			String qualifier = properties.getServiceProperties().get(ServiceProperties.QUALIFIER);
+			String qualifier = properties.getServiceProperties().get(ServiceProviderInstanceProperties.QUALIFIER);
 			return new ServiceKey(api, qualifier);
 		}
 		

@@ -16,7 +16,7 @@
 package com.avanza.astrix.serviceunit;
 
 import com.avanza.astrix.beans.service.ServiceComponent;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 
 class ServiceRegistryExportedService {
@@ -34,9 +34,9 @@ class ServiceRegistryExportedService {
 		this.serviceComponent = serviceComponent;
 	}
 
-	public ServiceProperties exportServiceProperties() {
-		ServiceProperties serviceProperties = serviceComponent.createServiceProperties(serviceBeanDefinition.getServiceDefinition());
-		serviceProperties.getProperties().put(ServiceProperties.PUBLISHED, Boolean.toString(isPublished()));
+	public ServiceProviderInstanceProperties exportServiceProperties() {
+		ServiceProviderInstanceProperties serviceProperties = serviceComponent.createServiceProperties(serviceBeanDefinition.getServiceDefinition());
+		serviceProperties.getProperties().put(ServiceProviderInstanceProperties.PUBLISHED, Boolean.toString(isPublished()));
 		serviceProperties.setApi(serviceBeanDefinition.getBeanKey().getBeanType());
 		serviceProperties.setQualifier(serviceBeanDefinition.getBeanKey().getQualifier());
 		serviceProperties.setComponent(serviceComponent.getName());

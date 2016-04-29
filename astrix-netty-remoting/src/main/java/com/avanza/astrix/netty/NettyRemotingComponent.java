@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.beans.service.SimpleBoundServiceBeanInstance;
 import com.avanza.astrix.core.remoting.RoutingStrategy;
 import com.avanza.astrix.netty.client.NettyRemotingClient;
@@ -63,7 +63,7 @@ public class NettyRemotingComponent implements ServiceComponent {
 	}
 
 	@Override
-	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
+	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProviderInstanceProperties serviceProperties) {
 		String host = serviceProperties.getProperty(NETTY_HOST);
 		int port = Integer.valueOf(serviceProperties.getProperty(NETTY_PORT));
 		log.info("Connecting to: {}:{}", host, port);
@@ -75,17 +75,17 @@ public class NettyRemotingComponent implements ServiceComponent {
 	}
 
 	@Override
-	public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
+	public ServiceProviderInstanceProperties parseServiceProviderUri(String serviceProviderUri) {
 		String[] hostAndPort = serviceProviderUri.split(":");
-		ServiceProperties result = new ServiceProperties();
+		ServiceProviderInstanceProperties result = new ServiceProviderInstanceProperties();
 		result.getProperties().put(NETTY_HOST, hostAndPort[0]);
 		result.getProperties().put(NETTY_PORT, hostAndPort[1]);
 		return result;
 	}
 
 	@Override
-	public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> exportedServiceDefinition) {
-		ServiceProperties properties = new ServiceProperties();
+	public <T> ServiceProviderInstanceProperties createServiceProperties(ServiceDefinition<T> exportedServiceDefinition) {
+		ServiceProviderInstanceProperties properties = new ServiceProviderInstanceProperties();
 		properties.getProperties().put(NETTY_HOST, getHostName()); // TODO
 		properties.getProperties().put(NETTY_PORT, Integer.toString(remotingServer.getPort()));
 		return properties;

@@ -27,7 +27,7 @@ import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryFactory;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.beans.util.AstrixFrameworkThread;
 import com.avanza.astrix.config.DynamicLongProperty;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -117,7 +117,7 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread {
 
 	private void exportProvidedServcies() {
 		for (ServiceRegistryExportedService exportedService : exportedServices) {
-			ServiceProperties serviceProperties = exportedService.exportServiceProperties();
+			ServiceProviderInstanceProperties serviceProperties = exportedService.exportServiceProperties();
 			serviceRegistryProviderClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());
 			log.debug("Exported to service registry. service={} properties={}", serviceProperties.getApi().getName(), serviceProperties);
 		}

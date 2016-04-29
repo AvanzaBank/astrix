@@ -179,18 +179,18 @@ public class AsyncServiceTest {
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
+		public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProviderInstanceProperties serviceProperties) {
 			return new SimpleBoundServiceBeanInstance<T>((T) instance);
 		}
 
 		@Override
-		public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
-			return new ServiceProperties();
+		public ServiceProviderInstanceProperties parseServiceProviderUri(String serviceProviderUri) {
+			return new ServiceProviderInstanceProperties();
 		}
 
 		@Override
-		public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> exportedServiceDefinition) {
-			return new ServiceProperties();
+		public <T> ServiceProviderInstanceProperties createServiceProperties(ServiceDefinition<T> exportedServiceDefinition) {
+			return new ServiceProviderInstanceProperties();
 		}
 
 		@Override

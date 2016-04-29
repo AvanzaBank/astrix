@@ -60,7 +60,7 @@ public class DirectComponent implements ServiceComponent {
 	}
 	
 	@Override
-	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
+	public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProviderInstanceProperties serviceProperties) {
 		String providerId = serviceProperties.getProperty("providerId");
 		ServiceProvider<?> serviceProvider = providerById.get(providerId);
 		if (serviceProvider == null) {
@@ -109,7 +109,7 @@ public class DirectComponent implements ServiceComponent {
 	}
 	
 	@Override
-	public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
+	public ServiceProviderInstanceProperties parseServiceProviderUri(String serviceProviderUri) {
 		return getServiceProperties(serviceProviderUri);
 	}
 
@@ -145,13 +145,13 @@ public class DirectComponent implements ServiceComponent {
 		return id;
 	}
 	
-	public static <T> ServiceProperties registerAndGetProperties(Class<T> type, T provider) {
+	public static <T> ServiceProviderInstanceProperties registerAndGetProperties(Class<T> type, T provider) {
 		String id = register(type, provider);
 		return getServiceProperties(id);
 	}
 	
-	public static ServiceProperties getServiceProperties(String id) {
-		ServiceProperties serviceProperties = new ServiceProperties();
+	public static ServiceProviderInstanceProperties getServiceProperties(String id) {
+		ServiceProviderInstanceProperties serviceProperties = new ServiceProviderInstanceProperties();
 		serviceProperties.setProperty("providerId", id);
 		serviceProperties.setComponent(AstrixServiceComponentNames.DIRECT);
 		ServiceProvider<?> serviceProvider = providerById.get(id);
@@ -159,7 +159,7 @@ public class DirectComponent implements ServiceComponent {
 			return serviceProperties; // TODO: Throw exception when no service-provider found. Requires rewrite of two unit-tests.
 		}
 		serviceProperties.setApi(serviceProvider.getType());
-		serviceProperties.setProperty(ServiceProperties.PUBLISHED, "true"); 
+		serviceProperties.setProperty(ServiceProviderInstanceProperties.PUBLISHED, "true"); 
 		return serviceProperties;
 	}
 	
@@ -281,7 +281,7 @@ public class DirectComponent implements ServiceComponent {
 	}
 	
 	@Override
-	public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> exportedService) {
+	public <T> ServiceProviderInstanceProperties createServiceProperties(ServiceDefinition<T> exportedService) {
 		String id = this.idByExportedBean.get(exportedService.getBeanKey());
 		return getServiceProperties(id);
 	}

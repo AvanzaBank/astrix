@@ -43,7 +43,7 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryClient;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
@@ -249,12 +249,12 @@ public class AstrixIntegrationTest {
 
 	@Test
 	public void leasesServices() throws Exception {
-		ServiceProperties properties = new ServiceProperties();
+		ServiceProviderInstanceProperties properties = new ServiceProviderInstanceProperties();
 		properties.setApi(FooService.class);
 		ServiceRegistryExporterClient exporterClient = new ServiceRegistryExporterClient(serviceRegistry, "test-sub-system" , "foo-app-instance-id");
 		exporterClient.register(FooService.class, properties, 1000);
 		
-		ServiceProperties props = serviceRegistryClient.lookup(AstrixBeanKey.create(FooService.class));
+		ServiceProviderInstanceProperties props = serviceRegistryClient.lookup(AstrixBeanKey.create(FooService.class));
 		assertNotNull("Expected properties to exists after registration", props);
 		
 		assertEventually(AstrixTestUtil.serviceInvocationResult(new Supplier<Object>() {
@@ -266,8 +266,8 @@ public class AstrixIntegrationTest {
 	
 	@Test
 	public void usesSpaceApplicationDescriptorNameAsdefaultApplicationInstanceIdForProcessingUnits() throws Exception {
-		ServiceProperties serviceProperties = serviceRegistryClient.lookup(AstrixBeanKey.create(LunchService.class));
-		assertEquals(LunchApplicationDescriptor.class.getName(), serviceProperties.getProperties().get(ServiceProperties.APPLICATION_INSTANCE_ID));
+		ServiceProviderInstanceProperties serviceProperties = serviceRegistryClient.lookup(AstrixBeanKey.create(LunchService.class));
+		assertEquals(LunchApplicationDescriptor.class.getName(), serviceProperties.getProperties().get(ServiceProviderInstanceProperties.APPLICATION_INSTANCE_ID));
 	}
 	
 	@Test(expected = ServiceUnavailableException.class)

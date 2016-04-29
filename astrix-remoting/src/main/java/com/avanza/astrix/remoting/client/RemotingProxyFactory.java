@@ -16,12 +16,12 @@
 package com.avanza.astrix.remoting.client;
 
 import com.avanza.astrix.beans.service.ServiceDefinition;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.core.remoting.RoutingStrategy;
 
 public interface RemotingProxyFactory {
 
-	<T> T create(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties, 
+	<T> T create(ServiceDefinition<T> serviceDefinition, ServiceProviderInstanceProperties serviceProperties, 
 				RemotingTransportSpi remotingTransportSpi, RoutingStrategy routingStrategy);
 
 }

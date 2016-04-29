@@ -21,7 +21,7 @@ import java.util.Objects;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.service.ServiceConsumerProperties;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -37,19 +37,19 @@ public class ServiceRegistryClient {
 		this.serviceRegistry = Objects.requireNonNull(serviceRegistry);
 	}
 
-	public <T> ServiceProperties lookup(AstrixBeanKey<T> beanKey) {
+	public <T> ServiceProviderInstanceProperties lookup(AstrixBeanKey<T> beanKey) {
 		AstrixServiceRegistryEntry entry = serviceRegistry.lookup(beanKey.getBeanType().getName(), beanKey.getQualifier(), consumerProperties);
 		if (entry == null) {
 			return null;
 		}
-		return new ServiceProperties(entry.getServiceProperties());
+		return new ServiceProviderInstanceProperties(entry.getServiceProperties());
 	}
 
-	public <T> List<ServiceProperties> list(AstrixBeanKey<T> beanKey) {
+	public <T> List<ServiceProviderInstanceProperties> list(AstrixBeanKey<T> beanKey) {
 		List<AstrixServiceRegistryEntry> registeresServices = serviceRegistry.listServices(beanKey.getBeanType().getName(), beanKey.getQualifier());
-		List<ServiceProperties> result = new ArrayList<>(registeresServices.size());
+		List<ServiceProviderInstanceProperties> result = new ArrayList<>(registeresServices.size());
 		for (AstrixServiceRegistryEntry entry : registeresServices) {
-			result.add(new ServiceProperties(entry.getServiceProperties()));
+			result.add(new ServiceProviderInstanceProperties(entry.getServiceProperties()));
 		}
 		return result;
 	}

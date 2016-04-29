@@ -56,7 +56,7 @@ public class AstrixServiceBeanInstance implements AstrixServiceBeanInstanceMBean
 	
 	@Override
 	public Map<String, String> getServiceProperties() {
-		ServiceProperties currentProperties = this.instance.getCurrentProperties();
+		ServiceProviderInstanceProperties currentProperties = this.instance.getCurrentProperties();
 		if (currentProperties == null) {
 			return Collections.emptyMap();
 		}

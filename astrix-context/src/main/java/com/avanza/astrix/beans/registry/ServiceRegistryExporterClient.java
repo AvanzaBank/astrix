@@ -17,7 +17,7 @@ package com.avanza.astrix.beans.registry;
 
 import java.util.Objects;
 
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -50,10 +50,10 @@ public class ServiceRegistryExporterClient {
 		this.applicationInstanceId = Objects.requireNonNull(applicationInstanceId);
 	}
 
-	public <T> void register(Class<T> type, ServiceProperties properties, long lease) {
-		properties.setProperty(ServiceProperties.SUBSYSTEM, this.subsystem);
-		properties.setProperty(ServiceProperties.APPLICATION_INSTANCE_ID, this.applicationInstanceId);
-		properties.setProperty(ServiceProperties.SERVICE_ZONE, zone);
+	public <T> void register(Class<T> type, ServiceProviderInstanceProperties properties, long lease) {
+		properties.setProperty(ServiceProviderInstanceProperties.SUBSYSTEM, this.subsystem);
+		properties.setProperty(ServiceProviderInstanceProperties.APPLICATION_INSTANCE_ID, this.applicationInstanceId);
+		properties.setProperty(ServiceProviderInstanceProperties.SERVICE_ZONE, zone);
 		AstrixServiceRegistryEntry entry = new AstrixServiceRegistryEntry();
 		entry.setServiceProperties(properties.getProperties());
 		entry.setServiceBeanType(type.getName());

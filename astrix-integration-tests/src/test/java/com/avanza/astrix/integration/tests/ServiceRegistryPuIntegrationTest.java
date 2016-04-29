@@ -29,7 +29,7 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryClient;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixConfigurer;
@@ -77,30 +77,30 @@ public class ServiceRegistryPuIntegrationTest {
 		ServiceRegistryExporterClient exporterClient1 =  new ServiceRegistryExporterClient(serviceRegistry, "default", "app-instance-1");
 		ServiceRegistryExporterClient exporterClient2 =  new ServiceRegistryExporterClient(serviceRegistry, "default", "app-instance-2");
 		
-		ServiceProperties server1Props = new ServiceProperties();
+		ServiceProviderInstanceProperties server1Props = new ServiceProviderInstanceProperties();
 		server1Props.getProperties().put("myProp", "1");
-		ServiceProperties server2 = new ServiceProperties();
+		ServiceProviderInstanceProperties server2 = new ServiceProviderInstanceProperties();
 		server2.getProperties().put("myProp", "1");
 		exporterClient1.register(SomeService.class, server1Props, 10000);
 		exporterClient2.register(SomeService.class, server2, 10000);
-		exporterClient2.register(AnotherService.class, new ServiceProperties(), 10000);
+		exporterClient2.register(AnotherService.class, new ServiceProviderInstanceProperties(), 10000);
 		
-		List<ServiceProperties> providers = serviceRegistryClient.list(AstrixBeanKey.create(SomeService.class));
+		List<ServiceProviderInstanceProperties> providers = serviceRegistryClient.list(AstrixBeanKey.create(SomeService.class));
 		assertEquals(2, providers.size());
 		
-		server1Props = new ServiceProperties();
+		server1Props = new ServiceProviderInstanceProperties();
 		server1Props.getProperties().put("myProp", "3");
 		exporterClient1.register(SomeService.class, server1Props, 10000);
 		
 		providers = serviceRegistryClient.list(AstrixBeanKey.create(SomeService.class));
 		assertEquals(2, providers.size());
-		ServiceProperties serviceProperties = getPropertiesForAppInstance("app-instance-1", providers);
+		ServiceProviderInstanceProperties serviceProperties = getPropertiesForAppInstance("app-instance-1", providers);
 		assertEquals("3", serviceProperties.getProperty("myProp"));
 	}
 	
-	private ServiceProperties getPropertiesForAppInstance(String appInstanceId, List<ServiceProperties> providers) {
-		for (ServiceProperties properties : providers) {
-			if (appInstanceId.equals(properties.getProperties().get(ServiceProperties.APPLICATION_INSTANCE_ID))) {
+	private ServiceProviderInstanceProperties getPropertiesForAppInstance(String appInstanceId, List<ServiceProviderInstanceProperties> providers) {
+		for (ServiceProviderInstanceProperties properties : providers) {
+			if (appInstanceId.equals(properties.getProperties().get(ServiceProviderInstanceProperties.APPLICATION_INSTANCE_ID))) {
 				return properties;
 			}
 		}

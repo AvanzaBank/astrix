@@ -30,7 +30,7 @@ import com.avanza.astrix.beans.core.BeanProxyNames;
 import com.avanza.astrix.beans.service.BoundServiceBeanInstance;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
-import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.service.ServiceProviderInstanceProperties;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
@@ -72,7 +72,7 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	@Override
 	public <T> BoundServiceBeanInstance<T> bind(
 			ServiceDefinition<T> serviceDefinition,
-			ServiceProperties serviceProperties) {
+			ServiceProviderInstanceProperties serviceProperties) {
 		Class<T> type = serviceDefinition.getServiceType();
 		if (!GigaSpace.class.isAssignableFrom(type)) {
 			throw new UnsupportedTargetTypeException(getName(), type);
@@ -96,7 +96,7 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		
 		String spaceName = serviceProperties.getProperty(GsBinder.SPACE_NAME_PROPERTY);
 		String commandKey = spaceName + "_" + GigaSpace.class.getSimpleName();
-		String qualifier = serviceProperties.getProperty(ServiceProperties.QUALIFIER);
+		String qualifier = serviceProperties.getProperty(ServiceProviderInstanceProperties.QUALIFIER);
 		if (qualifier != null) {
 			commandKey = commandKey + "-" + qualifier;
 		}
@@ -121,17 +121,17 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	}
 	
 	@Override
-	public ServiceProperties parseServiceProviderUri(String serviceProviderUri) {
+	public ServiceProviderInstanceProperties parseServiceProviderUri(String serviceProviderUri) {
 		return gsBinder.createServiceProperties(serviceProviderUri);
 	}
 
 	@Override
-	public <T> ServiceProperties createServiceProperties(ServiceDefinition<T> definition) {
+	public <T> ServiceProviderInstanceProperties createServiceProperties(ServiceDefinition<T> definition) {
 		if (!definition.getServiceType().equals(GigaSpace.class)) {
 			throw new UnsupportedTargetTypeException(getName(), definition.getServiceType());
 		}
 		GigaSpace space = gsBinder.getEmbeddedSpace(astrixSpringContext.getApplicationContext());
-		ServiceProperties properties = gsBinder.createProperties(space);
+		ServiceProviderInstanceProperties properties = gsBinder.createProperties(space);
 		return properties;
 	}
 
