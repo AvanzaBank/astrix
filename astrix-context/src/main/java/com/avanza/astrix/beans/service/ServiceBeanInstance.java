@@ -76,7 +76,6 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	 */
 	private final Lock beanStateLock = new ReentrantLock();
 	
-	private volatile ServiceProviderInstanceProperties currentProperties;
 	private volatile BeanState currentState;
 
 	private final List<BeanProxy> beanProxies;
@@ -120,11 +119,14 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 				log.warn(String.format("Failed to renew lease, service discovery failure. bean=%s astrixBeanId=%s", getBeanKey(), id), serviceDiscoveryResult.getError());
 				return;
 			}
-			if (serviceHasChanged(serviceDiscoveryResult.getResult())) {
-				bind(serviceDiscoveryResult.getResult());
-			} else {
-				log.debug("Service properties have not changed. No need to bind bean=" + getBeanKey());
-			}
+			currentState.discoveredProviders = serviceDiscoveryResult.getResult();
+			currentState.renew();
+			
+//			if (serviceHasChanged(serviceDiscoveryResult.getResult())) {
+//				bind(serviceDiscoveryResult.getResult());
+//			} else {
+//				log.debug("Service properties have not changed. No need to bind bean=" + getBeanKey());
+//			}
 		} catch (Exception e) {
 			log.warn(String.format("Failed to renew lease for service bean. bean=%s astrixBeanId=%s", getBeanKey(), id), e);
 		} finally {
@@ -132,12 +134,12 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		}
 	}
 	
-	private boolean serviceHasChanged(ServiceProviders serviceProviders) {
-		return !serviceProviders.getInstanceProperties().stream()
-				.filter(isEqual(currentProperties))
-				.findAny()
-				.isPresent();
-	}
+//	private boolean serviceHasChanged(ServiceProviders serviceProviders) {
+//		return !serviceProviders.getInstanceProperties().stream()
+//				.filter(isEqual(currentProperties))
+//				.findAny()
+//				.isPresent();
+//	}
 	
 	public void bind() {
 		beanStateLock.lock();
@@ -150,7 +152,6 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 				log.warn(String.format("Service discovery failure. bean=%s astrixBeanId=%s", getBeanKey(), id), serviceDiscoveryResult.getError());
 				currentState.setState(new Unbound(ServiceDiscoveryError.class, "An error occured during last service discovery attempt, see cause for details.", serviceDiscoveryResult.getError()));
 				return;
-				
 			}
 			if (serviceDiscoveryResult.getResult().isEmpty()) {
 				log.info(String.format(
@@ -159,7 +160,10 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 				currentState.setState(new Unbound(NoServiceProviderFound.class, "Did not discover a service provider for " + getBeanKey().getBeanType().getSimpleName() + " on last service discovery attempt. discoveryStrategy=" + serviceDiscovery.description()));
 				return;
 			}
-			bind(serviceDiscoveryResult.getResult());
+			currentState.discoveredProviders = serviceDiscoveryResult.getResult();
+			currentState.renew();
+
+//			this.currentState.bindTo(serviceDiscoveryResult.getResult().getRandom());
 		} catch (Exception e) {
 			log.warn(String.format("Failed to bind service bean. bean=%s astrixBeanId=%s", getBeanKey(), id), e);
 		} finally {
@@ -206,17 +210,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		
 	}
 	
-	
-	/**
-	 * Attempts to bind this bean with the latest serviceProperties, or null if serviceLookup
-	 * returned null indicating that service is not available.
-	 * 
-	 * Throws exception if bind attempt fails.
-	 */
-	private void bind(ServiceProviders serviceProperties) {
-		this.currentState.bindTo(serviceProperties.getRandom());
-	}
-	
+
 	void destroy() {
 		log.info("Destroying service bean. bean={} astrixBeanId={}", getBeanKey(), id);
 		beanStateLock.lock();
@@ -295,7 +289,10 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	
 	private abstract class BeanState implements InvocationHandler {
 
-		protected void bindTo(ServiceProviderInstanceProperties serviceProperties) {
+		private volatile ServiceProviders discoveredProviders;
+		private volatile ServiceProviderInstanceProperties currentProperties;
+
+		private void bindTo(ServiceProviderInstanceProperties serviceProperties) {
 			if (serviceProperties == null) {
 				setState(new Unbound(NoServiceProviderFound.class, "No service provider found"));
 				return;
@@ -321,6 +318,21 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 				log.warn(String.format("Failed to bind service bean: %s", getBeanKey()), e);
 				setState(new Unbound(ServiceBindError.class, "Failed to bind " + getBeanKey().getBeanType().getSimpleName() + " using serviceProperties=" + serviceProperties +  ", see cause for details.", e));
 			}
+		}
+
+		public void renew() {
+			if (serviceHasChanged(discoveredProviders)) {
+				bindTo(discoveredProviders.getRandom());
+			} else {
+				log.debug("Service properties have not changed. No need to bind bean=" + getBeanKey());
+			}
+		}
+		
+		private boolean serviceHasChanged(ServiceProviders serviceProviders) {
+			return currentProperties == null || !serviceProviders.getInstanceProperties().stream()
+					.filter(isEqual(currentProperties))
+					.findAny()
+					.isPresent();
 		}
 
 		private List<BeanProxy> getBeanProxies(ServiceComponent serviceComponent) {
@@ -376,6 +388,10 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		@Override
 		public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
 			return serviceBeanInvocationDispatcher.invoke(proxy, method, args);
+//			try {
+//			} catch(AstrixCommunicationException e) {
+//				
+//			}
 		}
 
 		@Override
@@ -477,7 +493,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 	}
 	
 	ServiceProviderInstanceProperties getCurrentProperties() {
-		return currentProperties;
+		return currentState.currentProperties;
 	}
 
 }
