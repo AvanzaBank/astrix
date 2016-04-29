@@ -310,8 +310,8 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 					throw new UnsupportedTargetTypeException(serviceComponent.getName(), beanKey.getBeanType());
 				}
 				BoundServiceBeanInstance<T> boundInstance = serviceComponent.bind(serviceDefinition, serviceProperties);
-				BeanInvocationDispatcher beanInvocationDispatcher = new BeanInvocationDispatcher(getBeanProxies(serviceComponent)
-																								,reactiveTypeConverter, 
+				BeanInvocationDispatcher beanInvocationDispatcher = new BeanInvocationDispatcher(getBeanProxies(serviceComponent),
+																								reactiveTypeConverter, 
 																								boundInstance.get());
 				setState(new Bound(boundInstance, beanInvocationDispatcher));
 				currentProperties = serviceProperties;
