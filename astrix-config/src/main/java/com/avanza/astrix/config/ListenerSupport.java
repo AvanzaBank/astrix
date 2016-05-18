@@ -26,7 +26,12 @@ import java.util.function.Consumer;
  *
  * @param <T>
  */
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 final class ListenerSupport<T> {
+	
+	private static final Logger log = LoggerFactory.getLogger(ListenerSupport.class);
 	
 	private final List<SubscribedListener> listeners = new CopyOnWriteArrayList<>();
 	
@@ -37,7 +42,11 @@ final class ListenerSupport<T> {
 	
 	void dispatchEvent(Consumer<T> eventNotification) {
 		for (SubscribedListener subscribedListener : listeners) {
-			eventNotification.accept(subscribedListener.listener);
+			try {
+				eventNotification.accept(subscribedListener.listener);
+			} catch (Exception e) {
+				log.warn("Error when notifying listener {}", subscribedListener, e);
+			}
 		}
 	}
 	
