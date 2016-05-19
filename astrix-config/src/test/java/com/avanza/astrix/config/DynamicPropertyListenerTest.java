@@ -121,6 +121,24 @@ public class DynamicPropertyListenerTest {
 		prop.set("3");
 		propertySpy.receivesNoChange();
 	}
+
+	@Test
+	public void propertyListenerErrorDoesNotPropagate() throws Exception {
+		DynamicIntProperty prop = new DynamicIntProperty(1);
+		prop.addListener(new ThrowingListener<>());
+		prop.set(2);
+	}
+
+	@Test
+	public void propertyListenerNotifiedWhenFirstListenerFails() throws Exception {
+		PropertySpy<Integer> propertySpy = new PropertySpy<>();
+		DynamicIntProperty prop = new DynamicIntProperty(1);
+		prop.addListener(new ThrowingListener<>());
+		prop.addListener(propertySpy);
+
+		prop.set(2);
+		propertySpy.receivesProperyChangeWithValue(2);
+	}
 	
 	private static class PropertySpy<T> implements DynamicPropertyListener<T> {
 		final Queue<T> notifiedChanges = new LinkedBlockingQueue<>();
@@ -141,5 +159,12 @@ public class DynamicPropertyListenerTest {
 		
 	}
 	
+	private static class ThrowingListener<T> implements DynamicPropertyListener<T> {
+
+		@Override
+		public void propertyChanged(T newValue) {
+			throw new RuntimeException();
+		}
+	}
 
 }
