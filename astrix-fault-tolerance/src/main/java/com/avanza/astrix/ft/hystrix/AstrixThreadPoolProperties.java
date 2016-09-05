@@ -26,41 +26,50 @@ import com.netflix.hystrix.strategy.properties.HystrixProperty;
 class AstrixThreadPoolProperties extends HystrixThreadPoolProperties {
 	
 	static final IntBeanSetting MAX_QUEUE_SIZE = new IntBeanSetting("faultTolerance.queueSize", 1_000_000);
-	private final BeanConfiguration beanConfiguration;
+	private final HystrixProperty<Integer> queueSizeRejectionThreshold;
+	private final HystrixProperty<Integer> coreSize;
+	private final HystrixProperty<Integer> keepAliveTimeMinutes;
+	private final HystrixProperty<Integer> maxQueueSize;
+	private final HystrixProperty<Integer> metricsRollingStatisticalWindowBuckets;
+	private final HystrixProperty<Integer> metricsRollingStatisticalWindowInMilliseconds;
 
 	AstrixThreadPoolProperties(BeanConfiguration beanConfiguration, HystrixThreadPoolKey key, HystrixThreadPoolProperties.Setter builder) {
 		super(key, builder);
-		this.beanConfiguration = beanConfiguration;
+		this.queueSizeRejectionThreshold = new DynamicPropertyAdapter<>(beanConfiguration.get(AstrixBeanSettings.QUEUE_SIZE_REJECTION_THRESHOLD));
+		this.coreSize = new DynamicPropertyAdapter<>(beanConfiguration.get(AstrixBeanSettings.CORE_SIZE));
+		this.keepAliveTimeMinutes = new DynamicPropertyAdapter<>(new DynamicIntProperty(1));
+		this.maxQueueSize = new DynamicPropertyAdapter<>(beanConfiguration.get(MAX_QUEUE_SIZE));
+		this.metricsRollingStatisticalWindowBuckets = new DynamicPropertyAdapter<>(new DynamicIntProperty(10));
+		this.metricsRollingStatisticalWindowInMilliseconds = new DynamicPropertyAdapter<>(new DynamicIntProperty(10_000));
 	}
 	
 	@Override
 	public HystrixProperty<Integer> queueSizeRejectionThreshold() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(AstrixBeanSettings.QUEUE_SIZE_REJECTION_THRESHOLD));
+		return queueSizeRejectionThreshold;
 	}
 	
 	@Override
 	public HystrixProperty<Integer> coreSize() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(AstrixBeanSettings.CORE_SIZE));
+		return coreSize;
 	}
 	
 	@Override
 	public HystrixProperty<Integer> keepAliveTimeMinutes() {
-		return new DynamicPropertyAdapter<>(new DynamicIntProperty(1)); 
+		return keepAliveTimeMinutes; 
 	}
 	
 	@Override
 	public HystrixProperty<Integer> maxQueueSize() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(MAX_QUEUE_SIZE));
+		return maxQueueSize;
 	}
 	
 	@Override
 	public HystrixProperty<Integer> metricsRollingStatisticalWindowBuckets() {
-		return new DynamicPropertyAdapter<>(new DynamicIntProperty(10));
+		return metricsRollingStatisticalWindowBuckets;
 	}
 	
 	@Override
 	public HystrixProperty<Integer> metricsRollingStatisticalWindowInMilliseconds() {
-		return new DynamicPropertyAdapter<>(new DynamicIntProperty(10_000)); 
+		return metricsRollingStatisticalWindowInMilliseconds; 
 	}
-	
 }
