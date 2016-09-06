@@ -52,6 +52,10 @@ final class AstrixCommandProperties extends HystrixCommandProperties {
 	AstrixCommandProperties(BeanConfiguration beanConfiguration, HystrixCommandKey key, com.netflix.hystrix.HystrixCommandProperties.Setter builder) {
 		super(key, builder);
 		this.isolationStrategy = builder.getExecutionIsolationStrategy();
+		
+		// We create all these property adaptors here as each and every one results in creation of several temporary String objects.
+		// The alternative to this, to create the adaptors at call-time in the various methods of this class, results in large amounts
+		// of temporary objects and thus heavy GC load in systems with many astrix calls.
 		this.executionTimeoutInMilliseconds = new DynamicPropertyAdapter<>(beanConfiguration.get(AstrixBeanSettings.TIMEOUT));
 		this.circuitBreakerEnabled = new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.circuitBreakerEnabled", true)));
 		this.circuitBreakerErrorThresholdPercentage = new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.circuitBreakerErrorThresholdPercentage", 50)));
