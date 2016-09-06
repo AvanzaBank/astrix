@@ -25,53 +25,94 @@ import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.hystrix.strategy.properties.HystrixProperty;
 
 final class AstrixCommandProperties extends HystrixCommandProperties {
-	private final BeanConfiguration beanConfiguration;
 	private final ExecutionIsolationStrategy isolationStrategy;
+	private final DynamicPropertyAdapter<Integer> executionTimeoutInMilliseconds;
+	private final HystrixProperty<Boolean> circuitBreakerEnabled;
+	private final HystrixProperty<Integer> circuitBreakerErrorThresholdPercentage;
+	private final HystrixProperty<Boolean> circuitBreakerForceClosed;
+	private final HystrixProperty<Boolean> circuitBreakerForceOpen;
+	private final HystrixProperty<Integer> circuitBreakerRequestVolumeThreshold;
+	private final HystrixProperty<Integer> circuitBreakerSleepWindowInMilliseconds;
+	private final HystrixProperty<Integer> executionIsolationSemaphoreMaxConcurrentRequests;
+	private final HystrixProperty<Boolean> executionIsolationThreadInterruptOnTimeout;
+	private final HystrixProperty<String> executionIsolationThreadPoolKeyOverride;
+	private final HystrixProperty<Boolean> executionTimeoutEnabled;
+	private final HystrixProperty<Boolean> fallbackEnabled;
+	private final HystrixProperty<Integer> metricsHealthSnapshotIntervalInMilliseconds;
+	private final HystrixProperty<Integer> metricsRollingPercentileBucketSize;
+	private final HystrixProperty<Boolean> metricsRollingPercentileEnabled;
+	private final HystrixProperty<Integer> metricsRollingPercentileWindowBuckets;
+	private final HystrixProperty<Integer> metricsRollingPercentileWindowInMilliseconds;
+	private final HystrixProperty<Integer> metricsRollingStatisticalWindowBuckets;
+	private final HystrixProperty<Integer> metricsRollingStatisticalWindowInMilliseconds;
+	private final HystrixProperty<Boolean> requestCacheEnabled;
+	private final HystrixProperty<Boolean> requestLogEnabled;
+	
 	
 	AstrixCommandProperties(BeanConfiguration beanConfiguration, HystrixCommandKey key, com.netflix.hystrix.HystrixCommandProperties.Setter builder) {
 		super(key, builder);
-		this.beanConfiguration = beanConfiguration;
 		this.isolationStrategy = builder.getExecutionIsolationStrategy();
+		this.executionTimeoutInMilliseconds = new DynamicPropertyAdapter<>(beanConfiguration.get(AstrixBeanSettings.TIMEOUT));
+		this.circuitBreakerEnabled = new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.circuitBreakerEnabled", true)));
+		this.circuitBreakerErrorThresholdPercentage = new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.circuitBreakerErrorThresholdPercentage", 50)));
+		this.circuitBreakerForceClosed = new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.circuitBreakerForceClosed", false)));
+		this.circuitBreakerForceOpen = new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.circuitBreakerForceOpen", false)));
+		this.circuitBreakerRequestVolumeThreshold = new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.circuitBreakerRequestVolumeThreshold", 20)));
+		this.circuitBreakerSleepWindowInMilliseconds = new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.circuitBreakerSleepWindowInMilliseconds", 5000)));
+		this.executionIsolationSemaphoreMaxConcurrentRequests = new DynamicPropertyAdapter<>(beanConfiguration.get(AstrixBeanSettings.MAX_CONCURRENT_REQUESTS));
+		this.executionIsolationThreadInterruptOnTimeout = new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.executionIsolationThreadInterruptOnTimeout", true)));
+		this.executionIsolationThreadPoolKeyOverride =  new DynamicPropertyAdapter<>(beanConfiguration.get(new StringBeanSetting("faultTolerance.executionIsolationThreadPoolKeyOverride", null)));
+		this.executionTimeoutEnabled = new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.executionTimeoutEnabled", true)));
+		this.fallbackEnabled = new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.fallbackEnabled", true)));
+		this.metricsHealthSnapshotIntervalInMilliseconds = new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.metricsHealthSnapshotIntervalInMilliseconds", 500)));
+		this.metricsRollingPercentileBucketSize = new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.metricsRollingPercentileBucketSize", 100)));
+		this.metricsRollingPercentileEnabled = new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.metricsRollingPercentileEnabled", true)));
+		this.metricsRollingPercentileWindowBuckets = new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.metricsRollingPercentileWindowBuckets", 6)));
+		this.metricsRollingPercentileWindowInMilliseconds = new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.metricsRollingPercentileWindowInMilliseconds", 60_000)));
+		this.metricsRollingStatisticalWindowBuckets = new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.metricsRollingStatisticalWindowBuckets", 10)));
+		this.metricsRollingStatisticalWindowInMilliseconds = new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.metricsRollingStatisticalWindowInMilliseconds", 10_000)));
+		this.requestCacheEnabled = new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.requestCacheEnabled", false)));
+		this.requestLogEnabled = new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.requestLogEnabled", false)));
 	}
 	
 	@Override
 	public HystrixProperty<Integer> executionTimeoutInMilliseconds() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(AstrixBeanSettings.TIMEOUT));
+		return executionTimeoutInMilliseconds;
 	}
 	
 	@Override
 	public HystrixProperty<Boolean> circuitBreakerEnabled() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.circuitBreakerEnabled", true)));
+		return circuitBreakerEnabled;
 	}
 	
 	@Override
 	public HystrixProperty<Integer> circuitBreakerErrorThresholdPercentage() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.circuitBreakerErrorThresholdPercentage", 50)));
+		return circuitBreakerErrorThresholdPercentage;
 	}
 	
 	@Override
 	public HystrixProperty<Boolean> circuitBreakerForceClosed() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.circuitBreakerForceClosed", false)));
+		return circuitBreakerForceClosed;
 	}
 	
 	@Override
 	public HystrixProperty<Boolean> circuitBreakerForceOpen() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.circuitBreakerForceOpen", false)));
+		return circuitBreakerForceOpen;
 	}
 
 	@Override
 	public HystrixProperty<Integer> circuitBreakerRequestVolumeThreshold() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.circuitBreakerRequestVolumeThreshold", 20)));
+		return circuitBreakerRequestVolumeThreshold;
 	}
 	
 	@Override
 	public HystrixProperty<Integer> circuitBreakerSleepWindowInMilliseconds() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.circuitBreakerSleepWindowInMilliseconds", 5000)));
+		return circuitBreakerSleepWindowInMilliseconds;
 	}
 	
 	@Override
 	public HystrixProperty<Integer> executionIsolationSemaphoreMaxConcurrentRequests() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(AstrixBeanSettings.MAX_CONCURRENT_REQUESTS));
+		return executionIsolationSemaphoreMaxConcurrentRequests;
 	}
 	
 	@Override
@@ -85,12 +126,12 @@ final class AstrixCommandProperties extends HystrixCommandProperties {
 	
 	@Override
 	public HystrixProperty<Boolean> executionIsolationThreadInterruptOnTimeout() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.executionIsolationThreadInterruptOnTimeout", true)));
+		return executionIsolationThreadInterruptOnTimeout;
 	}
 	
 	@Override
 	public HystrixProperty<String> executionIsolationThreadPoolKeyOverride() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new StringBeanSetting("faultTolerance.executionIsolationThreadPoolKeyOverride", null)));
+		return executionIsolationThreadPoolKeyOverride;
 	}
 	
 	@Override
@@ -101,12 +142,12 @@ final class AstrixCommandProperties extends HystrixCommandProperties {
 	
 	@Override
 	public HystrixProperty<Boolean> executionTimeoutEnabled() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.executionTimeoutEnabled", true)));
+		return executionTimeoutEnabled;
 	}
 	
 	@Override
 	public HystrixProperty<Boolean> fallbackEnabled() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.fallbackEnabled", true)));
+		return fallbackEnabled;
 	}
 	@Override
 	public HystrixProperty<Integer> fallbackIsolationSemaphoreMaxConcurrentRequests() {
@@ -121,17 +162,17 @@ final class AstrixCommandProperties extends HystrixCommandProperties {
 	
 	@Override
 	public HystrixProperty<Integer> metricsHealthSnapshotIntervalInMilliseconds() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.metricsHealthSnapshotIntervalInMilliseconds", 500)));
+		return metricsHealthSnapshotIntervalInMilliseconds;
 	}
 	
 	@Override
 	public HystrixProperty<Integer> metricsRollingPercentileBucketSize() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.metricsRollingPercentileBucketSize", 100)));
+		return metricsRollingPercentileBucketSize;
 	}
 	
 	@Override
 	public HystrixProperty<Boolean> metricsRollingPercentileEnabled() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.metricsRollingPercentileEnabled", true)));
+		return metricsRollingPercentileEnabled;
 	}
 	
 	@Deprecated
@@ -142,33 +183,31 @@ final class AstrixCommandProperties extends HystrixCommandProperties {
 	
 	@Override
 	public HystrixProperty<Integer> metricsRollingPercentileWindowBuckets() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.metricsRollingPercentileWindowBuckets", 6)));
+		return metricsRollingPercentileWindowBuckets;
 	}
 	
 	@Override
 	public HystrixProperty<Integer> metricsRollingPercentileWindowInMilliseconds() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.metricsRollingPercentileWindowInMilliseconds", 60_000)));
+		return metricsRollingPercentileWindowInMilliseconds;
 	}
 	
 	@Override
 	public HystrixProperty<Integer> metricsRollingStatisticalWindowBuckets() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.metricsRollingStatisticalWindowBuckets", 10)));
+		return metricsRollingStatisticalWindowBuckets;
 	}
 	
 	@Override
 	public HystrixProperty<Integer> metricsRollingStatisticalWindowInMilliseconds() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new IntBeanSetting("faultTolerance.metricsRollingStatisticalWindowInMilliseconds", 10_000)));
+		return metricsRollingStatisticalWindowInMilliseconds;
 	}
 	
 	@Override
 	public HystrixProperty<Boolean> requestCacheEnabled() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.requestCacheEnabled", false)));
+		return requestCacheEnabled;
 	}
 	
 	@Override
 	public HystrixProperty<Boolean> requestLogEnabled() {
-		return new DynamicPropertyAdapter<>(beanConfiguration.get(new BooleanBeanSetting("faultTolerance.requestLogEnabled", false)));
+		return requestLogEnabled;
 	}
-	
-	
 }
