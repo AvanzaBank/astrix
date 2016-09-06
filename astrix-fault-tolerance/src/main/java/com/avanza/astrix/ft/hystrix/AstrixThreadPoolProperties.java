@@ -35,6 +35,10 @@ class AstrixThreadPoolProperties extends HystrixThreadPoolProperties {
 
 	AstrixThreadPoolProperties(BeanConfiguration beanConfiguration, HystrixThreadPoolKey key, HystrixThreadPoolProperties.Setter builder) {
 		super(key, builder);
+		
+		// We create all these property adaptors here as each and every one results in creation of several temporary String objects.
+		// The alternative to this, to create the adaptors at call-time in the various methods of this class, results in large amounts
+		// of temporary objects and thus heavy GC load in systems with many astrix calls.
 		this.queueSizeRejectionThreshold = new DynamicPropertyAdapter<>(beanConfiguration.get(AstrixBeanSettings.QUEUE_SIZE_REJECTION_THRESHOLD));
 		this.coreSize = new DynamicPropertyAdapter<>(beanConfiguration.get(AstrixBeanSettings.CORE_SIZE));
 		this.keepAliveTimeMinutes = new DynamicPropertyAdapter<>(new DynamicIntProperty(1));
