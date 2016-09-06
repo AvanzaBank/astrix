@@ -1,3 +1,7 @@
+## Version 0.41.4
+#### Changed
+* [#44](https://github.com/AvanzaBank/astrix/issues/44) Reduced string allocations for improved performance
+
 ## Version 0.41.0
 #### Added
 * [#31](https://github.com/AvanzaBank/astrix/issues/31) Relevant Hystrix metrics are exported as mbeans.
