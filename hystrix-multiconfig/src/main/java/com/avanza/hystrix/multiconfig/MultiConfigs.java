@@ -15,11 +15,14 @@
  */
 package com.avanza.hystrix.multiconfig;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.netflix.hystrix.strategy.HystrixPlugins;
 import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
 
 public class MultiConfigs {
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(MultiConfigs.class);
 	private static MultiPropertiesDispatcher multiPropertiesDispatcher = new MultiPropertiesDispatcher();
 	
 	static {
@@ -28,10 +31,21 @@ public class MultiConfigs {
 	
 	public static void register(String id, HystrixPropertiesStrategy strategy) {
 		multiPropertiesDispatcher.register(id, strategy);
+		verifyRegistered();
+	}
+	
+	private static void verifyRegistered() {
+		synchronized (multiPropertiesDispatcher) {
+			if (!HystrixPlugins.getInstance().getPropertiesStrategy().getClass().equals(MultiPropertiesDispatcher.class)) {
+				LOGGER.warn(MultiPropertiesDispatcher.class.getName() + " not yet registered with Hystrix, registering...");
+				registerWithHystrix();
+			}
+		}
 	}
 	
 	private static void registerWithHystrix() {
 		HystrixPlugins.getInstance().registerPropertiesStrategy(multiPropertiesDispatcher);
+		LOGGER.info(MultiPropertiesDispatcher.class.getName() + " registered with Hystrix!");
 	}
 	
 }

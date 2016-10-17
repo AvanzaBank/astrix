@@ -15,6 +15,7 @@
  */
 package com.avanza.hystrix.multiconfig;
 
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,12 +25,12 @@ import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixThreadPoolKey;
 
 public class MultiConfigId {
-	private static Pattern pattern = Pattern.compile("^(\\[(\\d+)\\])(.*)");
+	private static Pattern pattern = Pattern.compile("\\[([a-zA-Z0-9-_]+)\\](.+)");
 	
 	private String propertySourceId;
 
 	private MultiConfigId(String propertySourceId) {
-		this.propertySourceId = propertySourceId;
+		this.propertySourceId = Objects.requireNonNull(propertySourceId);
 	}
 
 	// Factory methods
@@ -93,32 +94,27 @@ public class MultiConfigId {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((propertySourceId == null) ? 0 : propertySourceId.hashCode());
-		return result;
+		return Objects.hash(propertySourceId);
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		MultiConfigId other = (MultiConfigId) obj;
-		if (propertySourceId == null) {
-			if (other.propertySourceId != null)
-				return false;
-		} else if (!propertySourceId.equals(other.propertySourceId))
-			return false;
-		return true;
+		return this.propertySourceId.equals(other.propertySourceId);
 	}
 
 	@Override
 	public String toString() {
-		return "MultiPropertiesId [propertySourceId=" + propertySourceId + "]";
+		return propertySourceId;
 	}
 	
 }
