@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.netflix.hystrix.HystrixCollapserKey;
+import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixThreadPoolKey;
 
@@ -76,8 +77,28 @@ public class MultiConfigId {
 	
 	// public
 	
+	public HystrixCommandKey encode(HystrixCommandKey hystrixCommandKey) {
+		return createCommandKey(hystrixCommandKey.name());
+	}
+	
+	public HystrixCommandGroupKey encode(HystrixCommandGroupKey hystrixCommandGroupKey) {
+		return createCommandGroupKey(hystrixCommandGroupKey.name());
+	}
+	
+	public HystrixCollapserKey encode(HystrixCollapserKey hystrixCollapserKey) {
+		return createCollapserKey(hystrixCollapserKey.name());
+	}
+	
+	public HystrixThreadPoolKey encode(HystrixThreadPoolKey hystrixThreadPoolKey) {
+		return createThreadPoolKey(hystrixThreadPoolKey.name());
+	}
+	
 	public HystrixCommandKey createCommandKey(String commandKeyName) {
 		return HystrixCommandKey.Factory.asKey(getPrefix() + commandKeyName);
+	}
+	
+	public HystrixCommandGroupKey createCommandGroupKey(String commandKeyName) {
+		return HystrixCommandGroupKey.Factory.asKey(getPrefix() + commandKeyName);
 	}
 	
 	public HystrixCollapserKey createCollapserKey(String commandGroupName) {

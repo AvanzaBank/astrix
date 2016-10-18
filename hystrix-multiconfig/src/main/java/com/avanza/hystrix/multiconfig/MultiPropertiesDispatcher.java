@@ -15,8 +15,8 @@
  */
 package com.avanza.hystrix.multiconfig;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.netflix.hystrix.HystrixCollapserKey;
 import com.netflix.hystrix.HystrixCollapserProperties;
@@ -28,11 +28,11 @@ import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
 
 public class MultiPropertiesDispatcher extends HystrixPropertiesStrategy {
 
-	private Map<MultiConfigId, HystrixPropertiesStrategy> strategies = new HashMap<>();
+	private Map<MultiConfigId, HystrixPropertiesStrategy> strategies = new ConcurrentHashMap<>();
 	
 	@Override
 	public HystrixCommandProperties getCommandProperties(HystrixCommandKey qualifiedCommandKey, com.netflix.hystrix.HystrixCommandProperties.Setter builder) {
-		// TODO: Possibly match all qualifiedCommandKey -> commandKey mappings here?
+		// TODO: Possibly cache all qualifiedCommandKey -> commandKey mappings here?
 		return strategies.get(MultiConfigId.readFrom(qualifiedCommandKey))
 				.getCommandProperties(MultiConfigId.decode(qualifiedCommandKey), builder);
 	}

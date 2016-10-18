@@ -40,7 +40,7 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.AstrixTestUtil;
-import com.netflix.hystrix.HystrixCommandGroupKey;
+import com.avanza.hystrix.multiconfig.MultiConfigId;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
 import com.netflix.hystrix.HystrixObservableCommand.Setter;
@@ -55,9 +55,10 @@ public class HystrixObservableCommandFacadeTest {
 	
 	private final String groupKey = UUID.randomUUID().toString();
 	private final String commandKey = UUID.randomUUID().toString();
+	private final MultiConfigId multiConfigId = MultiConfigId.create("astrix");
 	
-	private final Setter commandSettings = Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(groupKey))
-			  .andCommandKey(HystrixCommandKey.Factory.asKey(commandKey))
+	private final Setter commandSettings = Setter.withGroupKey(multiConfigId.createCommandGroupKey(groupKey))
+			  .andCommandKey(multiConfigId.createCommandKey(commandKey))
 			  .andCommandPropertiesDefaults(com.netflix.hystrix.HystrixCommandProperties.Setter()
 					  .withExecutionTimeoutInMilliseconds(25)
 					  .withExecutionIsolationSemaphoreMaxConcurrentRequests(1));

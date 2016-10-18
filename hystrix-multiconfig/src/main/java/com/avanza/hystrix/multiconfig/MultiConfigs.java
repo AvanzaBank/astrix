@@ -22,6 +22,10 @@ import com.netflix.hystrix.strategy.HystrixPlugins;
 import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
 
 public class MultiConfigs {
+	//TODO: Default strategy?
+	//TODO: Error handling
+	//TODO: Remaining strategies
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(MultiConfigs.class);
 	private static MultiPropertiesDispatcher multiPropertiesDispatcher = new MultiPropertiesDispatcher();
 	
@@ -45,6 +49,8 @@ public class MultiConfigs {
 	
 	private static void registerWithHystrix() {
 		HystrixPlugins.getInstance().registerPropertiesStrategy(multiPropertiesDispatcher);
+//		HystrixPlugins.getInstance().registerConcurrencyStrategy(impl);
+//		HystrixPlugins.getInstance().registerEventNotifier(impl);
 		LOGGER.info(MultiPropertiesDispatcher.class.getName() + " registered with Hystrix!");
 	}
 	
