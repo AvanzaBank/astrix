@@ -26,6 +26,7 @@ import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixThreadPoolKey;
 
 public class MultiConfigId {
+	// TODO: Cache mappings!
 	private static Pattern pattern = Pattern.compile("\\[([a-zA-Z0-9-_]+)\\](.+)");
 	
 	private String propertySourceId;

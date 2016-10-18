@@ -23,9 +23,9 @@ import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixThreadPoolKey;
 import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
 
-public class MultiPropertiesDispatcherTest {
+public class MultiPropertiesStrategyDispatcherTest {
 
-	private final MultiPropertiesDispatcher dispatcher = new MultiPropertiesDispatcher();
+	private final MultiPropertiesStrategyDispatcher dispatcher = new MultiPropertiesStrategyDispatcher();
 	
 	private final com.netflix.hystrix.HystrixCommandProperties.Setter defaultCommandSetter = com.netflix.hystrix.HystrixCommandProperties.defaultSetter();
 	private final com.netflix.hystrix.HystrixThreadPoolProperties.Setter defaultThreadPoolSetter = com.netflix.hystrix.HystrixThreadPoolProperties.defaultSetter();

@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import com.avanza.hystrix.multiconfig.MultiConfigs;
 import com.netflix.hystrix.Hystrix;
-import com.netflix.hystrix.strategy.HystrixPlugins;
 
 final class HystrixStrategyDispatcher {
 	
@@ -45,12 +44,12 @@ final class HystrixStrategyDispatcher {
 	private static void verifyInitialized() {
 		// Hystrix already initialized, verify that Astrix-plugins are used
 		synchronized (log) {
-			if (!HystrixPlugins.getInstance().getConcurrencyStrategy().getClass().equals(ConcurrencyStrategyDispatcher.class)) {
-				log.warn("Hystrix is not properly initialized. This means that the current Hystrix configuration was reset outside of Astrix. "
-						+ "Astrix will reset Hystrix configuration and register custom Astrix stratgeis");
-				HystrixPlugins.reset();
+			if (!MultiConfigs.containsAllMappings("astrix")) {
+				log.warn("Hystrix MultiConfig is not properly initialized. This means that the current Hystrix MultiConfig configuration was reset outside of Astrix. "
+						+ "Astrix will reset Hystrix MultiConfig configuration and register custom Astrix stratgeis");
 				registerDispatcherStrategies();
 			}
+			MultiConfigs.verifyRegistered();
 		}
 	}
 	
@@ -66,11 +65,10 @@ final class HystrixStrategyDispatcher {
 	
 	private static void registerDispatcherStrategies() {
 		MultiConfigs.register("astrix", new PropertiesStrategyDispatcher(strategyMapping));
+		MultiConfigs.register("astrix", new ConcurrencyStrategyDispatcher(strategyMapping));
+		MultiConfigs.register("astrix", new EventNotifierDispatcher(strategyMapping));
 		
-//		HystrixPlugins.getInstance().registerPropertiesStrategy(new PropertiesStrategyDispatcher(strategyMapping));
-		HystrixPlugins.getInstance().registerConcurrencyStrategy(new ConcurrencyStrategyDispatcher(strategyMapping));
-		HystrixPlugins.getInstance().registerEventNotifier(new EventNotifierDispatcher(strategyMapping));
-		log.info("Successfully initialized Hystrix with custom Astrix strategies");
+		log.info("Successfully initialized Hystrix MultiConfig with custom Astrix strategies");
 	}
 
 

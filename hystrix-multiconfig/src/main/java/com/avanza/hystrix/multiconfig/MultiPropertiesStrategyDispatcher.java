@@ -26,13 +26,12 @@ import com.netflix.hystrix.HystrixThreadPoolKey;
 import com.netflix.hystrix.HystrixThreadPoolProperties;
 import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
 
-public class MultiPropertiesDispatcher extends HystrixPropertiesStrategy {
+public class MultiPropertiesStrategyDispatcher extends HystrixPropertiesStrategy {
 
 	private Map<MultiConfigId, HystrixPropertiesStrategy> strategies = new ConcurrentHashMap<>();
 	
 	@Override
 	public HystrixCommandProperties getCommandProperties(HystrixCommandKey qualifiedCommandKey, com.netflix.hystrix.HystrixCommandProperties.Setter builder) {
-		// TODO: Possibly cache all qualifiedCommandKey -> commandKey mappings here?
 		return strategies.get(MultiConfigId.readFrom(qualifiedCommandKey))
 				.getCommandProperties(MultiConfigId.decode(qualifiedCommandKey), builder);
 	}
@@ -51,6 +50,10 @@ public class MultiPropertiesDispatcher extends HystrixPropertiesStrategy {
 
 	public void register(String id, HystrixPropertiesStrategy strategy) {
 		this.strategies.put(MultiConfigId.create(id), strategy);
+	}
+
+	public boolean containsMapping(String id) {
+		return this.strategies.containsKey(MultiConfigId.create(id));
 	}
 	
 }

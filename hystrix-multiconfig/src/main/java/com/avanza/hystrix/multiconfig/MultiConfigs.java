@@ -19,39 +19,63 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.netflix.hystrix.strategy.HystrixPlugins;
+import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategy;
+import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;
 import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
 
 public class MultiConfigs {
 	//TODO: Default strategy?
-	//TODO: Error handling
-	//TODO: Remaining strategies
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(MultiConfigs.class);
-	private static MultiPropertiesDispatcher multiPropertiesDispatcher = new MultiPropertiesDispatcher();
+	private static MultiPropertiesStrategyDispatcher multiPropertiesStrategyDispatcher = new MultiPropertiesStrategyDispatcher();
+	private static MultiConcurrencyStrategyDispatcher multiConcurrencyStrategyDispatcher = new MultiConcurrencyStrategyDispatcher();
+	private static MultiEventNotifierDispatcher multiEventNotifierDispatcher = new MultiEventNotifierDispatcher();
 	
 	static {
 		registerWithHystrix();
 	}
 	
 	public static void register(String id, HystrixPropertiesStrategy strategy) {
-		multiPropertiesDispatcher.register(id, strategy);
+		multiPropertiesStrategyDispatcher.register(id, strategy);
 		verifyRegistered();
 	}
 	
-	private static void verifyRegistered() {
-		synchronized (multiPropertiesDispatcher) {
-			if (!HystrixPlugins.getInstance().getPropertiesStrategy().getClass().equals(MultiPropertiesDispatcher.class)) {
-				LOGGER.warn(MultiPropertiesDispatcher.class.getName() + " not yet registered with Hystrix, registering...");
-				registerWithHystrix();
+	public static void register(String id, HystrixConcurrencyStrategy strategy) {
+		multiConcurrencyStrategyDispatcher.register(id, strategy);
+		verifyRegistered();
+	}
+	
+	public static void register(String id, HystrixEventNotifier strategy) {
+		multiEventNotifierDispatcher.register(id, strategy);
+		verifyRegistered();
+	}
+	
+	public static boolean containsAllMappings(String id) {
+		return multiPropertiesStrategyDispatcher.containsMapping(id)
+				&& multiConcurrencyStrategyDispatcher.containsMapping(id)
+				&& multiEventNotifierDispatcher.containsMapping(id);
+	}
+	
+	public static void verifyRegistered() {
+		synchronized (multiPropertiesStrategyDispatcher) {
+			if (!HystrixPlugins.getInstance().getPropertiesStrategy().getClass().equals(MultiPropertiesStrategyDispatcher.class)) {
+				LOGGER.warn(MultiPropertiesStrategyDispatcher.class.getName() + " not yet registered with Hystrix, registering...");
+				reRegister();
 			}
 		}
 	}
 	
+	private static void reRegister() {
+		HystrixPlugins.reset();
+		registerWithHystrix();
+	}
+	
 	private static void registerWithHystrix() {
-		HystrixPlugins.getInstance().registerPropertiesStrategy(multiPropertiesDispatcher);
-//		HystrixPlugins.getInstance().registerConcurrencyStrategy(impl);
-//		HystrixPlugins.getInstance().registerEventNotifier(impl);
-		LOGGER.info(MultiPropertiesDispatcher.class.getName() + " registered with Hystrix!");
+		HystrixPlugins.getInstance().registerPropertiesStrategy(multiPropertiesStrategyDispatcher);
+		HystrixPlugins.getInstance().registerConcurrencyStrategy(multiConcurrencyStrategyDispatcher);
+		HystrixPlugins.getInstance().registerEventNotifier(multiEventNotifierDispatcher);
+		
+		LOGGER.info(MultiPropertiesStrategyDispatcher.class.getName() + " registered with Hystrix!");
 	}
 	
 }
