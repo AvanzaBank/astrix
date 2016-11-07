@@ -32,6 +32,7 @@
 		<module>astrix-metrics</module>
 		<module>astrix-contracts</module>
 		<module>astrix-netty-remoting</module>
+		<module>hystrix-multiconfig</module>
 	</modules>
 	<licenses>
 		<license>

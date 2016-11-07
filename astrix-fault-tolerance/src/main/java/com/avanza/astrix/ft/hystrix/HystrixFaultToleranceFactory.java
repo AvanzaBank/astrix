@@ -23,6 +23,7 @@ import com.avanza.astrix.beans.ft.BeanFaultTolerance;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.beans.ft.MonitorableFaultToleranceSpi;
+import com.avanza.hystrix.multiconfig.MultiConfigId;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixThreadPoolKey;
@@ -50,6 +51,7 @@ final class HystrixFaultToleranceFactory implements BeanFaultToleranceFactorySpi
 	private final BeanMapping beanMapping;
 	private final HystrixCommandKeyFactory hystrixCommandKeyFactory;
 	private final String id;
+	private MultiConfigId multiConfigId = MultiConfigId.create("astrix");
 	
 	@Override
 	public BeanFaultTolerance create(AstrixBeanKey<?> beanKey) {
@@ -79,19 +81,19 @@ final class HystrixFaultToleranceFactory implements BeanFaultToleranceFactorySpi
 	HystrixCommandGroupKey getGroupKey(AstrixBeanKey<?> beanKey) {
 		HystrixCommandGroupKey result = hystrixCommandKeyFactory.createGroupKey(beanKey);
 		this.beanMapping.registerBeanKey(result.name(), beanKey);
-		return result;
+		return multiConfigId.encode(result);
 	}
 
 	HystrixCommandKey getCommandKey(AstrixBeanKey<?> beanKey) {
 		HystrixCommandKey result =  hystrixCommandKeyFactory.createCommandKey(beanKey);
 		this.beanMapping.registerBeanKey(result.name(), beanKey);
-		return result;
+		return multiConfigId.encode(result);
 	}
 	
 	HystrixThreadPoolKey getThreadPoolKey(AstrixBeanKey<?> beanKey) {
 		HystrixThreadPoolKey result =  hystrixCommandKeyFactory.createThreadPoolKey(beanKey);
 		this.beanMapping.registerBeanKey(result.name(), beanKey);
-		return result;
+		return multiConfigId.encode(result);
 	}
 
 }
