@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.avanza.astrix</groupId>
 		<artifactId>astrix-parent</artifactId>
-		<version>0.41.5-SNAPSHOT</version>
+		<version>0.42.0</version>
 	</parent>
 	<artifactId>tutorial</artifactId>
 	<packaging>pom</packaging>
