@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.avanza.astrix</groupId>
 	<artifactId>astrix-parent</artifactId>
-	<version></version>
+	<version>0.42.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>${project.artifactId}</name>
 	<description>${project.artifactId}</description>
