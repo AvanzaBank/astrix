@@ -47,5 +47,17 @@ public class MultiConfigIdTest {
 		assertEquals(HystrixThreadPoolKey.Factory.asKey(name).name(), MultiConfigId.decode(MultiConfigId.create("t-T1").createThreadPoolKey(name)).name());
 		assertEquals(HystrixCollapserKey.Factory.asKey(name).name(), MultiConfigId.decode(MultiConfigId.create("t-T1").createCollapserKey(name)).name());
 	}
+
+	@Test
+	public void hasMultiSourceId() throws Exception {
+		String name = "com.avanza.test.TestServiceApi.TestService";
+		assertTrue(MultiConfigId.hasMultiSourceId(MultiConfigId.create("t-T1").createCommandKey(name)));
+		assertTrue(MultiConfigId.hasMultiSourceId(MultiConfigId.create("t-T1").createCollapserKey(name)));
+		assertTrue(MultiConfigId.hasMultiSourceId(MultiConfigId.create("t-T1").createThreadPoolKey(name)));
+		
+		assertFalse(MultiConfigId.hasMultiSourceId(HystrixCommandKey.Factory.asKey(name)));
+		assertFalse(MultiConfigId.hasMultiSourceId(HystrixCollapserKey.Factory.asKey(name)));
+		assertFalse(MultiConfigId.hasMultiSourceId(HystrixThreadPoolKey.Factory.asKey(name)));
+	}
 	
 }

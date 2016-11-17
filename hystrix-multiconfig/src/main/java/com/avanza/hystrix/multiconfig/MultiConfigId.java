@@ -45,15 +45,27 @@ public class MultiConfigId {
 		return consumeMatch(commandKey.name(), (matcher) -> create(matcher.group(1)));
 	}
 	
-	public static MultiConfigId readFrom(HystrixCollapserKey commandKey) {
-		return consumeMatch(commandKey.name(), (matcher) -> create(matcher.group(1)));
+	public static MultiConfigId readFrom(HystrixCollapserKey collapserKey) {
+		return consumeMatch(collapserKey.name(), (matcher) -> create(matcher.group(1)));
 	}
 	
-	public static MultiConfigId readFrom(HystrixThreadPoolKey commandKey) {
-		return consumeMatch(commandKey.name(), (matcher) -> create(matcher.group(1)));
+	public static MultiConfigId readFrom(HystrixThreadPoolKey threadPoolKey) {
+		return consumeMatch(threadPoolKey.name(), (matcher) -> create(matcher.group(1)));
 	}
 	
 	// Static helper methods
+	
+	public static boolean hasMultiSourceId(HystrixCommandKey commandKey) {
+		return pattern.matcher(commandKey.name()).find();
+	}
+	
+	public static boolean hasMultiSourceId(HystrixCollapserKey collapserKey) {
+		return pattern.matcher(collapserKey.name()).find();
+	}
+	
+	public static boolean hasMultiSourceId(HystrixThreadPoolKey threadPoolKey) {
+		return pattern.matcher(threadPoolKey.name()).find();
+	}
 	
 	public static HystrixCommandKey decode(HystrixCommandKey commandKey) {
 		return consumeMatch(commandKey.name(), (matcher) -> HystrixCommandKey.Factory.asKey(matcher.group(2)));
