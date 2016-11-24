@@ -29,14 +29,19 @@ import com.netflix.hystrix.strategy.concurrency.HystrixRequestVariableLifecycle;
 import com.netflix.hystrix.strategy.properties.HystrixProperty;
 
 public class MultiConcurrencyStrategyDispatcher extends HystrixConcurrencyStrategy {
-	private Map<MultiConfigId, HystrixConcurrencyStrategy> strategies = new ConcurrentHashMap<>();
+	private final Map<MultiConfigId, HystrixConcurrencyStrategy> strategies = new ConcurrentHashMap<>();
+	private final HystrixConcurrencyStrategy defaultStrategy = HystrixConcurrencyStrategyDefault.getInstance();
 	
 	@Override
 	public ThreadPoolExecutor getThreadPool(HystrixThreadPoolKey threadPoolKey, HystrixProperty<Integer> corePoolSize,
 			HystrixProperty<Integer> maximumPoolSize, HystrixProperty<Integer> keepAliveTime, TimeUnit unit,
 			BlockingQueue<Runnable> workQueue) {
-		return strategies.get(MultiConfigId.readFrom(threadPoolKey))
-				.getThreadPool(MultiConfigId.decode(threadPoolKey), corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+		if (MultiConfigId.hasMultiSourceId(threadPoolKey)) {
+			return strategies.get(MultiConfigId.readFrom(threadPoolKey))
+					.getThreadPool(MultiConfigId.decode(threadPoolKey), corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+		} else {
+			return defaultStrategy.getThreadPool(threadPoolKey, corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+		}
 	}
 
 	@Override

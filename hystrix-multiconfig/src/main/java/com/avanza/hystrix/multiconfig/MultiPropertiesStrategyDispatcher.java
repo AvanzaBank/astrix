@@ -25,27 +25,41 @@ import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.hystrix.HystrixThreadPoolKey;
 import com.netflix.hystrix.HystrixThreadPoolProperties;
 import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
+import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategyDefault;
 
 public class MultiPropertiesStrategyDispatcher extends HystrixPropertiesStrategy {
 
-	private Map<MultiConfigId, HystrixPropertiesStrategy> strategies = new ConcurrentHashMap<>();
+	private final Map<MultiConfigId, HystrixPropertiesStrategy> strategies = new ConcurrentHashMap<>();
+	private final HystrixPropertiesStrategy defaultStrategy = HystrixPropertiesStrategyDefault.getInstance();
 	
 	@Override
 	public HystrixCommandProperties getCommandProperties(HystrixCommandKey qualifiedCommandKey, com.netflix.hystrix.HystrixCommandProperties.Setter builder) {
-		return strategies.get(MultiConfigId.readFrom(qualifiedCommandKey))
-				.getCommandProperties(MultiConfigId.decode(qualifiedCommandKey), builder);
+		if (MultiConfigId.hasMultiSourceId(qualifiedCommandKey)) {
+			return strategies.get(MultiConfigId.readFrom(qualifiedCommandKey))
+					.getCommandProperties(MultiConfigId.decode(qualifiedCommandKey), builder);
+		} else {
+			return defaultStrategy.getCommandProperties(qualifiedCommandKey, builder);
+		}
 	}
 	
 	@Override
 	public HystrixThreadPoolProperties getThreadPoolProperties(HystrixThreadPoolKey qualifiedThreadPoolKey, com.netflix.hystrix.HystrixThreadPoolProperties.Setter builder) {
-		return strategies.get(MultiConfigId.readFrom(qualifiedThreadPoolKey))
-				.getThreadPoolProperties(MultiConfigId.decode(qualifiedThreadPoolKey), builder);
+		if (MultiConfigId.hasMultiSourceId(qualifiedThreadPoolKey)) {
+			return strategies.get(MultiConfigId.readFrom(qualifiedThreadPoolKey))
+					.getThreadPoolProperties(MultiConfigId.decode(qualifiedThreadPoolKey), builder);
+		} else {
+			return defaultStrategy.getThreadPoolProperties(qualifiedThreadPoolKey, builder);
+		}
 	}
 	
 	@Override
 	public HystrixCollapserProperties getCollapserProperties(HystrixCollapserKey qualifiedCollapserKey, com.netflix.hystrix.HystrixCollapserProperties.Setter builder) {
-		return strategies.get(MultiConfigId.readFrom(qualifiedCollapserKey))
-				.getCollapserProperties(MultiConfigId.decode(qualifiedCollapserKey), builder);
+		if (MultiConfigId.hasMultiSourceId(qualifiedCollapserKey)) {
+			return strategies.get(MultiConfigId.readFrom(qualifiedCollapserKey))
+					.getCollapserProperties(MultiConfigId.decode(qualifiedCollapserKey), builder);
+		} else {
+			return defaultStrategy.getCollapserProperties(qualifiedCollapserKey, builder);
+		}
 	}
 
 	public void register(String id, HystrixPropertiesStrategy strategy) {

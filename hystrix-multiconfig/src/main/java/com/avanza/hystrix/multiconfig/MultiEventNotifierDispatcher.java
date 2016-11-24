@@ -23,22 +23,32 @@ import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixEventType;
 import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;
+import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifierDefault;
 
 public class MultiEventNotifierDispatcher extends HystrixEventNotifier {
 
 	private Map<MultiConfigId, HystrixEventNotifier> strategies = new ConcurrentHashMap<>();
+	private HystrixEventNotifier defaultStrategy = HystrixEventNotifierDefault.getInstance();
 	
 	@Override
 	public void markCommandExecution(HystrixCommandKey key, ExecutionIsolationStrategy isolationStrategy, int duration,
 			List<HystrixEventType> eventsDuringExecution) {
-		strategies.get(MultiConfigId.readFrom(key))
-				.markCommandExecution(MultiConfigId.decode(key), isolationStrategy, duration, eventsDuringExecution);
+		if (MultiConfigId.hasMultiSourceId(key)) {
+			strategies.get(MultiConfigId.readFrom(key))
+					.markCommandExecution(MultiConfigId.decode(key), isolationStrategy, duration, eventsDuringExecution);
+		} else {
+			defaultStrategy.markCommandExecution(key, isolationStrategy, duration, eventsDuringExecution);
+		}
 	}
 	
 	@Override
 	public void markEvent(HystrixEventType eventType, HystrixCommandKey key) {
-		strategies.get(MultiConfigId.readFrom(key))
-			.markEvent(eventType, MultiConfigId.decode(key));
+		if (MultiConfigId.hasMultiSourceId(key)) {
+			strategies.get(MultiConfigId.readFrom(key))
+				.markEvent(eventType, MultiConfigId.decode(key));
+		} else {
+			defaultStrategy.markEvent(eventType, key);
+		}
 	}
 
 	public void register(String id, HystrixEventNotifier strategy) {
