@@ -27,11 +27,14 @@ import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
+import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.context.mbeans.MBeanServerFacade;
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.ft.hystrix.HystrixCommandFacadeTest.Ping;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.AssertBlockPoller;
@@ -67,7 +70,7 @@ public class FaultToleranceMetricsTest {
 		AstrixContext context = autoClose.add(testAstrixConfigurer.configure());
 		
 		Ping ping = context.getBean(Ping.class);
-		initMetrics(ping);
+		initMetrics(ping, context);
 		
 		BeanFaultToleranceMetricsMBean mbean = mbeanServer.getExportedMBean("BeanFaultToleranceMetrics", AstrixBeanKey.create(Ping.class).toString());
 		assertEquals(0, mbean.getErrorCount());
@@ -117,12 +120,13 @@ public class FaultToleranceMetricsTest {
 		});
 	}
 
-	private void initMetrics(Ping ping) {
-		HystrixCommandKey key = MultiConfigId.create("astrix").createCommandKey(AstrixBeanKey.create(Ping.class).toString());
+	private void initMetrics(Ping ping, AstrixContext context) {
 		try {
 			ping.ping("foo");
 		} catch (Exception e) {
 		}
+		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) AstrixApplicationContext.class.cast(context).getInstance(BeanFaultToleranceFactorySpi.class);
+		HystrixCommandKey key = faultTolerance.getCommandKey(AstrixBeanKey.create(Ping.class));
 		HystrixCommandMetrics.getInstance(key).getCumulativeCount(HystrixEventType.SUCCESS);
 	}
 
