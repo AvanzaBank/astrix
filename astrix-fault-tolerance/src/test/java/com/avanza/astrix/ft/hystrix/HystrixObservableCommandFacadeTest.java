@@ -39,10 +39,13 @@ import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
+import com.avanza.astrix.test.util.AssertBlockPoller;
 import com.avanza.astrix.test.util.AstrixTestUtil;
 import com.avanza.hystrix.multiconfig.MultiConfigId;
+import com.netflix.hystrix.Hystrix;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
+import com.netflix.hystrix.HystrixEventType;
 import com.netflix.hystrix.HystrixObservableCommand.Setter;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
 
@@ -68,7 +71,8 @@ public class HystrixObservableCommandFacadeTest {
 	private PingImpl pingServer = new PingImpl();
 	
 	@Before
-	public void before() {
+	public void before() throws InterruptedException {
+		Hystrix.reset();
 		context = new TestAstrixConfigurer().enableFaultTolerance(true)
 											.registerApiProvider(PingApi.class)
 											.set(AstrixBeanSettings.TIMEOUT, AstrixBeanKey.create(Ping.class), 25)
@@ -76,6 +80,19 @@ public class HystrixObservableCommandFacadeTest {
 											.set("pingUri", DirectComponent.registerAndGetUri(Ping.class, pingServer))
 											.configure();
 		ping = context.getBean(Ping.class);
+		initMetrics(ping);
+	}
+	
+	private void initMetrics(Ping ping) throws InterruptedException {
+		// Black hystrix magic here :(
+		try {
+			ping.ping();
+		} catch (Exception e) {
+		}
+		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) AstrixApplicationContext.class.cast(this.context).getInstance(BeanFaultToleranceFactorySpi.class);
+		HystrixCommandKey key = faultTolerance.getCommandKey(AstrixBeanKey.create(Ping.class));
+		
+		HystrixCommandMetrics.getInstance(key).getCumulativeCount(HystrixEventType.SUCCESS);
 	}
 	
 	@After
@@ -89,7 +106,9 @@ public class HystrixObservableCommandFacadeTest {
 		String result = ping.ping().toBlocking().first();
 
 		assertEquals("foo", result);
-		assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS));
+		eventually(() -> {
+			assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS));
+		});
 	}
 	
 	@Test
@@ -101,8 +120,10 @@ public class HystrixObservableCommandFacadeTest {
 		} catch (ServiceUnavailableException e) {
 			// Expcected
 		}
-		assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS));
-		assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.FAILURE));
+		eventually(() -> {
+			assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS));
+			assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.FAILURE));
+		});
 	}
 	
 	@Test
@@ -115,11 +136,13 @@ public class HystrixObservableCommandFacadeTest {
 			// Expcected
 		}
 		
-		// Note that from the perspective of a circuit-breaker an exception thrown
-		// by the underlying observable (typically a service call) should not
-		// count as failure and therefore not (possibly) trip circuit breaker.
-		assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS));
-		assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.FAILURE));
+		eventually(() -> {
+			// Note that from the perspective of a circuit-breaker an exception thrown
+			// by the underlying observable (typically a service call) should not
+			// count as failure and therefore not (possibly) trip circuit breaker.
+			assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS));
+			assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.FAILURE));
+		});
 	}
 	
 	@Test
@@ -136,9 +159,11 @@ public class HystrixObservableCommandFacadeTest {
 		} catch (ServiceUnavailableException e) {
 			// Expcected
 		}
-		assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS));
-		assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.TIMEOUT));
-		assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SEMAPHORE_REJECTED));
+		eventually(() -> {
+			assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS));
+			assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.TIMEOUT));
+			assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SEMAPHORE_REJECTED));
+		});
 	}
 	
 	@Test
@@ -156,8 +181,10 @@ public class HystrixObservableCommandFacadeTest {
 		ftObservable1.subscribe((item) -> {}, (exception) -> {});
 		ftObservable2.subscribe((item) -> {}, (exception) -> {});
 
-		assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS));
-		assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SEMAPHORE_REJECTED));
+		eventually(() -> {
+			assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS));
+			assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SEMAPHORE_REJECTED));
+		});
 	}
 	
 	@Test
@@ -171,7 +198,7 @@ public class HystrixObservableCommandFacadeTest {
 				});
 			}
 		};
-		Observable<String> ftObservable1 = HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
+		HystrixObservableCommandFacade.observe(timeoutCommandSupplier, commandSettings);
 		assertTrue(subscribed.get());
 	}
 	
@@ -237,6 +264,10 @@ public class HystrixObservableCommandFacadeTest {
 			return new PingImpl();
 		}
 		
+	}
+	
+	private void eventually(Runnable assertion) throws InterruptedException {
+		new AssertBlockPoller(3000, 25).check(assertion);
 	}
 	
 }

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -35,6 +36,11 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.AssertBlockPoller;
 import com.avanza.astrix.test.util.AutoCloseableRule;
+import com.avanza.hystrix.multiconfig.MultiConfigId;
+import com.netflix.hystrix.Hystrix;
+import com.netflix.hystrix.HystrixCommandKey;
+import com.netflix.hystrix.HystrixCommandMetrics;
+import com.netflix.hystrix.HystrixEventType;
 
 public class FaultToleranceMetricsTest {
 	
@@ -42,6 +48,11 @@ public class FaultToleranceMetricsTest {
 	
 	@Rule
 	public AutoCloseableRule autoClose = new AutoCloseableRule();
+	
+	@Before
+	public void before() {
+		Hystrix.reset();
+	}
 	
 	@Test
 	public void exportsMbean() throws Exception {
@@ -56,6 +67,7 @@ public class FaultToleranceMetricsTest {
 		AstrixContext context = autoClose.add(testAstrixConfigurer.configure());
 		
 		Ping ping = context.getBean(Ping.class);
+		initMetrics(ping);
 		
 		BeanFaultToleranceMetricsMBean mbean = mbeanServer.getExportedMBean("BeanFaultToleranceMetrics", AstrixBeanKey.create(Ping.class).toString());
 		assertEquals(0, mbean.getErrorCount());
@@ -65,12 +77,12 @@ public class FaultToleranceMetricsTest {
 		
 		ping.ping("foo");
 		
-		assertEquals(0, mbean.getErrorCount());
-		assertEquals(1, mbean.getSuccessCount());
-		assertEquals(0, mbean.getErrorPercentage());
-		assertEquals(1, mbean.getRollingMaxConcurrentExecutions());
+		eventually(() -> assertEquals(0, mbean.getErrorCount()));
+		eventually(() -> assertEquals(1, mbean.getSuccessCount()));
+		eventually(() -> assertEquals(0, mbean.getErrorPercentage()));
+		eventually(() -> assertEquals(1, mbean.getRollingMaxConcurrentExecutions()));
 	}
-	
+
 	@Test
 	public void countsErrors() throws Exception {
 		InMemoryServiceRegistry reg = new InMemoryServiceRegistry();
@@ -102,10 +114,18 @@ public class FaultToleranceMetricsTest {
 			assertEquals(0, mbean.getSuccessCount());
 			assertEquals(1, mbean.getErrorCount());
 			assertEquals(100, mbean.getErrorPercentage());
-			assertEquals(1, mbean.getRollingMaxConcurrentExecutions());
 		});
 	}
-	
+
+	private void initMetrics(Ping ping) {
+		HystrixCommandKey key = MultiConfigId.create("astrix").createCommandKey(AstrixBeanKey.create(Ping.class).toString());
+		try {
+			ping.ping("foo");
+		} catch (Exception e) {
+		}
+		HystrixCommandMetrics.getInstance(key).getCumulativeCount(HystrixEventType.SUCCESS);
+	}
+
 	private void eventually(Runnable assertion) throws InterruptedException {
 		new AssertBlockPoller(3000, 25).check(assertion);
 	}
