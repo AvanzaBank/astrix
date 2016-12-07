@@ -215,7 +215,7 @@ public class HystrixCommandFacadeTest {
 	}
 	
 	private void eventually(Runnable assertion) throws InterruptedException {
-		new AssertBlockPoller(3000, 25).check(assertion);
+		new AssertBlockPoller(5000, 25).check(assertion);
 	}
 	
 	private void initMetrics(Ping ping) throws InterruptedException {
