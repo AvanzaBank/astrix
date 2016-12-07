@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
@@ -45,6 +46,7 @@ import com.netflix.hystrix.HystrixEventType;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
 
 
+@Ignore
 public class HystrixCommandFacadeTest {
 	
 	// TODO: Rename to sync-service invocation test
@@ -215,7 +217,7 @@ public class HystrixCommandFacadeTest {
 	}
 	
 	private void eventually(Runnable assertion) throws InterruptedException {
-		new AssertBlockPoller(5000, 25).check(assertion);
+		new AssertBlockPoller(3000, 25).check(assertion);
 	}
 	
 	private void initMetrics(Ping ping) throws InterruptedException {
