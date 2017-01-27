@@ -18,12 +18,12 @@ package lunch.api.provider;
 import java.util.Arrays;
 import java.util.List;
 
-import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
-import com.avanza.astrix.versioning.jackson1.Jackson1ObjectSerializerConfigurer;
-import com.avanza.astrix.versioning.jackson1.JacksonObjectMapperBuilder;
+import com.avanza.astrix.versioning.jackson2.AstrixJsonApiMigration;
+import com.avanza.astrix.versioning.jackson2.Jackson2ObjectSerializerConfigurer;
+import com.avanza.astrix.versioning.jackson2.JacksonObjectMapperBuilder;
 
 
-public class LunchApiObjectSerializerConfigurer implements Jackson1ObjectSerializerConfigurer {
+public class LunchApiObjectSerializerConfigurer implements Jackson2ObjectSerializerConfigurer {
 
 	@Override
 	public void configure(JacksonObjectMapperBuilder objectMapperBuilder) {

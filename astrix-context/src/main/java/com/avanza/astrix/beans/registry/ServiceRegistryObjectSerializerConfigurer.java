@@ -18,11 +18,11 @@ package com.avanza.astrix.beans.registry;
 import java.util.Arrays;
 import java.util.List;
 
-import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
-import com.avanza.astrix.versioning.jackson1.Jackson1ObjectSerializerConfigurer;
-import com.avanza.astrix.versioning.jackson1.JacksonObjectMapperBuilder;
+import com.avanza.astrix.versioning.jackson2.AstrixJsonApiMigration;
+import com.avanza.astrix.versioning.jackson2.Jackson2ObjectSerializerConfigurer;
+import com.avanza.astrix.versioning.jackson2.JacksonObjectMapperBuilder;
 
-public class ServiceRegistryObjectSerializerConfigurer implements Jackson1ObjectSerializerConfigurer {
+public class ServiceRegistryObjectSerializerConfigurer implements Jackson2ObjectSerializerConfigurer {
 	
 	public static final int VERSION = 2;
 

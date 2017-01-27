@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.versioning.jackson1;
+package com.avanza.astrix.versioning.jackson2;
 
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 
-final class Jackson1SerializerPlugin implements ObjectSerializerFactoryPlugin {
+final class Jackson2SerializerPlugin implements ObjectSerializerFactoryPlugin {
 
 	@Override
 	public AstrixObjectSerializer create(ObjectSerializerDefinition serializerDefinition) {
-		return new Jackson1AstrixObjectSerializer(serializerDefinition);
+		return new Jackson2AstrixObjectSerializer(serializerDefinition);
 	}
 	
 	@Override
 	public Class<? extends AstrixObjectSerializerConfigurer> getConfigurerType() {
-		return Jackson1ObjectSerializerConfigurer.class;
+		return Jackson2ObjectSerializerConfigurer.class;
 	}
 
 }

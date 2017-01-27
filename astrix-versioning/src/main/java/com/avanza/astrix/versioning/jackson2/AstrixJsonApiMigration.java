@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.versioning.jackson1;
+package com.avanza.astrix.versioning.jackson2;
 
-import java.util.List;
-
-import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
 
 /**
- * @author Elias Lindholm
+ * Used on the server side to upgrade incoming arguments and downgrade outgoing responses.
  * 
+ * @author Elias Lindholm (elilin)
+ *
  */
-public interface Jackson1ObjectSerializerConfigurer extends AstrixObjectSerializerConfigurer {
-	List<? extends AstrixJsonApiMigration> apiMigrations();
-	void configure(JacksonObjectMapperBuilder objectMapperBuilder);
+public interface AstrixJsonApiMigration {
+	
+	int fromVersion();
+	
+	AstrixJsonMessageMigration<?>[] getMigrations();
+
 }

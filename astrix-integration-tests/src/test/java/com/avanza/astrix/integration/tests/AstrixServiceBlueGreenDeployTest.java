@@ -15,13 +15,7 @@
  */
 package com.avanza.astrix.integration.tests;
 
-import static com.avanza.astrix.beans.core.AstrixSettings.APPLICATION_INSTANCE_ID;
-import static com.avanza.astrix.beans.core.AstrixSettings.APPLICATION_TAG;
-import static com.avanza.astrix.beans.core.AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL;
-import static com.avanza.astrix.beans.core.AstrixSettings.SERVICE_ADMINISTRATOR_COMPONENT;
-import static com.avanza.astrix.beans.core.AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL;
-import static com.avanza.astrix.beans.core.AstrixSettings.SERVICE_REGISTRY_URI;
-import static com.avanza.astrix.beans.core.AstrixSettings.SUBSYSTEM_NAME;
+import static com.avanza.astrix.beans.core.AstrixSettings.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -31,16 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import org.hamcrest.Description;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.MapPropertySource;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
@@ -67,9 +51,18 @@ import com.avanza.astrix.test.util.Probe;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfig;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.versioning.core.Versioned;
-import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
-import com.avanza.astrix.versioning.jackson1.Jackson1ObjectSerializerConfigurer;
-import com.avanza.astrix.versioning.jackson1.JacksonObjectMapperBuilder;
+import com.avanza.astrix.versioning.jackson2.AstrixJsonApiMigration;
+import com.avanza.astrix.versioning.jackson2.Jackson2ObjectSerializerConfigurer;
+import com.avanza.astrix.versioning.jackson2.JacksonObjectMapperBuilder;
+import org.hamcrest.Description;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.MapPropertySource;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -403,7 +396,7 @@ public class AstrixServiceBlueGreenDeployTest {
 		AccountPerformanceInternal accountPerformanceInternal();
 	}
 	
-	public static class AccountPerformanceVersioningConfig implements Jackson1ObjectSerializerConfigurer {
+	public static class AccountPerformanceVersioningConfig implements Jackson2ObjectSerializerConfigurer {
 		@Override
 		public List<? extends AstrixJsonApiMigration> apiMigrations() {
 			return Collections.emptyList();

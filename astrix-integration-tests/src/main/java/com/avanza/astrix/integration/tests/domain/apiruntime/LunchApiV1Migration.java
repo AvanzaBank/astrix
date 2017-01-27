@@ -15,11 +15,10 @@
  */
 package com.avanza.astrix.integration.tests.domain.apiruntime;
 
-import org.codehaus.jackson.node.ObjectNode;
-
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
-import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
-import com.avanza.astrix.versioning.jackson1.AstrixJsonMessageMigration;
+import com.avanza.astrix.versioning.jackson2.AstrixJsonApiMigration;
+import com.avanza.astrix.versioning.jackson2.AstrixJsonMessageMigration;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class LunchApiV1Migration implements AstrixJsonApiMigration {
 

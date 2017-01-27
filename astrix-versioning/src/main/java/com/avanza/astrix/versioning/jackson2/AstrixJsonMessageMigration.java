@@ -13,19 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.versioning.jackson1;
+package com.avanza.astrix.versioning.jackson2;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Used on the server side to upgrade incoming arguments and downgrade outgoing responses.
  * 
  * @author Elias Lindholm (elilin)
  *
+ * @param <T>
  */
-public interface AstrixJsonApiMigration {
+public interface AstrixJsonMessageMigration<T> {
 	
-	int fromVersion();
+	/**
+	 * The java type representing the given json message.
+	 * 
+	 * @return
+	 */
+	Class<T> getJavaType();
 	
-	AstrixJsonMessageMigration<?>[] getMigrations();
+	/**
+	 * Upgrades a given json message to the next version. <p>
+	 * @param json
+	 */
+	void upgrade(ObjectNode json);
+	
+	/**
+	 * Downgrades a given json-message to this version (fromVersion()), from 
+	 * the next version. <p>	
+	 * 
+	 * @param json
+	 */
+	void downgrade(ObjectNode json);
+	
+	
 
 }

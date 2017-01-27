@@ -15,11 +15,10 @@
  */
 package com.avanza.astrix.beans.registry;
 
-import org.codehaus.jackson.node.ObjectNode;
-
 import com.avanza.astrix.beans.service.ServiceProperties;
-import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
-import com.avanza.astrix.versioning.jackson1.AstrixJsonMessageMigration;
+import com.avanza.astrix.versioning.jackson2.AstrixJsonApiMigration;
+import com.avanza.astrix.versioning.jackson2.AstrixJsonMessageMigration;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ServiceRegistryV1ApiMigration implements AstrixJsonApiMigration {
 
@@ -46,8 +45,8 @@ public class ServiceRegistryV1ApiMigration implements AstrixJsonApiMigration {
 			// ApplicationInstanceId concept was introduced to uniquely identify a service.
 			// Old clients will not set the property, but it was expected that a service (api + qualifier)
 			// was only provided by a single application instance, hence we use it as id.
-			String qualifier = json.get("serviceProperties").get("_qualifier").getTextValue();
-			String api = json.get("serviceProperties").get("_api").getTextValue();
+			String qualifier = json.get("serviceProperties").get("_qualifier").asText();
+			String api = json.get("serviceProperties").get("_api").asText();
 			String applicationInstanceId = api + "_" + qualifier; 
 			ObjectNode.class.cast(json.get("serviceProperties")).put(ServiceProperties.APPLICATION_INSTANCE_ID, applicationInstanceId);
 			
