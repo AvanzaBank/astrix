@@ -13,31 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.versioning.jackson1;
+package com.avanza.astrix.versioning.jackson2;
 
 import java.lang.reflect.Type;
 
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
-import com.avanza.astrix.versioning.jackson1.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
+import com.avanza.astrix.versioning.jackson2.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
 
-class Jackson1AstrixObjectSerializer implements AstrixObjectSerializer {
+class Jackson2AstrixObjectSerializer implements AstrixObjectSerializer {
 
 	private JsonObjectMapper objectMapper;
 	private int version;
 
-	public Jackson1AstrixObjectSerializer(ObjectSerializerDefinition serializerDefinition) {
+	public Jackson2AstrixObjectSerializer(ObjectSerializerDefinition serializerDefinition) {
 		Class<? extends AstrixObjectSerializerConfigurer> serializerBuilder = serializerDefinition.getObjectSerializerConfigurerClass();
 		this.version = serializerDefinition.version();
 		try {
-			this.objectMapper = buildObjectMapper(Jackson1ObjectSerializerConfigurer.class.cast(serializerBuilder.newInstance()));
+			this.objectMapper = buildObjectMapper(Jackson2ObjectSerializerConfigurer.class.cast(serializerBuilder.newInstance()));
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to init JsonObjectMapper", e);
 		}
 	}
 	
-	private JsonObjectMapper buildObjectMapper(Jackson1ObjectSerializerConfigurer serializerBuilder) {
+	private JsonObjectMapper buildObjectMapper(Jackson2ObjectSerializerConfigurer serializerBuilder) {
 		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(serializerBuilder.apiMigrations());
 		serializerBuilder.configure(objectMapperBuilder);
 		return JsonObjectMapper.create(objectMapperBuilder.build());

@@ -13,39 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.versioning.jackson1;
+package com.avanza.astrix.versioning.jackson2;
 
-import org.codehaus.jackson.node.ObjectNode;
+import java.util.List;
+
+import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
 
 /**
+ * @author Elias Lindholm
  * 
- * @author Elias Lindholm (elilin)
- *
- * @param <T>
  */
-public interface AstrixJsonMessageMigration<T> {
-	
-	/**
-	 * The java type representing the given json message.
-	 * 
-	 * @return
-	 */
-	Class<T> getJavaType();
-	
-	/**
-	 * Upgrades a given json message to the next version. <p>
-	 * @param json
-	 */
-	void upgrade(ObjectNode json);
-	
-	/**
-	 * Downgrades a given json-message to this version (fromVersion()), from 
-	 * the next version. <p>	
-	 * 
-	 * @param json
-	 */
-	void downgrade(ObjectNode json);
-	
-	
-
+public interface Jackson2ObjectSerializerConfigurer extends AstrixObjectSerializerConfigurer {
+	List<? extends AstrixJsonApiMigration> apiMigrations();
+	void configure(JacksonObjectMapperBuilder objectMapperBuilder);
 }

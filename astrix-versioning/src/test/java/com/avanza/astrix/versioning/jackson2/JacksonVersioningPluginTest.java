@@ -13,29 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.versioning.jackson1;
+package com.avanza.astrix.versioning.jackson2;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.codehaus.jackson.node.ObjectNode;
-import org.junit.Test;
-
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
-import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
-import com.avanza.astrix.versioning.jackson1.AstrixJsonMessageMigration;
-import com.avanza.astrix.versioning.jackson1.Jackson1ObjectSerializerConfigurer;
-import com.avanza.astrix.versioning.jackson1.Jackson1SerializerPlugin;
-import com.avanza.astrix.versioning.jackson1.JacksonObjectMapperBuilder;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.junit.Test;
 
 public class JacksonVersioningPluginTest {
 	
 	@Test
 	public void serializesV2Objects() throws Exception {
-		AstrixObjectSerializer astrixObjectSerializer = new Jackson1SerializerPlugin().create(ObjectSerializerDefinition.versionedService(2, TestObjectMapperConfigurer.class));
+		AstrixObjectSerializer astrixObjectSerializer = new Jackson2SerializerPlugin().create(ObjectSerializerDefinition.versionedService(2, TestObjectMapperConfigurer.class));
 		
 		Object serialized = astrixObjectSerializer.serialize(new TestPojoV2("foo", "bar"), 2);
 		TestPojoV2 deserializedPojo = astrixObjectSerializer.deserialize(serialized, TestPojoV2.class, 2);
@@ -45,7 +39,7 @@ public class JacksonVersioningPluginTest {
 	
 	@Test
 	public void deserializesFromV1ObjectsByUpgrading() throws Exception {
-		AstrixObjectSerializer astrixObjectSerializer = new Jackson1SerializerPlugin().create(ObjectSerializerDefinition.versionedService(2, TestObjectMapperConfigurer.class));
+		AstrixObjectSerializer astrixObjectSerializer = new Jackson2SerializerPlugin().create(ObjectSerializerDefinition.versionedService(2, TestObjectMapperConfigurer.class));
 		
 		Object serializedV1 = astrixObjectSerializer.serialize(new TestPojoV1("foo"), 1);
 		TestPojoV2 deserializedPojo = astrixObjectSerializer.deserialize(serializedV1, TestPojoV2.class, 1);
@@ -55,7 +49,7 @@ public class JacksonVersioningPluginTest {
 	
 	@Test
 	public void serializesToV1ObjectsByDowngrading() throws Exception {
-		AstrixObjectSerializer astrixObjectSerializer = new Jackson1SerializerPlugin().create(ObjectSerializerDefinition.versionedService(2, TestObjectMapperConfigurer.class));
+		AstrixObjectSerializer astrixObjectSerializer = new Jackson2SerializerPlugin().create(ObjectSerializerDefinition.versionedService(2, TestObjectMapperConfigurer.class));
 		
 		Object serializedV1 = astrixObjectSerializer.serialize(new TestPojoV2("foo", "bar"), 1); // bar will be removed during serialization
 		TestPojoV2 deserializedPojo = astrixObjectSerializer.deserialize(serializedV1, TestPojoV2.class, 2);
@@ -66,7 +60,7 @@ public class JacksonVersioningPluginTest {
 	public static class FakeDescriptor {
 	}
 	
-	public static class TestObjectMapperConfigurer implements Jackson1ObjectSerializerConfigurer {
+	public static class TestObjectMapperConfigurer implements Jackson2ObjectSerializerConfigurer {
 
 		@Override
 		public List<? extends AstrixJsonApiMigration> apiMigrations() {

@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.versioning.jackson1;
+package com.avanza.astrix.versioning.jackson2;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.codehaus.jackson.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * A message migrator is responsible for migration a message on an old version
  * to the current version, and also responsible for migration messages on the

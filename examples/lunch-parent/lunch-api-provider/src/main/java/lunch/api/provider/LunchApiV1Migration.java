@@ -15,12 +15,10 @@
  */
 package lunch.api.provider;
 
+import com.avanza.astrix.versioning.jackson2.AstrixJsonApiMigration;
+import com.avanza.astrix.versioning.jackson2.AstrixJsonMessageMigration;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lunch.api.LunchRestaurant;
-
-import org.codehaus.jackson.node.ObjectNode;
-
-import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
-import com.avanza.astrix.versioning.jackson1.AstrixJsonMessageMigration;
 
 public class LunchApiV1Migration implements AstrixJsonApiMigration {
 

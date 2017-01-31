@@ -18,11 +18,11 @@ package com.avanza.astrix.serviceunit;
 import java.util.Collections;
 import java.util.List;
 
-import com.avanza.astrix.versioning.jackson1.AstrixJsonApiMigration;
-import com.avanza.astrix.versioning.jackson1.Jackson1ObjectSerializerConfigurer;
-import com.avanza.astrix.versioning.jackson1.JacksonObjectMapperBuilder;
+import com.avanza.astrix.versioning.jackson2.AstrixJsonApiMigration;
+import com.avanza.astrix.versioning.jackson2.Jackson2ObjectSerializerConfigurer;
+import com.avanza.astrix.versioning.jackson2.JacksonObjectMapperBuilder;
 
-public class ServiceAdministratorVersioningConfigurer implements Jackson1ObjectSerializerConfigurer {
+public class ServiceAdministratorVersioningConfigurer implements Jackson2ObjectSerializerConfigurer {
 
 	@Override
 	public List<? extends AstrixJsonApiMigration> apiMigrations() {

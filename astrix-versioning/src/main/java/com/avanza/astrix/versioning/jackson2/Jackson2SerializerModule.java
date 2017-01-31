@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.versioning.jackson1;
+package com.avanza.astrix.versioning.jackson2;
 
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 
-public class Jackson1SerializerModule implements Module {
+public class Jackson2SerializerModule implements Module {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(ObjectSerializerFactoryPlugin.class, Jackson1SerializerPlugin.class);
+		moduleContext.bind(ObjectSerializerFactoryPlugin.class, Jackson2SerializerPlugin.class);
 		
 		moduleContext.export(ObjectSerializerFactoryPlugin.class);
 	}

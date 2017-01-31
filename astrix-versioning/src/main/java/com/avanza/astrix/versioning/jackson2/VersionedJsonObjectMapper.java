@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.versioning.jackson1;
+package com.avanza.astrix.versioning.jackson2;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -24,20 +24,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.Version;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.JsonDeserializer;
-import org.codehaus.jackson.map.JsonSerializer;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.codehaus.jackson.map.module.SimpleModule;
-import org.codehaus.jackson.node.ObjectNode;
-import org.codehaus.jackson.type.JavaType;
-
-import com.avanza.astrix.versioning.jackson1.JsonMessageMigrator.Builder;
+import com.avanza.astrix.versioning.jackson2.JsonMessageMigrator.Builder;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 	
@@ -170,7 +164,7 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 	
 	static class MessageMigratorsBuilder {
 		
-		Map<Class<?>, JsonMessageMigrator.Builder<?>> buildersByType = new HashMap<Class<?>, JsonMessageMigrator.Builder<?>>();
+		Map<Class<?>, JsonMessageMigrator.Builder<?>> buildersByType = new HashMap<>();
 		
 		MessageMigratorsBuilder registerAll(List<? extends AstrixJsonApiMigration> migrations) {
 			for (AstrixJsonApiMigration apiMigration : migrations) {
@@ -192,7 +186,7 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 		}
 		
 		ConcurrentMap<Class<?>, JsonMessageMigrator<?>> build() {
-			ConcurrentMap<Class<?>, JsonMessageMigrator<?>> migratorsByType = new ConcurrentHashMap<Class<?>, JsonMessageMigrator<?>>();
+			ConcurrentMap<Class<?>, JsonMessageMigrator<?>> migratorsByType = new ConcurrentHashMap<>();
 			for (JsonMessageMigrator.Builder<?> builder : this.buildersByType.values()) {
 				JsonMessageMigrator<?> jsonMessageMigrator = builder.build();
 				migratorsByType.put(jsonMessageMigrator.getJavaType(), jsonMessageMigrator);
@@ -229,7 +223,7 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 		}
 		
 		private ObjectMapper buildMigratingMapper(ObjectMapper rawMapper, ThreadLocal<Integer> versionHolder) {
-			SimpleModule module = new SimpleModule("Astrix-migratingModule", new Version(1,0,0, ""));
+			SimpleModule module = new SimpleModule("Astrix-migratingModule", new Version(1, 0, 0, "", null, null));
 			for (JsonMessageMigrator<?> migrator : this.migratorsByType.values()) {
 				registerSerializerAndDeserializer(rawMapper, versionHolder, module, migrator);
 			}
