@@ -145,7 +145,7 @@
 		<slf4j.version>1.7.10</slf4j.version>
 		<gigaspaces.version>10.1.1-12800-RELEASE</gigaspaces.version>
 		<rxjava.version>1.2.0</rxjava.version>
-		<hystrix.version>1.5.8</hystrix.version>
+		<hystrix.version>1.5.9</hystrix.version>
 		<archaius.version>0.4.1</archaius.version>
 		<jackson2.version>2.8.6</jackson2.version>
 		<guava.version>19.0</guava.version>
