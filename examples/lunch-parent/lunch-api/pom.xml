@@ -12,8 +12,12 @@
 		<artifactId>astrix-core</artifactId>  	
   	</dependency>
   	<dependency>
-		<groupId>com.gigaspaces</groupId>
-		<artifactId>gs-openspaces</artifactId>  	
+		<groupId>org.gigaspaces</groupId>
+		<artifactId>xap-datagrid</artifactId>  	
+  	</dependency>
+  	<dependency>
+		<groupId>org.gigaspaces</groupId>
+		<artifactId>xap-openspaces</artifactId>  	
   	</dependency>
   </dependencies>
 </project>

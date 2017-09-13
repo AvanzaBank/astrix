@@ -143,7 +143,7 @@
 		<spring.version>4.1.1.RELEASE</spring.version>
 		<spring.groupId>org.springframework</spring.groupId>
 		<slf4j.version>1.7.10</slf4j.version>
-		<gigaspaces.version>10.1.1-12800-RELEASE</gigaspaces.version>
+		<gigaspaces.version>12.1.1</gigaspaces.version>
 		<rxjava.version>1.2.0</rxjava.version>
 		<hystrix.version>1.5.8</hystrix.version>
 		<archaius.version>0.4.1</archaius.version>
@@ -281,90 +281,25 @@
 			</dependency>
 
 			<dependency>
-				<groupId>com.gigaspaces</groupId>
-				<artifactId>gs-openspaces</artifactId>
+				<groupId>org.gigaspaces</groupId>
+				<artifactId>xap-openspaces</artifactId>
 				<version>${gigaspaces.version}</version>
-				<exclusions>
+ 				<exclusions>
 					<exclusion>
-						<artifactId>junit</artifactId>
-						<groupId>junit</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>jruby</artifactId>
-						<groupId>org.jruby</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>hibernate-core</artifactId>
-						<groupId>org.hibernate</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>xap-jms</artifactId>
-						<groupId>com.gigaspaces</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>jotm-core</artifactId>
-						<groupId>org.ow2.jotm</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>spring-web</artifactId>
-						<groupId>org.springframework</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>commons-pool</artifactId>
-						<groupId>commons-pool</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>jbossjta</artifactId>
-						<groupId>org.jboss.jbossts</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>hsqldb</artifactId>
-						<groupId>org.hsqldb</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>geronimo-jta_1.1_spec</artifactId>
-						<groupId>org.apache.geronimo.specs</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>geronimo-jpa_2.0_spec</artifactId>
-						<groupId>org.apache.geronimo.specs</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-						<groupId>org.apache.geronimo.specs</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>velocity</artifactId>
-						<groupId>velocity</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>transactions-jta</artifactId>
-						<groupId>com.atomikos</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>openjpa</artifactId>
-						<groupId>org.apache.openjpa</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>commons-lang</artifactId>
-						<groupId>commons-lang</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>commons-collections</artifactId>
-						<groupId>commons-collections</groupId>
+						<artifactId>*</artifactId>
+						<groupId>*</groupId>
 					</exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
-				<groupId>com.gigaspaces</groupId>
-				<artifactId>gs-runtime</artifactId>
+				<groupId>org.gigaspaces</groupId>
+				<artifactId>xap-datagrid</artifactId>
 				<version>${gigaspaces.version}</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>tools</artifactId>
-						<groupId>com.sun</groupId>
-					</exclusion>
-				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>com.gigaspaces</groupId>
+				<artifactId>xap-near-cache-spring</artifactId>
+				<version>${gigaspaces.version}</version>
 			</dependency>
 
 			<!-- TEST -->
