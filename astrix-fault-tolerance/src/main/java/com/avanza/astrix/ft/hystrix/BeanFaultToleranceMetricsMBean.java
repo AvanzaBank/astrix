@@ -78,6 +78,18 @@ public interface BeanFaultToleranceMetricsMBean {
 	int getPoolCurrentQueueCount();
 
 	int getPoolRollingMaxActiveThreads();
-	
 
+	int getIsCircuitBreakerOpen();
+
+	int getLatencyExecute50();
+
+	int getLatencyExecute90();
+
+	int getLatencyExecute99();
+
+	int getLatencyExecute100();
+
+	int getPoolCurrentSize();
+
+	int getPoolQueueSizeRejectionThreshold();
 }
