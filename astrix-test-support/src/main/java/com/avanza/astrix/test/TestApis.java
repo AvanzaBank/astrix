@@ -20,26 +20,25 @@ import com.avanza.astrix.test.TestApi.TestContext;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Stream;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentMap;
 
 final class TestApis {
 
 	private final AstrixTestContext astrixTestContext;
-	private final Map<Class<?>, TestApi> testApiByType = new ConcurrentHashMap<>();
+	private final List<Class<? extends TestApi>> testApis;
+	private final ConcurrentMap<Class<? extends TestApi>, TestApi> testApiByType = new ConcurrentHashMap<>();
 	private final Object testApiLock = new Object();
-	private final List<AstrixBeanKey<?>> exportedServices = new CopyOnWriteArrayList<>();
+	private final Queue<AstrixBeanKey<?>> exportedServices = new ConcurrentLinkedQueue<>();
 
-	public TestApis(AstrixTestContext astrixTestContext, Class<?>... testApis) {
+	@SafeVarargs
+	public TestApis(AstrixTestContext astrixTestContext, Class<? extends TestApi>... testApis) {
 		this.astrixTestContext = astrixTestContext;
-		loadRecursive(Arrays.stream(testApis).map(TestApis::castToTestApi));
-	}
-
-	private void loadRecursive(Stream<Class<? extends TestApi>> testApis) {
-		testApis.forEach(this::ensureLoaded);
+		this.testApis = Arrays.asList(testApis);
+		this.testApis.forEach(this::ensureLoaded);
 	}
 
 	private void ensureLoaded(Class<? extends TestApi> testApi) {
@@ -54,39 +53,32 @@ final class TestApis {
 		}
 	}
 
-	private TestApi loadTestApi(Class<?> testApiType) {
+	private TestApi loadTestApi(Class<? extends TestApi> testApiType) {
 		TestApi testApi = initTestApi(testApiType);
-		loadRecursive(testApi.getDependencies());
+		testApi.getDependencies().forEach(this::ensureLoaded);
 		testApi.exportServices(new TestApiContext());
 		return testApi;
 	}
 
-	private TestApi initTestApi(Class<?> testApiType) {
+	private TestApi initTestApi(Class<? extends TestApi> testApiType) {
 		try {
-			return castToTestApi(testApiType).newInstance();
+			return testApiType.newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException("Failed to instantiate TestApi: " + testApiType.getName(), e);
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private static Class<? extends TestApi> castToTestApi(Class<?> api) {
-		if (!TestApi.class.isAssignableFrom(api)) {
-			throw new IllegalArgumentException("Not a testapi: " + api);
-		}
-		return (Class<? extends TestApi>) api;
-	}
-
 	<T extends TestApi> T getTestApi(Class<T> testApi) {
 		return Optional.ofNullable(testApiByType.get(testApi))
-					   .map(testApi::cast)
-					   .orElseThrow(() -> new IllegalStateException("No TestApi registered for: " + testApi.getName()));
+				.map(testApi::cast)
+				.orElseThrow(() -> new IllegalStateException("No TestApi registered for: " + testApi.getName()));
 	}
 
 	void reset() {
 		exportedServices.forEach(key -> astrixTestContext.setProxyState(key.getBeanType(), key.getQualifier(), null));
 		exportedServices.clear();
-		testApiByType.forEach((key, testApi) -> testApiByType.put(key, loadTestApi(key)));
+		testApiByType.clear();
+		testApis.forEach(this::ensureLoaded);
 	}
 
 	private class TestApiContext implements TestContext {
@@ -103,6 +95,8 @@ final class TestApis {
 
 		@Override
 		public <T> T getBean(Class<T> serviceBean) {
+			// TODO: If needed, then create a distinct AstrixContext
+			// instance for each TestApiContext instance.
 			return astrixTestContext.getBean(serviceBean);
 		}
 

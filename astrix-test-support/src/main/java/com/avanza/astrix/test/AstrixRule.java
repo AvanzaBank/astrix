@@ -69,11 +69,13 @@ public class AstrixRule implements TestRule {
 
 	private final AstrixTestContext astrixTestContext;
 
-	public AstrixRule(Class<?>... testApis) {
+	@SafeVarargs
+	public AstrixRule(Class<? extends TestApi>... testApis) {
 		this.astrixTestContext = new AstrixTestContext(testApis);
 	}
 
-	public AstrixRule(Consumer<AstrixRuleContext> contextConfigurer, Class<?>... testApis) {
+	@SafeVarargs
+	public AstrixRule(Consumer<AstrixRuleContext> contextConfigurer, Class<? extends TestApi>... testApis) {
 		this(testApis);
 		contextConfigurer.accept(new AstrixRuleContext() {
 
