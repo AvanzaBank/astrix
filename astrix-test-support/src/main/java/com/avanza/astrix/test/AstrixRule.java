@@ -75,10 +75,9 @@ public class AstrixRule implements TestRule {
 	}
 
 	@SafeVarargs
-	public AstrixRule(Consumer<AstrixRuleContext> contextConfigurer, Class<? extends TestApi>... testApis) {
+	public AstrixRule(Consumer<? super AstrixRuleContext> contextConfigurer, Class<? extends TestApi>... testApis) {
 		this(testApis);
 		contextConfigurer.accept(new AstrixRuleContext() {
-
             @Override
             public <T> void registerProxy(Class<T> service) {
             	astrixTestContext.registerProxy(service);
@@ -212,7 +211,7 @@ public class AstrixRule implements TestRule {
 		return astrixTestContext.getTestApi(testApi);
 	}
 
-	void resetTestApis() {
+	public void resetTestApis() {
 		this.astrixTestContext.resetTestApis();
 	}
 
