@@ -55,7 +55,7 @@ final class TestApis {
 
 	private TestApi loadTestApi(Class<? extends TestApi> testApiType) {
 		TestApi testApi = initTestApi(testApiType);
-		testApi.getDependencies().forEach(this::ensureLoaded);
+		testApi.getTestApiDependencies().forEach(this::ensureLoaded);
 		testApi.exportServices(new TestApiContext());
 		return testApi;
 	}
