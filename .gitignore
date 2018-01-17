@@ -9,3 +9,4 @@ target
 .recommenders/
 .idea/
 *.iml
+!.mvn/wrapper/maven-wrapper.jar
