@@ -32,8 +32,11 @@ public class TestApiResetRule implements TestRule {
 		return new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
-				base.evaluate();
-				astrixRule.resetTestApis();
+				try {
+					base.evaluate();
+				} finally {
+					astrixRule.resetTestApis();
+				}
 			}
 		};
 	}
