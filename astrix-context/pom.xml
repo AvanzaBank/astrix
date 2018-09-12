@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>astrix-config</artifactId>
-			<version>${project.version}</version>
+			<version>0.43.5</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

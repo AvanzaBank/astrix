@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>com.avanza.astrix</groupId>
 			<artifactId>astrix-config</artifactId>
-			<version>${project.version}</version>
+			<version>0.43.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
