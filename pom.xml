@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.avanza.astrix</groupId>
+	<groupId>com.avanza.astrix12</groupId>
 	<artifactId>astrix-parent</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
@@ -19,7 +19,6 @@
 		<module>astrix-service-registry-pu</module>
 		<module>astrix-test-util</module>
 		<module>astrix-gs-test-util</module>
-<!-- 		<module>astrix-dashboard</module> -->
 		<module>astrix-spring</module>
 		<module>astrix-http</module>
 		<module>astrix-remoting</module>
