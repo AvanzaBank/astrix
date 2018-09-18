@@ -16,14 +16,12 @@
 package com.avanza.astrix.ft.hystrix;
 
 
-import java.util.Optional;
-
-import com.netflix.hystrix.HystrixCommandKey;
-import com.netflix.hystrix.HystrixCommandMetrics;
+import com.netflix.hystrix.*;
 import com.netflix.hystrix.HystrixCommandMetrics.HealthCounts;
-import com.netflix.hystrix.HystrixThreadPoolKey;
-import com.netflix.hystrix.HystrixThreadPoolMetrics;
+import com.netflix.hystrix.strategy.properties.HystrixProperty;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
+
+import java.util.Optional;
 
 public class BeanFaultToleranceMetrics implements BeanFaultToleranceMetricsMBean {
 	
@@ -124,5 +122,53 @@ public class BeanFaultToleranceMetrics implements BeanFaultToleranceMetricsMBean
 				.map(Number::intValue)
 				.orElse(0);
 	}
-	
+
+	@Override
+	public int getIsCircuitBreakerOpen() {
+		return Optional.ofNullable(HystrixCircuitBreaker.Factory.getInstance(key))
+				.map(cb -> cb.isOpen() ? 1 : 0)
+				.orElse(1);
+	}
+
+	@Override
+	public int getLatencyExecute50() {
+		return getCommandMetrics().map(m -> m.getExecutionTimePercentile(50))
+				.orElse(0);
+	}
+
+	@Override
+	public int getLatencyExecute90() {
+		return getCommandMetrics().map(m -> m.getExecutionTimePercentile(90))
+				.orElse(0);
+	}
+
+	@Override
+	public int getLatencyExecute99() {
+		return getCommandMetrics().map(m -> m.getExecutionTimePercentile(99))
+				.orElse(0);
+	}
+
+	@Override
+	public int getLatencyExecute100() {
+		return getCommandMetrics().map(m -> m.getExecutionTimePercentile(100))
+				.orElse(0);
+	}
+
+	@Override
+	public int getPoolCurrentSize() {
+		return Optional.ofNullable(HystrixThreadPoolMetrics.getInstance(poolKey))
+				.map(HystrixThreadPoolMetrics::getCurrentPoolSize)
+				.map(Number::intValue)
+				.orElse(0);
+	}
+
+	@Override
+	public int getPoolQueueSizeRejectionThreshold() {
+		return Optional.ofNullable(HystrixThreadPoolMetrics.getInstance(poolKey))
+				.map(HystrixThreadPoolMetrics::getProperties)
+				.map(HystrixThreadPoolProperties::queueSizeRejectionThreshold)
+				.map(HystrixProperty::<Integer>get)
+				.orElse(0);
+	}
+
 }

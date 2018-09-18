@@ -46,7 +46,7 @@ public interface TestApi {
 	 * 
 	 * @return
 	 */
-	default Stream<Class<? extends TestApi>> getDependencies() {
+	default Stream<Class<? extends TestApi>> getTestApiDependencies() {
 		return Stream.empty();
 	}
 

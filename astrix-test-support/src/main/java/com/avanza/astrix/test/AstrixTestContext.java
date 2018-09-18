@@ -38,7 +38,8 @@ public class AstrixTestContext implements AstrixContext {
 	private final ConcurrentMap<AstrixBeanKey<?>, ProviderProxy<?>> providers = new ConcurrentHashMap<>();
 	private final TestApis testApis;
 
-	public AstrixTestContext(Class<?>... testApis) {
+	@SafeVarargs
+	public AstrixTestContext(Class<? extends TestApi>... testApis) {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setConfig(DynamicConfig.create(this.serviceRegistry));
 		this.context = configurer.configure();
