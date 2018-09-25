@@ -138,10 +138,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 		<log4j.version>1.2.16</log4j.version>
-		<spring.version>4.1.1.RELEASE</spring.version>
+		<spring.version>4.3.17.RELEASE</spring.version>
 		<spring.groupId>org.springframework</spring.groupId>
 		<slf4j.version>1.7.10</slf4j.version>
-		<gigaspaces.version>12.1.1</gigaspaces.version>
+		<gigaspaces.version>12.3.1</gigaspaces.version>
 		<rxjava.version>1.2.0</rxjava.version>
 		<hystrix.version>1.5.8</hystrix.version>
 		<archaius.version>0.4.1</archaius.version>
