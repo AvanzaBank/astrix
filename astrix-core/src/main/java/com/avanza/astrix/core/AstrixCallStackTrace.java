@@ -25,7 +25,7 @@ public final class AstrixCallStackTrace extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	
 	public AstrixCallStackTrace() {
-		super("This stack contains the point where the astrix bean where invoked");
+		super("This stack contains the point where the astrix bean was invoked");
 	}
 	
 }
