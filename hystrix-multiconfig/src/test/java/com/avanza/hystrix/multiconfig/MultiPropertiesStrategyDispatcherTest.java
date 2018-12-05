@@ -15,6 +15,8 @@
  */
 package com.avanza.hystrix.multiconfig;
 
+import com.netflix.hystrix.HystrixCollapserProperties;
+import com.netflix.hystrix.strategy.properties.HystrixPropertiesCollapserDefault;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -22,6 +24,8 @@ import com.netflix.hystrix.HystrixCollapserKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixThreadPoolKey;
 import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
+
+import static org.junit.Assert.assertTrue;
 
 public class MultiPropertiesStrategyDispatcherTest {
 
@@ -63,5 +67,22 @@ public class MultiPropertiesStrategyDispatcherTest {
 		
 		Mockito.verify(mock).getCollapserProperties(HystrixCollapserKey.Factory.asKey("com.avanza.test.TestApi.TestService"), defaultCollapserSetter);
 	}
-	
+
+	@Test
+	public void delegatesToUnderlyingCollapserKeys() {
+		HystrixPropertiesStrategy mock = Mockito.mock(HystrixPropertiesStrategy.class);
+
+		dispatcher.setUnderlying(mock);
+		dispatcher.getCollapserProperties(HystrixCollapserKey.Factory.asKey("com.avanza.test.TestApi.TestService"), defaultCollapserSetter);
+
+		Mockito.verify(mock).getCollapserProperties(HystrixCollapserKey.Factory.asKey("com.avanza.test.TestApi.TestService"), defaultCollapserSetter);
+	}
+
+	@Test
+	public void delegatesToDefaultCollapserKeys() {
+
+		final HystrixCollapserProperties collapserProperties = dispatcher.getCollapserProperties(HystrixCollapserKey.Factory.asKey("com.avanza.test.TestApi.TestService"), defaultCollapserSetter);
+
+		assertTrue(collapserProperties instanceof HystrixPropertiesCollapserDefault);
+	}
 }
