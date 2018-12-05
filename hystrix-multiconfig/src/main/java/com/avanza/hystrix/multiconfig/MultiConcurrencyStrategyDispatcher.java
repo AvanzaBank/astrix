@@ -15,51 +15,75 @@
  */
 package com.avanza.hystrix.multiconfig;
 
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import com.netflix.hystrix.HystrixThreadPoolKey;
 import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategy;
-import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategyDefault;
 import com.netflix.hystrix.strategy.concurrency.HystrixRequestVariable;
 import com.netflix.hystrix.strategy.concurrency.HystrixRequestVariableLifecycle;
 import com.netflix.hystrix.strategy.properties.HystrixProperty;
 
-public class MultiConcurrencyStrategyDispatcher extends HystrixConcurrencyStrategy {
-	private final Map<MultiConfigId, HystrixConcurrencyStrategy> strategies = new ConcurrentHashMap<>();
-	private final HystrixConcurrencyStrategy defaultStrategy = HystrixConcurrencyStrategyDefault.getInstance();
-	
-	@Override
-	public ThreadPoolExecutor getThreadPool(HystrixThreadPoolKey threadPoolKey, HystrixProperty<Integer> corePoolSize,
-			HystrixProperty<Integer> maximumPoolSize, HystrixProperty<Integer> keepAliveTime, TimeUnit unit,
-			BlockingQueue<Runnable> workQueue) {
-		if (MultiConfigId.hasMultiSourceId(threadPoolKey)) {
-			return strategies.get(MultiConfigId.readFrom(threadPoolKey))
-					.getThreadPool(MultiConfigId.decode(threadPoolKey), corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
-		} else {
-			return defaultStrategy.getThreadPool(threadPoolKey, corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
-		}
-	}
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
-	@Override
-	public <T> HystrixRequestVariable<T> getRequestVariable(HystrixRequestVariableLifecycle<T> rv) {
-		return HystrixConcurrencyStrategyDefault.getInstance().getRequestVariable(rv);
-	}
-	
-	@Override
-	public BlockingQueue<Runnable> getBlockingQueue(int maxQueueSize) {
-		return HystrixConcurrencyStrategyDefault.getInstance().getBlockingQueue(maxQueueSize);
-	}
+public class MultiConcurrencyStrategyDispatcher extends HystrixConcurrencyStrategy implements Dispatcher<HystrixConcurrencyStrategy> {
 
-	public void register(String id, HystrixConcurrencyStrategy strategy) {
-		this.strategies.put(MultiConfigId.create(id), strategy);
-	}
+    private final Map<MultiConfigId, HystrixConcurrencyStrategy> strategies = new ConcurrentHashMap<>();
+    private final AtomicReference<HystrixConcurrencyStrategy> underlying = new AtomicReference<>();
 
-	public boolean containsMapping(String id) {
-		return this.strategies.containsKey(MultiConfigId.create(id));
-	}
-	
+    @Override
+    public ThreadPoolExecutor getThreadPool(HystrixThreadPoolKey threadPoolKey,
+                                            HystrixProperty<Integer> corePoolSize,
+                                            HystrixProperty<Integer> maximumPoolSize,
+                                            HystrixProperty<Integer> keepAliveTime, TimeUnit unit,
+                                            BlockingQueue<Runnable> workQueue) {
+        if (MultiConfigId.hasMultiSourceId(threadPoolKey)) {
+            return strategies.get(MultiConfigId.readFrom(threadPoolKey))
+                             .getThreadPool(MultiConfigId.decode(threadPoolKey), corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+        }
+        else {
+            return underlying().map(strategy -> strategy.getThreadPool(threadPoolKey, corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue))
+                               .orElseGet(() -> super.getThreadPool(threadPoolKey, corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue));
+        }
+    }
+
+    @Override
+    public <T> HystrixRequestVariable<T> getRequestVariable(HystrixRequestVariableLifecycle<T> rv) {
+        return underlying().map(strategy -> strategy.getRequestVariable(rv))
+                           .orElseGet(() -> super.getRequestVariable(rv));
+    }
+
+    @Override
+    public BlockingQueue<Runnable> getBlockingQueue(int maxQueueSize) {
+        return underlying().map(strategy -> strategy.getBlockingQueue(maxQueueSize))
+                           .orElseGet(() -> super.getBlockingQueue(maxQueueSize));
+    }
+
+    @Override
+    public <T> Callable<T> wrapCallable(final Callable<T> callable) {
+        return underlying().map(strategy -> strategy.wrapCallable(callable))
+                           .orElseGet(() -> super.wrapCallable(callable));
+    }
+
+    public void register(String id, HystrixConcurrencyStrategy strategy) {
+        this.strategies.put(MultiConfigId.create(id), strategy);
+    }
+
+    public boolean containsMapping(String id) {
+        return this.strategies.containsKey(MultiConfigId.create(id));
+    }
+
+    private Optional<HystrixConcurrencyStrategy> underlying() {
+        return Optional.ofNullable(underlying.get());
+    }
+
+    @Override
+    public void setUnderlying(final HystrixConcurrencyStrategy underlying) {
+        this.underlying.set(underlying);
+    }
+
+    @Override
+    public HystrixConcurrencyStrategy instance() {
+        return this;
+    }
 }
