@@ -15,15 +15,13 @@
  */
 package com.avanza.astrix.remoting.server;
 
-import org.kohsuke.MetaInfServices;
-
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.mbeans.MBeanExporter;
 import com.avanza.astrix.context.metrics.Metrics;
 import com.avanza.astrix.modules.ModuleContext;
-@MetaInfServices(AstrixContextPlugin.class)
+
 public class RemotingServerModule implements AstrixContextPlugin {
 
 	@Override

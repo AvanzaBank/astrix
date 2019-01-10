@@ -15,14 +15,12 @@
  */
 package com.avanza.astrix.metrics;
 
-import org.kohsuke.MetaInfServices;
-
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.metrics.MetricsSpi;
 import com.avanza.astrix.modules.ModuleContext;
 
-@MetaInfServices(AstrixContextPlugin.class)
+
 public class DropwizardPlugin implements AstrixContextPlugin {
 
 	@Override

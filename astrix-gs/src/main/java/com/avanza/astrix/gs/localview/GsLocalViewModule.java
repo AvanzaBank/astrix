@@ -15,8 +15,6 @@
  */
 package com.avanza.astrix.gs.localview;
 
-import org.kohsuke.MetaInfServices;
-
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.context.AstrixContextPlugin;
@@ -25,7 +23,7 @@ import com.avanza.astrix.gs.ClusteredProxyBinder;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
 
-@MetaInfServices(AstrixContextPlugin.class)
+
 public class GsLocalViewModule implements AstrixContextPlugin  {
 
 	@Override

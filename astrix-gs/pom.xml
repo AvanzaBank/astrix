@@ -63,14 +63,7 @@
 			<groupId>org.gigaspaces</groupId>
 			<artifactId>xap-datagrid</artifactId>			
 		</dependency>
-		
-		<dependency>
-			<groupId>org.kohsuke.metainf-services</groupId>
-			<artifactId>metainf-services</artifactId>
-			<version>1.1</version>
-			<optional>true</optional>
-		</dependency>
-		
+
 		<!-- TEST -->
 		<dependency>
 			<groupId>junit</groupId>
