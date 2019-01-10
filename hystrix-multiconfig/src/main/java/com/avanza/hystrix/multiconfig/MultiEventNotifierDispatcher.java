@@ -15,48 +15,79 @@
  */
 package com.avanza.hystrix.multiconfig;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixEventType;
 import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;
-import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifierDefault;
 
-public class MultiEventNotifierDispatcher extends HystrixEventNotifier {
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
-	private Map<MultiConfigId, HystrixEventNotifier> strategies = new ConcurrentHashMap<>();
-	private HystrixEventNotifier defaultStrategy = HystrixEventNotifierDefault.getInstance();
-	
-	@Override
-	public void markCommandExecution(HystrixCommandKey key, ExecutionIsolationStrategy isolationStrategy, int duration,
-			List<HystrixEventType> eventsDuringExecution) {
-		if (MultiConfigId.hasMultiSourceId(key)) {
-			strategies.get(MultiConfigId.readFrom(key))
-					.markCommandExecution(MultiConfigId.decode(key), isolationStrategy, duration, eventsDuringExecution);
-		} else {
-			defaultStrategy.markCommandExecution(key, isolationStrategy, duration, eventsDuringExecution);
-		}
-	}
-	
-	@Override
-	public void markEvent(HystrixEventType eventType, HystrixCommandKey key) {
-		if (MultiConfigId.hasMultiSourceId(key)) {
-			strategies.get(MultiConfigId.readFrom(key))
-				.markEvent(eventType, MultiConfigId.decode(key));
-		} else {
-			defaultStrategy.markEvent(eventType, key);
-		}
-	}
+public class MultiEventNotifierDispatcher extends HystrixEventNotifier implements Dispatcher<HystrixEventNotifier> {
 
-	public void register(String id, HystrixEventNotifier strategy) {
-		this.strategies.put(MultiConfigId.create(id), strategy);
-	}
-	
-	public boolean containsMapping(String id) {
-		return this.strategies.containsKey(MultiConfigId.create(id));
-	}
-	
+    private Map<MultiConfigId, HystrixEventNotifier> strategies = new ConcurrentHashMap<>();
+    private final AtomicReference<HystrixEventNotifier> underlying = new AtomicReference<>();
+
+    @Override
+    public void markCommandExecution(HystrixCommandKey key, ExecutionIsolationStrategy isolationStrategy, int duration, List<HystrixEventType> eventsDuringExecution) {
+        if (MultiConfigId.hasMultiSourceId(key)) {
+            strategies.get(MultiConfigId.readFrom(key))
+                      .markCommandExecution(MultiConfigId.decode(key), isolationStrategy, duration, eventsDuringExecution);
+        }
+        else {
+            underlying()
+                    .map(notifier -> {
+                        notifier.markCommandExecution(key, isolationStrategy, duration, eventsDuringExecution);
+                        return null;
+                    })
+                    .orElseGet(() -> {
+                        super.markCommandExecution(key, isolationStrategy, duration, eventsDuringExecution);
+                        return null;
+                    });
+        }
+    }
+
+    @Override
+    public void markEvent(HystrixEventType eventType, HystrixCommandKey key) {
+        if (MultiConfigId.hasMultiSourceId(key)) {
+            strategies.get(MultiConfigId.readFrom(key))
+                      .markEvent(eventType, MultiConfigId.decode(key));
+        }
+        else {
+            underlying()
+                    .map(notifier -> {
+                        notifier.markEvent(eventType, key);
+                        return null;
+                    })
+                    .orElseGet(() -> {
+                        super.markEvent(eventType, key);
+                        return null;
+                    });
+        }
+    }
+
+    public void register(String id, HystrixEventNotifier strategy) {
+        this.strategies.put(MultiConfigId.create(id), strategy);
+    }
+
+    public boolean containsMapping(String id) {
+        return this.strategies.containsKey(MultiConfigId.create(id));
+    }
+
+    private Optional<HystrixEventNotifier> underlying() {
+        return Optional.ofNullable(underlying.get());
+    }
+
+    @Override
+    public void setUnderlying(final HystrixEventNotifier underlying) {
+        this.underlying.set(underlying);
+    }
+
+    @Override
+    public HystrixEventNotifier instance() {
+        return this;
+    }
 }

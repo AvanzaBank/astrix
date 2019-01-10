@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.core;
+package com.avanza.hystrix.multiconfig;
 
-/**
- * 
- * @author Elias Lindholm (elilin)
- *
- */
-public final class AstrixCallStackTrace extends RuntimeException {
+interface Dispatcher<T> {
 
-	private static final long serialVersionUID = 1L;
-	
-	public AstrixCallStackTrace() {
-		super("This stack contains the point where the astrix bean was invoked");
-	}
-	
+    void setUnderlying(T underlying);
+
+    T instance();
+
 }
