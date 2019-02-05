@@ -15,39 +15,40 @@
  */
 package com.avanza.astrix.gs.remoting;
 
-import java.util.Objects;
-
-import javax.annotation.Resource;
-
-import org.openspaces.core.executor.AutowireTask;
-import org.openspaces.core.executor.Task;
-
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 import com.avanza.astrix.spring.AstrixSpringContext;
+import org.openspaces.core.executor.AutowireTask;
+import org.openspaces.core.executor.Task;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Objects;
+
 /**
- * 
  * @author Elias Lindholm (elilin)
- *
  */
 @AutowireTask
 public class AstrixServiceInvocationTask implements Task<AstrixServiceInvocationResponse> {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Resource
-	private transient AstrixSpringContext astrixSpringContext;
-	private final AstrixServiceInvocationRequest invocationRequest;
-	
-	public AstrixServiceInvocationTask(AstrixServiceInvocationRequest invocationRequest) {
-		this.invocationRequest = Objects.requireNonNull(invocationRequest);
-	}
+    @Autowired
+    public transient AstrixSpringContext astrixSpringContext;
+    private final AstrixServiceInvocationRequest invocationRequest;
 
-	@Override
-	public AstrixServiceInvocationResponse execute() throws Exception {
-		AstrixServiceActivator serviceActivator = astrixSpringContext.getInstance(AstrixServiceActivator.class);
-		return serviceActivator.invokeService(invocationRequest);
-	}
+    public AstrixServiceInvocationTask(AstrixServiceInvocationRequest invocationRequest) {
+        this.invocationRequest = Objects.requireNonNull(invocationRequest);
+    }
+
+    @Override
+    public AstrixServiceInvocationResponse execute() throws Exception {
+        AstrixServiceActivator serviceActivator = Objects
+                .requireNonNull(astrixSpringContext, "astrixSpringContext not set!")
+                .getInstance(AstrixServiceActivator.class);
+        return Objects
+                .requireNonNull(serviceActivator, "serviceActivator not found!")
+                .invokeService(invocationRequest);
+    }
 
 }
