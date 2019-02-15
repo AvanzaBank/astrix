@@ -15,19 +15,18 @@
  */
 package com.avanza.astrix.gs.remoting;
 
-import java.util.List;
-import java.util.Objects;
-
-import javax.annotation.Resource;
-
-import org.openspaces.core.executor.AutowireTask;
-import org.openspaces.core.executor.DistributedTask;
-
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 import com.avanza.astrix.spring.AstrixSpringContext;
 import com.gigaspaces.async.AsyncResult;
+import org.openspaces.core.executor.AutowireTask;
+import org.openspaces.core.executor.DistributedTask;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Objects;
+
 /**
  * Carries an AstrixServiceInvocationRequest from client to server and performs
  * the invocation of the {@link AstrixServiceActivatorImpl} by using the possibility
@@ -40,8 +39,8 @@ import com.gigaspaces.async.AsyncResult;
 public class AstrixDistributedServiceInvocationTask implements DistributedTask<AstrixServiceInvocationResponse, List<AsyncResult<AstrixServiceInvocationResponse>>> {
 
 	private static final long serialVersionUID = 1L;
-	@Resource
-	private transient AstrixSpringContext astrixSpringContext;
+	@Autowired
+	public transient AstrixSpringContext astrixSpringContext;
 	private final AstrixServiceInvocationRequest request;
 	
 	public AstrixDistributedServiceInvocationTask(AstrixServiceInvocationRequest request) {
@@ -50,8 +49,12 @@ public class AstrixDistributedServiceInvocationTask implements DistributedTask<A
 
 	@Override
 	public AstrixServiceInvocationResponse execute() throws Exception {
-		AstrixServiceActivator serviceActivator = astrixSpringContext.getInstance(AstrixServiceActivator.class);
-		return serviceActivator.invokeService(request);
+		var serviceActivator = Objects
+				.requireNonNull(astrixSpringContext, "astrixSpringContext not set!")
+				.getInstance(AstrixServiceActivator.class);
+		return Objects
+				.requireNonNull(serviceActivator, "serviceActivator not found!")
+				.invokeService(request);
 	}
 	
 	@Override
