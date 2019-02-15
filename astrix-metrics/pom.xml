@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.avanza.astrix14</groupId>
 		<artifactId>astrix-parent</artifactId>
-		<version>14.0.3-SNAPSHOT</version>
+		<version>14.0.3</version>
 	</parent>
 	<artifactId>astrix-metrics</artifactId>
 	<name>${project.artifactId}</name>
