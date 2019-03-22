@@ -16,21 +16,6 @@
 package com.avanza.astrix.remoting.server;
 
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.config.DynamicBooleanProperty;
@@ -46,6 +31,20 @@ import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponseHeaders;
 import com.avanza.astrix.remoting.client.MissingServiceMethodException;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 /**
  * Server side component used to invoke exported services. <p> 
  * 
@@ -134,7 +133,11 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 		private AstrixServiceInvocationResponse invokeService(AstrixServiceInvocationRequest request, int version) throws IllegalAccessException,
 				InvocationTargetException {
 			Object[] arguments = unmarshal(request.getArguments(), serviceMethod.getGenericParameterTypes(), version);
+
+			// "Wingtips" restore trace data from request to trace context
 			Object result = serviceMethod.invoke(service, arguments);
+			// "Wingtips" remove trace data from trace context
+
 			AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
 			if (serviceMethod.getReturnType().equals(Void.TYPE)) {
 				return invocationResponse;

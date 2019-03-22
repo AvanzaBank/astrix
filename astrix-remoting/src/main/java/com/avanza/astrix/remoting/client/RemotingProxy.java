@@ -15,6 +15,15 @@
  */
 package com.avanza.astrix.remoting.client;
 
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
+import com.avanza.astrix.core.AstrixCallStackTrace;
+import com.avanza.astrix.core.remoting.RoutingStrategy;
+import com.avanza.astrix.core.util.ReflectionUtil;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.subjects.ReplaySubject;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -27,16 +36,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import com.avanza.astrix.beans.core.ReactiveTypeConverter;
-import com.avanza.astrix.core.AstrixCallStackTrace;
-import com.avanza.astrix.core.remoting.RoutingStrategy;
-import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
-
-import rx.Observable;
-import rx.functions.Action1;
-import rx.subjects.ReplaySubject;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -98,6 +97,8 @@ public class RemotingProxy implements InvocationHandler {
 		invocationRequest.setHeader("apiVersion", Integer.toString(this.apiVersion));
 		invocationRequest.setHeader("serviceMethodSignature", remoteServiceMethod.getSignature());
 		invocationRequest.setHeader("serviceApi", this.serviceApi);
+
+		// "Wingtips" lägg till header för traceid & parentid
 		
 		Observable<?> result = remoteServiceMethod.invoke(invocationRequest, args);
 		if (isObservableType(method.getReturnType())) {
