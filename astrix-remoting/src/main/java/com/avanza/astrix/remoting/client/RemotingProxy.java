@@ -37,6 +37,9 @@ import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.subjects.ReplaySubject;
+
+import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.*;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -95,9 +98,9 @@ public class RemotingProxy implements InvocationHandler {
 		
 		AstrixServiceInvocationRequest invocationRequest = new AstrixServiceInvocationRequest();
 		
-		invocationRequest.setHeader("apiVersion", Integer.toString(this.apiVersion));
-		invocationRequest.setHeader("serviceMethodSignature", remoteServiceMethod.getSignature());
-		invocationRequest.setHeader("serviceApi", this.serviceApi);
+		invocationRequest.setHeader(API_VERSION, Integer.toString(this.apiVersion));
+		invocationRequest.setHeader(SERVICE_METHOD_SIGNATURE, remoteServiceMethod.getSignature());
+		invocationRequest.setHeader(SERVICE_API, this.serviceApi);
 		
 		Observable<?> result = remoteServiceMethod.invoke(invocationRequest, args);
 		if (isObservableType(method.getReturnType())) {
