@@ -33,7 +33,7 @@ public class FaultToleranceModule implements Module {
 		moduleContext.importType(AstrixConfig.class);
 		moduleContext.importType(ReactiveTypeConverter.class);
 		moduleContext.importType(MBeanExporter.class);
-		
+
 		moduleContext.export(BeanFaultToleranceFactory.class);
 		moduleContext.export(ServiceBeanProxyFactory.class);
 	}

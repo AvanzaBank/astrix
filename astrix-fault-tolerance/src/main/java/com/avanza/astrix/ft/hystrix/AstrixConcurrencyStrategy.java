@@ -15,29 +15,28 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
+import com.netflix.hystrix.HystrixThreadPoolKey;
+import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategy;
+import com.netflix.hystrix.strategy.properties.HystrixProperty;
+
+import javax.annotation.PreDestroy;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PreDestroy;
-
-import com.netflix.hystrix.HystrixThreadPoolKey;
-import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategy;
-import com.netflix.hystrix.strategy.properties.HystrixProperty;
-
 final class AstrixConcurrencyStrategy extends HystrixConcurrencyStrategy {
-	
+
 	private ConcurrentMap<HystrixThreadPoolKey, ThreadPoolExecutor> threadPoolByKey = new ConcurrentHashMap<>();
-	
+
 	@Override
 	public ThreadPoolExecutor getThreadPool(HystrixThreadPoolKey threadPoolKey, HystrixProperty<Integer> corePoolSize,
 			HystrixProperty<Integer> maximumPoolSize, HystrixProperty<Integer> keepAliveTime, TimeUnit unit,
 			BlockingQueue<Runnable> workQueue) {
 		return threadPoolByKey.computeIfAbsent(threadPoolKey, (key) -> super.getThreadPool(key, corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue));
 	}
-	
+
 	@PreDestroy
 	public void destroy() {
 		/*
