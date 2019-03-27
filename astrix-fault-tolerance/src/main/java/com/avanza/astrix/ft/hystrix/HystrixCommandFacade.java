@@ -15,17 +15,17 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import java.util.Objects;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.avanza.astrix.beans.ft.ContextPropagator;
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.function.CheckedCommand;
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommand.Setter;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 /**
  * @author Elias Lindholm (elilin)
@@ -37,18 +37,20 @@ class HystrixCommandFacade<T> {
 
 	private final CheckedCommand<T> command;
 	private final Setter hystrixConfiguration;
-	
-	private HystrixCommandFacade(CheckedCommand<T> command, Setter hystrixConfiguration) {
+	private final ContextPropagation contextPropagation;
+
+	private HystrixCommandFacade(CheckedCommand<T> command, Setter hystrixConfiguration, ContextPropagation contextPropagation) {
 		this.command = command;
 		this.hystrixConfiguration = hystrixConfiguration;
+		this.contextPropagation = contextPropagation;
 	}
 
-	public static <T> T execute(CheckedCommand<T> command, Setter settings) throws Throwable {
-		return new HystrixCommandFacade<>(command, settings).execute();
+	public static <T> T execute(CheckedCommand<T> command, Setter settings, ContextPropagation contextPropagation) throws Throwable {
+		return new HystrixCommandFacade<>(command, settings, contextPropagation).execute();
 	}
 	
 	protected T execute() throws Throwable {
-		HystrixCommand<HystrixResult<T>> command = createHystrixCommand();
+		HystrixCommand<HystrixResult<T>> command = createHystrixCommand(contextPropagation);
 		HystrixResult<T> result;
 		try {
 			result = command.execute();
@@ -77,13 +79,14 @@ class HystrixCommandFacade<T> {
 		lastThowableInChain.initCause(trace);
 	}
 
-	private HystrixCommand<HystrixResult<T>> createHystrixCommand() {
+	private HystrixCommand<HystrixResult<T>> createHystrixCommand(ContextPropagation contextPropagators) {
+		ContextPropagator.ThrowingCallable<T> wrappedCall = contextPropagators.wrap(command::call);
 		return new HystrixCommand<HystrixResult<T>>(hystrixConfiguration) {
 
 			@Override
 			protected HystrixResult<T> run() throws Exception {
 				try {
-					return HystrixResult.success(command.call());
+					return HystrixResult.success(wrappedCall.call());
 				} catch (Throwable e) {
 					return handleException(e);
 				} 

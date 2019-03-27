@@ -15,17 +15,19 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import java.util.function.Supplier;
-
 import com.avanza.astrix.beans.ft.BeanFaultTolerance;
+import com.avanza.astrix.beans.ft.ContextPropagator;
 import com.avanza.astrix.core.function.CheckedCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixObservableCommand.Setter;
-
 import rx.Observable;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -35,8 +37,9 @@ final class HystrixBeanFaultTolerance implements BeanFaultTolerance {
 
 	private final Setter observableSettings;
 	private final com.netflix.hystrix.HystrixCommand.Setter commandSettings;
-	
-	public HystrixBeanFaultTolerance(HystrixCommandKey commandKey, HystrixCommandGroupKey groupKey) {
+	private final ContextPropagation contextPropagators;
+
+	public HystrixBeanFaultTolerance(HystrixCommandKey commandKey, HystrixCommandGroupKey groupKey, ContextPropagation contextPropagation) {
 		observableSettings = Setter.withGroupKey(groupKey)
 				.andCommandKey(commandKey)
 				.andCommandPropertiesDefaults(
@@ -45,6 +48,7 @@ final class HystrixBeanFaultTolerance implements BeanFaultTolerance {
 				.andCommandKey(commandKey)
 				.andCommandPropertiesDefaults(
 						HystrixCommandProperties.Setter().withExecutionIsolationStrategy(ExecutionIsolationStrategy.THREAD));
+		this.contextPropagators = Objects.requireNonNull(contextPropagation);
 	}
 
 	@Override
@@ -54,7 +58,7 @@ final class HystrixBeanFaultTolerance implements BeanFaultTolerance {
 
 	@Override
 	public <T> T execute(final CheckedCommand<T> command) throws Throwable {
-		return HystrixCommandFacade.execute(command, commandSettings);
+		return HystrixCommandFacade.execute(command, commandSettings, contextPropagators);
 	}
 
 }

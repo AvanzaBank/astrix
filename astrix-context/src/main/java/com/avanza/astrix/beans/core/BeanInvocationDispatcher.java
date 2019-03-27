@@ -15,16 +15,15 @@
  */
 package com.avanza.astrix.beans.core;
 
+import com.avanza.astrix.core.function.CheckedCommand;
+import com.avanza.astrix.core.util.ReflectionUtil;
+import rx.Observable;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
-
-import com.avanza.astrix.core.function.CheckedCommand;
-import com.avanza.astrix.core.util.ReflectionUtil;
-
-import rx.Observable;
 
 public final class BeanInvocationDispatcher implements InvocationHandler {
 	
