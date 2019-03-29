@@ -16,6 +16,7 @@
 package com.avanza.astrix.ft.hystrix;
 
 import com.avanza.astrix.beans.ft.ContextPropagator;
+import com.avanza.astrix.core.function.CheckedCommand;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,8 +34,8 @@ class ContextPropagation {
         this.propagators = Collections.unmodifiableList(new ArrayList<>(propagators));
     }
 
-    public <T> ContextPropagator.ThrowingCallable<T> wrap(ContextPropagator.ThrowingCallable<T> call) {
-        ContextPropagator.ThrowingCallable<T> wrapping = call;
+    public <T> CheckedCommand<T> wrap(CheckedCommand<T> call) {
+        CheckedCommand<T> wrapping = call;
         for (ContextPropagator propagator : propagators) {
             wrapping = propagator.wrap(wrapping);
         }

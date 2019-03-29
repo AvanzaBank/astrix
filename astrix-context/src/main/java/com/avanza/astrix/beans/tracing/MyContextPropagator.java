@@ -16,13 +16,14 @@
 package com.avanza.astrix.beans.tracing;
 
 import com.avanza.astrix.beans.ft.ContextPropagator;
+import com.avanza.astrix.core.function.CheckedCommand;
 
 public class MyContextPropagator implements ContextPropagator {
 
     //private static final AtomicInteger count = new AtomicInteger(0);
 
     @Override
-    public <T> ThrowingCallable<T> wrap(ThrowingCallable<T> call) {
+    public <T> CheckedCommand<T> wrap(CheckedCommand<T> call) {
         //int num = count.incrementAndGet();
         //System.out.println(this.getClass().getSimpleName() + " was here! Call#=" + num);
         return call;

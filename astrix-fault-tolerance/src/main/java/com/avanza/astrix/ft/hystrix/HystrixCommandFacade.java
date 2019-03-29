@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import com.avanza.astrix.beans.ft.ContextPropagator;
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.function.CheckedCommand;
@@ -80,7 +79,7 @@ class HystrixCommandFacade<T> {
 	}
 
 	private HystrixCommand<HystrixResult<T>> createHystrixCommand(ContextPropagation contextPropagators) {
-		ContextPropagator.ThrowingCallable<T> wrappedCall = contextPropagators.wrap(command::call);
+		CheckedCommand<T> wrappedCall = contextPropagators.wrap(command::call);
 		return new HystrixCommand<HystrixResult<T>>(hystrixConfiguration) {
 
 			@Override

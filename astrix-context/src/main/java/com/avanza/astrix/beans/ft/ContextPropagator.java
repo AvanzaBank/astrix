@@ -15,12 +15,10 @@
  */
 package com.avanza.astrix.beans.ft;
 
+import com.avanza.astrix.core.function.CheckedCommand;
+
 public interface ContextPropagator {
 
-    interface ThrowingCallable<T> {
-        T call() throws Throwable;
-    }
-
-    <T> ThrowingCallable<T> wrap(ThrowingCallable<T> call);
+    <T> CheckedCommand<T> wrap(CheckedCommand<T> call);
 
 }
