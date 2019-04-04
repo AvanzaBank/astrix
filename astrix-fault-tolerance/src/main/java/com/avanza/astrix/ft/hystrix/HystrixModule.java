@@ -17,7 +17,7 @@ package com.avanza.astrix.ft.hystrix;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
-import com.avanza.astrix.beans.ft.ContextPropagator;
+import com.avanza.astrix.beans.async.ContextPropagator;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;

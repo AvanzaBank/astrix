@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
+import com.avanza.astrix.beans.async.ContextPropagation;
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.function.CheckedCommand;

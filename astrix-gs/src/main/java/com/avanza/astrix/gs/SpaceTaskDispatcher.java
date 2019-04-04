@@ -15,20 +15,7 @@
  */
 package com.avanza.astrix.gs;
 
-import java.io.Serializable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
-
-import org.openspaces.core.GigaSpace;
-import org.openspaces.core.executor.DistributedTask;
-import org.openspaces.core.executor.Task;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.avanza.astrix.beans.async.ContextPropagation;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicIntProperty;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -37,9 +24,22 @@ import com.avanza.astrix.remoting.util.GsUtil;
 import com.gigaspaces.async.AsyncFuture;
 import com.gigaspaces.internal.client.spaceproxy.SpaceProxyImpl;
 import com.j_spaces.core.IJSpace;
-
+import org.openspaces.core.GigaSpace;
+import org.openspaces.core.executor.DistributedTask;
+import org.openspaces.core.executor.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.Subscriber;
+
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -59,10 +59,12 @@ public final class SpaceTaskDispatcher {
 	
 	private static final Logger log = LoggerFactory.getLogger(SpaceTaskDispatcher.class);
 	private final GigaSpace gigaSpace;
+	private final ContextPropagation contextPropagation;
 	private final ThreadPoolExecutor executorService;
 
-	public SpaceTaskDispatcher(GigaSpace gigaSpace, DynamicConfig config) {
+	public SpaceTaskDispatcher(GigaSpace gigaSpace, DynamicConfig config, ContextPropagation contextPropagation) {
 		this.gigaSpace = gigaSpace;
+		this.contextPropagation = Objects.requireNonNull(contextPropagation);
 		/* 
 		 * TODO 
 		 * 	(1) Improve configuration mechanism used to configure thread pool. 
@@ -106,11 +108,10 @@ public final class SpaceTaskDispatcher {
 	 */
 	public <T extends Serializable> Observable<T> observe(final Task<T> task, final Object routingKey) {
 		return Observable.create(subscriber -> {
+			Runnable command = contextPropagation.wrap(() -> submitRoutedTaskExecution(subscriber, task, routingKey));
 			usingErrorReporter(subscriber, serviceUnavailable()).accept(() -> {
 				// Use ExecutorService to ensure non-blocking programming model when subscribing to remote task invocation
-				executorService.execute(() -> {
-					submitRoutedTaskExecution(subscriber, task, routingKey);
-				});
+				executorService.execute(command);
 			});
 		});
 	}
@@ -133,10 +134,9 @@ public final class SpaceTaskDispatcher {
 	 */
 	public <T extends Serializable, R> Observable<R> observe(final DistributedTask<T, R> distributedTask) {
 		return Observable.create(t1 -> {
+			Runnable command = contextPropagation.wrap(() -> submitDistributedTaskExecution(distributedTask, t1));
 			usingErrorReporter(t1, serviceUnavailable()).accept(() -> {
-				executorService.execute(() -> {
-					submitDistributedTaskExecution(distributedTask, t1);
-				});
+				executorService.execute(command);
 			});
 		});
 	}
