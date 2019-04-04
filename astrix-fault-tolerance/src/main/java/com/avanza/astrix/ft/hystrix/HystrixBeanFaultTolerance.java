@@ -15,8 +15,8 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
+import com.avanza.astrix.beans.async.ContextPropagation;
 import com.avanza.astrix.beans.ft.BeanFaultTolerance;
-import com.avanza.astrix.beans.ft.ContextPropagator;
 import com.avanza.astrix.core.function.CheckedCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
@@ -25,7 +25,6 @@ import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
 import com.netflix.hystrix.HystrixObservableCommand.Setter;
 import rx.Observable;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 /**

@@ -15,11 +15,12 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
+import com.avanza.astrix.beans.async.ContextPropagation;
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.ft.BeanFaultTolerance;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
-import com.avanza.astrix.beans.ft.ContextPropagator;
+import com.avanza.astrix.beans.async.ContextPropagator;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.beans.ft.MonitorableFaultToleranceSpi;
 import com.avanza.hystrix.multiconfig.MultiConfigId;

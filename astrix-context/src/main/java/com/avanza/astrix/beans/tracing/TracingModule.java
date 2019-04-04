@@ -15,14 +15,15 @@
  */
 package com.avanza.astrix.beans.tracing;
 
-import com.avanza.astrix.beans.ft.ContextPropagator;
+import com.avanza.astrix.beans.async.ContextPropagator;
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 
 public class TracingModule implements Module {
     @Override
     public void prepare(ModuleContext moduleContext) {
-        moduleContext.bind(ContextPropagator.class, MyContextPropagator.class);
+        moduleContext.bind(ContextPropagator.class, AstrixTraceContextPropagator.class);
+        moduleContext.bind(AstrixTracerManager.class, AstrixTracerManagerImpl.class);
 
         moduleContext.export(ContextPropagator.class);
     }

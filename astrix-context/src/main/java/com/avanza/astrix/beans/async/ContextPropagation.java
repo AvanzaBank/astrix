@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.ft.hystrix;
+package com.avanza.astrix.beans.async;
 
-import com.avanza.astrix.beans.ft.ContextPropagator;
 import com.avanza.astrix.core.function.CheckedCommand;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class ContextPropagation {
+public class ContextPropagation {
 
     private final List<ContextPropagator> propagators;
 
@@ -36,6 +35,14 @@ class ContextPropagation {
 
     public <T> CheckedCommand<T> wrap(CheckedCommand<T> call) {
         CheckedCommand<T> wrapping = call;
+        for (ContextPropagator propagator : propagators) {
+            wrapping = propagator.wrap(wrapping);
+        }
+        return wrapping;
+    }
+
+    public Runnable wrap(Runnable c) {
+        Runnable wrapping = c;
         for (ContextPropagator propagator : propagators) {
             wrapping = propagator.wrap(wrapping);
         }
