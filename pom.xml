@@ -535,11 +535,6 @@
 					<version>1.2</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-enforcer-plugin</artifactId>
-					<version>1.4.1</version>
-				</plugin>
-				<plugin>
 				    <groupId>com.mycila</groupId>
 				    <artifactId>license-maven-plugin</artifactId>
 				    <version>2.11</version>
@@ -605,31 +600,6 @@
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 				</configuration>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<dependencies>
-					<dependency>
-						<groupId>de.andrena.tools.nopackagecycles</groupId>
-						<artifactId>no-package-cycles-enforcer-rule</artifactId>
-						<version>1.0.4</version>
-					</dependency>
-				</dependencies>
-				<executions>
-					<execution>
-						<id>enforce-no-package-cycles</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<phase>test</phase>
-						<configuration>
-							<rules>
-								<NoPackageCyclesRule implementation="de.andrena.tools.nopackagecycles.NoPackageCyclesRule" />
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 
 			<!-- TODO: Configuration of the versions plugin, so that only astrix 
