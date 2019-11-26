@@ -374,7 +374,7 @@ public class AstrixConfigurer {
 	 * allowed to invoke non-versioned services within the same subsystem. Attempting
 	 * to invoke a non-versioned service in another subsystem will throw an IllegalSubsystemException. <p>
 	 * 
-	 * @param string
+	 * @param subsystem
 	 * @return 
 	 */
 	public AstrixConfigurer setSubsystem(String subsystem) {

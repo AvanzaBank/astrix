@@ -34,7 +34,7 @@ public @interface AstrixRouting {
 	
 	/**
      * Optional method name. If set then the given method will be called on the argument holding this 
-     * annotation to resolve the rouging value. The method must have zero arguments.
+     * annotation to resolve the routing value. The method must have zero arguments.
      */
     String value() default "";
 }
