@@ -105,14 +105,12 @@ public final class SpaceTaskDispatcher {
 	 * @return
 	 */
 	public <T extends Serializable> Observable<T> observe(final Task<T> task, final Object routingKey) {
-		return Observable.create(subscriber -> {
-			usingErrorReporter(subscriber, serviceUnavailable()).accept(() -> {
-				// Use ExecutorService to ensure non-blocking programming model when subscribing to remote task invocation
-				executorService.execute(() -> {
-					submitRoutedTaskExecution(subscriber, task, routingKey);
-				});
+		return Observable.unsafeCreate(subscriber -> usingErrorReporter(subscriber, serviceUnavailable()).accept(() -> {
+			// Use ExecutorService to ensure non-blocking programming model when subscribing to remote task invocation
+			executorService.execute(() -> {
+				submitRoutedTaskExecution(subscriber, task, routingKey);
 			});
-		});
+		}));
 	}
 
 	private <T extends Serializable> void submitRoutedTaskExecution(Subscriber<? super T> subscriber, final Task<T> task, final Object routingKey) {
