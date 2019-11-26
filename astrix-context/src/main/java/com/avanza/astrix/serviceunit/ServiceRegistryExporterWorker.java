@@ -100,7 +100,7 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread {
 		while (!interrupted()) {
 			long sleepTimeUntilNextAttempt = this.exportIntervallMillis.get();
 			try {
-				exportProvidedServcies();
+				exportProvidedServices();
 			} catch (ServiceUnavailableException e) {
 				// Not bound to service registry
 				sleepTimeUntilNextAttempt = this.retryIntervallMillis.get();
@@ -117,7 +117,7 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread {
 		log.info("ServiceRegistryExporterWorker is interrupted, won't publish to service registry anymore.");
 	}
 
-	private void exportProvidedServcies() {
+	private void exportProvidedServices() {
 		for (ServiceRegistryExportedService exportedService : exportedServices) {
 			ServiceProperties serviceProperties = exportedService.exportServiceProperties();
 			serviceRegistryProviderClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());
