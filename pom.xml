@@ -58,7 +58,7 @@
 		<repository>
 			<id>gigaspaces</id>
 			<name>GigaSpaces</name>
-			<url>http://maven-repository.openspaces.org/</url>
+			<url>https://maven-repository.openspaces.org/</url>
 		</repository>
 	</repositories>
 	<distributionManagement>
