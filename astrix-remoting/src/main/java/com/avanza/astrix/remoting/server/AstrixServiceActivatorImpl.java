@@ -15,9 +15,14 @@
  */
 package com.avanza.astrix.remoting.server;
 
+import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.API_VERSION;
+import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.SERVICE_API;
+import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.SERVICE_METHOD_SIGNATURE;
 
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
+import com.avanza.astrix.beans.tracing.InvocationExecutionWatcher;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.context.mbeans.MBeanExporter;
 import com.avanza.astrix.context.metrics.Metrics;
@@ -42,7 +47,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 /**
@@ -59,20 +63,32 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 	private final MBeanExporter mbeanExporter;
 	private final ServiceInvocationMonitor allServicesAggregated;
 	private final DynamicBooleanProperty exportedServiceMetricsEnabled;
+	private final AstrixTraceProvider astrixTraceProvider;
 
 	@AstrixInject
-	public AstrixServiceActivatorImpl(AstrixConfig astrixConfig, Metrics metrics, MBeanExporter mbeanExporter) {
-		this(astrixConfig.get(AstrixSettings.EXPORTED_SERVICE_METRICS_ENABLED), metrics, mbeanExporter);
+	public AstrixServiceActivatorImpl(
+			AstrixConfig astrixConfig,
+			Metrics metrics,
+			MBeanExporter mbeanExporter,
+			AstrixTraceProvider astrixTraceProvider
+	) {
+		this(astrixConfig.get(AstrixSettings.EXPORTED_SERVICE_METRICS_ENABLED), metrics, mbeanExporter, astrixTraceProvider);
 	}
 	
 	// For testnig
-	AstrixServiceActivatorImpl(DynamicBooleanProperty exportedServiceMetricsEnabled, Metrics metrics, MBeanExporter mbeanExporter) {
+	AstrixServiceActivatorImpl(
+			DynamicBooleanProperty exportedServiceMetricsEnabled,
+			Metrics metrics,
+			MBeanExporter mbeanExporter,
+			AstrixTraceProvider astrixTraceProvider
+	) {
 		this.exportedServiceMetricsEnabled = exportedServiceMetricsEnabled;
 		this.metrics = metrics;
 		this.mbeanExporter = mbeanExporter;
 		// Monitor for aggregated stats for all exported services
 		this.allServicesAggregated = new ServiceInvocationMonitor(metrics.createTimer());
 		mbeanExporter.registerMBean(this.allServicesAggregated, "ExportedServices", "AllServicesAggregated");
+		this.astrixTraceProvider = astrixTraceProvider;
 	}
 	
 	private static class ServiceInvocationMonitors {
@@ -97,15 +113,26 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 	
 	private static class PublishedServiceMethod<T> {
 		private final ServiceInvocationMonitors serviceInvocationMonitors;
+		private final List<InvocationExecutionWatcher> invocationExecutionWatchers;
 		private final Method serviceMethod;
 		private final AstrixObjectSerializer objectSerializer;
 		private final T service;
-		
-		public PublishedServiceMethod(ServiceInvocationMonitors serviceInvocationMonitors, Method method, AstrixObjectSerializer objectSerializer, T service) {
+		private final AstrixTraceProvider astrixTraceProvider;
+
+		public PublishedServiceMethod(
+				ServiceInvocationMonitors serviceInvocationMonitors,
+				List<InvocationExecutionWatcher> invocationExecutionWatchers,
+				Method method,
+				AstrixObjectSerializer objectSerializer,
+				T service,
+				AstrixTraceProvider astrixTraceProvider
+		) {
 			this.serviceInvocationMonitors = serviceInvocationMonitors;
+			this.invocationExecutionWatchers = invocationExecutionWatchers;
 			this.serviceMethod = method;
 			this.objectSerializer = objectSerializer;
 			this.service = service;
+			this.astrixTraceProvider = astrixTraceProvider;
 		}
 		
 		private AstrixServiceInvocationResponse timeInvocation(AstrixServiceInvocationRequest request, int version) {
@@ -113,13 +140,14 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 		}
 		
 		private AstrixServiceInvocationResponse invoke(AstrixServiceInvocationRequest request, int version) {
+			Runnable afterInvocationWatchers = InvocationExecutionWatcher.apply(invocationExecutionWatchers, request.getHeaders());
 			try {
 				return invokeService(request, version);
 			} catch (Exception e) {
 				Throwable exceptionThrownByService = resolveException(e);
 				AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
 				invocationResponse.setExceptionMsg(exceptionThrownByService.getMessage());
-				invocationResponse.setCorrelationId(UUID.randomUUID().toString());
+				invocationResponse.setCorrelationId(getCorrelationId(astrixTraceProvider, request));
 				if (exceptionThrownByService instanceof ServiceInvocationException) {
 					invocationResponse.setException(this.objectSerializer.serialize(exceptionThrownByService, version));
 				} else {
@@ -127,6 +155,8 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 				}
 				logger.info(String.format("Service invocation ended with exception. request=%s correlationId=%s", request, invocationResponse.getCorrelationId()), exceptionThrownByService);
 				return invocationResponse;
+			} finally {
+				afterInvocationWatchers.run();
 			}
 		}
 
@@ -134,9 +164,7 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 				InvocationTargetException {
 			Object[] arguments = unmarshal(request.getArguments(), serviceMethod.getGenericParameterTypes(), version);
 
-			// "Wingtips" restore trace data from request to trace context
 			Object result = serviceMethod.invoke(service, arguments);
-			// "Wingtips" remove trace data from trace context
 
 			AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
 			if (serviceMethod.getReturnType().equals(Void.TYPE)) {
@@ -183,7 +211,18 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 			mbeanExporter.registerMBean(this.serviceMonitor, "ExportedServices", providedApi.getName());
 			for (Method m : providedApi.getMethods()) {
 				ServiceInvocationMonitors serviceInvocationMonitors = serviceInvocationMonitorsByMethodName.computeIfAbsent(m.getName(), this::createServiceInvocationMonitors);
-				methodBySignature.put(ReflectionUtil.methodSignatureWithoutReturnType(m), new PublishedServiceMethod<>(serviceInvocationMonitors, m, objectSerializer, service));
+				List<InvocationExecutionWatcher> invocationExecutionWatchers = astrixTraceProvider.getServerCallExecutionWatchers(providedApi.getName(), m.getName());
+				methodBySignature.put(
+						ReflectionUtil.methodSignatureWithoutReturnType(m),
+						new PublishedServiceMethod<>(
+								serviceInvocationMonitors,
+								invocationExecutionWatchers,
+								m,
+								objectSerializer,
+								service,
+								astrixTraceProvider
+						)
+				);
 			}
 		}
 
@@ -197,7 +236,7 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 		}
 		
 		private AstrixServiceInvocationResponse invoke(AstrixServiceInvocationRequest request, int version, String serviceApi) {
-			String serviceMethodSignature = request.getHeader("serviceMethodSignature");
+			String serviceMethodSignature = request.getHeader(SERVICE_METHOD_SIGNATURE);
 			PublishedServiceMethod<T> serviceMethod = methodBySignature.get(serviceMethodSignature);
 			if (serviceMethod == null) {
 				throw new MissingServiceMethodException(String.format("Missing service method: service=%s method=%s", serviceApi, serviceMethodSignature));
@@ -222,8 +261,8 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 	 */
 	@Override
 	public AstrixServiceInvocationResponse invokeService(final AstrixServiceInvocationRequest request) {
-		final int version = Integer.parseInt(request.getHeader("apiVersion"));
-		final String serviceApi = request.getHeader("serviceApi");
+		final int version = Integer.parseInt(request.getHeader(API_VERSION));
+		final String serviceApi = request.getHeader(SERVICE_API);
 		final PublishedService<?> publishedService = this.serviceByType.get(serviceApi);
 		if (publishedService == null) {
 			/*
@@ -231,9 +270,9 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 			 * is restarted and old clients connects to the space before the framework is fully initialized. 
 			 */
 			AstrixServiceInvocationResponse invocationResponse = new AstrixServiceInvocationResponse();
-			invocationResponse.setServiceUnavailable(true);;
+			invocationResponse.setServiceUnavailable(true);
 			invocationResponse.setExceptionMsg("Service not available in service activator: " + serviceApi);
-			invocationResponse.setCorrelationId(UUID.randomUUID().toString());
+			invocationResponse.setCorrelationId(getCorrelationId(astrixTraceProvider, request));
 			logger.info(String.format("Service not available. request=%s correlationId=%s", request, invocationResponse.getCorrelationId()));
 			return invocationResponse;
 		}
@@ -248,4 +287,10 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 		return e;
 	}
 
+	private static String getCorrelationId(
+			AstrixTraceProvider astrixTraceProvider,
+			AstrixServiceInvocationRequest request
+	) {
+		return astrixTraceProvider.getCorrelationId(request.getHeaders());
+	}
 }

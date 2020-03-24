@@ -101,7 +101,7 @@ class ModuleManager implements Modules {
 				@Override
 				public <T> void importType(final Class<T> type) {
 					if (!type.isInterface()) {
-						throw new IllegalArgumentException(String.format("Its only allowed to interface types. module=%s importedType=%s", moduleName, type));
+						throw new IllegalArgumentException(String.format("Its only allowed to import interface types. module=%s importedType=%s", moduleName, type));
 					}
 					moduleInjector.addImport(type);
 				}

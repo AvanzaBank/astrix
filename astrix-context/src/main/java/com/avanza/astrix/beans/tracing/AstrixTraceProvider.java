@@ -15,16 +15,17 @@
  */
 package com.avanza.astrix.beans.tracing;
 
+import java.util.List;
+import java.util.Map;
+
 import com.avanza.astrix.beans.async.ContextPropagator;
-import com.avanza.astrix.modules.Module;
-import com.avanza.astrix.modules.ModuleContext;
 
-public class TracingModule implements Module {
-    @Override
-    public void prepare(ModuleContext moduleContext) {
-        moduleContext.bind(ContextPropagator.class, AstrixTraceContextPropagator.class);
-        moduleContext.bind(AstrixTracerManager.class, AstrixTracerManagerImpl.class);
+public interface AstrixTraceProvider {
+	String getCorrelationId(Map<String, String> request);
 
-        moduleContext.export(ContextPropagator.class);
-    }
+	List<InvocationExecutionWatcher> getServerCallExecutionWatchers(String serviceName, String methodName);
+
+	List<InvocationExecutionWatcher> getClientCallExecutionWatchers(String serviceName, String methodName);
+
+	List<ContextPropagator> getContextPropagators();
 }

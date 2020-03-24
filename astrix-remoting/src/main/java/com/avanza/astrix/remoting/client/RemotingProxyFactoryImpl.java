@@ -18,6 +18,7 @@ package com.avanza.astrix.remoting.client;
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.core.remoting.RoutingStrategy;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
@@ -27,10 +28,16 @@ public class RemotingProxyFactoryImpl implements RemotingProxyFactory {
 	
 	private final ObjectSerializerFactory objectSerializerFactory;
 	private final ReactiveTypeConverter reactiveTypeConverter;
-	
-	public RemotingProxyFactoryImpl(ObjectSerializerFactory objectSerializerFactory, ReactiveTypeConverter reactiveTypeConverter) {
+	private final AstrixTraceProvider astrixTraceProvider;
+
+	public RemotingProxyFactoryImpl(
+			ObjectSerializerFactory objectSerializerFactory,
+			ReactiveTypeConverter reactiveTypeConverter,
+			AstrixTraceProvider astrixTraceProvider
+	) {
 		this.objectSerializerFactory = objectSerializerFactory;
 		this.reactiveTypeConverter = reactiveTypeConverter;
+		this.astrixTraceProvider = astrixTraceProvider;
 	}
 
 	@Override
@@ -38,8 +45,15 @@ public class RemotingProxyFactoryImpl implements RemotingProxyFactory {
 			RemotingTransportSpi remotingTransportSpi, RoutingStrategy routingStrategy) {
 		AstrixObjectSerializer objectSerializer = objectSerializerFactory.create(serviceDefinition.getObjectSerializerDefinition());
 		RemotingTransport remotingTransport = RemotingTransport.create(remotingTransportSpi);
-		return RemotingProxy.create(serviceDefinition.getServiceType(), ReflectionUtil.classForName(serviceProperties.getProperty(ServiceProperties.API))
-				, remotingTransport, objectSerializer, routingStrategy, reactiveTypeConverter);
+		return RemotingProxy.create(
+				serviceDefinition.getServiceType(),
+				ReflectionUtil.classForName(serviceProperties.getProperty(ServiceProperties.API)),
+				remotingTransport,
+				objectSerializer,
+				routingStrategy,
+				reactiveTypeConverter,
+				astrixTraceProvider
+		);
 	}
 
 }

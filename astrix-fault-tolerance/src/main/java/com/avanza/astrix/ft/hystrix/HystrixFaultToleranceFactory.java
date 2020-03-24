@@ -20,15 +20,14 @@ import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.ft.BeanFaultTolerance;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
-import com.avanza.astrix.beans.async.ContextPropagator;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.beans.ft.MonitorableFaultToleranceSpi;
+import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.hystrix.multiconfig.MultiConfigId;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixThreadPoolKey;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -60,7 +59,7 @@ final class HystrixFaultToleranceFactory implements BeanFaultToleranceFactorySpi
                                         AstrixConcurrencyStrategy concurrencyStrategy,
                                         BeanConfigurationPropertiesStrategy propertiesStrategy,
                                         BeanMapping beanMapping,
-                                        List<ContextPropagator> contextPropagators,
+                                        AstrixTraceProvider astrixTraceProvider,
                                         AstrixConfig config) {
         this.id = Integer.toString(idGenerator.incrementAndGet());
         this.beanMapping = beanMapping;
@@ -70,7 +69,7 @@ final class HystrixFaultToleranceFactory implements BeanFaultToleranceFactorySpi
                 id);
         HystrixStrategyDispatcher.registerStrategies(hystrixStrategies);
         this.hystrixCommandKeyFactory = new HystrixCommandKeyFactory(id, hystrixCommandNamingStrategy);
-        this.contextPropagation = ContextPropagation.create(contextPropagators);
+        this.contextPropagation = ContextPropagation.create(astrixTraceProvider.getContextPropagators());
     }
 
     @Override

@@ -15,11 +15,12 @@
  */
 package com.avanza.astrix.beans.async;
 
-import com.avanza.astrix.core.function.CheckedCommand;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
+
+import com.avanza.astrix.core.function.CheckedCommand;
 
 public class ContextPropagation {
 
@@ -34,17 +35,17 @@ public class ContextPropagation {
     }
 
     public <T> CheckedCommand<T> wrap(CheckedCommand<T> call) {
-        CheckedCommand<T> wrapping = call;
-        for (ContextPropagator propagator : propagators) {
-            wrapping = propagator.wrap(wrapping);
-        }
-        return wrapping;
+        return wrap(call, ContextPropagator::wrap);
     }
 
     public Runnable wrap(Runnable c) {
-        Runnable wrapping = c;
+        return wrap(c, ContextPropagator::wrap);
+    }
+
+    public <T> T wrap(T operation, BiFunction<ContextPropagator, T, T> wrapper) {
+        T wrapping = operation;
         for (ContextPropagator propagator : propagators) {
-            wrapping = propagator.wrap(wrapping);
+            wrapping = wrapper.apply(propagator, wrapping);
         }
         return wrapping;
     }

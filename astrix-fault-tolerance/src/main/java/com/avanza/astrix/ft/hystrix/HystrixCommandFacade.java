@@ -80,7 +80,7 @@ class HystrixCommandFacade<T> {
 	}
 
 	private HystrixCommand<HystrixResult<T>> createHystrixCommand(ContextPropagation contextPropagators) {
-		CheckedCommand<T> wrappedCall = contextPropagators.wrap(command::call);
+		CheckedCommand<T> wrappedCall = contextPropagators.wrap(command);
 		return new HystrixCommand<HystrixResult<T>>(hystrixConfiguration) {
 
 			@Override

@@ -272,7 +272,7 @@ public class AstrixIntegrationTest {
 	
 	@Test(expected = ServiceUnavailableException.class)
 	public void itsNotPossibleToBindToNonPublishedServiceBeansProvidedByOtherSubsystems() throws Exception {
-		astrix.getBean(InternalLunchFeeder.class).addLunchRestaurant(lunchRestaurant().build());;
+		astrix.getBean(InternalLunchFeeder.class).addLunchRestaurant(lunchRestaurant().build());
 	}
 
 	private TypeSafeMatcher<LunchRestaurant> restaurantWithName(final String restaurantName) {

@@ -15,11 +15,16 @@
  */
 package com.avanza.astrix.remoting.client;
 
+import java.util.List;
+
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
+import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
+import com.avanza.astrix.beans.tracing.InvocationExecutionWatcher;
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.remoting.RoutingStrategy;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
+
 import rx.Observable;
 import rx.functions.Action1;
 import rx.subjects.ReplaySubject;
@@ -39,11 +44,20 @@ public class RemotingProxy implements InvocationHandler {
 	private final int apiVersion;
 	private final String serviceApi;
 	private final ConcurrentMap<Method, RemoteServiceMethod> remoteServiceMethodByMethod = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Method, List<InvocationExecutionWatcher>> invocationWatchersByMethod = new ConcurrentHashMap<>();
 	private final RemoteServiceMethodFactory remoteServiceMethodFactory;
 	private final ReactiveTypeConverter reactiveTypeConverter;
 
-	public static <T> T create(Class<T> proxyApi, Class<?> targetApi, RemotingTransport transport, AstrixObjectSerializer objectSerializer, RoutingStrategy defaultRoutingStrategy, ReactiveTypeConverter reactiveTypeConverter) {
-		RemotingProxy handler = new RemotingProxy(proxyApi, targetApi, objectSerializer, transport, defaultRoutingStrategy, reactiveTypeConverter);
+	public static <T> T create(
+			Class<T> proxyApi,
+			Class<?> targetApi,
+			RemotingTransport transport,
+			AstrixObjectSerializer objectSerializer,
+			RoutingStrategy defaultRoutingStrategy,
+			ReactiveTypeConverter reactiveTypeConverter,
+			AstrixTraceProvider astrixTraceProvider
+	) {
+		RemotingProxy handler = new RemotingProxy(proxyApi, targetApi, objectSerializer, transport, defaultRoutingStrategy, reactiveTypeConverter, astrixTraceProvider);
 		T serviceProxy = (T) Proxy.newProxyInstance(RemotingProxy.class.getClassLoader(), new Class[]{proxyApi}, handler);
 		return serviceProxy;
 	}
@@ -53,7 +67,8 @@ public class RemotingProxy implements InvocationHandler {
 							    AstrixObjectSerializer objectSerializer,
 							    RemotingTransport AstrixServiceTransport,
 							    RoutingStrategy defaultRoutingStrategy,
-							    ReactiveTypeConverter reactiveTypeConverter) {
+							    ReactiveTypeConverter reactiveTypeConverter,
+							    AstrixTraceProvider astrixTraceProvider) {
 		this.reactiveTypeConverter = reactiveTypeConverter;
 		this.serviceApi = targetServiceApi.getName();
 		this.apiVersion = objectSerializer.version();
@@ -70,6 +85,7 @@ public class RemotingProxy implements InvocationHandler {
 			Type returnType = getReturnType(proxiedMethod);
 			RemoteServiceMethod remoteServiceMethod = this.remoteServiceMethodFactory.createRemoteServiceMethod(targetServiceType, proxiedMethod, returnType);
 			remoteServiceMethodByMethod.put(proxiedMethod, remoteServiceMethod);
+			invocationWatchersByMethod.put(proxiedMethod, astrixTraceProvider.getClientCallExecutionWatchers(serviceApi, proxiedMethod.getName()));
 		}
 	}
 
@@ -91,9 +107,11 @@ public class RemotingProxy implements InvocationHandler {
 		invocationRequest.setHeader(SERVICE_METHOD_SIGNATURE, remoteServiceMethod.getSignature());
 		invocationRequest.setHeader(SERVICE_API, this.serviceApi);
 
-		// "Wingtips" lägg till header för traceid & parentid
+		Runnable afterInvocationWatchers = InvocationExecutionWatcher.apply(invocationWatchersByMethod.get(method), invocationRequest.getHeaders());
 
-		Observable<?> result = remoteServiceMethod.invoke(invocationRequest, args);
+		Observable<?> result = remoteServiceMethod.invoke(invocationRequest, args)
+				.doOnError(e -> afterInvocationWatchers.run())
+				.doOnCompleted(afterInvocationWatchers::run);
 		if (isObservableType(method.getReturnType())) {
 			return result;
 		}

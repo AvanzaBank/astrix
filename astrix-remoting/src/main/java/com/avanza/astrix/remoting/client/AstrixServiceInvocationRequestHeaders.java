@@ -20,6 +20,5 @@ public class AstrixServiceInvocationRequestHeaders {
 	public static final String API_VERSION = "apiVersion";
 	public static final String SERVICE_METHOD_SIGNATURE = "serviceMethodSignature";
 	public static final String SERVICE_API = "serviceApi";
-	public static final String TRACE_ID = "traceId";
 
 }
