@@ -115,8 +115,9 @@ public final class AstrixSettings {
 	public static final BooleanSetting GS_DISABLE_LOCAL_VIEW = BooleanSetting.create("AstrixGsLocalViewComponent.disableLocalView", false);
 	public static final LongSetting GS_LOCAL_VIEW_MAX_DISCONNECTION_TIME = LongSetting.create("AstrixGsLocalViewComponent.maxDisconnectionTime", 60000L);
 	public static final IntSetting GS_LOCAL_VIEW_LOOKUP_TIMEOUT = IntSetting.create("AstrixGsLocalViewComponent.lookupTimeout", 1000);
-	
-	
+
+	public static final BooleanSetting GS_SPACE_CONFIG_QUERY_PROCESSOR_FORMAT_OVERRIDE = BooleanSetting.create("astrix.spaceConfig.QueryProcessor.dateFormatDefaults.override", false);
+
 	public static final StringSetting APPLICATION_NAME = StringSetting.create("astrix.application.name", null);
 	public static final StringSetting APPLICATION_TAG =  StringSetting.create("astrix.application.tag", null);
 	public static final StringSetting APPLICATION_INSTANCE_ID =  StringSetting.create("astrix.application.instanceid", null);

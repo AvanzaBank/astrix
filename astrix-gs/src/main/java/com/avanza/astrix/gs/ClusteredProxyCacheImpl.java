@@ -29,8 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.core.AstrixConfigAware;
+import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.gs.config.SpaceConfigQueryProcessors;
 import com.avanza.astrix.modules.KeyLock;
 import com.avanza.astrix.modules.ObjectCache;
 import com.avanza.astrix.modules.ObjectCache.ObjectFactory;
@@ -99,6 +101,11 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 			this.spaceUrl = spaceUrl;
 			this.config = dynamicConfig;
 			this.urlSpaceConfigurer = new UrlSpaceConfigurer(spaceUrl);
+
+			if(AstrixSettings.GS_SPACE_CONFIG_QUERY_PROCESSOR_FORMAT_OVERRIDE.getFrom(config).get()) {
+				SpaceConfigQueryProcessors.overrideDateFormatDefaults(this.urlSpaceConfigurer);
+			}
+
 			IJSpace space = urlSpaceConfigurer.create();
 			this.proxy = new GigaSpaceConfigurer(space).create();
 		}

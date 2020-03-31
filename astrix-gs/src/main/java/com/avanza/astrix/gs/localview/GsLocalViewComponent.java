@@ -40,6 +40,7 @@ import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.gs.ClusteredProxyBinder;
 import com.avanza.astrix.gs.GigaSpaceProxy;
 import com.avanza.astrix.gs.GsBinder;
+import com.avanza.astrix.gs.config.SpaceConfigQueryProcessors;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.spring.AstrixSpringContext;
 import com.j_spaces.core.IJSpace;
@@ -58,9 +59,8 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	private DynamicLongProperty maxDisonnectionTime;
 	private DynamicIntProperty lookupTimeout;
 	private ClusteredProxyBinder clusteredProxyBinder;
-	
-	
-	
+	private DynamicBooleanProperty queryProcessorDateFormatOverride;
+
 	public GsLocalViewComponent(GsBinder gsBinder,
 			AstrixSpringContext astrixSpringContext,
 			ClusteredProxyBinder clusteredProxyBinder) {
@@ -86,9 +86,15 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		Class<LocalViewConfigurer> serviceConfigClass = serviceDefinition.getServiceConfigClass(LocalViewConfigurer.class);	
 		LocalViewConfigurer localViewConfigurer = ReflectionUtil.newInstance(serviceConfigClass);
 		UrlSpaceConfigurer gsSpaceConfigurer = new UrlSpaceConfigurer(serviceProperties.getProperty(GsBinder.SPACE_URL_PROPERTY));
+
+		if(queryProcessorDateFormatOverride.get()) {
+			SpaceConfigQueryProcessors.overrideDateFormatDefaults(gsSpaceConfigurer);
+		}
+
 		IJSpace space = gsSpaceConfigurer.lookupTimeout(this.lookupTimeout.get())
-				// Disable memory shortage check for local view clients
-				.addParameter("space-config.engine.memory_usage.enabled", "false").create();
+										 // Disable memory shortage check for local view clients
+										 .addParameter("space-config.engine.memory_usage.enabled", "false")
+										 .create();
 		
 		LocalViewSpaceConfigurer gslocalViewSpaceConfigurer = new LocalViewSpaceConfigurer(space);
 		gslocalViewSpaceConfigurer.maxDisconnectionDuration(this.maxDisonnectionTime.get());
@@ -162,6 +168,7 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		this.disableLocalView = AstrixSettings.GS_DISABLE_LOCAL_VIEW.getFrom(config);
 		this.maxDisonnectionTime = AstrixSettings.GS_LOCAL_VIEW_MAX_DISCONNECTION_TIME.getFrom(config);
 		this.lookupTimeout = AstrixSettings.GS_LOCAL_VIEW_LOOKUP_TIMEOUT.getFrom(config);
+		this.queryProcessorDateFormatOverride = AstrixSettings.GS_SPACE_CONFIG_QUERY_PROCESSOR_FORMAT_OVERRIDE.getFrom(config);
 	}
 	
 	private static class BoundLocalViewGigaSpaceBeanInstance implements BoundServiceBeanInstance<GigaSpace> {
