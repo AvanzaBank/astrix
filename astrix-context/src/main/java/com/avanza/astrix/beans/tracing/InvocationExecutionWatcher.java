@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toList;
 import java.util.List;
 import java.util.Map;
 
+@FunctionalInterface
 public interface InvocationExecutionWatcher {
 	/**
 	 * Called just before the actual rpc method invocation.
@@ -28,6 +29,7 @@ public interface InvocationExecutionWatcher {
 	 */
 	AfterInvocation beforeInvocation(Map<String, String> headers);
 
+	@FunctionalInterface
 	interface AfterInvocation {
 		/**
 		 * Called just after the rpc method invocation
