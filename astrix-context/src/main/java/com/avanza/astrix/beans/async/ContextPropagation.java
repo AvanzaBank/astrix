@@ -24,6 +24,8 @@ import com.avanza.astrix.core.function.CheckedCommand;
 
 public class ContextPropagation {
 
+    public static final ContextPropagation NONE = new ContextPropagation(Collections.emptyList());
+
     private final List<ContextPropagator> propagators;
 
     public static ContextPropagation create(List<ContextPropagator> propagators) {

@@ -19,8 +19,10 @@ import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
+import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
 import com.avanza.astrix.core.remoting.RoutingStrategy;
 import com.avanza.astrix.core.util.ReflectionUtil;
+import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
 
@@ -30,6 +32,15 @@ public class RemotingProxyFactoryImpl implements RemotingProxyFactory {
 	private final ReactiveTypeConverter reactiveTypeConverter;
 	private final AstrixTraceProvider astrixTraceProvider;
 
+	/**
+	 * @deprecated please use {@link #RemotingProxyFactoryImpl(ObjectSerializerFactory, ReactiveTypeConverter, AstrixTraceProvider)}
+	 */
+	@Deprecated
+	public RemotingProxyFactoryImpl(ObjectSerializerFactory objectSerializerFactory, ReactiveTypeConverter reactiveTypeConverter) {
+		this(objectSerializerFactory, reactiveTypeConverter, new DefaultTraceProvider());
+	}
+
+	@AstrixInject
 	public RemotingProxyFactoryImpl(
 			ObjectSerializerFactory objectSerializerFactory,
 			ReactiveTypeConverter reactiveTypeConverter,

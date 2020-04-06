@@ -23,11 +23,13 @@ import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
+import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
 import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.gs.BoundProxyServiceBeanInstance;
 import com.avanza.astrix.gs.ClusteredProxyCache;
 import com.avanza.astrix.gs.ClusteredProxyCacheImpl.GigaSpaceInstance;
 import com.avanza.astrix.gs.GsBinder;
+import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.remoting.client.RemotingProxy;
 import com.avanza.astrix.remoting.client.RemotingTransport;
@@ -51,10 +53,34 @@ public class GsRemotingComponent implements ServiceComponent {
 	private final ReactiveTypeConverter reactiveTypeConverter;
 	private final AstrixTraceProvider astrixTraceProvider;
 
+	/**
+	 * @deprecated please use {@link #GsRemotingComponent(GsBinder, AstrixSpringContext, AstrixServiceActivator, ObjectSerializerFactory, ClusteredProxyCache, ReactiveTypeConverter, AstrixTraceProvider)}
+	 */
+	@Deprecated
 	public GsRemotingComponent(GsBinder gsBinder, AstrixSpringContext astrixSpringContext,
 			AstrixServiceActivator serviceActivator, ObjectSerializerFactory objectSerializerFactory,
-			ClusteredProxyCache proxyCache, ReactiveTypeConverter reactiveTypeConverter,
-			AstrixTraceProvider astrixTraceProvider) {
+			ClusteredProxyCache proxyCache, ReactiveTypeConverter reactiveTypeConverter) {
+		this(
+				gsBinder,
+				astrixSpringContext,
+				serviceActivator,
+				objectSerializerFactory,
+				proxyCache,
+				reactiveTypeConverter,
+				new DefaultTraceProvider()
+		);
+	}
+
+	@AstrixInject
+	public GsRemotingComponent(
+			GsBinder gsBinder,
+			AstrixSpringContext astrixSpringContext,
+			AstrixServiceActivator serviceActivator,
+			ObjectSerializerFactory objectSerializerFactory,
+			ClusteredProxyCache proxyCache,
+			ReactiveTypeConverter reactiveTypeConverter,
+			AstrixTraceProvider astrixTraceProvider
+	) {
 		this.gsBinder = gsBinder;
 		this.astrixSpringContext = astrixSpringContext;
 		this.serviceActivator = serviceActivator;

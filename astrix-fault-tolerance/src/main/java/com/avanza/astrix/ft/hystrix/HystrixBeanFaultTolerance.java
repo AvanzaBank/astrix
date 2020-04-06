@@ -38,6 +38,14 @@ final class HystrixBeanFaultTolerance implements BeanFaultTolerance {
 	private final com.netflix.hystrix.HystrixCommand.Setter commandSettings;
 	private final ContextPropagation contextPropagators;
 
+	/**
+	 * @deprecated please use {@link #HystrixBeanFaultTolerance(HystrixCommandKey, HystrixCommandGroupKey, ContextPropagation)}
+	 */
+	@Deprecated
+	public HystrixBeanFaultTolerance(HystrixCommandKey commandKey, HystrixCommandGroupKey groupKey) {
+		this(commandKey, groupKey, ContextPropagation.NONE);
+	}
+
 	public HystrixBeanFaultTolerance(HystrixCommandKey commandKey, HystrixCommandGroupKey groupKey, ContextPropagation contextPropagation) {
 		observableSettings = Setter.withGroupKey(groupKey)
 				.andCommandKey(commandKey)

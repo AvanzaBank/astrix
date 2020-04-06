@@ -42,7 +42,15 @@ class HystrixCommandFacade<T> {
 	private HystrixCommandFacade(CheckedCommand<T> command, Setter hystrixConfiguration, ContextPropagation contextPropagation) {
 		this.command = command;
 		this.hystrixConfiguration = hystrixConfiguration;
-		this.contextPropagation = contextPropagation;
+		this.contextPropagation = Objects.requireNonNull(contextPropagation);
+	}
+
+	/**
+	 * @deprecated please use {@link #execute(CheckedCommand, Setter, ContextPropagation)}
+	 */
+	@Deprecated
+	public static <T> T execute(CheckedCommand<T> command, Setter settings) throws Throwable {
+		return execute(command, settings, ContextPropagation.NONE);
 	}
 
 	public static <T> T execute(CheckedCommand<T> command, Setter settings, ContextPropagation contextPropagation) throws Throwable {

@@ -19,6 +19,7 @@ import java.util.List;
 
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
+import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
 import com.avanza.astrix.beans.tracing.InvocationExecutionWatcher;
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.remoting.RoutingStrategy;
@@ -47,6 +48,14 @@ public class RemotingProxy implements InvocationHandler {
 	private final ConcurrentMap<Method, List<InvocationExecutionWatcher>> invocationWatchersByMethod = new ConcurrentHashMap<>();
 	private final RemoteServiceMethodFactory remoteServiceMethodFactory;
 	private final ReactiveTypeConverter reactiveTypeConverter;
+
+	/**
+	 * @deprecated please use {@link #create(Class, Class, RemotingTransport, AstrixObjectSerializer, RoutingStrategy, ReactiveTypeConverter, AstrixTraceProvider)}
+	 */
+	@Deprecated
+	public static <T> T create(Class<T> proxyApi, Class<?> targetApi, RemotingTransport transport, AstrixObjectSerializer objectSerializer, RoutingStrategy defaultRoutingStrategy, ReactiveTypeConverter reactiveTypeConverter) {
+		return create(proxyApi, targetApi, transport, objectSerializer, defaultRoutingStrategy, reactiveTypeConverter, new DefaultTraceProvider());
+	}
 
 	public static <T> T create(
 			Class<T> proxyApi,

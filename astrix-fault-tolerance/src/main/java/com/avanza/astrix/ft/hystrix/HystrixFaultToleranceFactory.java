@@ -23,6 +23,8 @@ import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
 import com.avanza.astrix.beans.ft.MonitorableFaultToleranceSpi;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
+import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
+import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.hystrix.multiconfig.MultiConfigId;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
@@ -55,12 +57,34 @@ final class HystrixFaultToleranceFactory implements BeanFaultToleranceFactorySpi
     private final ContextPropagation contextPropagation;
     private MultiConfigId multiConfigId = MultiConfigId.create("astrix");
 
+    /**
+     * @deprecated please use {@link #HystrixFaultToleranceFactory(HystrixCommandNamingStrategy, AstrixConcurrencyStrategy, BeanConfigurationPropertiesStrategy, BeanMapping, AstrixTraceProvider, AstrixConfig)}
+     */
+    @Deprecated
     public HystrixFaultToleranceFactory(HystrixCommandNamingStrategy hystrixCommandNamingStrategy,
                                         AstrixConcurrencyStrategy concurrencyStrategy,
                                         BeanConfigurationPropertiesStrategy propertiesStrategy,
                                         BeanMapping beanMapping,
-                                        AstrixTraceProvider astrixTraceProvider,
                                         AstrixConfig config) {
+        this(
+                hystrixCommandNamingStrategy,
+                concurrencyStrategy,
+                propertiesStrategy,
+                beanMapping,
+                new DefaultTraceProvider(),
+                config
+        );
+    }
+
+    @AstrixInject
+    public HystrixFaultToleranceFactory(
+            HystrixCommandNamingStrategy hystrixCommandNamingStrategy,
+            AstrixConcurrencyStrategy concurrencyStrategy,
+            BeanConfigurationPropertiesStrategy propertiesStrategy,
+            BeanMapping beanMapping,
+            AstrixTraceProvider astrixTraceProvider,
+            AstrixConfig config
+    ) {
         this.id = Integer.toString(idGenerator.incrementAndGet());
         this.beanMapping = beanMapping;
         HystrixStrategies hystrixStrategies = new HystrixStrategies(propertiesStrategy,

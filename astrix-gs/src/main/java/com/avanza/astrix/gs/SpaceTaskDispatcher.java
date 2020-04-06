@@ -62,6 +62,14 @@ public final class SpaceTaskDispatcher {
 	private final ContextPropagation contextPropagation;
 	private final ThreadPoolExecutor executorService;
 
+	/**
+	 * @deprecated please use {@link #SpaceTaskDispatcher(GigaSpace, DynamicConfig, ContextPropagation)}
+	 */
+	@Deprecated
+	public SpaceTaskDispatcher(GigaSpace gigaSpace, DynamicConfig config) {
+		this(gigaSpace, config, ContextPropagation.NONE);
+	}
+
 	public SpaceTaskDispatcher(GigaSpace gigaSpace, DynamicConfig config, ContextPropagation contextPropagation) {
 		this.gigaSpace = gigaSpace;
 		this.contextPropagation = Objects.requireNonNull(contextPropagation);
