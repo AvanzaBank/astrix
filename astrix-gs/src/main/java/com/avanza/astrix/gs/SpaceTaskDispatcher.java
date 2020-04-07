@@ -15,6 +15,20 @@
  */
 package com.avanza.astrix.gs;
 
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
+
+import org.openspaces.core.GigaSpace;
+import org.openspaces.core.executor.DistributedTask;
+import org.openspaces.core.executor.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.avanza.astrix.beans.async.ContextPropagation;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicIntProperty;
@@ -24,22 +38,9 @@ import com.avanza.astrix.remoting.util.GsUtil;
 import com.gigaspaces.async.AsyncFuture;
 import com.gigaspaces.internal.client.spaceproxy.SpaceProxyImpl;
 import com.j_spaces.core.IJSpace;
-import org.openspaces.core.GigaSpace;
-import org.openspaces.core.executor.DistributedTask;
-import org.openspaces.core.executor.Task;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import rx.Observable;
 import rx.Subscriber;
-
-import java.io.Serializable;
-import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 /**
  * 
  * @author Elias Lindholm (elilin)

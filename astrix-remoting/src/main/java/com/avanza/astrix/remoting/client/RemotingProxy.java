@@ -15,7 +15,9 @@
  */
 package com.avanza.astrix.remoting.client;
 
-import java.util.List;
+import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.API_VERSION;
+import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.SERVICE_API;
+import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.SERVICE_METHOD_SIGNATURE;
 
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
@@ -30,10 +32,19 @@ import rx.Observable;
 import rx.functions.Action1;
 import rx.subjects.ReplaySubject;
 
-import java.lang.reflect.*;
-import java.util.concurrent.*;
-
-import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.*;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * 

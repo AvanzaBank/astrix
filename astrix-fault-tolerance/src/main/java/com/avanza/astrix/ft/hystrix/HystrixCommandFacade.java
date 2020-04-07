@@ -15,6 +15,10 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.avanza.astrix.beans.async.ContextPropagation;
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -22,10 +26,6 @@ import com.avanza.astrix.core.function.CheckedCommand;
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommand.Setter;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Objects;
 
 /**
  * @author Elias Lindholm (elilin)

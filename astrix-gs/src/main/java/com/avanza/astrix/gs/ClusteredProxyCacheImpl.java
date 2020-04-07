@@ -15,6 +15,19 @@
  */
 package com.avanza.astrix.gs;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import javax.annotation.PreDestroy;
+import javax.annotation.concurrent.GuardedBy;
+
+import org.openspaces.core.GigaSpace;
+import org.openspaces.core.GigaSpaceConfigurer;
+import org.openspaces.core.space.UrlSpaceConfigurer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.avanza.astrix.beans.async.ContextPropagation;
 import com.avanza.astrix.beans.async.ContextPropagator;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
@@ -25,19 +38,6 @@ import com.avanza.astrix.modules.KeyLock;
 import com.avanza.astrix.modules.ObjectCache;
 import com.avanza.astrix.modules.ObjectCache.ObjectFactory;
 import com.j_spaces.core.IJSpace;
-import org.openspaces.core.GigaSpace;
-import org.openspaces.core.GigaSpaceConfigurer;
-import org.openspaces.core.space.UrlSpaceConfigurer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.PreDestroy;
-import javax.annotation.concurrent.GuardedBy;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 /**
  * Manages lifecycle for each clustered-proxy created by Astrix.
  *  

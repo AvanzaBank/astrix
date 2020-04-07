@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.avanza.astrix.beans.async.ContextPropagation;
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
@@ -29,8 +31,6 @@ import com.avanza.hystrix.multiconfig.MultiConfigId;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixThreadPoolKey;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Elias Lindholm (elilin)

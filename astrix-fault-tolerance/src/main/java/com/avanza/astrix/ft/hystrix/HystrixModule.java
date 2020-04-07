@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
+import org.kohsuke.MetaInfServices;
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
@@ -22,7 +23,6 @@ import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.modules.ModuleContext;
-import org.kohsuke.MetaInfServices;
 
 @MetaInfServices(AstrixContextPlugin.class)
 public class HystrixModule implements AstrixContextPlugin {
