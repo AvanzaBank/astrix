@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -93,7 +94,7 @@ public class AstrixRemotingDriver {
 
 	public AstrixRemotingDriver(int partitionCount, AstrixTraceProvider astrixTraceProvider) {
 		this.partitions = new AstrixServiceActivatorImpl[partitionCount];
-		this.astrixTraceProvider = astrixTraceProvider;
+		this.astrixTraceProvider = Objects.requireNonNull(astrixTraceProvider);
 		IntStream.range(0, partitionCount).forEach(index -> partitions[index] = new AstrixServiceActivatorImpl(exportedServiceMetricsEnabled, metrics, exporter, astrixTraceProvider));
 	}
 	

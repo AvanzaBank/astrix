@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.gs.remoting;
 
+import java.util.Objects;
+
 import org.openspaces.core.GigaSpace;
 
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
@@ -87,7 +89,7 @@ public class GsRemotingComponent implements ServiceComponent {
 		this.objectSerializerFactory = objectSerializerFactory;
 		this.proxyCache = proxyCache;
 		this.reactiveTypeConverter = reactiveTypeConverter;
-		this.astrixTraceProvider = astrixTraceProvider;
+		this.astrixTraceProvider = Objects.requireNonNull(astrixTraceProvider);
 	}
 
 	@Override

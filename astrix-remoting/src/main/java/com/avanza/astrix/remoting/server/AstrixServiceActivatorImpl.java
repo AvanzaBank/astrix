@@ -46,6 +46,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -88,7 +89,7 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 		// Monitor for aggregated stats for all exported services
 		this.allServicesAggregated = new ServiceInvocationMonitor(metrics.createTimer());
 		mbeanExporter.registerMBean(this.allServicesAggregated, "ExportedServices", "AllServicesAggregated");
-		this.astrixTraceProvider = astrixTraceProvider;
+		this.astrixTraceProvider = Objects.requireNonNull(astrixTraceProvider);
 	}
 	
 	private static class ServiceInvocationMonitors {

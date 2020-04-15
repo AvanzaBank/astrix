@@ -58,7 +58,7 @@ final class HystrixFaultToleranceFactory implements BeanFaultToleranceFactorySpi
     private MultiConfigId multiConfigId = MultiConfigId.create("astrix");
 
     /**
-     * @deprecated please use {@link #HystrixFaultToleranceFactory(HystrixCommandNamingStrategy, AstrixConcurrencyStrategy, BeanConfigurationPropertiesStrategy, BeanMapping, AstrixTraceProvider, AstrixConfig)}
+     * @deprecated please use {@link #HystrixFaultToleranceFactory(HystrixCommandNamingStrategy, AstrixConcurrencyStrategy, BeanConfigurationPropertiesStrategy, BeanMapping, AstrixConfig, AstrixTraceProvider)}
      */
     @Deprecated
     public HystrixFaultToleranceFactory(HystrixCommandNamingStrategy hystrixCommandNamingStrategy,
@@ -71,8 +71,8 @@ final class HystrixFaultToleranceFactory implements BeanFaultToleranceFactorySpi
                 concurrencyStrategy,
                 propertiesStrategy,
                 beanMapping,
-                new DefaultTraceProvider(),
-                config
+                config,
+                new DefaultTraceProvider()
         );
     }
 
@@ -82,8 +82,8 @@ final class HystrixFaultToleranceFactory implements BeanFaultToleranceFactorySpi
             AstrixConcurrencyStrategy concurrencyStrategy,
             BeanConfigurationPropertiesStrategy propertiesStrategy,
             BeanMapping beanMapping,
-            AstrixTraceProvider astrixTraceProvider,
-            AstrixConfig config
+            AstrixConfig config,
+            AstrixTraceProvider astrixTraceProvider
     ) {
         this.id = Integer.toString(idGenerator.incrementAndGet());
         this.beanMapping = beanMapping;

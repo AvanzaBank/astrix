@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.remoting.client;
 
+import java.util.Objects;
+
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
@@ -48,7 +50,7 @@ public class RemotingProxyFactoryImpl implements RemotingProxyFactory {
 	) {
 		this.objectSerializerFactory = objectSerializerFactory;
 		this.reactiveTypeConverter = reactiveTypeConverter;
-		this.astrixTraceProvider = astrixTraceProvider;
+		this.astrixTraceProvider = Objects.requireNonNull(astrixTraceProvider);
 	}
 
 	@Override
