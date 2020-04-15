@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.gs;
 
+import com.avanza.astrix.beans.async.ContextPropagator;
 import org.kohsuke.MetaInfServices;
 
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
@@ -41,6 +42,7 @@ public class GsModule implements AstrixContextPlugin {
 		
 		moduleContext.importType(AstrixSpringContext.class);
 		moduleContext.importType(BeanFaultToleranceFactory.class);
+		moduleContext.importType(ContextPropagator.class);
 		
 		moduleContext.export(ServiceComponent.class);
 		moduleContext.export(ClusteredProxyBinder.class);
