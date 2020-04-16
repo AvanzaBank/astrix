@@ -15,8 +15,10 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
+import com.avanza.astrix.beans.async.ContextPropagation;
 import com.avanza.astrix.beans.ft.BeanFaultTolerance;
 import com.avanza.astrix.core.function.CheckedCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
@@ -35,8 +37,17 @@ final class HystrixBeanFaultTolerance implements BeanFaultTolerance {
 
 	private final Setter observableSettings;
 	private final com.netflix.hystrix.HystrixCommand.Setter commandSettings;
-	
+	private final ContextPropagation contextPropagators;
+
+	/**
+	 * @deprecated please use {@link #HystrixBeanFaultTolerance(HystrixCommandKey, HystrixCommandGroupKey, ContextPropagation)}
+	 */
+	@Deprecated
 	public HystrixBeanFaultTolerance(HystrixCommandKey commandKey, HystrixCommandGroupKey groupKey) {
+		this(commandKey, groupKey, ContextPropagation.NONE);
+	}
+
+	public HystrixBeanFaultTolerance(HystrixCommandKey commandKey, HystrixCommandGroupKey groupKey, ContextPropagation contextPropagation) {
 		observableSettings = Setter.withGroupKey(groupKey)
 				.andCommandKey(commandKey)
 				.andCommandPropertiesDefaults(
@@ -45,6 +56,7 @@ final class HystrixBeanFaultTolerance implements BeanFaultTolerance {
 				.andCommandKey(commandKey)
 				.andCommandPropertiesDefaults(
 						HystrixCommandProperties.Setter().withExecutionIsolationStrategy(ExecutionIsolationStrategy.THREAD));
+		this.contextPropagators = Objects.requireNonNull(contextPropagation);
 	}
 
 	@Override
@@ -54,7 +66,7 @@ final class HystrixBeanFaultTolerance implements BeanFaultTolerance {
 
 	@Override
 	public <T> T execute(final CheckedCommand<T> command) throws Throwable {
-		return HystrixCommandFacade.execute(command, commandSettings);
+		return HystrixCommandFacade.execute(command, commandSettings, contextPropagators);
 	}
 
 }

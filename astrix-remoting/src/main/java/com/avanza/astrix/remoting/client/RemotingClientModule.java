@@ -17,6 +17,7 @@ package com.avanza.astrix.remoting.client;
 
 
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
+import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
@@ -30,7 +31,8 @@ public class RemotingClientModule implements AstrixContextPlugin {
 		
 		moduleContext.importType(ObjectSerializerFactory.class);
 		moduleContext.importType(ReactiveTypeConverter.class);
-		
+		moduleContext.importType(AstrixTraceProvider.class);
+
 		moduleContext.export(RemotingProxyFactory.class);
 	}
 }
