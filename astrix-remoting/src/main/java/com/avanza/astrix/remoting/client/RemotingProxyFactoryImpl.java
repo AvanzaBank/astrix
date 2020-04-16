@@ -15,11 +15,16 @@
  */
 package com.avanza.astrix.remoting.client;
 
+import java.util.Objects;
+
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
+import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
 import com.avanza.astrix.core.remoting.RoutingStrategy;
 import com.avanza.astrix.core.util.ReflectionUtil;
+import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
 
@@ -27,10 +32,25 @@ public class RemotingProxyFactoryImpl implements RemotingProxyFactory {
 	
 	private final ObjectSerializerFactory objectSerializerFactory;
 	private final ReactiveTypeConverter reactiveTypeConverter;
-	
+	private final AstrixTraceProvider astrixTraceProvider;
+
+	/**
+	 * @deprecated please use {@link #RemotingProxyFactoryImpl(ObjectSerializerFactory, ReactiveTypeConverter, AstrixTraceProvider)}
+	 */
+	@Deprecated
 	public RemotingProxyFactoryImpl(ObjectSerializerFactory objectSerializerFactory, ReactiveTypeConverter reactiveTypeConverter) {
+		this(objectSerializerFactory, reactiveTypeConverter, new DefaultTraceProvider());
+	}
+
+	@AstrixInject
+	public RemotingProxyFactoryImpl(
+			ObjectSerializerFactory objectSerializerFactory,
+			ReactiveTypeConverter reactiveTypeConverter,
+			AstrixTraceProvider astrixTraceProvider
+	) {
 		this.objectSerializerFactory = objectSerializerFactory;
 		this.reactiveTypeConverter = reactiveTypeConverter;
+		this.astrixTraceProvider = Objects.requireNonNull(astrixTraceProvider);
 	}
 
 	@Override
@@ -38,8 +58,15 @@ public class RemotingProxyFactoryImpl implements RemotingProxyFactory {
 			RemotingTransportSpi remotingTransportSpi, RoutingStrategy routingStrategy) {
 		AstrixObjectSerializer objectSerializer = objectSerializerFactory.create(serviceDefinition.getObjectSerializerDefinition());
 		RemotingTransport remotingTransport = RemotingTransport.create(remotingTransportSpi);
-		return RemotingProxy.create(serviceDefinition.getServiceType(), ReflectionUtil.classForName(serviceProperties.getProperty(ServiceProperties.API))
-				, remotingTransport, objectSerializer, routingStrategy, reactiveTypeConverter);
+		return RemotingProxy.create(
+				serviceDefinition.getServiceType(),
+				ReflectionUtil.classForName(serviceProperties.getProperty(ServiceProperties.API)),
+				remotingTransport,
+				objectSerializer,
+				routingStrategy,
+				reactiveTypeConverter,
+				astrixTraceProvider
+		);
 	}
 
 }

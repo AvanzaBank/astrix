@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,6 +33,8 @@ import org.junit.Assert;
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
+import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
+import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.context.JavaSerializationSerializer;
 import com.avanza.astrix.context.mbeans.MBeanExporter;
@@ -73,16 +76,26 @@ public class AstrixRemotingDriver {
 	};
 	private ReactiveTypeConverter reactiveTypeConverter = new ReactiveTypeConverterImpl(Collections.<ReactiveTypeHandlerPlugin<?>>emptyList());
 	private DynamicBooleanProperty exportedServiceMetricsEnabled = new DynamicBooleanProperty(true);
-	
+	private final AstrixTraceProvider astrixTraceProvider;
+
 	private AstrixServiceActivatorImpl[] partitions;
 	
 	public AstrixRemotingDriver() {
 		this(1);
 	}
-	
+
+	public AstrixRemotingDriver(AstrixTraceProvider astrixTraceProvider) {
+		this(1, astrixTraceProvider);
+	}
+
 	public AstrixRemotingDriver(int partitionCount) {
+		this(partitionCount, new DefaultTraceProvider());
+	}
+
+	public AstrixRemotingDriver(int partitionCount, AstrixTraceProvider astrixTraceProvider) {
 		this.partitions = new AstrixServiceActivatorImpl[partitionCount];
-		IntStream.range(0, partitionCount).forEach(index -> partitions[index] = new AstrixServiceActivatorImpl(exportedServiceMetricsEnabled, metrics, exporter));
+		this.astrixTraceProvider = Objects.requireNonNull(astrixTraceProvider);
+		IntStream.range(0, partitionCount).forEach(index -> partitions[index] = new AstrixServiceActivatorImpl(exportedServiceMetricsEnabled, metrics, exporter, astrixTraceProvider));
 	}
 	
 	public <T> T hasExportedMbeanOfType(Class<T> expectedType, MBeanKey key) {
@@ -100,15 +113,15 @@ public class AstrixRemotingDriver {
 	}
 
 	public <T> T createRemotingProxy(Class<T> proxyApi, Class<?> targetApi) {
-		return RemotingProxy.create(proxyApi, targetApi, directTransport(), objectSerializer, new NoRoutingStrategy(), reactiveTypeConverter);
+		return RemotingProxy.create(proxyApi, targetApi, directTransport(), objectSerializer, new NoRoutingStrategy(), reactiveTypeConverter, astrixTraceProvider);
 	}
 	
 	public <T> T createRemotingProxy(Class<T> proxyApi, Class<?> targetApi,	AstrixObjectSerializer objectSerializerOverride) {
-		return RemotingProxy.create(proxyApi, targetApi, directTransport(), objectSerializerOverride, new NoRoutingStrategy(), reactiveTypeConverter);
+		return RemotingProxy.create(proxyApi, targetApi, directTransport(), objectSerializerOverride, new NoRoutingStrategy(), reactiveTypeConverter, astrixTraceProvider);
 	}
 	
 	public <T> T createRemotingProxy(Class<T> proxyApi, Class<?> targetApi,	RoutingStrategy routingStrategyOverride) {
-		return RemotingProxy.create(proxyApi, targetApi, directTransport(), objectSerializer, routingStrategyOverride, reactiveTypeConverter);
+		return RemotingProxy.create(proxyApi, targetApi, directTransport(), objectSerializer, routingStrategyOverride, reactiveTypeConverter, astrixTraceProvider);
 	}
 	
 	/**

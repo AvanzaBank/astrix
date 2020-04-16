@@ -15,10 +15,11 @@
  */
 package com.avanza.astrix.gs;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
 import javax.annotation.PreDestroy;
 import javax.annotation.concurrent.GuardedBy;
 
@@ -27,10 +28,12 @@ import org.openspaces.core.GigaSpaceConfigurer;
 import org.openspaces.core.space.UrlSpaceConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import com.avanza.astrix.beans.async.ContextPropagation;
+import com.avanza.astrix.beans.async.ContextPropagator;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.modules.KeyLock;
 import com.avanza.astrix.modules.ObjectCache;
 import com.avanza.astrix.modules.ObjectCache.ObjectFactory;
@@ -43,19 +46,32 @@ import com.j_spaces.core.IJSpace;
  */
 public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProxyCache {
 
-	
 	private static final Logger log = LoggerFactory.getLogger(ClusteredProxyCacheImpl.class);
 	private final ObjectCache objectCache = new ObjectCache();
 	private final KeyLock<String> proxyByUrlLock = new KeyLock<>();
 	private DynamicConfig config;
-	
+	private ContextPropagation contextPropagation;
+
 	/**
-	 * Retreives a given proxy from the cache and creates the proxy if it does not exits.
+	 * @deprecated please use {@link #ClusteredProxyCacheImpl(List)}
+	 */
+	@Deprecated
+	public ClusteredProxyCacheImpl() {
+		this(Collections.emptyList());
+	}
+
+	@AstrixInject
+	public ClusteredProxyCacheImpl(List<ContextPropagator> contextPropagators) {
+		this.contextPropagation = ContextPropagation.create(contextPropagators);
+	}
+
+	/**
+	 * Retrieves a given proxy from the cache and creates the proxy if it does not exits.
 	 * 
-	 * Every time a proxy is retreived from the cache the proxyConsumerCount will be incremented. The
+	 * Every time a proxy is retrieved from the cache the proxyConsumerCount will be incremented. The
 	 * proxy must be returned to the cache by invoking GigaSpaceInstance.release. When all instance
-	 * for a proxy agains a given space is release, then the proxy will be destroyed and all associated resources
-	 * released. 
+	 * for a proxy against a given space is release, then the proxy will be destroyed and all associated resources
+	 * are released.
 	 * 
 	 * @param serviceProperties
 	 * @return
@@ -115,7 +131,7 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 			spaceTaskDispatcherStateLock.lock();
 			try {
 				if (spaceTaskDispatcher == null) {
-					this.spaceTaskDispatcher = new SpaceTaskDispatcher(proxy, config); 
+					this.spaceTaskDispatcher = new SpaceTaskDispatcher(proxy, config, contextPropagation);
 				}
 				return spaceTaskDispatcher;
 			} finally {

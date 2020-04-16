@@ -119,7 +119,7 @@ public final class ObjectCache {
 			try {
 				instance = objectFactory.create();
 				init(instance);
-				this.instanceById.put(id, instance);;
+				this.instanceById.put(id, instance);
 				return instance;
 			} catch (RuntimeException e) {
 				throw e;

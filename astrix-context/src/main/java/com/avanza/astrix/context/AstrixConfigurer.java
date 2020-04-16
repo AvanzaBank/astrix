@@ -44,6 +44,8 @@ import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.ServiceRegistryDiscoveryModule;
 import com.avanza.astrix.beans.service.DirectComponentModule;
 import com.avanza.astrix.beans.service.ServiceModule;
+import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
+import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.MapConfigSource;
@@ -128,6 +130,7 @@ public class AstrixConfigurer {
 		modulesConfigurer.registerDefault(StrategyProvider.create(HystrixCommandNamingStrategy.class, DefaultHystrixCommandNamingStrategy.class));
 		modulesConfigurer.registerDefault(StrategyProvider.create(BeanFaultToleranceFactorySpi.class, NoFaultTolerance.class));
 		modulesConfigurer.registerDefault(StrategyProvider.create(MetricsSpi.class, DefaultMetricSpi.class));
+		modulesConfigurer.registerDefault(StrategyProvider.create(AstrixTraceProvider.class, DefaultTraceProvider.class));
 		modulesConfigurer.registerDefault(StrategyProvider.create(MBeanServerFacade.class, PlatformMBeanServer.class, context -> context.importType(AstrixConfig.class)));
 		
 		for (Module plugin : customModules) {
