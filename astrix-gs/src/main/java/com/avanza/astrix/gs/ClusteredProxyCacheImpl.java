@@ -15,8 +15,7 @@
  */
 package com.avanza.astrix.gs;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -29,9 +28,10 @@ import org.openspaces.core.space.UrlSpaceConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.avanza.astrix.beans.async.ContextPropagation;
-import com.avanza.astrix.beans.async.ContextPropagator;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.service.ServiceProperties;
+import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
+import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.modules.KeyLock;
@@ -53,16 +53,18 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 	private ContextPropagation contextPropagation;
 
 	/**
-	 * @deprecated please use {@link #ClusteredProxyCacheImpl(List)}
+	 * @deprecated please use {@link #ClusteredProxyCacheImpl(AstrixTraceProvider)}
 	 */
 	@Deprecated
 	public ClusteredProxyCacheImpl() {
-		this(Collections.emptyList());
+		this(new DefaultTraceProvider());
 	}
 
 	@AstrixInject
-	public ClusteredProxyCacheImpl(List<ContextPropagator> contextPropagators) {
-		this.contextPropagation = ContextPropagation.create(contextPropagators);
+	public ClusteredProxyCacheImpl(AstrixTraceProvider astrixTraceProvider) {
+		this.contextPropagation = ContextPropagation.create(
+				Objects.requireNonNull(astrixTraceProvider).getContextPropagators()
+		);
 	}
 
 	/**
