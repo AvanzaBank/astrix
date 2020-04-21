@@ -15,10 +15,10 @@
  */
 package com.avanza.astrix.gs;
 
-import com.avanza.astrix.beans.async.ContextPropagator;
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
+import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.modules.ModuleContext;
@@ -40,7 +40,7 @@ public class GsModule implements AstrixContextPlugin {
 		
 		moduleContext.importType(AstrixSpringContext.class);
 		moduleContext.importType(BeanFaultToleranceFactory.class);
-		moduleContext.importType(ContextPropagator.class);
+		moduleContext.importType(AstrixTraceProvider.class);
 		
 		moduleContext.export(ServiceComponent.class);
 		moduleContext.export(ClusteredProxyBinder.class);

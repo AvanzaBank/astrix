@@ -87,7 +87,7 @@ public final class SpaceTaskDispatcher {
 											 new LinkedBlockingQueue<Runnable>(),
 											 new NamedThreadFactory(String.format("SpaceTaskDispatcher[%s]", spaceInstanceName)));
 		poolSize.addListener(newValue -> {
-			log.info(String.format("Changing pool-size for SpaceTaskDistpatcher. space=%s newSize=%s, oldSize=%s", 
+			log.info(String.format("Changing pool-size for SpaceTaskDispatcher. space=%s newSize=%s, oldSize=%s",
 									SpaceTaskDispatcher.this.gigaSpace.getName(), 
 									newValue, executorService.getMaximumPoolSize()));
 			executorService.setCorePoolSize(newValue);
