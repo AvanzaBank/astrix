@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.avanza.astrix14</groupId>
     <artifactId>tutorial</artifactId>
-    <version>14.1.1-SNAPSHOT</version>
+    <version>14.1.2-SNAPSHOT</version>
   </parent>
   <artifactId>trading-api-parent</artifactId>
   <packaging>pom</packaging>
