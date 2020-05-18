@@ -68,6 +68,7 @@ import com.avanza.astrix.test.util.AstrixTestUtil;
 import com.avanza.astrix.test.util.AutoCloseableRule;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -84,6 +85,7 @@ public class AstrixIntegrationTest {
 															.beanProperties("space", new Properties() {{
 																// Run lease-manager thread every 200 ms.
 																setProperty("space-config.lease_manager.expiration_time_interval", "200");
+																setProperty("secured", "true");
 															}})
 															.startAsync(true)
 															.configure();
@@ -269,7 +271,7 @@ public class AstrixIntegrationTest {
 		ServiceProperties serviceProperties = serviceRegistryClient.lookup(AstrixBeanKey.create(LunchService.class));
 		assertEquals(LunchApplicationDescriptor.class.getName(), serviceProperties.getProperties().get(ServiceProperties.APPLICATION_INSTANCE_ID));
 	}
-	
+
 	@Test(expected = ServiceUnavailableException.class)
 	public void itsNotPossibleToBindToNonPublishedServiceBeansProvidedByOtherSubsystems() throws Exception {
 		astrix.getBean(InternalLunchFeeder.class).addLunchRestaurant(lunchRestaurant().build());

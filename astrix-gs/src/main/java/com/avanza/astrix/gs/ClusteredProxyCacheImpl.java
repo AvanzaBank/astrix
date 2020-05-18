@@ -24,6 +24,7 @@ import javax.annotation.concurrent.GuardedBy;
 
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.GigaSpaceConfigurer;
+import org.openspaces.core.space.CannotFindSpaceException;
 import org.openspaces.core.space.UrlSpaceConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.gs.security.GsCredentialsProvider;
 import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.modules.KeyLock;
 import com.avanza.astrix.modules.ObjectCache;
@@ -107,7 +109,7 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 		private final GigaSpace proxy;
 		private final AtomicInteger proxyConsumerCount = new AtomicInteger(0);
 		private final String spaceUrl;
-		private final UrlSpaceConfigurer urlSpaceConfigurer;
+		private UrlSpaceConfigurer urlSpaceConfigurer;
 		@GuardedBy("spaceTaskDispatcherStateLock")
 		private volatile SpaceTaskDispatcher spaceTaskDispatcher;
 		private final Lock spaceTaskDispatcherStateLock = new ReentrantLock();
@@ -116,9 +118,24 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 		public GigaSpaceInstance(String spaceUrl, DynamicConfig dynamicConfig) {
 			this.spaceUrl = spaceUrl;
 			this.config = dynamicConfig;
-			this.urlSpaceConfigurer = new UrlSpaceConfigurer(spaceUrl);
-			IJSpace space = urlSpaceConfigurer.create();
+			IJSpace space = createSpaceWithSecurityIfEnabled(spaceUrl, dynamicConfig);
 			this.proxy = new GigaSpaceConfigurer(space).create();
+		}
+
+		private IJSpace createSpaceWithSecurityIfEnabled(String spaceUrl, DynamicConfig dynamicConfig) {
+			UrlSpaceConfigurer urlSpaceConfigurer = new UrlSpaceConfigurer(spaceUrl);
+			urlSpaceConfigurer.credentialsProvider(new GsCredentialsProvider(dynamicConfig));
+			IJSpace space;
+			try {
+				// Will throw CannotFindSpaceException if credentials are provided to a space that isn't secured
+				space = urlSpaceConfigurer.create();
+			} catch (CannotFindSpaceException e) {
+				// Falls back to not using credentials, if the space does in fact not exist that exception will be propagated just like before
+				urlSpaceConfigurer = new UrlSpaceConfigurer(spaceUrl);
+				space = urlSpaceConfigurer.create();
+			}
+			this.urlSpaceConfigurer = urlSpaceConfigurer;
+			return space;
 		}
 
 		public void incConsumerCount() {
