@@ -15,12 +15,10 @@
  */
 package com.avanza.astrix.spring;
 
-import org.kohsuke.MetaInfServices;
-
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.modules.ModuleContext;
-@MetaInfServices(AstrixContextPlugin.class)
+
 public class SpringModule implements AstrixContextPlugin {
 
 	@Override

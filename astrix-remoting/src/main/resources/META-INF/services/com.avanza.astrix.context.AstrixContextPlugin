@@ -1,0 +1,2 @@
+com.avanza.astrix.remoting.client.RemotingClientModule
+com.avanza.astrix.remoting.server.RemotingServerModule

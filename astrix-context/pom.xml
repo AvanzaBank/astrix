@@ -37,12 +37,6 @@
 			<groupId>io.reactivex</groupId>
 			<artifactId>rxjava</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.kohsuke.metainf-services</groupId>
-			<artifactId>metainf-services</artifactId>
-			<version>1.1</version>
-			<optional>true</optional>
-		</dependency>
 
 		<dependency>
 			<groupId>org.reflections</groupId>
