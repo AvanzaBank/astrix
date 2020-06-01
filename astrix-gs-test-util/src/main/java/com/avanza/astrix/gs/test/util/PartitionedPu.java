@@ -103,6 +103,7 @@ public final class PartitionedPu implements PuRunner {
 		return this.lookupGroupName;
 	}
 	
+	@Override
 	public boolean autostart() {
 		return this.autostart ;
 	}

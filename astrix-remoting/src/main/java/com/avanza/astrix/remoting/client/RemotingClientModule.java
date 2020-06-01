@@ -16,15 +16,12 @@
 package com.avanza.astrix.remoting.client;
 
 
-import org.kohsuke.MetaInfServices;
-
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
 
-@MetaInfServices(AstrixContextPlugin.class)
 public class RemotingClientModule implements AstrixContextPlugin {
 
 	@Override

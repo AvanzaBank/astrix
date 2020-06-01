@@ -15,8 +15,6 @@
  */
 package com.avanza.astrix.gs.remoting;
 
-import org.kohsuke.MetaInfServices;
-
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
@@ -28,7 +26,7 @@ import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 import com.avanza.astrix.spring.AstrixSpringContext;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
-@MetaInfServices(AstrixContextPlugin.class)
+
 public class GsRemotingModule implements AstrixContextPlugin {
 
 	@Override
@@ -37,6 +35,7 @@ public class GsRemotingModule implements AstrixContextPlugin {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
+		ensureGigaSpaceJavaCompatibility();
 		moduleContext.bind(ServiceComponent.class, GsRemotingComponent.class);
 		
 		moduleContext.importType(ObjectSerializerFactory.class);
@@ -50,4 +49,17 @@ public class GsRemotingModule implements AstrixContextPlugin {
 		moduleContext.export(ServiceComponent.class);
 	}
 
+	private void ensureGigaSpaceJavaCompatibility() {
+		final String jreVersion = System.getProperty("java.specification.version");
+		if (jreVersion.matches("\\d+")) {
+			int jreVersionInt = Integer.parseInt(jreVersion);
+			if (jreVersionInt >= 11) {
+				throw new IllegalArgumentException(
+						"This JRE seems to be Java 11 or later."
+								+ " GigaSpaces v10.x is unable to run on this JRE."
+								+ " Please upgrade GigaSpaces or use a Java 8 JRE."
+				);
+			}
+		}
+	}
 }

@@ -21,10 +21,7 @@ import java.util.Map;
 import com.avanza.astrix.beans.registry.ServiceKey;
 import com.avanza.astrix.beans.registry.ServiceProviderKey;
 import com.gigaspaces.annotation.pojo.SpaceId;
-import com.gigaspaces.annotation.pojo.SpaceIndex;
-import com.gigaspaces.annotation.pojo.SpaceProperty;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
-import com.gigaspaces.metadata.index.SpaceIndexType;
 
 public class SpaceServiceRegistryEntry implements Serializable {
 

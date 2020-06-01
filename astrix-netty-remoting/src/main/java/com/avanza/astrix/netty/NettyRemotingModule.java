@@ -15,8 +15,6 @@
  */
 package com.avanza.astrix.netty;
 
-import org.kohsuke.MetaInfServices;
-
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.context.AstrixContextPlugin;
@@ -25,7 +23,6 @@ import com.avanza.astrix.remoting.client.RemotingProxyFactory;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
 
-@MetaInfServices(AstrixContextPlugin.class)
 public class NettyRemotingModule implements AstrixContextPlugin {
 
 	@Override

@@ -15,10 +15,6 @@
  */
 package com.avanza.astrix.context;
 
-import java.lang.annotation.Annotation;
-import java.util.*;
-import java.util.stream.Stream;
-
 import com.avanza.astrix.beans.api.ApiProviderBeanPublisherModule;
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.AstrixConfigModule;
@@ -33,8 +29,16 @@ import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.factory.BeanFactoryModule;
 import com.avanza.astrix.beans.factory.StandardFactoryBean;
-import com.avanza.astrix.beans.ft.*;
-import com.avanza.astrix.beans.publish.*;
+import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
+import com.avanza.astrix.beans.ft.DefaultHystrixCommandNamingStrategy;
+import com.avanza.astrix.beans.ft.FaultToleranceModule;
+import com.avanza.astrix.beans.ft.HystrixCommandNamingStrategy;
+import com.avanza.astrix.beans.ft.NoFaultTolerance;
+import com.avanza.astrix.beans.publish.ApiProviderClass;
+import com.avanza.astrix.beans.publish.ApiProviderPlugins;
+import com.avanza.astrix.beans.publish.ApiProviders;
+import com.avanza.astrix.beans.publish.BeanPublisherPlugin;
+import com.avanza.astrix.beans.publish.BeansPublishModule;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
 import com.avanza.astrix.beans.registry.ServiceRegistryDiscoveryModule;
@@ -42,14 +46,25 @@ import com.avanza.astrix.beans.service.DirectComponentModule;
 import com.avanza.astrix.beans.service.ServiceModule;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
-import com.avanza.astrix.config.*;
+import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.config.LongSetting;
+import com.avanza.astrix.config.MapConfigSource;
+import com.avanza.astrix.config.PropertiesConfigSource;
+import com.avanza.astrix.config.Setting;
+import com.avanza.astrix.config.SystemPropertiesConfigSource;
 import com.avanza.astrix.context.mbeans.AstrixMBeanModule;
 import com.avanza.astrix.context.mbeans.MBeanServerFacade;
 import com.avanza.astrix.context.mbeans.PlatformMBeanServer;
 import com.avanza.astrix.context.metrics.DefaultMetricSpi;
 import com.avanza.astrix.context.metrics.MetricsModule;
 import com.avanza.astrix.context.metrics.MetricsSpi;
-import com.avanza.astrix.modules.*;
+import com.avanza.astrix.modules.Module;
+import com.avanza.astrix.modules.ModuleContext;
+import com.avanza.astrix.modules.ModuleInstancePostProcessor;
+import com.avanza.astrix.modules.Modules;
+import com.avanza.astrix.modules.ModulesConfigurer;
+import com.avanza.astrix.modules.StrategyContextPreparer;
+import com.avanza.astrix.modules.StrategyProvider;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
@@ -60,6 +75,20 @@ import com.avanza.astrix.versioning.core.ObjectSerializerModule;
 import com.avanza.astrix.versioning.jackson2.Jackson2SerializerModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.stream.Stream;
 /**
  * Used to configure and create an {@link AstrixContext}. <p>
  * 
