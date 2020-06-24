@@ -33,6 +33,8 @@ import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.gs.security.DefaultGsSecurityProvider;
+import com.avanza.astrix.gs.security.GsSecurityProvider;
 import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.modules.KeyLock;
 import com.avanza.astrix.modules.ObjectCache;
@@ -50,21 +52,26 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 	private final ObjectCache objectCache = new ObjectCache();
 	private final KeyLock<String> proxyByUrlLock = new KeyLock<>();
 	private DynamicConfig config;
-	private ContextPropagation contextPropagation;
+	private final ContextPropagation contextPropagation;
+	private final GsSecurityProvider gsSecurityProvider;
 
 	/**
-	 * @deprecated please use {@link #ClusteredProxyCacheImpl(AstrixTraceProvider)}
+	 * @deprecated please use {@link #ClusteredProxyCacheImpl(AstrixTraceProvider, GsSecurityProvider)}
 	 */
 	@Deprecated
 	public ClusteredProxyCacheImpl() {
-		this(new DefaultTraceProvider());
+		this(new DefaultTraceProvider(), new DefaultGsSecurityProvider());
 	}
 
 	@AstrixInject
-	public ClusteredProxyCacheImpl(AstrixTraceProvider astrixTraceProvider) {
+	public ClusteredProxyCacheImpl(
+			AstrixTraceProvider astrixTraceProvider,
+			GsSecurityProvider gsSecurityProvider
+	) {
 		this.contextPropagation = ContextPropagation.create(
 				Objects.requireNonNull(astrixTraceProvider).getContextPropagators()
 		);
+		this.gsSecurityProvider = Objects.requireNonNull(gsSecurityProvider);
 	}
 
 	/**
@@ -80,14 +87,14 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 	 */
 	@Override
 	public GigaSpaceInstance getProxy(final ServiceProperties serviceProperties) {
-		final String spaceUrl = serviceProperties.getProperty(GsBinder.SPACE_URL_PROPERTY);
+		final String spaceUrl = GsBinder.getSpaceUrl(serviceProperties);
 		proxyByUrlLock.lock(spaceUrl);
 		try {
 			GigaSpaceInstance spaceInstance = objectCache.getInstance(spaceUrl, new ObjectFactory<GigaSpaceInstance>() {
 				@Override
 				public GigaSpaceInstance create() throws Exception {
 					log.info("Creating clustered proxy against: " + spaceUrl);
-					return new GigaSpaceInstance(spaceUrl, config);
+					return new GigaSpaceInstance(spaceUrl, config, serviceProperties);
 				}
 			});
 			spaceInstance.incConsumerCount();
@@ -112,11 +119,16 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 		private volatile SpaceTaskDispatcher spaceTaskDispatcher;
 		private final Lock spaceTaskDispatcherStateLock = new ReentrantLock();
 		private final DynamicConfig config;
-		
-		public GigaSpaceInstance(String spaceUrl, DynamicConfig dynamicConfig) {
+
+		public GigaSpaceInstance(String spaceUrl, DynamicConfig dynamicConfig, ServiceProperties serviceProperties) {
 			this.spaceUrl = spaceUrl;
 			this.config = dynamicConfig;
 			this.urlSpaceConfigurer = new UrlSpaceConfigurer(spaceUrl);
+			if (GsBinder.isAuthenticationRequired(serviceProperties)) {
+				final String spaceName = GsBinder.getSpaceName(serviceProperties);
+				log.debug("Connecting to space {} as a secured space.", spaceName);
+				urlSpaceConfigurer.credentialsProvider(gsSecurityProvider.getGsClientCredentialsProvider(spaceName));
+			}
 			IJSpace space = urlSpaceConfigurer.create();
 			this.proxy = new GigaSpaceConfigurer(space).create();
 		}
