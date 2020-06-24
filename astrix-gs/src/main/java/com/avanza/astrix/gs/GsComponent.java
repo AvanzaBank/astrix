@@ -23,6 +23,8 @@ import com.avanza.astrix.beans.service.ServiceDefinition;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.service.UnsupportedTargetTypeException;
 import com.avanza.astrix.gs.ClusteredProxyCacheImpl.GigaSpaceInstance;
+import com.avanza.astrix.gs.security.GsSecurityManager;
+import com.avanza.astrix.gs.security.GsSecurityProvider;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.spring.AstrixSpringContext;
 /**
@@ -37,10 +39,16 @@ public class GsComponent implements ServiceComponent, ClusteredProxyBinder {
 	private AstrixSpringContext astrixSpringContext;
 	private ClusteredProxyCache proxyCache;
 	
-	public GsComponent(GsBinder gsBinder, AstrixSpringContext astrixSpringContext, ClusteredProxyCache proxyCache) {
+	public GsComponent(
+			GsBinder gsBinder,
+			AstrixSpringContext astrixSpringContext,
+			ClusteredProxyCache proxyCache,
+			GsSecurityProvider gsSecurityProvider
+	) {
 		this.gsBinder = gsBinder;
 		this.astrixSpringContext = astrixSpringContext;
 		this.proxyCache = proxyCache;
+		GsSecurityManager.setGsServerAuthenticator(gsSecurityProvider.getGsServerAuthenticator());
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import org.openspaces.core.properties.BeanLevelProperties;
 import org.openspaces.pu.container.integrated.IntegratedProcessingUnitContainer;
 import org.openspaces.pu.container.integrated.IntegratedProcessingUnitContainerProvider;
 import org.openspaces.pu.container.support.CompoundProcessingUnitContainer;
+import com.gigaspaces.security.directory.DefaultCredentialsProvider;
 
 /**
  * 
@@ -43,6 +44,7 @@ public final class PartitionedPu implements PuRunner {
 	private final Map<String, Properties> beanProperies = new HashMap<>();
 	private final String lookupGroupName;
 	private final boolean autostart;
+	private final boolean useAuthentication;
 
 	public PartitionedPu(PartitionedPuConfigurer configurer) {
 		this.puXmlPath = configurer.puXmlPath;
@@ -52,6 +54,7 @@ public final class PartitionedPu implements PuRunner {
 		this.beanProperies.putAll(configurer.beanProperies);
 		this.lookupGroupName = configurer.lookupGroupName;
 		this.autostart = configurer.autostart;
+		this.useAuthentication = configurer.useAuthentication;
 		this.contextProperties.put("spaceName", UniqueSpaceNameLookup.getSpaceNameWithSequence(configurer.spaceName));
 	}
 
@@ -69,7 +72,23 @@ public final class PartitionedPu implements PuRunner {
 		provider.setBeanLevelProperties(createBeanLevelProperties());
 		provider.setClusterInfo(createClusterInfo());
 		provider.addConfigLocation(puXmlPath);
+		if (useAuthentication) {
+			enableAuthentication(provider);
+		}
 		container = (CompoundProcessingUnitContainer) provider.createContainer();
+	}
+
+	private void enableAuthentication(IntegratedProcessingUnitContainerProvider provider) {
+		final Properties contextProperties = provider.getBeanLevelProperties().getContextProperties();
+		contextProperties.put("com.gs.security.security-manager.class", new SecurityManagerForTests());
+		provider.setCredentialsProvider(new DefaultCredentialsProvider(SecurityManagerForTests.TEST_USER, SecurityManagerForTests.TEST_PASS));
+
+		// Override default timeouts that are being used when security is enabled
+		// during PU startup.
+		// SpaceRemoteOperationsExecutorsClusterConfig defaults to 20s
+		contextProperties.setProperty("space-config.proxy.router.active-server-lookup-timeout", "300");
+		// ClusterXML::createActiveElectConfig used by ActiveElectionManager::sleepYieldTime defaults to 1s
+		contextProperties.setProperty("cluster-config.groups.group.fail-over-policy.active-election.yield-time", "100");
 	}
 
 	private ClusterInfo createClusterInfo() {
