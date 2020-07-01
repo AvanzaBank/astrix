@@ -30,6 +30,7 @@ public final class PartitionedPuConfigurer {
 	String lookupGroupName = JVMGlobalLus.getLookupGroupName();
 	String spaceName = "test-space";
 	public boolean autostart = true;
+	boolean useAuthentication;
 
 	public PartitionedPuConfigurer(String puXmlPath) {
 		this.puXmlPath = puXmlPath;
@@ -87,4 +88,8 @@ public final class PartitionedPuConfigurer {
 		return this;
 	}
 
+	public PartitionedPuConfigurer withAuthentication() {
+		this.useAuthentication = true;
+		return this;
+	}
 }
