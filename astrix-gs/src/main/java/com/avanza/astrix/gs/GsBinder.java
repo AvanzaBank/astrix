@@ -19,10 +19,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.openspaces.core.GigaSpace;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
-
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.ServiceProperties;
@@ -38,7 +36,8 @@ public class GsBinder implements AstrixConfigAware {
 	
 	public static final String SPACE_NAME_PROPERTY = "spaceName";
 	public static final String SPACE_URL_PROPERTY = "spaceUrl";
-	
+	private static final String SPACE_REQUIRES_AUTHENTICATION = "isSecured";
+
 	private static final Pattern SPACE_URL_PATTERN = Pattern.compile("jini://.*?/.*?/(.*)?[?](.*)");
 	private DynamicConfig config;
 	
@@ -75,12 +74,25 @@ public class GsBinder implements AstrixConfigAware {
 			return false;
 		}
 	}
-	
+
+	static String getSpaceName(ServiceProperties serviceProperties) {
+		return serviceProperties.getProperty(SPACE_NAME_PROPERTY);
+	}
+
+	static String getSpaceUrl(ServiceProperties serviceProperties) {
+		return serviceProperties.getProperty(SPACE_URL_PROPERTY);
+	}
+
+	static boolean isAuthenticationRequired(ServiceProperties serviceProperties) {
+		return Boolean.parseBoolean(serviceProperties.getProperty(SPACE_REQUIRES_AUTHENTICATION));
+	}
+
 	public ServiceProperties createProperties(GigaSpace space) {
 		ServiceProperties result = new ServiceProperties();
 //		result.setApi(GigaSpace.class);
 		result.setProperty(SPACE_NAME_PROPERTY, space.getSpace().getName());
 		result.setProperty(SPACE_URL_PROPERTY, new SpaceUrlBuilder(space).buildSpaceUrl());
+		result.setProperty(SPACE_REQUIRES_AUTHENTICATION, Boolean.toString(space.getSpace().isSecured()));
 		return result;
 	}
 

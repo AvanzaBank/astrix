@@ -21,6 +21,8 @@ import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
+import com.avanza.astrix.gs.security.DefaultGsSecurityProvider;
+import com.avanza.astrix.gs.security.GsSecurityProvider;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
 /**
@@ -41,7 +43,8 @@ public class GsModule implements AstrixContextPlugin {
 		moduleContext.importType(AstrixSpringContext.class);
 		moduleContext.importType(BeanFaultToleranceFactory.class);
 		moduleContext.importType(AstrixTraceProvider.class);
-		
+		moduleContext.importType(GsSecurityProvider.class);
+
 		moduleContext.export(ServiceComponent.class);
 		moduleContext.export(ClusteredProxyBinder.class);
 		moduleContext.export(ClusteredProxyCache.class);
@@ -50,6 +53,7 @@ public class GsModule implements AstrixContextPlugin {
 
 	@Override
 	public void registerStrategies(AstrixStrategiesConfig astrixContextConfig) {
+		astrixContextConfig.registerDefaultStrategy(GsSecurityProvider.class, DefaultGsSecurityProvider.class);
 	}
 
 }
