@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.avanza.astrix</groupId>
 		<artifactId>astrix-parent</artifactId>
-		<version>0.44.3-SNAPSHOT</version>
+		<version>0.45.0</version>
 	</parent>
 	<artifactId>astrix-provider</artifactId>
 	<name>${project.artifactId}</name>
