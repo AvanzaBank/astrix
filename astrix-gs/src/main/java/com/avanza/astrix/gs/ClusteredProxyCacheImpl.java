@@ -39,6 +39,7 @@ import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.modules.KeyLock;
 import com.avanza.astrix.modules.ObjectCache;
 import com.avanza.astrix.modules.ObjectCache.ObjectFactory;
+import com.gigaspaces.security.directory.CredentialsProvider;
 import com.j_spaces.core.IJSpace;
 /**
  * Manages lifecycle for each clustered-proxy created by Astrix.
@@ -127,7 +128,7 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 			if (GsBinder.isAuthenticationRequired(serviceProperties)) {
 				final String spaceName = GsBinder.getSpaceName(serviceProperties);
 				log.debug("Connecting to space {} as a secured space.", spaceName);
-				urlSpaceConfigurer.credentialsProvider(gsSecurityProvider.getGsClientCredentialsProvider(spaceName));
+				urlSpaceConfigurer.credentialsProvider(getCredentialsProvider(spaceName));
 			}
 			IJSpace space = urlSpaceConfigurer.create();
 			this.proxy = new GigaSpaceConfigurer(space).create();
@@ -181,4 +182,11 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 		this.config = config;
 	}
 
+	private CredentialsProvider getCredentialsProvider(String spaceName) {
+		Object credentialsProvider = System.getProperties().get("com.gs.security.credentials-provider.class");
+		if (credentialsProvider instanceof CredentialsProvider) {
+			return (CredentialsProvider) credentialsProvider;
+		}
+		return gsSecurityProvider.getGsClientCredentialsProvider(spaceName);
+	}
 }
