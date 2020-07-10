@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.avanza.astrix</groupId>
 		<artifactId>astrix-parent</artifactId>
-		<version>0.45.2-SNAPSHOT</version>
+		<version>0.45.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>hystrix-multiconfig</artifactId>
