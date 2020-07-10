@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>com.avanza.astrix</groupId>
 			<artifactId>astrix-config</artifactId>
-			<version>0.43.5</version>
+			<version>0.45.2</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
