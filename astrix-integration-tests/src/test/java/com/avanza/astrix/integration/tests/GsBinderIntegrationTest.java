@@ -73,16 +73,16 @@ public class GsBinderIntegrationTest {
 		public GigaSpace gigaSpace() {
 			IJSpace space = Mockito.mock(IJSpace.class);
 			GigaSpace gs = Mockito.mock(GigaSpace.class);
-			Mockito.stub(gs.getSpace()).toReturn(space);
-			Mockito.stub(space.isEmbedded()).toReturn(true);
+			Mockito.when(gs.getSpace()).thenReturn(space);
+			Mockito.when(space.isEmbedded()).thenReturn(true);
 			return gs;
 		}
 		@Bean
 		public GigaSpace otherEmbeddedGigaSpace() {
 			IJSpace space = Mockito.mock(IJSpace.class);
 			GigaSpace gs = Mockito.mock(GigaSpace.class);
-			Mockito.stub(gs.getSpace()).toReturn(space);
-			Mockito.stub(space.isEmbedded()).toReturn(true);
+			Mockito.when(gs.getSpace()).thenReturn(space);
+			Mockito.when(space.isEmbedded()).thenReturn(true);
 			return gs;
 		}
 	}
@@ -93,16 +93,16 @@ public class GsBinderIntegrationTest {
 		public GigaSpace gigaSpace() {
 			IJSpace space = Mockito.mock(IJSpace.class);
 			GigaSpace gs = Mockito.mock(GigaSpace.class);
-			Mockito.stub(gs.getSpace()).toReturn(space);
-			Mockito.stub(space.isEmbedded()).toReturn(true);
+			Mockito.when(gs.getSpace()).thenReturn(space);
+			Mockito.when(space.isEmbedded()).thenReturn(true);
 			return gs;
 		}
 		@Bean
 		public GigaSpace clusteredGigaSpace() {
 			IJSpace space = Mockito.mock(IJSpace.class);
 			GigaSpace gs = Mockito.mock(GigaSpace.class);
-			Mockito.stub(gs.getSpace()).toReturn(space);
-			Mockito.stub(space.isEmbedded()).toReturn(false);
+			Mockito.when(gs.getSpace()).thenReturn(space);
+			Mockito.when(space.isEmbedded()).thenReturn(false);
 			return gs;
 		}
 	}
