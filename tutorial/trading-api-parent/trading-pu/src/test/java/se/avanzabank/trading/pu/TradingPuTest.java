@@ -30,9 +30,9 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.gs.test.util.PuConfigurers;
-import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.test.util.AutoCloseableRule;
+import com.avanza.gs.test.PuConfigurers;
+import com.avanza.gs.test.RunningPu;
 
 public class TradingPuTest {
 	

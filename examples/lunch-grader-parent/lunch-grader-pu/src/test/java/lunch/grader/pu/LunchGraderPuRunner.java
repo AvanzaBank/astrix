@@ -15,7 +15,7 @@
  */
 package lunch.grader.pu;
 
-import com.avanza.astrix.gs.test.util.PuApp;
+import com.avanza.gs.test.PuApp;
 
 public class LunchGraderPuRunner {
 	

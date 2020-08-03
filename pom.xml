@@ -18,7 +18,6 @@
 		<module>astrix-integration-tests</module>
 		<module>astrix-service-registry-pu</module>
 		<module>astrix-test-util</module>
-		<module>astrix-gs-test-util</module>
 		<module>astrix-spring</module>
 		<module>astrix-http</module>
 		<module>astrix-remoting</module>
@@ -142,6 +141,7 @@
 		<netty.version>4.0.31.Final</netty.version>
 		<mimer-config.version>0.0.4</mimer-config.version>
 		<hystrix-multiconfig.version>0.0.3</hystrix-multiconfig.version>
+		<gs-test.groupId>com.avanza.gs14</gs-test.groupId>
 	</properties>
 
 	<dependencyManagement>
@@ -349,6 +349,11 @@
 				<groupId>com.netflix.archaius</groupId>
 				<artifactId>archaius-core</artifactId>
 				<version>${archaius.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${gs-test.groupId}</groupId>
+				<artifactId>gs-test</artifactId>
+				<version>14.0.7</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
