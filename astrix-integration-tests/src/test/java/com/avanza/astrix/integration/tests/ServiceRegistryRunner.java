@@ -17,8 +17,8 @@ package com.avanza.astrix.integration.tests;
 
 import java.io.IOException;
 
-import com.avanza.astrix.gs.test.util.PartitionedPu;
-import com.avanza.astrix.gs.test.util.PuConfigurers;
+import com.avanza.gs.test.PartitionedPu;
+import com.avanza.gs.test.PuConfigurers;
 
 public class ServiceRegistryRunner {
 	

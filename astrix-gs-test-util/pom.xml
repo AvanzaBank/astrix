@@ -6,46 +6,13 @@
 	<version>14.2.3-SNAPSHOT</version>
   </parent>
   <artifactId>astrix-gs-test-util</artifactId>
-  <name>${project.artifactId}</name>
-  <dependencies>
-  	<dependency>
-  		<groupId>org.gigaspaces</groupId>
-  		<artifactId>xap-openspaces</artifactId>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.gigaspaces</groupId>
-  		<artifactId>xap-datagrid</artifactId>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.springframework</groupId>
-  		<artifactId>spring-core</artifactId>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.springframework</groupId>
-  		<artifactId>spring-context</artifactId>
-  	</dependency>
-  	<dependency>
-  		<groupId>junit</groupId>
-  		<artifactId>junit</artifactId>
-  	</dependency>
-  </dependencies>
-  	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<configuration>
-					<!-- Don't publish internal test artifacts -->
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<configuration>
-					<skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+	<distributionManagement>
+		<relocation>
+			<groupId>com.avanza.gs</groupId>
+			<artifactId>gs-test</artifactId>
+			<message>
+				The content of this artifact has moved to com.avanza.gs:gs-test .
+			</message>
+		</relocation>
+	</distributionManagement>
 </project>
