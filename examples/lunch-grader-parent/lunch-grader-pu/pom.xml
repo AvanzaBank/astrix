@@ -49,8 +49,8 @@
 			<artifactId>astrix-service-registry</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${astrix.groupId}</groupId>
-			<artifactId>astrix-gs-test-util</artifactId>
+			<groupId>${gs-test.groupId}</groupId>
+			<artifactId>gs-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		

@@ -19,13 +19,12 @@ import java.io.IOException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
-import com.avanza.astrix.gs.test.util.PartitionedPu;
-import com.avanza.astrix.gs.test.util.PuConfigurers;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
+import com.avanza.gs.test.PartitionedPu;
+import com.avanza.gs.test.PuConfigurers;
 
 public class LunchGraderPuRunner {
 	

@@ -17,11 +17,10 @@ package runners;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
-import com.avanza.astrix.gs.test.util.PuApp;
+import com.avanza.gs.test.PuApp;
 
 public class LunchPuRunner {
 	

@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,7 +31,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixContext;
@@ -40,7 +38,6 @@ import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixRouting;
 import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.gs.test.util.JVMGlobalLus;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixApplication;
@@ -48,6 +45,7 @@ import com.avanza.astrix.provider.core.AstrixServiceExport;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.spring.AstrixFrameworkBean;
 import com.avanza.astrix.test.util.AutoCloseableRule;
+import com.avanza.gs.test.JVMGlobalLus;
 import com.j_spaces.core.IJSpace;
 
 public class GsRemotingTest {
