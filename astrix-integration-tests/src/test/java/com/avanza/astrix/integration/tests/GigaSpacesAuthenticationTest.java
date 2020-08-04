@@ -35,9 +35,9 @@ import com.avanza.astrix.gs.ClusteredProxyCacheImpl;
 import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.gs.security.DefaultGsSecurityProvider;
 import com.avanza.astrix.gs.security.GsSecurityProvider;
-import com.avanza.astrix.gs.test.util.PuConfigurers;
-import com.avanza.astrix.gs.test.util.RunningPu;
-import com.avanza.astrix.gs.test.util.SecurityManagerForTests;
+import com.avanza.gs.test.PuConfigurers;
+import com.avanza.gs.test.RunningPu;
+import com.avanza.gs.test.SecurityManagerForTests;
 import com.gigaspaces.security.directory.CredentialsProvider;
 import com.gigaspaces.security.directory.DefaultCredentialsProvider;
 import com.gigaspaces.security.directory.User;
@@ -99,6 +99,7 @@ public class GigaSpacesAuthenticationTest {
 	@Test
 	public void shouldDisallowConnectingToGigaSpacesUsingClientCredentialsWithWrongPassword() {
 		// Arrange
+		System.getProperties().remove("com.gs.security.credentials-provider.class");
 		clientCredentials.setPassword("incorrect");
 
 		// Act
