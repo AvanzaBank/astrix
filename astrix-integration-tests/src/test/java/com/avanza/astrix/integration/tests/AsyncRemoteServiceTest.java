@@ -16,7 +16,7 @@
 package com.avanza.astrix.integration.tests;
 
 import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +26,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.config.DynamicConfig;
@@ -34,13 +33,14 @@ import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.gs.test.util.PuConfigurers;
-import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.integration.tests.domain.api.GetLunchRestaurantRequest;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.api.LunchServiceAsync;
 import com.avanza.astrix.test.util.AutoCloseableRule;
+import com.avanza.gs.test.PuConfigurers;
+import com.avanza.gs.test.RunningPu;
+
 /**
  * 
  * @author Elias Lindholm (elilin)

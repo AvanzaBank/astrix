@@ -19,11 +19,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
@@ -34,20 +32,17 @@ import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.gs.test.util.PuConfigurers;
-import com.avanza.astrix.gs.test.util.RunningPu;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.test.util.AutoCloseableRule;
-import com.avanza.astrix.test.util.Poller;
-import com.avanza.astrix.test.util.Probe;
+import com.avanza.gs.test.PuConfigurers;
+import com.avanza.gs.test.RunningPu;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public class ServiceRegistryPuIntegrationTest {
-	
-	
 	
 	@Rule
 	public RunningPu serviceRegistrypu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
