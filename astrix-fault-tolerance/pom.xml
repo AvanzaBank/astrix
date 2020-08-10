@@ -14,9 +14,8 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
+			<groupId>com.avanza.hystrix</groupId>
 			<artifactId>hystrix-multiconfig</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.netflix.hystrix</groupId>
