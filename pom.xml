@@ -140,7 +140,6 @@
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 		<dropwizard.version>3.1.2</dropwizard.version>
 		<netty.version>4.0.31.Final</netty.version>
-		<gs-test.groupId>com.avanza.gs</gs-test.groupId>
 	</properties>
 
 	<dependencyManagement>
@@ -405,9 +404,9 @@
 				<version>${archaius.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>${gs-test.groupId}</groupId>
+				<groupId>com.avanza.gs</groupId>
 				<artifactId>gs-test</artifactId>
-				<version>0.1.12</version>
+				<version>0.1.15</version>
 			</dependency>
 			<dependency>
 				<groupId>com.avanza.mimer</groupId>

@@ -49,7 +49,7 @@
 			<artifactId>astrix-service-registry</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${gs-test.groupId}</groupId>
+			<groupId>com.avanza.gs</groupId>
 			<artifactId>gs-test</artifactId>
 			<scope>test</scope>
 		</dependency>
