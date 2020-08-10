@@ -26,9 +26,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.avanza.astrix</groupId>
-            <artifactId>astrix-config</artifactId>
-            <version>0.45.2</version>
+            <groupId>com.avanza.mimer</groupId>
+            <artifactId>mimer-config</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>

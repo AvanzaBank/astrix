@@ -344,6 +344,16 @@
 				<artifactId>gs-test</artifactId>
 				<version>14.0.7</version>
 			</dependency>
+			<dependency>
+				<groupId>com.avanza.mimer</groupId>
+				<artifactId>mimer-config</artifactId>
+				<version>0.0.4</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avanza.hystrix</groupId>
+				<artifactId>hystrix-multiconfig</artifactId>
+				<version>0.0.3</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

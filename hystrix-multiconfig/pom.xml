@@ -11,27 +11,20 @@
 	
 	<dependencies>
 		<dependency>
-			<groupId>com.netflix.hystrix</groupId>
-			<artifactId>hystrix-core</artifactId>
-		</dependency>
-		
-		<!-- 3rd party -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-
-		<!-- Test -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<scope>test</scope>
+			<groupId>com.avanza.hystrix</groupId>
+			<artifactId>hystrix-multiconfig</artifactId>
 		</dependency>
 	</dependencies>
+
+	<distributionManagement>
+		<relocation>
+			<groupId>com.avanza.hystrix</groupId>
+			<artifactId>hystrix-multiconfig</artifactId>
+			<message>
+				The contents of this artifact has moved to
+				com.avanza.hystrix:hystrix-multiconfig
+			</message>
+		</relocation>
+	</distributionManagement>
 	
 </project>
