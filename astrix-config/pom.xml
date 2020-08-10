@@ -9,22 +9,19 @@
 	<name>${project.artifactId}</name>
 	<dependencies>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.annotation</groupId>
-			<artifactId>javax.annotation-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-			<scope>test</scope>
+			<groupId>com.avanza.mimer</groupId>
+			<artifactId>mimer-config</artifactId>
 		</dependency>
 	</dependencies>
+
+	<distributionManagement>
+		<relocation>
+			<groupId>com.avanza.mimer</groupId>
+			<artifactId>mimer-config</artifactId>
+			<message>
+				The contents of this artifact has moved to
+				com.avanza.mimer:mimer-config
+			</message>
+		</relocation>
+	</distributionManagement>
 </project>
