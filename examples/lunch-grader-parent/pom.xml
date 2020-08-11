@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.avanza.astrix14</groupId>
 		<artifactId>astrix-examples-parent</artifactId>
-		<version>14.2.3-SNAPSHOT</version>
+		<version>14.2.3</version>
 	</parent>
 	<artifactId>lunch-grader-parent</artifactId>
 	<packaging>pom</packaging>
