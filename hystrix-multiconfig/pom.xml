@@ -20,7 +20,7 @@
 		<relocation>
 			<groupId>com.avanza.hystrix</groupId>
 			<artifactId>hystrix-multiconfig</artifactId>
-			<version>0.0.3</version>
+			<version>${hystrix-multiconfig.version}</version>
 			<message>
 				The contents of this artifact has moved to
 				com.avanza.hystrix:hystrix-multiconfig
