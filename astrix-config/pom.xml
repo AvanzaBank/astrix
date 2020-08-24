@@ -18,6 +18,7 @@
 		<relocation>
 			<groupId>com.avanza.mimer</groupId>
 			<artifactId>mimer-config</artifactId>
+			<version>${mimer-config.version}</version>
 			<message>
 				The contents of this artifact has moved to
 				com.avanza.mimer:mimer-config
