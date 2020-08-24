@@ -409,17 +409,17 @@
 			<dependency>
 				<groupId>com.avanza.gs</groupId>
 				<artifactId>gs-test</artifactId>
-				<version>${gs-test.version}</version>
+				<version>0.1.15</version>
 			</dependency>
 			<dependency>
 				<groupId>com.avanza.mimer</groupId>
 				<artifactId>mimer-config</artifactId>
-				<version>${mimer-config.version}</version>
+				<version>0.0.4</version>
 			</dependency>
 			<dependency>
 				<groupId>com.avanza.hystrix</groupId>
 				<artifactId>hystrix-multiconfig</artifactId>
-				<version>${hystrix-multiconfig.version}</version>
+				<version>0.0.3</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
