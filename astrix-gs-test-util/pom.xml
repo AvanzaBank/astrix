@@ -10,6 +10,7 @@
 		<relocation>
 			<groupId>com.avanza.gs</groupId>
 			<artifactId>gs-test</artifactId>
+			<version>0.1.15</version>
 			<message>
 				The content of this artifact has moved to com.avanza.gs:gs-test .
 			</message>
