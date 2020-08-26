@@ -619,6 +619,12 @@
 						<include>**/*TestCase.java</include>
 						<include>**/*Tests.java</include>
 					</includes>
+					<!--
+						-Djava.net.preferIPv4Stack=true is set since embedded spaces take ages to start on some
+						developer machines without it. See also:
+						http://stackoverflow.com/questions/30997298/why-is-multicastsocket-setnetworkinterface-much-slower-using-java-8-runtime
+					-->
+					<argLine>-Djava.net.preferIPv4Stack=true</argLine>
 				</configuration>
 			</plugin>
 
