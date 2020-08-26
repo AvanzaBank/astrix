@@ -149,16 +149,6 @@
 		<!-- Third party dependencies -->
 		<dependencies>
 			<dependency>
-				<groupId>com.avanza.mimer</groupId>
-				<artifactId>mimer-config</artifactId>
-				<version>${mimer-config.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.avanza.hystrix</groupId>
-				<artifactId>hystrix-multiconfig</artifactId>
-				<version>${hystrix-multiconfig.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>io.dropwizard.metrics</groupId>
 				<artifactId>metrics-core</artifactId>
 				<version>${dropwizard.version}</version>
@@ -359,12 +349,12 @@
 			<dependency>
 				<groupId>com.avanza.mimer</groupId>
 				<artifactId>mimer-config</artifactId>
-				<version>0.0.4</version>
+				<version>${mimer-config.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.avanza.hystrix</groupId>
 				<artifactId>hystrix-multiconfig</artifactId>
-				<version>0.0.3</version>
+				<version>${hystrix-multiconfig.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
