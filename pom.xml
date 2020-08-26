@@ -31,7 +31,6 @@
 		<module>astrix-contracts</module>
 		<module>astrix-netty-remoting</module>
 		<module>astrix-test-support</module>
-		<module>hystrix-multiconfig</module>
 	</modules>
 	<licenses>
 		<license>
@@ -141,11 +140,23 @@
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 		<dropwizard.version>3.1.2</dropwizard.version>
 		<netty.version>4.0.31.Final</netty.version>
+		<mimer-config.version>0.0.4</mimer-config.version>
+		<hystrix-multiconfig.version>0.0.3</hystrix-multiconfig.version>
 	</properties>
 
 	<dependencyManagement>
 		<!-- Third party dependencies -->
 		<dependencies>
+			<dependency>
+				<groupId>com.avanza.mimer</groupId>
+				<artifactId>mimer-config</artifactId>
+				<version>${mimer-config.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avanza.hystrix</groupId>
+				<artifactId>hystrix-multiconfig</artifactId>
+				<version>${hystrix-multiconfig.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>io.dropwizard.metrics</groupId>
 				<artifactId>metrics-core</artifactId>
