@@ -14,8 +14,8 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.avanza.mimer</groupId>
-			<artifactId>mimer-config</artifactId>
+			<groupId>com.avanza.hystrix</groupId>
+			<artifactId>hystrix-multiconfig</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.netflix.hystrix</groupId>
