@@ -49,7 +49,7 @@ public class MockingAstrixBeansTest {
 		LunchSuggester lunchSuggester = astrixContext.getBean(LunchSuggester.class);
 		
 		// Stub out getAllRestaurants to allways return one restaurant
-		Mockito.stub(restaurantFinderStub.getAllRestaurants()).toReturn(Arrays.asList("Max"));
+		Mockito.when(restaurantFinderStub.getAllRestaurants()).thenReturn(Arrays.asList("Max"));
 
 		assertEquals("Max", lunchSuggester.randomLunchRestaurant());
 	}

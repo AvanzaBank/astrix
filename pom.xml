@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.avanza.astrix14</groupId>
+	<groupId>com.avanza.astrix14-5</groupId>
 	<artifactId>astrix-parent</artifactId>
-	<version>14.2.5-SNAPSHOT</version>
+	<version>14.5.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>${project.artifactId}</name>
 	<description>${project.artifactId}</description>
@@ -25,12 +25,12 @@
 		<module>doc-snippets</module>
 		<module>tutorial</module>
 		<module>astrix-all</module>
+		<module>astrix-bom</module>
 		<module>astrix-modules</module>
 		<module>astrix-metrics</module>
 		<module>astrix-contracts</module>
 		<module>astrix-netty-remoting</module>
 		<module>astrix-test-support</module>
-		<module>hystrix-multiconfig</module>
 	</modules>
 	<licenses>
 		<license>
@@ -125,24 +125,25 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
 		<log4j.version>1.2.16</log4j.version>
-		<spring.version>4.3.19.RELEASE</spring.version>
+		<spring.version>5.1.7.RELEASE</spring.version>
 		<spring.groupId>org.springframework</spring.groupId>
-		<slf4j.version>1.7.10</slf4j.version>
-		<gigaspaces.version>14.0.1</gigaspaces.version>
+		<slf4j.version>1.7.26</slf4j.version>
+		<gigaspaces.version>14.5.0</gigaspaces.version>
 		<rxjava.version>1.3.8</rxjava.version>
 		<hystrix.version>1.5.18</hystrix.version>
 		<archaius.version>0.4.1</archaius.version>
-		<jackson2.version>2.8.11</jackson2.version>
-		<guava.version>20.0</guava.version>
-		<junit.version>4.11</junit.version>
-		<hamcrest.version>1.2.1</hamcrest.version>
-		<mockito.version>1.9.0</mockito.version>
+		<jackson2.version>2.11.2</jackson2.version>
+		<guava.version>29.0-jre</guava.version>
+		<junit.version>4.12</junit.version>
+		<hamcrest.version>1.3</hamcrest.version>
+		<mockito.version>2.23.0</mockito.version>
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 		<dropwizard.version>3.1.2</dropwizard.version>
-		<netty.version>4.0.31.Final</netty.version>
-		<gs-test.version>14.0.8</gs-test.version>
+		<netty.version>4.1.30.Final</netty.version>
 		<mimer-config.version>0.0.4</mimer-config.version>
 		<hystrix-multiconfig.version>0.0.3</hystrix-multiconfig.version>
+		<gs-test.groupId>com.avanza.gs14</gs-test.groupId>
+		<gs-test.version>14.5.0-SNAPSHOT</gs-test.version>
 	</properties>
 
 	<dependencyManagement>
@@ -261,7 +262,7 @@
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
-				<version>2.8.11.1</version>
+				<version>${jackson2.version}</version>
 			</dependency>
 
 			<dependency>
@@ -342,7 +343,7 @@
 				<version>${archaius.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.avanza.gs14</groupId>
+				<groupId>${gs-test.groupId}</groupId>
 				<artifactId>gs-test</artifactId>
 				<version>${gs-test.version}</version>
 			</dependency>
@@ -367,12 +368,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-shade-plugin</artifactId>
-					<version>2.0</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<version>1.3</version>
+					<version>2.4.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -387,7 +383,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.0</version>
+                    <version>3.8.1</version>
                 </plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -398,16 +394,6 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>2.8.1</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-ear-plugin</artifactId>
-					<version>2.5</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-ejb-plugin</artifactId>
-					<version>2.3</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -457,12 +443,12 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.14</version>
+					<version>2.22.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>2.22.0</version>
+					<version>2.22.2</version>
 					<configuration>
 						<argLine>
 							--illegal-access=permit
@@ -470,14 +456,9 @@
 					</configuration>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-war-plugin</artifactId>
-					<version>2.1.azapatch</version>
-				</plugin>
-				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>versions-maven-plugin</artifactId>
-					<version>2.8.1</version>
+					<version>2.5</version>
 					<configuration>
 						<generateBackupPoms>false</generateBackupPoms>
 					</configuration>
@@ -525,7 +506,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
@@ -640,6 +620,12 @@
 						<include>**/*TestCase.java</include>
 						<include>**/*Tests.java</include>
 					</includes>
+					<!--
+						-Djava.net.preferIPv4Stack=true is set since embedded spaces take ages to start on some
+						developer machines without it. See also:
+						http://stackoverflow.com/questions/30997298/why-is-multicastsocket-setnetworkinterface-much-slower-using-java-8-runtime
+					-->
+					<argLine>-Djava.net.preferIPv4Stack=true</argLine>
 				</configuration>
 			</plugin>
 
