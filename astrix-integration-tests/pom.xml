@@ -44,7 +44,7 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.avanza.gs14</groupId>
+			<groupId>${gs-test.groupId}</groupId>
 			<artifactId>gs-test</artifactId>
 			<scope>test</scope>
 		</dependency>
