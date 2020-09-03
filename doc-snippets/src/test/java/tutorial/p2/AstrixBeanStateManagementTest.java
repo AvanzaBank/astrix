@@ -80,7 +80,7 @@ public class AstrixBeanStateManagementTest {
 		// waits until the LunchService is bound
 		astrix.waitForBean(LunchSuggester.class, 2000);
 		
-		Mockito.stub(restaurantFinder.getAllRestaurants()).toReturn(Arrays.asList("Pontus!"));
+		Mockito.when(restaurantFinder.getAllRestaurants()).thenReturn(Arrays.asList("Pontus!"));
 		
 		// Invoke library which will in turn invoke the mock.
 		assertEquals("Pontus!", lunchSuggester.randomLunchRestaurant());
