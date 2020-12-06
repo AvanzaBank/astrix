@@ -50,7 +50,7 @@ public class PlatformMBeanServer implements MBeanServerFacade {
 	public void registerMBean(Object mbean, String folder, String name) {
 		try {
 			ObjectName objectName = getObjectName(folder, name);
-			logger.debug("Register mbean: name={}", objectName);
+			logger.info("Register mbean: name={}", objectName);
 			ManagementFactory.getPlatformMBeanServer().registerMBean(mbean, objectName);
 			exportedMbeans.putIfAbsent(objectName, objectName);
 		} catch (Exception e) {
@@ -73,7 +73,7 @@ public class PlatformMBeanServer implements MBeanServerFacade {
 	
 	private void unregisterMBean(ObjectName objectName) {
 		try {
-			logger.debug("Unregister mbean: name={}", objectName);
+			logger.info("Unregister mbean: name={}", objectName);
 			ManagementFactory.getPlatformMBeanServer().unregisterMBean(objectName);
 		} catch (Exception e) {
 			logger.warn("Failed to unregister mbean: name={}", objectName);
