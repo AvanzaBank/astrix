@@ -46,12 +46,17 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public class RemotingProxy implements InvocationHandler {
+
+	private static final Logger LOG = LoggerFactory.getLogger(RemotingProxy.class);
 	
 	private final int apiVersion;
 	private final String serviceApi;
@@ -107,6 +112,7 @@ public class RemotingProxy implements InvocationHandler {
 			remoteServiceMethodByMethod.put(proxiedMethod, remoteServiceMethod);
 			invocationWatchersByMethod.put(proxiedMethod, astrixTraceProvider.getClientCallExecutionWatchers(serviceApi, proxiedMethod.getName()));
 		}
+		LOG.info("Initialized Astrix remoting client, consuming api=[{}] using proxiedApi=[{}]", targetServiceApi.getName(), proxiedServiceApi.getName());
 	}
 
 	@Override

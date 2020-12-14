@@ -253,6 +253,7 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 			throw new IllegalArgumentException("Provider: " + provider.getClass() + " does not implement: " + publishedApi);
 		}
 		PublishedService<?> publishedService = new PublishedService<>(provider, objectSerializer, publishedApi);
+		logger.info("Initialized Astrix remoting server, providing api=[{}] from provider=[{}]", publishedApi.getName(), provider.getClass().getName());
 		this.serviceByType.put(publishedApi.getName(), publishedService);
 	}
 	
