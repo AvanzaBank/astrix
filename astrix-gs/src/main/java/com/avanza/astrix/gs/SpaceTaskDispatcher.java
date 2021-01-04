@@ -127,7 +127,7 @@ public final class SpaceTaskDispatcher {
 		usingErrorReporter(subscriber, serviceUnavailable()).accept(() -> {
 			// Submit task on current thread in executorService
 			AsyncFuture<T> taskResult = gigaSpace.execute(task, routingKey);
-			GsUtil.subscribe(taskResult, subscriber);
+			GsUtil.subscribe(taskResult, subscriber, contextPropagation);
 		});
 	}
 	
@@ -152,7 +152,7 @@ public final class SpaceTaskDispatcher {
 		usingErrorReporter(t1, serviceUnavailable()).accept(() -> {
 			// Submit task on current thread in executorService
 			AsyncFuture<R> taskResult = gigaSpace.execute(distributedTask);
-			GsUtil.subscribe(taskResult, t1);
+			GsUtil.subscribe(taskResult, t1, contextPropagation);
 		});
 	}
 	
