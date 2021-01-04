@@ -17,15 +17,15 @@ package com.avanza.astrix.remoting.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.openspaces.remoting.SpaceRemotingResult;
-
+import com.avanza.astrix.beans.async.ContextPropagation;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.CorrelationId;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
 import com.avanza.astrix.core.ServiceInvocationException;
 import com.gigaspaces.async.AsyncFuture;
-import com.gigaspaces.async.AsyncFutureListener;
 import com.gigaspaces.async.AsyncResult;
 
 import rx.Observable;
@@ -59,10 +59,13 @@ public class GsUtil {
 		}
 	}
 	
-	public static <T> void subscribe(final AsyncFuture<T> asyncFuture, final Subscriber<? super T> t1) {
-		asyncFuture.setListener(new AsyncFutureListener<T>() {
-			@Override
-			public void onResult(AsyncResult<T> result) {
+	public static <T> void subscribe(
+			final AsyncFuture<T> asyncFuture,
+			final Subscriber<? super T> t1,
+			final ContextPropagation contextPropagation
+	) {
+		Consumer<AsyncResult<T>> wrappedListener = contextPropagation.wrap(
+			result -> {
 				if (result.getException() == null) {
 					t1.onNext(result.getResult());
 					t1.onCompleted();
@@ -70,7 +73,8 @@ public class GsUtil {
 					t1.onError(result.getException());
 				}
 			}
-		});
+		);
+		asyncFuture.setListener(wrappedListener::accept);
 	}
 
 	public static <T> Func1<List<AsyncResult<T>>, Observable<T>> asyncResultListToObservable() {

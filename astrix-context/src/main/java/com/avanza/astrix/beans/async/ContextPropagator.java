@@ -17,6 +17,15 @@ package com.avanza.astrix.beans.async;
 
 import com.avanza.astrix.core.function.CheckedCommand;
 
+/**
+ * Defines actions that may be applied to an operation before it is executed.
+ * For example, this might be a decoration of the call state for a particular
+ * function, or logging of a certain call.
+ * In Astrix, this is used to carry along thread state when switching execution
+ * to a different thread. The state of the calling thread can be retrieved when
+ * {@link #wrap} is called, and later restored on another thread by the
+ * operation returned by the wrapping operation.
+ */
 public interface ContextPropagator {
 
     <T> CheckedCommand<T> wrap(CheckedCommand<T> call);
