@@ -30,6 +30,7 @@ import org.openspaces.core.executor.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.avanza.astrix.beans.async.ContextPropagation;
+import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.DynamicIntProperty;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -62,6 +63,7 @@ public final class SpaceTaskDispatcher {
 	private final GigaSpace gigaSpace;
 	private final ContextPropagation contextPropagation;
 	private final ThreadPoolExecutor executorService;
+	private final DynamicBooleanProperty propagateAsyncContexts;
 
 	/**
 	 * @deprecated please use {@link #SpaceTaskDispatcher(GigaSpace, DynamicConfig, ContextPropagation)}
@@ -93,6 +95,10 @@ public final class SpaceTaskDispatcher {
 			executorService.setCorePoolSize(newValue);
 			executorService.setMaximumPoolSize(newValue);
 		});
+		this.propagateAsyncContexts = config.getBooleanProperty(
+				"com.avanza.astrix.gs.SpaceTaskDispatcher.propagateAsyncContexts",
+				true
+		);
 	}
 
 
@@ -129,7 +135,11 @@ public final class SpaceTaskDispatcher {
 		usingErrorReporter(subscriber, serviceUnavailable()).accept(() -> {
 			// Submit task on current thread in executorService
 			AsyncFuture<T> taskResult = gigaSpace.execute(task, routingKey);
-			GsUtil.subscribe(taskResult, subscriber);
+			if (propagateAsyncContexts.get()) {
+				GsUtil.subscribe(taskResult, subscriber, contextPropagation);
+			} else {
+				GsUtil.subscribe(taskResult, subscriber);
+			}
 		});
 	}
 	
@@ -154,7 +164,11 @@ public final class SpaceTaskDispatcher {
 		usingErrorReporter(t1, serviceUnavailable()).accept(() -> {
 			// Submit task on current thread in executorService
 			AsyncFuture<R> taskResult = gigaSpace.execute(distributedTask);
-			GsUtil.subscribe(taskResult, t1);
+			if (propagateAsyncContexts.get()) {
+				GsUtil.subscribe(taskResult, t1, contextPropagation);
+			} else {
+				GsUtil.subscribe(taskResult, t1);
+			}
 		});
 	}
 	
