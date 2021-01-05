@@ -17,15 +17,15 @@ package com.avanza.astrix.remoting.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.openspaces.remoting.SpaceRemotingResult;
-
+import com.avanza.astrix.beans.async.ContextPropagation;
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.CorrelationId;
 import com.avanza.astrix.core.RemoteServiceInvocationException;
 import com.avanza.astrix.core.ServiceInvocationException;
 import com.gigaspaces.async.AsyncFuture;
-import com.gigaspaces.async.AsyncFutureListener;
 import com.gigaspaces.async.AsyncResult;
 
 import rx.Observable;
@@ -58,19 +58,38 @@ public class GsUtil {
 			return new RemoteServiceInvocationException("Remote service threw exception: " + exception.getMessage(), exception.getClass().getName());
 		}
 	}
-	
+
+	private static <T> void applyAsyncResultOnSubscriber(
+			AsyncResult<T> result,
+			Subscriber<? super T> subscriber
+	) {
+		if (result.getException() == null) {
+			subscriber.onNext(result.getResult());
+			subscriber.onCompleted();
+		} else {
+			subscriber.onError(result.getException());
+		}
+	}
+
+	/**
+	 * @deprecated Please use {@link #subscribe(AsyncFuture, Subscriber, ContextPropagation)} instead.
+	 */
+	@Deprecated
 	public static <T> void subscribe(final AsyncFuture<T> asyncFuture, final Subscriber<? super T> t1) {
-		asyncFuture.setListener(new AsyncFutureListener<T>() {
-			@Override
-			public void onResult(AsyncResult<T> result) {
-				if (result.getException() == null) {
-					t1.onNext(result.getResult());
-					t1.onCompleted();
-				} else {
-					t1.onError(result.getException());
-				}
-			}
-		});
+		asyncFuture.setListener(
+				result -> applyAsyncResultOnSubscriber(result, t1)
+		);
+	}
+
+	public static <T> void subscribe(
+			final AsyncFuture<T> asyncFuture,
+			final Subscriber<? super T> subscriber,
+			final ContextPropagation contextPropagation
+	) {
+		Consumer<AsyncResult<T>> wrappedListener = contextPropagation.wrap(
+				result -> applyAsyncResultOnSubscriber(result, subscriber)
+		);
+		asyncFuture.setListener(wrappedListener::accept);
 	}
 
 	public static <T> Func1<List<AsyncResult<T>>, Observable<T>> asyncResultListToObservable() {

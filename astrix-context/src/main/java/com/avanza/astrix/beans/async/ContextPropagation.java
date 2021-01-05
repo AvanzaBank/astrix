@@ -18,10 +18,17 @@ package com.avanza.astrix.beans.async;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import com.avanza.astrix.core.function.CheckedCommand;
 
+/**
+ * Contains a list of {@link ContextPropagator}s that may be applied to supplied
+ * actions. See {@link ContextPropagator} for further description of wrapping
+ * operations.
+ */
 public class ContextPropagation {
 
     public static final ContextPropagation NONE = new ContextPropagation(Collections.emptyList());
@@ -52,4 +59,20 @@ public class ContextPropagation {
         return wrapping;
     }
 
+    public <T> Consumer<T> wrap(Consumer<T> c) {
+        // We transform the supplied Consumer into a Runnable by using a local
+        // reference to the parameter value passed into the Consumer. This will
+        // not work if the Consumer is called simultaneously by different
+        // threads. But in our use-cases in Astrix, this is never the case.
+        // The reason we want to transform the Consumer into a Runnable is so
+        // that we can reuse the wrapping operations that operate on Runnable.
+        final AtomicReference<T> parameter = new AtomicReference<>();
+        final Runnable wrappedRunnable = wrap(() -> {
+            c.accept(parameter.get());
+        });
+        return value -> {
+            parameter.set(value);
+            wrappedRunnable.run();
+        };
+    }
 }
