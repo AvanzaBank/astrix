@@ -59,28 +59,35 @@ public class GsUtil {
 		}
 	}
 
+	private static <T> void applyAsyncResultOnSubscriber(
+			AsyncResult<T> result,
+			Subscriber<? super T> subscriber
+	) {
+		if (result.getException() == null) {
+			subscriber.onNext(result.getResult());
+			subscriber.onCompleted();
+		} else {
+			subscriber.onError(result.getException());
+		}
+	}
+
 	/**
 	 * @deprecated Please use {@link #subscribe(AsyncFuture, Subscriber, ContextPropagation)} instead.
 	 */
 	@Deprecated
 	public static <T> void subscribe(final AsyncFuture<T> asyncFuture, final Subscriber<? super T> t1) {
-		subscribe(asyncFuture, t1, ContextPropagation.NONE);
+		asyncFuture.setListener(
+				result -> applyAsyncResultOnSubscriber(result, t1)
+		);
 	}
 
 	public static <T> void subscribe(
 			final AsyncFuture<T> asyncFuture,
-			final Subscriber<? super T> t1,
+			final Subscriber<? super T> subscriber,
 			final ContextPropagation contextPropagation
 	) {
 		Consumer<AsyncResult<T>> wrappedListener = contextPropagation.wrap(
-			result -> {
-				if (result.getException() == null) {
-					t1.onNext(result.getResult());
-					t1.onCompleted();
-				} else {
-					t1.onError(result.getException());
-				}
-			}
+				result -> applyAsyncResultOnSubscriber(result, subscriber)
 		);
 		asyncFuture.setListener(wrappedListener::accept);
 	}
