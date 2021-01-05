@@ -58,7 +58,15 @@ public class GsUtil {
 			return new RemoteServiceInvocationException("Remote service threw exception: " + exception.getMessage(), exception.getClass().getName());
 		}
 	}
-	
+
+	/**
+	 * @deprecated Please use {@link #subscribe(AsyncFuture, Subscriber, ContextPropagation)} instead.
+	 */
+	@Deprecated
+	public static <T> void subscribe(final AsyncFuture<T> asyncFuture, final Subscriber<? super T> t1) {
+		subscribe(asyncFuture, t1, ContextPropagation.NONE);
+	}
+
 	public static <T> void subscribe(
 			final AsyncFuture<T> asyncFuture,
 			final Subscriber<? super T> t1,
