@@ -20,7 +20,6 @@ import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.metrics.MetricsSpi;
 import com.avanza.astrix.modules.ModuleContext;
 
-
 public class DropwizardPlugin implements AstrixContextPlugin {
 
 	@Override

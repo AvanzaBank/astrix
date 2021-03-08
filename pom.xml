@@ -241,7 +241,6 @@
                 <artifactId>javax.annotation-api</artifactId>
                 <version>1.3.2</version>
             </dependency>
-
 			<!-- Reflections for annotation scanning-->
 			<dependency>
 				<groupId>org.reflections</groupId>
@@ -340,6 +339,21 @@
 				<groupId>com.netflix.archaius</groupId>
 				<artifactId>archaius-core</artifactId>
 				<version>${archaius.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avanza.gs</groupId>
+				<artifactId>gs-test</artifactId>
+				<version>${gs-test.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avanza.mimer</groupId>
+				<artifactId>mimer-config</artifactId>
+				<version>${mimer-config.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avanza.hystrix</groupId>
+				<artifactId>hystrix-multiconfig</artifactId>
+				<version>${hystrix-multiconfig.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.avanza.gs14</groupId>
@@ -462,7 +476,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>2.22.0</version>
+					<version>3.0.0-M4</version>
 					<configuration>
 						<argLine>
 							--illegal-access=permit
@@ -591,6 +605,8 @@
 				</executions>
 			</plugin>
 
+			<!-- This plugin makes sure that a source jar is always built together
+				with the binary jar -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
@@ -656,19 +672,6 @@
 					<scmBranch>gh-pages</scmBranch> <!-- branch with static site -->
 				</configuration>
 			</plugin>
-				
-			<!-- Plugin for deploying to the central repository -->
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.sonatype.plugins</groupId> -->
-<!-- 				<artifactId>nexus-staging-maven-plugin</artifactId> -->
-<!-- 				<version>1.6.3</version> -->
-<!-- 				<extensions>true</extensions> -->
-<!-- 				<configuration> -->
-<!-- 					<serverId>ossrh</serverId> -->
-<!-- 					<nexusUrl>https://oss.sonatype.org/</nexusUrl> -->
-<!-- 					<autoReleaseAfterClose>true</autoReleaseAfterClose> -->
-<!-- 				</configuration> -->
-<!-- 			</plugin> -->
 		</plugins>
 	</build>
 </project>

@@ -22,8 +22,7 @@
 		<groupId>${project.groupId}</groupId>
 		<artifactId>astrix-versioning</artifactId>
 		<version>${project.version}</version>
-	</dependency>	
-
+	</dependency>
 	<!-- TEST -->
 	<dependency>
 		<groupId>${project.groupId}</groupId>

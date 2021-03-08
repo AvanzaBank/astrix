@@ -13,7 +13,7 @@
   	</dependency>
   	<dependency>
 		<groupId>org.gigaspaces</groupId>
-		<artifactId>xap-openspaces</artifactId>  	
+		<artifactId>xap-openspaces</artifactId>
   	</dependency>
   	<dependency>
 		<groupId>${project.groupId}</groupId>
