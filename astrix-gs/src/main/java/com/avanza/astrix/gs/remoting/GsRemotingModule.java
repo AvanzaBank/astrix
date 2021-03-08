@@ -35,7 +35,6 @@ public class GsRemotingModule implements AstrixContextPlugin {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
-		ensureGigaSpaceJavaCompatibility();
 		moduleContext.bind(ServiceComponent.class, GsRemotingComponent.class);
 		
 		moduleContext.importType(ObjectSerializerFactory.class);
@@ -49,17 +48,4 @@ public class GsRemotingModule implements AstrixContextPlugin {
 		moduleContext.export(ServiceComponent.class);
 	}
 
-	private void ensureGigaSpaceJavaCompatibility() {
-		final String jreVersion = System.getProperty("java.specification.version");
-		if (jreVersion.matches("\\d+")) {
-			int jreVersionInt = Integer.parseInt(jreVersion);
-			if (jreVersionInt >= 11) {
-				throw new IllegalArgumentException(
-						"This JRE seems to be Java 11 or later."
-								+ " GigaSpaces v10.x is unable to run on this JRE."
-								+ " Please upgrade GigaSpaces or use a Java 8 JRE."
-				);
-			}
-		}
-	}
 }
