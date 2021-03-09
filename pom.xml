@@ -55,7 +55,7 @@
 		<repository>
 			<id>gigaspaces</id>
 			<name>GigaSpaces</name>
-			<url>http://maven-repository.openspaces.org/</url>
+			<url>https://gigaspaces-maven-repository-eu.s3.amazonaws.com/</url>
 		</repository>
 	</repositories>
 	<distributionManagement>
@@ -656,7 +656,7 @@
 					<!--
 						-Djava.net.preferIPv4Stack=true is set since embedded spaces take ages to start on some
 						developer machines without it. See also:
-						http://stackoverflow.com/questions/30997298/why-is-multicastsocket-setnetworkinterface-much-slower-using-java-8-runtime
+						https://stackoverflow.com/questions/30997298/why-is-multicastsocket-setnetworkinterface-much-slower-using-java-8-runtime
 					-->
 					<argLine>-Djava.net.preferIPv4Stack=true</argLine>
 				</configuration>
