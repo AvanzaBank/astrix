@@ -19,9 +19,18 @@ import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHe
 import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.SERVICE_API;
 import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.SERVICE_METHOD_SIGNATURE;
 
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
 import com.avanza.astrix.beans.tracing.InvocationExecutionWatcher;
+import com.avanza.astrix.core.AstrixCallStackTrace;
+import com.avanza.astrix.core.remoting.RoutingStrategy;
+import com.avanza.astrix.core.util.ReflectionUtil;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
+
+import rx.Observable;
+import rx.functions.Action1;
+import rx.subjects.ReplaySubject;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -37,22 +46,18 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.avanza.astrix.beans.core.ReactiveTypeConverter;
-import com.avanza.astrix.core.AstrixCallStackTrace;
-import com.avanza.astrix.core.remoting.RoutingStrategy;
-import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import rx.Observable;
-import rx.functions.Action1;
-import rx.subjects.ReplaySubject;
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
 public class RemotingProxy implements InvocationHandler {
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(RemotingProxy.class);
+
 	private final int apiVersion;
 	private final String serviceApi;
 	private final ConcurrentMap<Method, RemoteServiceMethod> remoteServiceMethodByMethod = new ConcurrentHashMap<>();
@@ -107,6 +112,7 @@ public class RemotingProxy implements InvocationHandler {
 			remoteServiceMethodByMethod.put(proxiedMethod, remoteServiceMethod);
 			invocationWatchersByMethod.put(proxiedMethod, astrixTraceProvider.getClientCallExecutionWatchers(serviceApi, proxiedMethod.getName()));
 		}
+		LOG.info("Initialized Astrix remoting client, consuming api=[{}] using proxiedApi=[{}]", targetServiceApi.getName(), proxiedServiceApi.getName());
 	}
 
 	@Override
@@ -126,7 +132,7 @@ public class RemotingProxy implements InvocationHandler {
 		invocationRequest.setHeader(API_VERSION, Integer.toString(this.apiVersion));
 		invocationRequest.setHeader(SERVICE_METHOD_SIGNATURE, remoteServiceMethod.getSignature());
 		invocationRequest.setHeader(SERVICE_API, this.serviceApi);
-		
+
 		Runnable afterInvocationWatchers = InvocationExecutionWatcher.apply(invocationWatchersByMethod.get(method), invocationRequest.getHeaders());
 
 		Observable<?> result = remoteServiceMethod.invoke(invocationRequest, args)

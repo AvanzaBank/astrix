@@ -39,16 +39,18 @@ import com.avanza.astrix.core.ServiceUnavailableException;
  * 
  */
 public class ServiceRegistryExporterWorker extends AstrixFrameworkThread {
-	
+
+	private static final Logger log = LoggerFactory.getLogger(ServiceRegistryExporterWorker.class);
+
 	private final List<ServiceRegistryExportedService> exportedServices = new CopyOnWriteArrayList<>();
-	private ServiceRegistryExporterClient serviceRegistryProviderClient;
-	private final Logger log = LoggerFactory.getLogger(ServiceRegistryExporterWorker.class);
-	private final DynamicLongProperty exportIntervallMillis;		  
+	private final DynamicLongProperty exportIntervallMillis;
 	private final DynamicLongProperty serviceLeaseTimeMillis;
 	private final DynamicLongProperty retryIntervallMillis;
 	private final AstrixConfig config;
 	private final Timer timer = new Timer();
 	private final AstrixServiceRegistryFactory serviceRegistryFactory;
+
+	private ServiceRegistryExporterClient serviceRegistryProviderClient;
 
 	public ServiceRegistryExporterWorker(AstrixConfig config, AstrixServiceRegistryFactory serviceRegistryFactory) {
 		super("ServiceRegistryExporter");
@@ -98,7 +100,7 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread {
 		while (!interrupted()) {
 			long sleepTimeUntilNextAttempt = this.exportIntervallMillis.get();
 			try {
-				exportProvidedServcies();
+				exportProvidedServices();
 			} catch (ServiceUnavailableException e) {
 				// Not bound to service registry
 				sleepTimeUntilNextAttempt = this.retryIntervallMillis.get();
@@ -115,7 +117,7 @@ public class ServiceRegistryExporterWorker extends AstrixFrameworkThread {
 		log.info("ServiceRegistryExporterWorker is interrupted, won't publish to service registry anymore.");
 	}
 
-	private void exportProvidedServcies() {
+	private void exportProvidedServices() {
 		for (ServiceRegistryExportedService exportedService : exportedServices) {
 			ServiceProperties serviceProperties = exportedService.exportServiceProperties();
 			serviceRegistryProviderClient.register(serviceProperties.getApi(), serviceProperties, serviceLeaseTimeMillis.get());

@@ -8,7 +8,7 @@
   <artifactId>astrix-gs-test-util</artifactId>
 	<distributionManagement>
 		<relocation>
-			<groupId>com.avanza.gs</groupId>
+			<groupId>com.avanza.gs14</groupId>
 			<artifactId>gs-test</artifactId>
 			<version>${gs-test.version}</version>
 			<message>
