@@ -23,7 +23,6 @@ import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.modules.ModuleContext;
 
-
 public class HystrixModule implements AstrixContextPlugin {
 	
 	@Override

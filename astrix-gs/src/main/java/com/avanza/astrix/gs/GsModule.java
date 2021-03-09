@@ -25,12 +25,12 @@ import com.avanza.astrix.gs.security.DefaultGsSecurityProvider;
 import com.avanza.astrix.gs.security.GsSecurityProvider;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
+
 /**
  * 
  * @author Elias Lindholm
  *
  */
-
 public class GsModule implements AstrixContextPlugin {
 
 	@Override
