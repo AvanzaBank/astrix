@@ -55,7 +55,7 @@ public class AstrixServiceRegistryTest {
 	
 	
 	@Test
-	public void serviceRegsistrySupportsMultipleProvidersOfSameService() throws Exception {
+	public void serviceRegistrySupportsMultipleProvidersOfSameService() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
 		astrixConfigurer.setSubsystem("default");
@@ -164,6 +164,26 @@ public class AstrixServiceRegistryTest {
 		assertEquals(5, server1ConsumerCount);
 		assertEquals(5, server2ConsumerCount);
 		
+	}
+
+	@Test
+	public void usesApplicationInstanceIdToDeregisterService() {
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
+		astrixConfigurer.registerApiProvider(PingApiProvider.class);
+		clientContext = astrixConfigurer.configure();
+
+		ServiceRegistryExporterClient registryClient = new ServiceRegistryExporterClient(serviceRegistry, "default", "server-1");
+		registryClient.register(Ping.class, DirectComponent.registerAndGetProperties(Ping.class, new PingImpl("1")), Integer.MAX_VALUE);
+
+		AstrixServiceRegistryEntry entryToDeregister = new AstrixServiceRegistryEntry();
+		entryToDeregister.getServiceProperties().put(ServiceProperties.APPLICATION_INSTANCE_ID, "server-1");
+		entryToDeregister.setServiceBeanType(Ping.class.getName());
+		serviceRegistry.deregister(entryToDeregister);
+
+		ServiceRegistryClient serviceRegistryClient = clientContext.getBean(ServiceRegistryClient.class);
+		List<ServiceProperties> providers = serviceRegistryClient.list(AstrixBeanKey.create(Ping.class));
+		assertEquals(0, providers.size());
+		assertEquals(0, serviceRegistry.listServices().size());
 	}
 	
 	@AstrixApiProvider

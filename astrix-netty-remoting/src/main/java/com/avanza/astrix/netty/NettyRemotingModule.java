@@ -23,7 +23,6 @@ import com.avanza.astrix.remoting.client.RemotingProxyFactory;
 import com.avanza.astrix.remoting.server.AstrixServiceActivator;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
 
-
 public class NettyRemotingModule implements AstrixContextPlugin {
 
 	@Override

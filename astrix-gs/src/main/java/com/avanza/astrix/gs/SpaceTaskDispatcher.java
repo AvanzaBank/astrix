@@ -76,7 +76,7 @@ public final class SpaceTaskDispatcher {
 	public SpaceTaskDispatcher(GigaSpace gigaSpace, DynamicConfig config, ContextPropagation contextPropagation) {
 		this.gigaSpace = gigaSpace;
 		this.contextPropagation = Objects.requireNonNull(contextPropagation);
-		/* 
+		/*
 		 * TODO 
 		 * 	(1) Improve configuration mechanism used to configure thread pool. 
 		 */
@@ -122,13 +122,11 @@ public final class SpaceTaskDispatcher {
 	 * @return
 	 */
 	public <T extends Serializable> Observable<T> observe(final Task<T> task, final Object routingKey) {
-		return Observable.create(subscriber -> {
-			usingErrorReporter(subscriber, serviceUnavailable()).accept(() -> {
-				Runnable command = contextPropagation.wrap(() -> submitRoutedTaskExecution(subscriber, task, routingKey));
-				// Use ExecutorService to ensure non-blocking programming model when subscribing to remote task invocation
-				executorService.execute(command);
-			});
-		});
+		return Observable.unsafeCreate(subscriber -> usingErrorReporter(subscriber, serviceUnavailable()).accept(() -> {
+			Runnable command = contextPropagation.wrap(() -> submitRoutedTaskExecution(subscriber, task, routingKey));
+			// Use ExecutorService to ensure non-blocking programming model when subscribing to remote task invocation
+			executorService.execute(command);
+		}));
 	}
 
 	private <T extends Serializable> void submitRoutedTaskExecution(Subscriber<? super T> subscriber, final Task<T> task, final Object routingKey) {

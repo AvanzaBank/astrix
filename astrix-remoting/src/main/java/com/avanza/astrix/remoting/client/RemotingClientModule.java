@@ -22,7 +22,6 @@ import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
 
-
 public class RemotingClientModule implements AstrixContextPlugin {
 
 	@Override
