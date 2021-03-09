@@ -23,7 +23,6 @@ import com.avanza.astrix.gs.ClusteredProxyBinder;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
 
-
 public class GsLocalViewModule implements AstrixContextPlugin  {
 
 	@Override

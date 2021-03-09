@@ -78,7 +78,7 @@ public class DropwizardMetricsTest {
 	public void timeObservable() throws Throwable {
 		TimerSpi timer = dropwizardMetrics.createTimer();
 		
-		Supplier<Observable<String>> observable = timer.timeObservable(() -> Observable.create(subscriber -> {
+		Supplier<Observable<String>> observable = timer.timeObservable(() -> Observable.unsafeCreate(subscriber -> {
 			try {
 				Thread.sleep(10);
 				subscriber.onNext("foo");
