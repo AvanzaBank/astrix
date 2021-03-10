@@ -2,8 +2,8 @@
 [![][travis img]][travis]
 [![][maven img]][maven]
 [![][license img]][license]
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/AvanzaBank/astrix.svg)](http://isitmaintained.com/project/AvanzaBank/Astrix "Average time to resolve an issue")
-[![Percentage of issues still open](http://isitmaintained.com/badge/open/AvanzaBank/astrix.svg)](http://isitmaintained.com/project/AvanzaBank/Astrix "Percentage of issues still open")
+[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/AvanzaBank/astrix.svg)](https://isitmaintained.com/project/AvanzaBank/Astrix "Average time to resolve an issue")
+[![Percentage of issues still open](https://isitmaintained.com/badge/open/AvanzaBank/astrix.svg)](https://isitmaintained.com/project/AvanzaBank/Astrix "Percentage of issues still open")
 
 
 Astrix is a Java framework designed to simplify development and maintenance of microservices. At Avanza we use Astrix to run about one hundred microservices collaborating to provide the services required by the backend applications for the Avanza web site and our mobile applications.
@@ -20,7 +20,7 @@ Astrix is used by service providers to:
 * Version the provided services to allow an independent release cycle from its consumers
 * Temporarily stop exporting its services at runtime to allow for blue green deployment 
 
-The design philosophy behind Astrix aligns well with the characteristics of microservices described by James Lewis and Martin Fowler (http://martinfowler.com/articles/microservices.html). However, it's worth pointing out where the characteristics between a microservice developed using Astrix, and other microservice approaches differ:
+The design philosophy behind Astrix aligns well with the characteristics of microservices described by James Lewis and Martin Fowler (https://martinfowler.com/articles/microservices.html). However, it's worth pointing out where the characteristics between a microservice developed using Astrix, and other microservice approaches differ:
 
 * Selected centralized governance (as opposed to fully decentralized governance)
 * Transport mechanism agnostic service consumers
@@ -28,7 +28,7 @@ The design philosophy behind Astrix aligns well with the characteristics of micr
 ### Selected centralized governance
 Microservices are a broad field and Astrix is designed to emphasize certain characteristics of microservices, whereas other characteristics are intentionally ignored. Most notably Astrix does not emphasize an organization where different microservices are developed using completely different technology stacks. Quite opposite Astrix assumes a standardization using the jvm as the platform for running microservices. But, apart from standardizing on the jvm, microservice providers are free to use a technology stack most suitable for their needs. Most notably each microservice could choose a data-store suitable for their needs, and a programming language of their choice, as long as it runs on the jvm and can run java code.
 
-At Avanza we have chosen to standardize on a single language (Java), a single application framework ([GigaSpaces](http://www.gigaspaces.com/), which in turn is built on top of Spring), and a single service framework (Astrix). This is actually quite restricting compared to the common view of microservices which often favor a more decentralized governance.
+At Avanza we have chosen to standardize on a single language (Java), a single application framework ([GigaSpaces](https://www.gigaspaces.com/), which in turn is built on top of Spring), and a single service framework (Astrix). This is actually quite restricting compared to the common view of microservices which often favor a more decentralized governance.
 
 ### Transport mechanism agnostic service consumers
 Although microservices are not by any means tied to a given protocol, the most common approach to microservices is to export "REST"-style services over HTTP. This means that consumers of a service are tied to use HTTP to access a given service, which is a severe limitation when it comes to testing. Service consumers using Astrix are completely decoupled from the transport mechanism used by a given service provider, which allows simple stubbing of consumed services allowing each microservice to be tested in isolation, without any special spring configuration files to stub out service dependencies. A typical microservice developed using Astrix can be started in-memory using the same spring configuration as in a production environment, but where the services consumed by the given application are completely stubbed out using in-memory mocks. The magic that allows this simple stubbing is provided by the service-registry and the dynamic service-binding mechanism provided by Astrix.
@@ -69,10 +69,10 @@ The Astrix Framework has been under rapid development for almost a year. At Avan
 ## Documentation
 [Wiki](https://github.com/AvanzaBank/astrix/wiki)
 
-[JavaDoc](http://avanzabank.github.io/astrix/)
+[JavaDoc](https://avanzabank.github.io/astrix/)
 
 ## License
-The Astrix Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+The Astrix Framework is released under version 2.0 of the [Apache License](https://www.apache.org/licenses/LICENSE-2.0).
 
 
 [travis]:https://travis-ci.org/AvanzaBank/astrix
@@ -84,5 +84,5 @@ The Astrix Framework is released under version 2.0 of the [Apache License](http:
 [license]:LICENSE
 [license img]:https://img.shields.io/badge/License-Apache%202-blue.svg
 
-[maven]:http://search.maven.org/#search|gav|1|g:"com.avanza.astrix"
+[maven]:https://search.maven.org/#search|gav|1|g:"com.avanza.astrix"
 [maven img]:https://maven-badges.herokuapp.com/maven-central/com.avanza.astrix/astrix-core/badge.svg
