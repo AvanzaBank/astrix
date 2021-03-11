@@ -136,7 +136,7 @@
 		<guava.version>29.0-jre</guava.version>
 		<junit.version>4.13.1</junit.version>
 		<hamcrest.version>1.3</hamcrest.version>
-		<mockito.version>2.23.0</mockito.version>
+		<mockito.version>3.8.0</mockito.version>
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 		<dropwizard.version>3.1.2</dropwizard.version>
 		<netty.version>4.1.30.Final</netty.version>
