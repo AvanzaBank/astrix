@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="60" shutdownHook="disable">
+<Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+        <PatternLayout pattern="[ASTRIX-INTEGRATION-TEST] %d{HH:mm:ss} %-5p %-30c{1} - %m%n" />
+    </Console>
+</Appenders>
+<Loggers>
+    <Logger name="com.avanza.astrix.beans" level="warn" additivity="false">
+        <AppenderRef ref="Console" />
+    </Logger>
+    <Logger name="com.avanza" level="info" additivity="false">
+        <AppenderRef ref="Console" />
+    </Logger>
+    <Root level="info">
+        <AppenderRef ref="Console" />
+    </Root>
+</Loggers>
+</Configuration>

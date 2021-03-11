@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.avanza.astrix14-5</groupId>
+		<groupId>com.avanza.astrix</groupId>
 		<artifactId>astrix-parent</artifactId>
-		<version>14.5.2-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>doc-snippets</artifactId>
 	<dependencies>
@@ -25,7 +25,7 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>${gs-test.groupId}</groupId>
+			<groupId>com.avanza.gs</groupId>
 			<artifactId>gs-test</artifactId>
 			<scope>test</scope>
 		</dependency>
@@ -51,8 +51,13 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-1.2-api</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

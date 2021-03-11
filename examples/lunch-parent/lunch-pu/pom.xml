@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.avanza.astrix14-5</groupId>
+		<groupId>com.avanza.astrix</groupId>
 		<artifactId>lunch-parent</artifactId>
-		<version>14.5.2-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>lunch-pu</artifactId>
 	<dependencies>
@@ -44,7 +44,7 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>${gs-test.groupId}</groupId>
+			<groupId>com.avanza.gs</groupId>
 			<artifactId>gs-test</artifactId>
 			<scope>test</scope>
 		</dependency>
@@ -67,8 +67,9 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>

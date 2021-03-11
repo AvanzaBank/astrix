@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.avanza.astrix14-5</groupId>
+	<groupId>com.avanza.astrix</groupId>
 	<artifactId>astrix-parent</artifactId>
-	<version>14.5.2-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>${project.artifactId}</name>
 	<description>${project.artifactId}</description>
@@ -35,7 +35,7 @@
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
 	<developers>
@@ -55,7 +55,7 @@
 		<repository>
 			<id>gigaspaces</id>
 			<name>GigaSpaces</name>
-			<url>http://maven-repository.openspaces.org/</url>
+			<url>https://gigaspaces-maven-repository-eu.s3.amazonaws.com/</url>
 		</repository>
 	</repositories>
 	<distributionManagement>
@@ -124,7 +124,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-		<log4j.version>1.2.16</log4j.version>
+		<log4j.version>2.13.3</log4j.version>
 		<spring.version>5.1.7.RELEASE</spring.version>
 		<spring.groupId>org.springframework</spring.groupId>
 		<slf4j.version>1.7.26</slf4j.version>
@@ -142,8 +142,7 @@
 		<netty.version>4.1.30.Final</netty.version>
 		<mimer-config.version>0.0.4</mimer-config.version>
 		<hystrix-multiconfig.version>0.0.3</hystrix-multiconfig.version>
-		<gs-test.groupId>com.avanza.gs14-5</gs-test.groupId>
-		<gs-test.version>14.5.0</gs-test.version>
+		<gs-test.version>1.0.0</gs-test.version>
 
 		<!-- Plugins -->
 		<maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
@@ -179,8 +178,18 @@
 				<version>${dropwizard.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-slf4j-impl</artifactId>
+				<version>${log4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-core</artifactId>
+				<version>${log4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-1.2-api</artifactId>
 				<version>${log4j.version}</version>
 			</dependency>
 			<dependency>
@@ -294,11 +303,6 @@
 				<artifactId>slf4j-api</artifactId>
 				<version>${slf4j.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-log4j12</artifactId>
-				<version>${slf4j.version}</version>
-			</dependency>
 			
 			<dependency>
 				<groupId>io.netty</groupId>
@@ -367,7 +371,7 @@
 				<version>${archaius.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>${gs-test.groupId}</groupId>
+				<groupId>com.avanza.gs</groupId>
 				<artifactId>gs-test</artifactId>
 				<version>${gs-test.version}</version>
 			</dependency>
@@ -651,7 +655,7 @@
 					<!--
 						-Djava.net.preferIPv4Stack=true is set since embedded spaces take ages to start on some
 						developer machines without it. See also:
-						http://stackoverflow.com/questions/30997298/why-is-multicastsocket-setnetworkinterface-much-slower-using-java-8-runtime
+						https://stackoverflow.com/questions/30997298/why-is-multicastsocket-setnetworkinterface-much-slower-using-java-8-runtime
 					-->
 					<argLine>-Djava.net.preferIPv4Stack=true</argLine>
 				</configuration>
