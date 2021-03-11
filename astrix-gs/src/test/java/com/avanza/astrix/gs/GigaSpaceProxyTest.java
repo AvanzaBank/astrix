@@ -33,7 +33,7 @@ public class GigaSpaceProxyTest {
 		GigaSpace gigaSpace = Mockito.mock(GigaSpace.class);
 		GigaSpace proxied = GigaSpaceProxy.create(gigaSpace);
 		
-		Mockito.stub(gigaSpace.count(null)).toReturn(21);
+		Mockito.when(gigaSpace.count(null)).thenReturn(21);
 		
 		assertEquals(21, proxied.count(null));
 	}
@@ -41,8 +41,8 @@ public class GigaSpaceProxyTest {
 	@Test
 	public void wrappsSpaceCacheExceptionsInServiceUnavailableException() throws Exception {
 		GigaSpace gigaSpace = Mockito.mock(GigaSpace.class);
-		
-		Mockito.stub(gigaSpace.count(null)).toThrow(new SpaceCacheException(""));
+
+		Mockito.when(gigaSpace.count(null)).thenThrow(new SpaceCacheException(""));
 		GigaSpace proxied = GigaSpaceProxy.create(gigaSpace);
 		
 		try {

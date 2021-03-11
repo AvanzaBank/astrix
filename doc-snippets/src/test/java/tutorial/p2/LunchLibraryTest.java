@@ -54,7 +54,7 @@ public class LunchLibraryTest {
 		
 		LunchSuggester lunchSuggester = astrix.getBean(LunchSuggester.class);
 
-		Mockito.stub(restaurantFinderStub.getAllRestaurants()).toReturn(Arrays.asList("Pontus!"));
+		Mockito.when(restaurantFinderStub.getAllRestaurants()).thenReturn(Arrays.asList("Pontus!"));
 		assertEquals("Pontus!", lunchSuggester.randomLunchRestaurant());
 	}
 

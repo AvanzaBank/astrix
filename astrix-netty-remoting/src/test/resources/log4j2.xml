@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="60" shutdownHook="disable">
+<Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+        <PatternLayout pattern="%d{HH:mm:ss} %-5p %-30c{1} - %m%n" />
+    </Console>
+</Appenders>
+<Loggers>
+<!--    <Logger name="com.avanza" level="debug" additivity="false">-->
+<!--        <AppenderRef ref="Console" />-->
+<!--    </Logger>-->
+<!--    <Logger name="io.netty" level="debug" additivity="false">-->
+<!--        <AppenderRef ref="Console" />-->
+<!--    </Logger>-->
+    <Root level="warn">
+        <AppenderRef ref="Console" />
+    </Root>
+</Loggers>
+</Configuration>

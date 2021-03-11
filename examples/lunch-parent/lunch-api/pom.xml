@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.avanza.astrix</groupId>
     <artifactId>lunch-parent</artifactId>
-	<version>0.45.6-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>lunch-api</artifactId>
   <dependencies>
@@ -12,8 +12,12 @@
 		<artifactId>astrix-core</artifactId>  	
   	</dependency>
   	<dependency>
-		<groupId>com.gigaspaces</groupId>
-		<artifactId>gs-openspaces</artifactId>  	
+		<groupId>org.gigaspaces</groupId>
+		<artifactId>xap-datagrid</artifactId>  	
+  	</dependency>
+  	<dependency>
+		<groupId>org.gigaspaces</groupId>
+		<artifactId>xap-openspaces</artifactId>  	
   	</dependency>
   </dependencies>
 </project>

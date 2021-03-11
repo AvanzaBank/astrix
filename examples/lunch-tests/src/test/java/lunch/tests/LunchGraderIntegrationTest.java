@@ -52,7 +52,7 @@ public class LunchGraderIntegrationTest {
 	@Test
 	public void itsPossibleToStubOutServiceDependenciesUsingInMemoryServiceRegistry() throws Exception {
 		LunchService lunchMock = Mockito.mock(LunchService.class);
-		Mockito.stub(lunchMock.getLunchRestaurant("mcdonalds")).toReturn(new LunchRestaurant("mcdonalds", "fastfood"));
+		Mockito.when(lunchMock.getLunchRestaurant("mcdonalds")).thenReturn(new LunchRestaurant("mcdonalds", "fastfood"));
 		serviceRegistry.registerProvider(LunchService.class, lunchMock, "lunch-system");
 		
 		AstrixConfigurer configurer = new AstrixConfigurer();

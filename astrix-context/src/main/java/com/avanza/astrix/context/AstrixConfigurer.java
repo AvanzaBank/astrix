@@ -103,7 +103,7 @@ public class AstrixConfigurer {
 	
 	private ApiProviders astrixApiProviders;
 	private final Collection<StandardFactoryBean<?>> standaloneFactories = new LinkedList<>();
-	private final List<Module> customModules = new ArrayList<>();
+	private final List<com.avanza.astrix.modules.Module> customModules = new ArrayList<>();
 	private final Map<Class<?>, StrategyProvider<?>> strategyProviderByType = new HashMap<>();
 	private final MapConfigSource settings = new MapConfigSource();
 	
@@ -450,7 +450,7 @@ public class AstrixConfigurer {
 		set(beanSetting.nameFor(beanKey), value);
 	}
 
-	void registerModule(Module module) {
+	void registerModule(com.avanza.astrix.modules.Module module) {
 		this.customModules.add(module);
 	}
 

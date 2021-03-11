@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 public class RemotingProxy implements InvocationHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RemotingProxy.class);
-	
+
 	private final int apiVersion;
 	private final String serviceApi;
 	private final ConcurrentMap<Method, RemoteServiceMethod> remoteServiceMethodByMethod = new ConcurrentHashMap<>();

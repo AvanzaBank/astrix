@@ -76,7 +76,7 @@ public final class SpaceTaskDispatcher {
 	public SpaceTaskDispatcher(GigaSpace gigaSpace, DynamicConfig config, ContextPropagation contextPropagation) {
 		this.gigaSpace = gigaSpace;
 		this.contextPropagation = Objects.requireNonNull(contextPropagation);
-		/* 
+		/*
 		 * TODO 
 		 * 	(1) Improve configuration mechanism used to configure thread pool. 
 		 */

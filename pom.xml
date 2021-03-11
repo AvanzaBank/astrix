@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.avanza.astrix</groupId>
 	<artifactId>astrix-parent</artifactId>
-	<version>0.45.6-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>${project.artifactId}</name>
 	<description>${project.artifactId}</description>
@@ -23,20 +23,19 @@
 		<module>astrix-remoting</module>
 		<module>examples</module>
 		<module>doc-snippets</module>
-		<module>astrix-config</module>
 		<module>tutorial</module>
 		<module>astrix-all</module>
+		<module>astrix-bom</module>
 		<module>astrix-modules</module>
 		<module>astrix-metrics</module>
 		<module>astrix-contracts</module>
 		<module>astrix-netty-remoting</module>
 		<module>astrix-test-support</module>
-		<module>hystrix-multiconfig</module>
 	</modules>
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
 	<developers>
@@ -56,7 +55,7 @@
 		<repository>
 			<id>gigaspaces</id>
 			<name>GigaSpaces</name>
-			<url>http://maven-repository.openspaces.org/</url>
+			<url>https://gigaspaces-maven-repository-eu.s3.amazonaws.com/</url>
 		</repository>
 	</repositories>
 	<distributionManagement>
@@ -121,28 +120,53 @@
 		<!-- -Xdoclint:NONE ignores validation errors in javadoc -->
 		<additionalparam>-Xdoclint:none</additionalparam>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
-		<maven.compiler.source>${java.version}</maven.compiler.source>
-		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<log4j.version>1.2.16</log4j.version>
-		<spring.version>4.1.9.RELEASE</spring.version>
+		<java.version>11</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+
+		<log4j.version>2.13.3</log4j.version>
+		<spring.version>5.1.7.RELEASE</spring.version>
 		<spring.groupId>org.springframework</spring.groupId>
-		<slf4j.version>1.7.10</slf4j.version>
-		<gigaspaces.version>10.1.1-12800-RELEASE</gigaspaces.version>
+		<slf4j.version>1.7.26</slf4j.version>
+		<gigaspaces.version>14.5.0</gigaspaces.version>
 		<rxjava.version>1.3.8</rxjava.version>
 		<hystrix.version>1.5.18</hystrix.version>
 		<archaius.version>0.4.1</archaius.version>
-		<jackson2.version>2.8.11</jackson2.version>
-		<guava.version>20.0</guava.version>
-		<junit.version>4.11</junit.version>
-		<hamcrest.version>1.2.1</hamcrest.version>
-		<mockito.version>1.9.0</mockito.version>
+		<jackson2.version>2.11.2</jackson2.version>
+		<guava.version>29.0-jre</guava.version>
+		<junit.version>4.12</junit.version>
+		<hamcrest.version>1.3</hamcrest.version>
+		<mockito.version>2.23.0</mockito.version>
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 		<dropwizard.version>3.1.2</dropwizard.version>
-		<netty.version>4.0.31.Final</netty.version>
-		<gs-test.version>0.1.15</gs-test.version>
+		<netty.version>4.1.30.Final</netty.version>
 		<mimer-config.version>0.0.4</mimer-config.version>
 		<hystrix-multiconfig.version>0.0.3</hystrix-multiconfig.version>
+		<gs-test.version>1.0.0</gs-test.version>
+
+		<!-- Plugins -->
+		<maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
+		<maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
+		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
+		<maven-deploy-plugin.version>2.8.1</maven-deploy-plugin.version>
+		<maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
+		<maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version>
+		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
+		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
+		<maven-source-plugin.version>3.2.0</maven-source-plugin.version>
+		<maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
+		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+		<maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
+		<maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
+		<maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
+		<exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
+		<versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
+		<maven-site-plugin.version>3.9.1</maven-site-plugin.version>
+		<license-maven-plugin.version>2.11</license-maven-plugin.version>
+		<maven-scm-publish-plugin.version>3.0.0</maven-scm-publish-plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -154,8 +178,18 @@
 				<version>${dropwizard.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-slf4j-impl</artifactId>
+				<version>${log4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-core</artifactId>
+				<version>${log4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-1.2-api</artifactId>
 				<version>${log4j.version}</version>
 			</dependency>
 			<dependency>
@@ -235,12 +269,12 @@
 				<version>${guava.version}</version>
 			</dependency>
 
-			<!-- Java 11 back-comp -->
-			<dependency>
-				<groupId>javax.annotation</groupId>
-				<artifactId>javax.annotation-api</artifactId>
-				<version>1.3.2</version>
-			</dependency>
+            <!-- Java 11 back-comp -->
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>1.3.2</version>
+            </dependency>
 
 			<!-- Reflections for annotation scanning-->
 			<dependency>
@@ -261,17 +295,12 @@
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
-				<version>2.8.11.1</version>
+				<version>${jackson2.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>${slf4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-log4j12</artifactId>
 				<version>${slf4j.version}</version>
 			</dependency>
 			
@@ -282,90 +311,25 @@
 			</dependency>
 
 			<dependency>
-				<groupId>com.gigaspaces</groupId>
-				<artifactId>gs-openspaces</artifactId>
+				<groupId>org.gigaspaces</groupId>
+				<artifactId>xap-openspaces</artifactId>
 				<version>${gigaspaces.version}</version>
-				<exclusions>
+ 				<exclusions>
 					<exclusion>
-						<artifactId>junit</artifactId>
-						<groupId>junit</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>jruby</artifactId>
-						<groupId>org.jruby</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>hibernate-core</artifactId>
-						<groupId>org.hibernate</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>xap-jms</artifactId>
-						<groupId>com.gigaspaces</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>jotm-core</artifactId>
-						<groupId>org.ow2.jotm</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>spring-web</artifactId>
-						<groupId>org.springframework</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>commons-pool</artifactId>
-						<groupId>commons-pool</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>jbossjta</artifactId>
-						<groupId>org.jboss.jbossts</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>hsqldb</artifactId>
-						<groupId>org.hsqldb</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>geronimo-jta_1.1_spec</artifactId>
-						<groupId>org.apache.geronimo.specs</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>geronimo-jpa_2.0_spec</artifactId>
-						<groupId>org.apache.geronimo.specs</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-						<groupId>org.apache.geronimo.specs</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>velocity</artifactId>
-						<groupId>velocity</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>transactions-jta</artifactId>
-						<groupId>com.atomikos</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>openjpa</artifactId>
-						<groupId>org.apache.openjpa</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>commons-lang</artifactId>
-						<groupId>commons-lang</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>commons-collections</artifactId>
-						<groupId>commons-collections</groupId>
+						<artifactId>*</artifactId>
+						<groupId>*</groupId>
 					</exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
-				<groupId>com.gigaspaces</groupId>
-				<artifactId>gs-runtime</artifactId>
+				<groupId>org.gigaspaces</groupId>
+				<artifactId>xap-datagrid</artifactId>
 				<version>${gigaspaces.version}</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>tools</artifactId>
-						<groupId>com.sun</groupId>
-					</exclusion>
-				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>com.gigaspaces</groupId>
+				<artifactId>xap-near-cache-spring</artifactId>
+				<version>${gigaspaces.version}</version>
 			</dependency>
 
 			<!-- TEST -->
@@ -432,102 +396,82 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-shade-plugin</artifactId>
-					<version>2.0</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<version>1.3</version>
+					<version>${maven-shade-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
-					<version>2.2.1</version>
+					<version>${maven-assembly-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-clean-plugin</artifactId>
-					<version>2.5</version>
+					<version>${maven-clean-plugin.version}</version>
 				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.0</version>
-				</plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                </plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>2.8</version>
+					<version>${maven-dependency-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
-					<version>2.8.1</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-ear-plugin</artifactId>
-					<version>2.5</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-ejb-plugin</artifactId>
-					<version>2.3</version>
+					<version>${maven-deploy-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
-					<version>2.3.1</version>
+					<version>${maven-install-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>2.3.1</version>
+					<version>${maven-jar-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>2.9.1</version>
+					<version>${maven-javadoc-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-plugin-plugin</artifactId>
-					<version>2.7</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-rar-plugin</artifactId>
-					<version>2.2</version>
+					<version>${maven-plugin-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>2.5.1</version>
+					<version>${maven-release-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
-					<version>2.6</version>
+					<version>${maven-resources-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>2.2</version>
+					<version>${maven-site-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
-					<version>2.1.2</version>
+					<version>${maven-source-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.14</version>
+					<version>${maven-surefire-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>3.0.0-M4</version>
+					<version>${maven-failsafe-plugin.version}</version>
 					<configuration>
 						<argLine>
 							--illegal-access=permit
@@ -535,14 +479,9 @@
 					</configuration>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-war-plugin</artifactId>
-					<version>2.1.azapatch</version>
-				</plugin>
-				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>versions-maven-plugin</artifactId>
-					<version>2.8.1</version>
+					<version>${versions-maven-plugin.version}</version>
 					<configuration>
 						<generateBackupPoms>false</generateBackupPoms>
 					</configuration>
@@ -550,12 +489,12 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
-					<version>1.2</version>
+					<version>${exec-maven-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-enforcer-plugin</artifactId>
-					<version>3.0.0-M2</version>
+					<version>${maven-enforcer-plugin.version}</version>
 					<configuration>
 						<rules>
 							<requireMavenVersion>
@@ -567,7 +506,7 @@
 				<plugin>
 				    <groupId>com.mycila</groupId>
 				    <artifactId>license-maven-plugin</artifactId>
-				    <version>2.11</version>
+				    <version>${license-maven-plugin.version}</version>
 					<configuration>
 						<header>src/license/apache2.txt</header>
 						<properties>
@@ -583,6 +522,16 @@
 						</includes>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-scm-plugin</artifactId>
+					<version>${maven-scm-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-scm-publish-plugin</artifactId>
+					<version>${maven-scm-publish-plugin.version}</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -593,6 +542,7 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+					<!--<release>11</release>-->
 					<encoding>${project.build.sourceEncoding}</encoding>
 					<showDeprecation>true</showDeprecation>
 				</configuration>
@@ -690,7 +640,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-scm-plugin</artifactId>
-				<version>1.4</version>
 			</plugin>
 
 			<plugin>
@@ -703,13 +652,18 @@
 						<include>**/*TestCase.java</include>
 						<include>**/*Tests.java</include>
 					</includes>
+					<!--
+						-Djava.net.preferIPv4Stack=true is set since embedded spaces take ages to start on some
+						developer machines without it. See also:
+						https://stackoverflow.com/questions/30997298/why-is-multicastsocket-setnetworkinterface-much-slower-using-java-8-runtime
+					-->
+					<argLine>-Djava.net.preferIPv4Stack=true</argLine>
 				</configuration>
 			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-scm-publish-plugin</artifactId>
-				<version>1.1</version>
 				<configuration>
 					<checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
 					<checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}</checkinComment>
