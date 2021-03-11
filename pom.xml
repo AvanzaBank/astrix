@@ -78,7 +78,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-gpg-plugin</artifactId>
-					<version>1.5</version>
+					<version>${maven-gpg-plugin.version}</version>
 					<executions>
 						<execution>
 							<id>sign-artifacts</id>
@@ -167,6 +167,7 @@
 		<maven-site-plugin.version>3.9.1</maven-site-plugin.version>
 		<license-maven-plugin.version>2.11</license-maven-plugin.version>
 		<maven-scm-publish-plugin.version>3.0.0</maven-scm-publish-plugin.version>
+		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
 	</properties>
 
 	<dependencyManagement>
