@@ -8,8 +8,8 @@
 	<artifactId>lunch-web</artifactId>
 
 	<properties>
-		<spring.boot.version>1.1.6.RELEASE</spring.boot.version>
-		<spring.version>4.0.7.RELEASE</spring.version>
+		<spring.boot.version>2.1.5.RELEASE</spring.boot.version>
+		<spring.version>5.1.7.RELEASE</spring.version>
 	</properties>
 
 	<dependencies>
@@ -66,7 +66,14 @@
 			<version>${project.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-1.2-api</artifactId>
+		</dependency>
 
 		<!-- Astrix -->
 		<dependency>
