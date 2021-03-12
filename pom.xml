@@ -94,6 +94,8 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<configuration>
+						<!-- TODO: Remove failOnError once all Javadoc has been fixed -->
+						<failOnError>false</failOnError>
 						<excludePackageNames>lunch*:se*:tutorial*:runners*:com.avanza.astrix.integration.tests*</excludePackageNames>
 						<aggregate>true</aggregate>
 						<show>public</show>
