@@ -182,8 +182,6 @@ public abstract class AstrixRemoteResult<T> {
 	/**
 	 * Returns the result from the underlying service invocation.
 	 * 
-	 * @throws Exception - If the underlying service invocation threw an exception. 
-	 * 
 	 * @return
 	 */
 	public abstract T getResult();

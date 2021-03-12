@@ -28,8 +28,8 @@ import java.lang.annotation.Target;
  * 
  * Astrix beans are identified by type and qualifier. When an Astrix bean
  * is defined without a qualifier it is consider "unqualified". Unqualified
- * beans can be retrieved from a AstrixContext using the unqualified getBean(Class<T>)
- * method, whereas qualified beans can be retrieved using the getBean(Class<T>, String)
+ * beans can be retrieved from a AstrixContext using the unqualified getBean(Class&#60;T&#62;)
+ * method, whereas qualified beans can be retrieved using the getBean(Class&#60;T&#62;, String)
  * method. <p> 
  * 
  * By qualifying Astrix beans one can hook more than one bean of 

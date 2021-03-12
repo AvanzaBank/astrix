@@ -145,8 +145,7 @@ public final class SpaceTaskDispatcher {
 	/**
 	 * Creates a lazy Observable that will execute a given DistributedTask asynchronously once subscribed to.
 	 * 
-	 * @param task
-	 * @param routingKey
+	 * @param distributedTask
 	 * @return
 	 */
 	public <T extends Serializable, R> Observable<R> observe(final DistributedTask<T, R> distributedTask) {

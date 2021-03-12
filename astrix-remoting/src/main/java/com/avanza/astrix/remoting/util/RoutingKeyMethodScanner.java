@@ -28,7 +28,8 @@ final class RoutingKeyMethodScanner {
 	/**
 	 * Inspects the given Object looking for a routing key method. 
 	 * 
-	 * @param spaceObject
+	 * @param annotationType
+	 * @param spaceObjectClass
 	 * @return	the routing key method if one exists, null otherwise
 	 */
 	public <T extends Annotation> Method getRoutingKeyMethod(Class<T> annotationType, Class<?> spaceObjectClass) {

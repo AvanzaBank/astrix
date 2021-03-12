@@ -32,7 +32,7 @@ import org.hamcrest.StringDescription;
  * 			new Poller(1000L, 50L).check(probe); // 1 second timeout, checks probe every 50 ms until timeout.
  * 		}
  * 
- * 		public static Probe fileLength(String file, Matcher<Integer> matcher) {
+ * 		public static Probe fileLength(String file, Matcher&#60;Integer&#62; matcher) {
  * 			return new Probe() {
  * 				int lastFileLength;
  * 

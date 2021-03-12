@@ -93,23 +93,6 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<configuration>
-						<excludePackageNames>lunch*:se*:tutorial*:runners*:com.avanza.astrix.integration.tests*</excludePackageNames>
-						<aggregate>true</aggregate>
-						<show>public</show>
-						<nohelp>true</nohelp>
-						<header>Astrix Framework ${project.version}</header>
-						<footer>Astrix Framework ${project.version}</footer>
-						<doctitle>Astrix Framework ${project.version}</doctitle>
-					</configuration>
-					<executions>
-						<execution>
-							<id>attach-javadocs</id>
-							<goals>
-								<goal>jar</goal>
-							</goals>
-						</execution>
-					</executions>
 				</plugin>
 			</plugins>
 			</build>
@@ -121,8 +104,6 @@
 		<additionalparam>-Xdoclint:none</additionalparam>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>11</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
 
 		<log4j.version>2.14.0</log4j.version>
 		<spring.version>5.1.7.RELEASE</spring.version>
@@ -438,6 +419,23 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>${maven-javadoc-plugin.version}</version>
+					<configuration>
+						<excludePackageNames>lunch*:se*:tutorial*:runners*:com.avanza.astrix.integration.tests*</excludePackageNames>
+						<aggregate>true</aggregate>
+						<show>public</show>
+						<nohelp>true</nohelp>
+						<header>Astrix Framework ${project.version}</header>
+						<footer>Astrix Framework ${project.version}</footer>
+						<doctitle>Astrix Framework ${project.version}</doctitle>
+					</configuration>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -541,9 +539,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<!--<release>11</release>-->
+					<release>11</release>
 					<encoding>${project.build.sourceEncoding}</encoding>
 					<showDeprecation>true</showDeprecation>
 				</configuration>
@@ -660,6 +656,11 @@
 					-->
 					<argLine>-Djava.net.preferIPv4Stack=true</argLine>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
 			</plugin>
 
 			<plugin>

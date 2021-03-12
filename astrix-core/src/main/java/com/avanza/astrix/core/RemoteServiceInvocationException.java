@@ -33,7 +33,6 @@ public class RemoteServiceInvocationException extends ServiceInvocationException
 	 * 
 	 * @param serviceExceptionMessage - the message from the exception thrown 
 	 * @param serviceExceptionType - the type of the thrown exception
-	 * @param msg - 
 	 */
 	public RemoteServiceInvocationException(String serviceExceptionMessage, String serviceExceptionType) {
 		super("Remote service threw exception, see server log for details. [" + serviceExceptionType + ": " + serviceExceptionMessage + "]");

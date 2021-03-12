@@ -33,11 +33,10 @@ public class NamedThreadFactory implements ThreadFactory {
 	private boolean daemon;
 
 	/**
-	 * Creates a daemon thread with the specified name prefix. Thread names will be namePrefix-<threadId>. Thread ID is
+	 * Creates a daemon thread with the specified name prefix. Thread names will be {@code namePrefix-<threadId>}. Thread ID is
 	 * incremented each time a thread is created using this factory.
 	 * 
-	 * @param namePrefix
-	 *            not null.
+	 * @param namePrefix not null.
 	 */
 	public NamedThreadFactory(String namePrefix) {
 		this.namePrefix = Objects.requireNonNull(namePrefix);
@@ -47,6 +46,9 @@ public class NamedThreadFactory implements ThreadFactory {
 
 	/**
 	 * Creates a thread with the specified daemon mode.
+	 *
+	 * @param namePrefix
+	 * @param daemon
 	 */
 	public NamedThreadFactory(String namePrefix, boolean daemon) {
 		this(namePrefix);

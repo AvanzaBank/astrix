@@ -65,8 +65,8 @@ public interface ServiceComponent {
 	/**
 	 * Defines whether this ServiceComponent can be used to bind a bean of a given type.
 	 * 
-	 * If this ServiceComponent can be used to bind the given type, then {@link #parseServiceProviderUri(Class)}
-	 * should create ServiceProperties that can be passed to {@link #bind(Class, ServiceDefinition, ServiceProperties)}
+	 * If this ServiceComponent can be used to bind the given type, then {@link #parseServiceProviderUri(String)}
+	 * should create ServiceProperties that can be passed to {@link #bind(ServiceDefinition, ServiceProperties)}
 	 * to bind to an instance of the given type.
 	 * 
 	 * @param type
