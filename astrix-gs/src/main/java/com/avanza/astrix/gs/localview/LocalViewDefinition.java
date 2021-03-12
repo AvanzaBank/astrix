@@ -40,7 +40,7 @@ public interface LocalViewDefinition {
 	
 	/**
 	 * See {@link LocalViewSpaceConfigurer#maxDisconnectionDuration(long)}
-	 * @param size
+	 * @param maxDisconnectionDuration
 	 */
 	void setMaxDisconnectionDuration(long maxDisconnectionDuration);
 

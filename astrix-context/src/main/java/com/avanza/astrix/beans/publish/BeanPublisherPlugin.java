@@ -21,10 +21,10 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 
 
 /**
- * A BeanPublisherPlugin is responsible for creating a PublishedBeanDefinition for
+ * A BeanPublisherPlugin is responsible for creating a {@link ServiceBeanDefinition} for
  * all published types in an api (represented by a ApiProviderClass). 
  * 
- * Astrix comes with the {@link ApiProviderBeanPublisherPlugin} which handles api-providers
+ * Astrix comes with the ApiProviderBeanPublisherPlugin which handles api-providers
  * annotated with {@link AstrixApiProvider}, see {@link AstrixApiProvider} for more information.<p> 
  * 
  * @author Elias Lindholm (elilin)

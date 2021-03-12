@@ -385,7 +385,7 @@ public class AstrixConfigurer {
 	 * for the custom configuration sources, otherwise no custom configuration sources will be used by the 
 	 * created AstrixContext (that is, only well-known configuration sources will be used). 
 	 * 
-	 * <h6>List of well-known configuration sources</h6>
+git s	 * <h6>List of well-known configuration sources</h6>
 	 * <ol>
 	 * <li>System Properties</li>
 	 * <li>Programmatic configuration set on this instance</li>

@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * @author Elias Lindholm (elilin)
- * @deprecated - design flaw -> replaced by {@link RemoteResultReducer}
+ * @deprecated - design flaw, replaced by {@link RemoteResultReducer}
  */
 @Deprecated
 public interface AstrixRemoteResultReducer<R, T> extends RemoteResultReducer<T> {

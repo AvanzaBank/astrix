@@ -68,7 +68,7 @@ public class TestAstrixConfigurer {
 	 * This is an alias for registerApiDescriptor(Class<?> descriptor), which
 	 * should be removed in the future.
 	 * 
-	 * @param provider
+	 * @param providers
 	 * @return 
 	 */
 	public TestAstrixConfigurer registerApiProvider(Class<?>... providers) {

@@ -24,7 +24,7 @@ public interface ServiceAdministrator {
 	 * should publish its versioned services. When services are
 	 * published they can be consumed from other subsystems. 
 	 * 
-	 * @param serviceState
+	 * @param published
 	 */
 	@AstrixBroadcast
 	void setPublishServices(boolean published);
