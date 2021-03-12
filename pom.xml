@@ -142,7 +142,7 @@
 		<netty.version>4.1.30.Final</netty.version>
 		<mimer-config.version>0.0.4</mimer-config.version>
 		<hystrix-multiconfig.version>0.0.3</hystrix-multiconfig.version>
-		<gs-test.version>1.0.0</gs-test.version>
+		<gs-test.version>1.0.1</gs-test.version>
 
 		<!-- Plugins -->
 		<maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
