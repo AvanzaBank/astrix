@@ -93,23 +93,6 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<configuration>
-						<excludePackageNames>lunch*:se*:tutorial*:runners*:com.avanza.astrix.integration.tests*</excludePackageNames>
-						<aggregate>true</aggregate>
-						<show>public</show>
-						<nohelp>true</nohelp>
-						<header>Astrix Framework ${project.version}</header>
-						<footer>Astrix Framework ${project.version}</footer>
-						<doctitle>Astrix Framework ${project.version}</doctitle>
-					</configuration>
-					<executions>
-						<execution>
-							<id>attach-javadocs</id>
-							<goals>
-								<goal>jar</goal>
-							</goals>
-						</execution>
-					</executions>
 				</plugin>
 			</plugins>
 			</build>
@@ -436,6 +419,23 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>${maven-javadoc-plugin.version}</version>
+					<configuration>
+						<excludePackageNames>lunch*:se*:tutorial*:runners*:com.avanza.astrix.integration.tests*</excludePackageNames>
+						<aggregate>true</aggregate>
+						<show>public</show>
+						<nohelp>true</nohelp>
+						<header>Astrix Framework ${project.version}</header>
+						<footer>Astrix Framework ${project.version}</footer>
+						<doctitle>Astrix Framework ${project.version}</doctitle>
+					</configuration>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -656,6 +656,11 @@
 					-->
 					<argLine>-Djava.net.preferIPv4Stack=true</argLine>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
 			</plugin>
 
 			<plugin>
