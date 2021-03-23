@@ -73,7 +73,7 @@ public class NettyRemotingClientHandler extends ChannelInboundHandlerAdapter {
     }
 
 	public Observable<AstrixServiceInvocationResponse> sendInvocationRequest(AstrixServiceInvocationRequest request) {
-		return Observable.create((subscriber) -> {
+		return Observable.unsafeCreate((subscriber) -> {
 			String invocationId = UUID.randomUUID().toString();
 			this.subscriberBySubscriberId.put(invocationId, subscriber);
 			request.setHeader(NETTY_RESPONSE_SUBSCRIBER_ID, invocationId);

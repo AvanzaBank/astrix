@@ -47,8 +47,8 @@ public class ReflectionUtil {
 	
 	public static <T> T newInstance(Class<T> type) {
 		try {
-			return type.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+			return type.getDeclaredConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException("Failed to instantiate class: " + type.getName(), e);
 		}
 	}

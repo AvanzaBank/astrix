@@ -96,7 +96,7 @@ public class GsUtil {
 		return new Func1<List<AsyncResult<T>>, Observable<T>>() {
 			@Override
 			public Observable<T> call(final List<AsyncResult<T>> asyncRresults) {
-				return Observable.create(new OnSubscribe<T>() {
+				return Observable.unsafeCreate(new OnSubscribe<T>() {
 					@Override
 					public void call(Subscriber<? super T> subscriber) {
 						for (AsyncResult<T> asyncInvocationResponse : asyncRresults) {

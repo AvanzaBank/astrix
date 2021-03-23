@@ -82,11 +82,13 @@ class ModuleInjector {
 				}
 			});
 		}
-		
+
 		public <T> Class<T> resolveBean(Class<T> type) {
 			Class<?> boundType = beanBindings.get(type);
 			if (boundType != null) {
-				return (Class<T>) boundType;
+				@SuppressWarnings("unchecked")
+				var castedBoundType = (Class<T>) boundType;
+				return castedBoundType;
 			}
 			if (Modifier.isAbstract(type.getModifiers()) || type.isInterface()) {
 				throw new MissingBeanBinding(moduleName, type, constructionStack);

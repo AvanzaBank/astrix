@@ -19,12 +19,11 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
-import rx.functions.Func1;
-
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.RemoteResultReducer;
 import com.avanza.astrix.core.util.ReflectionUtil;
+
+import rx.Observable;
 
 /**
  * 
@@ -66,6 +65,7 @@ public class BroadcastedRemoteServiceMethod implements RemoteServiceMethod {
 			AstrixServiceInvocationRequest request, Object[] args) throws InstantiationException,
 			IllegalAccessException {
 		request.setArguments(remotingEngine.marshall(args));
+		@SuppressWarnings("unchecked")
 		final RemoteResultReducer<T> reducer = (RemoteResultReducer<T>) newReducer();
 		Observable<List<AstrixServiceInvocationResponse>> responesObservable = remotingEngine.submitBroadcastRequest(request);
 		if (returnType.equals(Void.TYPE) || returnType.equals(Void.class)) {

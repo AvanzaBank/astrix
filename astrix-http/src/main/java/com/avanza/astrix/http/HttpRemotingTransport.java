@@ -67,7 +67,7 @@ public final class HttpRemotingTransport implements RemotingTransportSpi {
 		ClusterMember clusterMember = getTargetMember(routingKey);
 		final HttpPost postRequest = new HttpPost(clusterMember.getRemoteEndpointUri());
 		postRequest.setEntity(new SerializableEntity(request));
-		return Observable.create(new OnSubscribe<AstrixServiceInvocationResponse>() {
+		return Observable.unsafeCreate(new OnSubscribe<AstrixServiceInvocationResponse>() {
 			@Override
 			public void call(final Subscriber<? super AstrixServiceInvocationResponse> t1) {
 				try {
@@ -97,7 +97,7 @@ public final class HttpRemotingTransport implements RemotingTransportSpi {
 		for (ClusterMember clusterMember : getAllClusterMembers()) {
 			final HttpPost postRequest = new HttpPost(clusterMember.getRemoteEndpointUri());
 			postRequest.setEntity(new SerializableEntity(request));
-			result = result.mergeWith(Observable.create(new OnSubscribe<AstrixServiceInvocationResponse>() {
+			result = result.mergeWith(Observable.unsafeCreate(new OnSubscribe<AstrixServiceInvocationResponse>() {
 				@Override
 				public void call(final Subscriber<? super AstrixServiceInvocationResponse> t1) {
 					try {

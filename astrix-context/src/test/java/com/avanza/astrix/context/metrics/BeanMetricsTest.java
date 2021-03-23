@@ -134,7 +134,7 @@ public class BeanMetricsTest {
 
 		@Override
 		public Observable<String> observePing(final String msg) {
-			return Observable.create(t -> {
+			return Observable.unsafeCreate(t -> {
 				fakeClock.incrementAndGet(); // Simulate 2 ms execution time by ticking clock
 				fakeClock.incrementAndGet();
 				t.onNext(msg);

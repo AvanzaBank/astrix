@@ -59,7 +59,8 @@ public class AsyncFutureTypeHandler implements ReactiveTypeHandlerPlugin<AsyncFu
 	public AsyncFuture<Object> newReactiveType() {
 		return new AsyncFutureImpl<>();
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public Class<AsyncFuture<Object>> reactiveTypeHandled() {
 		Class<?> class1 = AsyncFuture.class;

@@ -16,7 +16,7 @@
 package com.avanza.astrix.integration.tests;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Properties;

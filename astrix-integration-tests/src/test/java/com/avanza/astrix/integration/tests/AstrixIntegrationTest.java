@@ -18,11 +18,11 @@ package com.avanza.astrix.integration.tests;
 import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 import java.util.List;
 import java.util.Properties;
@@ -37,6 +37,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
+
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistry;

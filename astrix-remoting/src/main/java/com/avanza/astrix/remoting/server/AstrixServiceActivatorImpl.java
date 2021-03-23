@@ -19,6 +19,21 @@ import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHe
 import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.SERVICE_API;
 import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.SERVICE_METHOD_SIGNATURE;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
@@ -36,20 +51,6 @@ import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponseHeaders;
 import com.avanza.astrix.remoting.client.MissingServiceMethodException;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 /**
  * Server side component used to invoke exported services. <p> 
  * 
@@ -175,7 +176,9 @@ class AstrixServiceActivatorImpl implements AstrixServiceActivator {
 				if (result == null) {
 					invocationResponse.setHeader(AstrixServiceInvocationResponseHeaders.OPTIONAL_RETURN_VALUE_IS_NULL, "true");
 				} else {
-					invocationResponse.setResponseBody(objectSerializer.serialize(Optional.class.cast(result).orElse(null), version));
+					@SuppressWarnings("unchecked")
+					var cast = Optional.class.cast(result).orElse(null);
+					invocationResponse.setResponseBody(objectSerializer.serialize(cast, version));
 				}
 			} else {
 				invocationResponse.setResponseBody(objectSerializer.serialize(result, version));

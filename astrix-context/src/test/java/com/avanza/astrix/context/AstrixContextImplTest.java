@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.context;
 
-import static junit.framework.Assert.assertSame;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

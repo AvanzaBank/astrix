@@ -68,7 +68,10 @@ public final class RemotingEngine {
 		}
 		ParameterizedType optionalType = ParameterizedType.class.cast(returnType);
 		Object result = unmarshall(response, optionalType.getActualTypeArguments()[0], apiVersion);
-		return (T) Optional.ofNullable(result);
+
+		@SuppressWarnings("unchecked")
+		T castedResult = (T) Optional.ofNullable(result);
+		return castedResult;
 	}
 
 	// Defines whether the service invocation returned the value 'null' (as opposed to Optional.empty()).

@@ -40,7 +40,7 @@ public class GsBinderIntegrationTest {
 	
 	@After
 	public void closeContext() {
-		applicationContext.destroy(); 
+		applicationContext.close();
 	}
 
 	@Test

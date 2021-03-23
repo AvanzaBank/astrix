@@ -84,6 +84,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 		if (partitionedArgumentType.isArray()) {
 			return new ArrayContainerType(partitionedArgumentType.getComponentType());
 		}
+		@SuppressWarnings("unchecked")
 		Class<? extends Collection<?>> collectionFactory = (Class<? extends Collection<?>>) partitionBy.collectionFactory();
 		if (!proxiedMethod.getParameterTypes()[partitionedArgumentIndex].isAssignableFrom(collectionFactory)) {
 			throw new IllegalArgumentException(String.format("Collection class supplied by @AstrixPartitionedRouting is not "
@@ -100,6 +101,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 	}
 
 	private Class<? extends RemoteResultReducer<?>> getReducer(AstrixPartitionedRouting partitionBy, Method targetServiceMethod) {
+		@SuppressWarnings("unchecked")
 		Class<? extends RemoteResultReducer<?>> reducerType = (Class<? extends RemoteResultReducer<?>>) partitionBy.reducer();
 		RemotingProxyUtil.validateRemoteResultReducer(targetServiceMethod, reducerType);
 		return reducerType;
@@ -245,6 +247,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 			this.elementType = Objects.requireNonNull(elementType);
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public ContainerBuilder newInstance() {
 			return new CollectionContainerBuilder((Collection<? super Object>) ReflectionUtil.newInstance(this.collectionFactory));

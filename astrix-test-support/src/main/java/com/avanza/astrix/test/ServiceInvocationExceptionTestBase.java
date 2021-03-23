@@ -23,8 +23,8 @@ import java.lang.reflect.Method;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 /**
  * Extend this test-class in order to test that your RuntimeExceptions are Astrix ready.

@@ -369,7 +369,7 @@ public class FaultToleranceThroughputTest {
 
 		@Override
 		public Observable<String> observeServiceCall() {
-			return Observable.create((subscriber) -> {
+			return Observable.unsafeCreate((subscriber) -> {
 				exec.execute(() -> {
 					try {
 						subscriber.onNext(serviceCall());

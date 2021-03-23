@@ -117,7 +117,7 @@ public class GsBinder implements AstrixConfigAware {
 		private String versioned;
 		
 		public SpaceUrlBuilder(GigaSpace space) {
-			SpaceURL finderURL = space.getSpace().getFinderURL();
+			var finderURL = space.getSpace().getFinderURL();
 			this.locators = finderURL.getProperty("locators");
 			this.groups = finderURL.getProperty("groups");
 			this.versioned = Boolean.toString(space.getSpace().isOptimisticLockingEnabled());

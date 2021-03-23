@@ -83,6 +83,7 @@ public class RemotingProxy implements InvocationHandler {
 			AstrixTraceProvider astrixTraceProvider
 	) {
 		RemotingProxy handler = new RemotingProxy(proxyApi, targetApi, objectSerializer, transport, defaultRoutingStrategy, reactiveTypeConverter, astrixTraceProvider);
+		@SuppressWarnings("unchecked")
 		T serviceProxy = (T) Proxy.newProxyInstance(RemotingProxy.class.getClassLoader(), new Class[]{proxyApi}, handler);
 		return serviceProxy;
 	}

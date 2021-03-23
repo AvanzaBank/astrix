@@ -46,6 +46,7 @@ public class CompletableFutureTypeHandlerPlugin implements ReactiveTypeHandlerPl
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Class<CompletableFuture<Object>> reactiveTypeHandled() {
 		Class<?> result = CompletableFuture.class;
 		return (Class<CompletableFuture<Object>>) result;

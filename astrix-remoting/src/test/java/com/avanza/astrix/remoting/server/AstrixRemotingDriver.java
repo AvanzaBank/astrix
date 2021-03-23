@@ -152,7 +152,7 @@ public class AstrixRemotingDriver {
 		@Override
 		public Observable<AstrixServiceInvocationResponse> submitRoutedRequest(AstrixServiceInvocationRequest request, RoutingKey routingKey){
 			final AstrixServiceInvocationResponse response = getActivator(routingKey).invokeService(request);
-			return Observable.create(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {
+			return Observable.unsafeCreate(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {
 				@Override
 				public void call(Subscriber<? super AstrixServiceInvocationResponse> t1) {
 					t1.onNext(response);
@@ -171,7 +171,7 @@ public class AstrixRemotingDriver {
 			for (AstrixServiceActivatorImpl partition : partitions) {
 				responses.add(partition.invokeService(request));
 			}
-			return Observable.create(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {
+			return Observable.unsafeCreate(new Observable.OnSubscribe<AstrixServiceInvocationResponse>() {
 				@Override
 				public void call(Subscriber<? super AstrixServiceInvocationResponse> t1) {
 					for (AstrixServiceInvocationResponse r : responses) {
