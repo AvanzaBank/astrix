@@ -85,7 +85,7 @@ public class DirectComponent implements ServiceComponent {
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				try {
 					Method targetMethod = targetProvider.getClass().getMethod(method.getName(), method.getParameterTypes());
-					Observable<Object> observableResult = Observable.create((s) -> {
+					Observable<Object> observableResult = Observable.unsafeCreate((s) -> {
 						try {
 							Object result = ReflectionUtil.invokeMethod(targetMethod, targetProvider, args);
 							s.onNext(result);

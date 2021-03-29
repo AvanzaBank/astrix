@@ -101,7 +101,7 @@ public abstract class ReactiveTypeHandlerContract<T> {
 	@Test(timeout=1000)
 	public final void reactiveTypeToObservable_CreatedObserverIsSubscribedInConversion() throws Exception {
 		AtomicInteger sourceSubscriptionCount = new AtomicInteger(0);
-		Observable<Object> emitsFoo = Observable.create((s) -> {
+		Observable<Object> emitsFoo = Observable.unsafeCreate((s) -> {
 			sourceSubscriptionCount.incrementAndGet();
 			s.onNext("foo");
 			s.onCompleted();
@@ -120,7 +120,7 @@ public abstract class ReactiveTypeHandlerContract<T> {
 	@Test
 	public final void onlySubscribesOneTimeToSourceObservableIfConvertingBackAndForth() throws Exception {
 		AtomicInteger sourceSubscriptionCount = new AtomicInteger(0);
-		Observable<Object> emitsFoo = Observable.create((s) -> {
+		Observable<Object> emitsFoo = Observable.unsafeCreate((s) -> {
 			sourceSubscriptionCount.incrementAndGet();
 			s.onNext("foo");
 			s.onCompleted();
@@ -154,6 +154,7 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		assertEquals("foo", resultSpy.error.getMessage());
 	}
 
+	@SuppressWarnings("unchecked")
 	private T toCustomReactiveType(Observable<Object> emitsFoo) {
 		return (T) reactiveTypeConverter.toCustomReactiveType(reactiveType(), emitsFoo);
 	}

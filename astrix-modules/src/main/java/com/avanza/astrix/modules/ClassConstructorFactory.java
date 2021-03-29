@@ -81,6 +81,7 @@ final class ClassConstructorFactory<T> {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private static <E> Class<E> getElementType(ParameterizedType listType) {
 		Type actualTypeArguments = listType.getActualTypeArguments()[0];
 		if (actualTypeArguments instanceof Class) {
@@ -90,6 +91,7 @@ final class ClassConstructorFactory<T> {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Constructor<T> getFactory() {
 		Constructor<?>[] constructors = factory.getDeclaredConstructors();
 		if (constructors.length == 0) {

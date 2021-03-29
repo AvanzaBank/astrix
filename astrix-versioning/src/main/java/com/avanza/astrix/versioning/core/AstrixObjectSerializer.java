@@ -44,7 +44,8 @@ public interface AstrixObjectSerializer {
 	public static class NoVersioningSupport implements AstrixObjectSerializer {
 		
 		public static final int NO_VERSIONING = -21;
-		
+
+		@SuppressWarnings("unchecked")
 		@Override
 		public <T> T deserialize(Object element, Type type, int version) {
 			return (T) element;

@@ -21,11 +21,11 @@ import java.util.regex.Pattern;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
+
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
-import com.j_spaces.core.client.SpaceURL;
 
 /**
  * 
@@ -117,7 +117,7 @@ public class GsBinder implements AstrixConfigAware {
 		private String versioned;
 		
 		public SpaceUrlBuilder(GigaSpace space) {
-			SpaceURL finderURL = space.getSpace().getFinderURL();
+			var finderURL = space.getSpace().getFinderURL();
 			this.locators = finderURL.getProperty("locators");
 			this.groups = finderURL.getProperty("groups");
 			this.versioned = Boolean.toString(space.getSpace().isOptimisticLockingEnabled());

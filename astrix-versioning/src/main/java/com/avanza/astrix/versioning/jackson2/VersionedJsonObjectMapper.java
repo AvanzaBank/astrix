@@ -177,6 +177,7 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 		}
 
 		<T> void register(int version, AstrixJsonMessageMigration<T> messageMigration) {
+			@SuppressWarnings("unchecked")
 			Builder<T> builder = (Builder<T>) buildersByType.get(messageMigration.getJavaType());
 			if (builder == null) {
 				builder = new Builder<>(messageMigration.getJavaType());
@@ -253,7 +254,7 @@ public class VersionedJsonObjectMapper implements JsonObjectMapper.Impl {
 		}
 
 		private ObjectMapper buildRaw() {
-			SimpleModule rawModule = new SimpleModule("Astrix-rawModule", new Version(1,0,0, ""));
+			SimpleModule rawModule = new SimpleModule("Astrix-rawModule", new Version(1,0,0, "", null, null));
 			for (JsonDeserializerHolder<?> deserializer : this.deserializers) {
 				deserializer.register(rawModule);
 			}

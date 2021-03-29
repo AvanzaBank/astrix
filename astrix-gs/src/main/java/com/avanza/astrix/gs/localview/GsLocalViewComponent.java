@@ -103,10 +103,11 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		
 		IJSpace localViewSpace = gslocalViewSpaceConfigurer.create();
 		GigaSpace localViewGigaSpace = GigaSpaceProxy.create(new GigaSpaceConfigurer(localViewSpace).create());
-		
-		BoundLocalViewGigaSpaceBeanInstance localViewGigaSpaceBeanInstance = 
-				new BoundLocalViewGigaSpaceBeanInstance(localViewGigaSpace, gslocalViewSpaceConfigurer, gsSpaceConfigurer);
-		return (BoundServiceBeanInstance<T>) localViewGigaSpaceBeanInstance;
+
+		@SuppressWarnings("unchecked")
+		BoundServiceBeanInstance<T> localViewGigaSpaceBeanInstance =
+				(BoundServiceBeanInstance<T>) new BoundLocalViewGigaSpaceBeanInstance(localViewGigaSpace, gslocalViewSpaceConfigurer, gsSpaceConfigurer);
+		return localViewGigaSpaceBeanInstance;
 	}
 	
 	@Override

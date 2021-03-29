@@ -24,6 +24,7 @@ import com.avanza.astrix.config.StringSetting;
  * @deprecated - Moved to {@link com.avanza.astrix.beans.core.AstrixSettings}
  *
  */
+@Deprecated
 public class AstrixSettings {
 	
 	

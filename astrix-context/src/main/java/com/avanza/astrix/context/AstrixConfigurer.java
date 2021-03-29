@@ -77,6 +77,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -237,8 +238,8 @@ public class AstrixConfigurer {
 
 	private AstrixDynamicConfigFactory initFactory(String dynamicConfigFactoryClass) {
 		try {
-			return (AstrixDynamicConfigFactory) Class.forName(dynamicConfigFactoryClass).newInstance();
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			return (AstrixDynamicConfigFactory) Class.forName(dynamicConfigFactoryClass).getDeclaredConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException("Failed to init AstrixDynamicConfigFactoryClass: " + dynamicConfigFactoryClass, e);
 		}
 	}

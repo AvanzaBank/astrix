@@ -87,6 +87,7 @@ public class RemoteServiceMethodFactory {
 
 	private Class<? extends RemoteResultReducer<?>> getRemoteResultReducerClass( Method targetServiceMethod) {
 		AstrixBroadcast broadcast = targetServiceMethod.getAnnotation(AstrixBroadcast.class);
+		@SuppressWarnings("unchecked")
 		Class<? extends RemoteResultReducer<?>> reducerType = (Class<? extends RemoteResultReducer<?>>) broadcast.reducer();
 		RemotingProxyUtil.validateRemoteResultReducer(targetServiceMethod, reducerType);
 		return reducerType;

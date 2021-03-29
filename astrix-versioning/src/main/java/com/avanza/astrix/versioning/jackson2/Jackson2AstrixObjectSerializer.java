@@ -31,7 +31,7 @@ class Jackson2AstrixObjectSerializer implements AstrixObjectSerializer {
 		Class<? extends AstrixObjectSerializerConfigurer> serializerBuilder = serializerDefinition.getObjectSerializerConfigurerClass();
 		this.version = serializerDefinition.version();
 		try {
-			this.objectMapper = buildObjectMapper(Jackson2ObjectSerializerConfigurer.class.cast(serializerBuilder.newInstance()));
+			this.objectMapper = buildObjectMapper(Jackson2ObjectSerializerConfigurer.class.cast(serializerBuilder.getDeclaredConstructor().newInstance()));
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to init JsonObjectMapper", e);
 		}
@@ -46,7 +46,9 @@ class Jackson2AstrixObjectSerializer implements AstrixObjectSerializer {
 	@Override
 	public <T> T deserialize(Object element, Type type, int fromVersion) {
 		if (fromVersion == NoVersioningSupport.NO_VERSIONING) {
-			return (T) element;
+			@SuppressWarnings("unchecked")
+			T castedElement = (T) element;
+			return castedElement;
 		}
 		return objectMapper.deserialize((String) element, type, fromVersion);
 	}

@@ -147,7 +147,7 @@ public class HystrixObservableCommandFacadeTest {
 	
 	@Test
 	public void throwsServiceUnavailableOnTimeouts() throws Exception {
-		pingServer.setResult(Observable.create(new OnSubscribe<String>() {
+		pingServer.setResult(Observable.unsafeCreate(new OnSubscribe<String>() {
 			@Override
 			public void call(Subscriber<? super String> t1) {
 				// Simulate timeout by not invoking subscriber
@@ -168,7 +168,7 @@ public class HystrixObservableCommandFacadeTest {
 	
 	@Test
 	public void semaphoreRejectedCountsAsFailure() throws Exception {
-		pingServer.setResult(Observable.create(new OnSubscribe<String>() {
+		pingServer.setResult(Observable.unsafeCreate(new OnSubscribe<String>() {
 			@Override
 			public void call(Subscriber<? super String> t1) {
 				// Simulate timeout by not invoking subscriber
@@ -193,7 +193,7 @@ public class HystrixObservableCommandFacadeTest {
 		Supplier<Observable<String>> timeoutCommandSupplier = new Supplier<Observable<String>>() {
 			@Override
 			public Observable<String> get() {
-				return Observable.create(t1 -> {
+				return Observable.unsafeCreate(t1 -> {
 					subscribed.set(true);
 				});
 			}
@@ -210,7 +210,7 @@ public class HystrixObservableCommandFacadeTest {
 			@Override
 			public Observable<String> get() {
 				supplierInvocationCount.incrementAndGet();
-				return Observable.create(new OnSubscribe<String>() {
+				return Observable.unsafeCreate(new OnSubscribe<String>() {
 					@Override
 					public void call(Subscriber<? super String> t1) {
 						// Simulate timeout by not invoking subscriber

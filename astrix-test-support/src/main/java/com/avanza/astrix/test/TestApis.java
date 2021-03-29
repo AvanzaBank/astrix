@@ -18,6 +18,7 @@ package com.avanza.astrix.test;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.test.TestApi.TestContext;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -62,8 +63,8 @@ final class TestApis {
 
 	private TestApi initTestApi(Class<? extends TestApi> testApiType) {
 		try {
-			return testApiType.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+			return testApiType.getDeclaredConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException("Failed to instantiate TestApi: " + testApiType.getName(), e);
 		}
 	}

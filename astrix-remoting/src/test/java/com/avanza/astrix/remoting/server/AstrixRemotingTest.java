@@ -19,7 +19,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.Serializable;
@@ -272,7 +272,7 @@ public class AstrixRemotingTest {
 
 		PartitionedPingService partitionedPing = remotingDriver.createRemotingProxy(PartitionedPingService.class, PartitionedPingService.class); 
 		partitionedPing.pingVoid(new Integer[]{});
-		Mockito.verifyZeroInteractions(evenPartitionPing, oddPartitionPing);
+		Mockito.verifyNoInteractions(evenPartitionPing, oddPartitionPing);
 	}
 	
 	@Test(expected = RemoteServiceInvocationException.class)
@@ -406,6 +406,7 @@ public class AstrixRemotingTest {
 		assertEquals(setOf(1,2,3), calculatorService.ping(setOf(1,2,3)));
 	}
 	
+	@SafeVarargs
 	private static <T> Set<T> setOf(@SuppressWarnings("unchecked") T... values) {
 		return new HashSet<T>(Arrays.asList(values));
 	}

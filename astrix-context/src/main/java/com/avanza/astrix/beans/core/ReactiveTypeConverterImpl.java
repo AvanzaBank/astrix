@@ -36,7 +36,7 @@ public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
 	@Override
 	public <T> Observable<Object> toObservable(Class<T> fromType, T reactiveType) {
 		ReactiveTypeHandlerPlugin<T> plugin = getPlugin(fromType);
-		return Observable.create((s) -> {
+		return Observable.unsafeCreate((s) -> {
 			plugin.subscribe(new ReactiveExecutionListener() {
 				@Override
 				public void onResult(Object result) {
@@ -61,6 +61,7 @@ public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
 	}
 	
 	private <T> ReactiveTypeHandlerPlugin<T> getPlugin(Class<T> type) {
+		@SuppressWarnings("unchecked")
 		ReactiveTypeHandlerPlugin<T> plugin = (ReactiveTypeHandlerPlugin<T>) this.pluginByReactiveType.get(type);
 		if (plugin == null) {
 			throw new IllegalArgumentException("Cant convert reactive type to rx.Observable. No ReactiveTypeHandlerPlugin registered for type: " + type);

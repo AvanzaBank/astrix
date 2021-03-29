@@ -129,6 +129,7 @@ public final class SpaceTaskDispatcher {
 		}));
 	}
 
+	@SuppressWarnings("deprecation")
 	private <T extends Serializable> void submitRoutedTaskExecution(Subscriber<? super T> subscriber, final Task<T> task, final Object routingKey) {
 		usingErrorReporter(subscriber, serviceUnavailable()).accept(() -> {
 			// Submit task on current thread in executorService
@@ -145,19 +146,19 @@ public final class SpaceTaskDispatcher {
 	/**
 	 * Creates a lazy Observable that will execute a given DistributedTask asynchronously once subscribed to.
 	 * 
-	 * @param task
-	 * @param routingKey
+	 * @param distributedTask
 	 * @return
 	 */
 	public <T extends Serializable, R> Observable<R> observe(final DistributedTask<T, R> distributedTask) {
-		return Observable.create(t1 -> {
+		return Observable.unsafeCreate(t1 -> {
 			Runnable command = contextPropagation.wrap(() -> submitDistributedTaskExecution(distributedTask, t1));
 			usingErrorReporter(t1, serviceUnavailable()).accept(() -> {
 				executorService.execute(command);
 			});
 		});
 	}
-	
+
+	@SuppressWarnings("deprecation")
 	private <R, T extends Serializable> void submitDistributedTaskExecution(final DistributedTask<T, R> distributedTask, Subscriber<? super R> t1) {
 		usingErrorReporter(t1, serviceUnavailable()).accept(() -> {
 			// Submit task on current thread in executorService
