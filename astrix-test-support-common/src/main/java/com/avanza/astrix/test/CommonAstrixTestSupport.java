@@ -19,63 +19,20 @@ import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.context.Astrix;
 import com.avanza.astrix.context.AstrixContext;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 
 import java.util.function.Consumer;
 
-/**
- * Test utility that manages an internal service registry, config-source and AstrixContext. The
- * managed AstrixContext is configured to use the internal service registry.<p>
- *
- * The AstrixRule allows registering providers programmatically in the
- *  service-registry, see {@link AstrixRule#setProxyState(Class, Object)}.
- *
- * Typical usage: <p>
- *
- * <pre>
- *
- * {@literal @}ClassRule
- * public static AstrixRule astrix = new AstrixRule();
- *
- * {@literal @}ClassRule
- * public static RunningPu testedPu = ... // setup pu
- *
- *
- * {@literal @}Test
- * public void aTest() {
- *     ...
- *     astrix.registerProvider(ConsumedService.class, serviceStub);
- *     ...
- *     ServiceUnderTest service = astrix.waitForBean(ServiceUnderTest.class, 2000);
- * }
- *
- * {@literal @}Test
- * public void anotherTest() {
- *     ...
- *     astrix.registerProvider(ConsumedService.class, serviceStubWithDifferentBehavior);
- *     ...
- *     ServiceUnderTest service = astrix.waitForBean(ServiceUnderTest.class, 2000);
- * }
- *
- * </pre>
- *
- *
- * @author Elias Lindholm
- *
- */
-public class AstrixRule implements TestRule {
+abstract class CommonAstrixTestSupport {
 
 	private final AstrixTestContext astrixTestContext;
 
 	@SafeVarargs
-	public AstrixRule(Class<? extends TestApi>... testApis) {
+	protected CommonAstrixTestSupport(Class<? extends TestApi>... testApis) {
 		this.astrixTestContext = new AstrixTestContext(testApis);
 	}
 
 	@SafeVarargs
-	public AstrixRule(Consumer<? super AstrixRuleContext> contextConfigurer, Class<? extends TestApi>... testApis) {
+	protected CommonAstrixTestSupport(Consumer<? super AstrixRuleContext> contextConfigurer, Class<? extends TestApi>... testApis) {
 		this(testApis);
 		contextConfigurer.accept(new AstrixRuleContext() {
             @Override
@@ -94,25 +51,6 @@ public class AstrixRule implements TestRule {
 			}
 		});
 
-	}
-
-	@Override
-	public Statement apply(final Statement base, Description description) {
-		return new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				try {
-					base.evaluate();
-				} finally {
-					try {
-						astrixTestContext.destroy();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-
-		};
 	}
 
 	/**
