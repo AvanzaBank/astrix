@@ -18,10 +18,14 @@ package com.avanza.astrix.test;
 import com.avanza.astrix.core.ServiceInvocationException;
 import org.junit.Test;
 import org.reflections.Reflections;
+import org.reflections.ReflectionsException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.Set;
 
+import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -31,6 +35,8 @@ import static org.junit.Assert.assertEquals;
  */
 public abstract class ServiceInvocationExceptionTestBase {
 
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	private final Reflections reflections;
 
 	protected ServiceInvocationExceptionTestBase(String packageName) {
@@ -39,7 +45,7 @@ public abstract class ServiceInvocationExceptionTestBase {
 
 	@Test
 	public void exceptionsExtendsServiceInvocationException() {
-		reflections.getSubTypesOf(RuntimeException.class)
+		getSubTypesOf(RuntimeException.class)
 				.forEach(this::assertIsServiceInvocationException);
 	}
 
@@ -49,7 +55,7 @@ public abstract class ServiceInvocationExceptionTestBase {
 
 	@Test
 	public void subtypesOfServiceInvocationExceptionImplementRecreateOnClientSideMethod() throws Exception {
-		Set<Class<? extends ServiceInvocationException>> exceptions = reflections.getSubTypesOf(ServiceInvocationException.class);
+		Set<Class<? extends ServiceInvocationException>> exceptions = getSubTypesOf(ServiceInvocationException.class);
 
 		for (Class<? extends RuntimeException> exceptionClass : exceptions) {
 			Method method = exceptionClass.getDeclaredMethod("recreateOnClientSide");
@@ -58,4 +64,15 @@ public abstract class ServiceInvocationExceptionTestBase {
 			assertEquals("Exception class must implement 'recreateOnClientSide' self.", declaringClass, exceptionClass);
 		}
 	}
+
+	private <T> Set<Class<? extends T>> getSubTypesOf(Class<T> type) {
+		try {
+			return reflections.getSubTypesOf(type);
+		} catch (ReflectionsException exception) {
+			// Reflections (0.9.12) throws ReflectionsException if nothing found in package
+			log.trace("Could not retrieve subtypes of {}", type, exception);
+			return emptySet();
+		}
+	}
+
 }
