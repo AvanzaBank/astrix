@@ -27,31 +27,27 @@ import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.serviceunit.ServiceExporter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestApiTest {
+class AstrixExtensionTest {
 	
 	@RegisterExtension
-	static AstrixExtension astrixRule = new AstrixExtension(PingEngineTestApi.class);
+	static AstrixExtension astrixRule = AstrixExtension.create(PingEngineTestApi.class);
 	
 	@RegisterExtension
-	TestApiResetExtension resetApis = new TestApiResetExtension(astrixRule);
-	
-	@RegisterExtension
-	static FakePingaApp pingApp = new FakePingaApp(astrixRule);
-	
-	
+	static FakePingApp pingApp = new FakePingApp(astrixRule);
+
 	private Ping ping;
 	
 	@BeforeEach
-	void setup() {
+	void setup(AstrixTestContext astrixTestContext) {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, astrixRule.getServiceRegistryUri());
+		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, astrixTestContext.getServiceRegistryUri());
 		astrixConfigurer.registerApiProvider(PingApi.class);
 		
 		AstrixContext context = astrixConfigurer.configure();
@@ -60,20 +56,20 @@ class TestApiTest {
 	}
 	
 	@Test
-	void useTestApi() {
-		astrixRule.getTestApi(PingEngineTestApi.class).setPrefix("hello: ");
+	void useTestApi(PingEngineTestApi testApi) {
+		testApi.setPrefix("hello: ");
 		
 		assertEquals("hello: foo", ping.ping("foo"));
 	}
 	
 	@Test
-	void resetClearsStateAndCreatesNewInstanceOfTestApi() {
-		PingEngineTestApi testApi = astrixRule.getTestApi(PingEngineTestApi.class);
+	void resetClearsStateAndCreatesNewInstanceOfTestApi(AstrixTestContext astrixTestContext) {
+		PingEngineTestApi testApi = astrixTestContext.getTestApi(PingEngineTestApi.class);
 		testApi.setPrefix("hello: ");
 		
 		assertEquals("hello: foo", ping.ping("foo"));
 
-		astrixRule.resetTestApis();
+		astrixTestContext.resetTestApis();
 		
 		// Setting values on "old" TestApi instance after reset should have no effect
 		testApi.setPrefix("foo: "); 
@@ -81,14 +77,14 @@ class TestApiTest {
 		assertEquals("foo", ping.ping("foo"));
 		
 		// Get new intstance of test api and set prefix
-		astrixRule.getTestApi(PingEngineTestApi.class).setPrefix("hello: ");
+		astrixTestContext.getTestApi(PingEngineTestApi.class).setPrefix("hello: ");
 		assertEquals("hello: foo", ping.ping("foo"));
 	}
 	
 	@AstrixServiceExport(Ping.class)
 	private static class PrivatePingImpl implements Ping {
 		
-		private PingEngine pingEngine;
+		private final PingEngine pingEngine;
 
 		PrivatePingImpl(PingEngine pingEngine) {
 			this.pingEngine = pingEngine;
@@ -140,21 +136,21 @@ class TestApiTest {
 		exportsRemoteServicesFor = PingApi.class,
 		defaultServiceComponent = AstrixServiceComponentNames.DIRECT
 	)
-	static class FakePingaApp implements BeforeEachCallback, AfterEachCallback {
+	static class FakePingApp implements BeforeAllCallback, AfterAllCallback {
 
+		private final AstrixExtension astrix;
 		private AstrixApplicationContext context;
-		private AstrixExtension astrix;
 
-		FakePingaApp(AstrixExtension astrix) {
+		FakePingApp(AstrixExtension astrix) {
 			this.astrix = astrix;
 		}
 
 		@Override
-		public void beforeEach(ExtensionContext extensionContext) {
+		public void beforeAll(ExtensionContext extensionContext) {
 			TestAstrixConfigurer astrixConfig = new TestAstrixConfigurer();
-			astrixConfig.setApplicationDescriptor(FakePingaApp.class);
+			astrixConfig.setApplicationDescriptor(FakePingApp.class);
 			astrixConfig.registerApiProvider(PingEngineApi.class);
-			astrixConfig.set(AstrixSettings.SERVICE_REGISTRY_URI, astrix.getServiceRegistryUri());
+			astrixConfig.set(AstrixSettings.SERVICE_REGISTRY_URI, astrix.getAstrixTestContext(extensionContext).getServiceRegistryUri());
 			context = (AstrixApplicationContext) astrixConfig.configure();
 
 			context.getInstance(ServiceExporter.class).addServiceProvider(new PrivatePingImpl(context.getBean(PingEngine.class)));
@@ -162,7 +158,7 @@ class TestApiTest {
 		}
 
 		@Override
-		public void afterEach(ExtensionContext extensionContext) {
+		public void afterAll(ExtensionContext extensionContext) {
 			context.destroy();
 		}
 

@@ -15,6 +15,10 @@
  */
 package com.avanza.astrix.test;
 
+import com.avanza.astrix.config.GlobalConfigSourceRegistry;
+import com.avanza.astrix.config.Setting;
+import com.avanza.astrix.context.Astrix;
+import com.avanza.astrix.context.AstrixContext;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -24,10 +28,10 @@ import java.util.function.Consumer;
 /**
  * Test utility that manages an internal service registry, config-source and AstrixContext. The
  * managed AstrixContext is configured to use the internal service registry.<p>
- * <p>
+ *
  * The AstrixRule allows registering providers programmatically in the
- * service-registry, see {@link AstrixRule#setProxyState(Class, Object)}.
- * <p>
+ *  service-registry, see {@link AstrixRule#setProxyState(Class, Object)}.
+ *
  * Typical usage: <p>
  *
  * <pre>
@@ -57,39 +61,171 @@ import java.util.function.Consumer;
  *
  * </pre>
  *
+ *
  * @author Elias Lindholm
+ *
  */
-public class AstrixRule extends CommonAstrixTestSupport implements TestRule {
+public class AstrixRule implements TestRule {
 
-    @SafeVarargs
-    public AstrixRule(Class<? extends TestApi>... testApis) {
-        super(testApis);
-    }
+	private final AstrixTestContext astrixTestContext;
 
-    @SafeVarargs
-    public AstrixRule(Consumer<? super AstrixRuleContext> contextConfigurer, Class<? extends TestApi>... testApis) {
-        super(contextConfigurer, testApis);
-    }
+	@SafeVarargs
+	public AstrixRule(Class<? extends TestApi>... testApis) {
+		this.astrixTestContext = new AstrixTestContext(testApis);
+	}
 
-    @Override
-    public Statement apply(final Statement base, Description description) {
-        return new Statement() {
-
-        	@Override
-            public void evaluate() throws Throwable {
-                try {
-                    base.evaluate();
-                } finally {
-                    try {
-                        destroy();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+	@SafeVarargs
+	public AstrixRule(Consumer<? super AstrixRuleContext> contextConfigurer, Class<? extends TestApi>... testApis) {
+		this(testApis);
+		contextConfigurer.accept(new AstrixRuleContext() {
+            @Override
+            public <T> void registerProxy(Class<T> service) {
+            	astrixTestContext.registerProxy(service);
             }
 
-        };
+            @Override
+            public <T> void registerProxy(Class<T> service, String qualifier) {
+            	astrixTestContext.registerProxy(service, qualifier);
+            }
+
+            @Override
+			public <T> void set(Setting<T> setting, T value) {
+				astrixTestContext.set(setting, value);
+			}
+		});
+
+	}
+
+	@Override
+	public Statement apply(final Statement base, Description description) {
+		return new Statement() {
+			@Override
+			public void evaluate() throws Throwable {
+				try {
+					base.evaluate();
+				} finally {
+					try {
+						astrixTestContext.destroy();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+		};
+	}
+
+	/**
+	 * The configSourceId might be used to retrieve the ConfigSource instance
+	 * using {@link GlobalConfigSourceRegistry#getConfigSource(String)}
+	 *
+	 * @return the configSourceId for the associated ConfigSource.
+	 */
+	public String getConfigSourceId() {
+		return astrixTestContext.getConfigSourceId();
+	}
+
+	/**
+	 * @return the serviceUri for the associated service-registry.
+	 */
+	public String getServiceRegistryUri() {
+		return astrixTestContext.getServiceRegistryUri();
+	}
+
+	public void destroy() {
+		this.astrixTestContext.destroy();
+	}
+
+	/**
+	 * @see AstrixRuleContext#registerProxy(Class)
+	 *
+	 * @param service - The qualified bean type to register a proxy for
+	 */
+    public <T> void registerProxy(Class<T> service) {
+    	astrixTestContext.registerProxy(service);
     }
+
+	/**
+	 * @see AstrixRuleContext#registerProxy(Class)
+	 *
+	 * @param service - The qualified bean type to register a proxy for
+	 * @param qualifier - The qualifier of the bean type to register a proxy for
+	 */
+    public <T> void registerProxy(Class<T> service, String qualifier) {
+        astrixTestContext.registerProxy(service, qualifier);
+    }
+
+	/**
+     * Sets the proxy state for a given proxy in the service registry. If no proxy has bean registered
+     * before it will be created with the given initial state,
+     * see {@link AstrixRuleContext#registerProxy(Class)} for more details.
+     *
+     * When a service-provider is proxied it allows fast switching of the given provider between
+     * different test-runs, without restarting the entire test environment.
+	 *
+	 * @param type - The api to register a provider for.
+	 * @param mock - The instance to delegate all invocations to the given api to. Might be null in which case a ServiceUnavailableException will be thrown when the service is invoked.
+	 */
+	public <T> void setProxyState(final Class<T> type, final T mock) {
+		astrixTestContext.setProxyState(type, mock);
+	}
+
+    /**
+     * Sets the proxy state for a given proxy in the service registry. If no proxy has bean registered
+     * before it will be created with the given initial state,
+     * see {@link AstrixRuleContext#registerProxy(Class)} for more details.
+     *
+     * When a service-provider is proxied it allows fast switching of the given provider between
+     * different test-runs, without restarting the entire test environment.
+     *
+     * @param type - The api to register a provider for.
+     * @param qualifier - The qualifier for the service bean to register a provider for
+     * @param mock - The instance to delegate all invocations to the given api to. Might be null in which case a ServiceUnavailableException will be thrown when the service is invoked.
+     *
+     */
+    public <T> void setProxyState(final Class<T> type, final String qualifier, final T mock) {
+		astrixTestContext.setProxyState(type, qualifier, mock);
+    }
+
+	public void resetProxies() {
+		astrixTestContext.resetProxies();
+	}
+
+	public <T> T waitForBean(Class<T> type, long timeoutMillis) throws InterruptedException {
+		return astrixTestContext.waitForBean(type, timeoutMillis);
+	}
+
+	public <T> T waitForBean(Class<T> type, String qualifier, long timeoutMillis) throws InterruptedException {
+		return astrixTestContext.waitForBean(type, qualifier, timeoutMillis);
+	}
+
+	public Astrix getAstrix() {
+		return astrixTestContext.getAstrixContext();
+	}
+
+	public AstrixContext getAstrixContext() {
+		return astrixTestContext.getAstrixContext();
+	}
+
+	public <T extends TestApi> T getTestApi(Class<T> testApi) {
+		return astrixTestContext.getTestApi(testApi);
+	}
+
+	public void resetTestApis() {
+		this.astrixTestContext.resetTestApis();
+	}
+
+	<T> T getBean(Class<T> serviceBean) {
+		return astrixTestContext.getBean(serviceBean);
+	}
+
+	<T> T getBean(Class<T> serviceBean, String qualifier) {
+		return astrixTestContext.getBean(serviceBean, qualifier);
+	}
+
+	public void setConfigurationProperty(String settingName, String value) {
+		astrixTestContext.setConfigurationProperty(settingName, value);
+	}
 
 }
 
