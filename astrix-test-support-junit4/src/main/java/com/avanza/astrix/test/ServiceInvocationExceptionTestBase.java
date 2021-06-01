@@ -22,7 +22,7 @@ import org.reflections.Reflections;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
@@ -43,10 +43,6 @@ public abstract class ServiceInvocationExceptionTestBase {
 				.forEach(this::assertIsServiceInvocationException);
 	}
 
-	private void assertIsServiceInvocationException(Class<? extends RuntimeException> exceptionClass) {
-		assertThat(exceptionClass, instanceOf(ServiceInvocationException.class));
-	}
-
 	@Test
 	public void subtypesOfServiceInvocationExceptionImplementRecreateOnClientSideMethod() throws Exception {
 		Set<Class<? extends ServiceInvocationException>> exceptions = reflections.getSubTypesOf(ServiceInvocationException.class);
@@ -57,5 +53,9 @@ public abstract class ServiceInvocationExceptionTestBase {
 
 			assertEquals("Exception class must implement 'recreateOnClientSide' self.", declaringClass, exceptionClass);
 		}
+	}
+
+	private void assertIsServiceInvocationException(Class<? extends RuntimeException> exceptionClass) {
+		assertThat(ServiceInvocationException.class.isAssignableFrom(exceptionClass), is(true));
 	}
 }
