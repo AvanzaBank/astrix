@@ -15,7 +15,7 @@
  */
 package com.avanza.astrix.test;
 
-import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.Astrix;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.platform.commons.support.AnnotationSupport;
@@ -94,7 +94,7 @@ public class AstrixExtension implements ParameterResolver, BeforeAllCallback, Af
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         Class<?> parameterType = parameterContext.getParameter().getType();
-        return AstrixContext.class.isAssignableFrom(parameterType) || TestApi.class.isAssignableFrom(parameterType);
+        return Astrix.class.isAssignableFrom(parameterType) || TestApi.class.isAssignableFrom(parameterType);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class AstrixExtension implements ParameterResolver, BeforeAllCallback, Af
         if (AstrixTestContext.class.isAssignableFrom(parameterType)) {
             return astrixTestContext;
         }
-        if (AstrixContext.class.isAssignableFrom(parameterType)) {
+        if (Astrix.class.isAssignableFrom(parameterType)) {
             return astrixTestContext.getAstrixContext();
         }
         if (TestApi.class.isAssignableFrom(parameterType)) {

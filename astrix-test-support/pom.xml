@@ -10,12 +10,10 @@
     <artifactId>astrix-test-support</artifactId>
     <name>${project.artifactId}</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
+    <distributionManagement>
+        <relocation>
             <artifactId>astrix-test-support-junit4</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
+        </relocation>
+    </distributionManagement>
 
 </project>
