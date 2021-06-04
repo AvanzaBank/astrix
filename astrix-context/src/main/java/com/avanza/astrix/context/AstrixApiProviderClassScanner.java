@@ -15,20 +15,26 @@
  */
 package com.avanza.astrix.context;
 
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
 import org.reflections.Reflections;
+import org.reflections.ReflectionsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.beans.publish.ApiProviders;
+
 /**
  * Uses classpath scanning to find api-providers. <p>
  * 
@@ -37,9 +43,9 @@ import com.avanza.astrix.beans.publish.ApiProviders;
  */
 public class AstrixApiProviderClassScanner implements ApiProviders {
 
-	private final Logger log = LoggerFactory.getLogger(AstrixApiProviderClassScanner.class);
+	private static final Logger log = LoggerFactory.getLogger(AstrixApiProviderClassScanner.class);
 	
-	private static final Map<String, List<ApiProviderClass>> apiProvidersByBasePackage = new ConcurrentHashMap<>();
+	private static final ConcurrentMap<String, List<ApiProviderClass>> apiProvidersByBasePackage = new ConcurrentHashMap<>();
 	private final List<String> basePackages = new ArrayList<>();
 	private final List<Class<? extends Annotation>> providerAnnotationsToScanFor;
 	
@@ -64,17 +70,15 @@ public class AstrixApiProviderClassScanner implements ApiProviders {
 		}
 		List<Class<? extends Annotation>> allProviderAnnotationTypes = getAllProviderAnnotationTypes();
 		log.debug("Running scan for api-providers of types={}", allProviderAnnotationTypes);
-		List<ApiProviderClass> discoveredApiPRoviders = new ArrayList<>();
+
 		Reflections reflections = new Reflections(basePackage);
-		for (Class<? extends Annotation> apiAnnotation : allProviderAnnotationTypes) { 
-			for (Class<?> providerClass : reflections.getTypesAnnotatedWith(apiAnnotation)) {
-				ApiProviderClass provider = ApiProviderClass.create(providerClass);
-				log.debug("Found api provider {}", provider);
-				discoveredApiPRoviders.add(provider);
-			}
-		}
-		apiProvidersByBasePackage.put(basePackage, discoveredApiPRoviders);
-		return discoveredApiPRoviders.stream();
+		List<ApiProviderClass> discoveredApiProviders = allProviderAnnotationTypes.stream()
+				.flatMap(apiAnnotation -> getTypesAnnotatedWith(reflections, apiAnnotation).stream())
+				.map(ApiProviderClass::create)
+				.peek(provider -> log.debug("Found api provider {}", provider))
+				.collect(toList());
+		apiProvidersByBasePackage.put(basePackage, discoveredApiProviders);
+		return discoveredApiProviders.stream();
 	}
 	
 	void addBasePackage(String basePackage) {
@@ -85,4 +89,13 @@ public class AstrixApiProviderClassScanner implements ApiProviders {
 		return providerAnnotationsToScanFor;
 	}
 
+	private static Set<Class<?>> getTypesAnnotatedWith(Reflections reflections, Class<? extends Annotation> annotation) {
+		try {
+			return reflections.getTypesAnnotatedWith(annotation);
+		} catch (ReflectionsException exception) {
+			// Reflections (0.9.12) throws ReflectionsException if nothing found in package
+			log.trace("Could not retrieve types annotated with {}", annotation, exception);
+			return emptySet();
+		}
+	}
 }

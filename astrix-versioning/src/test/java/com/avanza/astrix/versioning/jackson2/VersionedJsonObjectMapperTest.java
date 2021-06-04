@@ -15,22 +15,22 @@
  */
 package com.avanza.astrix.versioning.jackson2;
 
-import static org.junit.Assert.assertEquals;
+import com.avanza.astrix.versioning.jackson2.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.avanza.astrix.versioning.jackson2.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.reflect.TypeToken;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 
 
 public class VersionedJsonObjectMapperTest {
 	
 	List<AstrixJsonApiMigration> apiMigrations = new ArrayList<>();
-	
+
 	@Test
 	public void canSerializerAndDeserializeObjectsUsingObjectMapper() throws Exception {
 		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
@@ -75,7 +75,6 @@ public class VersionedJsonObjectMapperTest {
 	}
 	
 	@Test
-	@SuppressWarnings("serial")
 	public void deserializesGenericTypes() throws Exception {
 		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
 		VersionedJsonObjectMapper objectMapper = objectMapperBuilder.build();
@@ -85,7 +84,7 @@ public class VersionedJsonObjectMapperTest {
 		testPojos.add(testPojo1);
 		String jsonPojo = objectMapper.serialize(testPojos, 1);
 		
-		TypeToken<List<TestPojoV1>> genericListType = new TypeToken<List<TestPojoV1>>() {};
+		TypeReference<List<TestPojoV1>> genericListType = new TypeReference<>() {};
 		
 		List<TestPojoV1> deserializedPojos = objectMapper.deserialize(jsonPojo, genericListType.getType(), 1);
 		assertEquals(1, deserializedPojos.size());
@@ -93,7 +92,6 @@ public class VersionedJsonObjectMapperTest {
 	}
 
 	@Test
-	@SuppressWarnings("serial")
 	public void migratesGenericTypes() throws Exception {
 		apiMigrations.add(new TestPojoV1ToV2Migration());
 		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
@@ -104,7 +102,7 @@ public class VersionedJsonObjectMapperTest {
 		testPojos.add(testPojo1);
 		String jsonPojo = objectMapper.serialize(testPojos, 1);
 		
-		TypeToken<List<TestPojoV2>> genericListType = new TypeToken<List<TestPojoV2>>() {};
+		TypeReference<List<TestPojoV2>> genericListType = new TypeReference<>() {};
 		
 		List<TestPojoV2> deserializedPojos = objectMapper.deserialize(jsonPojo, genericListType.getType(), 1);
 		assertEquals(1, deserializedPojos.size());
@@ -112,7 +110,7 @@ public class VersionedJsonObjectMapperTest {
 		assertEquals("defaultBar", deserializedPojos.get(0).getBar());
 	}
 	
-	private final class TestPojoV1ToV2Migration implements AstrixJsonApiMigration {
+	private static final class TestPojoV1ToV2Migration implements AstrixJsonApiMigration {
 		@Override
 		public AstrixJsonMessageMigration<?>[] getMigrations() {
 			return new AstrixJsonMessageMigration<?>[] {
