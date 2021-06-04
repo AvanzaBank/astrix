@@ -15,20 +15,25 @@
  */
 package com.avanza.astrix.context;
 
-import com.avanza.astrix.beans.publish.ApiProviderClass;
-import com.avanza.astrix.beans.publish.ApiProviders;
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
+
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Stream;
+
 import org.reflections.Reflections;
 import org.reflections.ReflectionsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.annotation.Annotation;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
-
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
+import com.avanza.astrix.beans.publish.ApiProviderClass;
+import com.avanza.astrix.beans.publish.ApiProviders;
 
 /**
  * Uses classpath scanning to find api-providers. <p>
@@ -38,9 +43,9 @@ import static java.util.stream.Collectors.toList;
  */
 public class AstrixApiProviderClassScanner implements ApiProviders {
 
-	private final Logger log = LoggerFactory.getLogger(AstrixApiProviderClassScanner.class);
+	private static final Logger log = LoggerFactory.getLogger(AstrixApiProviderClassScanner.class);
 	
-	private static final Map<String, List<ApiProviderClass>> apiProvidersByBasePackage = new ConcurrentHashMap<>();
+	private static final ConcurrentMap<String, List<ApiProviderClass>> apiProvidersByBasePackage = new ConcurrentHashMap<>();
 	private final List<String> basePackages = new ArrayList<>();
 	private final List<Class<? extends Annotation>> providerAnnotationsToScanFor;
 	
@@ -84,7 +89,7 @@ public class AstrixApiProviderClassScanner implements ApiProviders {
 		return providerAnnotationsToScanFor;
 	}
 
-	private Set<Class<?>> getTypesAnnotatedWith(Reflections reflections, Class<? extends Annotation> annotation) {
+	private static Set<Class<?>> getTypesAnnotatedWith(Reflections reflections, Class<? extends Annotation> annotation) {
 		try {
 			return reflections.getTypesAnnotatedWith(annotation);
 		} catch (ReflectionsException exception) {
