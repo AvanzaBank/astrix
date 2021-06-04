@@ -39,9 +39,10 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-slf4j-impl</artifactId>
-			<scope>test</scope>
+			<!-- @GuardedBy, only used at compile time -->
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -53,15 +54,15 @@
 		</dependency>
 		<dependency>
 			<groupId>org.gigaspaces</groupId>
-			<artifactId>xap-openspaces</artifactId>			
+			<artifactId>xap-openspaces</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.gigaspaces</groupId>
-			<artifactId>xap-near-cache-spring</artifactId>			
+			<artifactId>xap-near-cache-spring</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.gigaspaces</groupId>
-			<artifactId>xap-datagrid</artifactId>			
+			<artifactId>xap-datagrid</artifactId>
 		</dependency>
 
 		<!-- TEST -->
@@ -73,6 +74,11 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
