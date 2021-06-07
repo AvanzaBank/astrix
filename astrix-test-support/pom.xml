@@ -13,6 +13,7 @@
     <distributionManagement>
         <relocation>
             <artifactId>astrix-test-support-junit4</artifactId>
+            <message>The content of this artifact has been moved to astrix-test-support-junit4</message>
         </relocation>
     </distributionManagement>
 
