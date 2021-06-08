@@ -15,16 +15,6 @@
  */
 package com.avanza.astrix.service.registry.client;
 
-import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationResult;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.util.function.Supplier;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryServiceProvider;
@@ -38,17 +28,24 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationResult;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
-public class ServiceRegistryLookupTest {
+class ServiceRegistryLookupTest {
 	
 	private static final long UNUSED_LEASE = 10_000L;
+	private final InMemoryServiceRegistry fakeServiceRegistry = new InMemoryServiceRegistry();
 	private ServiceRegistryExporterClient serviceRegistryExporterClient;
 	private AstrixContext context;
-	private InMemoryServiceRegistry fakeServiceRegistry = new InMemoryServiceRegistry();
-	
-	@Before
-	public void setup() {
+
+	@BeforeEach
+	void setup() {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		configurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 10);
@@ -61,7 +58,7 @@ public class ServiceRegistryLookupTest {
 	}
 	
 	@Test
-	public void lookupService_serviceAvailableInRegistry_ServiceIsImmediatlyBound() throws Exception {
+	void lookupService_serviceAvailableInRegistry_ServiceIsImmediatelyBound() {
 		final String objectId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		serviceRegistryExporterClient.register(GreetingService.class, DirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
 		
@@ -70,23 +67,14 @@ public class ServiceRegistryLookupTest {
 	}
 	
 	@Test
-	public void lookupService_ServiceAvailableInRegistryButItsNotPossibleToBindToIt_ServiceIsBoundWhenServiceBecamesAvailable() throws Exception {
+	void lookupService_ServiceAvailableInRegistryButItsNotPossibleToBindToIt_ServiceIsBoundWhenServiceBecamesAvailable() throws Exception {
 		final String objectId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		final GreetingService dummyService = context.getBean(GreetingService.class);
-		
-		try {
-			dummyService.hello("kalle");
-			fail("Excpected service not to be registered in registry");
-		} catch (ServiceUnavailableException e) {
-		}
+
+		assertThrows(ServiceUnavailableException.class, () -> dummyService.hello("kalle"), "Expected service not to be registered in registry");
 
 		serviceRegistryExporterClient.register(GreetingService.class, DirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
-		assertEventually(serviceInvocationResult(new Supplier<String>() {
-			@Override
-			public String get() {
-				return dummyService.hello("kalle");
-			}
-		}, equalTo("hello: kalle")));
+		assertEventually(serviceInvocationResult(() -> dummyService.hello("kalle"), equalTo("hello: kalle")));
 	}
 	
 	private void assertEventually(Probe probe) throws InterruptedException {
@@ -106,7 +94,7 @@ public class ServiceRegistryLookupTest {
 	
 	public static class GreetingServiceImpl implements GreetingService {
 		
-		private String greeting;
+		private final String greeting;
 
 		public GreetingServiceImpl(String greeting) {
 			this.greeting = greeting;

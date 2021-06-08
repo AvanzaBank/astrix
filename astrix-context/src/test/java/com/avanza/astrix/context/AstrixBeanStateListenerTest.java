@@ -15,24 +15,24 @@
  */
 package com.avanza.astrix.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Library;
 import com.avanza.astrix.provider.core.Service;
+import org.junit.jupiter.api.Test;
 
-public class AstrixBeanStateListenerTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class AstrixBeanStateListenerTest {
 	
-	TestAstrixConfigurer testAstrixConfigurer = new TestAstrixConfigurer();
+	private final TestAstrixConfigurer testAstrixConfigurer = new TestAstrixConfigurer();
 	
 	@Test
-	public void waitForBean_beanIsLibrary_waitsUntilAllTransitiveDependenciesAreBeBound() throws Exception {
+	void waitForBean_beanIsLibrary_waitsUntilAllTransitiveDependenciesAreBeBound() throws Exception {
 		String myServiceId = DirectComponent.register(MyService.class, new MyServiceImpl());
 		testAstrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
 		testAstrixConfigurer.registerApiProvider(MyLibraryProvider.class);
@@ -41,13 +41,8 @@ public class AstrixBeanStateListenerTest {
 		
 		final MyClient myClient = astrix.getBean(MyClient.class);
 		
-		try {
-			myClient.hello("kalle");
-			fail("Expected service to be unbound");
-		} catch (ServiceUnavailableException e) {
+		assertThrows(ServiceUnavailableException.class, () -> myClient.hello("kalle"), "Expected service to be unbound");
 
-		}
-		
 		// Make myService available in configuration => Allows bean to be bound
 		testAstrixConfigurer.set("myService", DirectComponent.getServiceUri(myServiceId));
 		
@@ -56,7 +51,7 @@ public class AstrixBeanStateListenerTest {
 		
 	}
 	
-	public static interface MyService {
+	public interface MyService {
 		String hello(String msg);
 	}
 	
@@ -67,12 +62,12 @@ public class AstrixBeanStateListenerTest {
 		}
 	}
 	
-	public static interface MyClient {
+	public interface MyClient {
 		String hello(String msg);
 	}
 	
 	public static class MyClientImpl implements MyClient {
-		private MyService service;
+		private final MyService service;
 		public MyClientImpl(MyService service) {
 			this.service = service;
 		}
@@ -82,7 +77,7 @@ public class AstrixBeanStateListenerTest {
 		}
 	}
 	
-	@com.avanza.astrix.provider.core.AstrixApiProvider
+	@AstrixApiProvider
 	public static class MyLibraryProvider {
 		
 		@Library
@@ -91,12 +86,12 @@ public class AstrixBeanStateListenerTest {
 		}
 	}
 	
-	@com.avanza.astrix.provider.core.AstrixApiProvider
+	@AstrixApiProvider
 	public interface MyServiceProvider {
 		
 		@AstrixConfigDiscovery("myService")
 		@Service
-		MyService myServcie();
+		MyService myService();
 	}
 	
 	

@@ -15,23 +15,6 @@
  */
 package com.avanza.astrix.modules.test;
 
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import javax.annotation.PreDestroy;
-
-import org.hamcrest.Matchers;
-import org.junit.Test;
-
 import com.avanza.astrix.modules.AstrixInject;
 import com.avanza.astrix.modules.CircularDependency;
 import com.avanza.astrix.modules.MissingBeanBinding;
@@ -43,13 +26,29 @@ import com.avanza.astrix.modules.ModuleNameConflict;
 import com.avanza.astrix.modules.Modules;
 import com.avanza.astrix.modules.ModulesConfigurer;
 import com.avanza.astrix.modules.StrategyProvider;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+
+import javax.annotation.PreDestroy;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
-public class ModulesTest {
+class ModulesTest {
 	
 	
 	@Test
-	public void exportedBeansAreAccessibleOutsideTheModule() throws Exception {
+	void exportedBeansAreAccessibleOutsideTheModule() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -63,7 +62,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void itsPossibleToBindToInstancesCreatedOutsideTheModuleSystem() throws Exception {
+	void itsPossibleToBindToInstancesCreatedOutsideTheModuleSystem() {
 		final Ping ping = new Ping() {
 			@Override
 			public String ping(String msg) {
@@ -85,8 +84,8 @@ public class ModulesTest {
 		assertSame(ping, exportedPing);
 	}
 	
-	@Test(expected = MissingBeanBinding.class)
-	public void throwsMissingBeanBindingForDependencyToNonBoundAbstractTypes() throws Exception {
+	@Test
+	void throwsMissingBeanBindingForDependencyToNonBoundAbstractTypes() {
 		// A -> B
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
@@ -97,12 +96,12 @@ public class ModulesTest {
 			}
 		});
 		Modules modules = modulesConfigurer.configure();
-		modules.getInstance(AType.class);
+		assertThrows(MissingBeanBinding.class, () -> modules.getInstance(AType.class));
 	}
 	
 	
 	@Test
-	public void createdBeansAreCached() throws Exception {
+	void createdBeansAreCached() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -117,8 +116,8 @@ public class ModulesTest {
 		assertSame(ping1, ping2);
 	}
 	
-	@Test(expected = MissingProvider.class)
-	public void itsNotAllowedToPullNonExportedInstancesFromAModule() throws Exception {
+	@Test
+	void itsNotAllowedToPullNonExportedInstancesFromAModule() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -128,11 +127,11 @@ public class ModulesTest {
 			}
 		});
 		Modules modules = modulesConfigurer.configure();
-		modules.getInstance(NormalPingDriver.class);
+		assertThrows(MissingProvider.class, () -> modules.getInstance(NormalPingDriver.class));
 	}
 	
-	@Test(expected = ModuleNameConflict.class)
-	public void itsNotAllowedToRegisterMultipleModulesWithSameName() throws Exception {
+	@Test
+	void itsNotAllowedToRegisterMultipleModulesWithSameName() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -143,7 +142,7 @@ public class ModulesTest {
 				return "a";
 			}
 		});
-		modulesConfigurer.register(new Module() {
+		assertThrows(ModuleNameConflict.class, () -> modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext context) {
 			}
@@ -151,11 +150,11 @@ public class ModulesTest {
 			public String name() {
 				return "a";
 			}
-		});
+		}));
 	}
 	
 	@Test
-	public void itsPossibleToImportBeansExportedByOtherModules() throws Exception {
+	void itsPossibleToImportBeansExportedByOtherModules() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -177,7 +176,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void destroyingAModulesInstanceInvokesDestroyAnnotatedMethodsExactlyOnce() throws Exception {
+	void destroyingAModulesInstanceInvokesDestroyAnnotatedMethodsExactlyOnce() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -211,7 +210,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void multipleExportedBeansOfSameType_UsesFirstProvider() throws Exception {
+	void multipleExportedBeansOfSameType_UsesFirstProvider() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -234,7 +233,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void itsPossibleToImportAllExportedBeansOfAGivenType() throws Exception {
+	void itsPossibleToImportAllExportedBeansOfAGivenType() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -264,7 +263,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void injectingAllBeansOfImportedTypesWithNoRegisteredProviders() throws Exception {
+	void injectingAllBeansOfImportedTypesWithNoRegisteredProviders() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -280,7 +279,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void multipleExportedBeansOfImportedType_UsesFirstRegisteredProvider() throws Exception {
+	void multipleExportedBeansOfImportedType_UsesFirstRegisteredProvider() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -310,7 +309,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void getBeansOfTypeReturnsAllExportedBeansOfAGivenType() throws Exception {
+	void getBeansOfTypeReturnsAllExportedBeansOfAGivenType() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -342,9 +341,9 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void beanPostProcessorAreAppliedToAllCreatedBeans() throws Exception {
+	void beanPostProcessorAreAppliedToAllCreatedBeans() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
-		final BlockingQueue<Object> postProcessedBeans = new LinkedBlockingQueue<Object>();
+		final BlockingQueue<Object> postProcessedBeans = new LinkedBlockingQueue<>();
 		modulesConfigurer.register(new Module() {
 			@Override
 			public void prepare(ModuleContext moduleContext) {
@@ -365,7 +364,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void setterInjectedDependencies() throws Exception {
+	void setterInjectedDependencies() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -412,7 +411,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void includesBoundComponentsInSameModuleWhenInjectingListOfAllInstancesOfGivenType() throws Exception {
+	void includesBoundComponentsInSameModuleWhenInjectingListOfAllInstancesOfGivenType() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -429,7 +428,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void exportingMultipleInterfaceFromSameInstance() throws Exception {
+	void exportingMultipleInterfaceFromSameInstance() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -453,7 +452,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void strategiesSupport() throws Exception {
+	void strategiesSupport() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -473,7 +472,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void registerDefaultDoesNotOverridePreviouslyRegisteredStrategy() throws Exception {
+	void registerDefaultDoesNotOverridePreviouslyRegisteredStrategy() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -494,7 +493,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void registerOverridesPreviouslyRegisteredStrategy() throws Exception {
+	void registerOverridesPreviouslyRegisteredStrategy() {
 		ModulesConfigurer modulesConfigurer = new ModulesConfigurer();
 		modulesConfigurer.register(new Module() {
 			@Override
@@ -513,7 +512,7 @@ public class ModulesTest {
 	}
 	
 	@Test
-	public void circularDependenciesAreAllowedOnAModularLevel() throws Exception {
+	void circularDependenciesAreAllowedOnAModularLevel() {
 		/*
 		 * Class dependencies contains no cycles:
 		 * A -> B (ModA)
@@ -561,8 +560,8 @@ public class ModulesTest {
 		modules.getInstance(AType.class);
 	}
 	
-	@Test(expected = CircularDependency.class)
-	public void circularDependenciesAreDetectedBetweenModules() throws Exception {
+	@Test
+	void circularDependenciesAreDetectedBetweenModules() {
 		/*
 		 * A -> B (ModA)
 		 * B -> A (ModB)
@@ -599,11 +598,11 @@ public class ModulesTest {
 		});
 		Modules modules = modulesConfigurer.configure();
 		
-		modules.getInstance(AType.class);
+		assertThrows(CircularDependency.class, () -> modules.getInstance(AType.class));
 	}
 	
-	@Test(expected = CircularDependency.class)
-	public void circularDependenciesAreNotAllowedOnInsideAModule() throws Exception {
+	@Test
+	void circularDependenciesAreNotAllowedOnInsideAModule() {
 		/*
 		 * Class dependencies contains cycle:
 		 * A -> B, B -> A
@@ -624,7 +623,7 @@ public class ModulesTest {
 			}
 		});
 		Modules modules = modulesConfigurer.configure();
-		modules.getInstance(BType.class);
+		assertThrows(CircularDependency.class, () -> modules.getInstance(BType.class));
 	}
 	
 	public interface AType {
@@ -673,7 +672,7 @@ public class ModulesTest {
 		}
 	}
 	
-	public static class C implements CType  {
+	private static class C implements CType  {
 	}
 	
 	public static class SuperPing implements Ping, PingCollector {
@@ -797,7 +796,7 @@ public class ModulesTest {
 	
 	public static class PingWithInternalDriver implements Ping {
 		
-		private NormalPingDriver pingDriver;
+		private final NormalPingDriver pingDriver;
 		
 		public PingWithInternalDriver(NormalPingDriver pingDependency) {
 			this.pingDriver = pingDependency;
@@ -812,7 +811,7 @@ public class ModulesTest {
 	
 	public static class PingWithImportedDriver implements Ping {
 		
-		private PingDriver pingDriver;
+		private final PingDriver pingDriver;
 		
 		public PingWithImportedDriver(PingDriver pingdriver) {
 			this.pingDriver = pingdriver;

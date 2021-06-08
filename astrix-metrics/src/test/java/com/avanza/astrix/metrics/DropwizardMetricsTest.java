@@ -15,33 +15,31 @@
  */
 package com.avanza.astrix.metrics;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import java.util.function.Supplier;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.context.metrics.MetricsSpi;
 import com.avanza.astrix.context.metrics.TimerSnaphot;
 import com.avanza.astrix.context.metrics.TimerSpi;
 import com.avanza.astrix.core.function.CheckedCommand;
-
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import rx.Observable;
 
-public class DropwizardMetricsTest {
+import java.util.function.Supplier;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class DropwizardMetricsTest {
 
 	
 	private DropwizardMetrics dropwizardMetrics;
 	private AstrixApplicationContext astrixContext;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		astrixContext = (AstrixApplicationContext) new TestAstrixConfigurer().configure();
 		MetricsSpi metricsSpi = astrixContext.getInstance(MetricsSpi.class);
 		
@@ -50,13 +48,13 @@ public class DropwizardMetricsTest {
 		dropwizardMetrics = (DropwizardMetrics) metricsSpi;
 	}
 	
-	@After
-	public void cleanup() throws Exception {
+	@AfterEach
+	void cleanup() throws Exception {
 		astrixContext.close();
 	}
 	
 	@Test
-	public void timeExecution() throws Throwable {
+	void timeExecution() throws Throwable {
 
 		TimerSpi timer = dropwizardMetrics.createTimer();
 		
@@ -75,7 +73,7 @@ public class DropwizardMetricsTest {
 	
 
 	@Test
-	public void timeObservable() throws Throwable {
+	void timeObservable() {
 		TimerSpi timer = dropwizardMetrics.createTimer();
 		
 		Supplier<Observable<String>> observable = timer.timeObservable(() -> Observable.unsafeCreate(subscriber -> {
@@ -92,7 +90,7 @@ public class DropwizardMetricsTest {
 
 		TimerSnaphot timerSnapshot = timer.getSnapshot();
 		assertEquals(1, timerSnapshot.getCount());
-		// Should meassure execution time roughly equal to 10 ms
+		// Should measure execution time roughly equal to 10 ms
 		assertThat(timerSnapshot.getMax(), greaterThan(8D));
 	}
 

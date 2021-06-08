@@ -19,7 +19,7 @@ import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
 import com.avanza.astrix.gs.AsyncFutureTypeHandler;
 import com.gigaspaces.async.AsyncFuture;
 
-public class AsyncFutureReactiveTypeHandlerTest extends ReactiveTypeHandlerContract<AsyncFuture<Object>> {
+class AsyncFutureReactiveTypeHandlerTest extends ReactiveTypeHandlerContract<AsyncFuture<Object>> {
 
 	@Override
 	protected ReactiveTypeHandlerPlugin<AsyncFuture<Object>> newReactiveTypeHandler() {

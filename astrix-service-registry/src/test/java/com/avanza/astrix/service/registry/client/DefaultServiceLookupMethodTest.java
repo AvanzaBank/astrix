@@ -15,10 +15,6 @@
  */
 package com.avanza.astrix.service.registry.client;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
@@ -30,15 +26,19 @@ import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class DefaultServiceLookupMethodTest {
 	
 	private static final long UNUSED_LEASE = 10_000L;
+	private final InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 	private AstrixContext context;
-	private InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
-	
-	@Before
+
+	@BeforeEach
 	public void setup() {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.registerApiProvider(GreetingApiProviderNoLookupDefined.class);
@@ -49,7 +49,7 @@ public class DefaultServiceLookupMethodTest {
 	}
 	
 	@Test
-	public void lookupService_serviceAvailableInRegistry_ServiceIsImmediatlyBound() throws Exception {
+	public void lookupService_serviceAvailableInRegistry_ServiceIsImmediatelyBound() {
 		final String objectId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		
 		ServiceRegistryExporterClient serviceRegistryClient = new ServiceRegistryExporterClient(serviceRegistry, "default", "FooInstanceId");
@@ -73,7 +73,7 @@ public class DefaultServiceLookupMethodTest {
 	
 	public static class GreetingServiceImpl implements GreetingService {
 		
-		private String greeting;
+		private final String greeting;
 
 		public GreetingServiceImpl(String greeting) {
 			this.greeting = greeting;

@@ -15,39 +15,38 @@
  */
 package com.avanza.astrix.beans.factory;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
-
-public class AstrixBeanFactoryTest {
+class AstrixBeanFactoryTest {
 	
 	
-	@Test(expected = CircularDependency.class)
-	public void detectsCircularDependencies1() throws Exception {
+	@Test
+	void detectsCircularDependencies1() {
 		/*    __________________
 		 *   |                  |
 		 *   v                  |
 		 * Ping --> Pong --> PingPong
 		 */
-		SimpleAstrixFactoryBean<Ping> pingFactory = new SimpleAstrixFactoryBean<Ping>(Ping.class) {
+		SimpleAstrixFactoryBean<Ping> pingFactory = new SimpleAstrixFactoryBean<>(Ping.class) {
 			@Override
 			public Ping create(AstrixBeans context) {
 				context.getBean(beanKey(Pong.class));
 				return new Ping();
 			}
 		};
-		SimpleAstrixFactoryBean<Pong> pongFactory = new SimpleAstrixFactoryBean<Pong>(Pong.class) {
+		SimpleAstrixFactoryBean<Pong> pongFactory = new SimpleAstrixFactoryBean<>(Pong.class) {
 			@Override
 			public Pong create(AstrixBeans context) {
-				context.getBean(beanKey(PingPong.class)); 
+				context.getBean(beanKey(PingPong.class));
 				return new Pong();
 			}
 		};
-		SimpleAstrixFactoryBean<PingPong> pingpongFactory = new SimpleAstrixFactoryBean<PingPong>(PingPong.class) {
+		SimpleAstrixFactoryBean<PingPong> pingpongFactory = new SimpleAstrixFactoryBean<>(PingPong.class) {
 			@Override
 			public PingPong create(AstrixBeans context) {
 				context.getBean(beanKey(Ping.class));
@@ -60,33 +59,33 @@ public class AstrixBeanFactoryTest {
 		beanFactory.registerFactory(pongFactory);
 		beanFactory.registerFactory(pingpongFactory);
 		
-		beanFactory.getBean(beanKey(Ping.class));
+		assertThrows(CircularDependency.class, () -> beanFactory.getBean(beanKey(Ping.class)));
 	}
 	
-	@Test(expected = CircularDependency.class)
-	public void detectsCircularDependencies2() throws Exception {
+	@Test
+	void detectsCircularDependencies2() {
 		/*             _________
 		 *            |         |
 		 *            v         |
 		 * Ping --> Pong --> PingPong
 		 */
-		SimpleAstrixFactoryBean<Ping> pingFactory = new SimpleAstrixFactoryBean<Ping>(Ping.class) {
-			
-			
+		SimpleAstrixFactoryBean<Ping> pingFactory = new SimpleAstrixFactoryBean<>(Ping.class) {
+
+
 			@Override
 			public Ping create(AstrixBeans context) {
 				context.getBean(beanKey(Pong.class)); // "Depend on Pong";
 				return new Ping();
 			}
 		};
-		SimpleAstrixFactoryBean<Pong> pongFactory = new SimpleAstrixFactoryBean<Pong>(Pong.class) {
+		SimpleAstrixFactoryBean<Pong> pongFactory = new SimpleAstrixFactoryBean<>(Pong.class) {
 			@Override
 			public Pong create(AstrixBeans context) {
 				context.getBean(beanKey(PingPong.class)); // "Depend on PingPong";
 				return new Pong();
 			}
 		};
-		SimpleAstrixFactoryBean<PingPong> pingpongFactory = new SimpleAstrixFactoryBean<PingPong>(PingPong.class) {
+		SimpleAstrixFactoryBean<PingPong> pingpongFactory = new SimpleAstrixFactoryBean<>(PingPong.class) {
 			@Override
 			public PingPong create(AstrixBeans context) {
 				context.getBean(beanKey(Pong.class)); // "Depend on Pong";
@@ -99,18 +98,18 @@ public class AstrixBeanFactoryTest {
 		beanFactory.registerFactory(pongFactory);
 		beanFactory.registerFactory(pingpongFactory);
 		
-		beanFactory.getBean(beanKey(Ping.class));
+		assertThrows(CircularDependency.class, () -> beanFactory.getBean(beanKey(Ping.class)));
 	}
 	
 	@Test
-	public void nonCircularDependency() throws Exception {
+	void nonCircularDependency() {
 		/*    __________________
 		 *   |                  |
 		 *   |                  v
 		 * Ping --> Pong --> PingPong
 		 */
-		SimpleAstrixFactoryBean<Ping> pingFactory = new SimpleAstrixFactoryBean<Ping>(Ping.class) {
-			
+		SimpleAstrixFactoryBean<Ping> pingFactory = new SimpleAstrixFactoryBean<>(Ping.class) {
+
 			@Override
 			public Ping create(AstrixBeans context) {
 				context.getBean(beanKey(Pong.class));
@@ -118,14 +117,14 @@ public class AstrixBeanFactoryTest {
 				return new Ping();
 			}
 		};
-		SimpleAstrixFactoryBean<Pong> pongFactory = new SimpleAstrixFactoryBean<Pong>(Pong.class) {
+		SimpleAstrixFactoryBean<Pong> pongFactory = new SimpleAstrixFactoryBean<>(Pong.class) {
 			@Override
 			public Pong create(AstrixBeans context) {
 				context.getBean(beanKey(PingPong.class)); // "Depend on PingPong";
 				return new Pong();
 			}
 		};
-		SimpleAstrixFactoryBean<PingPong> pingpongFactory = new SimpleAstrixFactoryBean<PingPong>(PingPong.class) {
+		SimpleAstrixFactoryBean<PingPong> pingpongFactory = new SimpleAstrixFactoryBean<>(PingPong.class) {
 			@Override
 			public PingPong create(AstrixBeans context) {
 				return new PingPong();
@@ -141,14 +140,14 @@ public class AstrixBeanFactoryTest {
 	}
 	
 	@Test
-	public void cachesCreatedBeans() throws Exception {
+	void cachesCreatedBeans() {
 		/*    __________________
 		 *   |                  |
 		 *   |                  v
 		 * Ping --> Pong --> PingPong
 		 */
-		SimpleAstrixFactoryBean<Ping> pingFactory = new SimpleAstrixFactoryBean<Ping>(Ping.class) {
-			
+		SimpleAstrixFactoryBean<Ping> pingFactory = new SimpleAstrixFactoryBean<>(Ping.class) {
+
 			@Override
 			public Ping create(AstrixBeans context) {
 				context.getBean(beanKey(Pong.class));
@@ -156,14 +155,14 @@ public class AstrixBeanFactoryTest {
 				return new Ping();
 			}
 		};
-		SimpleAstrixFactoryBean<Pong> pongFactory = new SimpleAstrixFactoryBean<Pong>(Pong.class) {
+		SimpleAstrixFactoryBean<Pong> pongFactory = new SimpleAstrixFactoryBean<>(Pong.class) {
 			@Override
 			public Pong create(AstrixBeans context) {
 				context.getBean(beanKey(PingPong.class));
 				return new Pong();
 			}
 		};
-		SimpleAstrixFactoryBean<PingPong> pingpongFactory = new SimpleAstrixFactoryBean<PingPong>(PingPong.class) {
+		SimpleAstrixFactoryBean<PingPong> pingpongFactory = new SimpleAstrixFactoryBean<>(PingPong.class) {
 			@Override
 			public PingPong create(AstrixBeans context) {
 				creationCount++;
@@ -181,13 +180,13 @@ public class AstrixBeanFactoryTest {
 		assertEquals(1, pingpongFactory.creationCount);
 	}
 	
-	static class Ping {
+	private static class Ping {
 	}
 	
-	static class Pong {
+	private static class Pong {
 	}
 	
-	static class PingPong {
+	private static class PingPong {
 	}
 	
 	static <T> AstrixBeanKey<T> beanKey(Class<T> type) {
@@ -195,12 +194,12 @@ public class AstrixBeanFactoryTest {
 	}
 	
 	
-	static abstract class SimpleAstrixFactoryBean<T> implements StandardFactoryBean<T> {
+	abstract static class SimpleAstrixFactoryBean<T> implements StandardFactoryBean<T> {
 
-		private AstrixBeanKey<T> key;
+		private final AstrixBeanKey<T> key;
 		int creationCount = 0;
 		
-		public SimpleAstrixFactoryBean(Class<T> type) {
+		SimpleAstrixFactoryBean(Class<T> type) {
 			this.key = AstrixBeanKey.create(type, null);
 		}
 

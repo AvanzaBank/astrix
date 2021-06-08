@@ -23,60 +23,59 @@ import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
-import com.avanza.astrix.test.util.AutoCloseableRule;
-import com.avanza.gs.test.PuConfigurers;
-import com.avanza.gs.test.RunningPu;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import com.avanza.astrix.test.util.AutoCloseableExtension;
+import com.avanza.gs.test.junit5.PuConfigurers;
+import com.avanza.gs.test.junit5.RunningPu;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.util.Properties;
 
 import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
 
-public class TracingTests {
+class TracingTests {
 
-    @ClassRule
-    public static RunningPu serviceRegistrypu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
-            .numberOfPrimaries(1)
-            .numberOfBackups(0)
-            .beanProperties("space", new Properties() {{
+    @RegisterExtension
+    static RunningPu serviceRegistryPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
+                                                             .numberOfPrimaries(1)
+                                                             .numberOfBackups(0)
+                                                             .beanProperties("space", new Properties() {{
                 // Run lease-manager thread every 200 ms.
                 setProperty("space-config.lease_manager.expiration_time_interval", "200");
             }})
-            .startAsync(true)
-            .configure();
+                                                             .startAsync(true)
+                                                             .configure();
 
-    private static MapConfigSource config = new MapConfigSource() {{
-        set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
+    private static final MapConfigSource config = new MapConfigSource() {{
+        set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistryPu.getLookupGroupName());
         set(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
         set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 250);
     }};
 
-    @ClassRule
-    public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
+    @RegisterExtension
+    static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
             .numberOfPrimaries(1)
             .numberOfBackups(0)
             .contextProperty("configSourceId", GlobalConfigSourceRegistry.register(config))
             .startAsync(true)
             .configure();
 
-    @ClassRule
-    public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
+    @RegisterExtension
+    static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
             .numberOfPrimaries(1)
             .numberOfBackups(0)
             .contextProperty("configSourceId", GlobalConfigSourceRegistry.register(config))
             .startAsync(true)
             .configure();
 
-    @Rule
-    public AutoCloseableRule autoClosables = new AutoCloseableRule();
+    @RegisterExtension
+    AutoCloseableExtension autoClosables = new AutoCloseableExtension();
 
     private AstrixContext astrix;
 
-    @Before
-    public void before() {
+    @BeforeEach
+    void before() {
         AstrixConfigurer configurer = new AstrixConfigurer();
         configurer.enableFaultTolerance(true);
         configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 250);
@@ -86,7 +85,7 @@ public class TracingTests {
     }
 
     @Test
-    public void verifyTracing() throws InterruptedException {
+    void verifyTracing() throws InterruptedException {
         LunchService lunchService = astrix.waitForBean(LunchService.class, 5000);
 
         lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());

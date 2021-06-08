@@ -15,33 +15,33 @@
  */
 package com.avanza.astrix.beans.service;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.factory.MissingBeanProviderException;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class AsyncServiceTest {
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class AsyncServiceTest {
 	
 	private PingAsync ping;
 	private AstrixContext context;
 	private BlockingPing server = new BlockingPing();
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		SingleServiceComponent singleService = new SingleServiceComponent(PingAsync.class, server);
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
@@ -54,40 +54,39 @@ public class AsyncServiceTest {
 		ping = context.getBean(PingAsync.class);
 	}
 	
-	@After
-	public void after() {
+	@AfterEach
+	void after() {
 		context.destroy();
 	}
 	
 	@Test
-	public void asyncServiceInvocationShouldRunAsynchronouslyWithMethodCalll() throws Exception {
+	void asyncServiceInvocationShouldRunAsynchronouslyWithMethodCall() throws Exception {
 		Future<String> response = ping.ping("foo");
 		server.setResponse("bar");
 		assertEquals("bar", response.get());
 	}
 	
 	@Test
-	public void asyncServiceInvocationShouldStartSynchronouslyWithMethodCalll() throws Exception {
+	void asyncServiceInvocationShouldStartSynchronouslyWithMethodCall() throws Exception {
 		PingAsync ping = context.getBean(PingAsync.class);
 
 		@SuppressWarnings("unused")
 		Future<String> response = ping.ping("foo");
-		assertEquals("Service invocation should be started synchronously with method call. Last server invocation: ", 
-					 "foo", server.pingRequests.poll(1, TimeUnit.SECONDS));
+		assertEquals("foo", server.pingRequests.poll(1, SECONDS), "Service invocation should be started synchronously with method call. Last server invocation: ");
 	}
 	
-	@Test(expected = MissingBeanProviderException.class)
-	public void validatesAllThatAllMethodsInReactiveTypeAreReactive() throws Exception {
+	@Test
+	void validatesAllThatAllMethodsInReactiveTypeAreReactive() {
 		AstrixContext context = new TestAstrixConfigurer().registerApiProvider(BrokenPingApi.class)
 								  .configure();
-		context.getBean(BrokenPingAsync.class);
+		assertThrows(MissingBeanProviderException.class, () -> context.getBean(BrokenPingAsync.class));
 	}
 	
-	@Test(expected = MissingBeanProviderException.class)
-	public void validatesAllThatAllMethodsInReactiveTypeCorrespondToSyncVersion() throws Exception {
+	@Test
+	void validatesAllThatAllMethodsInReactiveTypeCorrespondToSyncVersion() {
 		AstrixContext context = new TestAstrixConfigurer().registerApiProvider(InconsistentPingApi.class)
 								  .configure();
-		context.getBean(InconsistentPingAsync.class);
+		assertThrows(MissingBeanProviderException.class, () -> context.getBean(InconsistentPingAsync.class));
 	}
 	
 	public static final class BlockingPing implements PingAsync {
@@ -98,10 +97,10 @@ public class AsyncServiceTest {
 		@Override
 		public CompletableFuture<String> ping(String msg) {
 			pingRequests.add(msg);
-			CompletableFuture<String> result = new CompletableFuture<String>();
+			CompletableFuture<String> result = new CompletableFuture<>();
 			new Thread(() -> {
 				try {
-					String response = pingResponses.poll(1, TimeUnit.SECONDS);
+					String response = pingResponses.poll(1, SECONDS);
 					if (response != null) {
 						result.complete(response);
 					} else {
@@ -142,25 +141,25 @@ public class AsyncServiceTest {
 	}
 	
 	public interface InconsistentPingAsync {
-		CompletableFuture<String> inconsistendPingMethod(String msg);
+		CompletableFuture<String> inconsistentPingMethod(String msg);
 	}
 	
 	@AstrixApiProvider
-	public static interface PingApi {
+	public interface PingApi {
 		@AstrixConfigDiscovery("pingUri")
 		@Service
 		Ping ping();
 	}
 	
 	@AstrixApiProvider
-	public static interface BrokenPingApi {
+	public interface BrokenPingApi {
 		@AstrixConfigDiscovery("pingUri")
 		@Service
 		BrokenPing ping();
 	}
 	
 	@AstrixApiProvider
-	public static interface InconsistentPingApi {
+	public interface InconsistentPingApi {
 		@AstrixConfigDiscovery("pingUri")
 		@Service
 		InconsistentPing ping();
@@ -168,8 +167,8 @@ public class AsyncServiceTest {
 	
 	private static class SingleServiceComponent implements ServiceComponent {
 		
-		private Class<?> api;
-		private Object instance;
+		private final Class<?> api;
+		private final Object instance;
 		
 		
 		public SingleServiceComponent(Class<?> api, Object instance) {
@@ -180,7 +179,7 @@ public class AsyncServiceTest {
 		@SuppressWarnings("unchecked")
 		@Override
 		public <T> BoundServiceBeanInstance<T> bind(ServiceDefinition<T> serviceDefinition, ServiceProperties serviceProperties) {
-			return new SimpleBoundServiceBeanInstance<T>((T) instance);
+			return new SimpleBoundServiceBeanInstance<>((T) instance);
 		}
 
 		@Override

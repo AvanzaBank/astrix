@@ -15,22 +15,21 @@
  */
 package com.avanza.astrix.beans.registry;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-public class ServiceRegistryV1ApiMigrationTest {
+class ServiceRegistryV1ApiMigrationTest {
 	
 	@Test
-	public void generatesApplicationInstanceIdFromQualifierAndApiTypeFor_AstrixServiceRegistryEntry_onVersion1() throws Exception {
+	void generatesApplicationInstanceIdFromQualifierAndApiTypeFor_AstrixServiceRegistryEntry_onVersion1() {
 		AstrixApplicationContext context = (AstrixApplicationContext) new TestAstrixConfigurer().configure();
 		ObjectSerializerFactory versioningPlugin = context.getInstance(ObjectSerializerFactory.class);
 		AstrixObjectSerializer objectSerializer = versioningPlugin.create(ObjectSerializerDefinition.versionedService(2, ServiceRegistryObjectSerializerConfigurer.class));

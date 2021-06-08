@@ -15,24 +15,8 @@
  */
 package com.avanza.astrix.remoting.server;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
-import java.util.stream.IntStream;
-
-import org.junit.Assert;
-
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
-import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
 import com.avanza.astrix.config.DynamicBooleanProperty;
@@ -54,13 +38,28 @@ import com.avanza.astrix.remoting.client.RemotingTransport;
 import com.avanza.astrix.remoting.client.RemotingTransportSpi;
 import com.avanza.astrix.remoting.client.RoutedServiceInvocationRequest;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
-
 import rx.Observable;
 import rx.Subscriber;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
+
+import static java.util.Collections.emptyList;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class AstrixRemotingDriver {
 	
-	private AstrixObjectSerializer objectSerializer = new JavaSerializationSerializer(1);
+	private final AstrixObjectSerializer objectSerializer = new JavaSerializationSerializer(1);
 	private final ConcurrentMap<MBeanKey, Object> mbeanByKey = new ConcurrentHashMap<>();
 	private final Metrics metrics = new Metrics() {
 		@Override
@@ -68,14 +67,14 @@ public class AstrixRemotingDriver {
 			return new Timer(new FakeTimer());
 		}
 	};
-	private MBeanExporter exporter = new MBeanExporter() {
+	private final MBeanExporter exporter = new MBeanExporter() {
 		@Override
 		public void registerMBean(Object mbean, String folder, String name) {
 			mbeanByKey.putIfAbsent(new MBeanKey(folder, name), mbean);
 		}
 	};
-	private ReactiveTypeConverter reactiveTypeConverter = new ReactiveTypeConverterImpl(Collections.<ReactiveTypeHandlerPlugin<?>>emptyList());
-	private DynamicBooleanProperty exportedServiceMetricsEnabled = new DynamicBooleanProperty(true);
+	private final ReactiveTypeConverter reactiveTypeConverter = new ReactiveTypeConverterImpl(emptyList());
+	private final DynamicBooleanProperty exportedServiceMetricsEnabled = new DynamicBooleanProperty(true);
 	private final AstrixTraceProvider astrixTraceProvider;
 
 	private AstrixServiceActivatorImpl[] partitions;
@@ -101,8 +100,8 @@ public class AstrixRemotingDriver {
 	public <T> T hasExportedMbeanOfType(Class<T> expectedType, MBeanKey key) {
 		
 		Object mbean = this.mbeanByKey.get(key);
-		Assert.assertNotNull("Expected an exported mbean with key: " + key, mbean);
-		Assert.assertTrue("Mbean type, expected: " + expectedType + ", got: " + mbean.getClass(), expectedType.isAssignableFrom(mbean.getClass()));
+		assertNotNull(mbean, "Expected an exported mbean with key: " + key);
+		assertTrue(expectedType.isAssignableFrom(mbean.getClass()), "Mbean type, expected: " + expectedType + ", got: " + mbean.getClass());
 		return expectedType.cast(mbean);
 	}
 	
@@ -143,7 +142,7 @@ public class AstrixRemotingDriver {
 	
 	private static class PartitionedDirectTransport implements RemotingTransportSpi {
 
-		private List<AstrixServiceActivatorImpl> partitions;
+		private final List<AstrixServiceActivatorImpl> partitions;
 		
 		public PartitionedDirectTransport(List<AstrixServiceActivatorImpl> partitions) {
 			this.partitions = partitions;
@@ -205,14 +204,14 @@ public class AstrixRemotingDriver {
 			if (serviceMethod.isAnnotationPresent(AstrixBroadcast.class)) {
 				return new Router() {
 					@Override
-					public RoutingKey getRoutingKey(Object[] args) throws Exception {
+					public RoutingKey getRoutingKey(Object[] args) {
 						return null; // Broadcast
 					}
 				};
 			}
 			return new Router() {
 				@Override
-				public RoutingKey getRoutingKey(Object[] args) throws Exception {
+				public RoutingKey getRoutingKey(Object[] args) {
 					return RoutingKey.create(1); // Constant routing
 				}
 				
@@ -222,7 +221,7 @@ public class AstrixRemotingDriver {
 	
 	
 	private static class FakeTimer implements TimerSpi {
-		private AtomicInteger invocationCount = new AtomicInteger(0);
+		private final AtomicInteger invocationCount = new AtomicInteger(0);
 		@Override
 		public <T> CheckedCommand<T> timeExecution(CheckedCommand<T> execution) {
 			invocationCount.incrementAndGet();

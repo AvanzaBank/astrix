@@ -15,42 +15,35 @@
  */
 package com.avanza.astrix.context;
 
+import com.avanza.astrix.beans.publish.ApiProviderClass;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
-import static org.junit.Assert.assertEquals;
-
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Test;
-
-import com.avanza.astrix.beans.publish.ApiProviderClass;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-
-public class AstrixApiProviderClassScannerTest {
+class AstrixApiProviderClassScannerTest {
 	
 	@Test
-	public void scansDefinedPackagesForDefinedAnnotations() throws Exception {
-		List<ApiProviderClass> apiDescriptors = new AstrixApiProviderClassScanner(asList(DummyDescriptor.class), "com.avanza.astrix.context").getAll().collect(toList());
+	void scansDefinedPackagesForDefinedAnnotations() {
+		List<ApiProviderClass> apiDescriptors = new AstrixApiProviderClassScanner(singletonList(DummyDescriptor.class), "com.avanza.astrix.context").getAll().collect(toList());
 		assertEquals(2, apiDescriptors.size());
 		assertThat(apiDescriptors, hasItem(equalTo(ApiProviderClass.create(DescriptorA.class))));
 		assertThat(apiDescriptors, hasItem(equalTo(ApiProviderClass.create(DescriptorB.class))));
 	}
 	
 	@Test
-	public void doesNotFinedDescriptorsOutsideDefinedPackge() throws Exception {
-		List<ApiProviderClass> apiDescriptors = new AstrixApiProviderClassScanner(asList(DummyDescriptor.class), "com.avanza.astrix.context.foo.bar").getAll().collect(toList());
+	void doesNotFinedDescriptorsOutsideDefinedPackage() {
+		List<ApiProviderClass> apiDescriptors = new AstrixApiProviderClassScanner(singletonList(DummyDescriptor.class), "com.avanza.astrix.context.foo.bar").getAll().collect(toList());
 		assertEquals(0, apiDescriptors.size());
 	}
 
-	private List<Class<? extends Annotation>> asList(Class<? extends Annotation> classes) {
-		return Arrays.<Class<? extends Annotation>>asList(classes);
-	}
-	
 	public @interface DummyDescriptor {
 	}
 	

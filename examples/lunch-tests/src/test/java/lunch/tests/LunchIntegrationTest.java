@@ -15,34 +15,33 @@
  */
 package lunch.tests;
 
-import static org.junit.Assert.assertNotNull;
-import lunch.api.LunchRestaurant;
-import lunch.api.LunchService;
-
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.test.util.AutoCloseableRule;
-import com.avanza.gs.test.PuConfigurers;
-import com.avanza.gs.test.RunningPu;
+import com.avanza.astrix.test.util.AutoCloseableExtension;
+import com.avanza.gs.test.junit5.PuConfigurers;
+import com.avanza.gs.test.junit5.RunningPu;
+import lunch.api.LunchRestaurant;
+import lunch.api.LunchService;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class LunchIntegrationTest {
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+class LunchIntegrationTest {
 	
-	public static InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
+	private static final InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 	
-	@ClassRule
-	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
-												   .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
-												   .configure();
-	@Rule
-	public AutoCloseableRule autoClosables = new AutoCloseableRule(); 
+	@RegisterExtension
+	static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
+											.contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
+											.configure();
+	@RegisterExtension
+	AutoCloseableExtension autoClosables = new AutoCloseableExtension();
 	
 	@Test
-	public void testName() throws Exception {
+	void testName() throws Exception {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 500);
 		configurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());

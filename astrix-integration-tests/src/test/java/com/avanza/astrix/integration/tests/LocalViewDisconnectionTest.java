@@ -15,13 +15,6 @@
  */
 package com.avanza.astrix.integration.tests;
 
-import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
-
-import org.hamcrest.Description;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.openspaces.core.GigaSpace;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.config.DynamicConfig;
@@ -31,37 +24,44 @@ import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.test.util.AstrixTestUtil;
-import com.avanza.astrix.test.util.AutoCloseableRule;
+import com.avanza.astrix.test.util.AutoCloseableExtension;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
-import com.avanza.gs.test.PuConfigurers;
-import com.avanza.gs.test.RunningPu;
+import com.avanza.gs.test.junit5.PuConfigurers;
+import com.avanza.gs.test.junit5.RunningPu;
+import org.hamcrest.Description;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.openspaces.core.GigaSpace;
 
-public class LocalViewDisconnectionTest {
+import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
+
+class LocalViewDisconnectionTest {
 	
-	private InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
+	private final InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
 		set(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
 	}};
 	
 	private LunchService lunchService;
 
-	private AstrixConfigurer configurer = new AstrixConfigurer();
+	private final AstrixConfigurer configurer = new AstrixConfigurer();
 	private AstrixContext astrix;
 	
-	@Rule
-	public AutoCloseableRule autoClosables = new AutoCloseableRule();
+	@RegisterExtension
+	AutoCloseableExtension autoClosables = new AutoCloseableExtension();
 	
-	@Rule
-	public RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
-											  .numberOfPrimaries(1)
-											  .numberOfBackups(0)
-											  .spaceName("local-view-disonnection-test")
-									  		  .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
-											  .startAsync(false)
-											  .configure();
+	@RegisterExtension
+	RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
+									 .numberOfPrimaries(1)
+									 .numberOfBackups(0)
+									 .spaceName("local-view-disonnection-test")
+									 .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
+									 .startAsync(false)
+									 .configure();
 	
-	@Before	
-	public void setup() throws Exception {
+	@BeforeEach
+	void setup() {
 		configurer.enableFaultTolerance(false);
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
 		configurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 100);
@@ -72,7 +72,7 @@ public class LocalViewDisconnectionTest {
 	}
 	
 	@Test
-	public void localViewDisonnectionTest() throws Exception {
+	void localViewDisconnectionTest() throws Exception {
 		this.lunchService = astrix.waitForBean(LunchService.class, 10_000L);
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		

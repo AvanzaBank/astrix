@@ -15,14 +15,14 @@
  */
 package com.avanza.astrix.remoting.server;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ServiceActivatorMetricsTest {
+class ServiceActivatorMetricsTest {
 	
 	@Test
-	public void exportsMBeanForExportedService() throws Exception {
+	void exportsMBeanForExportedService() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		remotingDriver.registerServer(Ping.class, new Ping() {
 			@Override
@@ -44,7 +44,7 @@ public class ServiceActivatorMetricsTest {
 	}
 	
 	@Test
-	public void exportedMBeanTracksInvocationErrorCount() throws Exception {
+	void exportedMBeanTracksInvocationErrorCount() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		remotingDriver.registerServer(Ping.class, new Ping() {
 			@Override
@@ -71,7 +71,7 @@ public class ServiceActivatorMetricsTest {
 	}
 	
 	@Test
-	public void exportsMBeanForEachExportedServiceMethod() throws Exception {
+	void exportsMBeanForEachExportedServiceMethod() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		remotingDriver.registerServer(Ping.class, new Ping() {
 			@Override
@@ -93,7 +93,7 @@ public class ServiceActivatorMetricsTest {
 	}
 	
 	@Test
-	public void exportsMBeanForEachExportedAllServicesInActivator() throws Exception {
+	void exportsMBeanForEachExportedAllServicesInActivator() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		remotingDriver.registerServer(Ping.class, new Ping() {
 			@Override
@@ -122,7 +122,7 @@ public class ServiceActivatorMetricsTest {
 	}
 	
 	@Test
-	public void itIsPossibleToGloballyDisableAllExportedServiceMetrics() throws Exception {
+	void itIsPossibleToGloballyDisableAllExportedServiceMetrics() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		remotingDriver.registerServer(Ping.class, new Ping() {
 			@Override

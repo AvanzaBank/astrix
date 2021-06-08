@@ -15,38 +15,36 @@
  */
 package tutorial.p2;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-
-import org.junit.After;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import tutorial.p2.api.LunchRestaurantFinder;
-import tutorial.p2.api.LunchSuggester;
-import tutorial.p2.provider.LunchLibraryProvider;
-import tutorial.p2.provider.LunchServiceProvider;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import tutorial.p2.api.LunchRestaurantFinder;
+import tutorial.p2.api.LunchSuggester;
+import tutorial.p2.provider.LunchLibraryProvider;
+import tutorial.p2.provider.LunchServiceProvider;
 
-public class AstrixBeanStateManagementTest {
+import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+class AstrixBeanStateManagementTest {
 	
 //	private AstrixSettings settings = new AstrixSettings();
 	private AstrixContext astrix;
-	TestAstrixConfigurer configurer = new TestAstrixConfigurer();
+	private TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 	
-	@After
-	public void after() {
+	@AfterEach
+	void after() {
 		astrix.destroy();
 	}
 	
 	@Test
-	public void astrixManagesStateForEachServiceBean() throws Exception {
+	void astrixManagesStateForEachServiceBean() throws Exception {
 		// The BEAN_BIND_ATTEMPT_INTERVAL determines how often 
 		// Astrix will attempt to bind a given bean (millis).
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
@@ -67,7 +65,7 @@ public class AstrixBeanStateManagementTest {
 		}
 		
 		
-		LunchRestaurantFinder restaurantFinder = Mockito.mock(LunchRestaurantFinder.class);
+		LunchRestaurantFinder restaurantFinder = mock(LunchRestaurantFinder.class);
 
 		// Register mock instance in direct-component
 		String serviceUri = DirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinder);
@@ -80,7 +78,7 @@ public class AstrixBeanStateManagementTest {
 		// waits until the LunchService is bound
 		astrix.waitForBean(LunchSuggester.class, 2000);
 		
-		Mockito.when(restaurantFinder.getAllRestaurants()).thenReturn(Arrays.asList("Pontus!"));
+		when(restaurantFinder.getAllRestaurants()).thenReturn(singletonList("Pontus!"));
 		
 		// Invoke library which will in turn invoke the mock.
 		assertEquals("Pontus!", lunchSuggester.randomLunchRestaurant());

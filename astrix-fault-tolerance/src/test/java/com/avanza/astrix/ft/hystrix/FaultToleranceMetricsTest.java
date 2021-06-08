@@ -15,16 +15,6 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
@@ -37,26 +27,35 @@ import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.AssertBlockPoller;
-import com.avanza.astrix.test.util.AutoCloseableRule;
+import com.avanza.astrix.test.util.AutoCloseableExtension;
 import com.netflix.hystrix.Hystrix;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
 import com.netflix.hystrix.HystrixEventType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class FaultToleranceMetricsTest {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class FaultToleranceMetricsTest {
 	
-	private FakeMBeanServer mbeanServer = new FakeMBeanServer();
+	private final FakeMBeanServer mbeanServer = new FakeMBeanServer();
 	
-	@Rule
-	public AutoCloseableRule autoClose = new AutoCloseableRule();
+	@RegisterExtension
+	AutoCloseableExtension autoClose = new AutoCloseableExtension();
 	
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		Hystrix.reset();
 	}
 	
 	@Test
-	public void exportsMbean() throws Exception {
+	void exportsMbean() throws Exception {
 		InMemoryServiceRegistry reg = new InMemoryServiceRegistry();
 		reg.registerProvider(Ping.class, msg -> msg);
 		TestAstrixConfigurer testAstrixConfigurer = new TestAstrixConfigurer();
@@ -85,7 +84,7 @@ public class FaultToleranceMetricsTest {
 	}
 
 	@Test
-	public void countsErrors() throws Exception {
+	void countsErrors() throws Exception {
 		InMemoryServiceRegistry reg = new InMemoryServiceRegistry();
 		reg.registerProvider(Ping.class, msg -> {
 			throw new ServiceUnavailableException("");
@@ -121,9 +120,9 @@ public class FaultToleranceMetricsTest {
 	private void initMetrics(Ping ping, AstrixContext context) {
 		try {
 			ping.ping("foo");
-		} catch (Exception e) {
+		} catch (Exception ignore) {
 		}
-		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) AstrixApplicationContext.class.cast(context).getInstance(BeanFaultToleranceFactorySpi.class);
+		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) ((AstrixApplicationContext) context).getInstance(BeanFaultToleranceFactorySpi.class);
 		HystrixCommandKey key = faultTolerance.getCommandKey(AstrixBeanKey.create(Ping.class));
 		HystrixCommandMetrics.getInstance(key).getCumulativeCount(HystrixEventType.SUCCESS);
 	}
@@ -134,7 +133,7 @@ public class FaultToleranceMetricsTest {
 	
 	private static class FakeMBeanServer implements MBeanServerFacade {
 		
-		private Map<MBeanKey, Object> exportedMBeans = new HashMap<>();
+		private final Map<MBeanKey, Object> exportedMBeans = new HashMap<>();
 		
 		@Override
 		public void registerMBean(Object mbean, String folder, String name) {

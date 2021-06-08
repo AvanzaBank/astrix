@@ -15,11 +15,6 @@
  */
 package com.avanza.astrix.netty;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.After;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixApplicationContext;
@@ -31,22 +26,27 @@ import com.avanza.astrix.provider.core.AstrixApplication;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.serviceunit.ServiceExporter;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
-public class NettyRemotingTest {
-	
-	
-	InMemoryServiceRegistry registry = new InMemoryServiceRegistry();
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class NettyRemotingTest {
+
+	private final InMemoryServiceRegistry registry = new InMemoryServiceRegistry();
 	private AstrixApplicationContext serverContext;
 	private AstrixContext clientContext;
 	
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		serverContext.destroy();
 		clientContext.destroy();
 	}
 	
-	@Test(timeout=5000)
-	public void nettyRemotingTest() throws Exception {
+	@Test
+	@Timeout(5)
+	void nettyRemotingTest() throws Exception {
 		
 		serverContext = (AstrixApplicationContext) new TestAstrixConfigurer().setApplicationDescriptor(PingApp.class)
 				.set(AstrixSettings.SERVICE_REGISTRY_URI, registry.getServiceUri())
@@ -76,13 +76,13 @@ public class NettyRemotingTest {
 	}
 
 	@AstrixApiProvider
-	public static interface PingApi {
+	public interface PingApi {
 		@Service
 		Ping ping();
 	}
 	
 	@AstrixApplication(defaultServiceComponent = NettyRemotingComponent.NAME, exportsRemoteServicesFor = PingApi.class)
 //	@AstrixApplication(defaultServiceComponent = AstrixServiceComponentNames.DIRECT, exportsRemoteServicesFor = PingApi.class)
-	public static class PingApp {
+	private static class PingApp {
 	}
 }

@@ -15,25 +15,26 @@
  */
 package com.avanza.astrix.core.util;
 
-import static org.junit.Assert.assertEquals;
+import com.avanza.astrix.core.AstrixRemoteResult;
+import com.avanza.astrix.core.CorrelationId;
+import com.avanza.astrix.core.ServiceInvocationException;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
-
-import com.avanza.astrix.core.AstrixRemoteResult;
-import com.avanza.astrix.core.CorrelationId;
-import com.avanza.astrix.core.ServiceInvocationException;
+import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
-public class GenericAstrixMapReducerTest {
+class GenericAstrixMapReducerTest {
 
 	@Test
-	public void reduce_flattensMaps() throws Exception {
-		GenericAstrixMapReducer<String, Integer> reducer = new GenericAstrixMapReducer<String, Integer>();
-		assertEquals(newMap("a", 1).build(), reducer.reduce(Arrays.asList(AstrixRemoteResult.successful(newMap("a", 1).build()))));
+	void reduce_flattensMaps() {
+		GenericAstrixMapReducer<String, Integer> reducer = new GenericAstrixMapReducer<>();
+		assertEquals(newMap("a", 1).build(), reducer.reduce(singletonList(AstrixRemoteResult.successful(newMap("a", 1).build()))));
 		
 		assertEquals(newMap("a", 1).with("b", 2).build(), reducer.reduce(Arrays.asList(
 				AstrixRemoteResult.successful(newMap("a", 1).build()),
@@ -44,15 +45,15 @@ public class GenericAstrixMapReducerTest {
 				AstrixRemoteResult.successful(newMap("b", 2).build()))));
 	}
 	
-	@Test(expected = MyRuntimeException.class)
-	public void reduce_rethrowsException() throws Exception {
+	@Test
+	void reduce_rethrowsException() {
 		GenericAstrixMapReducer<String, Integer> reducer = new GenericAstrixMapReducer<>();
-		reducer.reduce(Arrays.asList(
+		assertThrows(MyRuntimeException.class, () ->reducer.reduce(Arrays.asList(
 				AstrixRemoteResult.successful(newMap("a", 1).build()),
-				AstrixRemoteResult.<Map<String, Integer>>failure(new MyRuntimeException(), CorrelationId.undefined())));
+				AstrixRemoteResult.failure(new MyRuntimeException(), CorrelationId.undefined()))));
 	}
 	
-	public static MapBuilder newMap(String key, Integer value) {
+	static MapBuilder newMap(String key, Integer value) {
 		return new MapBuilder(key, value);
 	}
 	
@@ -68,7 +69,7 @@ public class GenericAstrixMapReducerTest {
 	}
 	
 	public static class MapBuilder {
-		private HashMap<String, Integer> result = new HashMap<>();
+		private final Map<String, Integer> result = new HashMap<>();
 		public MapBuilder() { }
 		public MapBuilder(String key, Integer value) { 
 			with(key, value);

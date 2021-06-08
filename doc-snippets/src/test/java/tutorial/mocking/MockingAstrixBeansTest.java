@@ -15,27 +15,25 @@
  */
 package tutorial.mocking;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import tutorial.p1.api.LunchRestaurantFinder;
-import tutorial.p1.api.LunchSuggester;
-import tutorial.p1.provider.LunchSuggesterImpl;
-
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
+import org.junit.jupiter.api.Test;
+import tutorial.p1.api.LunchRestaurantFinder;
+import tutorial.p1.api.LunchSuggester;
+import tutorial.p1.provider.LunchSuggesterImpl;
 
-public class MockingAstrixBeansTest {
+import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+class MockingAstrixBeansTest {
 	
 	@Test
-	public void testAstrixConfigurerAllowsRegistrationOfMockInstances() throws Exception {
-		LunchRestaurantFinder restaurantFinderStub = Mockito.mock(LunchRestaurantFinder.class);
+	void testAstrixConfigurerAllowsRegistrationOfMockInstances() {
+		LunchRestaurantFinder restaurantFinderStub = mock(LunchRestaurantFinder.class);
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		
 		// Register the api(s) we intend to test
@@ -48,8 +46,8 @@ public class MockingAstrixBeansTest {
 		// Get the api we intend to test
 		LunchSuggester lunchSuggester = astrixContext.getBean(LunchSuggester.class);
 		
-		// Stub out getAllRestaurants to allways return one restaurant
-		Mockito.when(restaurantFinderStub.getAllRestaurants()).thenReturn(Arrays.asList("Max"));
+		// Stub out getAllRestaurants to always return one restaurant
+		when(restaurantFinderStub.getAllRestaurants()).thenReturn(singletonList("Max"));
 
 		assertEquals("Max", lunchSuggester.randomLunchRestaurant());
 	}

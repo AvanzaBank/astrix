@@ -15,16 +15,15 @@
  */
 package com.avanza.astrix.beans.factory;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
+import org.junit.jupiter.api.Test;
 
-public class SimpleAstrixFactoryBeanRegistryTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class SimpleAstrixFactoryBeanRegistryTest {
 	
 	@Test
-	public void synthesizesFactoryBeanUsingDynamicFactoryBean() throws Exception {
+	void synthesizesFactoryBeanUsingDynamicFactoryBean() {
 		AstrixFactoryBeanRegistry registry = new AstrixFactoryBeanRegistry();
 		registry.registerFactory(new DynamicFactoryBean<Ping>() {
 			@Override
@@ -45,7 +44,7 @@ public class SimpleAstrixFactoryBeanRegistryTest {
 	}
 	
 	static class Ping {
-		private String qualifier;
+		private final String qualifier;
 		public Ping(String qualifier) {
 			this.qualifier = qualifier;
 		}

@@ -15,10 +15,11 @@
  */
 package com.avanza.astrix.integration.tests;
 
+import com.avanza.gs.test.PartitionedPu;
+import com.avanza.gs.test.junit5.PuConfigurers;
+
 import java.io.IOException;
 
-import com.avanza.gs.test.PartitionedPu;
-import com.avanza.gs.test.PuConfigurers;
 
 public class ServiceRegistryRunner {
 	

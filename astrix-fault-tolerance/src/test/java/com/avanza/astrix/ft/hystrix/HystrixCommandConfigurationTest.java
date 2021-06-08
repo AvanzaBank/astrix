@@ -15,12 +15,6 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
@@ -31,7 +25,7 @@ import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.DefaultBeanSettings;
 import com.avanza.astrix.provider.core.Library;
-import com.avanza.astrix.test.util.AutoCloseableRule;
+import com.avanza.astrix.test.util.AutoCloseableExtension;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
@@ -39,16 +33,22 @@ import com.netflix.hystrix.HystrixThreadPoolKey;
 import com.netflix.hystrix.HystrixThreadPoolProperties;
 import com.netflix.hystrix.strategy.HystrixPlugins;
 import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class HystrixCommandConfigurationTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class HystrixCommandConfigurationTest {
 	
-	@Rule
-	public AutoCloseableRule autoClosables = new AutoCloseableRule();
+	@RegisterExtension
+	AutoCloseableExtension autoClosables = new AutoCloseableExtension();
+
 	private AstrixContext astrixContext;
 	private TestAstrixConfigurer astrixConfigurer;
 	
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.enableFaultTolerance(true);
 		astrixConfigurer.registerApiProvider(PingApi.class);
@@ -56,7 +56,7 @@ public class HystrixCommandConfigurationTest {
 	}
 	
 	@Test
-	public void differentContextCanHaveDifferentSettingsForSameApi() throws Throwable {
+	void differentContextCanHaveDifferentSettingsForSameApi() {
 		astrixConfigurer.set(AstrixBeanSettings.TIMEOUT, AstrixBeanKey.create(Ping.class), 100);
 		
 		TestAstrixConfigurer astrixConfigurer2 = new TestAstrixConfigurer();
@@ -79,7 +79,7 @@ public class HystrixCommandConfigurationTest {
 	}
 	
 	@Test
-	public void readsDefaultBeanSettingsFromBeanConfiguration() throws Throwable {
+	void readsDefaultBeanSettingsFromBeanConfiguration() {
 		astrixConfigurer.set(AstrixBeanSettings.CORE_SIZE, AstrixBeanKey.create(Ping.class), 4);
 		astrixConfigurer.set(AstrixBeanSettings.QUEUE_SIZE_REJECTION_THRESHOLD, AstrixBeanKey.create(Ping.class), 6);
 		astrixConfigurer.set(AstrixBeanSettings.TIMEOUT, AstrixBeanKey.create(Ping.class), 100);
@@ -97,7 +97,7 @@ public class HystrixCommandConfigurationTest {
 	}
 
 	@Test
-	public void defaultBeanSettingsFromBeanConfiguration() throws Throwable {
+	void defaultBeanSettingsFromBeanConfiguration() {
 		astrixContext.getBean(Ping.class).ping("foo");
 		
 		HystrixFaultToleranceFactory hystrixFaultTolerance = getFaultTolerance(astrixContext);
@@ -118,13 +118,12 @@ public class HystrixCommandConfigurationTest {
 	}
 
 	private static HystrixFaultToleranceFactory getFaultTolerance(AstrixContext astrixContext) {
-		BeanFaultToleranceFactorySpi ftStrategy = AstrixApplicationContext.class.cast(astrixContext).getInstance(BeanFaultToleranceFactorySpi.class);
+		BeanFaultToleranceFactorySpi ftStrategy = ((AstrixApplicationContext) astrixContext).getInstance(BeanFaultToleranceFactorySpi.class);
 		assertEquals(HystrixFaultToleranceFactory.class, ftStrategy.getClass());
 		return (HystrixFaultToleranceFactory) ftStrategy;
 	}
 	
-	private static HystrixThreadPoolProperties getThreadPoolProperties(HystrixFaultToleranceFactory hystrixFaultTolerance,
-			Class<?> api) {
+	private static HystrixThreadPoolProperties getThreadPoolProperties(HystrixFaultToleranceFactory hystrixFaultTolerance, Class<?> api) {
 		HystrixPropertiesStrategy hystrixPropertiesStrategy = HystrixPlugins.getInstance().getPropertiesStrategy();
 		HystrixCommandGroupKey groupKey = hystrixFaultTolerance.getGroupKey(AstrixBeanKey.create(api));
 		return hystrixPropertiesStrategy.getThreadPoolProperties(HystrixThreadPoolKey.Factory.asKey(groupKey.name()), 

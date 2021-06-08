@@ -15,35 +15,33 @@
  */
 package tutorial.p2;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-
-import org.junit.After;
-import org.junit.Test;
-import org.mockito.Mockito;
-
+import com.avanza.astrix.beans.service.DirectComponent;
+import com.avanza.astrix.context.AstrixContext;
+import com.avanza.astrix.context.TestAstrixConfigurer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import tutorial.p2.api.LunchRestaurantFinder;
 import tutorial.p2.api.LunchSuggester;
 import tutorial.p2.provider.LunchLibraryProvider;
 import tutorial.p2.provider.LunchServiceProvider;
 
-import com.avanza.astrix.beans.service.DirectComponent;
-import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.context.TestAstrixConfigurer;
+import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-public class LunchLibraryTest {
+class LunchLibraryTest {
 	
 	private AstrixContext astrix;
 	
-	@After
-	public void after() {
+	@AfterEach
+	void after() {
 		astrix.destroy();
 	}
 	
 	@Test
-	public void astrixDirectComponentAllowsBindingToObjectsInSameProcess() throws Exception {
-		LunchRestaurantFinder restaurantFinderStub = Mockito.mock(LunchRestaurantFinder.class);
+	void astrixDirectComponentAllowsBindingToObjectsInSameProcess() {
+		LunchRestaurantFinder restaurantFinderStub = mock(LunchRestaurantFinder.class);
 		String serviceUri = DirectComponent.registerAndGetUri(LunchRestaurantFinder.class, restaurantFinderStub);
 
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
@@ -54,7 +52,7 @@ public class LunchLibraryTest {
 		
 		LunchSuggester lunchSuggester = astrix.getBean(LunchSuggester.class);
 
-		Mockito.when(restaurantFinderStub.getAllRestaurants()).thenReturn(Arrays.asList("Pontus!"));
+		when(restaurantFinderStub.getAllRestaurants()).thenReturn(singletonList("Pontus!"));
 		assertEquals("Pontus!", lunchSuggester.randomLunchRestaurant());
 	}
 

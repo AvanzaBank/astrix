@@ -15,13 +15,6 @@
  */
 package com.avanza.astrix.integration.tests;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
@@ -33,40 +26,47 @@ import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
-import com.avanza.astrix.test.util.AutoCloseableRule;
-import com.avanza.gs.test.PuConfigurers;
-import com.avanza.gs.test.RunningPu;
+import com.avanza.astrix.test.util.AutoCloseableExtension;
+import com.avanza.gs.test.junit5.PuConfigurers;
+import com.avanza.gs.test.junit5.RunningPu;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class ServiceRegistryPuIntegrationTest {
+class ServiceRegistryPuIntegrationTest {
 	
-	@Rule
-	public RunningPu serviceRegistrypu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
-															.numberOfPrimaries(1)
-															.numberOfBackups(0)
-															.startAsync(false)
-															.configure();
+	@RegisterExtension
+	RunningPu serviceRegistryPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
+													  .numberOfPrimaries(1)
+													  .numberOfBackups(0)
+													  .startAsync(false)
+													  .configure();
 	
-	private MapConfigSource clientConfig = new MapConfigSource() {{
-		set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
+	private final MapConfigSource clientConfig = new MapConfigSource() {{
+		set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistryPu.getLookupGroupName());
 	}};
 	
 	private AstrixContext clientContext;
 	
-	@Rule
-	public AutoCloseableRule autoCloseableRule = new AutoCloseableRule();
+	@RegisterExtension
+	AutoCloseableExtension autoCloseableExtension = new AutoCloseableExtension();
 	
-	@Before
-	public void setup() throws Exception {
-		this.clientContext = autoCloseableRule.add(new AstrixConfigurer().setConfig(DynamicConfig.create(clientConfig)).configure());
+	@BeforeEach
+	void setup() {
+		this.clientContext = autoCloseableExtension.add(new AstrixConfigurer().setConfig(DynamicConfig.create(clientConfig)).configure());
 	}
 	
 	@Test
-	public void serviceRegistration() throws Exception {
+	void serviceRegistration() {
 		AstrixServiceRegistry serviceRegistry = clientContext.getBean(AstrixServiceRegistry.class);
 		ServiceRegistryClient serviceRegistryClient = clientContext.getBean(ServiceRegistryClient.class);
 		ServiceRegistryExporterClient exporterClient1 =  new ServiceRegistryExporterClient(serviceRegistry, "default", "app-instance-1");

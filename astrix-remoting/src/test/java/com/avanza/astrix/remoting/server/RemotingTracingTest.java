@@ -15,45 +15,44 @@
  */
 package com.avanza.astrix.remoting.server;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Collections;
-import java.util.UUID;
-import java.util.concurrent.Future;
-
-import org.junit.Before;
-import org.junit.Test;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.beans.tracing.InvocationExecutionWatcher;
 import com.avanza.astrix.beans.tracing.InvocationExecutionWatcher.AfterInvocation;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import rx.Observable;
 
-public class RemotingTracingTest {
+import java.util.Collections;
+import java.util.UUID;
+import java.util.concurrent.Future;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class RemotingTracingTest {
 
 	private Ping ping;
 	private PingFuture pingFuture;
 	private PingObservable pingObservable;
-	private InvocationExecutionWatcher clientInvocationWatcher = mock(InvocationExecutionWatcher.class);
-	private InvocationExecutionWatcher serverInvocationWatcher = mock(InvocationExecutionWatcher.class);
-	private AfterInvocation afterClientInvocationWatcher = mock(AfterInvocation.class);
-	private AfterInvocation afterServerInvocationWatcher = mock(AfterInvocation.class);
-	private AstrixTraceProvider mockTraceProvider = mock(AstrixTraceProvider.class);
-	private String correlationId = UUID.randomUUID().toString();
+	private final InvocationExecutionWatcher clientInvocationWatcher = mock(InvocationExecutionWatcher.class);
+	private final InvocationExecutionWatcher serverInvocationWatcher = mock(InvocationExecutionWatcher.class);
+	private final AfterInvocation afterClientInvocationWatcher = mock(AfterInvocation.class);
+	private final AfterInvocation afterServerInvocationWatcher = mock(AfterInvocation.class);
+	private final AstrixTraceProvider mockTraceProvider = mock(AstrixTraceProvider.class);
+	private final String correlationId = UUID.randomUUID().toString();
 
-	@Before
-	public void beforeEachTest() {
+	@BeforeEach
+	void beforeEachTest() {
 		when(clientInvocationWatcher.beforeInvocation(any())).thenReturn(afterClientInvocationWatcher);
 		when(serverInvocationWatcher.beforeInvocation(any())).thenReturn(afterServerInvocationWatcher);
 		when(mockTraceProvider.getClientCallExecutionWatchers(any(), any()))
@@ -71,7 +70,7 @@ public class RemotingTracingTest {
 	}
 
 	@Test
-	public void shouldCallInvocationWatchers() {
+	void shouldCallInvocationWatchers() {
 		String response = ping.ping("msg");
 
 		assertThat(response, equalTo("msg"));
@@ -82,7 +81,7 @@ public class RemotingTracingTest {
 	}
 
 	@Test
-	public void shouldCallInvocationWatchersFuture() throws Exception {
+	void shouldCallInvocationWatchersFuture() throws Exception {
 		String response = pingFuture.ping("msg").get();
 
 		assertThat(response, equalTo("msg"));
@@ -93,7 +92,7 @@ public class RemotingTracingTest {
 	}
 
 	@Test
-	public void shouldCallInvocationWatchersObservable() {
+	void shouldCallInvocationWatchersObservable() {
 		String response = pingObservable.ping("msg").toBlocking().single();
 
 		assertThat(response, equalTo("msg"));
@@ -104,7 +103,7 @@ public class RemotingTracingTest {
 	}
 
 	@Test
-	public void shouldNotCallAllInvocationWatchersIfObservableIsNotCompleted() {
+	void shouldNotCallAllInvocationWatchersIfObservableIsNotCompleted() {
 		pingObservable.ping("msg");
 
 		verify(clientInvocationWatcher).beforeInvocation(any());
@@ -114,13 +113,10 @@ public class RemotingTracingTest {
 	}
 
 	@Test
-	public void shouldCallInvocationWatchersOnException() {
-		try {
-			ping.pingThrows("msg");
-			fail("Expected an exception to be thrown here, but no exception was seen");
-		} catch (Exception e) {
-			assertThat(e.getMessage(), containsString(correlationId));
-		}
+	void shouldCallInvocationWatchersOnException() {
+		Exception exception = assertThrows(Exception.class, () -> ping.pingThrows("msg"), "Expected an exception to be thrown here, but no exception was seen");
+
+		assertThat(exception.getMessage(), containsString(correlationId));
 
 		verify(clientInvocationWatcher).beforeInvocation(any());
 		verify(afterClientInvocationWatcher).afterInvocation();
@@ -129,13 +125,10 @@ public class RemotingTracingTest {
 	}
 
 	@Test
-	public void shouldCallInvocationWatchersFutureOnException() {
-		try {
-			pingFuture.pingThrows("msg").get();
-			fail("Expected an exception to be thrown here, but no exception was seen");
-		} catch (Exception e) {
-			assertThat(e.getMessage(), containsString(correlationId));
-		}
+	void shouldCallInvocationWatchersFutureOnException() {
+		Exception exception = assertThrows(Exception.class, () -> pingFuture.pingThrows("msg").get(), "Expected an exception to be thrown here, but no exception was seen");
+
+		assertThat(exception.getMessage(), containsString(correlationId));
 
 		verify(clientInvocationWatcher).beforeInvocation(any());
 		verify(afterClientInvocationWatcher).afterInvocation();
@@ -144,7 +137,7 @@ public class RemotingTracingTest {
 	}
 
 	@Test
-	public void shouldCallInvocationWatchersObservableOnException() {
+	void shouldCallInvocationWatchersObservableOnException() {
 		String response = pingObservable.pingThrows("msg")
 					.onErrorReturn(e -> {
 						assertThat(e.getMessage(), containsString(correlationId));

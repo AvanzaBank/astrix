@@ -15,7 +15,8 @@
  */
 package runners;
 
-import com.avanza.gs.test.PuApp;
+
+import com.avanza.gs.test.junit5.PuApp;
 
 public class ServiceRegistryRunner {
 

@@ -15,40 +15,37 @@
  */
 package se.avanzabank.trading.pu;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import se.avanzabank.trading.api.Account;
-import se.avanzabank.trading.api.AccountId;
-import se.avanzabank.trading.api.AccountService;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.test.util.AutoCloseableRule;
-import com.avanza.gs.test.PuConfigurers;
-import com.avanza.gs.test.RunningPu;
+import com.avanza.astrix.test.util.AutoCloseableExtension;
+import com.avanza.gs.test.junit5.PuConfigurers;
+import com.avanza.gs.test.junit5.RunningPu;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import se.avanzabank.trading.api.Account;
+import se.avanzabank.trading.api.AccountId;
+import se.avanzabank.trading.api.AccountService;
 
-public class TradingPuTest {
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+class TradingPuTest {
 	
 	private static final InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 	
-	@ClassRule
-	public static final RunningPu tradingPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/pu.xml")
-														   .startAsync(false)
-														   .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
-														   .configure();
-	@Rule
-	public AutoCloseableRule autoCloseableRule = new AutoCloseableRule();
+	@RegisterExtension
+	static final RunningPu tradingPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/pu.xml")
+													.startAsync(false)
+													.contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
+													.configure();
+	@RegisterExtension
+	AutoCloseableExtension autoCloseableExtension = new AutoCloseableExtension();
 	
 	@Test
-	public void accountServiceConsumtionExample() throws Exception {
-		AstrixContext context = autoCloseableRule.add(new AstrixConfigurer()
+	void accountServiceConsumptionExample() throws Exception {
+		AstrixContext context = autoCloseableExtension.add(new AstrixConfigurer()
 															.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri())
 															.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 50)
 															.configure());	

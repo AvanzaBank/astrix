@@ -15,19 +15,18 @@
  */
 package com.avanza.astrix.context;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixExcludedByProfile;
 import com.avanza.astrix.provider.core.AstrixIncludedByProfile;
 import com.avanza.astrix.provider.core.Library;
+import org.junit.jupiter.api.Test;
 
-public class AstrixContextProfileTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class AstrixContextProfileTest {
 	
 	@Test
-	public void aProviderIsNotExcludedIfTheCorrespondingProfileIsNotEacive() throws Exception {
+	void aProviderIsNotExcludedIfTheCorrespondingProfileIsNotActive() {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.registerApiProvider(NormalPingProvider.class);
 		configurer.registerApiProvider(ReversePingProvider.class);
@@ -38,7 +37,7 @@ public class AstrixContextProfileTest {
 	}
 	
 	@Test
-	public void aProviderIsExcludedWhenTheCorrespondingProfileIsActivet() throws Exception {
+	void aProviderIsExcludedWhenTheCorrespondingProfileIsActive() {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.activateProfile("test");
 		configurer.registerApiProvider(NormalPingProvider.class);

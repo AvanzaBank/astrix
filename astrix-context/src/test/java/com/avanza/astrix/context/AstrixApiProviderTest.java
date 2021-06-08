@@ -15,10 +15,6 @@
  */
 package com.avanza.astrix.context;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.context.JavaSerializationSerializerPlugin.JavaSerializationConfigurer;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
@@ -31,12 +27,15 @@ import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfig;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactoryPlugin;
 import com.avanza.astrix.versioning.core.Versioned;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-public class AstrixApiProviderTest {
+class AstrixApiProviderTest {
 	
 	@Test
-	public void apiWithOneLibrary() throws Exception {
+	void apiWithOneLibrary() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingLibraryProvider.class);
 		AstrixContext context = astrixConfigurer.configure();
@@ -46,17 +45,17 @@ public class AstrixApiProviderTest {
 	}
 	
 	@Test
-	public void librariesShouldNotBeStateful() throws Exception {
+	void librariesShouldNotBeStateful() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingLibraryProvider.class);
 		AstrixContext context = astrixConfigurer.configure();
 		
 		PingLib ping = context.getBean(PingLib.class);
-		assertEquals("Expected non-stateful astrix bean without a proxy.", PingLibImpl.class, ping.getClass());
+		assertEquals(PingLibImpl.class, ping.getClass(), "Expected non-stateful astrix bean without a proxy.");
 	}
 	
 	@Test
-	public void librariesCanBeQualifiedToDistinguishProviders() throws Exception {
+	void librariesCanBeQualifiedToDistinguishProviders() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingAndReversePingLibraryProvider.class);
 		AstrixContext context = astrixConfigurer.configure();
@@ -68,7 +67,7 @@ public class AstrixApiProviderTest {
 	}
 	
 	@Test
-	public void servicesCanBeQualifiedToDistinguishProviders() throws Exception {
+	void servicesCanBeQualifiedToDistinguishProviders() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.set("pingServiceUri", DirectComponent.registerAndGetUri(PingService.class, new PingServiceImpl()));
 		astrixConfigurer.set("reversePingServiceUri", DirectComponent.registerAndGetUri(PingService.class, new ReversePingServiceImpl()));
@@ -82,7 +81,7 @@ public class AstrixApiProviderTest {
 	}
 	
 	@Test
-	public void apiWithOneLibraryAndOneService() throws Exception {
+	void apiWithOneLibraryAndOneService() {
 		String pingServiceUri = DirectComponent.registerAndGetUri(PingService.class, new PingServiceImpl());
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingServiceAndLibraryProvider.class);
@@ -98,7 +97,7 @@ public class AstrixApiProviderTest {
 	
 	
 	@Test
-	public void versionedApi() throws Exception {
+	void versionedApi() {
 		String pingServiceUri = DirectComponent.registerAndGetUri(PingService.class, 
 																		new PingServiceImpl(), 
 																		ObjectSerializerDefinition.versionedService(1, JavaSerializationSerializerPlugin.JavaSerializationConfigurer.class));
@@ -114,7 +113,7 @@ public class AstrixApiProviderTest {
 	}
 	
 	@Test
-	public void apiWithVersionedAndTxNonVersionedService() throws Exception {
+	void apiWithVersionedAndTxNonVersionedService() {
 		String pingServiceUri = DirectComponent.registerAndGetUri(PingService.class, 
 																		new PingServiceImpl(), 
 																		ObjectSerializerDefinition.versionedService(1, JavaSerializationSerializerPlugin.JavaSerializationConfigurer.class));
@@ -136,7 +135,7 @@ public class AstrixApiProviderTest {
 	}
 	
 	@Test
-	public void supportsDynamicQualifiedServices() throws Exception {
+	void supportsDynamicQualifiedServices() {
 		String pingServiceUri = DirectComponent.registerAndGetUri(PingService.class, 
 																		new PingServiceImpl());
 		

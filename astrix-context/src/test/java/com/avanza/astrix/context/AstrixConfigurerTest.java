@@ -15,18 +15,9 @@
  */
 package com.avanza.astrix.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
-import java.util.stream.Stream;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.config.BeanConfiguration;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
-import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.BooleanBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.IntBeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanSettings.LongBeanSetting;
@@ -35,21 +26,29 @@ import com.avanza.astrix.beans.publish.ApiProviderClass;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.DefaultBeanSettings;
 import com.avanza.astrix.provider.core.Service;
-import com.avanza.astrix.test.util.AutoCloseableRule;
+import com.avanza.astrix.test.util.AutoCloseableExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class AstrixConfigurerTest {
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class AstrixConfigurerTest {
 	
-	@Rule
-	public AutoCloseableRule autoClosables = new AutoCloseableRule(); 
+	@RegisterExtension
+	AutoCloseableExtension autoClosables = new AutoCloseableExtension();
 	
 	@Test
-	public void passesBeanSettingsToConfiguration() throws Exception {
+	void passesBeanSettingsToConfiguration() {
 		AstrixConfigurer configurer = new AstrixConfigurer();
-		configurer.setAstrixApiProviders(() -> Stream.empty());
+		configurer.setAstrixApiProviders(Stream::empty);
 		IntBeanSetting intSetting = new IntBeanSetting("intSetting", 1);
 		BooleanBeanSetting aBooleanSetting = new BooleanBeanSetting("booleanSetting", true);
 		LongBeanSetting longSetting = new LongBeanSetting("longSetting", 2);
-		BeanSetting<String> stringSetting = new StringBeanSetting("stringSetting", "foo");
+		StringBeanSetting stringSetting = new StringBeanSetting("stringSetting", "foo");
 		
 		configurer.set(aBooleanSetting, AstrixBeanKey.create(Ping.class), false);
 		configurer.set(intSetting, AstrixBeanKey.create(Ping.class), 21);
@@ -62,11 +61,11 @@ public class AstrixConfigurerTest {
 		assertEquals(21, pingConfig.get(intSetting).get());
 		assertFalse(pingConfig.get(aBooleanSetting).get());
 		assertEquals(19, pingConfig.get(longSetting).get());
-		assertEquals("bar", pingConfig.get((StringBeanSetting)stringSetting).get());
+		assertEquals("bar", pingConfig.get(stringSetting).get());
 	}
 	
 	@Test
-	public void customDefaultBeanSettings() throws Exception {
+	void customDefaultBeanSettings() {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setAstrixApiProviders(() -> Stream.of(ApiProviderClass.create(PingApiProvider.class)));
 		
@@ -74,15 +73,15 @@ public class AstrixConfigurerTest {
 		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
 
 		assertEquals(2000, pingConfig.get(AstrixBeanSettings.TIMEOUT).get());
-		assertEquals(false, pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
-		assertEquals(false, pingConfig.get(AstrixBeanSettings.BEAN_METRICS_ENABLED).get());
+		assertFalse(pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
+		assertFalse(pingConfig.get(AstrixBeanSettings.BEAN_METRICS_ENABLED).get());
 		assertEquals(1, pingConfig.get(AstrixBeanSettings.MAX_CONCURRENT_REQUESTS).get());
 		assertEquals(2, pingConfig.get(AstrixBeanSettings.CORE_SIZE).get());
 		assertEquals(3, pingConfig.get(AstrixBeanSettings.QUEUE_SIZE_REJECTION_THRESHOLD).get());
 	}
 	
 	@Test
-	public void itsPossibleToOverrideCustomDefaultBeanSettingsOnBeanDefinition() throws Exception {
+	void itsPossibleToOverrideCustomDefaultBeanSettingsOnBeanDefinition() {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setAstrixApiProviders(() -> Stream.of(ApiProviderClass.create(PingApiProviderWithOverridingDefault.class)));
 		
@@ -90,15 +89,15 @@ public class AstrixConfigurerTest {
 		BeanConfiguration pingConfig = astrixContext.getBeanConfiguration(AstrixBeanKey.create(Ping.class));
 
 		assertEquals(3000, pingConfig.get(AstrixBeanSettings.TIMEOUT).get());
-		assertEquals(true, pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
-		assertEquals(false, pingConfig.get(AstrixBeanSettings.BEAN_METRICS_ENABLED).get());
+		assertTrue(pingConfig.get(AstrixBeanSettings.FAULT_TOLERANCE_ENABLED).get());
+		assertFalse(pingConfig.get(AstrixBeanSettings.BEAN_METRICS_ENABLED).get());
 		assertEquals(2, pingConfig.get(AstrixBeanSettings.MAX_CONCURRENT_REQUESTS).get());
 		assertEquals(5, pingConfig.get(AstrixBeanSettings.CORE_SIZE).get());
 		assertEquals(6, pingConfig.get(AstrixBeanSettings.QUEUE_SIZE_REJECTION_THRESHOLD).get());
 	}
 	
 	@Test
-	public void customDefaultBeanSettingsAppliesToAsyncProxy() throws Exception {
+	void customDefaultBeanSettingsAppliesToAsyncProxy() {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setAstrixApiProviders(() -> Stream.of(ApiProviderClass.create(PingApiProvider.class)));
 		
