@@ -44,7 +44,7 @@ public class TestApiTest {
 	public TestApiResetRule resetApis = new TestApiResetRule(astrixRule);
 	
 	@ClassRule
-	public static FakePingaApp pingApp = new FakePingaApp(astrixRule);
+	public static FakePingApp pingApp = new FakePingApp(astrixRule);
 	
 	
 	private Ping ping;
@@ -141,18 +141,18 @@ public class TestApiTest {
 		exportsRemoteServicesFor = PingApi.class,
 		defaultServiceComponent = AstrixServiceComponentNames.DIRECT
 	)
-	public static class FakePingaApp implements TestRule {
+	public static class FakePingApp implements TestRule {
 		
 		private AstrixApplicationContext context;
 		private AstrixRule astrix;
 
-		public FakePingaApp(AstrixRule astrix) {
+		public FakePingApp(AstrixRule astrix) {
 			this.astrix = astrix;
 		}
 
 		public void start() {
 			TestAstrixConfigurer astrixConfig = new TestAstrixConfigurer();
-			astrixConfig.setApplicationDescriptor(FakePingaApp.class);
+			astrixConfig.setApplicationDescriptor(FakePingApp.class);
 			astrixConfig.registerApiProvider(PingEngineApi.class);
 			astrixConfig.set(AstrixSettings.SERVICE_REGISTRY_URI, astrix.getServiceRegistryUri());
 			context = (AstrixApplicationContext) astrixConfig.configure();

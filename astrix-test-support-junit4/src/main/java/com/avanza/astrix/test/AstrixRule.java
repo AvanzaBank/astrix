@@ -218,7 +218,7 @@ public class AstrixRule implements TestRule {
 	<T> T getBean(Class<T> serviceBean) {
 		return astrixTestContext.getBean(serviceBean);
 	}
-	
+
 	<T> T getBean(Class<T> serviceBean, String qualifier) {
 		return astrixTestContext.getBean(serviceBean, qualifier);
 	}
