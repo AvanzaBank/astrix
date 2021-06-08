@@ -15,16 +15,6 @@
  */
 package com.avanza.astrix.beans.registry;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import java.util.List;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.DirectComponent;
@@ -35,27 +25,36 @@ import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.AstrixTestUtil;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class AstrixServiceRegistryTest {
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class AstrixServiceRegistryTest {
 	
-	InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
-	TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-	AstrixContext clientContext;
+	private final InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
+	private final TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+	private AstrixContext clientContext;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryLibraryProvider.class);
 		astrixConfigurer.registerApiProvider(AstrixServiceRegistryServiceProvider.class);
 	}
 	
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		AstrixTestUtil.closeQuiet(clientContext);
 	}
 	
 	
 	@Test
-	public void serviceRegistrySupportsMultipleProvidersOfSameService() throws Exception {
+	void serviceRegistrySupportsMultipleProvidersOfSameService() {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
 		astrixConfigurer.setSubsystem("default");
@@ -80,7 +79,7 @@ public class AstrixServiceRegistryTest {
 	}
 	
 	@Test
-	public void doesNotBindToNonPublishedProvidersInOtherZones() throws Exception {
+	void doesNotBindToNonPublishedProvidersInOtherZones() {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
 		astrixConfigurer.setSubsystem("default");
@@ -100,16 +99,12 @@ public class AstrixServiceRegistryTest {
 		assertEquals(1, providers.size());
 
 		Ping ping = clientContext.getBean(Ping.class);
-		try {
-			ping.ping();
-			fail("Expected service to not be available when server is INACTIVE");
-		} catch (ServiceUnavailableException e) {
-			// expected
-		}
+
+		assertThrows(ServiceUnavailableException.class, ping::ping, "Expected service to not be available when server is INACTIVE");
 	}
 	
 	@Test
-	public void bindsToNonPublishedProvidersInSameZone() throws Exception {
+	void bindsToNonPublishedProvidersInSameZone() {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
 		astrixConfigurer.setSubsystem("my-subsystem");
@@ -132,7 +127,7 @@ public class AstrixServiceRegistryTest {
 	}
 	
 	@Test
-	public void usesRoundRobinToDistributeConsumers() throws Exception {
+	void usesRoundRobinToDistributeConsumers() {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
@@ -167,7 +162,7 @@ public class AstrixServiceRegistryTest {
 	}
 
 	@Test
-	public void usesApplicationInstanceIdToDeregisterService() {
+	void usesApplicationInstanceIdToDeregisterService() {
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		clientContext = astrixConfigurer.configure();
@@ -196,8 +191,8 @@ public class AstrixServiceRegistryTest {
 		String ping();
 	}
 	
-	public class PingImpl implements Ping {
-		private String id;
+	public static class PingImpl implements Ping {
+		private final String id;
 		
 		public PingImpl(String id) {
 			this.id = id;

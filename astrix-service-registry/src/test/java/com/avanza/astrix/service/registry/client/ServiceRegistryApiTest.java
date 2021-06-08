@@ -15,18 +15,6 @@
  */
 package com.avanza.astrix.service.registry.client;
 
-import static com.avanza.astrix.test.util.AstrixTestUtil.isExceptionOfType;
-import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationException;
-import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationResult;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.util.function.Supplier;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
@@ -38,17 +26,26 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static com.avanza.astrix.test.util.AstrixTestUtil.isExceptionOfType;
+import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationException;
+import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationResult;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
-public class ServiceRegistryApiTest {
+class ServiceRegistryApiTest {
 	
 	private static final long UNUSED_LEASE = 10_000L;
+	private final InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 	private ServiceRegistryExporterClient serviceRegistryExporterClient;
 	private AstrixContext context;
-	private InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
-	
-	@Before
-	public void setup() {
+
+	@BeforeEach
+	void setup() {
 		TestAstrixConfigurer configurer = new TestAstrixConfigurer();
 		configurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 10);
 		configurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 10);
@@ -59,7 +56,7 @@ public class ServiceRegistryApiTest {
 	}
 	
 	@Test
-	public void lookupService_serviceAvailableInRegistry_ServiceIsImmediatlyBound() throws Exception {
+	void lookupService_serviceAvailableInRegistry_ServiceIsImmediatelyBound() {
 		final String objectId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		serviceRegistryExporterClient.register(GreetingService.class, DirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
 		
@@ -68,27 +65,18 @@ public class ServiceRegistryApiTest {
 	}
 	
 	@Test
-	public void lookupService_ServiceAvailableInRegistryButItsNotPossibleToBindToIt_ServiceIsBoundWhenServiceBecamesAvailable() throws Exception {
+	void lookupService_ServiceAvailableInRegistryButItsNotPossibleToBindToIt_ServiceIsBoundWhenServiceBecamesAvailable() throws Exception {
 		final String objectId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		final GreetingService dummyService = context.getBean(GreetingService.class);
 		
-		try {
-			dummyService.hello("kalle");
-			fail("Excpected service not to be registered in registry");
-		} catch (ServiceUnavailableException e) {
-		}
+		assertThrows(ServiceUnavailableException.class, () -> dummyService.hello("kalle"), "Expected service not to be registered in registry");
 
 		serviceRegistryExporterClient.register(GreetingService.class, DirectComponent.getServiceProperties(objectId), UNUSED_LEASE);
-		assertEventually(serviceInvocationResult(new Supplier<String>() {
-			@Override
-			public String get() {
-				return dummyService.hello("kalle");
-			}
-		}, equalTo("hello: kalle")));
+		assertEventually(serviceInvocationResult(() -> dummyService.hello("kalle"), equalTo("hello: kalle")));
 	}
 	
 	@Test
-	public void serviceIsReboundIfServiceIsMovedInRegistry() throws Exception {
+	void serviceIsReboundIfServiceIsMovedInRegistry() throws Exception {
 		final String providerId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		serviceRegistryExporterClient.register(GreetingService.class, DirectComponent.getServiceProperties(providerId), UNUSED_LEASE);
 		
@@ -98,16 +86,11 @@ public class ServiceRegistryApiTest {
 		final String newProviderId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hej: "));
 		serviceRegistryExporterClient.register(GreetingService.class, DirectComponent.getServiceProperties(newProviderId), UNUSED_LEASE);
 		
-		assertEventually(serviceInvocationResult(new Supplier<String>() {
-			@Override
-			public String get() {
-				return dummyService.hello("kalle");
-			}
-		}, equalTo("hej: kalle")));
+		assertEventually(serviceInvocationResult(() -> dummyService.hello("kalle"), equalTo("hej: kalle")));
 	}
 	
 	@Test
-	public void whenServiceIsRemovedFromRegistryItShouldStartThrowingServiceUnavailable() throws Exception {
+	void whenServiceIsRemovedFromRegistryItShouldStartThrowingServiceUnavailable() throws Exception {
 		final String providerId = DirectComponent.register(GreetingService.class, new GreetingServiceImpl("hello: "));
 		serviceRegistryExporterClient.register(GreetingService.class, DirectComponent.getServiceProperties(providerId), UNUSED_LEASE);
 		
@@ -135,7 +118,7 @@ public class ServiceRegistryApiTest {
 	
 	public static class GreetingServiceImpl implements GreetingService {
 		
-		private String greeting;
+		private final String greeting;
 
 		public GreetingServiceImpl(String greeting) {
 			this.greeting = greeting;

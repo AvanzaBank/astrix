@@ -15,20 +15,6 @@
  */
 package com.avanza.astrix.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
-
-import javax.annotation.PreDestroy;
-
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.BasicFuture;
 import com.avanza.astrix.beans.factory.CircularDependency;
 import com.avanza.astrix.beans.ft.BeanFaultTolerance;
@@ -37,56 +23,68 @@ import com.avanza.astrix.core.AstrixFaultToleranceProxy;
 import com.avanza.astrix.core.function.CheckedCommand;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
-
+import org.junit.jupiter.api.Test;
 import rx.Observable;
 
+import javax.annotation.PreDestroy;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
-public class AstrixLibraryTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+
+class AstrixLibraryTest {
 	
 	@Test
-	public void aLibraryCanExportInterfaces() throws Exception {
-		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiProvider(MyLibraryProvider.class);
-		AstrixContextImpl AstrixContext = (AstrixContextImpl) AstrixConfigurer.configure();
+	void aLibraryCanExportInterfaces() {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(MyLibraryProvider.class);
+		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 		
-		HelloBean libraryBean = AstrixContext.getBean(HelloBean.class);
+		HelloBean libraryBean = astrixContext.getBean(HelloBean.class);
 		assertEquals("hello: kalle", libraryBean.hello("kalle"));
 	}
 	
 	@Test
-	public void aLibraryCanExportClasses() throws Exception {
-		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiProvider(MyLibraryProviderNoInterface.class);
-		AstrixContextImpl AstrixContext = (AstrixContextImpl) AstrixConfigurer.configure();
+	void aLibraryCanExportClasses() {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(MyLibraryProviderNoInterface.class);
+		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 
-		HelloBeanImpl libraryBean = AstrixContext.getBean(HelloBeanImpl.class);
+		HelloBeanImpl libraryBean = astrixContext.getBean(HelloBeanImpl.class);
 		assertEquals("hello: kalle", libraryBean.hello("kalle"));
 	}
 	
-	@Test(expected = CircularDependency.class)
-	public void detectsCircularDependenciesAmongLibraries() throws Exception {
-		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiProvider(CircularApiA.class);
-		AstrixConfigurer.registerApiProvider(CircularApiB.class);
-		AstrixConfigurer.registerApiProvider(CircularApiC.class);
-		AstrixContextImpl AstrixContext = (AstrixContextImpl) AstrixConfigurer.configure();
+	@Test
+	void detectsCircularDependenciesAmongLibraries() {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(CircularApiA.class);
+		astrixConfigurer.registerApiProvider(CircularApiB.class);
+		astrixConfigurer.registerApiProvider(CircularApiC.class);
+		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 
-		AstrixContext.getBean(HelloBeanImpl.class);
+		assertThrows(CircularDependency.class, () -> astrixContext.getBean(HelloBeanImpl.class));
 	}
 	
 	@Test
-	public void doesNotForceDependenciesForUnusedApis() throws Exception {
-		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiProvider(DependentApi.class);
-		AstrixConfigurer.registerApiProvider(IndependentApi.class);
-		AstrixContextImpl AstrixContext = (AstrixContextImpl) AstrixConfigurer.configure();
+	void doesNotForceDependenciesForUnusedApis() {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(DependentApi.class);
+		astrixConfigurer.registerApiProvider(IndependentApi.class);
+		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 
-		IndependentApi bean = AstrixContext.getBean(IndependentApi.class);
+		IndependentApi bean = astrixContext.getBean(IndependentApi.class);
 		assertNotNull(bean);
 	}
 	
 	@Test
-	public void preDestroyAnnotatedMethodsOnLibraryFactoryInstancesAreInvokedWhenAstrixContextIsDestroyed() throws Exception {
+	void preDestroyAnnotatedMethodsOnLibraryFactoryInstancesAreInvokedWhenAstrixContextIsDestroyed() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(MyLibraryProvider.class);
 		AstrixContextImpl context = (AstrixContextImpl) astrixConfigurer.configure();
@@ -98,7 +96,7 @@ public class AstrixLibraryTest {
 	}
 	
 	@Test
-	public void librariesCreatedUsingDifferentContextsShouldReturnDifferentInstances() throws Exception {
+	void librariesCreatedUsingDifferentContextsShouldReturnDifferentInstances() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(MyLibraryProvider.class);
 		AstrixContextImpl context = (AstrixContextImpl) astrixConfigurer.configure();
@@ -114,7 +112,7 @@ public class AstrixLibraryTest {
 	}
 	
 	@Test
-	public void appliesFaultToleranceProxyToAstrixFaultToleranceProxyAnnotatedLibraries() throws Exception {
+	void appliesFaultToleranceProxyToAstrixFaultToleranceProxyAnnotatedLibraries() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(MyLibraryProviderWithFaultTolerance.class);
 		astrixConfigurer.enableFaultTolerance(true);
@@ -147,7 +145,7 @@ public class AstrixLibraryTest {
 	}
 	
 	@Test
-	public void doesNotApplyFaultToleranceProxyToNonAstrixFaultToleranceProxyAnnotatedLibraries() throws Exception {
+	void doesNotApplyFaultToleranceProxyToNonAstrixFaultToleranceProxyAnnotatedLibraries() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.enableFaultTolerance(true);
 		astrixConfigurer.registerApiProvider(MyLibraryProvider.class); // No Fault tolerance

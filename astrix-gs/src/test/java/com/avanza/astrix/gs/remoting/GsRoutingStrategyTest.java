@@ -15,20 +15,21 @@
  */
 package com.avanza.astrix.gs.remoting;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-import org.openspaces.remoting.Routing;
-
 import com.avanza.astrix.core.AstrixRouting;
 import com.avanza.astrix.core.remoting.Router;
 import com.avanza.astrix.core.remoting.RoutingKey;
 import com.avanza.astrix.remoting.client.AmbiguousRoutingException;
+import org.junit.jupiter.api.Test;
+import org.openspaces.remoting.Routing;
 
-public class GsRoutingStrategyTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+
+class GsRoutingStrategyTest {
 	
 	@Test
-	public void astrixRoutingTakesPrecedence() throws Exception {
+	void astrixRoutingTakesPrecedence() throws Exception {
 		class Service {
 			@SuppressWarnings("unused")
 			public void hello(@Routing String routingArg, @AstrixRouting String anotherArg) {
@@ -41,7 +42,7 @@ public class GsRoutingStrategyTest {
 	
 	
 	@Test
-	public void routesOnRoutingAnnotatedArgument() throws Exception {
+	void routesOnRoutingAnnotatedArgument() throws Exception {
 		class Service {
 			@SuppressWarnings("unused")
 			public void hello(@Routing String routingArg, String anotherArg) {
@@ -53,7 +54,7 @@ public class GsRoutingStrategyTest {
 	}
 	
 	@Test
-	public void routesOnRoutingAnnotatedArgumentPropertyIfDefined() throws Exception {
+	void routesOnRoutingAnnotatedArgumentPropertyIfDefined() throws Exception {
 		class Service {
 			@SuppressWarnings("unused")
 			public void hello(@Routing("getRouting") ProperRoutingMethod routingArg) {
@@ -65,45 +66,45 @@ public class GsRoutingStrategyTest {
 		assertEquals(RoutingKey.create("routing-arg"), routingKey);
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
-	public void missingPropertyMethod_throwsIllegalArgumentException() throws Exception {
+	@Test
+	void missingPropertyMethod_throwsIllegalArgumentException() {
 		class Service {
 			@SuppressWarnings("unused")
 			public void hello(@Routing("getRouting") MissingRoutingMethod routingArg) {
 			}
 		}
-		new GsRoutingStrategy().create(Service.class.getMethod("hello", MissingRoutingMethod.class));
+		assertThrows(IllegalArgumentException.class, () -> new GsRoutingStrategy().create(Service.class.getMethod("hello", MissingRoutingMethod.class)));
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
-	public void invalidPropertyMethod_throwsIllegalArgumentException() throws Exception {
+	@Test
+	void invalidPropertyMethod_throwsIllegalArgumentException() {
 		class Service {
 			@SuppressWarnings("unused")
 			public void hello(@Routing("getRouting") IllegalRoutingMethod routingArg) {
 			}
 		}
 		
-		new GsRoutingStrategy().create(Service.class.getMethod("hello", IllegalRoutingMethod.class));
+		assertThrows(IllegalArgumentException.class, () -> new GsRoutingStrategy().create(Service.class.getMethod("hello", IllegalRoutingMethod.class)));
 	}
 	
-	@Test(expected = AmbiguousRoutingException.class)
-	public void multipleRoutingAnnotations_throwsAmbiguousRoutingException() throws Exception {
+	@Test
+	void multipleRoutingAnnotations_throwsAmbiguousRoutingException() {
 		class Service {
 			@SuppressWarnings("unused")
 			public void hello(@Routing String routingArg, @Routing String routingArg2) {
 			}
 		}
-		new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
+		assertThrows(AmbiguousRoutingException.class, () -> new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class)));
 	}
 	
-	@Test(expected = AmbiguousRoutingException.class)
-	public void noRoutingArgument_throwsAmbiguousRoutingException() throws Exception {
+	@Test
+	void noRoutingArgument_throwsAmbiguousRoutingException() {
 		class Service {
 			@SuppressWarnings("unused")
 			public void hello(String routingArg, String routingArg2) {
 			}
 		}
-		new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
+		assertThrows(AmbiguousRoutingException.class, () -> new GsRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class)));
 	}
 	
 	public static class ProperRoutingMethod {

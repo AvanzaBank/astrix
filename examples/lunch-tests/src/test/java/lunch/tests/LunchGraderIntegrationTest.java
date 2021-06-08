@@ -15,42 +15,41 @@
  */
 package lunch.tests;
 
-import static com.avanza.astrix.test.util.AstrixTestUtil.isSuccessfulServiceInvocation;
-import static org.junit.Assert.assertEquals;
-import lunch.api.LunchRestaurant;
-import lunch.api.LunchService;
-import lunch.grader.api.LunchRestaurantGrader;
-
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mockito;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.astrix.test.util.AutoCloseableRule;
+import com.avanza.astrix.test.util.AutoCloseableExtension;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
-import com.avanza.gs.test.PuConfigurers;
-import com.avanza.gs.test.RunningPu;
+import com.avanza.gs.test.junit5.PuConfigurers;
+import com.avanza.gs.test.junit5.RunningPu;
+import lunch.api.LunchRestaurant;
+import lunch.api.LunchService;
+import lunch.grader.api.LunchRestaurantGrader;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mockito;
 
-public class LunchGraderIntegrationTest {
+import static com.avanza.astrix.test.util.AstrixTestUtil.isSuccessfulServiceInvocation;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class LunchGraderIntegrationTest {
 	
-	public static InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
+	private static final InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
 		set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 200);
 	}};
 	
-	@ClassRule
-	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
-			   											 .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
-			   											 .startAsync(false)
-														 .configure();
-	@Rule
-	public AutoCloseableRule autoCloseableRule = new AutoCloseableRule();
+	@RegisterExtension
+	static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
+												  .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
+												  .startAsync(false)
+												  .configure();
+	@RegisterExtension
+	AutoCloseableExtension autoCloseableExtension = new AutoCloseableExtension();
 	
 	@Test
-	public void itsPossibleToStubOutServiceDependenciesUsingInMemoryServiceRegistry() throws Exception {
+	void itsPossibleToStubOutServiceDependenciesUsingInMemoryServiceRegistry() throws Exception {
 		LunchService lunchMock = Mockito.mock(LunchService.class);
 		Mockito.when(lunchMock.getLunchRestaurant("mcdonalds")).thenReturn(new LunchRestaurant("mcdonalds", "fastfood"));
 		serviceRegistry.registerProvider(LunchService.class, lunchMock, "lunch-system");
@@ -58,17 +57,12 @@ public class LunchGraderIntegrationTest {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		configurer.setSubsystem("lunch-system");
-		AstrixContext astrix = autoCloseableRule.add(configurer.configure());
+		AstrixContext astrix = autoCloseableExtension.add(configurer.configure());
 		final LunchRestaurantGrader grader = astrix.waitForBean(LunchRestaurantGrader.class, 5_000);
 		
 		// Not that the lunch-grader-pu grader.grade uses another service internally, hence we must wait
 		// For that as well to bind its service-bean
-		assertEventually(isSuccessfulServiceInvocation(new Runnable() {
-			@Override
-			public void run() {
-				grader.grade("mcdonalds", 5);
-			}
-		}));
+		assertEventually(isSuccessfulServiceInvocation(() -> grader.grade("mcdonalds", 5)));
 		grader.grade("mcdonalds", 3);
 		
 		assertEquals(4D, grader.getAvarageGrade("mcdonalds"), 0.01D);

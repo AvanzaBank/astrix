@@ -15,22 +15,24 @@
  */
 package com.avanza.astrix.test.util;
 
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
-public class Timeout {
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-	private final long endTimeMillis;
+public class AutoCloseableExtension implements AfterEachCallback {
 
-	public Timeout(long timeoutMillis) {
-		this.endTimeMillis = currentTimeMillis() + timeoutMillis;
-	}
+    private final Queue<AutoCloseable> autoClosables = new ConcurrentLinkedQueue<>();
 
-	public boolean hasTimeout() {
-		return currentTimeMillis() >= endTimeMillis;
-	}
+    @Override
+    public void afterEach(ExtensionContext context) {
+		autoClosables.forEach(AstrixTestUtil::closeQuiet);
+    }
 
-	// test hook
-	long currentTimeMillis() {
-		return System.currentTimeMillis();
-	}
-	
+    public <T extends AutoCloseable> T add(T autoClosable) {
+        autoClosables.add(autoClosable);
+        return autoClosable;
+    }
+
 }

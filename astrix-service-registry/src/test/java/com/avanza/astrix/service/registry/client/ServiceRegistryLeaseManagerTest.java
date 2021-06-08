@@ -15,18 +15,6 @@
  */
 package com.avanza.astrix.service.registry.client;
 
-import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationResult;
-import static org.junit.Assert.fail;
-
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
-import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
@@ -40,18 +28,28 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
+import static com.avanza.astrix.test.util.AstrixTestUtil.serviceInvocationResult;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
+class ServiceRegistryLeaseManagerTest {
 
-public class ServiceRegistryLeaseManagerTest {
-
+	private final CorruptibleServiceRegistry serviceRegistry = new CorruptibleServiceRegistry();
 	private ServiceRegistryExporterClient serviceRegistryExporterClient;
 	private AstrixContext context;
-	private CorruptableServiceRegistry serviceRegistry = new CorruptableServiceRegistry();
 	private TestService testService;
 	
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 100); // No Sleep between attempts
 		astrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -73,9 +71,9 @@ public class ServiceRegistryLeaseManagerTest {
 	}
 	
 	@Test
-	public void leaseManagerShouldRecoverFromFailuresInCommunicationWithServiceRegistry() throws Exception {
+	void leaseManagerShouldRecoverFromFailuresInCommunicationWithServiceRegistry() throws Exception {
 		// Verify that we are bound to an instance
-		assertEventually(serviceInvocationResult(new Supplier<String>() {
+		assertEventually(serviceInvocationResult(new Supplier<>() {
 			@Override
 			public String get() {
 				return testService.call();
@@ -100,19 +98,14 @@ public class ServiceRegistryLeaseManagerTest {
 		};
 		String id = DirectComponent.register(TestService.class, impl);
 		serviceRegistryExporterClient.register(TestService.class, DirectComponent.getServiceProperties(id), -1);
-		assertEventually(serviceInvocationResult(new Supplier<String>() {
-			@Override
-			public String get() {
-				return testService.call();
-			}
-		}, CoreMatchers.equalTo("2")));
+		assertEventually(serviceInvocationResult(() -> testService.call(), CoreMatchers.equalTo("2")));
 	}
 	
 	private void assertEventually(Probe probe) throws InterruptedException {
 		new Poller(1000, 1).check(probe);
 	}
 	
-	public static class CorruptableServiceRegistry extends InMemoryServiceRegistry {
+	public static class CorruptibleServiceRegistry extends InMemoryServiceRegistry {
 		private volatile CountDownLatch exceptionsToThrow = new CountDownLatch(0);
 		
 		@Override

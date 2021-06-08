@@ -15,19 +15,6 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
@@ -48,13 +35,24 @@ import com.netflix.hystrix.HystrixCommandMetrics;
 import com.netflix.hystrix.HystrixEventType;
 import com.netflix.hystrix.HystrixObservableCommand.Setter;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
-
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import rx.Observable;
 import rx.Observable.OnSubscribe;
 import rx.Subscriber;
 
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
-public class HystrixObservableCommandFacadeTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+
+class HystrixObservableCommandFacadeTest {
 	
 	private final String groupKey = UUID.randomUUID().toString();
 	private final String commandKey = UUID.randomUUID().toString();
@@ -70,8 +68,8 @@ public class HystrixObservableCommandFacadeTest {
 	private Ping ping;
 	private PingImpl pingServer = new PingImpl();
 	
-	@Before
-	public void before() throws InterruptedException {
+	@BeforeEach
+	void before() {
 		Hystrix.reset();
 		context = new TestAstrixConfigurer().enableFaultTolerance(true)
 											.registerApiProvider(PingApi.class)
@@ -83,25 +81,25 @@ public class HystrixObservableCommandFacadeTest {
 		initMetrics(ping);
 	}
 	
-	private void initMetrics(Ping ping) throws InterruptedException {
+	private void initMetrics(Ping ping) {
 		// Black hystrix magic here :(
 		try {
 			ping.ping();
-		} catch (Exception e) {
+		} catch (Exception ignore) {
 		}
-		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) AstrixApplicationContext.class.cast(this.context).getInstance(BeanFaultToleranceFactorySpi.class);
+		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) ((AstrixApplicationContext) this.context).getInstance(BeanFaultToleranceFactorySpi.class);
 		HystrixCommandKey key = faultTolerance.getCommandKey(AstrixBeanKey.create(Ping.class));
 		
 		HystrixCommandMetrics.getInstance(key).getCumulativeCount(HystrixEventType.SUCCESS);
 	}
 	
-	@After
-	public void after() {
+	@AfterEach
+	void after() {
 		context.destroy();
 	}
 	
 	@Test
-	public void underlyingObservableIsWrappedWithFaultTolerance() throws Throwable {
+	void underlyingObservableIsWrappedWithFaultTolerance() throws Throwable {
 		pingServer.setResult(Observable.just("foo"));
 		String result = ping.ping().toBlocking().first();
 
@@ -112,14 +110,11 @@ public class HystrixObservableCommandFacadeTest {
 	}
 	
 	@Test
-	public void serviceUnavailableThrownByUnderlyingObservableShouldCountAsFailure() throws Exception {
-		pingServer.setResult(Observable.<String>error(new ServiceUnavailableException("")));
-		try {
-			ping.ping().toBlocking().first();
-			fail("Expected service unavailable");
-		} catch (ServiceUnavailableException e) {
-			// Expcected
-		}
+	void serviceUnavailableThrownByUnderlyingObservableShouldCountAsFailure() throws Exception {
+		pingServer.setResult(Observable.error(new ServiceUnavailableException("")));
+
+		assertThrows(ServiceUnavailableException.class, () -> ping.ping().toBlocking().first(), "Expected service unavailable");
+
 		eventually(() -> {
 			assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS));
 			assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.FAILURE));
@@ -127,15 +122,11 @@ public class HystrixObservableCommandFacadeTest {
 	}
 	
 	@Test
-	public void normalExceptionsThrownIsTreatedAsPartOfNormalApiFlowAndDoesNotCountAsFailure() throws Exception {
-		pingServer.setResult(Observable.<String>error(new MyDomainException()));
-		try {
-			ping.ping().toBlocking().first();
-			fail("All regular exception should be propagated as is from underlying observable");
-		} catch (MyDomainException e) {
-			// Expcected
-		}
-		
+	void normalExceptionsThrownIsTreatedAsPartOfNormalApiFlowAndDoesNotCountAsFailure() throws Exception {
+		pingServer.setResult(Observable.error(new MyDomainException()));
+
+		assertThrows(MyDomainException.class, () -> ping.ping().toBlocking().first(), "All regular exception should be propagated as is from underlying observable");
+
 		eventually(() -> {
 			// Note that from the perspective of a circuit-breaker an exception thrown
 			// by the underlying observable (typically a service call) should not
@@ -146,19 +137,16 @@ public class HystrixObservableCommandFacadeTest {
 	}
 	
 	@Test
-	public void throwsServiceUnavailableOnTimeouts() throws Exception {
-		pingServer.setResult(Observable.unsafeCreate(new OnSubscribe<String>() {
+	void throwsServiceUnavailableOnTimeouts() throws Exception {
+		pingServer.setResult(Observable.unsafeCreate(new OnSubscribe<>() {
 			@Override
 			public void call(Subscriber<? super String> t1) {
 				// Simulate timeout by not invoking subscriber
 			}
 		}));
-		try {
-			ping.ping().toBlocking().first();
-			fail("All ServiceUnavailableException should be thrown on timeout");
-		} catch (ServiceUnavailableException e) {
-			// Expcected
-		}
+
+		assertThrows(ServiceUnavailableException.class, () -> ping.ping().toBlocking().first(), "All ServiceUnavailableException should be thrown on timeout");
+
 		eventually(() -> {
 			assertEquals(0, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS));
 			assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.TIMEOUT));
@@ -167,8 +155,8 @@ public class HystrixObservableCommandFacadeTest {
 	}
 	
 	@Test
-	public void semaphoreRejectedCountsAsFailure() throws Exception {
-		pingServer.setResult(Observable.unsafeCreate(new OnSubscribe<String>() {
+	void semaphoreRejectedCountsAsFailure() throws Exception {
+		pingServer.setResult(Observable.unsafeCreate(new OnSubscribe<>() {
 			@Override
 			public void call(Subscriber<? super String> t1) {
 				// Simulate timeout by not invoking subscriber
@@ -188,9 +176,9 @@ public class HystrixObservableCommandFacadeTest {
 	}
 	
 	@Test
-	public void subscribesEagerlyToCreatedObserver() throws Exception {
+	void subscribesEagerlyToCreatedObserver() {
 		AtomicBoolean subscribed = new AtomicBoolean(false);
-		Supplier<Observable<String>> timeoutCommandSupplier = new Supplier<Observable<String>>() {
+		Supplier<Observable<String>> timeoutCommandSupplier = new Supplier<>() {
 			@Override
 			public Observable<String> get() {
 				return Observable.unsafeCreate(t1 -> {
@@ -204,13 +192,13 @@ public class HystrixObservableCommandFacadeTest {
 	
 	
 	@Test
-	public void doesNotInvokeSupplierWhenBulkHeadIsFull() throws Exception {
+	void doesNotInvokeSupplierWhenBulkHeadIsFull() {
 		final AtomicInteger supplierInvocationCount = new AtomicInteger();
-		Supplier<Observable<String>> timeoutCommandSupplier = new Supplier<Observable<String>>() {
+		Supplier<Observable<String>> timeoutCommandSupplier = new Supplier<>() {
 			@Override
 			public Observable<String> get() {
 				supplierInvocationCount.incrementAndGet();
-				return Observable.unsafeCreate(new OnSubscribe<String>() {
+				return Observable.unsafeCreate(new OnSubscribe<>() {
 					@Override
 					public void call(Subscriber<? super String> t1) {
 						// Simulate timeout by not invoking subscriber
@@ -229,18 +217,18 @@ public class HystrixObservableCommandFacadeTest {
 	}
 	
 	private int getEventCountForCommand(HystrixRollingNumberEvent hystrixRollingNumberEvent) {
-		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) AstrixApplicationContext.class.cast(this.context).getInstance(BeanFaultToleranceFactorySpi.class);
+		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) ((AstrixApplicationContext) this.context).getInstance(BeanFaultToleranceFactorySpi.class);
 		HystrixCommandKey commandKey = faultTolerance.getCommandKey(AstrixBeanKey.create(Ping.class));
 		HystrixCommandMetrics metrics = HystrixCommandMetrics.getInstance(commandKey);
 		int currentConcurrentExecutionCount = (int) metrics.getCumulativeCount(hystrixRollingNumberEvent);
 		return currentConcurrentExecutionCount;
 	}
 	
-	public static class MyDomainException extends RuntimeException {
+	private static class MyDomainException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 	}
 	
-	public static interface Ping {
+	public interface Ping {
 		Observable<String> ping();
 	}
 	

@@ -15,16 +15,16 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HystrixStrategyMappingTest {
+class HystrixStrategyMappingTest {
 	
 	@Test
-	public void parsesAstrixContextIdFromCommandKey() throws Exception {
+	void parsesAstrixContextIdFromCommandKey() {
 		HystrixStrategyMapping strategiesMappingTest = new HystrixStrategyMapping();
 		assertEquals(Optional.empty(), strategiesMappingTest.parseStrategiesId("fooBar"));
 		assertEquals(Optional.empty(), strategiesMappingTest.parseStrategiesId("fooBar[1"));

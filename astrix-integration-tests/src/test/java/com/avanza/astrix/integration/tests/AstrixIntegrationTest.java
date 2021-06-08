@@ -15,29 +15,6 @@
  */
 package com.avanza.astrix.integration.tests;
 
-import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.openspaces.core.GigaSpace;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
@@ -63,54 +40,76 @@ import com.avanza.astrix.integration.tests.domain2.api.LunchRestaurantGrader;
 import com.avanza.astrix.integration.tests.domain2.apiruntime.PublicLunchFeeder;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.test.util.AstrixTestUtil;
-import com.avanza.astrix.test.util.AutoCloseableRule;
+import com.avanza.astrix.test.util.AutoCloseableExtension;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
-import com.avanza.gs.test.PuConfigurers;
-import com.avanza.gs.test.RunningPu;
+import com.avanza.gs.test.junit5.PuConfigurers;
+import com.avanza.gs.test.junit5.RunningPu;
+import org.hamcrest.CustomTypeSafeMatcher;
+import org.hamcrest.Matcher;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.openspaces.core.GigaSpace;
+
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
+
+import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixIntegrationTest {
+class AstrixIntegrationTest {
 
-	@ClassRule
-	public static RunningPu serviceRegistrypu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
-															.numberOfPrimaries(1)
-															.numberOfBackups(0)
-															.beanProperties("space", new Properties() {{
+	@RegisterExtension
+	static RunningPu serviceRegistryPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
+													  .numberOfPrimaries(1)
+													  .numberOfBackups(0)
+													  .beanProperties("space", new Properties() {{
 																// Run lease-manager thread every 200 ms.
 																setProperty("space-config.lease_manager.expiration_time_interval", "200");
 															}})
-															.startAsync(true)
-															.configure();
+													  .startAsync(true)
+													  .configure();
 	
-	private static MapConfigSource config = new MapConfigSource() {{
-		set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
+	private static final MapConfigSource config = new MapConfigSource() {{
+		set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistryPu.getLookupGroupName());
 		set(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
 		set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 250);
 	}};
 	
-	@ClassRule
-	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
+	@RegisterExtension
+	static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
 											  .numberOfPrimaries(1)
 											  .numberOfBackups(0)
 											  .contextProperty("configSourceId", GlobalConfigSourceRegistry.register(config))
 											  .startAsync(true)
 											  .configure();
 	
-	@ClassRule
-	public static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
+	@RegisterExtension
+	static RunningPu lunchGraderPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
 														.numberOfPrimaries(1)
 														.numberOfBackups(0)
 														  .contextProperty("configSourceId", GlobalConfigSourceRegistry.register(config))
 														.startAsync(true)
 														.configure();
 	
-	@Rule 
-	public AutoCloseableRule autoClosables = new AutoCloseableRule();
+	@RegisterExtension
+	AutoCloseableExtension autoClosables = new AutoCloseableExtension();
 
 	private LunchService lunchService;
 	private LunchUtil lunchUtil;
@@ -124,8 +123,8 @@ public class AstrixIntegrationTest {
 
 	private AstrixServiceRegistry serviceRegistry;
 
-	@Before
-	public void setup() throws Exception {
+	@BeforeEach
+	void setup() throws Exception {
 		GigaSpace proxy = lunchPu.getClusteredGigaSpace();
 		proxy.clear(null);
 		
@@ -154,7 +153,7 @@ public class AstrixIntegrationTest {
 	}
 	
 	@Test
-	public void routedRemotingRequest() throws Exception {
+	void routedRemotingRequest() {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		
 		GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
@@ -165,7 +164,7 @@ public class AstrixIntegrationTest {
 	}
 	
 	@Test
-	public void partitionedRemotingRequest() throws Exception {
+	void partitionedRemotingRequest() {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("McDonalds").build());
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Max Burger").build());
@@ -182,12 +181,12 @@ public class AstrixIntegrationTest {
 	}
 	
 	@Test
-	public void requestToQualifiedService() throws Exception {
+	void requestToQualifiedService() {
 		assertEquals("hi", lunchPing.ping("hi"));
 	}
 	
 	@Test
-	public void testPuThatConsumesAnotherService() throws Exception {
+	void testPuThatConsumesAnotherService() {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		
 		lunchRestaurantGrader.grade("Martins Green Room", 2);
@@ -197,7 +196,7 @@ public class AstrixIntegrationTest {
 	}
 	
 	@Test
-	public void broadcastedRemotingRequest() throws Exception {
+	void broadcastedRemotingRequest() {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		
 		LunchRestaurant r = lunchService.suggestRandomLunchRestaurant("vegetarian");
@@ -205,82 +204,70 @@ public class AstrixIntegrationTest {
 	}
 	
 	@Test
-	public void routedRemotingRequest_throwsException() throws Exception {
-		try {
-			GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
-			request.setName("throwException"); // LunchServiceImpl is hard-coded to throw exception for this name.
-			lunchService.getLunchRestaurant(request);
-		} catch (RemoteServiceInvocationException e) {
-			assertEquals(IllegalArgumentException.class.getName(), e.getExceptionType());
-			assertThat(e.getMessage(), startsWith("Remote service threw exception, see server log for details. [java.lang.IllegalArgumentException: Illegal restaurant: throwException]"));
-		}
+	void routedRemotingRequest_throwsException() {
+		GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
+		request.setName("throwException"); // LunchServiceImpl is hard-coded to throw exception for this name.
+		RemoteServiceInvocationException e = assertThrows(RemoteServiceInvocationException.class, () -> lunchService.getLunchRestaurant(request));
+		assertEquals(IllegalArgumentException.class.getName(), e.getExceptionType());
+		assertThat(e.getMessage(), startsWith("Remote service threw exception, see server log for details. [java.lang.IllegalArgumentException: Illegal restaurant: throwException]"));
 	}
 	
 	@Test
-	public void libraryUsageTest() throws Exception {
+	void libraryUsageTest() {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").withFoodType("vegetarian").build());
 		LunchRestaurant r = lunchUtil.suggestVegetarianRestaurant();
 		assertEquals("Martins Green Room", r.getName());
 	}
 	
 	@Test
-	public void asyncService() throws Exception {
+	void asyncService() throws Exception {
 		lunchService.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
 		request.setName("Martins Green Room");
 		
 		Future<LunchRestaurant> f = asyncLunchService.getLunchRestaurant(request);
-		LunchRestaurant r = f.get(300, TimeUnit.MILLISECONDS);
+		LunchRestaurant r = f.get(300, MILLISECONDS);
 		assertEquals("Martins Green Room", r.getName());
 	}
 	
 	@Test
-	public void itsOkToInvokeUnversionedServicesWithinSameSubSystem() throws Exception {
+	void itsOkToInvokeUnversionedServicesWithinSameSubSystem() throws Exception {
 		// Lunch feeder indirectly invokes "internal" service 
 		publicLunchFeeder.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		GetLunchRestaurantRequest request = new GetLunchRestaurantRequest();
 		request.setName("Martins Green Room");
 		
 		Future<LunchRestaurant> f = asyncLunchService.getLunchRestaurant(request);
-		LunchRestaurant r = f.get(300, TimeUnit.MILLISECONDS);
+		LunchRestaurant r = f.get(300, MILLISECONDS);
 		assertEquals("Martins Green Room", r.getName());
 	}
 
 	@Test
-	public void leasesServices() throws Exception {
+	void leasesServices() throws Exception {
 		ServiceProperties properties = new ServiceProperties();
 		properties.setApi(FooService.class);
 		ServiceRegistryExporterClient exporterClient = new ServiceRegistryExporterClient(serviceRegistry, "test-sub-system" , "foo-app-instance-id");
 		exporterClient.register(FooService.class, properties, 1000);
 		
 		ServiceProperties props = serviceRegistryClient.lookup(AstrixBeanKey.create(FooService.class));
-		assertNotNull("Expected properties to exists after registration", props);
+		assertNotNull(props, "Expected properties to exists after registration");
 		
-		assertEventually(AstrixTestUtil.serviceInvocationResult(new Supplier<Object>() {
-			public Object get() {
-				return serviceRegistryClient.lookup(AstrixBeanKey.create(FooService.class));
-			};
-		}, is(nullValue())));
+		assertEventually(AstrixTestUtil.serviceInvocationResult((Supplier<Object>) () -> serviceRegistryClient.lookup(AstrixBeanKey.create(FooService.class)), is(nullValue())));
 	}
 	
 	@Test
-	public void usesSpaceApplicationDescriptorNameAsdefaultApplicationInstanceIdForProcessingUnits() throws Exception {
+	void usesSpaceApplicationDescriptorNameAsDefaultApplicationInstanceIdForProcessingUnits() {
 		ServiceProperties serviceProperties = serviceRegistryClient.lookup(AstrixBeanKey.create(LunchService.class));
 		assertEquals(LunchApplicationDescriptor.class.getName(), serviceProperties.getProperties().get(ServiceProperties.APPLICATION_INSTANCE_ID));
 	}
 	
-	@Test(expected = ServiceUnavailableException.class)
-	public void itsNotPossibleToBindToNonPublishedServiceBeansProvidedByOtherSubsystems() throws Exception {
-		astrix.getBean(InternalLunchFeeder.class).addLunchRestaurant(lunchRestaurant().build());
+	@Test
+	void itsNotPossibleToBindToNonPublishedServiceBeansProvidedByOtherSubsystems() {
+		assertThrows(ServiceUnavailableException.class, () -> astrix.getBean(InternalLunchFeeder.class).addLunchRestaurant(lunchRestaurant().build()));
 	}
 
-	private TypeSafeMatcher<LunchRestaurant> restaurantWithName(final String restaurantName) {
-		return new TypeSafeMatcher<LunchRestaurant>() {
-			@Override
-			public void describeTo(Description description) {
-				description.appendText("LunchRestaurant with name: " + restaurantName);
-			}
-
+	private Matcher<LunchRestaurant> restaurantWithName(final String restaurantName) {
+		return new CustomTypeSafeMatcher<>("LunchRestaurant with name: " + restaurantName) {
 			@Override
 			protected boolean matchesSafely(LunchRestaurant item) {
 				return item.getName().equals(restaurantName);

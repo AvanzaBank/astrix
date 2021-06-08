@@ -15,24 +15,6 @@
  */
 package com.avanza.astrix.beans.service;
 
-import static org.hamcrest.CoreMatchers.any;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.Collections;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
-
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matcher;
-import org.junit.After;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
@@ -58,22 +40,39 @@ import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
 import com.avanza.astrix.versioning.core.ObjectSerializerDefinition;
 import com.avanza.astrix.versioning.core.ObjectSerializerFactory;
-
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matcher;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import rx.Observable;
 
-public class ServiceBeanInstanceTest {
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
+
+import static org.hamcrest.CoreMatchers.any;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+class ServiceBeanInstanceTest {
 	
 	private AstrixContext astrixContext;
 
-	@After
-	public void destroy() {
+	@AfterEach
+	void destroy() {
 		if (astrixContext != null) {
 			astrixContext.destroy();
 		}
 	}
 	
 	@Test
-	public void addsFtProxyToServiceBean() throws Exception {
+	void addsFtProxyToServiceBean() {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		serviceRegistry.registerProvider(Ping.class, new PingImpl());
 		
@@ -101,11 +100,11 @@ public class ServiceBeanInstanceTest {
 		
 		ftApplied.set(false);
 		assertEquals("foo", ping.ping("foo"));
-		assertTrue("Fault tolerance proxy should be applied to service beans", ftApplied.get());
+		assertTrue(ftApplied.get(), "Fault tolerance proxy should be applied to service beans");
 	}
 	
 	@Test
-	public void ftProxyCanBeDisabledByServiceComponent() throws Exception {
+	void ftProxyCanBeDisabledByServiceComponent() {
 		DisabledFtComponent component = new DisabledFtComponent();
 		
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
@@ -138,11 +137,11 @@ public class ServiceBeanInstanceTest {
 		
 		ftApplied.set(false);
 		assertEquals("foo", ping.ping("foo"));
-		assertFalse("Fault tolerance can be disabled by ServiceComponent", ftApplied.get());
+		assertFalse(ftApplied.get(), "Fault tolerance can be disabled by ServiceComponent");
 	}
 	
 	@Test
-	public void itsPossibleToSetBeanInInactiveStateUsingBeanSettings() throws Exception {
+	void itsPossibleToSetBeanInInactiveStateUsingBeanSettings() {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		serviceRegistry.registerProvider(Ping.class, new PingImpl());
 		
@@ -159,7 +158,7 @@ public class ServiceBeanInstanceTest {
 	}
 	
 	@Test
-	public void waitForBeanReturnsWhenServiceIsBound() throws Exception {
+	void waitForBeanReturnsWhenServiceIsBound() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
@@ -180,7 +179,7 @@ public class ServiceBeanInstanceTest {
 	}
 	
 	@Test
-	public void whenServiceNotAvailableOnFirstBindAttemptTheServiceBeanShouldReattemptToBindLater() throws Exception {
+	void whenServiceNotAvailableOnFirstBindAttemptTheServiceBeanShouldReattemptToBindLater() throws Exception {
 		String serviceId = DirectComponent.register(Ping.class, new PingImpl());
 		
 		TestAstrixConfigurer config = new TestAstrixConfigurer();
@@ -193,13 +192,9 @@ public class ServiceBeanInstanceTest {
 		DirectComponent.unregister(serviceId);
 		
 		final Ping ping = context.getBean(Ping.class);
-		try {
-			ping.ping("foo");
-			fail("Bean should not be bound");
-		} catch (ServiceUnavailableException e) {
-			// expected
-		}
-		
+
+		assertThrows(ServiceUnavailableException.class, () -> ping.ping("foo"), "Bean should not be bound");
+
 		DirectComponent.register(Ping.class, new PingImpl(), serviceId);
 
 		assertEventually(() -> ping.ping("foo"), equalTo("foo"));
@@ -207,7 +202,7 @@ public class ServiceBeanInstanceTest {
 	}
 	
 	@Test
-	public void boundServiceInstancesShouldBeReleasedWhenContextIsDestroyed() throws Exception {
+	void boundServiceInstancesShouldBeReleasedWhenContextIsDestroyed() {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		serviceRegistry.registerProvider(Ping.class, new PingImpl());
 		
@@ -226,12 +221,12 @@ public class ServiceBeanInstanceTest {
 		assertThat("Expected at least one service to be bound after pingBean is bound", directComponent.getBoundServices().size(), greaterThanOrEqualTo(1));
 		
 		astrixContext.destroy();
-		assertEquals("All bound beans should be release when context is destroyed", 0, directComponent.getBoundServices().size());
+		assertEquals(0, directComponent.getBoundServices().size(), "All bound beans should be release when context is destroyed");
 	}
 	
 	
 	@Test
-	public void boundServiceInstancesShouldBeReleasedWhenMovingToUnboundState() throws Exception {
+	void boundServiceInstancesShouldBeReleasedWhenMovingToUnboundState() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		serviceRegistry.registerProvider(Ping.class, new PingImpl());
 		
@@ -256,7 +251,7 @@ public class ServiceBeanInstanceTest {
 	}
 
 	@Test
-	public void serviceBeanInstanceUsesDefaultSubsystemNameWhenNoSubsystemIsSetInServiceProperties() throws Exception {
+	void serviceBeanInstanceUsesDefaultSubsystemNameWhenNoSubsystemIsSetInServiceProperties() {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		
 		String serviceUri = DirectComponent.registerAndGetUri(Ping.class, new PingImpl());
@@ -271,8 +266,8 @@ public class ServiceBeanInstanceTest {
 		assertEquals("foo", astrixContext.getBean(Ping.class).ping("foo"));
 	}
 	
-	@Test(expected = MyException.class)
-	public void exceptionsThrownArePropagatedForServices() throws Exception {
+	@Test
+	void exceptionsThrownArePropagatedForServices() {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		serviceRegistry.registerProvider(Ping.class, new Ping() {
 			@Override
@@ -287,11 +282,11 @@ public class ServiceBeanInstanceTest {
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixContext = astrixConfigurer.configure();
 		
-		astrixContext.getBean(Ping.class).ping("foo");
+		assertThrows(MyException.class, () -> astrixContext.getBean(Ping.class).ping("foo"));
 	}
 	
 	@Test
-	public void throwsServiceUnavailableExceptionIfBeanNotBoundBeforeTimeout() throws Exception {
+	void throwsServiceUnavailableExceptionIfBeanNotBoundBeforeTimeout() throws Exception {
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
@@ -306,7 +301,7 @@ public class ServiceBeanInstanceTest {
 	}
 	
 	@Test
-	public void throwsIllegalMetadataExceptionIfServiceIsNotWellFormed() throws Exception {
+	void throwsIllegalMetadataExceptionIfServiceIsNotWellFormed() throws Exception {
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApiProviderUsingConfigLookup.class);
@@ -322,7 +317,7 @@ public class ServiceBeanInstanceTest {
 	}
 	
 	@Test
-	public void beanIsConsideredBoundWhenMovedToIllegalMetadataState() throws Exception {
+	void beanIsConsideredBoundWhenMovedToIllegalMetadataState() throws Exception {
 		
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 1);
@@ -341,7 +336,7 @@ public class ServiceBeanInstanceTest {
 	
 	
 	@Test
-	public void throwsServiceDiscoveryErrorWhenServiceDiscoveryThrowsAnException() throws Exception {
+	void throwsServiceDiscoveryErrorWhenServiceDiscoveryThrowsAnException() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
 		astrixConfigurer.registerPlugin(ServiceComponent.class, new FakeComponent());
@@ -356,32 +351,26 @@ public class ServiceBeanInstanceTest {
 	}
 	
 	@Test
-	public void throwsNoServiceProviderFoundWhenNoServiceProviderFound() throws Exception {
+	void throwsNoServiceProviderFoundWhenNoServiceProviderFound() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApiProviderUsingConfigLookup.class);
 		astrixConfigurer.registerPlugin(ServiceComponent.class, new FakeComponent());
 		// No serviceUri for Ping in configuration => NoProviderFound
 		astrixContext = astrixConfigurer.configure();
-		try {
-			astrixContext.waitForBean(Ping.class, 1).ping("foo");
-			fail("Expected NoServiceProviderFound");
-		} catch (NoServiceProviderFound e) {
-		}
+
+		assertThrows(NoServiceProviderFound.class, () -> astrixContext.waitForBean(Ping.class, 1).ping("foo"), "Expected NoServiceProviderFound");
 	}
 	
 	
 	@Test
-	public void throwsServiceBindErrorWhenBindingADiscoveredServiceFails() throws Exception {
+	void throwsServiceBindErrorWhenBindingADiscoveredServiceFails() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(PingApiProviderUsingConfigLookup.class);
 		astrixConfigurer.registerPlugin(ServiceComponent.class, new FakeComponent());
 		astrixConfigurer.set("pingUri", "direct:-21"); // DirectComponent will not find the associated provider (since it does not exist)
 		astrixContext = astrixConfigurer.configure();
-		try {
-			astrixContext.waitForBean(Ping.class, 1).ping("foo");
-			fail("Expected ServiceBindError");
-		} catch (ServiceBindError e) {
-		}
+
+		assertThrows(ServiceBindError.class, () -> astrixContext.waitForBean(Ping.class, 1).ping("foo"), "Expected ServiceBindError");
 	}
 	
 	private <T extends Exception> void assertEventuallyThrows(Supplier<?> invocation, Matcher<T> returnValueMatcher) throws InterruptedException {
@@ -430,7 +419,7 @@ public class ServiceBeanInstanceTest {
 	}
 	
 	
-	static class MyException extends RuntimeException {
+	private static class MyException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 	}
 	

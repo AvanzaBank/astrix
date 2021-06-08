@@ -15,15 +15,6 @@
  */
 package com.avanza.astrix.integration.tests;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
-
-import java.util.Properties;
-
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.openspaces.core.space.CannotFindSpaceException;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.service.ServiceProperties;
@@ -35,14 +26,24 @@ import com.avanza.astrix.gs.ClusteredProxyCacheImpl;
 import com.avanza.astrix.gs.GsBinder;
 import com.avanza.astrix.gs.security.DefaultGsSecurityProvider;
 import com.avanza.astrix.gs.security.GsSecurityProvider;
-import com.avanza.gs.test.PuConfigurers;
-import com.avanza.gs.test.RunningPu;
 import com.avanza.gs.test.SecurityManagerForTests;
+import com.avanza.gs.test.junit5.PuConfigurers;
+import com.avanza.gs.test.junit5.RunningPu;
 import com.gigaspaces.security.directory.CredentialsProvider;
 import com.gigaspaces.security.directory.DefaultCredentialsProvider;
 import com.gigaspaces.security.directory.User;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.openspaces.core.space.CannotFindSpaceException;
 
-public class GigaSpacesAuthenticationTest {
+import java.util.Properties;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class GigaSpacesAuthenticationTest {
 
 	private static final InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 	private static final MapConfigSource settings = new MapConfigSource() {{
@@ -50,22 +51,22 @@ public class GigaSpacesAuthenticationTest {
 	}};
 
 	// PU with authentication
-	@ClassRule
-	public static final RunningPu LUNCH_PU = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
-			.contextProperty("configSourceId", GlobalConfigSourceRegistry.register(settings))
-			.beanProperties("space", new Properties() {{
+	@RegisterExtension
+	static final RunningPu LUNCH_PU = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
+												   .contextProperty("configSourceId", GlobalConfigSourceRegistry.register(settings))
+												   .beanProperties("space", new Properties() {{
 				// This is equivalent to configuring the pu in pu.xml like so:
 				// <os-core:space id="space" url="/./${spaceName}" mirror="false" versioned="true">
 				//   <os-core:security secured="true" />
 				// </os-core:space>
 				setProperty("secured", "true");
 			}})
-			.withAuthentication()
-			.configure();
+												   .withAuthentication()
+												   .configure();
 
 	// PU without authentication
-	@ClassRule
-	public static final RunningPu LUNCH_GRADER_PU = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
+	@RegisterExtension
+	static final RunningPu LUNCH_GRADER_PU = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-grader-pu.xml")
 			.contextProperty("configSourceId", GlobalConfigSourceRegistry.register(settings))
 			.configure();
 
@@ -89,7 +90,7 @@ public class GigaSpacesAuthenticationTest {
 	private final User clientCredentials = new User(SecurityManagerForTests.TEST_USER, SecurityManagerForTests.TEST_PASS);
 
 	@Test
-	public void shouldAllowConnectingToGigaSpacesUsingClientCredentials() {
+	void shouldAllowConnectingToGigaSpacesUsingClientCredentials() {
 		// Act
 		proxyCache.getProxy(lunchPuServiceProperties);
 
@@ -97,61 +98,47 @@ public class GigaSpacesAuthenticationTest {
 	}
 
 	@Test
-	public void shouldDisallowConnectingToGigaSpacesUsingClientCredentialsWithWrongPassword() {
+	void shouldDisallowConnectingToGigaSpacesUsingClientCredentialsWithWrongPassword() {
 		// Arrange
 		System.getProperties().remove("com.gs.security.credentials-provider.class");
 		clientCredentials.setPassword("incorrect");
 
 		// Act
-		try {
-			proxyCache.getProxy(lunchPuServiceProperties);
+		CannotFindSpaceException e = assertThrows(CannotFindSpaceException.class, () -> proxyCache.getProxy(lunchPuServiceProperties), "Expected an exception to be thrown here, but no exception was seen.");
 
-			// Assert
-			fail("Expected an exception to be thrown here, but no exception was seen.");
-		} catch (CannotFindSpaceException e) {
-			assertThat(e.toString(), containsString("Failed to find space"));
-			assertThat(e.getRootCause().toString(), containsString("Incorrect auth password"));
-		}
+		// Assert
+		assertThat(e.toString(), containsString("Failed to find space"));
+		assertThat(e.getRootCause().toString(), containsString("Incorrect auth password"));
 	}
 
 	@Test
-	public void shouldDisallowConnectingToSecuredGigaSpacesWithoutUsingClientCredentials() {
+	void shouldDisallowConnectingToSecuredGigaSpacesWithoutUsingClientCredentials() {
 		// Arrange
 		lunchPuServiceProperties.setProperty("isSecured", "false");
 
 		// Act
-		try {
-			proxyCache.getProxy(lunchPuServiceProperties).get().clear(null);
+		Exception e = assertThrows(Exception.class, () -> proxyCache.getProxy(lunchPuServiceProperties).get().clear(null), "Expected an exception to be thrown here, but no exception was seen.");
 
-			// Assert
-			fail("Expected an exception to be thrown here, but no exception was seen.");
-		} catch (Exception e) {
-			assertThat(e.toString(), containsString("No credentials were provided"));
-		}
+		// Assert
+		assertThat(e.toString(), containsString("No credentials were provided"));
 	}
 
 	@Test
-	public void shouldAllowConnectingToNonSecureGigaSpacesWithoutClientCredentials() {
+	void shouldAllowConnectingToNonSecureGigaSpacesWithoutClientCredentials() {
 		// Act
-		proxyCache.getProxy(lunchGraderPuServiceProperties);
-
-		// Assert that no exceptions were thrown
+		assertDoesNotThrow(() -> proxyCache.getProxy(lunchGraderPuServiceProperties));
 	}
 
 	@Test
-	public void shouldDisallowConnectingToNonSecureGigaSpacesUsingClientCredentials() {
+	void shouldDisallowConnectingToNonSecureGigaSpacesUsingClientCredentials() {
 		// Arrange
 		lunchGraderPuServiceProperties.setProperty("isSecured", "true");
 
 		// Act
-		try {
-			proxyCache.getProxy(lunchGraderPuServiceProperties);
+		CannotFindSpaceException e = assertThrows(CannotFindSpaceException.class, () -> proxyCache.getProxy(lunchGraderPuServiceProperties), "Expected an exception to be thrown here, but no exception was seen.");
 
-			// Assert
-			fail("Expected an exception to be thrown here, but no exception was seen.");
-		} catch (CannotFindSpaceException e) {
-			assertThat(e.toString(), containsString("Failed to find space"));
-			assertThat(e.getRootCause().toString(), containsString("Can't provide security credentials to a non-secured space"));
-		}
+		// Assert
+		assertThat(e.toString(), containsString("Failed to find space"));
+		assertThat(e.getRootCause().toString(), containsString("Can't provide security credentials to a non-secured space"));
 	}
 }

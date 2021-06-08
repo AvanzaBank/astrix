@@ -15,16 +15,6 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.BasicFuture;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
@@ -42,10 +32,19 @@ import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
 import com.netflix.hystrix.HystrixEventType;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import rx.Observable;
 
-public class HystrixFaulttoleranceIntegrationTest {
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class HystrixFaultToleranceIntegrationTest {
 	
 	private static final AtomicInteger counter = new AtomicInteger(0);
 	
@@ -53,8 +52,8 @@ public class HystrixFaulttoleranceIntegrationTest {
 	private TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 	private Ping ping;
 	
-	@Before
-	public void setup() throws InterruptedException {
+	@BeforeEach
+	void setup() {
 		Hystrix.reset();
 		counter.incrementAndGet();
 		astrixConfigurer.registerApiProvider(PingApiProvider.class);
@@ -65,20 +64,20 @@ public class HystrixFaulttoleranceIntegrationTest {
 		initMetrics(ping);
 	}
 	
-	private void initMetrics(Ping ping) throws InterruptedException {
+	private void initMetrics(Ping ping) {
 		// Black hystrix magic here :(
 		try {
 			ping.ping("foo");
-		} catch (Exception e) {
+		} catch (Exception ignore) {
 		}
-		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) AstrixApplicationContext.class.cast(this.context).getInstance(BeanFaultToleranceFactorySpi.class);
+		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) this.context.getInstance(BeanFaultToleranceFactorySpi.class);
 		HystrixCommandKey key = faultTolerance.getCommandKey(AstrixBeanKey.create(Ping.class));
 		
 		HystrixCommandMetrics.getInstance(key).getCumulativeCount(HystrixEventType.SUCCESS);
 	}
 	
 	@Test
-	public void usesHystrixFaultToleranceProxyProviderPluginToApplyFaultToleranceToLibraries() throws Exception {
+	void usesHystrixFaultToleranceProxyProviderPluginToApplyFaultToleranceToLibraries() throws Exception {
 		assertEquals(0, getAppliedFaultToleranceCount(Ping.class));
 
 		assertEquals("foo", ping.ping("foo"));
@@ -92,9 +91,9 @@ public class HystrixFaulttoleranceIntegrationTest {
 		});
 	}
 	
-	@Ignore("Fails for maven clean install, works standalone")
+	@Disabled("Fails for maven clean install, works standalone")
 	@Test
-	public void observable() throws Exception {
+	void observable() throws Exception {
 		assertEquals(0, getAppliedFaultToleranceCount(Ping.class));
 		assertEquals("foo", ping.observePing("foo").toBlocking().first());
 		eventually(() -> {
@@ -111,26 +110,28 @@ public class HystrixFaulttoleranceIntegrationTest {
 	 */
 	
 	
-	@Test(timeout = 2000)
-	public void usesThreadIsolationByDefaultForFutureReturnTypes() throws Exception {
+	@Test
+	@Timeout(2)
+	void usesThreadIsolationByDefaultForFutureReturnTypes() {
 		CorruptPing ping = context.getBean(CorruptPing.class);
 		for (int i = 0; i < 100; i++) {
 			try {
 				ping.foreverBlockingQueue("foo");
-			} catch (ServiceUnavailableException e) {
+			} catch (ServiceUnavailableException ignore) {
 			}
 		}
 	}
 	
 
 	
-	@Test(timeout = 2000)
-	public void excpetionsOfTypesOtherThanServiceUnavailableExceptionDoesNotCountAsFailure() throws Exception {
+	@Test
+	@Timeout(2)
+	void exceptionsOfTypesOtherThanServiceUnavailableExceptionDoesNotCountAsFailure() {
 		CorruptPing ping = context.getBean(CorruptPing.class);
 		for (int i = 0; i < 100; i++) {
 			try {
 				ping.foreverBlockingQueue("foo");
-			} catch (ServiceUnavailableException e) {
+			} catch (ServiceUnavailableException ignore) {
 			}
 		}
 	}
@@ -152,13 +153,13 @@ public class HystrixFaulttoleranceIntegrationTest {
 		private void block() {
 			try {
 				countDownLatch.await(); // Simulate blocking construction of observable
-			} catch (InterruptedException e) {
+			} catch (InterruptedException ignore) {
 			}
 		}
 		@Override
 		public Future<String> foreverBlockingQueue(String msg) {
 			block();
-			return new BasicFuture<String>(msg);
+			return new BasicFuture<>(msg);
 		}
 		@Override
 		public Future<String> neverEndingFuture(String msg) {
@@ -172,7 +173,7 @@ public class HystrixFaulttoleranceIntegrationTest {
 	}
 	
 	private static HystrixFaultToleranceFactory getFaultTolerance(AstrixContext astrixContext) {
-		BeanFaultToleranceFactorySpi ftStrategy = AstrixApplicationContext.class.cast(astrixContext).getInstance(BeanFaultToleranceFactorySpi.class);
+		BeanFaultToleranceFactorySpi ftStrategy = ((AstrixApplicationContext) astrixContext).getInstance(BeanFaultToleranceFactorySpi.class);
 		assertEquals(HystrixFaultToleranceFactory.class, ftStrategy.getClass());
 		return (HystrixFaultToleranceFactory) ftStrategy;
 	}

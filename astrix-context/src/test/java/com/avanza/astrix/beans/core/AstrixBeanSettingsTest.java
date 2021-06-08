@@ -15,22 +15,21 @@
  */
 package com.avanza.astrix.beans.core;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixBeanSettings.IntBeanSetting;
+import org.junit.jupiter.api.Test;
 
-public class AstrixBeanSettingsTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class AstrixBeanSettingsTest {
 	
 	@Test
-	public void qualifiedSettingName() throws Exception {
+	void qualifiedSettingName() {
 		IntBeanSetting testSetting = new IntBeanSetting("test.setting", 0);
 		assertEquals("astrix.bean." + Ping.class.getName() + "-theQualifier" + ".test.setting", testSetting.nameFor(AstrixBeanKey.create(Ping.class, "theQualifier")));
 	}
 	
 	@Test
-	public void unqualifiedSettingName() throws Exception {
+	void unqualifiedSettingName() {
 		IntBeanSetting testSetting = new IntBeanSetting("test.setting", 0);
 		assertEquals("astrix.bean." + Ping.class.getName() + ".test.setting", testSetting.nameFor(AstrixBeanKey.create(Ping.class)));
 	}

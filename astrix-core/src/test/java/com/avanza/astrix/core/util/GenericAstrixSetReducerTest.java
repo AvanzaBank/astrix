@@ -15,52 +15,45 @@
  */
 package com.avanza.astrix.core.util;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.CorrelationId;
 import com.avanza.astrix.core.ServiceInvocationException;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.Set;
+
+import static java.util.Collections.singleton;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-public class GenericAstrixSetReducerTest {
+class GenericAstrixSetReducerTest {
 
-    private GenericAstrixSetReducer<String> reducer;
-
-    @Before
-    public void setup() {
-        reducer = new GenericAstrixSetReducer<String>();
-    }
+    private final GenericAstrixSetReducer<String> reducer = new GenericAstrixSetReducer<>();
 
     @Test
-    public void reducedSetContainsUniqueElements() {
-        Set<String> first = Collections.singleton("1");
-        Set<String> second = Collections.singleton("1");
-        Set<String> third = Collections.singleton("2");
+    void reducedSetContainsUniqueElements() {
+        Set<String> first = singleton("1");
+        Set<String> second = singleton("1");
+        Set<String> third = singleton("2");
 
-        Set<String> reduced = reducer.reduce(Arrays.<AstrixRemoteResult<Set<String>>>asList(
+        Set<String> reduced = reducer.reduce(Arrays.asList(
                 AstrixRemoteResult.successful(first),
                 AstrixRemoteResult.successful(second),
                 AstrixRemoteResult.successful(third)));
 
-        assertThat(reduced.size(), is(2));
+        assertEquals(reduced.size(), 2);
         assertTrue(reduced.containsAll(first));
         assertTrue(reduced.containsAll(third));
     }
 
-	@Test(expected = MyRuntimeException.class)
-	public void exceptionIsRethrown() throws Exception {
-		reducer.reduce(Arrays.asList(
-                AstrixRemoteResult.successful(Collections.singleton("hello world")),
-				AstrixRemoteResult.<Set<String>>failure(new MyRuntimeException(), CorrelationId.undefined())));
+	@Test
+    void exceptionIsRethrown() {
+		assertThrows(MyRuntimeException.class, () -> reducer.reduce(Arrays.asList(
+                AstrixRemoteResult.successful(singleton("hello world")),
+				AstrixRemoteResult.failure(new MyRuntimeException(), CorrelationId.undefined()))));
 	}
 
 	private static class MyRuntimeException extends ServiceInvocationException {

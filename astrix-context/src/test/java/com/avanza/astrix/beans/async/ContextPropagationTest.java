@@ -15,18 +15,18 @@
  */
 package com.avanza.astrix.beans.async;
 
-import static org.junit.Assert.assertEquals;
+import com.avanza.astrix.core.function.CheckedCommand;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.junit.Test;
-import com.avanza.astrix.core.function.CheckedCommand;
+import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ContextPropagationTest {
+class ContextPropagationTest {
 	private final List<String> operations = new ArrayList<>();
 	private final ContextPropagator propagator = new ContextPropagator() {
 		@Override
@@ -44,10 +44,10 @@ public class ContextPropagationTest {
 			};
 		}
 	};
-	private final ContextPropagation propagation = new ContextPropagation(Collections.singletonList(propagator));
+	private final ContextPropagation propagation = new ContextPropagation(singletonList(propagator));
 
 	@Test
-	public void shouldWrapRunnable() {
+	void shouldWrapRunnable() {
 		// Arrange
 		operations.add("before");
 		final Runnable action = propagation.wrap(() -> {
@@ -71,12 +71,10 @@ public class ContextPropagationTest {
 	}
 
 	@Test
-	public void shouldWrapConsumer() {
+	void shouldWrapConsumer() {
 		// Arrange
 		operations.add("before");
-		final Consumer<String> consumer = propagation.wrap(v -> {
-			operations.add("consumer: " + v);
-		});
+		final Consumer<String> consumer = propagation.wrap(v -> operations.add("consumer: " + v));
 		operations.add("after");
 
 		// Act

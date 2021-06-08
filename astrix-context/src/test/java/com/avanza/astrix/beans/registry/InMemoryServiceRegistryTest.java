@@ -15,22 +15,21 @@
  */
 package com.avanza.astrix.beans.registry;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixQualifier;
 import com.avanza.astrix.provider.core.Service;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-public class InMemoryServiceRegistryTest {
+class InMemoryServiceRegistryTest {
 	
 	@Test
-	public void itsPossibleToRegisterProviderForQualifiedBeans() throws Exception {
+	void itsPossibleToRegisterProviderForQualifiedBeans() {
 		InMemoryServiceRegistry registry = new InMemoryServiceRegistry();
 		registry.registerProvider(Ping.class, "ping", new PingImpl());
 		
@@ -39,7 +38,6 @@ public class InMemoryServiceRegistryTest {
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, registry.getServiceUri());
 		AstrixContext context = astrixConfigurer.configure();
 		Ping ping = context.getBean(Ping.class, "ping");
-		
 		
 		assertEquals("foo", ping.ping("foo"));
 	}

@@ -22,6 +22,11 @@
 			<artifactId>gs-test</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
 			<groupId>${astrix.groupId}</groupId>
 			<artifactId>astrix-service-registry-pu</artifactId>
 		</dependency>

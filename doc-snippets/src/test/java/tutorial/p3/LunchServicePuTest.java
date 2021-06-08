@@ -15,36 +15,34 @@
  */
 package tutorial.p3;
 
-import static org.junit.Assert.assertEquals;
-
-import javax.annotation.PostConstruct;
-
-import org.apache.log4j.BasicConfigurator;
-import org.junit.ClassRule;
-import org.junit.Test;
-
-import tutorial.p3.api.LunchService;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
-import com.avanza.gs.test.PuConfigurers;
-import com.avanza.gs.test.RunningPu;
+import com.avanza.gs.test.junit5.PuConfigurers;
+import com.avanza.gs.test.junit5.RunningPu;
+import org.apache.log4j.BasicConfigurator;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import tutorial.p3.api.LunchService;
 
-public class LunchServicePuTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class LunchServicePuTest {
 	
-	public static InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
+	private static final InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 	
-	@ClassRule
-	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/p3/lunch-pu.xml")
+	@RegisterExtension
+	static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/p3/lunch-pu.xml")
 												   .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
 												   .configure();
 
 	private AstrixContext astrix;
 	
-	@PostConstruct
-	public void destroy() {
+	@AfterEach
+	void destroy() {
 		astrix.destroy();
 	}
 	
@@ -53,7 +51,7 @@ public class LunchServicePuTest {
 	}
 	
 	@Test
-	public void testName() throws Exception {
+	void testName() throws Exception {
 		AstrixConfigurer astrixConfigurer = new AstrixConfigurer();
 		astrixConfigurer.set(AstrixSettings.SERVICE_REGISTRY_URI, serviceRegistry.getServiceUri());
 		astrixConfigurer.set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
@@ -66,7 +64,7 @@ public class LunchServicePuTest {
 		
 		assertEquals("FEI", lunchService.getAllRestaurants().get(0));
 	}
-	
-	
+
+
 
 }

@@ -15,41 +15,41 @@
  */
 package com.avanza.astrix.context;
 
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
-import org.junit.Test;
-
 import com.avanza.astrix.beans.factory.MissingBeanDependencyException;
 import com.avanza.astrix.beans.factory.MissingBeanProviderException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Library;
+import org.junit.jupiter.api.Test;
 
-public class AstrixContextImplTest {
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class AstrixContextImplTest {
 	
-	@Test(expected = MissingBeanProviderException.class)
-	public void detectsMissingBeans() throws Exception {
+	@Test
+	void detectsMissingBeans() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		AstrixContextImpl AstrixContext = (AstrixContextImpl) astrixConfigurer.configure();
+		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 
-		AstrixContext.getBean(HelloBeanImpl.class);
-	}
-	
-	@Test(expected = MissingBeanDependencyException.class)
-	public void detectsMissingBeanDependencies() throws Exception {
-		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
-		astrixConfigurer.registerApiProvider(DependentApi.class);
-		AstrixContextImpl AstrixContext = (AstrixContextImpl) astrixConfigurer.configure();
-
-		AstrixContext.getBean(DependentBean.class);
+		assertThrows(MissingBeanProviderException.class, () -> astrixContext.getBean(HelloBeanImpl.class));
 	}
 	
 	@Test
-	public void astrixBeansAreDestroyedWhenContextIsDestroy() throws Exception {
+	void detectsMissingBeanDependencies() {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(DependentApi.class);
+		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
+
+		assertThrows(MissingBeanDependencyException.class, () -> astrixContext.getBean(DependentBean.class));
+	}
+	
+	@Test
+	void astrixBeansAreDestroyedWhenContextIsDestroy() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
 		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
@@ -63,7 +63,7 @@ public class AstrixContextImplTest {
 	}
 	
 	@Test
-	public void astrixBeansAreInitializedWhenFirstCreated() throws Exception {
+	void astrixBeansAreInitializedWhenFirstCreated() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
 		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
@@ -73,51 +73,51 @@ public class AstrixContextImplTest {
 	}
 	
 	@Test
-	public void createdAstrixBeansAreCached() throws Exception {
+	void createdAstrixBeansAreCached() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
-		AstrixContextImpl AstrixContext = (AstrixContextImpl) astrixConfigurer.configure();
+		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 
-		HelloBeanImpl beanA = AstrixContext.getBean(HelloBeanImpl.class);
-		HelloBeanImpl beanB = AstrixContext.getBean(HelloBeanImpl.class);
+		HelloBeanImpl beanA = astrixContext.getBean(HelloBeanImpl.class);
+		HelloBeanImpl beanB = astrixContext.getBean(HelloBeanImpl.class);
 		assertSame(beanA, beanB);
 	}
 	
 	@Test
-	public void moduleManagerIsDestroyedWhenContextIsDestroyed() throws Exception {
+	void moduleManagerIsDestroyedWhenContextIsDestroyed() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.registerPlugin(HelloBean.class, new HelloBeanImpl());
 		AstrixContextImpl astrixContext = (AstrixContextImpl) astrixConfigurer.configure();
 		HelloBean helloBean = astrixContext.getInstance(HelloBean.class); // treat HelloBean as internal class
-		assertFalse(helloBean.isDestoryed());
+		assertFalse(helloBean.isDestroyed());
 		
 		astrixContext.destroy();
-		assertTrue(helloBean.isDestoryed());
+		assertTrue(helloBean.isDestroyed());
 	}
 	
 	@Test
-	public void manyAstrixContextShouldBeAbleToRunInSameProcessWithoutInterferenceInShutdown() throws Exception {
-		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
-		AstrixContext context = AstrixConfigurer.configure();
+	void manyAstrixContextShouldBeAbleToRunInSameProcessWithoutInterferenceInShutdown() {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		astrixConfigurer.registerApiProvider(HelloBeanLibrary.class);
+		AstrixContext context = astrixConfigurer.configure();
 		
 		TestAstrixConfigurer astrixConfigurer2 = new TestAstrixConfigurer();
 		astrixConfigurer2.registerApiProvider(HelloBeanLibrary.class);
 		AstrixContextImpl context2 = (AstrixContextImpl) astrixConfigurer2.configure();
 		context.destroy();
 		
-		HelloBeanImpl helloBean2 = (HelloBeanImpl) context2.getBean(HelloBeanImpl.class);
+		HelloBeanImpl helloBean2 = context2.getBean(HelloBeanImpl.class);
 		assertFalse(helloBean2.destroyed);
 		
 		context2.destroy();
 		assertTrue(helloBean2.destroyed);
 	}
 	
-	@Test(expected=IllegalStateException.class)
-	public void throwsIllegalStateExceptionWhenStartingServicePublisherForNonServer() throws Exception {
-		TestAstrixConfigurer AstrixConfigurer = new TestAstrixConfigurer();
-		AstrixApplicationContext context = (AstrixApplicationContext) AstrixConfigurer.configure();
-		context.startServicePublisher();
+	@Test
+	void throwsIllegalStateExceptionWhenStartingServicePublisherForNonServer() {
+		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
+		AstrixApplicationContext context = (AstrixApplicationContext) astrixConfigurer.configure();
+		assertThrows(IllegalStateException.class, context::startServicePublisher);
 	}
 	
 	@AstrixApiProvider
@@ -150,7 +150,7 @@ public class AstrixContextImplTest {
 	}
 	
 	public interface HelloBean {
-		boolean isDestoryed();
+		boolean isDestroyed();
 	}
 	
 	public static class HelloBeanImpl implements HelloBean {
@@ -172,7 +172,7 @@ public class AstrixContextImplTest {
 		}
 
 		@Override
-		public boolean isDestoryed() {
+		public boolean isDestroyed() {
 			return destroyed;
 		}
 	}

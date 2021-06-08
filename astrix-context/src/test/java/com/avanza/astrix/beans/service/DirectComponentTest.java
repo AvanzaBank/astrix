@@ -15,13 +15,6 @@
  */
 package com.avanza.astrix.beans.service;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.concurrent.CompletableFuture;
-
-import org.junit.After;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixContext;
@@ -29,13 +22,19 @@ import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.AstrixTestUtil;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
-public class DirectComponentTest {
+import java.util.concurrent.CompletableFuture;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class DirectComponentTest {
 	
 	private AstrixContext astrixContext;
 
 	@Test
-	public void itsPossibleToStubReactiveServiceUsingDirectComponent() throws Exception {
+	void itsPossibleToStubReactiveServiceUsingDirectComponent() throws Exception {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		serviceRegistry.registerProvider(Ping.class, new PingImpl());
 		
@@ -56,19 +55,19 @@ public class DirectComponentTest {
 		CompletableFuture<String> ping(String msg);
 	}
 	
-	public class PingImpl implements Ping {
+	public static class PingImpl implements Ping {
 		public String ping(String msg) {
 			return msg;
 		}
 	}
 	
-	@After
-	public void after() {
+	@AfterEach
+	void after() {
 		AstrixTestUtil.closeQuiet(astrixContext);
 	}
 	
 	@AstrixApiProvider
-	public static interface PingApiProvider {
+	public interface PingApiProvider {
 		@Service
 		Ping ping();
 	}

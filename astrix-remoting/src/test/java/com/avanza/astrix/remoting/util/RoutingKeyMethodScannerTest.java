@@ -15,22 +15,20 @@
  */
 package com.avanza.astrix.remoting.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import com.avanza.astrix.core.AstrixRouting;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-import org.junit.Test;
-
-import com.avanza.astrix.core.AstrixRouting;
-import com.avanza.astrix.remoting.util.RoutingKeyMethodScanner;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
-public class RoutingKeyMethodScannerTest {
+class RoutingKeyMethodScannerTest {
 	
 	@Test
-	public void findsNoArgumentMethodWithAstrixRoutingAnnotation() throws Exception {
+	void findsNoArgumentMethodWithAstrixRoutingAnnotation() throws Exception {
 		class Test {
 			@AstrixRouting
 			public String routingMethod() {
@@ -46,8 +44,8 @@ public class RoutingKeyMethodScannerTest {
 		assertEquals(Test.class.getMethod("routingMethod"), routingKeyMethod);
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
-	public void throwsIllegalArgumentExceptionForTypeWithMultipleAstrixRoutingAnnotations() throws Exception {
+	@Test
+	void throwsIllegalArgumentExceptionForTypeWithMultipleAstrixRoutingAnnotations() {
 		class Test {
 			@AstrixRouting
 			public String routingMethod() {
@@ -60,11 +58,11 @@ public class RoutingKeyMethodScannerTest {
 			}
 		}
 		RoutingKeyMethodScanner scanner = new RoutingKeyMethodScanner();
-		scanner.getRoutingKeyMethod(AstrixRouting.class, Test.class);
+		assertThrows(IllegalArgumentException.class, () -> scanner.getRoutingKeyMethod(AstrixRouting.class, Test.class));
 	}
 	
 	@Test
-	public void returnsNullIfNoMethodIsMethodHasAstrixRoutingAnnotating() throws Exception {
+	void returnsNullIfNoMethodIsMethodHasAstrixRoutingAnnotating() {
 		class Test {
 			@SuppressWarnings("unused")
 			public String routingMethod() {

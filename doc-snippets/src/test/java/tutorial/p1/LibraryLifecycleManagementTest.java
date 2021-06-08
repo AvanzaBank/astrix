@@ -15,28 +15,27 @@
  */
 package tutorial.p1;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.After;
-import org.junit.Test;
-
-import tutorial.p1.api.LunchRestaurantFinder;
-
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import tutorial.p1.api.LunchRestaurantFinder;
 
-public class LibraryLifecycleManagementTest {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+
+class LibraryLifecycleManagementTest {
 
 	private AstrixContext astrix;
 	
-	@After
-	public void after() {
+	@AfterEach
+	void after() {
 		astrix.destroy();
 	}
 	
 	@Test
-	public void postConstructAnnotatedMethodsAreInvokedWhenTheBeanIsCreated() throws Exception {
+	void postConstructAnnotatedMethodsAreInvokedWhenTheBeanIsCreated() {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setBasePackage("tutorial.p1");
 		astrix = configurer.configure();
@@ -46,7 +45,7 @@ public class LibraryLifecycleManagementTest {
 	}
 	
 	@Test
-	public void preDestroyAnnotatedMethodsAreInvokedWhenTheContextIsDestroyed() throws Exception {
+	void preDestroyAnnotatedMethodsAreInvokedWhenTheContextIsDestroyed() {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setBasePackage("tutorial.p1");
 		astrix = configurer.configure();

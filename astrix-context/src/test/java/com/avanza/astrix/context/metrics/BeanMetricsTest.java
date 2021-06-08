@@ -15,15 +15,6 @@
  */
 package com.avanza.astrix.context.metrics;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Supplier;
-
-import org.junit.After;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
@@ -36,20 +27,27 @@ import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.AstrixConfigDiscovery;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.test.util.AstrixTestUtil;
-
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import rx.Observable;
 
-public class BeanMetricsTest {
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class BeanMetricsTest {
 	
 	private AstrixContext astrixContext;
 
-	@After
-	public void after() {
+	@AfterEach
+	void after() {
 		AstrixTestUtil.closeQuiet(astrixContext);
 	}
 	
 	@Test
-	public void timesReactiveInvocationsUsingTimeObservable() throws Exception {
+	void timesReactiveInvocationsUsingTimeObservable() {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		final AtomicLong fakeClock = new AtomicLong(0);
 		FakeTimer fakeTimer = new FakeTimer(fakeClock);
@@ -66,7 +64,7 @@ public class BeanMetricsTest {
 	}
 	
 	@Test
-	public void timesAsyncInvocationsWithFutureReturnTypeAsSynchronousInvocation() throws Exception {
+	void timesAsyncInvocationsWithFutureReturnTypeAsSynchronousInvocation() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		final AtomicLong fakeClock = new AtomicLong(0);
 		FakeTimer fakeTimer = new FakeTimer(fakeClock);
@@ -77,13 +75,13 @@ public class BeanMetricsTest {
 		
 		Ping ping = this.astrixContext.getBean(Ping.class);
 
-		assertEquals(-1L, fakeTimer.getLastTimedExecututionTime());
+		assertEquals(-1L, fakeTimer.getLastTimedExecutionTime());
 		assertEquals("foo", ping.pingAsync("foo").get());
-		assertEquals(2, fakeTimer.getLastTimedExecututionTime());
+		assertEquals(2, fakeTimer.getLastTimedExecutionTime());
 	}
 	
 	@Test
-	public void itsPossibleToDisableBeanMetrics() throws Exception {
+	void itsPossibleToDisableBeanMetrics() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		final AtomicLong fakeClock = new AtomicLong(0);
 		FakeTimer fakeTimer = new FakeTimer(fakeClock);
@@ -104,7 +102,7 @@ public class BeanMetricsTest {
 	}
 	
 	@Test
-	public void itsPossibleToDisableBeanMetricsGlobally() throws Exception {
+	void itsPossibleToDisableBeanMetricsGlobally() throws Exception {
 		TestAstrixConfigurer astrixConfigurer = new TestAstrixConfigurer();
 		final AtomicLong fakeClock = new AtomicLong(0);
 		FakeTimer fakeTimer = new FakeTimer(fakeClock);
@@ -158,7 +156,7 @@ public class BeanMetricsTest {
 	private static final class FakeTimer implements MetricsSpi {
 		private final AtomicLong fakeClock;
 		private long lastTimedObservableTime = -1L;
-		private long lastTimedExecututionTime = -1L;
+		private long lastTimedExecutionTime = -1L;
 
 		private FakeTimer(AtomicLong fakeClock) {
 			this.fakeClock = fakeClock;
@@ -168,8 +166,8 @@ public class BeanMetricsTest {
 			return this.lastTimedObservableTime;
 		}
 		
-		public long getLastTimedExecututionTime() {
-			return lastTimedExecututionTime;
+		public long getLastTimedExecutionTime() {
+			return lastTimedExecutionTime;
 		}
 
 		@Override
@@ -180,7 +178,7 @@ public class BeanMetricsTest {
 					return () -> {
 						long start = fakeClock.get(); // Set time before execution
 						T result = execution.call();
-						lastTimedExecututionTime = fakeClock.get() - start;
+						lastTimedExecutionTime = fakeClock.get() - start;
 						return result;
 					};
 				}

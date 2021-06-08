@@ -15,45 +15,37 @@
  */
 package com.avanza.astrix.contracts;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.ReactiveExecutionListener;
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
-
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import rx.Observable;
 import rx.Subscriber;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public abstract class ReactiveTypeHandlerContract<T> {
 	
-	private ReactiveTypeConverter reactiveTypeConverter;
-	private ReactiveTypeHandlerPlugin<T> reactiveTypeHandler;
-	
-	@Before
-	public void setup() {
-		reactiveTypeHandler = newReactiveTypeHandler();
-		reactiveTypeConverter = new ReactiveTypeConverterImpl(Arrays.asList(reactiveTypeHandler));
-	}
-	
+	private final ReactiveTypeHandlerPlugin<T> reactiveTypeHandler = newReactiveTypeHandler();
+	private final ReactiveTypeConverter reactiveTypeConverter = new ReactiveTypeConverterImpl(singletonList(reactiveTypeHandler));
+
 	protected abstract ReactiveTypeHandlerPlugin<T> newReactiveTypeHandler();
 
-	@Test(timeout=2000)
-	public final void reactiveTypeListenerIsNotifiedAsynchronouslyWhenReactiveExecutionCompletes() throws Exception {
+	@Test
+	@Timeout(2)
+	final void reactiveTypeListenerIsNotifiedAsynchronouslyWhenReactiveExecutionCompletes() {
 		T reactiveType = reactiveTypeHandler.newReactiveType();
 
-		
 		ReactiveResultSpy resultSpy = new ReactiveResultSpy();
 		reactiveTypeHandler.subscribe(resultSpy, reactiveType); // Subscribe after execution completes
 		assertFalse(resultSpy.isDone());
@@ -66,8 +58,9 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		assertNull(resultSpy.error);
 	}
 	
-	@Test(timeout=2000)
-	public final void reactiveTypeListenerIsNotifiedSynchronouslyIfReactiveExecutionAlreadyCompleted() throws Exception {
+	@Test
+	@Timeout(2)
+	final void reactiveTypeListenerIsNotifiedSynchronouslyIfReactiveExecutionAlreadyCompleted() {
 		T reactiveType = reactiveTypeHandler.newReactiveType();
 
 		reactiveTypeHandler.complete("foo", reactiveType); // Completes reactive execution
@@ -80,8 +73,9 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		assertNull(resultSpy.error);
 	}
 	
-	@Test(timeout=2000)
-	public final void reactiveTypeToObservableShouldNotBlock() throws Exception {
+	@Test
+	@Timeout(2)
+	final void reactiveTypeToObservableShouldNotBlock() {
 		T reactiveType = reactiveTypeHandler.newReactiveType();
 
 		Observable<Object> observable = reactiveTypeConverter.toObservable(reactiveTypeHandler.reactiveTypeHandled(), reactiveType);
@@ -98,8 +92,9 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		assertNull(reactiveResultListener.error);
 	}
 	
-	@Test(timeout=1000)
-	public final void reactiveTypeToObservable_CreatedObserverIsSubscribedInConversion() throws Exception {
+	@Test
+	@Timeout(2)
+	final void reactiveTypeToObservable_CreatedObserverIsSubscribedInConversion() {
 		AtomicInteger sourceSubscriptionCount = new AtomicInteger(0);
 		Observable<Object> emitsFoo = Observable.unsafeCreate((s) -> {
 			sourceSubscriptionCount.incrementAndGet();
@@ -118,7 +113,7 @@ public abstract class ReactiveTypeHandlerContract<T> {
 	}
 	
 	@Test
-	public final void onlySubscribesOneTimeToSourceObservableIfConvertingBackAndForth() throws Exception {
+	final void onlySubscribesOneTimeToSourceObservableIfConvertingBackAndForth() {
 		AtomicInteger sourceSubscriptionCount = new AtomicInteger(0);
 		Observable<Object> emitsFoo = Observable.unsafeCreate((s) -> {
 			sourceSubscriptionCount.incrementAndGet();
@@ -127,7 +122,7 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		});
 		
 		T reactiveType = toCustomReactiveType(emitsFoo);
-		Observable<Object> reconstructedObservable = (Observable<Object>) reactiveTypeConverter.toObservable(reactiveTypeHandler.reactiveTypeHandled(), reactiveType);
+		Observable<Object> reconstructedObservable = reactiveTypeConverter.toObservable(reactiveTypeHandler.reactiveTypeHandled(), reactiveType);
 		reactiveType = toCustomReactiveType(reconstructedObservable);
 		
 		assertEquals(1, sourceSubscriptionCount.get());
@@ -138,7 +133,7 @@ public abstract class ReactiveTypeHandlerContract<T> {
 	}
 	
 	@Test
-	public final void notifiesExceptionalResults() throws Exception {
+	final void notifiesExceptionalResults() {
 		T reactiveType = reactiveTypeHandler.newReactiveType();
 
 		ReactiveResultSpy resultSpy = new ReactiveResultSpy();

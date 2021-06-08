@@ -15,34 +15,35 @@
  */
 package com.avanza.astrix.integration.tests;
 
-import org.junit.After;
-import org.junit.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.provider.core.AstrixApplication;
 import com.avanza.astrix.spring.AstrixFrameworkBean;
 import com.avanza.astrix.test.util.AstrixTestUtil;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-public class AstrixApplicationTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class AstrixApplicationTest {
 	
 	// TODO: Convert to unit test using AstrixConfigurer?
 	
 	
 	private AnnotationConfigApplicationContext appContext;
 	
-	@After
-	public void after() {
+	@AfterEach
+	void after() {
 		AstrixTestUtil.closeQuiet(appContext);
 	}
 
-	@Test(expected = RuntimeException.class)
-	public void throwsExceptionIfExportedRemoteServiceDoesNotPointToAnApiProvider() throws Exception {
+	@Test
+	void throwsExceptionIfExportedRemoteServiceDoesNotPointToAnApiProvider() {
 		appContext = new AnnotationConfigApplicationContext();
 		appContext.register(MyAppConfig.class);
-		appContext.refresh();
+		assertThrows(RuntimeException.class, () -> appContext.refresh());
 	}
 	
 	public interface MyService {

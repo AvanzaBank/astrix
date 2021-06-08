@@ -15,12 +15,22 @@
  */
 package com.avanza.astrix.remoting.server;
 
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import com.avanza.astrix.core.AstrixBroadcast;
+import com.avanza.astrix.core.AstrixPartitionedRouting;
+import com.avanza.astrix.core.AstrixRemoteResult;
+import com.avanza.astrix.core.AstrixRoutingStrategy;
+import com.avanza.astrix.core.RemoteResultReducer;
+import com.avanza.astrix.core.RemoteServiceInvocationException;
+import com.avanza.astrix.core.ServiceInvocationException;
+import com.avanza.astrix.core.ServiceUnavailableException;
+import com.avanza.astrix.core.remoting.Router;
+import com.avanza.astrix.core.remoting.RoutingKey;
+import com.avanza.astrix.core.remoting.RoutingStrategy;
+import com.avanza.astrix.remoting.client.IncompatibleRemoteResultReducerException;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import rx.Observable;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -38,34 +48,25 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import com.avanza.astrix.core.AstrixBroadcast;
-import com.avanza.astrix.core.AstrixPartitionedRouting;
-import com.avanza.astrix.core.AstrixRemoteResult;
-import com.avanza.astrix.core.AstrixRoutingStrategy;
-import com.avanza.astrix.core.RemoteResultReducer;
-import com.avanza.astrix.core.RemoteServiceInvocationException;
-import com.avanza.astrix.core.ServiceInvocationException;
-import com.avanza.astrix.core.ServiceUnavailableException;
-import com.avanza.astrix.core.remoting.Router;
-import com.avanza.astrix.core.remoting.RoutingKey;
-import com.avanza.astrix.core.remoting.RoutingStrategy;
-import com.avanza.astrix.remoting.client.IncompatibleRemoteResultReducerException;
-import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
-
-import rx.Observable;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * 
  * @author Elias Lindholm (elilin)
  *
  */
-public class AstrixRemotingTest {
+class AstrixRemotingTest {
 
 	@Test
-	public void supportsServiceMethodsWithMultipleArguments() throws Exception {
+	void supportsServiceMethodsWithMultipleArguments() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		TwoArgumentTest impl = new TwoArgumentTest() {
 			@Override
@@ -81,30 +82,30 @@ public class AstrixRemotingTest {
 		String reply = testService.hello(request, "replyTo-");
 		assertEquals("replyTo-kalle", reply);
 	}
-	
-	@Test
-	public void routedRequest_throwsExceptionOfNonServiceInvocationExceptionType() throws Exception {
-		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
-		try {
-			TestService impl = new TestService() {
-				@Override
-				public HelloResponse hello(HelloRequest message) {
-					throw new IllegalArgumentException("Remote service error message");
-				}
-			};
-			remotingDriver.registerServer(TestService.class, impl);
 
-			TestService testService = remotingDriver.createRemotingProxy(TestService.class);
-			testService.hello(new HelloRequest("foo"));
-			fail("Expected remote service exception to be thrown");
-		} catch (RemoteServiceInvocationException e) {
-			assertEquals(IllegalArgumentException.class.getName(), e.getExceptionType());
-			assertThat(e.getMessage(), startsWith("Remote service threw exception, see server log for details. [java.lang.IllegalArgumentException: Remote service error message]"));
-		}
+	@Test
+	void routedRequest_throwsExceptionOfNonServiceInvocationExceptionType() {
+		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
+
+		TestService impl = new TestService() {
+			@Override
+			public HelloResponse hello(HelloRequest message) {
+				throw new IllegalArgumentException("Remote service error message");
+			}
+		};
+		remotingDriver.registerServer(TestService.class, impl);
+
+		TestService testService = remotingDriver.createRemotingProxy(TestService.class);
+		RemoteServiceInvocationException exception = assertThrows(RemoteServiceInvocationException.class,
+														  () -> testService.hello(new HelloRequest("foo")),
+														  "Expected remote service exception to be thrown");
+
+		assertEquals(IllegalArgumentException.class.getName(), exception.getExceptionType());
+		assertThat(exception.getMessage(), startsWith("Remote service threw exception, see server log for details. [java.lang.IllegalArgumentException: Remote service error message]"));
 	}
 	
 	@Test
-	public void routedRequest_throwsExceptionOfServiceInvocationType() throws Exception {
+	void routedRequest_throwsExceptionOfServiceInvocationType() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		try {
 			TestService impl = new TestService() {
@@ -116,10 +117,7 @@ public class AstrixRemotingTest {
 			remotingDriver.registerServer(TestService.class, impl);
 
 			TestService testService = remotingDriver.createRemotingProxy(TestService.class);
-			testService.hello(new HelloRequest("foo"));
-			fail("Expected remote service exception to be thrown");
-		} catch (MyCustomServiceException e) {
-			// Expected
+			assertThrows(MyCustomServiceException.class, () -> testService.hello(new HelloRequest("foo")), "Expected remote service exception to be thrown");
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Excpected exception of type MyCustomServiceException, but was: " + e);
@@ -127,26 +125,26 @@ public class AstrixRemotingTest {
 	}
 	
 	@Test
-	public void broadcastRequest() throws Exception {
+	void broadcastRequest() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver(2);
 		PingService impl = new PingService() {
 			@Override
 			public List<String> ping(String msg) {
-				return Arrays.asList(msg);
+				return singletonList(msg);
 			}
 		};
 		remotingDriver.registerServerPartition(0, PingService.class, impl);
 		remotingDriver.registerServerPartition(1, PingService.class, impl);
 
 		PingService broadcastService = remotingDriver.createRemotingProxy(PingService.class);
-		List<String> replys = broadcastService.ping("foo");
-		assertEquals(2, replys.size());
-		assertEquals("foo", replys.get(0));
-		assertEquals("foo", replys.get(1));
+		List<String> replies = broadcastService.ping("foo");
+		assertEquals(2, replies.size());
+		assertEquals("foo", replies.get(0));
+		assertEquals("foo", replies.get(1));
 	}
 	
 	@Test
-	public void partitionedRequest() throws Exception {
+	void partitionedRequest() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver(2);
 		CalculatorListService eventPartitionCalculator = new CalculatorListService() {
 			@Override
@@ -184,7 +182,7 @@ public class AstrixRemotingTest {
 	}
 	
 	@Test
-	public void customRoutingRequest() throws Exception {
+	void customRoutingRequest() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver(2);
 		CustomRoutedCalc evenPartitionCalculator = new CustomRoutedCalc() {
 			@Override
@@ -212,7 +210,7 @@ public class AstrixRemotingTest {
 	}
 
 	@Test
-	public void partitionedRequest_GenericArrayArgument() throws Exception {
+	void partitionedRequest_GenericArrayArgument() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver(2);
 		PartitionedPingService eventPartitionPing = new PartitionedPingServiceImpl();
 		PartitionedPingService oddPartitionPing = new PartitionedPingServiceImpl();
@@ -230,7 +228,7 @@ public class AstrixRemotingTest {
 	}
 	
 	@Test
-	public void partitionedRequest_voidReturnType() throws Exception {
+	void partitionedRequest_voidReturnType() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver(2);
 		PartitionedPingServiceImpl evenPartitionPing = new PartitionedPingServiceImpl();
 		PartitionedPingServiceImpl oddPartitionPing = new PartitionedPingServiceImpl();
@@ -246,7 +244,7 @@ public class AstrixRemotingTest {
 	}
 	
 	@Test
-	public void asyncPartitionedRequest_voidReturnType() throws Exception {
+	void asyncPartitionedRequest_voidReturnType() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver(2);
 		PartitionedPingServiceImpl evenPartitionPing = new PartitionedPingServiceImpl();
 		PartitionedPingServiceImpl oddPartitionPing = new PartitionedPingServiceImpl();
@@ -262,7 +260,7 @@ public class AstrixRemotingTest {
 	}
 
 	@Test
-	public void partitionedRequest_emptyArgument() throws Exception {
+	void partitionedRequest_emptyArgument() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver(2);
 		PartitionedPingService evenPartitionPing = Mockito.mock(PartitionedPingService.class);
 		PartitionedPingService oddPartitionPing = Mockito.mock(PartitionedPingService.class);
@@ -275,14 +273,14 @@ public class AstrixRemotingTest {
 		Mockito.verifyNoInteractions(evenPartitionPing, oddPartitionPing);
 	}
 	
-	@Test(expected = RemoteServiceInvocationException.class)
-	public void partitionedRoutingRequest_NonServiceInovcationExcpetion_WrappedInRemoteServiceInvocation() throws Exception {
+	@Test
+	void partitionedRoutingRequest_NonServiceInovcationExcpetion_WrappedInRemoteServiceInvocation() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver(2);
 		PartitionedPingService evenPartitionPing = new PartitionedPingServiceImpl() {
 			@Override
 			public List<String> ping(String... nums) {
 				throw new NullPointerException();
-			};
+			}
 		};
 		PartitionedPingService oddPartitionPing = new PartitionedPingServiceImpl();
 		
@@ -290,11 +288,11 @@ public class AstrixRemotingTest {
 		remotingDriver.registerServerPartition(1, PartitionedPingService.class, oddPartitionPing);
 
 		PartitionedPingService partitionedPing = remotingDriver.createRemotingProxy(PartitionedPingService.class, PartitionedPingService.class);
-		partitionedPing.ping(new String[]{"1", "2", "3", "4", "5"});
+		assertThrows(RemoteServiceInvocationException.class, () ->partitionedPing.ping(new String[]{"1", "2", "3", "4", "5"}));
 	}
 
-	@Test(expected = MyCustomServiceException.class)
-	public void partitionedRoutingRequest_voidReturnType_throwsException() throws Exception{
+	@Test
+	void partitionedRoutingRequest_voidReturnType_throwsException() {
 		AstrixRemotingDriver astrixRemotingDriver = new AstrixRemotingDriver(2);
 		PartitionedPingServiceImpl evenPartition = new PartitionedPingServiceImpl() {
 			@Override
@@ -307,12 +305,11 @@ public class AstrixRemotingTest {
 		astrixRemotingDriver.registerServerPartition(0, PartitionedPingService.class, evenPartition);
 		astrixRemotingDriver.registerServerPartition(1,PartitionedPingService.class, oddPartition);
 		PartitionedPingService partitionedService = astrixRemotingDriver.createRemotingProxy(PartitionedPingService.class);
-		partitionedService.pingVoid(1,2,3,4);
-
+		assertThrows(MyCustomServiceException.class, () -> partitionedService.pingVoid(1,2,3,4));
 	}
 	
 	@Test
-	public void partitionedRequest_routingOnPropertyOnTargetObject() throws Exception {
+	void partitionedRequest_routingOnPropertyOnTargetObject() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver(2);
 		CalculatorArrayPojoService evenPartitionCalculator = new CalculatorArrayPojoService() {
 			@Override
@@ -353,7 +350,7 @@ public class AstrixRemotingTest {
 	}
 	
 	@Test
-	public void partitionedRequest_routingOnPropertyOnTargetObject_CollectionArgument() throws Exception {
+	void partitionedRequest_routingOnPropertyOnTargetObject_CollectionArgument() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver(2);
 		CalculatorListPojoService eventPartitionCalculator = new CalculatorListPojoServiceImpl();
 		CalculatorListPojoService oddPartitionCalculator = new CalculatorListPojoServiceImpl();
@@ -366,32 +363,32 @@ public class AstrixRemotingTest {
 		assertEquals(1 + 4 + 9 + 16 + 25, squareSum);
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
-	public void partitionedRequest_routingOnProperty_throwsExceptionForRawTypes() throws Exception {
+	@Test
+	void partitionedRequest_routingOnProperty_throwsExceptionForRawTypes() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
-		remotingDriver.createRemotingProxy(ServiceWithRawListRoutingArgument.class); 
-	}
-	
-	@Test(expected = IllegalArgumentException.class)
-	public void partitionedRequest_routingOnProperty_throwsExceptionForMissingMethods() throws Exception {
-		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
-		remotingDriver.createRemotingProxy(ServiceWithListMissingRoutingPropertyMethod.class);
-	}
-	
-	@Test(expected = IllegalArgumentException.class)
-	public void partitionedService_IncompatibleCollectionType_throwsException() throws Exception {
-		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
-		remotingDriver.createRemotingProxy(InvalidCollectionTypePartitionedService.class); 
-	}
-	
-	@Test(expected = IncompatibleRemoteResultReducerException.class)
-	public void partitionedService_IncompatibleReducer_throwsException() throws Exception {
-		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
-		remotingDriver.createRemotingProxy(InvalidReducerPartitionedService.class);
+		assertThrows(IllegalArgumentException.class, () -> remotingDriver.createRemotingProxy(ServiceWithRawListRoutingArgument.class));
 	}
 	
 	@Test
-	public void partitionedService_NonListCollection() throws Exception {
+	void partitionedRequest_routingOnProperty_throwsExceptionForMissingMethods() {
+		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
+		assertThrows(IllegalArgumentException.class, () -> remotingDriver.createRemotingProxy(ServiceWithListMissingRoutingPropertyMethod.class));
+	}
+	
+	@Test
+	void partitionedService_IncompatibleCollectionType_throwsException() {
+		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
+		assertThrows(IllegalArgumentException.class, () -> remotingDriver.createRemotingProxy(InvalidCollectionTypePartitionedService.class));
+	}
+	
+	@Test
+	void partitionedService_IncompatibleReducer_throwsException() {
+		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
+		assertThrows(IncompatibleRemoteResultReducerException.class, () -> remotingDriver.createRemotingProxy(InvalidReducerPartitionedService.class));
+	}
+	
+	@Test
+	void partitionedService_NonListCollection() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		PartitionedServiceUsingSet sevenPartitionService = new PartitionedServiceUsingSet() {
 			@Override
@@ -407,12 +404,12 @@ public class AstrixRemotingTest {
 	}
 	
 	@SafeVarargs
-	private static <T> Set<T> setOf(@SuppressWarnings("unchecked") T... values) {
-		return new HashSet<T>(Arrays.asList(values));
+	private static <T> Set<T> setOf(T... values) {
+		return new HashSet<>(Arrays.asList(values));
 	}
 
 	@Test
-	public void broadcastRequest_throwsException() throws Exception {
+	void broadcastRequest_throwsException() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		try {
 			BroadcastService impl = new BroadcastService() {
@@ -433,7 +430,7 @@ public class AstrixRemotingTest {
 	}
 	
 	@Test
-	public void publishMultipleApis() throws Exception {
+	void publishMultipleApis() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		class MultiProvider implements BroadcastService, TestService {
 
@@ -460,15 +457,15 @@ public class AstrixRemotingTest {
 		assertEquals(provider.broadcast(new BroadcastRequest("kalle")), broadcastService.broadcast(new BroadcastRequest("kalle")));
 	}
 	
-	@Test(expected = ServiceUnavailableException.class)
-	public void request_NoCorrespondingServiceRegisteredInServiceActivator_throwsServiceUnavailableException() throws Exception {
+	@Test
+	void request_NoCorrespondingServiceRegisteredInServiceActivator_throwsServiceUnavailableException() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		TestService missingRemoteService = remotingDriver.createRemotingProxy(TestService.class);
-		missingRemoteService.hello(new HelloRequest("foo"));
+		assertThrows(ServiceUnavailableException.class, () -> missingRemoteService.hello(new HelloRequest("foo")));
 	}
 	
 	@Test
-	public void useObservableVersionOfAService() throws Exception {
+	void useObservableVersionOfAService() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		TestService impl = new TestService() {
 			@Override
@@ -484,7 +481,7 @@ public class AstrixRemotingTest {
 	}
 	
 	@Test
-	public void useAsyncVersionOfAService() throws Exception {
+	void useAsyncVersionOfAService() throws Exception {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		TestService impl = new TestService() {
 			@Override
@@ -499,8 +496,8 @@ public class AstrixRemotingTest {
 		assertEquals("reply-kalle", response.get().getGreeting());
 	}
 	
-	@Test(expected = RuntimeException.class)
-	public void ioExceptionThrownDuringDeserializationAreProppagatedAsRuntimeExceptions() throws Exception {
+	@Test
+	void ioExceptionThrownDuringDeserializationAreProppagatedAsRuntimeExceptions() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		AstrixObjectSerializer corruptDeserializer = new AstrixObjectSerializer.NoVersioningSupport() {
 			@Override
@@ -525,11 +522,11 @@ public class AstrixRemotingTest {
 		
 		ObservableTestService service = remotingDriver.createRemotingProxy(ObservableTestService.class, TestService.class, corruptDeserializer);
 		Observable<HelloResponse> message = service.hello(new HelloRequest("kalle"));
-		message.toBlocking().first();
+		assertThrows(RuntimeException.class, () -> message.toBlocking().first());
 	}
 	
 	@Test
-	public void supportServicesThatAcceptAndReturnGenericTypes() throws Exception {
+	void supportServicesThatAcceptAndReturnGenericTypes() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		GenericReturnTypeService impl = new GenericReturnTypeService() {
 			@Override
@@ -546,13 +543,13 @@ public class AstrixRemotingTest {
 		GenericReturnTypeService testService = remotingDriver.createRemotingProxy(GenericReturnTypeService.class, GenericReturnTypeService.class);
 
 		HelloRequest request = new HelloRequest("kalle");
-		List<HelloResponse> reply = testService.hello("foo-routing", Arrays.<HelloRequest>asList(request));
+		List<HelloResponse> reply = testService.hello("foo-routing", singletonList(request));
 		assertEquals(1, reply.size());
 		assertEquals("reply-kalle", reply.get(0).getGreeting());
 	}
 	
 	@Test
-	public void supportServicesThatAcceptAndReturnGenericOnBroadcast() throws Exception {
+	void supportServicesThatAcceptAndReturnGenericOnBroadcast() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		BroadcastingGenericReturnTypeService impl = new BroadcastingGenericReturnTypeService() {
 			@Override
@@ -569,18 +566,18 @@ public class AstrixRemotingTest {
 		BroadcastingGenericReturnTypeService testService = remotingDriver.createRemotingProxy(BroadcastingGenericReturnTypeService.class);
 
 		HelloRequest request = new HelloRequest("kalle");
-		List<HelloResponse> reply = testService.hello(Arrays.<HelloRequest>asList(request));
+		List<HelloResponse> reply = testService.hello(singletonList(request));
 		assertEquals(1, reply.size());
 		assertEquals("reply-kalle", reply.get(0).getGreeting());
 	}
 	
 	@Test
-	public void supportServicesWithNoArgument() throws Exception {
+	void supportServicesWithNoArgument() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		NoArgumentService impl = new NoArgumentService() {
 			@Override
 			public List<String> hello() {
-				return Arrays.asList("response");
+				return singletonList("response");
 			}
 		};
 		remotingDriver.registerServer(NoArgumentService.class, impl);
@@ -592,7 +589,7 @@ public class AstrixRemotingTest {
 	}
 	
 	@Test
-	public void supportsServicesThatWithVoidReturnType() throws Exception {
+	void supportsServicesThatWithVoidReturnType() throws Exception {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		final BlockingQueue<String> receivedRequest = new LinkedBlockingQueue<>();
 		VoidService impl = new VoidService() {
@@ -611,7 +608,7 @@ public class AstrixRemotingTest {
 	}
 	
 	@Test
-	public void supportsBroadcastedServicesWithVoidReturnType() throws Exception {
+	void supportsBroadcastedServicesWithVoidReturnType() throws Exception {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		final BlockingQueue<String> receivedRequest = new LinkedBlockingQueue<>();
 		BroadcastVoidService impl = new BroadcastVoidService() {
@@ -630,7 +627,7 @@ public class AstrixRemotingTest {
 	}
 
 	@Test
-	public void supportsAsyncBroadcastedServicesWithVoidReturnType() throws Exception {
+	void supportsAsyncBroadcastedServicesWithVoidReturnType() throws Exception {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		final BlockingQueue<String> receivedRequest = new LinkedBlockingQueue<>();
 		BroadcastVoidService impl = new BroadcastVoidService() {
@@ -648,8 +645,8 @@ public class AstrixRemotingTest {
 		assertEquals("kalle", lastReceivedRequest);
 	}
 	
-	@Test(expected = MyCustomServiceException.class)
-	public void supports_BroadcastedServicesWithVoidReturnType_throwingExceptions() throws Exception{
+	@Test
+	void supports_BroadcastedServicesWithVoidReturnType_throwingExceptions() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		BroadcastVoidService impl = new BroadcastVoidService(){
 
@@ -662,18 +659,18 @@ public class AstrixRemotingTest {
 
 		BroadcastVoidService voideService = remotingDriver.createRemotingProxy(BroadcastVoidService.class);
 
-		voideService.hello("test");
+		assertThrows(MyCustomServiceException.class, () -> voideService.hello("test"));
 	}
 
 
-	@Test(expected = IllegalArgumentException.class)
-	public void throwsExceptionWhenRegisteringProviderForNonImplementedInterface() throws Exception {
+	@Test
+	void throwsExceptionWhenRegisteringProviderForNonImplementedInterface() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
-		remotingDriver.registerServer(TestService.class, new Object());
+		assertThrows(IllegalArgumentException.class, () -> remotingDriver.registerServer(TestService.class, new Object()));
 	}
 	
 	@Test
-	public void remotingProxiesDoesNotDelegateMethodCallsForMethodsDefinedIn_java_lang_Object() throws Exception {
+	void remotingProxiesDoesNotDelegateMethodCallsForMethodsDefinedIn_java_lang_Object() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		remotingDriver.registerServer(VoidService.class, new VoidService() {
 			@Override
@@ -690,31 +687,31 @@ public class AstrixRemotingTest {
 	}
 	
 	@Test
-	public void asyncBroadcastedService() throws Exception {
+	void asyncBroadcastedService() throws Exception {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		remotingDriver.registerServer(BroadcastingGenericReturnTypeService.class, new BroadcastingGenericReturnTypeService() {
 			@Override
 			public List<HelloResponse> hello(List<HelloRequest> greeting) {
-				return Arrays.asList(new HelloResponse(greeting.get(0).getMesssage()));
+				return singletonList(new HelloResponse(greeting.get(0).getMesssage()));
 			}
 			
 		});
 		
 		BroadcastingGenericReturnTypeServiceAsync service = remotingDriver.createRemotingProxy(BroadcastingGenericReturnTypeServiceAsync.class,
 																							   BroadcastingGenericReturnTypeService.class);
-		Future<List<HelloResponse>> resultFuture = service.hello(Arrays.asList(new HelloRequest("foo")));
+		Future<List<HelloResponse>> resultFuture = service.hello(singletonList(new HelloRequest("foo")));
 		List<HelloResponse> result = resultFuture.get();
 		assertEquals(1, result.size());
 	}
 	
-	@Test(expected = IncompatibleRemoteResultReducerException.class)
-	public void throwsExceptionOnProxyCreationIfRemoteResultReducerDoesNotHaveAMethodSignatureCompatibleWithServiceMethodSignature() throws Exception {
+	@Test
+	void throwsExceptionOnProxyCreationIfRemoteResultReducerDoesNotHaveAMethodSignatureCompatibleWithServiceMethodSignature() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
-		remotingDriver.createRemotingProxy(BroadcastServiceWithIllegalReducer.class); 
+		assertThrows(IncompatibleRemoteResultReducerException.class, () -> remotingDriver.createRemotingProxy(BroadcastServiceWithIllegalReducer.class));
 	}
 	
-	@Test(expected = IllegalStateException.class)
-	public void throwsIllegalStateExceptionIfRoutingStrategyReturnsNull() throws Exception {
+	@Test
+	void throwsIllegalStateExceptionIfRoutingStrategyReturnsNull() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		remotingDriver.registerServer(VoidService.class, new VoidService() {
 			@Override
@@ -728,11 +725,11 @@ public class AstrixRemotingTest {
 				return args -> null;
 			}
 		});
-		voidService.hello("foo");
+		assertThrows(IllegalStateException.class, () -> voidService.hello("foo"));
 	}
 	
 	@Test
-	public void supportsOptionalReturnType() throws Exception {
+	void supportsOptionalReturnType() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		remotingDriver.registerServer(OptionalPing.class, new OptionalPing() {
 			@Override
@@ -751,7 +748,7 @@ public class AstrixRemotingTest {
 	}
 	
 	@Test
-	public void supportsOptionalWithNullReturnValue() throws Exception {
+	void supportsOptionalWithNullReturnValue() {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver();
 		remotingDriver.registerServer(OptionalPing.class, new OptionalPing() {
 			@Override
@@ -762,10 +759,9 @@ public class AstrixRemotingTest {
 		
 		OptionalPing pingService = remotingDriver.createRemotingProxy(OptionalPing.class);
 
-		assertEquals(null, pingService.ping("foo"));
+		assertNull(pingService.ping("foo"));
 	}
 	
-	@SuppressWarnings("serial")
 	public static class HelloRequest implements Serializable {
 		private String messsage;
 		
@@ -785,7 +781,6 @@ public class AstrixRemotingTest {
 		}
 	}
 	
-	@SuppressWarnings("serial")
 	public static class BroadcastRequest implements Serializable {
 		private String messsage;
 		
@@ -805,7 +800,6 @@ public class AstrixRemotingTest {
 		}
 	}
 	
-	@SuppressWarnings("serial")
 	public static class HelloResponse implements Serializable {
 		private String greeting;
 		
@@ -1013,11 +1007,7 @@ public class AstrixRemotingTest {
 
 		@Override
 		public List<String> ping(String... nums) {
-			List<String> result = new ArrayList<>();
-			for (String s : nums) {
-				result.add(s);
-			}
-			return result;
+			return Arrays.asList(nums);
 		}
 		@Override
 		public void pingVoid(Integer... nums) {
@@ -1056,7 +1046,7 @@ public class AstrixRemotingTest {
 		public Router create(Method serviceMethod) {
 			return new Router() {
 				@Override
-				public RoutingKey getRoutingKey(Object[] args) throws Exception {
+				public RoutingKey getRoutingKey(Object[] args) {
 					return RoutingKey.create(0);
 				}
 			};

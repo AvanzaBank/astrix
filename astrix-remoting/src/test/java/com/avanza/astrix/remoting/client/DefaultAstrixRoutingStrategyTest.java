@@ -15,18 +15,18 @@
  */
 package com.avanza.astrix.remoting.client;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import com.avanza.astrix.core.AstrixRouting;
 import com.avanza.astrix.core.remoting.Router;
 import com.avanza.astrix.core.remoting.RoutingKey;
+import org.junit.jupiter.api.Test;
 
-public class DefaultAstrixRoutingStrategyTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class DefaultAstrixRoutingStrategyTest {
 	
 	@Test
-	public void routesOnRoutingAnnotatedArgument() throws Exception {
+	void routesOnRoutingAnnotatedArgument() throws Exception {
 		class Service {
 			public void hello(@AstrixRouting String routingArg, String anotherArg) {
 			}
@@ -37,7 +37,7 @@ public class DefaultAstrixRoutingStrategyTest {
 	}
 	
 	@Test
-	public void routesOnRoutingAnnotatedArgumentPropertyIfDefined() throws Exception {
+	void routesOnRoutingAnnotatedArgumentPropertyIfDefined() throws Exception {
 		class Service {
 			@SuppressWarnings("unused")
 			public void hello(@AstrixRouting("getRouting") ProperRoutingMethod routingArg) {
@@ -49,35 +49,35 @@ public class DefaultAstrixRoutingStrategyTest {
 		assertEquals(RoutingKey.create("routing-arg"), routingKey);
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
-	public void missingPropertyMethod_throwsIllegalArgumentException() throws Exception {
+	@Test
+	void missingPropertyMethod_throwsIllegalArgumentException() {
 		class Service {
 			@SuppressWarnings("unused")
 			public void hello(@AstrixRouting("getRouting") MissingRoutingMethod routingArg) {
 			}
 		}
-		new DefaultAstrixRoutingStrategy().create(Service.class.getMethod("hello", MissingRoutingMethod.class));
+		assertThrows(IllegalArgumentException.class, () -> new DefaultAstrixRoutingStrategy().create(Service.class.getMethod("hello", MissingRoutingMethod.class)));
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
-	public void invalidPropertyMethod_throwsIllegalArgumentException() throws Exception {
+	@Test
+	void invalidPropertyMethod_throwsIllegalArgumentException() {
 		class Service {
 			@SuppressWarnings("unused")
 			public void hello(@AstrixRouting("getRouting") IllegalRoutingMethod routingArg) {
 			}
 		}
 		
-		new DefaultAstrixRoutingStrategy().create(Service.class.getMethod("hello", IllegalRoutingMethod.class));
+		assertThrows(IllegalArgumentException.class, () -> new DefaultAstrixRoutingStrategy().create(Service.class.getMethod("hello", IllegalRoutingMethod.class)));
 	}
 	
-	@Test(expected = AmbiguousRoutingException.class)
-	public void multipleRoutingAnnotations_throwsAmbiguousRoutingException() throws Exception {
+	@Test
+	void multipleRoutingAnnotations_throwsAmbiguousRoutingException() {
 		class Service {
 			@SuppressWarnings("unused")
 			public void hello(@AstrixRouting String routingArg, @AstrixRouting String routingArg2) {
 			}
 		}
-		new DefaultAstrixRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class));
+		assertThrows(AmbiguousRoutingException.class, () -> new DefaultAstrixRoutingStrategy().create(Service.class.getMethod("hello", String.class, String.class)));
 	}
 	
 	public static class ProperRoutingMethod {

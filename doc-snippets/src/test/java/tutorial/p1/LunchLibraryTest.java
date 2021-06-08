@@ -15,28 +15,26 @@
  */
 package tutorial.p1;
 
-import static org.junit.Assert.assertTrue;
-
-import org.junit.After;
-import org.junit.Test;
-
+import com.avanza.astrix.context.AstrixConfigurer;
+import com.avanza.astrix.context.AstrixContext;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import tutorial.p1.api.LunchSuggester;
 import tutorial.p1.provider.AllLunchRestaurants;
 
-import com.avanza.astrix.context.AstrixConfigurer;
-import com.avanza.astrix.context.AstrixContext;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LunchLibraryTest {
+class LunchLibraryTest {
 	
 	private AstrixContext astrix;
 	
-	@After
-	public void after() {
+	@AfterEach
+	void after() {
 		astrix.destroy();
 	}
 
 	@Test
-	public void lunchSuggesterCanBeConsumedUsingAstrix() throws Exception {
+	void lunchSuggesterCanBeConsumedUsingAstrix() {
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setBasePackage("tutorial.p1");
 		astrix = configurer.configure();

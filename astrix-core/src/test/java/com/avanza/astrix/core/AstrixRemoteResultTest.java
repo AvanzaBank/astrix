@@ -15,14 +15,18 @@
  */
 package com.avanza.astrix.core;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AstrixRemoteResultTest {
+class AstrixRemoteResultTest {
 	
 	@Test
-	public void successfulResult() throws Exception {
+	void successfulResult() {
 		AstrixRemoteResult<String> result = AstrixRemoteResult.successful("foo");
 		
 		assertFalse(result.hasThrownException());
@@ -31,29 +35,23 @@ public class AstrixRemoteResultTest {
 	}
 	
 	@Test
-	public void serviceUnavailableResult() throws Exception {
+	void serviceUnavailableResult() {
 		AstrixRemoteResult<String> result = AstrixRemoteResult.unavailable("unavailable", CorrelationId.valueOf("foo"));
 		
 		assertTrue(result.hasThrownException());
 		assertEquals(ServiceUnavailableException.class, result.getThrownException().getClass());
-		try {
-			result.getResult();
-			fail("Expected ServiceUnavailableException");
-		} catch (ServiceUnavailableException e) {
-		}
+
+		assertThrows(ServiceUnavailableException.class, result::getResult, "Expected ServiceUnavailableException");
 	}
 	
 	@Test
-	public void serviceInvocationExceptionResult() throws Exception {
+	void serviceInvocationExceptionResult() {
 		AstrixRemoteResult<String> result = AstrixRemoteResult.failure(new FakeServiceInvocationException(), CorrelationId.valueOf("foo"));
 		
 		assertTrue(result.hasThrownException());
 		assertEquals(FakeServiceInvocationException.class, result.getThrownException().getClass());
-		try {
-			result.getResult();
-			fail("Expected FakeServiceInvocationException");
-		} catch (FakeServiceInvocationException e) {
-		}
+
+		assertThrows(FakeServiceInvocationException.class, result::getResult, "Expected FakeServiceInvocationException");
 	}
 	
 	private static class FakeServiceInvocationException extends ServiceInvocationException {

@@ -15,7 +15,8 @@
  */
 package lunch.grader.pu;
 
-import com.avanza.gs.test.PuApp;
+
+import com.avanza.gs.test.junit5.PuApp;
 
 public class LunchGraderPuRunner {
 	

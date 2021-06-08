@@ -18,21 +18,20 @@ package com.avanza.astrix.versioning.jackson2;
 import com.avanza.astrix.versioning.jackson2.VersionedJsonObjectMapper.VersionedObjectMapperBuilder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-
-public class VersionedJsonObjectMapperTest {
+class VersionedJsonObjectMapperTest {
 	
-	List<AstrixJsonApiMigration> apiMigrations = new ArrayList<>();
+	private final List<AstrixJsonApiMigration> apiMigrations = new ArrayList<>();
 
 	@Test
-	public void canSerializerAndDeserializeObjectsUsingObjectMapper() throws Exception {
+	void canSerializerAndDeserializeObjectsUsingObjectMapper() throws Exception {
 		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
 		VersionedJsonObjectMapper objectMapper = objectMapperBuilder.build();
 		
@@ -43,7 +42,7 @@ public class VersionedJsonObjectMapperTest {
 	}
 	
 	@Test
-	public void upgradesOldDocuments() throws Exception {
+	void upgradesOldDocuments() throws Exception {
 		this.apiMigrations.add(new TestPojoV1ToV2Migration());
 		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
 		VersionedJsonObjectMapper objectMapper = objectMapperBuilder.build();
@@ -60,7 +59,7 @@ public class VersionedJsonObjectMapperTest {
 	
 
 	@Test
-	public void downgradesToOldDocuments() throws Exception {
+	void downgradesToOldDocuments() throws Exception {
 		this.apiMigrations.add(new TestPojoV1ToV2Migration());
 		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
 		VersionedJsonObjectMapper objectMapper = objectMapperBuilder.build();
@@ -75,7 +74,7 @@ public class VersionedJsonObjectMapperTest {
 	}
 	
 	@Test
-	public void deserializesGenericTypes() throws Exception {
+	void deserializesGenericTypes() throws Exception {
 		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
 		VersionedJsonObjectMapper objectMapper = objectMapperBuilder.build();
 		
@@ -92,7 +91,7 @@ public class VersionedJsonObjectMapperTest {
 	}
 
 	@Test
-	public void migratesGenericTypes() throws Exception {
+	void migratesGenericTypes() throws Exception {
 		apiMigrations.add(new TestPojoV1ToV2Migration());
 		VersionedObjectMapperBuilder objectMapperBuilder = new VersionedObjectMapperBuilder(apiMigrations);
 		VersionedJsonObjectMapper objectMapper = objectMapperBuilder.build();

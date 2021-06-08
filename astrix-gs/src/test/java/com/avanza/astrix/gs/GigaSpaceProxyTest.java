@@ -15,42 +15,37 @@
  */
 package com.avanza.astrix.gs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.openspaces.core.GigaSpace;
-
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.gigaspaces.internal.client.cache.SpaceCacheException;
+import org.junit.jupiter.api.Test;
+import org.openspaces.core.GigaSpace;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
-public class GigaSpaceProxyTest {
-	
-	@Test
-	public void proxiesInvocations() throws Exception {
-		GigaSpace gigaSpace = Mockito.mock(GigaSpace.class);
-		GigaSpace proxied = GigaSpaceProxy.create(gigaSpace);
-		
-		Mockito.when(gigaSpace.count(null)).thenReturn(21);
-		
-		assertEquals(21, proxied.count(null));
-	}
-	
-	@Test
-	public void wrappsSpaceCacheExceptionsInServiceUnavailableException() throws Exception {
-		GigaSpace gigaSpace = Mockito.mock(GigaSpace.class);
+class GigaSpaceProxyTest {
 
-		Mockito.when(gigaSpace.count(null)).thenThrow(new SpaceCacheException(""));
-		GigaSpace proxied = GigaSpaceProxy.create(gigaSpace);
-		
-		try {
-			proxied.count(null);
-			fail("Expected ServiceUnavailableException or subclass to be thrown");
-		} catch (ServiceUnavailableException e) {
-			// Expected
-		}
-	}
+    @Test
+    void proxiesInvocations() {
+        GigaSpace gigaSpace = mock(GigaSpace.class);
+        GigaSpace proxied = GigaSpaceProxy.create(gigaSpace);
+
+        when(gigaSpace.count(null)).thenReturn(21);
+
+        assertEquals(21, proxied.count(null));
+    }
+
+    @Test
+    void wrapsSpaceCacheExceptionsInServiceUnavailableException() {
+        GigaSpace gigaSpace = mock(GigaSpace.class);
+
+        when(gigaSpace.count(null)).thenThrow(new SpaceCacheException(""));
+        GigaSpace proxied = GigaSpaceProxy.create(gigaSpace);
+
+        assertThrows(ServiceUnavailableException.class, () -> proxied.count(null), "Expected ServiceUnavailableException or subclass to be thrown");
+    }
 
 }

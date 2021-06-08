@@ -15,12 +15,14 @@
  */
 package com.avanza.astrix.test.util;
 
-import java.util.function.Supplier;
-
+import org.hamcrest.CustomTypeSafeMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-import org.junit.Assert;
+
+import java.util.function.Supplier;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class AstrixTestUtil {
 	
@@ -46,10 +48,10 @@ public class AstrixTestUtil {
 			
 			@Override
 			public void describeFailureTo(Description description) {
-				description.appendText("Expected serviceInovcation to return:\n");
+				description.appendText("Expected serviceInvocation to return:\n");
 				matcher.describeTo(description);
 				if (lastException != null) {
-					description.appendText("\nBut last serviceInvocation threw exception:\n" + lastException.toString());
+					description.appendText("\nBut last serviceInvocation threw exception:\n" + lastException);
 				} else {
 					description.appendText("\nBut last serviceInvocation returned:\n" + lastResult);
 				}
@@ -79,10 +81,10 @@ public class AstrixTestUtil {
 			
 			@Override
 			public void describeFailureTo(Description description) {
-				description.appendText("Expected serviceInovcation to throw exception: ");
+				description.appendText("Expected serviceInvocation to throw exception: ");
 				matcher.describeTo(description);
 				if (lastException != null) {
-					description.appendText("\nBut last service invocation threw exception: " + lastException.toString());
+					description.appendText("\nBut last service invocation threw exception: " + lastException);
 				} else {
 					description.appendText("\nBut last service invocation returned " + lastResult);
 				}
@@ -90,7 +92,7 @@ public class AstrixTestUtil {
 		};
 	}
 	
-	public static <T extends Exception> Probe isSuccessfulServiceInvocation(final Runnable serviceInvocation) {
+	public static Probe isSuccessfulServiceInvocation(final Runnable serviceInvocation) {
 		return new Probe() {
 			
 			private volatile Exception lastException;
@@ -118,15 +120,13 @@ public class AstrixTestUtil {
 	}
 	
 	public static <T extends Exception> Matcher<T> isExceptionOfType(final Class<T> type) {
-		return new TypeSafeMatcher<T>() {
-			@Override
-			public void describeTo(Description description) {
-				description.appendText("Expected exception of type " + type.getName() + " to be thrown");
-			}
+		return new CustomTypeSafeMatcher<>("Expected exception of type " + type.getName() + " to be thrown") {
+
 			@Override
 			protected boolean matchesSafely(T item) {
 				return type.isAssignableFrom(item.getClass());
 			}
+
 		};
 	}
 	
@@ -136,16 +136,16 @@ public class AstrixTestUtil {
 		}
 		try {
 			autoClosable.close();
-		} catch (Exception e) {
+		} catch (Exception ignore) {
 		}
 	}
 
 	public static void assertThrows(Runnable command, Class<? extends RuntimeException> expectedExceptionType) {
 		try {
 			command.run();
-			Assert.fail("Expected exception of type " + expectedExceptionType.getName() + " to be thrown");
+			fail("Expected exception of type " + expectedExceptionType.getName() + " to be thrown");
 		} catch (RuntimeException e) {
-			Assert.assertEquals("Thrown type: ", expectedExceptionType, e.getClass());
+			assertEquals(expectedExceptionType, e.getClass(), "Thrown type: ");
 		}
 	}
 

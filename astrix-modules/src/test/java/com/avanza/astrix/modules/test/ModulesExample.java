@@ -15,12 +15,12 @@
  */
 package com.avanza.astrix.modules.test;
 
-import java.util.Scanner;
-
 import com.avanza.astrix.modules.Module;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.modules.Modules;
 import com.avanza.astrix.modules.ModulesConfigurer;
+
+import java.util.Scanner;
 
 public class ModulesExample {
 	
@@ -40,7 +40,7 @@ public class ModulesExample {
 	}
 
 	static class ConsoleUi implements PingUi {
-		private Scanner consoleReader = new Scanner(System.in);
+		private final Scanner consoleReader = new Scanner(System.in);
 		public String readMsg() {
 			return consoleReader.nextLine();
 		}

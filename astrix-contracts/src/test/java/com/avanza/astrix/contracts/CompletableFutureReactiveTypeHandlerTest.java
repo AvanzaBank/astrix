@@ -15,12 +15,13 @@
  */
 package com.avanza.astrix.contracts;
 
-import java.util.concurrent.CompletableFuture;
-
 import com.avanza.astrix.beans.core.CompletableFutureTypeHandlerPlugin;
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
 
-public class CompletableFutureReactiveTypeHandlerTest extends ReactiveTypeHandlerContract<CompletableFuture<Object>> {
+import java.util.concurrent.CompletableFuture;
+
+class CompletableFutureReactiveTypeHandlerTest extends ReactiveTypeHandlerContract<CompletableFuture<Object>> {
+
 	@Override
 	protected ReactiveTypeHandlerPlugin<CompletableFuture<Object>> newReactiveTypeHandler() {
 		return new CompletableFutureTypeHandlerPlugin(); 

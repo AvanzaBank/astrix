@@ -15,18 +15,6 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
@@ -44,10 +32,22 @@ import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandMetrics;
 import com.netflix.hystrix.HystrixEventType;
 import com.netflix.hystrix.util.HystrixRollingNumberEvent;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
-@Ignore
-public class HystrixCommandFacadeTest {
+@Disabled
+class HystrixCommandFacadeTest {
 	
 	// TODO: Rename to sync-service invocation test
 
@@ -55,8 +55,8 @@ public class HystrixCommandFacadeTest {
 	private Ping ping;
 	private PingImpl pingServer = new PingImpl();
 	
-	@Before
-	public void before() throws InterruptedException {
+	@BeforeEach
+	void before() {
 		Hystrix.reset();
 		context = new TestAstrixConfigurer().enableFaultTolerance(true)
 											.registerApiProvider(PingApi.class)
@@ -69,13 +69,13 @@ public class HystrixCommandFacadeTest {
 		initMetrics(ping);
 	}
 	
-	@After
-	public void after() {
+	@AfterEach
+	void after() {
 		context.destroy();
 	}
 	
 	@Test
-	public void underlyingObservableIsWrappedWithFaultTolerance() throws Throwable {
+	void underlyingObservableIsWrappedWithFaultTolerance() throws Throwable {
 		String result = ping.ping("foo");
 
 		assertEquals("foo", result);
@@ -85,21 +85,15 @@ public class HystrixCommandFacadeTest {
 	}
 	
 	@Test
-	public void serviceUnavailableThrownByUnderlyingObservableShouldCountAsFailure() throws Exception {
+	void serviceUnavailableThrownByUnderlyingObservableShouldCountAsFailure() throws Exception {
 		initMetrics(ping);
 		
 		pingServer.setFault(() -> {
 			throw new ServiceUnavailableException("");
 		});
-		try {
-			ping.ping("foo");
-			fail("Expected service unavailable");
-		} catch (ServiceUnavailableException e) {
-			// Expcected
-		} catch (Throwable e) {
-			fail("Expected exception of type ServiceUnavailableException, got: " + e.getClass().getName());
-		}
-		
+
+		assertThrows(ServiceUnavailableException.class, () -> ping.ping("foo"),"Expected service unavailable");
+
 		eventually(() -> {
 			assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS)); // 1 from init
 			assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.FAILURE));
@@ -107,18 +101,14 @@ public class HystrixCommandFacadeTest {
 	}
 	
 	@Test
-	public void normalExceptionsThrownIsTreatedAsPartOfNormalApiFlowAndDoesNotCountAsFailure() throws Throwable {
+	void normalExceptionsThrownIsTreatedAsPartOfNormalApiFlowAndDoesNotCountAsFailure() throws Throwable {
 		initMetrics(ping);
 		pingServer.setFault(() -> {
 			throw new MyDomainException();
 		});
-		try {
-			ping.ping("foo");
-			fail("Expected service unavailable");
-		} catch (MyDomainException e) {
-			// Expcected
-		} 
-		
+
+		assertThrows(MyDomainException.class, () -> ping.ping("foo"), "Expected service unavailable");
+
 		eventually(() -> {
 			// Note that from the perspective of a circuit-breaker an exception thrown
 			// by the underlying service call (typically a service call) should not
@@ -129,17 +119,14 @@ public class HystrixCommandFacadeTest {
 	}
 	
 	@Test
-	public void throwsServiceUnavailableOnTimeouts() throws Throwable {
+	void throwsServiceUnavailableOnTimeouts() throws Throwable {
 		initMetrics(ping);
 		pingServer.setFault(() -> {
 			sleep(10_000); //simulate timeout by sleeping
 		});
-		try {
-			ping.ping("foo");
-			fail("A ServiceUnavailableException should be thrown on timeout");
-		} catch (ServiceUnavailableException e) {
-			// Expcected
-		}
+
+		assertThrows(ServiceUnavailableException.class, () -> ping.ping("foo"), "A ServiceUnavailableException should be thrown on timeout");
+
 		eventually(() -> {
 			assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS)); // 1 from init
 			assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.TIMEOUT));
@@ -148,7 +135,7 @@ public class HystrixCommandFacadeTest {
 	}
 	
 	@Test
-	public void threadPoolRejectedCountsAsFailure() throws Exception {
+	void threadPoolRejectedCountsAsFailure() throws Exception {
 		initMetrics(ping);
 		pingServer.setFault(() -> {
 			sleep(10_000); //simulate timeout by sleeping
@@ -158,19 +145,19 @@ public class HystrixCommandFacadeTest {
 		new Thread(() -> {
 			try {
 				ping.ping("foo");
-			} catch (Exception e) {
+			} catch (Exception ignore) {
 			}
 			done.countDown();
 		}).start();
 		new Thread(() -> {
 			try {
 				ping.ping("foo");
-			} catch (Exception e) {
+			} catch (Exception ignore) {
 			}
 			done.countDown();
 		}).start();
 
-		done.await(5, TimeUnit.SECONDS);
+		done.await(5, SECONDS);
 		eventually(() -> {
 			assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.SUCCESS)); // 1 from init
 			assertEquals(1, getEventCountForCommand(HystrixRollingNumberEvent.THREAD_POOL_REJECTED));
@@ -178,22 +165,22 @@ public class HystrixCommandFacadeTest {
 	}
 	
 	@Test
-	public void doesNotInvokeServiceWhenBulkHeadIsFull() throws Exception {
+	void doesNotInvokeServiceWhenBulkHeadIsFull() throws Exception {
 		AtomicInteger invocationCount = new AtomicInteger();
 		CountDownLatch done = new CountDownLatch(1);
 		CountDownLatch serverInvocationCompleted = new CountDownLatch(1);
 		pingServer.setFault(() -> {
 			invocationCount.incrementAndGet();
 			try {
-				done.await(10, TimeUnit.SECONDS); //simulate timeout by waiting on latch
-			} catch (Exception e) {
+				done.await(10, SECONDS); //simulate timeout by waiting on latch
+			} catch (Exception ignore) {
 			}
 			serverInvocationCompleted.countDown();
 		});
 		Thread t1 = new Thread(() -> {
 			try {
 				ping.ping("foo");
-			} catch (ServiceUnavailableException e) {
+			} catch (ServiceUnavailableException ignore) {
 			}
 			done.countDown();
 		});
@@ -201,16 +188,16 @@ public class HystrixCommandFacadeTest {
 		Thread t2 = new Thread(() -> {
 			try {
 				ping.ping("foo");
-			} catch (ServiceUnavailableException e) {
+			} catch (ServiceUnavailableException ignore) {
 			}
 			done.countDown();
 		});
 		t2.start();
 		
-		if (!done.await(3, TimeUnit.SECONDS)) {
+		if (!done.await(3, SECONDS)) {
 			fail("Expected one ping invocation to be aborted by fault tolerance layer");
 		}
-		if (!serverInvocationCompleted.await(3, TimeUnit.SECONDS)) {
+		if (!serverInvocationCompleted.await(3, SECONDS)) {
 			fail("Expected server invocation to complete when second service call is aborted");
 		}
 		assertEquals(1, invocationCount.get());
@@ -220,38 +207,39 @@ public class HystrixCommandFacadeTest {
 		new AssertBlockPoller(3000, 25).check(assertion);
 	}
 	
-	private void initMetrics(Ping ping) throws InterruptedException {
+	private void initMetrics(Ping ping) {
 		// Black hystrix magic here :(
 		try {
 			ping.ping("foo");
-		} catch (Exception e) {
+		} catch (Exception ignore) {
 		}
-		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) AstrixApplicationContext.class.cast(this.context).getInstance(BeanFaultToleranceFactorySpi.class);
+		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) ((AstrixApplicationContext) this.context).getInstance(BeanFaultToleranceFactorySpi.class);
 		HystrixCommandKey key = faultTolerance.getCommandKey(AstrixBeanKey.create(Ping.class));
 		
 		HystrixCommandMetrics.getInstance(key).getCumulativeCount(HystrixEventType.SUCCESS);
 	}
 	
+	@SuppressWarnings("SameParameterValue")
 	private static void sleep(long time) {
 		try {
 			Thread.sleep(time);
-		} catch (InterruptedException e) {
+		} catch (InterruptedException ignore) {
 		}
 	}
 	
 	private int getEventCountForCommand(HystrixRollingNumberEvent hystrixRollingNumberEvent) {
-		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) AstrixApplicationContext.class.cast(this.context).getInstance(BeanFaultToleranceFactorySpi.class);
+		HystrixFaultToleranceFactory faultTolerance = (HystrixFaultToleranceFactory) ((AstrixApplicationContext) this.context).getInstance(BeanFaultToleranceFactorySpi.class);
 		HystrixCommandKey commandKey = faultTolerance.getCommandKey(AstrixBeanKey.create(Ping.class));
 		HystrixCommandMetrics metrics = HystrixCommandMetrics.getInstance(commandKey);
 		int currentConcurrentExecutionCount = (int) metrics.getCumulativeCount(hystrixRollingNumberEvent);
 		return currentConcurrentExecutionCount;
 	}
 	
-	public static class MyDomainException extends RuntimeException {
+	private static class MyDomainException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 	}
 	
-	public static interface Ping {
+	public interface Ping {
 		String ping(String msg);
 	}
 	

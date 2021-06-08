@@ -15,16 +15,15 @@
  */
 package com.avanza.astrix.remoting.util;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
+import com.avanza.astrix.beans.async.ContextPropagation;
+import com.gigaspaces.async.AsyncResult;
+import com.gigaspaces.async.SettableFuture;
+import com.gigaspaces.async.internal.DefaultAsyncResult;
+import org.junit.jupiter.api.Test;
+import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Func1;
+import rx.observers.Subscribers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,45 +33,40 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 
-import com.avanza.astrix.beans.async.ContextPropagation;
-import com.gigaspaces.async.AsyncResult;
-import com.gigaspaces.async.SettableFuture;
-import com.gigaspaces.async.internal.DefaultAsyncResult;
-
-import rx.Observable;
-import rx.Subscriber;
-import rx.functions.Func1;
-import rx.observers.Subscribers;
-
-public class GsUtilTest {
+class GsUtilTest {
 
 	@Test
-	public void asyncResultList_ToFlatObservable_EmitsEachResultAsSingleItem() throws Exception {
+	void asyncResultList_ToFlatObservable_EmitsEachResultAsSingleItem() {
 		Func1<List<AsyncResult<String>>, Observable<String>> listToObservable = GsUtil.asyncResultListToObservable();
-		List<AsyncResult<String>> r = Arrays.<AsyncResult<String>> asList(new DefaultAsyncResult<String>("foo", null),
-				new DefaultAsyncResult<String>("bar", null));
+		List<AsyncResult<String>> r = Arrays.asList(new DefaultAsyncResult<>("foo", null),
+													new DefaultAsyncResult<>("bar", null));
 
 		Observable<String> result = Observable.just(r).flatMap(listToObservable);
 		assertEquals(Arrays.asList("foo", "bar"), result.toList().toBlocking().first());
 	}
 
 	@Test
-	public void asyncResultList_ToFlatObservable_Error() throws Exception {
+	void asyncResultList_ToFlatObservable_Error() {
 		Func1<List<AsyncResult<String>>, Observable<String>> listToObservable = GsUtil.asyncResultListToObservable();
-		List<AsyncResult<String>> r = Arrays.<AsyncResult<String>> asList(new DefaultAsyncResult<String>("foo", null),
-				new DefaultAsyncResult<String>(null, new TestException()));
+		List<AsyncResult<String>> r = Arrays.asList(new DefaultAsyncResult<>("foo", null),
+													new DefaultAsyncResult<>(null, new TestException()));
 
 		Observable<String> result = Observable.just(r).flatMap(listToObservable);
 		Iterator<String> resultIterator = result.toBlocking().getIterator();
 		resultIterator.next();
-		try {
-			resultIterator.next();
-			fail("Expected TestException to be thrown");
-		} catch (TestException e) {
-			// expected
-		}
+
+		assertThrows(TestException.class, resultIterator::next, "Expected TestException to be thrown");
 	}
 
 	public static class TestException extends RuntimeException {
@@ -92,7 +86,7 @@ public class GsUtilTest {
 	private final ContextPropagation propagation = ContextPropagation.NONE;
 
 	@Test
-	public void shouldSetSubscriberOnNextUsingAsyncFutureValue() {
+	void shouldSetSubscriberOnNextUsingAsyncFutureValue() {
 		// Arrange
 		GsUtil.subscribe(asyncFuture, subscriber, propagation);
 
@@ -106,7 +100,7 @@ public class GsUtilTest {
 	}
 
 	@Test
-	public void shouldSetSubscriberOnErrorUsingAsyncFutureException() {
+	void shouldSetSubscriberOnErrorUsingAsyncFutureException() {
 		// Arrange
 		GsUtil.subscribe(asyncFuture, subscriber, propagation);
 
@@ -122,7 +116,7 @@ public class GsUtilTest {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void shouldSetSubscriberOnNextUsingAsyncFutureValueWithContextPropagators() {
+	void shouldSetSubscriberOnNextUsingAsyncFutureValueWithContextPropagators() {
 		// Arrange
 		final List<String> operations = new ArrayList<>();
 		final ContextPropagation propagation = mock(ContextPropagation.class);

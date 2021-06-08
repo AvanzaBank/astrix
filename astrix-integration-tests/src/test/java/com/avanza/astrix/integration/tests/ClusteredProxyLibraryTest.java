@@ -15,17 +15,6 @@
  */
 package com.avanza.astrix.integration.tests;
 
-import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import org.hamcrest.Description;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.openspaces.core.GigaSpace;
-import org.openspaces.core.executor.Task;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.config.DynamicConfig;
@@ -36,37 +25,48 @@ import com.avanza.astrix.gs.AsyncFutureTypeHandler.AsyncFutureImpl;
 import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.api.LunchStatistics;
-import com.avanza.astrix.test.util.AutoCloseableRule;
+import com.avanza.astrix.test.util.AutoCloseableExtension;
 import com.avanza.astrix.test.util.Poller;
 import com.avanza.astrix.test.util.Probe;
-import com.avanza.gs.test.PuConfigurers;
-import com.avanza.gs.test.RunningPu;
+import com.avanza.gs.test.junit5.PuConfigurers;
+import com.avanza.gs.test.junit5.RunningPu;
 import com.gigaspaces.async.AsyncFuture;
+import org.hamcrest.Description;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.openspaces.core.GigaSpace;
+import org.openspaces.core.executor.Task;
 
-public class ClusteredProxyLibraryTest {
+import static com.avanza.astrix.integration.tests.TestLunchRestaurantBuilder.lunchRestaurant;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class ClusteredProxyLibraryTest {
 	
-	private static InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
+	private static final InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
 		set(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
 	}};
 	
-	@ClassRule
-	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
-											  .numberOfPrimaries(1)
-											  .numberOfBackups(0)
-									  		  .contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
-											  .startAsync(true)
-											  .configure();
+	@RegisterExtension
+	static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/lunch-pu.xml")
+											.numberOfPrimaries(1)
+											.numberOfBackups(0)
+											.contextProperty("configSourceId", serviceRegistry.getConfigSourceId())
+											.startAsync(true)
+											.configure();
 	
-	@Rule
-	public AutoCloseableRule autoClosables = new AutoCloseableRule();
+	@RegisterExtension
+	AutoCloseableExtension autoClosables = new AutoCloseableExtension();
 	
 	private LunchService lunchService;
 
-	private AstrixConfigurer configurer = new AstrixConfigurer();
+	private final AstrixConfigurer configurer = new AstrixConfigurer();
 	private AstrixContext astrix;
 	
-	@Before
-	public void setup() throws Exception {
+	@BeforeEach
+	void setup() {
 		GigaSpace proxy = lunchPu.getClusteredGigaSpace();
 		proxy.clear(null);
 		
@@ -76,7 +76,7 @@ public class ClusteredProxyLibraryTest {
 	}
 	
 	@Test
-	public void aClusteredProxyIsConsumableUsingTheServiceRegistryFromTheSameSubsystem() throws Exception {
+	void aClusteredProxyIsConsumableUsingTheServiceRegistryFromTheSameSubsystem() throws Exception {
 		configurer.setSubsystem("lunch-system");
 		astrix = autoClosables.add(configurer.configure());
 		this.lunchService = astrix.waitForBean(LunchService.class, 10000);
@@ -87,7 +87,7 @@ public class ClusteredProxyLibraryTest {
 	}
 	
 	@Test
-	public void itsPossibleToInvokeMethodsReturningAsyncFutureWithFaultTolerance() throws Exception {
+	void itsPossibleToInvokeMethodsReturningAsyncFutureWithFaultTolerance() throws Exception {
 		configurer.setSubsystem("lunch-system");
 		configurer.enableFaultTolerance(true);
 		astrix = autoClosables.add(configurer.configure());
@@ -96,16 +96,16 @@ public class ClusteredProxyLibraryTest {
 		assertEquals(AsyncFutureImpl.class, future.getClass());
 	}
 	
-	@Test(expected = ServiceUnavailableException.class)
-	public void aClusteredProxyIsNotConsumableFromAnotherSubsystem() throws Exception {
+	@Test
+	void aClusteredProxyIsNotConsumableFromAnotherSubsystem() {
 		configurer.setSubsystem("another-subsystem");
 		astrix = autoClosables.add(configurer.configure());
 		
-		astrix.getBean(LunchStatistics.class).getRestaurantCount();
+		assertThrows(ServiceUnavailableException.class, () -> astrix.getBean(LunchStatistics.class).getRestaurantCount());
 	}
 	
 	@Test
-	public void aClusteredProxyUsesOptimisticLockinWhenMasterSpaceIsConfiguredForOptimisticLocking() throws Exception {
+	void aClusteredProxyUsesOptimisticLockinWhenMasterSpaceIsConfiguredForOptimisticLocking() throws Exception {
 		configurer.setSubsystem("lunch-system");
 		astrix = autoClosables.add(configurer.configure());
 		GigaSpace proxy = astrix.waitForBean(GigaSpace.class, "lunch-space", 10000);
@@ -113,7 +113,7 @@ public class ClusteredProxyLibraryTest {
 	}
 	
 	@Test
-	public void supportsMethodsReturningAsyncFuture() throws Exception {
+	void supportsMethodsReturningAsyncFuture() throws Exception {
 		configurer.setSubsystem("lunch-system");
 		astrix = autoClosables.add(configurer.configure());
 		GigaSpace proxy = astrix.waitForBean(GigaSpace.class, "lunch-space", 10000);
@@ -122,7 +122,7 @@ public class ClusteredProxyLibraryTest {
 	}
 	
 	@Test
-	public void localViewTest() throws Exception {
+	void localViewTest() throws Exception {
 		configurer.setSubsystem("lunch-system");
 		astrix = autoClosables.add(configurer.configure());
 		this.lunchService = astrix.waitForBean(LunchService.class, 10_000L);
@@ -171,7 +171,7 @@ public class ClusteredProxyLibraryTest {
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		public Integer execute() throws Exception {
+		public Integer execute() {
 			return 1;
 		}
 	}

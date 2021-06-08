@@ -15,30 +15,6 @@
  */
 package com.avanza.astrix.ft.hystrix;
 
-import static com.avanza.astrix.ft.hystrix.FaultToleranceThroughputTest.Protection.BULK_HEAD;
-import static com.avanza.astrix.ft.hystrix.FaultToleranceThroughputTest.Protection.TIMEOUT;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
@@ -49,11 +25,34 @@ import com.avanza.astrix.context.TestAstrixConfigurer;
 import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.provider.core.AstrixApiProvider;
 import com.avanza.astrix.provider.core.DefaultBeanSettings;
-
+import com.avanza.astrix.provider.core.Service;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.api.function.ThrowingConsumer;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import rx.Observable;
 
-@RunWith(Parameterized.class)
-public class FaultToleranceThroughputTest {
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
+
+import static com.avanza.astrix.ft.hystrix.FaultToleranceThroughputTest.Protection.BULK_HEAD;
+import static com.avanza.astrix.ft.hystrix.FaultToleranceThroughputTest.Protection.TIMEOUT;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class FaultToleranceThroughputTest {
 	
 	public enum Protection {
 		BULK_HEAD,
@@ -62,35 +61,32 @@ public class FaultToleranceThroughputTest {
 	}
 	
 	private static final AtomicInteger counter = new AtomicInteger(0);
-	private InMemoryServiceRegistry registry = new InMemoryServiceRegistry();
+	private final InMemoryServiceRegistry registry = new InMemoryServiceRegistry();
 	private AstrixContext astrixContext;
-	private Consumer<FailingService> serviceInvocation;
 	private AbstractFailingService server;
-	private EnumSet<Protection> missingProtections;
 	private TestAstrixConfigurer astrixConfigurer;
-	
-	@Parameters(name = "{0}") // Uses first argument in parameters as name in name for test
-	public static Collection<Object[]> testCases() {
-		List<Object[]> result = new LinkedList<>();
-		result.add(new Object[]{"Sync Invocation", serviceCall(), allProtections()});
-		// Current design of FT layer does not provide proper protection for methods returning Future
-		result.add(new Object[]{"Future", asyncServiceCall(), allProtectionsExcept(BULK_HEAD)}); 
-		result.add(new Object[]{"Observable", observableServiceCall(), allProtections()});
-		result.add(new Object[]{"Blocking Observable", blockingObservableServiceCall(), allProtectionsExcept(TIMEOUT)});
-		result.add(new Object[]{"CompletableFuture", completableServiceCall(), allProtections()});
-		result.add(new Object[]{"Blocking CompletableFuture", blockingCompletableServiceCall(), allProtectionsExcept(TIMEOUT) });
-		return result;
+
+	public static Stream<Object[]> testCases() {
+		return Stream.of(
+				new Object[]{"Sync Invocation", serviceCall(), allProtections()},
+				// Current design of FT layer does not provide proper protection for methods returning Future
+				new Object[]{"Future", asyncServiceCall(), allProtectionsExcept(BULK_HEAD)},
+				new Object[]{"Observable", observableServiceCall(), allProtections()},
+				new Object[]{"Blocking Observable", blockingObservableServiceCall(), allProtectionsExcept(TIMEOUT)},
+				new Object[]{"CompletableFuture", completableServiceCall(), allProtections()},
+				new Object[]{"Blocking CompletableFuture", blockingCompletableServiceCall(), allProtectionsExcept(TIMEOUT)}
+						);
 	}
 
-	private static EnumSet<Protection> allProtectionsExcept(Protection missingprotection) {
-		return EnumSet.of(missingprotection);
+	private static Set<Protection> allProtectionsExcept(Protection missingProtection) {
+		return EnumSet.of(missingProtection);
 	}
 
-	private static EnumSet<Protection> allProtections() {
+	private static Set<Protection> allProtections() {
 		return EnumSet.noneOf(Protection.class);
 	}
 
-	private static Consumer<FailingService> completableServiceCall() {
+	private static ThrowingConsumer<FailingService> completableServiceCall() {
 		return (service) -> { 
 			try {
 				service.completableServiceCall().get();
@@ -100,7 +96,7 @@ public class FaultToleranceThroughputTest {
 		};
 	}
 	
-	private static Consumer<FailingService> blockingCompletableServiceCall() {
+	private static ThrowingConsumer<FailingService> blockingCompletableServiceCall() {
 		return (service) -> { 
 			try {
 				service.blockingCompletableServiceCall().get();
@@ -110,32 +106,27 @@ public class FaultToleranceThroughputTest {
 		};
 	}
 
-	private static Consumer<FailingService> observableServiceCall() {
+	private static ThrowingConsumer<FailingService> observableServiceCall() {
 		return (service) -> {
 			service.observeServiceCall().toBlocking().first();
 		};
 	}
 	
-	private static Consumer<FailingService> blockingObservableServiceCall() {
+	private static ThrowingConsumer<FailingService> blockingObservableServiceCall() {
 		return (ping) -> ping.blockingObserveServiceCall().toBlocking().first();
 	}
 
-	private static Consumer<FailingService> asyncServiceCall() {
-		return (ping) -> ping.asyncServiceCall();
+	private static ThrowingConsumer<FailingService> asyncServiceCall() {
+		return FailingService::asyncServiceCall;
 	}
 
-	private static Consumer<FailingService> serviceCall() {
-		return (ping) -> ping.serviceCall();
-	}
-
-	public FaultToleranceThroughputTest(String name, Consumer<FailingService> pingInvocation, EnumSet<Protection> missingProtections) {
-		this.serviceInvocation = pingInvocation;
-		this.missingProtections = missingProtections;
+	private static ThrowingConsumer<FailingService> serviceCall() {
+		return FailingService::serviceCall;
 	}
 
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		astrixConfigurer = new TestAstrixConfigurer();
 		astrixConfigurer.enableFaultTolerance(true);
         astrixConfigurer.set(AstrixSettings.ENABLE_BEAN_METRICS, true);
@@ -155,25 +146,29 @@ public class FaultToleranceThroughputTest {
         astrixContext = astrixConfigurer.configure();
 	}
 	
-	@After
-	public void after() {
+	@AfterEach
+	void after() {
 		astrixContext.destroy();
 		if (server != null) {
 			server.exec.shutdownNow();
 		}
 	}
 
-	@Test(timeout = 10000)
-	public void faultToleranceProvidesGoodThoughputWithSlowConsumer() throws Exception {
-		// With a 250 ms response time, it not posible to get more than 1000/250 * 50 = 200 request throughput without bulkhead
-		setServer(new SlowService(250, TimeUnit.MILLISECONDS)); // The timeout is set to 2000 ms, so this call is not expected to timeout
+	@Timeout(10)
+	@MethodSource("testCases")
+	@ParameterizedTest(name = "{0}")
+	void faultToleranceProvidesGoodThroughputWithSlowConsumer(@SuppressWarnings("unused") String name,
+															  ThrowingConsumer<FailingService> serviceInvocation,
+															  Set<Protection> missingProtections) throws Exception {
+		// With a 250 ms response time, it not possible to get more than 1000/250 * 50 = 200 request throughput without bulkhead
+		setServer(new SlowService(250, MILLISECONDS)); // The timeout is set to 2000 ms, so this call is not expected to timeout
 		FailingService service = astrixContext.getBean(FailingService.class);
 
-		ThroughputTest throughputTest = new ThroughputTest(1_000, 50, simulatedPageViewUsing(service));
+		ThroughputTest throughputTest = new ThroughputTest(1_000, 50, simulatedPageViewUsing(() -> serviceInvocation.accept(service)));
 		throughputTest.run(1, TimeUnit.SECONDS);
 
 		if (!missingProtections.contains(BULK_HEAD)) {
-			assertTrue("Max concurrent server calls: " + server.getMaxConcurrentExecutions(), server.getMaxConcurrentExecutions() <= 20);
+			assertTrue(server.getMaxConcurrentExecutions() <= 20, "Max concurrent server calls: " + server.getMaxConcurrentExecutions());
 		}
 		// Expect full throughput within 1 second, that is, all but the 20 (bulkhead size) that is still waiting for a response)
 		throughputTest.assertThroughputPercentAtLeast(97);
@@ -183,53 +178,60 @@ public class FaultToleranceThroughputTest {
 		this.server = server;
 		registry.registerProvider(FailingService.class, server); // 100 ms under the 250 ms timeout for the service
 	}
-    
-	@Test(timeout = 10000)
-	public void faultToleranceProvidesGoodThoughputWithNonRespondingConsumer() throws Exception {
+
+	@Timeout(10)
+	@MethodSource("testCases")
+	@ParameterizedTest(name = "{0}")
+	void faultToleranceProvidesGoodThroughputWithNonRespondingConsumer(@SuppressWarnings("unused") String name,
+																	   ThrowingConsumer<FailingService> serviceInvocation,
+																	   Set<Protection> missingProtections) throws Exception {
 		setServer(new NonRespondingService());
 		FailingService service = astrixContext.getBean(FailingService.class);
 
 		
-		ThroughputTest throughputTest = new ThroughputTest(1_000, 50, simulatedPageViewUsing(service));
+		ThroughputTest throughputTest = new ThroughputTest(1_000, 50, simulatedPageViewUsing(() -> serviceInvocation.accept(service)));
 		throughputTest.run(1, TimeUnit.SECONDS);
 
 		// Expect full throughput within 1 second
 		if (!missingProtections.contains(BULK_HEAD)) {
-			assertTrue("Max concurrent server calls: " + server.getMaxConcurrentExecutions(), server.getMaxConcurrentExecutions() <= 20);
+			assertTrue(server.getMaxConcurrentExecutions() <= 20, "Max concurrent server calls: " + server.getMaxConcurrentExecutions());
 		}
 		// Expect full throughput within 1 second, that is, all but the 20 (bulkhead size) that is still waiting for a response)
-		throughputTest.assertThroughputPercentAtLeast(97); 
+		throughputTest.assertThroughputPercentAtLeast(97);
 	}
 
-	@Test(timeout = 2500)
-	public void invocationsAreProtectedByTimeout() throws Exception {
+	@Timeout(value = 2500, unit = MILLISECONDS)
+	@MethodSource("testCases")
+	@ParameterizedTest(name = "{0}")
+	void invocationsAreProtectedByTimeout(@SuppressWarnings("unused") String name,
+										  ThrowingConsumer<FailingService> serviceInvocation,
+										  Set<Protection> missingProtections) throws Throwable {
 		if (missingProtections.contains(TIMEOUT)) {
 			return;
 		}
 		astrixConfigurer.set(AstrixBeanSettings.TIMEOUT, AstrixBeanKey.create(FailingService.class), 50);
 		registry.registerProvider(FailingService.class, new NonRespondingService());
-		FailingService  service = astrixContext.getBean(FailingService.class);
+		FailingService service = astrixContext.getBean(FailingService.class);
 
 		try {
 			serviceInvocation.accept(service);
-		} catch (ServiceUnavailableException e) {
+		} catch (ServiceUnavailableException ignore) {
 		}
 	}
 
     
     /*
      * This command simulates the job of executing a page view in a web application.
-     * 
      */
-	private Runnable simulatedPageViewUsing(FailingService service) {
+	private Executable simulatedPageViewUsing(Executable invocation) {
 		return () -> {
 			try {
-				// This simulates a low importence service call. The fault-tolerance layer should
+				// This simulates a low importance service call. The fault-tolerance layer should
 				// ensure that this call fails fast
-				serviceInvocation.accept(service);
-			} catch (ServiceUnavailableException e) {
+				invocation.execute();
+			} catch (ServiceUnavailableException ignore) {
 			}
-			// Other more imortant work on the page view
+			// Other more important work on the page view
 		};
 	}
 	
@@ -262,13 +264,12 @@ public class FaultToleranceThroughputTest {
 	}
 	
 	public static class ThroughputTest {
-		private ExecutorService executor;
-		private int totalExecutions;
-		private Runnable command;
-		private int executionThreadCount;
+		private final int totalExecutions;
+		private final Executable command;
+		private final int executionThreadCount;
 		private ThroughputStatistics statistics;
 		
-		public ThroughputTest(int totalExecutions, int executionThreadCount, Runnable command) {
+		public ThroughputTest(int totalExecutions, int executionThreadCount, Executable command) {
 			this.totalExecutions = totalExecutions;
 			this.executionThreadCount = executionThreadCount;
 			this.command = command;
@@ -279,7 +280,7 @@ public class FaultToleranceThroughputTest {
 			AtomicInteger failedExecutions = new AtomicInteger(0);
 			AtomicInteger pendingExecutions = new AtomicInteger();
 			AtomicInteger nonFinishedExecutionCount = new AtomicInteger();
-			executor = Executors.newFixedThreadPool(executionThreadCount);
+			ExecutorService executor = Executors.newFixedThreadPool(executionThreadCount);
 			try {
 				for (int i = 0; i < totalExecutions; i++) {
 					pendingExecutions.incrementAndGet();
@@ -287,9 +288,9 @@ public class FaultToleranceThroughputTest {
 						pendingExecutions.decrementAndGet();
 						nonFinishedExecutionCount.incrementAndGet();
 						try {
-							command.run();
+							command.execute();
 							successfulExecutions.incrementAndGet();
-						} catch (Exception e) {
+						} catch (Throwable e) {
 							failedExecutions.incrementAndGet();
 						} finally {
 							nonFinishedExecutionCount.decrementAndGet();
@@ -305,15 +306,14 @@ public class FaultToleranceThroughputTest {
 		}
 		
 		public String summary() {
-			return String.format("suscessful: %d failed: %d througput: %2.1f%%", 
+			return String.format("successful: %d failed: %d throughput: %2.1f%%",
 					statistics.successful,
 					statistics.failed, 
 					statistics.successfulThroughputPercentage());
 		}
 
 		public void assertThroughputPercentAtLeast(int expectedMinimumThroughput) {
-			assertTrue("Expected mininum throughput: " + expectedMinimumThroughput + "%. Test Result:\n " + statistics.summary(),
-					this.statistics.successfulThroughputPercentage() >= expectedMinimumThroughput);
+			assertTrue(statistics.successfulThroughputPercentage() >= expectedMinimumThroughput, "Expected minimum throughput: " + expectedMinimumThroughput + "%. Test Result:\n " + statistics.summary());
 		}
 		
 	}
@@ -327,8 +327,8 @@ public class FaultToleranceThroughputTest {
          CompletableFuture<String> blockingCompletableServiceCall();
     }
     
-    public static abstract class AbstractFailingService implements FailingService {
-    	private ExecutorService exec = Executors.newCachedThreadPool();
+    public abstract static class AbstractFailingService implements FailingService {
+    	private final ExecutorService exec = Executors.newCachedThreadPool();
     	private final AtomicInteger maxConcurrentExecutions = new AtomicInteger(0);
     	private final AtomicInteger currentConcurrentExecutions = new AtomicInteger(0);
 		@Override
@@ -359,7 +359,6 @@ public class FaultToleranceThroughputTest {
 		 * The maximum number of concurrent executions into the failing service. 
 		 * 
 		 * This should never be larger than the bulkhead
-		 * @return
 		 */
 		public int getMaxConcurrentExecutions() {
 			return maxConcurrentExecutions.get();
@@ -388,14 +387,14 @@ public class FaultToleranceThroughputTest {
 
 		@Override
 		public CompletableFuture<String> completableServiceCall() {
-			CompletableFuture<String> result = new CompletableFuture<String>();
+			CompletableFuture<String> result = new CompletableFuture<>();
 			exec.execute(() -> result.complete(serviceCall()));
 			return result;
 		}
 
 		@Override
 		public CompletableFuture<String> blockingCompletableServiceCall() {
-			CompletableFuture<String> result = new CompletableFuture<String>();
+			CompletableFuture<String> result = new CompletableFuture<>();
 			result.complete(serviceCall());
 			return result;
 		}
@@ -404,13 +403,13 @@ public class FaultToleranceThroughputTest {
 
 	public static class NonRespondingService extends AbstractFailingService {
 
-		private CountDownLatch countDownLatch = new CountDownLatch(1);
+		private final CountDownLatch countDownLatch = new CountDownLatch(1);
 
 		@Override
 		protected String invokeServiceImpl() {
 			try {
-				countDownLatch.await(); // Block indefinitly
-			} catch (InterruptedException e) {
+				countDownLatch.await(); // Block indefinitely
+			} catch (InterruptedException ignore) {
 			}
 			return "success";
 		}
@@ -418,8 +417,8 @@ public class FaultToleranceThroughputTest {
     
     public static class SlowService extends AbstractFailingService {
 
-		private int simulatedExecutionTime;
-		private TimeUnit unit;
+		private final int simulatedExecutionTime;
+		private final TimeUnit unit;
 
 		public SlowService(int simulatedExecutionTime, TimeUnit unit) {
 			this.simulatedExecutionTime = simulatedExecutionTime;
@@ -430,7 +429,7 @@ public class FaultToleranceThroughputTest {
 		protected String invokeServiceImpl() {
 			try {
 				Thread.sleep(unit.toMillis(simulatedExecutionTime)); // If we don't use fault-tolerance we wont get more than around 50 * 2 = 100 requests throughput
-			} catch (InterruptedException e) {
+			} catch (InterruptedException ignore) {
 			}
 			return "succuss";
 		}
@@ -439,17 +438,8 @@ public class FaultToleranceThroughputTest {
     @AstrixApiProvider
     public interface ServiceApi {
          @DefaultBeanSettings(initialTimeout=2000)
-         @com.avanza.astrix.provider.core.Service
+         @Service
          FailingService service();
     }
     
-    // Define Consumer/Runnable interface that allows checked exceptions
-    public interface Consumer<T> {
-	    void accept(T t) throws Exception;
-	}
-	public interface Runnable {
-	    void run() throws Exception;
-	}
-
-
 }

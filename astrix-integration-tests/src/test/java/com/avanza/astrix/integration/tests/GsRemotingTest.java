@@ -15,22 +15,6 @@
  */
 package com.avanza.astrix.integration.tests;
 
-import static com.avanza.astrix.test.util.AstrixTestUtil.assertThrows;
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.openspaces.core.GigaSpace;
-import org.openspaces.core.GigaSpaceConfigurer;
-import org.openspaces.core.space.EmbeddedSpaceFactoryBean;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.MapPropertySource;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.context.AstrixContext;
@@ -44,22 +28,38 @@ import com.avanza.astrix.provider.core.AstrixApplication;
 import com.avanza.astrix.provider.core.AstrixServiceExport;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.spring.AstrixFrameworkBean;
-import com.avanza.astrix.test.util.AutoCloseableRule;
+import com.avanza.astrix.test.util.AutoCloseableExtension;
 import com.avanza.gs.test.JVMGlobalLus;
 import com.j_spaces.core.IJSpace;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.openspaces.core.GigaSpace;
+import org.openspaces.core.GigaSpaceConfigurer;
+import org.openspaces.core.space.EmbeddedSpaceFactoryBean;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.MapPropertySource;
 
-public class GsRemotingTest {
+import java.util.HashMap;
+import java.util.List;
+
+import static com.avanza.astrix.test.util.AstrixTestUtil.assertThrows;
+import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class GsRemotingTest {
 	
-	private InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
+	private final InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 	
-	@Rule 
-	public AutoCloseableRule autoClosables = new AutoCloseableRule();
+	@RegisterExtension
+	AutoCloseableExtension autoClosables = new AutoCloseableExtension();
 	
 	@Test
-	public void routedServiceInvocationThrowServiceUnavailableWhenProxyIsContextIsClosed() throws Exception {
+	void routedServiceInvocationThrowServiceUnavailableWhenProxyIsContextIsClosed() throws Exception {
 		AnnotationConfigApplicationContext pingServer = autoClosables.add(new AnnotationConfigApplicationContext());
 		pingServer.register(PingAppConfig.class);
-		pingServer.getEnvironment().getPropertySources().addFirst(new MapPropertySource("props", new HashMap<String, Object>() {{
+		pingServer.getEnvironment().getPropertySources().addFirst(new MapPropertySource("props", new HashMap<>() {{
 			put("serviceRegistryUri", serviceRegistry.getServiceUri());
 		}}));
 		pingServer.refresh();
@@ -79,10 +79,10 @@ public class GsRemotingTest {
 	}
 	
 	@Test
-	public void broadcastedServiceInvocationThrowServiceUnavailableWhenProxyIsContextIsClosed() throws Exception {
+	void broadcastedServiceInvocationThrowServiceUnavailableWhenProxyIsContextIsClosed() throws Exception {
 		AnnotationConfigApplicationContext pingServer = autoClosables.add(new AnnotationConfigApplicationContext());
 		pingServer.register(PingAppConfig.class);
-		pingServer.getEnvironment().getPropertySources().addFirst(new MapPropertySource("props", new HashMap<String, Object>() {{
+		pingServer.getEnvironment().getPropertySources().addFirst(new MapPropertySource("props", new HashMap<>() {{
 			put("serviceRegistryUri", serviceRegistry.getServiceUri());
 		}}));
 		pingServer.refresh();
@@ -122,7 +122,7 @@ public class GsRemotingTest {
 
 		@Override
 		public List<String> broadcastPing(String msg) {
-			return Arrays.asList(msg);
+			return singletonList(msg);
 		}
 	}
 

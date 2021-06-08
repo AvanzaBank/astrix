@@ -15,13 +15,8 @@
  */
 package com.avanza.astrix.service.registry.client;
 
-import static org.junit.Assert.assertNotNull;
-
-import org.junit.Test;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistry;
-import com.avanza.astrix.beans.registry.AstrixServiceRegistryLibraryProvider;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.registry.ServiceRegistryExporterClient;
 import com.avanza.astrix.beans.service.DirectComponent;
@@ -33,11 +28,14 @@ import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfig;
 import com.avanza.astrix.versioning.core.AstrixObjectSerializerConfigurer;
 import com.avanza.astrix.versioning.core.Versioned;
+import org.junit.jupiter.api.Test;
 
-public class AstrixSubsystemTest {
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+class AstrixSubsystemTest {
 	
 	@Test
-	public void itsAllowedToInvokePublishedServicesInOtherSubsystems() throws Exception {
+	void itsAllowedToInvokePublishedServicesInOtherSubsystems() {
 		InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 		// Simulate two different subsystems using to AstrixContextImpl's
 		TestAstrixConfigurer configurerA = new TestAstrixConfigurer();
@@ -60,7 +58,7 @@ public class AstrixSubsystemTest {
 		
 		GreetingService greetingServiceB = contextB.getBean(GreetingService.class);
 		
-		assertNotNull("Its allowed to invoce service provided in same subsystem", greetingServiceB.hello("foo"));
+		assertNotNull(greetingServiceB.hello("foo"), "Its allowed to invoke service provided in same subsystem");
 		
 		GreetingService greetingServiceA = contextA.getBean(GreetingService.class);
 		
@@ -94,7 +92,7 @@ public class AstrixSubsystemTest {
 
 	public static class GreetingServiceImpl implements GreetingService {
 
-		private String greeting;
+		private final String greeting;
 
 		public GreetingServiceImpl(String greeting) {
 			this.greeting = greeting;
