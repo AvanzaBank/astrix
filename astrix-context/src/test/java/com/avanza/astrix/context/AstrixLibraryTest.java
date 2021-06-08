@@ -15,7 +15,6 @@
  */
 package com.avanza.astrix.context;
 
-import com.avanza.astrix.beans.core.BasicFuture;
 import com.avanza.astrix.beans.factory.CircularDependency;
 import com.avanza.astrix.beans.ft.BeanFaultTolerance;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
@@ -31,6 +30,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -272,7 +272,7 @@ class AstrixLibraryTest {
 		
 		@Override
 		public Future<String> asyncHello(String msg) {
-			return new BasicFuture<>(hello(msg));
+			return completedFuture(hello(msg));
 		}
 	}
 	

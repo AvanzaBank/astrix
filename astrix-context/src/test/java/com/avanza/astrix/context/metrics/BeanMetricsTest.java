@@ -18,7 +18,6 @@ package com.avanza.astrix.context.metrics;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
 import com.avanza.astrix.beans.core.AstrixBeanSettings;
 import com.avanza.astrix.beans.core.AstrixSettings;
-import com.avanza.astrix.beans.core.BasicFuture;
 import com.avanza.astrix.beans.service.DirectComponent;
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -35,6 +34,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BeanMetricsTest {
@@ -142,7 +142,7 @@ class BeanMetricsTest {
 
 		@Override
 		public Future<String> pingAsync(String msg) {
-			return new BasicFuture<>(ping(msg));
+			return completedFuture(ping(msg));
 		}
 		
 		@Override

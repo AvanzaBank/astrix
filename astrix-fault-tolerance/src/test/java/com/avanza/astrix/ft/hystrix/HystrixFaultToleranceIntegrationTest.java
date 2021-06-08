@@ -16,7 +16,6 @@
 package com.avanza.astrix.ft.hystrix;
 
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.BasicFuture;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactorySpi;
 import com.avanza.astrix.context.AstrixApplicationContext;
 import com.avanza.astrix.context.AstrixContext;
@@ -38,10 +37,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import rx.Observable;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class HystrixFaultToleranceIntegrationTest {
@@ -159,11 +160,11 @@ class HystrixFaultToleranceIntegrationTest {
 		@Override
 		public Future<String> foreverBlockingQueue(String msg) {
 			block();
-			return new BasicFuture<>(msg);
+			return completedFuture(msg);
 		}
 		@Override
 		public Future<String> neverEndingFuture(String msg) {
-			return new BasicFuture<>(); // Never set result on future
+			return new CompletableFuture<>(); // Never set result on future
 		}
 	}
 	
