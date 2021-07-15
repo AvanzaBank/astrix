@@ -144,21 +144,12 @@ public class AstrixExtension implements ParameterResolver, BeforeAllCallback, Af
     }
 
     public AstrixTestContext getAstrixTestContext(ExtensionContext context) {
-        final MapConfigSource configSource = getMapConfigSource(context);
         return getStore(context).getOrComputeIfAbsent(context.getRequiredTestClass(),
                                                       key -> new AstrixTestContext(
-                                                              configSource,
+                                                              new MapConfigSource(),
                                                               getConfiguration(context).getTestApis()
                                                       ),
                                                       AstrixTestContext.class);
-    }
-
-    private MapConfigSource getMapConfigSource(ExtensionContext context) {
-        return getStore(context).getOrComputeIfAbsent(
-                MapConfigSource.class.getName(),
-                key -> new MapConfigSource(),
-                MapConfigSource.class
-        );
     }
 
     private Configuration getConfiguration(ExtensionContext context) {
