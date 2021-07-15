@@ -15,16 +15,23 @@
  */
 package com.avanza.astrix.test;
 
-import com.avanza.astrix.context.Astrix;
-import org.junit.jupiter.api.extension.*;
-import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
-import org.junit.platform.commons.support.AnnotationSupport;
+import static java.util.Objects.requireNonNull;
 
 import java.lang.annotation.Annotation;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static java.util.Objects.requireNonNull;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.platform.commons.support.AnnotationSupport;
+import com.avanza.astrix.config.MapConfigSource;
+import com.avanza.astrix.context.Astrix;
 
 /**
  * Test utility that manages an internal service registry, config-source and AstrixContext. The
@@ -137,9 +144,21 @@ public class AstrixExtension implements ParameterResolver, BeforeAllCallback, Af
     }
 
     public AstrixTestContext getAstrixTestContext(ExtensionContext context) {
+        final MapConfigSource configSource = getMapConfigSource(context);
         return getStore(context).getOrComputeIfAbsent(context.getRequiredTestClass(),
-                                                      key -> new AstrixTestContext(getConfiguration(context).getTestApis()),
+                                                      key -> new AstrixTestContext(
+                                                              configSource,
+                                                              getConfiguration(context).getTestApis()
+                                                      ),
                                                       AstrixTestContext.class);
+    }
+
+    private MapConfigSource getMapConfigSource(ExtensionContext context) {
+        return getStore(context).getOrComputeIfAbsent(
+                MapConfigSource.class.getName(),
+                key -> new MapConfigSource(),
+                MapConfigSource.class
+        );
     }
 
     private Configuration getConfiguration(ExtensionContext context) {
