@@ -15,6 +15,8 @@
  */
 package com.avanza.astrix.beans.registry;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,18 +45,23 @@ import com.avanza.astrix.provider.core.AstrixServiceExport;
 @AstrixServiceExport(AstrixServiceRegistry.class)
 public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServiceRegistry, MutableConfigSource {
 	
-	private final MapConfigSource configSource = new MapConfigSource();
-	private String id;
-	private String configSourceId;
-	private InMemoryServiceRegistryRepo repo = new InMemoryServiceRegistryRepo();
-	private AstrixServiceRegistry serviceRegistry = new AstrixServiceRegistryImpl(repo);
-	
+	private final MapConfigSource configSource;
+	private final String id;
+	private final String configSourceId;
+	private final InMemoryServiceRegistryRepo repo = new InMemoryServiceRegistryRepo();
+	private final AstrixServiceRegistry serviceRegistry = new AstrixServiceRegistryImpl(repo);
+
 	public InMemoryServiceRegistry() {
+		this(new MapConfigSource());
+	}
+
+	public InMemoryServiceRegistry(MapConfigSource configSource) {
 		this.id = DirectComponent.register(AstrixServiceRegistry.class, this);
+		this.configSource = requireNonNull(configSource);
 		this.configSourceId = GlobalConfigSourceRegistry.register(this);
 		this.configSource.set(AstrixSettings.SERVICE_REGISTRY_URI, getServiceUri());
 	}
-	
+
 	@Override
 	public List<AstrixServiceRegistryEntry> listServices() {
 		return serviceRegistry.listServices();

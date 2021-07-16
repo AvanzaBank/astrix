@@ -20,6 +20,7 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
@@ -33,13 +34,26 @@ import java.util.concurrent.ConcurrentMap;
 
 public class AstrixTestContext implements AstrixContext {
 
-	private final ProxiedServiceRegistry serviceRegistry = new ProxiedServiceRegistry();
+	private final ProxiedServiceRegistry serviceRegistry;
 	private final AstrixContext context;
 	private final ConcurrentMap<AstrixBeanKey<?>, ProviderProxy<?>> providers = new ConcurrentHashMap<>();
 	private final TestApis testApis;
 
+	/**
+	 * @deprecated Please use {@link #AstrixTestContext(MapConfigSource, Class[])}
+	 */
+	@Deprecated
 	@SafeVarargs
 	public AstrixTestContext(Class<? extends TestApi>... testApis) {
+		this(new MapConfigSource(), testApis);
+	}
+
+	@SafeVarargs
+	public AstrixTestContext(
+			MapConfigSource configSource,
+			Class<? extends TestApi>... testApis
+	) {
+		this.serviceRegistry = new ProxiedServiceRegistry(configSource);
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		configurer.setConfig(DynamicConfig.create(this.serviceRegistry));
 		this.context = configurer.configure();
@@ -217,16 +231,13 @@ public class AstrixTestContext implements AstrixContext {
 	/**
 	 * This service registry implementation intercepts all lookup attempts and ensures that
 	 * there exists a proxy for the given service see {@link AstrixTestContext#registerProxy(Class)}
-	 *
 	 */
-	private final class ProxiedServiceRegistry extends InMemoryServiceRegistry {
-
-		public ProxiedServiceRegistry() {
+	private static class ProxiedServiceRegistry extends InMemoryServiceRegistry {
+		public ProxiedServiceRegistry(MapConfigSource configSource) {
+			super(configSource);
 			set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 100);
 			set(AstrixSettings.ENABLE_FAULT_TOLERANCE, false); // Explicit disable fault tolerance, might be overridden using Consumer<AstrixRuleContext> constructor
 		}
-
 	}
-
 }
 

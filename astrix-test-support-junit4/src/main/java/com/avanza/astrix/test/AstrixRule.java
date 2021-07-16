@@ -16,6 +16,7 @@
 package com.avanza.astrix.test;
 
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
+import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.context.Astrix;
 import com.avanza.astrix.context.AstrixContext;
@@ -71,12 +72,29 @@ public class AstrixRule implements TestRule {
 
 	@SafeVarargs
 	public AstrixRule(Class<? extends TestApi>... testApis) {
-		this.astrixTestContext = new AstrixTestContext(testApis);
+		this(new MapConfigSource(), testApis);
+	}
+
+	@SafeVarargs
+	public AstrixRule(
+			MapConfigSource configSource,
+			Class<? extends TestApi>... testApis
+	) {
+		this.astrixTestContext = new AstrixTestContext(configSource, testApis);
 	}
 
 	@SafeVarargs
 	public AstrixRule(Consumer<? super AstrixRuleContext> contextConfigurer, Class<? extends TestApi>... testApis) {
-		this(testApis);
+		this(new MapConfigSource(), contextConfigurer, testApis);
+	}
+
+	@SafeVarargs
+	public AstrixRule(
+			MapConfigSource configSource,
+			Consumer<? super AstrixRuleContext> contextConfigurer,
+			Class<? extends TestApi>... testApis
+	) {
+		this(configSource, testApis);
 		contextConfigurer.accept(new AstrixRuleContext() {
             @Override
             public <T> void registerProxy(Class<T> service) {
