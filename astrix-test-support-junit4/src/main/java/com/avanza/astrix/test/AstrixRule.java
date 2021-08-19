@@ -143,6 +143,10 @@ public class AstrixRule implements TestRule {
 		return astrixTestContext.getConfigSourceId();
 	}
 
+	public MapConfigSource getConfigSource() {
+		return astrixTestContext.getConfigSource();
+	}
+
 	/**
 	 * @return the serviceUri for the associated service-registry.
 	 */

@@ -90,7 +90,11 @@ public class InMemoryServiceRegistry implements DynamicConfigSource, AstrixServi
 	public String getConfigSourceId() {
 		return configSourceId;
 	}
-	
+
+	public MapConfigSource getConfigSource() {
+		return configSource;
+	}
+
 	public void clear() {
 		this.repo.clear();
 	}

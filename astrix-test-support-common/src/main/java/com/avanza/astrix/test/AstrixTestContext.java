@@ -70,6 +70,10 @@ public class AstrixTestContext implements AstrixContext {
 		return serviceRegistry.getConfigSourceId();
 	}
 
+	public MapConfigSource getConfigSource() {
+		return serviceRegistry.getConfigSource();
+	}
+
 	/**
 	 * @return the serviceUri for the associated service-registry.
 	 */
