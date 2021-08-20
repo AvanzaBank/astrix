@@ -569,6 +569,8 @@
 					<includes>
 						<include>com.avanza.*</include>
 					</includes>
+					<groupId>com.avanza.*</groupId>
+					<artifactId>*</artifactId>
 				</configuration>
 			</plugin>
 
