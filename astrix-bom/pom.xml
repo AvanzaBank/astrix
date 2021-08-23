@@ -6,7 +6,7 @@
 
     <groupId>com.avanza.astrix</groupId>
     <artifactId>astrix-bom</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.5-SNAPSHOT</version>
     <name>${project.artifactId}</name>
 
     <description>Astrix (Bill of Materials)</description>
