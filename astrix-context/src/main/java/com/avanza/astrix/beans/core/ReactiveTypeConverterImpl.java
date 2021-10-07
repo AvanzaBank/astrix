@@ -45,7 +45,7 @@ public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
 
 	@Override
 	public <T> Observable<Object> toObservable(Class<T> fromType, T reactiveType) {
-		RxTypeConverter<T> rxTypeConverter = getRxTypeConverter(fromType);
+		RxTypeConverter<T> rxTypeConverter = findRxTypeConverter(fromType);
 		if (rxTypeConverter != null) {
 			return rxTypeConverter.toObservable(reactiveType);
 		}
@@ -68,7 +68,7 @@ public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
 
 	@Override
 	public <T> T toCustomReactiveType(Class<T> targetType, Observable<Object> observable) {
-		RxTypeConverter<T> rxTypeConverter = getRxTypeConverter(targetType);
+		RxTypeConverter<T> rxTypeConverter = findRxTypeConverter(targetType);
 		if (rxTypeConverter != null) {
 			return rxTypeConverter.toRxType(observable);
 		}
@@ -80,7 +80,7 @@ public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
 		return reactiveType;
 	}
 
-	private <T> RxTypeConverter<T> getRxTypeConverter(Class<T> rxType) {
+	private <T> RxTypeConverter<T> findRxTypeConverter(Class<T> rxType) {
 		@SuppressWarnings("unchecked")
 		RxTypeConverter<T> rxTypeConverter = (RxTypeConverter<T>) rxTypeConverters.get(rxType);
 		return rxTypeConverter;
