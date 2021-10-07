@@ -27,9 +27,9 @@ import rx.Single;
 
 public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
 
-	private final Map<Class<?>, RxCodec<?>> rxCodecs = Map.of(
-			Single.class, rxCodec(Single::toObservable, Observable::toSingle),
-			Completable.class, rxCodec(Completable::toObservable, Observable::toCompletable)
+	private final Map<Class<?>, RxTypeConverter<?>> rxTypeConverters = Map.of(
+			Single.class, rxTypeConverter(Single::toObservable, Observable::toSingle),
+			Completable.class, rxTypeConverter(Completable::toObservable, Observable::toCompletable)
 	);
 
 	private final Map<Class<?>, ReactiveTypeHandlerPlugin<?>> pluginByReactiveType;
@@ -45,9 +45,9 @@ public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
 
 	@Override
 	public <T> Observable<Object> toObservable(Class<T> fromType, T reactiveType) {
-		RxCodec<T> rxCodec = getRxCodec(fromType);
-		if (rxCodec != null) {
-			return rxCodec.toObservable(reactiveType);
+		RxTypeConverter<T> rxTypeConverter = getRxTypeConverter(fromType);
+		if (rxTypeConverter != null) {
+			return rxTypeConverter.toObservable(reactiveType);
 		}
 
 		ReactiveTypeHandlerPlugin<T> plugin = getPlugin(fromType);
@@ -68,9 +68,9 @@ public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
 
 	@Override
 	public <T> T toCustomReactiveType(Class<T> targetType, Observable<Object> observable) {
-		RxCodec<T> rxCodec = getRxCodec(targetType);
-		if (rxCodec != null) {
-			return rxCodec.toRxType(observable);
+		RxTypeConverter<T> rxTypeConverter = getRxTypeConverter(targetType);
+		if (rxTypeConverter != null) {
+			return rxTypeConverter.toRxType(observable);
 		}
 
 		ReactiveTypeHandlerPlugin<T> plugin = getPlugin(targetType);
@@ -80,10 +80,10 @@ public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
 		return reactiveType;
 	}
 
-	private <T> RxCodec<T> getRxCodec(Class<T> rxType) {
+	private <T> RxTypeConverter<T> getRxTypeConverter(Class<T> rxType) {
 		@SuppressWarnings("unchecked")
-		RxCodec<T> rxCodec = (RxCodec<T>) rxCodecs.get(rxType);
-		return rxCodec;
+		RxTypeConverter<T> rxTypeConverter = (RxTypeConverter<T>) rxTypeConverters.get(rxType);
+		return rxTypeConverter;
 	}
 
 	private <T> ReactiveTypeHandlerPlugin<T> getPlugin(Class<T> type) {
@@ -97,11 +97,11 @@ public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
 	
 	@Override
 	public boolean isReactiveType(Class<?> type) {
-		return rxCodecs.containsKey(type) || pluginByReactiveType.containsKey(type);
+		return rxTypeConverters.containsKey(type) || pluginByReactiveType.containsKey(type);
 	}
 
-	private static <T> RxCodec<T> rxCodec(Function<T, Observable<Object>> toObservable, Function<Observable<Object>, T> toType) {
-		return new RxCodec<>() {
+	private static <T> RxTypeConverter<T> rxTypeConverter(Function<T, Observable<Object>> toObservable, Function<Observable<Object>, T> toType) {
+		return new RxTypeConverter<>() {
 			@Override
 			public Observable<Object> toObservable(T rxTypeInstance) {
 				return toObservable.apply(rxTypeInstance);
@@ -114,7 +114,7 @@ public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
 		};
 	}
 
-	private interface RxCodec <T> {
+	private interface RxTypeConverter<T> {
 
 		Observable<Object> toObservable(T rxTypeInstance);
 
