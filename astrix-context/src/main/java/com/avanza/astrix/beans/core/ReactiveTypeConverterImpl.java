@@ -15,26 +15,41 @@
  */
 package com.avanza.astrix.beans.core;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 
+import rx.Completable;
 import rx.Observable;
+import rx.Single;
 
 public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
-	
-	private final ConcurrentMap<Class<?>, ReactiveTypeHandlerPlugin<?>> pluginByReactiveType = new ConcurrentHashMap<>();
-	
+
+	private final Map<Class<?>, RxTypeConverter<?>> rxTypeConverters = Map.of(
+			Single.class, rxTypeConverter(Single::toObservable, Observable::toSingle),
+			Completable.class, rxTypeConverter(Completable::toObservable, Observable::toCompletable)
+	);
+
+	private final Map<Class<?>, ReactiveTypeHandlerPlugin<?>> pluginByReactiveType;
+
 	public ReactiveTypeConverterImpl(List<ReactiveTypeHandlerPlugin<?>> typeConverterPlugins) {
+		Map<Class<?>, ReactiveTypeHandlerPlugin<?>> pluginByReactiveType = new LinkedHashMap<>(typeConverterPlugins.size() + 1);
 		for (ReactiveTypeHandlerPlugin<?> asyncTypeConverterPlugin : typeConverterPlugins) {
-			this.pluginByReactiveType.put(asyncTypeConverterPlugin.reactiveTypeHandled(), asyncTypeConverterPlugin);
+			pluginByReactiveType.put(asyncTypeConverterPlugin.reactiveTypeHandled(), asyncTypeConverterPlugin);
 		}
-		this.pluginByReactiveType.putIfAbsent(CompletableFuture.class, new CompletableFutureTypeHandlerPlugin());
+		pluginByReactiveType.putIfAbsent(CompletableFuture.class, new CompletableFutureTypeHandlerPlugin());
+		this.pluginByReactiveType = Map.copyOf(pluginByReactiveType);
 	}
 
 	@Override
 	public <T> Observable<Object> toObservable(Class<T> fromType, T reactiveType) {
+		RxTypeConverter<T> rxTypeConverter = findRxTypeConverter(fromType);
+		if (rxTypeConverter != null) {
+			return rxTypeConverter.toObservable(reactiveType);
+		}
+
 		ReactiveTypeHandlerPlugin<T> plugin = getPlugin(fromType);
 		return Observable.unsafeCreate((s) -> {
 			plugin.subscribe(new ReactiveExecutionListener() {
@@ -53,13 +68,24 @@ public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
 
 	@Override
 	public <T> T toCustomReactiveType(Class<T> targetType, Observable<Object> observable) {
+		RxTypeConverter<T> rxTypeConverter = findRxTypeConverter(targetType);
+		if (rxTypeConverter != null) {
+			return rxTypeConverter.toRxType(observable);
+		}
+
 		ReactiveTypeHandlerPlugin<T> plugin = getPlugin(targetType);
 		T reactiveType = plugin.newReactiveType();
 		// Eagerly subscribe to the given observable
 		observable.subscribe((next) -> plugin.complete(next, reactiveType), (error) -> plugin.completeExceptionally(error, reactiveType));
 		return reactiveType;
 	}
-	
+
+	private <T> RxTypeConverter<T> findRxTypeConverter(Class<T> rxType) {
+		@SuppressWarnings("unchecked")
+		RxTypeConverter<T> rxTypeConverter = (RxTypeConverter<T>) rxTypeConverters.get(rxType);
+		return rxTypeConverter;
+	}
+
 	private <T> ReactiveTypeHandlerPlugin<T> getPlugin(Class<T> type) {
 		@SuppressWarnings("unchecked")
 		ReactiveTypeHandlerPlugin<T> plugin = (ReactiveTypeHandlerPlugin<T>) this.pluginByReactiveType.get(type);
@@ -71,7 +97,29 @@ public final class ReactiveTypeConverterImpl implements ReactiveTypeConverter {
 	
 	@Override
 	public boolean isReactiveType(Class<?> type) {
-		return pluginByReactiveType.containsKey(type);
-	}		
-	
+		return rxTypeConverters.containsKey(type) || pluginByReactiveType.containsKey(type);
+	}
+
+	private static <T> RxTypeConverter<T> rxTypeConverter(Function<T, Observable<Object>> toObservable, Function<Observable<Object>, T> toType) {
+		return new RxTypeConverter<>() {
+			@Override
+			public Observable<Object> toObservable(T rxTypeInstance) {
+				return toObservable.apply(rxTypeInstance);
+			}
+
+			@Override
+			public T toRxType(Observable<Object> observable) {
+				return toType.apply(observable);
+			}
+		};
+	}
+
+	private interface RxTypeConverter<T> {
+
+		Observable<Object> toObservable(T rxTypeInstance);
+
+		T toRxType(Observable<Object> observable);
+
+	}
+
 }
