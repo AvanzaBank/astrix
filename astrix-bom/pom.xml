@@ -131,13 +131,38 @@
         </dependencies>
     </dependencyManagement>
 
+    <profiles>
+    <profile>
+    <id>release</id>
+    <build>
+    <!--  javadoc, source and gpg plugin from above -->
+    <!-- All artifacts deployed to the central repository must be signed -->
+    <plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>3.0.1</version>
+        <executions>
+            <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                    <goal>sign</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+    </plugins>
+    </build>
+    </profile>
+    </profiles>
     <build>
         <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M3</version>
+                    <version>3.0.0</version>
                     <configuration>
                         <skip>true</skip>
                     </configuration>
