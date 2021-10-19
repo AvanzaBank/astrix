@@ -26,6 +26,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
+
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.config.DynamicConfig;
@@ -40,6 +41,8 @@ import com.avanza.astrix.integration.tests.domain.api.LunchServiceAsync;
 import com.avanza.astrix.test.util.AutoCloseableRule;
 import com.avanza.gs.test.PuConfigurers;
 import com.avanza.gs.test.RunningPu;
+
+import rx.Completable;
 
 /**
  * 
@@ -86,7 +89,7 @@ public class AsyncRemoteServiceTest {
 		this.lunchServiceAsync = astrix.waitForBean(LunchServiceAsync.class, 10000);
 		this.lunchService = astrix.waitForBean(LunchService.class, 10000);
 	}
-	
+
 	/* NOTE: Since Astrix converts between Future/Observable internally its easy
 	 * to run into a state where asynchronous calls becomes effectively synchronous.
 	 * 
@@ -113,7 +116,7 @@ public class AsyncRemoteServiceTest {
 		
 		// By adding the LunchRestaurant asynchronously and not invoke Future.get we ensure that the underlying 
 		// service invocation is really started
-		Future<Void> addLunchRestaurant = lunchServiceAsync.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
+		Completable addLunchRestaurant = lunchServiceAsync.addLunchRestaurant(lunchRestaurant().withName("Martins Green Room").build());
 		
 		assertNotNull(lunchRestaurant.get());
 	}

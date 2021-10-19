@@ -19,19 +19,6 @@ import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHe
 import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.SERVICE_API;
 import static com.avanza.astrix.remoting.client.AstrixServiceInvocationRequestHeaders.SERVICE_METHOD_SIGNATURE;
 
-import com.avanza.astrix.beans.core.ReactiveTypeConverter;
-import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
-import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
-import com.avanza.astrix.beans.tracing.InvocationExecutionWatcher;
-import com.avanza.astrix.core.AstrixCallStackTrace;
-import com.avanza.astrix.core.remoting.RoutingStrategy;
-import com.avanza.astrix.core.util.ReflectionUtil;
-import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
-
-import rx.Observable;
-import rx.functions.Action1;
-import rx.subjects.ReplaySubject;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -48,6 +35,20 @@ import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.avanza.astrix.beans.core.ReactiveTypeConverter;
+import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
+import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
+import com.avanza.astrix.beans.tracing.InvocationExecutionWatcher;
+import com.avanza.astrix.core.AstrixCallStackTrace;
+import com.avanza.astrix.core.remoting.RoutingStrategy;
+import com.avanza.astrix.core.util.ReflectionUtil;
+import com.avanza.astrix.versioning.core.AstrixObjectSerializer;
+
+import rx.Completable;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.subjects.ReplaySubject;
 
 /**
  * 
@@ -172,13 +173,18 @@ public class RemotingProxy implements InvocationHandler {
 		}
 		lastThowableInChain.initCause(trace);
 	}
-	
+
 	private Type getReturnType(Method method) {
 		Class<?> returnType = method.getReturnType();
-		if (isReactiveType(returnType) || isObservableType(returnType) || isFutureType(returnType)) {
-			return ParameterizedType.class.cast(method.getGenericReturnType()).getActualTypeArguments()[0];
+		if (Completable.class.equals(returnType)) {
+			return Void.TYPE;
 		}
-		return method.getGenericReturnType();
+		Type genericReturnType = method.getGenericReturnType();
+		if (isReactiveType(returnType) || isObservableType(returnType) || isFutureType(returnType)) {
+			return ((ParameterizedType) genericReturnType).getActualTypeArguments()[0];
+		} else {
+			return genericReturnType;
+		}
 	}
 
 	private boolean isFutureType(Class<?> returnType) {
