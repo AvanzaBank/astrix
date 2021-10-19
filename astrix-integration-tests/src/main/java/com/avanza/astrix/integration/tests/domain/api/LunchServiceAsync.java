@@ -19,7 +19,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.avanza.astrix.core.AstrixRouting;
-import com.gigaspaces.async.AsyncFuture;
+
+import rx.Completable;
 
 public interface LunchServiceAsync {
 
@@ -29,5 +30,5 @@ public interface LunchServiceAsync {
 	
 	CompletableFuture<LunchRestaurant> waitForLunchRestaurant(@AstrixRouting String name, int duration, TimeUnit unit);
 	
-	AsyncFuture<Void> addLunchRestaurant(LunchRestaurant restaurant);
+	Completable addLunchRestaurant(LunchRestaurant restaurant);
 }
