@@ -27,11 +27,7 @@ jobs:
       - name: Compile
         run: mvn -T 1C --batch-mode -Dstyle.color=always --fail-at-end -DskipTests package
       - name: Test
-        if: success()
-        run: mvn --batch-mode -Dstyle.color=always -Dmaven.test.failure.ignore=true verify
+        run: mvn --batch-mode -Dstyle.color=always --fail-at-end verify
       - name: Publish Test Report
-        if: success()
+        if: always()
         uses: scacap/action-surefire-report@v1
-        with:
-          fail_on_test_failures: true
-          fail_if_no_tests: false
