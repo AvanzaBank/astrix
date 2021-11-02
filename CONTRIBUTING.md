@@ -6,7 +6,7 @@ For non-trivial contributions (i.e other than fixing spelling errors etc) you sh
 When submitting code, please make every effort to follow existing conventions and style in order to keep the code as readable as possible.
 
 ## Continuous Integration
-https://travis-ci.org/AvanzaBank/astrix/builds
+https://github.com/AvanzaBank/astrix/actions/workflows/build.yml
 
 ## License
 
