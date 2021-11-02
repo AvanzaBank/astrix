@@ -31,6 +31,7 @@ jobs:
         run: mvn --batch-mode -Dstyle.color=always -Dmaven.test.failure.ignore=true verify
       - name: Publish Test Report
         if: success()
-        uses: mikepenz/action-junit-report@v2
+        uses: scacap/action-surefire-report@v1
         with:
-          fail_on_failure: true
+          fail_on_test_failures: true
+          fail_if_no_tests: false
