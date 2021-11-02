@@ -1,5 +1,5 @@
 # Astrix Framework
-[![][travis img]][travis]
+[![][build img]][build]
 [![][maven img]][maven]
 [![][license img]][license]
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/AvanzaBank/astrix.svg)](https://isitmaintained.com/project/AvanzaBank/Astrix "Average time to resolve an issue")
@@ -75,8 +75,8 @@ The Astrix Framework has been under rapid development for almost a year. At Avan
 The Astrix Framework is released under version 2.0 of the [Apache License](https://www.apache.org/licenses/LICENSE-2.0).
 
 
-[travis]:https://travis-ci.org/AvanzaBank/astrix
-[travis img]:https://api.travis-ci.org/AvanzaBank/astrix.svg
+[build]:https://github.com/AvanzaBank/astrix/actions/workflows/build.yml
+[build img]:https://github.com/AvanzaBank/astrix/actions/workflows/build.yml/badge.svg
 
 [release]:https://github.com/avanzabank/astrix/releases
 [release img]:https://img.shields.io/github/release/avanzabank/astrix.svg
