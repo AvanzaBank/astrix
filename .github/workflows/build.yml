@@ -6,11 +6,6 @@ on:
       - master
   pull_request:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch'
-        required: true
-        default: 'master'
 
 jobs:
   Build:
