@@ -141,7 +141,7 @@
 		<dropwizard.version>3.1.2</dropwizard.version>
 		<netty.version>4.0.31.Final</netty.version>
 		<gs-test.version>0.1.15</gs-test.version>
-		<mimer-config.version>0.0.4</mimer-config.version>
+		<mimer-config.version>0.0.8</mimer-config.version>
 		<hystrix-multiconfig.version>0.0.3</hystrix-multiconfig.version>
 	</properties>
 
