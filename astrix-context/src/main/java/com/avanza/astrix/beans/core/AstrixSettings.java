@@ -19,7 +19,6 @@ import com.avanza.astrix.config.BooleanSetting;
 import com.avanza.astrix.config.IntSetting;
 import com.avanza.astrix.config.LongSetting;
 import com.avanza.astrix.config.StringSetting;
-import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 /**
  * 
@@ -104,7 +103,12 @@ public final class AstrixSettings {
 	 * that {@link #EXPORT_ASTRIX_MBEANS} is true.
 	 */
 	public static final BooleanSetting EXPORTED_SERVICE_METRICS_ENABLED = BooleanSetting.create("com.avanza.astrix.exportedServiceMetricsEnabled", true);
-	
+
+	/**
+	 * Whether to export Gigaspace metrics (currently the LRMI thread pool) as an MBean.
+	 */
+	public static final BooleanSetting EXPORTED_GIGASPACE_METRICS_ENABLED = BooleanSetting.create("com.avanza.astrix.exportedGigaspaceMetricsEnabled", true);
+
 	
 	public static final StringSetting GIGA_SPACE_BEAN_NAME = StringSetting.create("AstrixGsComponent.gigaSpaceBeanName", null);
 	public static final StringSetting DYNAMIC_CONFIG_FACTORY = StringSetting.create("com.avanza.astrix.context.AstrixDynamicConfigFactory", null);

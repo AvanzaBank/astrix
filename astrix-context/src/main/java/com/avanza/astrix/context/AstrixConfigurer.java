@@ -15,8 +15,25 @@
  */
 package com.avanza.astrix.context;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.beans.api.ApiProviderBeanPublisherModule;
-import com.avanza.astrix.beans.config.AstrixConfig;
 import com.avanza.astrix.beans.config.AstrixConfigModule;
 import com.avanza.astrix.beans.configdiscovery.ConfigDiscoveryModule;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
@@ -73,23 +90,6 @@ import com.avanza.astrix.serviceunit.ServiceUnitModule;
 import com.avanza.astrix.serviceunit.SystemServiceApiProvider;
 import com.avanza.astrix.versioning.core.ObjectSerializerModule;
 import com.avanza.astrix.versioning.jackson2.Jackson2SerializerModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.stream.Stream;
 /**
  * Used to configure and create an {@link AstrixContext}. <p>
  * 
@@ -132,7 +132,7 @@ public class AstrixConfigurer {
 		modulesConfigurer.registerDefault(StrategyProvider.create(BeanFaultToleranceFactorySpi.class, NoFaultTolerance.class));
 		modulesConfigurer.registerDefault(StrategyProvider.create(MetricsSpi.class, DefaultMetricSpi.class));
 		modulesConfigurer.registerDefault(StrategyProvider.create(AstrixTraceProvider.class, DefaultTraceProvider.class));
-		modulesConfigurer.registerDefault(StrategyProvider.create(MBeanServerFacade.class, PlatformMBeanServer.class, context -> context.importType(AstrixConfig.class)));
+		modulesConfigurer.registerDefault(StrategyProvider.create(MBeanServerFacade.class, PlatformMBeanServer.class));
 		
 		for (Module plugin : customModules) {
 			modulesConfigurer.register(plugin);
@@ -217,7 +217,7 @@ public class AstrixConfigurer {
 						StrategyContextPreparer contextPreparer) {
 					modulesConfigurer.register(StrategyProvider.create(strategyType, strategyImpl, contextPreparer));
 				}
-				
+
 			});
 			modulesConfigurer.register(contextPlugin);
 		}
@@ -248,7 +248,7 @@ public class AstrixConfigurer {
 	 * Allows api's published using astrix (using @AstrixApiProvider) to have the
 	 * DynamicConfig instance associated with the current AstrixContext injected
 	 */
-	private final class AstrixAwareInjector implements ModuleInstancePostProcessor {
+	private static final class AstrixAwareInjector implements ModuleInstancePostProcessor {
 		
 		private final DynamicConfig config;
 		

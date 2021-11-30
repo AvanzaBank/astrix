@@ -40,6 +40,7 @@ import com.avanza.astrix.core.util.ReflectionUtil;
 import com.avanza.astrix.gs.ClusteredProxyBinder;
 import com.avanza.astrix.gs.GigaSpaceProxy;
 import com.avanza.astrix.gs.GsBinder;
+import com.avanza.astrix.gs.metrics.GigaspaceMetricsExporter;
 import com.avanza.astrix.provider.component.AstrixServiceComponentNames;
 import com.avanza.astrix.spring.AstrixSpringContext;
 import com.j_spaces.core.IJSpace;
@@ -51,22 +52,23 @@ import com.j_spaces.core.IJSpace;
  */
 public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware, BeanProxyFilter {
 
-	private static Logger log = LoggerFactory.getLogger(GsLocalViewComponent.class);
-	private GsBinder gsBinder;
-	private AstrixSpringContext astrixSpringContext;
+	private static final Logger log = LoggerFactory.getLogger(GsLocalViewComponent.class);
+	private final GsBinder gsBinder;
+	private final AstrixSpringContext astrixSpringContext;
+	private final ClusteredProxyBinder clusteredProxyBinder;
+	private final GigaspaceMetricsExporter metricsExporter;
 	private DynamicBooleanProperty disableLocalView;
 	private DynamicLongProperty maxDisonnectionTime;
 	private DynamicIntProperty lookupTimeout;
-	private ClusteredProxyBinder clusteredProxyBinder;
-	
-	
-	
+
 	public GsLocalViewComponent(GsBinder gsBinder,
-			AstrixSpringContext astrixSpringContext,
-			ClusteredProxyBinder clusteredProxyBinder) {
+								AstrixSpringContext astrixSpringContext,
+								ClusteredProxyBinder clusteredProxyBinder,
+								GigaspaceMetricsExporter metricsExporter) {
 		this.gsBinder = gsBinder;
 		this.astrixSpringContext = astrixSpringContext;
 		this.clusteredProxyBinder = clusteredProxyBinder;
+		this.metricsExporter = metricsExporter;
 	}
 
 	@Override
@@ -103,6 +105,8 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 		
 		IJSpace localViewSpace = gslocalViewSpaceConfigurer.create();
 		GigaSpace localViewGigaSpace = GigaSpaceProxy.create(new GigaSpaceConfigurer(localViewSpace).create());
+
+		metricsExporter.exportGigaspaceMetrics();
 
 		@SuppressWarnings("unchecked")
 		BoundServiceBeanInstance<T> localViewGigaSpaceBeanInstance =
@@ -167,9 +171,9 @@ public class GsLocalViewComponent implements ServiceComponent, AstrixConfigAware
 	
 	private static class BoundLocalViewGigaSpaceBeanInstance implements BoundServiceBeanInstance<GigaSpace> {
 
-		private GigaSpace instance;
-		private LocalViewSpaceConfigurer localViewSpaceConfigurer;
-		private UrlSpaceConfigurer spaceConfigurer;
+		private final GigaSpace instance;
+		private final LocalViewSpaceConfigurer localViewSpaceConfigurer;
+		private final UrlSpaceConfigurer spaceConfigurer;
 		
 		public BoundLocalViewGigaSpaceBeanInstance(GigaSpace instance,
 												   LocalViewSpaceConfigurer localViewSpaceConfigurer,

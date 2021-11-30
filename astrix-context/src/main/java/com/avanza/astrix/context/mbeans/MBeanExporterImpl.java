@@ -24,10 +24,10 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 final class MBeanExporterImpl implements MBeanExporter {
 
 	private final Logger logger = LoggerFactory.getLogger(MBeanExporterImpl.class);
-	
+
 	private final AstrixConfig astrixConfig;
 	private final MBeanServerFacade mbeanServer;
-	
+
 	public MBeanExporterImpl(AstrixConfig astrixConfig, MBeanServerFacade mbeanServer) {
 		this.astrixConfig = astrixConfig;
 		this.mbeanServer = mbeanServer;
@@ -36,14 +36,19 @@ final class MBeanExporterImpl implements MBeanExporter {
 	@Override
 	public void registerMBean(Object mbean, String folder, String name) {
 		if (!exportMBeans()) {
-			logger.debug("Exporting of Astrix MBeans is disabled, won't export mbean with name={}",name.toString());
+			logger.debug("Exporting of Astrix MBeans is disabled, won't export mbean with name={}", name);
 			return;
 		}
 		mbeanServer.registerMBean(mbean, folder, name);
 	}
 
+	@Override
+	public void unregisterMBean(String folder, String name) {
+		mbeanServer.unregisterMBean(folder, name);
+	}
+
 	private boolean exportMBeans() {
 		return astrixConfig.get(AstrixSettings.EXPORT_ASTRIX_MBEANS).get();
 	}
-	
+
 }

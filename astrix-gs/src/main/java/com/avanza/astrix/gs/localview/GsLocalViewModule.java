@@ -18,8 +18,8 @@ package com.avanza.astrix.gs.localview;
 import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.context.AstrixContextPlugin;
-import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.gs.ClusteredProxyBinder;
+import com.avanza.astrix.gs.metrics.GigaspaceMetricsExporter;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
 
@@ -32,12 +32,9 @@ public class GsLocalViewModule implements AstrixContextPlugin  {
 		moduleContext.importType(AstrixSpringContext.class);
 		moduleContext.importType(BeanFaultToleranceFactory.class);
 		moduleContext.importType(ClusteredProxyBinder.class);
+		moduleContext.importType(GigaspaceMetricsExporter.class);
 		
 		moduleContext.export(ServiceComponent.class);
-	}
-
-	@Override
-	public void registerStrategies(AstrixStrategiesConfig astrixContextConfig) {
 	}
 
 }

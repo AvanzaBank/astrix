@@ -24,6 +24,7 @@ import java.util.Properties;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.openspaces.core.space.CannotFindSpaceException;
+
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.beans.service.ServiceProperties;
@@ -33,6 +34,7 @@ import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.gs.ClusteredProxyCacheImpl;
 import com.avanza.astrix.gs.GsBinder;
+import com.avanza.astrix.gs.metrics.GigaspaceMetricsExporter;
 import com.avanza.astrix.gs.security.DefaultGsSecurityProvider;
 import com.avanza.astrix.gs.security.GsSecurityProvider;
 import com.avanza.gs.test.PuConfigurers;
@@ -76,9 +78,10 @@ public class GigaSpacesAuthenticationTest {
 			return new DefaultCredentialsProvider(clientCredentials);
 		}
 	};
+	private final GigaspaceMetricsExporter metricsExporter = GigaspaceMetricsExporter.noExporter();
 	private final ServiceProperties lunchPuServiceProperties = new GsBinder().createProperties(LUNCH_PU.getClusteredGigaSpace());
 	private final ServiceProperties lunchGraderPuServiceProperties = new GsBinder().createProperties(LUNCH_GRADER_PU.getClusteredGigaSpace());
-	private final ClusteredProxyCacheImpl proxyCache = new ClusteredProxyCacheImpl(traceProvider, mockGsSecurityProvider);
+	private final ClusteredProxyCacheImpl proxyCache = new ClusteredProxyCacheImpl(traceProvider, mockGsSecurityProvider, metricsExporter);
 
 	/**
 	 * This are the client-side credentials that will be used when connecting to

@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.mbeans;
+package com.avanza.astrix.gs.metrics;
 
-public interface MBeanServerFacade {
+import com.avanza.astrix.context.AstrixContextPlugin;
+import com.avanza.astrix.context.mbeans.MBeanExporter;
+import com.avanza.astrix.modules.ModuleContext;
 
-	void registerMBean(Object mbean, String folder, String name);
+public class GsMetricsModule implements AstrixContextPlugin {
 
-	void unregisterMBean(String folder, String name);
+	@Override
+	public void prepare(ModuleContext moduleContext) {
+		moduleContext.bind(GigaspaceMetricsExporter.class, GigaspaceMetricsExporterImpl.class);
+
+		moduleContext.importType(MBeanExporter.class);
+
+		moduleContext.export(GigaspaceMetricsExporter.class);
+	}
 
 }

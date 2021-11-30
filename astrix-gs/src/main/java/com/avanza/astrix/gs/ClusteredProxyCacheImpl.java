@@ -15,10 +15,12 @@
  */
 package com.avanza.astrix.gs;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
 import javax.annotation.PreDestroy;
 import javax.annotation.concurrent.GuardedBy;
 
@@ -27,12 +29,14 @@ import org.openspaces.core.GigaSpaceConfigurer;
 import org.openspaces.core.space.UrlSpaceConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.beans.async.ContextPropagation;
 import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.beans.tracing.DefaultTraceProvider;
 import com.avanza.astrix.config.DynamicConfig;
+import com.avanza.astrix.gs.metrics.GigaspaceMetricsExporter;
 import com.avanza.astrix.gs.security.DefaultGsSecurityProvider;
 import com.avanza.astrix.gs.security.GsSecurityProvider;
 import com.avanza.astrix.modules.AstrixInject;
@@ -52,27 +56,27 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 	private static final Logger log = LoggerFactory.getLogger(ClusteredProxyCacheImpl.class);
 	private final ObjectCache objectCache = new ObjectCache();
 	private final KeyLock<String> proxyByUrlLock = new KeyLock<>();
-	private DynamicConfig config;
 	private final ContextPropagation contextPropagation;
 	private final GsSecurityProvider gsSecurityProvider;
+	private final GigaspaceMetricsExporter metricsExporter;
+	private DynamicConfig config;
 
 	/**
-	 * @deprecated please use {@link #ClusteredProxyCacheImpl(AstrixTraceProvider, GsSecurityProvider)}
+	 * @deprecated please use {@link #ClusteredProxyCacheImpl(AstrixTraceProvider, GsSecurityProvider, GigaspaceMetricsExporter)}
 	 */
 	@Deprecated
 	public ClusteredProxyCacheImpl() {
-		this(new DefaultTraceProvider(), new DefaultGsSecurityProvider());
+		this(new DefaultTraceProvider(), new DefaultGsSecurityProvider(), GigaspaceMetricsExporter.noExporter());
 	}
 
 	@AstrixInject
 	public ClusteredProxyCacheImpl(
 			AstrixTraceProvider astrixTraceProvider,
-			GsSecurityProvider gsSecurityProvider
-	) {
-		this.contextPropagation = ContextPropagation.create(
-				Objects.requireNonNull(astrixTraceProvider).getContextPropagators()
-		);
-		this.gsSecurityProvider = Objects.requireNonNull(gsSecurityProvider);
+			GsSecurityProvider gsSecurityProvider,
+			GigaspaceMetricsExporter metricsExporter) {
+		this.contextPropagation = ContextPropagation.create(astrixTraceProvider.getContextPropagators());
+		this.gsSecurityProvider = requireNonNull(gsSecurityProvider);
+		this.metricsExporter = requireNonNull(metricsExporter);
 	}
 
 	/**
@@ -82,9 +86,6 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 	 * proxy must be returned to the cache by invoking GigaSpaceInstance.release. When all instance
 	 * for a proxy against a given space is release, then the proxy will be destroyed and all associated resources
 	 * are released.
-	 * 
-	 * @param serviceProperties
-	 * @return
 	 */
 	@Override
 	public GigaSpaceInstance getProxy(final ServiceProperties serviceProperties) {
@@ -93,9 +94,11 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 		try {
 			GigaSpaceInstance spaceInstance = objectCache.getInstance(spaceUrl, new ObjectFactory<GigaSpaceInstance>() {
 				@Override
-				public GigaSpaceInstance create() throws Exception {
-					log.info("Creating clustered proxy against: " + spaceUrl);
-					return new GigaSpaceInstance(spaceUrl, config, serviceProperties);
+				public GigaSpaceInstance create() {
+					log.info("Creating clustered proxy against: {}", spaceUrl);
+					GigaSpaceInstance gigaSpaceInstance = new GigaSpaceInstance(spaceUrl, config, serviceProperties);
+					metricsExporter.exportGigaspaceMetrics();
+					return gigaSpaceInstance;
 				}
 			});
 			spaceInstance.incConsumerCount();
@@ -166,10 +169,10 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 				proxyByUrlLock.unlock(spaceUrl);
 			}
 		}
-		
+
 		@PreDestroy
 		public void destroy() throws Exception {
-			log.info("Destroying clustered proxy against: " + spaceUrl);
+			log.info("Destroying clustered proxy against: {}", spaceUrl);
 			if (this.spaceTaskDispatcher != null) {
 				this.spaceTaskDispatcher.destroy();
 			}

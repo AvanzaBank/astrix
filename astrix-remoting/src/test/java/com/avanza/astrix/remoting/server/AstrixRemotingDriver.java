@@ -60,7 +60,7 @@ import rx.Subscriber;
 
 public class AstrixRemotingDriver {
 	
-	private AstrixObjectSerializer objectSerializer = new JavaSerializationSerializer(1);
+	private final AstrixObjectSerializer objectSerializer = new JavaSerializationSerializer(1);
 	private final ConcurrentMap<MBeanKey, Object> mbeanByKey = new ConcurrentHashMap<>();
 	private final Metrics metrics = new Metrics() {
 		@Override
@@ -72,6 +72,11 @@ public class AstrixRemotingDriver {
 		@Override
 		public void registerMBean(Object mbean, String folder, String name) {
 			mbeanByKey.putIfAbsent(new MBeanKey(folder, name), mbean);
+		}
+
+		@Override
+		public void unregisterMBean(String folder, String name) {
+			mbeanByKey.remove(new MBeanKey(folder, name));
 		}
 	};
 	private ReactiveTypeConverter reactiveTypeConverter = new ReactiveTypeConverterImpl(Collections.<ReactiveTypeHandlerPlugin<?>>emptyList());
