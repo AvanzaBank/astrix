@@ -1,4 +1,3 @@
 com.avanza.astrix.gs.GsModule
 com.avanza.astrix.gs.localview.GsLocalViewModule
 com.avanza.astrix.gs.remoting.GsRemotingModule
-com.avanza.astrix.gs.metrics.GsMetricsModule

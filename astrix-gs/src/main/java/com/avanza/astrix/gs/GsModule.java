@@ -21,7 +21,7 @@ import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.beans.tracing.AstrixTraceProvider;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.context.AstrixStrategiesConfig;
-import com.avanza.astrix.gs.metrics.GigaspaceMetricsExporter;
+import com.avanza.astrix.context.mbeans.MBeanExporter;
 import com.avanza.astrix.gs.security.DefaultGsSecurityProvider;
 import com.avanza.astrix.gs.security.GsSecurityProvider;
 import com.avanza.astrix.modules.ModuleContext;
@@ -40,17 +40,19 @@ public class GsModule implements AstrixContextPlugin {
 		moduleContext.bind(ClusteredProxyBinder.class, GsComponent.class);
 		moduleContext.bind(ClusteredProxyCache.class, ClusteredProxyCacheImpl.class);
 		moduleContext.bind(ReactiveTypeHandlerPlugin.class, AsyncFutureTypeHandler.class);
+		moduleContext.bind(GigaspaceMetricsExporter.class, GigaspaceMetricsExporterImpl.class);
 		
 		moduleContext.importType(AstrixSpringContext.class);
 		moduleContext.importType(BeanFaultToleranceFactory.class);
 		moduleContext.importType(AstrixTraceProvider.class);
 		moduleContext.importType(GsSecurityProvider.class);
-		moduleContext.importType(GigaspaceMetricsExporter.class);
+		moduleContext.importType(MBeanExporter.class);
 
 		moduleContext.export(ServiceComponent.class);
 		moduleContext.export(ClusteredProxyBinder.class);
 		moduleContext.export(ClusteredProxyCache.class);
 		moduleContext.export(ReactiveTypeHandlerPlugin.class);
+		moduleContext.export(GigaspaceMetricsExporter.class);
 	}
 
 	@Override

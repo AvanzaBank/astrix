@@ -19,7 +19,7 @@ import com.avanza.astrix.beans.ft.BeanFaultToleranceFactory;
 import com.avanza.astrix.beans.service.ServiceComponent;
 import com.avanza.astrix.context.AstrixContextPlugin;
 import com.avanza.astrix.gs.ClusteredProxyBinder;
-import com.avanza.astrix.gs.metrics.GigaspaceMetricsExporter;
+import com.avanza.astrix.gs.GigaspaceMetricsExporter;
 import com.avanza.astrix.modules.ModuleContext;
 import com.avanza.astrix.spring.AstrixSpringContext;
 

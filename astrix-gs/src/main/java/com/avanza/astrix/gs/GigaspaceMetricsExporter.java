@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.gs.metrics;
+package com.avanza.astrix.gs;
 
-import com.avanza.astrix.context.AstrixContextPlugin;
-import com.avanza.astrix.context.mbeans.MBeanExporter;
-import com.avanza.astrix.modules.ModuleContext;
+public interface GigaspaceMetricsExporter {
 
-public class GsMetricsModule implements AstrixContextPlugin {
+	void exportGigaspaceMetrics();
 
-	@Override
-	public void prepare(ModuleContext moduleContext) {
-		moduleContext.bind(GigaspaceMetricsExporter.class, GigaspaceMetricsExporterImpl.class);
+	static GigaspaceMetricsExporter noExporter() {
+		return new GigaspaceMetricsExporter() {
+			@Override
+			public void exportGigaspaceMetrics() {
 
-		moduleContext.importType(MBeanExporter.class);
-
-		moduleContext.export(GigaspaceMetricsExporter.class);
+			}
+		};
 	}
 
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.gs.metrics;
+package com.avanza.astrix.gs;
 
 import static java.util.Objects.requireNonNull;
 
@@ -24,6 +24,7 @@ import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.config.DynamicBooleanProperty;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.context.mbeans.MBeanExporter;
+import com.avanza.astrix.gs.metrics.GigaspaceMetrics;
 
 final class GigaspaceMetricsExporterImpl implements AstrixConfigAware, GigaspaceMetricsExporter {
 	private static final String MBEAN_FOLDER = "Gigaspaces";
