@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.context.mbeans;
+package com.avanza.astrix.gs.metrics;
 
-public interface MBeanServerFacade {
+public interface GigaspaceMetricsMBean {
 
-	void registerMBean(Object mbean, String folder, String name);
+	long getLrmiPoolCompletedTaskCount();
 
-	void unregisterMBean(String folder, String name);
+	int getLrmiPoolQueueSize();
+
+	int getLrmiPoolActiveCount();
 
 }

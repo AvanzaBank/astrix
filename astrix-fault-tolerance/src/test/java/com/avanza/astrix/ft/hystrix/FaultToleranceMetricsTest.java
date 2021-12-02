@@ -17,9 +17,10 @@ package com.avanza.astrix.ft.hystrix;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -134,15 +135,20 @@ public class FaultToleranceMetricsTest {
 	
 	private static class FakeMBeanServer implements MBeanServerFacade {
 		
-		private Map<MBeanKey, Object> exportedMBeans = new HashMap<>();
+		private final ConcurrentMap<MBeanKey, Object> exportedMBeans = new ConcurrentHashMap<>();
 		
 		@Override
 		public void registerMBean(Object mbean, String folder, String name) {
 			this.exportedMBeans.put(new MBeanKey(folder, name), mbean);
 		}
 
+		@Override
+		public void unregisterMBean(String folder, String name) {
+			this.exportedMBeans.remove(new MBeanKey(folder, name));
+		}
+
 		public BeanFaultToleranceMetricsMBean getExportedMBean(String folder, String name) {
-			return java.util.Optional.ofNullable(exportedMBeans.get(new MBeanKey(folder, name)))
+			return Optional.ofNullable(exportedMBeans.get(new MBeanKey(folder, name)))
 									.map(BeanFaultToleranceMetricsMBean.class::cast)
 									.orElseThrow(() -> new AssertionError("No mbean exported: folder=" + folder + " name=" + name ));
 		}

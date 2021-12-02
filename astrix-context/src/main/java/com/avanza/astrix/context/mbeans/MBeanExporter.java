@@ -19,9 +19,16 @@ public interface MBeanExporter {
 
 	void registerMBean(Object mbean, String folder, String name);
 
-	public static class NoExporter implements MBeanExporter {
+	void unregisterMBean(String folder, String name);
+
+	class NoExporter implements MBeanExporter {
+
 		@Override
 		public void registerMBean(Object mbean, String folder, String name) {
+		}
+
+		@Override
+		public void unregisterMBean(String folder, String name) {
 		}
 	}
 	
