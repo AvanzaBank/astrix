@@ -128,10 +128,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>11</java.version>
 
-		<log4j.version>2.15.0</log4j.version>
+		<log4j.version>2.17.0</log4j.version>
 		<spring.version>5.1.7.RELEASE</spring.version>
 		<spring.groupId>org.springframework</spring.groupId>
-		<slf4j.version>1.7.30</slf4j.version>
+		<slf4j.version>1.7.32</slf4j.version>
 		<gigaspaces.version>14.5.0</gigaspaces.version>
 		<rxjava.version>1.3.8</rxjava.version>
 		<hystrix.version>1.5.18</hystrix.version>
