@@ -590,12 +590,19 @@
 						<include>**/*TestCase.java</include>
 						<include>**/*Tests.java</include>
 					</includes>
-					<!--
+					<systemPropertyVariables>
+						<!--
 						-Djava.net.preferIPv4Stack=true is set since embedded spaces take ages to start on some
 						developer machines without it. See also:
-						https://stackoverflow.com/questions/30997298/why-is-multicastsocket-setnetworkinterface-much-slower-using-java-8-runtime
-					-->
-					<argLine>-Djava.net.preferIPv4Stack=true</argLine>
+						http://stackoverflow.com/questions/30997298/why-is-multicastsocket-setnetworkinterface-much-slower-using-java-8-runtime
+						-->
+						<java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
+						<!--
+						Disable GS use of Oshi for detecting machine architecture and operating system
+						because the version (3.13.1) used by GS 14.5 does not work with macOS aarch
+						-->
+						<com.gs.oshi.enabled>false</com.gs.oshi.enabled>
+					</systemPropertyVariables>
 				</configuration>
 			</plugin>
 
