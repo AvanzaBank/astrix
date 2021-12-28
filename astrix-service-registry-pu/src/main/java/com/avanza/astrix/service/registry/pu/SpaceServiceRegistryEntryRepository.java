@@ -15,15 +15,18 @@
  */
 package com.avanza.astrix.service.registry.pu;
 
+import static com.avanza.astrix.gs.GsBinder.START_TIME;
+import static java.lang.Math.max;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.avanza.astrix.beans.registry.AstrixServiceRegistryEntry;
 import com.avanza.astrix.beans.registry.ServiceKey;
 import com.avanza.astrix.beans.registry.ServiceProviderKey;
@@ -49,12 +52,37 @@ public class SpaceServiceRegistryEntryRepository implements ServiceRegistryEntry
 		ServiceProviderKey serviceProviderKey = ServiceProviderKey.create(serviceKey, applicationInstanceId);
 		spaceEntry.setServiceProviderKey(serviceProviderKey);
 		spaceEntry.setProperties(entry.getServiceProperties());
+		setLatestStartTime(spaceEntry);
 		Map<String, String> metadata = new HashMap<>();
 		Date now = new Date();
 		metadata.put("lastLeaseRenewalTime", now.toString());
 		metadata.put("leaseExpireTime", new Date(now.getTime() + lease).toString());
 		spaceEntry.setServiceMetadata(metadata);
 		gigaSpace.write(spaceEntry, lease);
+	}
+
+	private void setLatestStartTime(SpaceServiceRegistryEntry spaceEntry) {
+		final SpaceServiceRegistryEntry existingEntry = gigaSpace.readById(
+				SpaceServiceRegistryEntry.class,
+				spaceEntry.getServiceProviderKey(),
+				spaceEntry.getApiType()
+		);
+		if (existingEntry == null) {
+			return;
+		}
+		final long startTimeExistingEntry = getStartTime(existingEntry);
+		final long startTimeNewEntry = getStartTime(spaceEntry);
+		spaceEntry.getProperties().put(
+				START_TIME,
+				Long.toString(max(startTimeExistingEntry, startTimeNewEntry))
+		);
+	}
+
+	private long getStartTime(SpaceServiceRegistryEntry entry) {
+		return Optional.ofNullable(entry.getProperties())
+				.map(p -> p.get(START_TIME))
+				.map(Long::parseLong)
+				.orElse(0L);
 	}
 
 	@Override
