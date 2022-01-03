@@ -119,8 +119,8 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 			}
 			if (serviceHasChanged(serviceDiscoveryResult.getResult())) {
 				if (isBound() && currentProperties != null) {
-					log.info("Service properties for bean={} astrixBeanId={} have changed, will rebind service bean.", getBeanKey(), id);
-					destroy();
+					log.info("Service properties for bean={} astrixBeanId={} have changed, will unbind current service bean and rebind new bean.", getBeanKey(), id);
+					unbind();
 				}
 				bind(serviceDiscoveryResult.getResult());
 			} else {
@@ -220,10 +220,14 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 		beanStateLock.lock();
 		try {
 			this.currentState.releaseInstance();
-			this.currentState = new Unbound(ServiceUnavailableException.class, "Service is unavailable");
 		} finally {
 			beanStateLock.unlock();
 		}
+	}
+
+	private void unbind() {
+		this.currentState.releaseInstance();
+		this.currentState = new Unbound(ServiceUnavailableException.class, "Service is unavailable");
 	}
 
 	private void notifyBound() {
