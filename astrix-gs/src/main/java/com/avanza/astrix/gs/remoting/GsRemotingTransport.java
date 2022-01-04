@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.avanza.astrix.core.ServiceUnavailableException;
 import com.avanza.astrix.core.remoting.RoutingKey;
 import com.avanza.astrix.gs.SpaceTaskDispatcher;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
@@ -26,6 +27,7 @@ import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 import com.avanza.astrix.remoting.client.RemotingTransportSpi;
 import com.avanza.astrix.remoting.client.RoutedServiceInvocationRequest;
 import com.avanza.astrix.remoting.util.GsUtil;
+import com.gigaspaces.admin.quiesce.QuiesceException;
 import com.gigaspaces.async.AsyncResult;
 
 import rx.Observable;
@@ -64,7 +66,8 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 	
 	private Observable<AstrixServiceInvocationResponse> observeRoutedRequest(AstrixServiceInvocationRequest request,
 																			  RoutingKey routingKey) {
-		return spaceTaskDispatcher.observe(new AstrixServiceInvocationTask(request), routingKey);
+		return spaceTaskDispatcher.observe(new AstrixServiceInvocationTask(request), routingKey)
+				.onErrorResumeNext(this::translateToObservableError);
 	}
 	
 	private Observable<List<AstrixServiceInvocationResponse>> observeRoutedReqeuests(Collection<RoutedServiceInvocationRequest> requests) {
@@ -72,7 +75,8 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 		for (RoutedServiceInvocationRequest request : requests) {
 			result = result.mergeWith(spaceTaskDispatcher.observe(new AstrixServiceInvocationTask(request.getRequest()), request.getRoutingkey()));
 		}
-		return result.toList();
+		return result.toList()
+				.onErrorResumeNext(this::translateToObservableError);
 	}
 	
 	private Observable<List<AstrixServiceInvocationResponse>> observeBroadcastRequest(AstrixServiceInvocationRequest request) {
@@ -80,9 +84,21 @@ public class GsRemotingTransport implements RemotingTransportSpi {
 		Func1<List<AsyncResult<AstrixServiceInvocationResponse>>, Observable<AstrixServiceInvocationResponse>> listToObservable = 
 				GsUtil.asyncResultListToObservable();
 		Observable<AstrixServiceInvocationResponse> responseStream = responses.flatMap(listToObservable);
-		return responseStream.toList();
+		return responseStream.toList()
+				.onErrorResumeNext(this::translateToObservableError);
 	}
-	
+
+	private <T> Observable<T> translateToObservableError(Throwable e) {
+		return Observable.error(translateException(e));
+	}
+
+	private Throwable translateException(Throwable e) {
+		if (e instanceof QuiesceException) {
+			return new ServiceUnavailableException(e.getMessage(), e);
+		}
+		return e;
+	}
+
 	@Override
 	public int partitionCount() {
 		return this.spaceTaskDispatcher.partitionCount();
