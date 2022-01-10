@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.gs;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,6 +27,9 @@ import com.avanza.astrix.beans.core.AstrixConfigAware;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.service.ServiceProperties;
 import com.avanza.astrix.config.DynamicConfig;
+import com.gigaspaces.internal.client.spaceproxy.IDirectSpaceProxy;
+import com.gigaspaces.internal.server.space.SpaceImpl;
+import com.j_spaces.core.JSpaceContainerImpl;
 
 /**
  * 
@@ -37,6 +41,7 @@ public class GsBinder implements AstrixConfigAware {
 	public static final String SPACE_NAME_PROPERTY = "spaceName";
 	public static final String SPACE_URL_PROPERTY = "spaceUrl";
 	private static final String SPACE_REQUIRES_AUTHENTICATION = "isSecured";
+	public static final String START_TIME = "startTime";
 
 	private static final Pattern SPACE_URL_PATTERN = Pattern.compile("jini://.*?/.*?/(.*)?[?](.*)");
 	private DynamicConfig config;
@@ -93,7 +98,15 @@ public class GsBinder implements AstrixConfigAware {
 		result.setProperty(SPACE_NAME_PROPERTY, space.getSpace().getName());
 		result.setProperty(SPACE_URL_PROPERTY, new SpaceUrlBuilder(space).buildSpaceUrl());
 		result.setProperty(SPACE_REQUIRES_AUTHENTICATION, Boolean.toString(space.getSpace().isSecured()));
+		getInstanceStartTime(space).ifPresent(t -> result.setProperty(START_TIME, t.toString()));
 		return result;
+	}
+
+	private Optional<Long> getInstanceStartTime(GigaSpace space) {
+		return Optional.ofNullable(space.getSpace().getDirectProxy())
+				.map(IDirectSpaceProxy::getSpaceImplIfEmbedded)
+				.map(SpaceImpl::getContainer)
+				.map(JSpaceContainerImpl::getStartTime);
 	}
 
 	public ServiceProperties createServiceProperties(String spaceUrl) {
