@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -44,7 +45,8 @@ public final class ObjectCache {
 	private static final Logger logger = LoggerFactory.getLogger(ObjectCache.class);
 	private final ConcurrentMap<Object, Object> instanceById = new ConcurrentHashMap<>();
 	private final KeyLock<Object> lockedObjects = new KeyLock<>();
-	
+	private final AtomicInteger numCreatedInstances = new AtomicInteger();
+
 	@SuppressWarnings("unchecked")
 	public <T> T getInstance(Object objectId, ObjectFactory<T> factory) {
 		T object = (T) this.instanceById.get(objectId);
@@ -120,6 +122,7 @@ public final class ObjectCache {
 				instance = objectFactory.create();
 				init(instance);
 				this.instanceById.put(id, instance);
+				numCreatedInstances.incrementAndGet();
 				return instance;
 			} catch (RuntimeException e) {
 				throw e;
@@ -153,5 +156,12 @@ public final class ObjectCache {
 	    }
 	    return methods;
 	}
-	
+
+	public int getCurrentSize() {
+		return instanceById.size();
+	}
+
+	public int getCreatedCount() {
+		return numCreatedInstances.get();
+	}
 }

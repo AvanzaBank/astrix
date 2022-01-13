@@ -118,7 +118,7 @@ public class ServiceBeanInstance<T> implements StatefulAstrixBean, InvocationHan
 				return;
 			}
 			if (serviceHasChanged(serviceDiscoveryResult.getResult())) {
-				if (isBound() && currentProperties != null) {
+				if (isBound() && currentProperties != null && serviceDiscoveryResult.getResult() != null) {
 					log.info("Service properties for bean={} astrixBeanId={} have changed, will unbind current service bean and rebind new bean.", getBeanKey(), id);
 					unbind();
 				}
