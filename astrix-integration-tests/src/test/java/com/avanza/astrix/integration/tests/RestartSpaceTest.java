@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openspaces.core.cluster.ClusterInfo;
@@ -78,6 +79,30 @@ public class RestartSpaceTest {
 		}
 		if (pu != null) {
 			pu.close();
+		}
+	}
+
+	@AfterClass
+	public static void afterAllTests() {
+		interruptAllServiceRegistryExporterWorkerThreads();
+	}
+
+	/**
+	 * The tests in this class closes the pu while threads from
+	 * ServiceRegistryExporterWorker are still connected to it. This makes the
+	 * threads not get interrupted correctly (they get HystrixRuntimeException
+	 * instead, which leads to ServiceUnavailableException: COMMAND_EXCEPTION ).
+	 * Therefore, we make sure here to clean up our leftover threads that these
+	 * tests may have still around. This prevents unnecessary logging in tests
+	 * executed after this class.
+	 */
+	private static void interruptAllServiceRegistryExporterWorkerThreads() {
+		Thread[] threads = new Thread[Thread.activeCount()];
+		int count = Thread.enumerate(threads);
+		for (int i = 0; i < count; i++) {
+			if (threads[i].getName().startsWith("Astrix-ServiceRegistryExporter")) {
+				threads[i].interrupt();
+			}
 		}
 	}
 
