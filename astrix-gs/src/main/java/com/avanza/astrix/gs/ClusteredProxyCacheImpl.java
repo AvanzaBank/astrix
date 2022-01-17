@@ -15,6 +15,7 @@
  */
 package com.avanza.astrix.gs;
 
+import static com.avanza.astrix.gs.GsBinder.START_TIME;
 import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -91,11 +92,12 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 		final String spaceUrl = GsBinder.getSpaceUrl(serviceProperties);
 		proxyByUrlLock.lock(spaceUrl);
 		try {
-			GigaSpaceInstance spaceInstance = objectCache.getInstance(spaceUrl, new ObjectFactory<GigaSpaceInstance>() {
+			final String cacheKey = getCacheKey(serviceProperties);
+			GigaSpaceInstance spaceInstance = objectCache.getInstance(cacheKey, new ObjectFactory<GigaSpaceInstance>() {
 				@Override
 				public GigaSpaceInstance create() {
 					log.info("Creating clustered proxy against: {}", spaceUrl);
-					GigaSpaceInstance gigaSpaceInstance = new GigaSpaceInstance(spaceUrl, config, serviceProperties);
+					GigaSpaceInstance gigaSpaceInstance = new GigaSpaceInstance(spaceUrl, cacheKey, config, serviceProperties);
 					metricsExporter.exportGigaspaceMetrics();
 					return gigaSpaceInstance;
 				}
@@ -111,20 +113,27 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 	public void destroy() {
 		this.objectCache.destroy();
 	}
-	
+
+	// For tests, totally unsafe!
+	ObjectCache getObjectCache() {
+		return objectCache;
+	}
+
 	public class GigaSpaceInstance {
 		
 		private final GigaSpace proxy;
 		private final AtomicInteger proxyConsumerCount = new AtomicInteger(0);
 		private final String spaceUrl;
+		private final String cacheKey;
 		private final UrlSpaceConfigurer urlSpaceConfigurer;
 		@GuardedBy("spaceTaskDispatcherStateLock")
 		private volatile SpaceTaskDispatcher spaceTaskDispatcher;
 		private final Lock spaceTaskDispatcherStateLock = new ReentrantLock();
 		private final DynamicConfig config;
 
-		public GigaSpaceInstance(String spaceUrl, DynamicConfig dynamicConfig, ServiceProperties serviceProperties) {
+		public GigaSpaceInstance(String spaceUrl, String cacheKey, DynamicConfig dynamicConfig, ServiceProperties serviceProperties) {
 			this.spaceUrl = spaceUrl;
+			this.cacheKey = cacheKey;
 			this.config = dynamicConfig;
 			this.urlSpaceConfigurer = new UrlSpaceConfigurer(spaceUrl);
 			if (GsBinder.isAuthenticationRequired(serviceProperties)) {
@@ -162,7 +171,7 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 				int consumerCount = this.proxyConsumerCount.decrementAndGet();
 				if (consumerCount == 0) {
 					// Destroy this instance in cache. That in turn will invoke @PreDestroy annotated methods
-					objectCache.destroyInCache(spaceUrl);
+					objectCache.destroyInCache(cacheKey);
 				}
 			} finally {
 				proxyByUrlLock.unlock(spaceUrl);
@@ -190,5 +199,18 @@ public class ClusteredProxyCacheImpl implements AstrixConfigAware, ClusteredProx
 			return (CredentialsProvider) credentialsProvider;
 		}
 		return gsSecurityProvider.getGsClientCredentialsProvider(spaceName);
+	}
+
+	/**
+	 * Returns a value that may be used to identify whether the space connection
+	 * can be reused or not. If this value changes for a given service, then a
+	 * new connection to the space should be obtained.
+	 * <p>Implementation note: this string includes the start time, so that
+	 * this class adds a new connection into {@code ObjectCache} for the space
+	 * if any PU has restarted.
+	 */
+	private static String getCacheKey(ServiceProperties serviceProperties) {
+		return GsBinder.getSpaceUrl(serviceProperties)
+				+ "&" + START_TIME + "=" + serviceProperties.getProperty(START_TIME);
 	}
 }
