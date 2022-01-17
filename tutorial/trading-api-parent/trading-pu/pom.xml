@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.avanza.astrix</groupId>
     <artifactId>trading-api-parent</artifactId>
-    <version>1.0.11-SNAPSHOT</version>
+    <version>1.0.11</version>
   </parent>
   <artifactId>trading-pu</artifactId>
   <dependencies>
