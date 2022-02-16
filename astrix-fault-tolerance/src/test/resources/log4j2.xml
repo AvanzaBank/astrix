@@ -9,7 +9,10 @@
     <Logger name="com.avanza" level="warn" additivity="false">
         <AppenderRef ref="Console" />
     </Logger>
-    <Root level="warn">
+    <Logger name="com.avanza.astrix.ft.hystrix.HystrixBeanFaultTolerance" level="info" additivity="false">
+        <AppenderRef ref="Console" />
+    </Logger>
+    <Root level="info">
         <AppenderRef ref="Console" />
     </Root>
 </Loggers>

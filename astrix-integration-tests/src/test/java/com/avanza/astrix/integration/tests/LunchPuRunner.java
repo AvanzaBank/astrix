@@ -17,8 +17,6 @@ package com.avanza.astrix.integration.tests;
 
 import java.io.IOException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
@@ -29,7 +27,6 @@ import com.avanza.gs.test.PuConfigurers;
 public class LunchPuRunner {
 	
 	public static void main(String[] args) throws IOException {
-		Logger.getRootLogger().setLevel(Level.INFO);
 		System.setProperty("com.gs.jini_lus.groups", "lunch-pu");
 		MapConfigSource settings = new MapConfigSource();
 		settings.set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=service-registry");

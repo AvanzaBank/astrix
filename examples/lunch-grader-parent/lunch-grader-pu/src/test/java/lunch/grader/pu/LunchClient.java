@@ -15,19 +15,15 @@
  */
 package lunch.grader.pu;
 
-import lunch.api.LunchRestaurant;
-import lunch.api.LunchService;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 import com.avanza.astrix.context.AstrixConfigurer;
 import com.avanza.astrix.context.AstrixContext;
+
+import lunch.api.LunchRestaurant;
+import lunch.api.LunchService;
 
 public class LunchClient {
 	
 	public static void main(String[] args) throws InterruptedException {
-		Logger.getLogger("com.avanza.astrix").setLevel(Level.DEBUG);
 		AstrixConfigurer configurer = new AstrixConfigurer();
 		AstrixContext AstrixContext = configurer.configure();
 		LunchService lunchService = AstrixContext.waitForBean(LunchService.class, 5000);

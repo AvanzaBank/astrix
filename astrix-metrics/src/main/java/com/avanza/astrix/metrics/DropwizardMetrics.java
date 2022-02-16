@@ -41,7 +41,7 @@ final class DropwizardMetrics implements MetricsSpi {
 	}
 	
 	static class TimerAdapter implements TimerSpi {
-		private Timer timer;
+		private final Timer timer;
 		public TimerAdapter(Timer timer) {
 			this.timer = timer;
 		}
@@ -68,7 +68,7 @@ final class DropwizardMetrics implements MetricsSpi {
 
 		@Override
 		public TimerSnaphot getSnapshot() {
-			// Rates are are in seconds by default
+			// Rates are in seconds by default
 			// Duration are in NANO_SECONDS
 			TimeUnit rateUnit = TimeUnit.SECONDS;
 			TimeUnit durationUnit = TimeUnit.MILLISECONDS;

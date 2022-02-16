@@ -15,8 +15,6 @@
  */
 package runners;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
@@ -30,7 +28,6 @@ public class LunchPuRunner {
 		System.setProperty(AstrixSettings.EXPORT_ASTRIX_MBEANS.name(), "true");
 		System.setProperty("configSourceId", GlobalConfigSourceRegistry.register(mapConfigSource));
 		PuApp.run("classpath:/META-INF/spring/lunch-pu.xml");
-		Logger.getLogger("com.avanza").setLevel(Level.DEBUG);
 	}
 
 }
