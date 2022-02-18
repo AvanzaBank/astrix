@@ -18,9 +18,7 @@ package com.avanza.astrix.ft.hystrix;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.context.AstrixContext;
 import com.avanza.astrix.context.TestAstrixConfigurer;
@@ -32,9 +30,7 @@ import com.avanza.astrix.provider.core.Library;
 public class HystrixSpike {
 	
 	public static void main(String[] args) throws Exception {
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.INFO);
-		Logger.getLogger(HystrixBeanFaultTolerance.class).info("HELL");
+		LoggerFactory.getLogger(HystrixBeanFaultTolerance.class).info("HELL");
 		TestAstrixConfigurer astrix = new TestAstrixConfigurer();
 		astrix.enableFaultTolerance(true);
 		astrix.registerApiProvider(PingApi.class);

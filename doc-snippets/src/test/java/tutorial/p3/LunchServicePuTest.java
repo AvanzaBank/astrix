@@ -19,11 +19,8 @@ import static org.junit.Assert.assertEquals;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import tutorial.p3.api.LunchService;
 
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
@@ -32,9 +29,11 @@ import com.avanza.astrix.context.AstrixContext;
 import com.avanza.gs.test.PuConfigurers;
 import com.avanza.gs.test.RunningPu;
 
+import tutorial.p3.api.LunchService;
+
 public class LunchServicePuTest {
 	
-	public static InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
+	private static InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 	
 	@ClassRule
 	public static RunningPu lunchPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/p3/lunch-pu.xml")
@@ -46,10 +45,6 @@ public class LunchServicePuTest {
 	@PostConstruct
 	public void destroy() {
 		astrix.destroy();
-	}
-	
-	static {
-		BasicConfigurator.configure();
 	}
 	
 	@Test

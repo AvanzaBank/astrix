@@ -129,35 +129,34 @@
 		<java.version>11</java.version>
 
 		<log4j.version>2.17.1</log4j.version>
-		<spring.version>5.1.7.RELEASE</spring.version>
-		<spring.groupId>org.springframework</spring.groupId>
+		<spring.version>5.3.7</spring.version>
 		<slf4j.version>1.7.32</slf4j.version>
-		<gigaspaces.version>14.5.0</gigaspaces.version>
+		<gigaspaces.version>16.1.0</gigaspaces.version>
 		<rxjava.version>1.3.8</rxjava.version>
 		<hystrix.version>1.5.18</hystrix.version>
 		<archaius.version>0.4.1</archaius.version>
-		<jackson2.version>2.11.2</jackson2.version>
+		<jackson2.version>2.12.3</jackson2.version>
 		<junit.version>4.13.2</junit.version>
-		<junit-jupiter.version>5.7.2</junit-jupiter.version>
-		<hamcrest.version>1.3</hamcrest.version>
-		<mockito.version>3.8.0</mockito.version>
+		<junit-jupiter.version>5.8.2</junit-jupiter.version>
+		<hamcrest.version>2.2</hamcrest.version>
+		<mockito.version>3.12.4</mockito.version>
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-		<dropwizard.version>3.1.2</dropwizard.version>
+		<dropwizard.version>4.1.21</dropwizard.version>
 		<netty.version>4.1.69.Final</netty.version>
 		<mimer-config.version>0.0.8</mimer-config.version>
 		<hystrix-multiconfig.version>0.0.3</hystrix-multiconfig.version>
-		<gs-test.version>1.0.1</gs-test.version>
+		<gs-test.version>2.0.0</gs-test.version>
 
 		<!-- Plugins -->
 		<maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
 		<maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
 		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
-		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-compiler-plugin.version>3.10.0</maven-compiler-plugin.version>
 		<maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
 		<maven-deploy-plugin.version>2.8.1</maven-deploy-plugin.version>
 		<maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
 		<maven-release-plugin.version>3.0.0-M4</maven-release-plugin.version>
-		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+		<maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
 		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
 		<maven-source-plugin.version>3.2.0</maven-source-plugin.version>
@@ -179,8 +178,10 @@
 		<dependencies>
 			<dependency>
 				<groupId>io.dropwizard.metrics</groupId>
-				<artifactId>metrics-core</artifactId>
+				<artifactId>metrics-bom</artifactId>
 				<version>${dropwizard.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 
 			<dependency>
@@ -192,7 +193,7 @@
 			</dependency>
 
 			<dependency>
-				<groupId>${spring.groupId}</groupId>
+				<groupId>org.springframework</groupId>
 				<artifactId>spring-framework-bom</artifactId>
 				<version>${spring.version}</version>
 				<type>pom</type>
@@ -267,6 +268,12 @@
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>${junit.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.hamcrest</groupId>
+						<artifactId>hamcrest-core</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.junit</groupId>
@@ -277,15 +284,10 @@
 			</dependency>
 			<dependency>
 				<groupId>org.hamcrest</groupId>
-				<artifactId>hamcrest-library</artifactId>
+				<artifactId>hamcrest</artifactId>
 				<version>${hamcrest.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.hamcrest</groupId>
-				<artifactId>hamcrest-core</artifactId>
-				<version>${hamcrest.version}</version>
-			</dependency>
-			
+
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-core</artifactId>
@@ -482,13 +484,6 @@
 					<showDeprecation>true</showDeprecation>
 					<failOnWarning>true</failOnWarning>
 				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>org.ow2.asm</groupId>
-						<artifactId>asm</artifactId>
-						<version>6.2</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 
 			<!-- Configures jar creation and manifest contents -->
