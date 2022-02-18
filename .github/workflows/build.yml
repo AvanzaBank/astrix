@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - gs16
   pull_request:
   workflow_dispatch:
 
