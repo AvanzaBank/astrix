@@ -9,7 +9,6 @@
 	<url>https://github.com/AvanzaBank/astrix</url>
 	<modules>
 		<module>astrix-core</module>
-		<module>astrix-provider</module>
 		<module>astrix-gs</module>
 		<module>astrix-context</module>
 		<module>astrix-versioning</module>
@@ -30,7 +29,6 @@
 		<module>astrix-metrics</module>
 		<module>astrix-contracts</module>
 		<module>astrix-netty-remoting</module>
-		<module>astrix-test-support</module>
 		<module>astrix-test-support-common</module>
 		<module>astrix-test-support-junit4</module>
 		<module>astrix-test-support-junit5</module>
