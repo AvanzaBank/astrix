@@ -84,5 +84,5 @@ The Astrix Framework is released under version 2.0 of the [Apache License](https
 [license]:LICENSE
 [license img]:https://img.shields.io/badge/License-Apache%202-blue.svg
 
-[maven]:https://search.maven.org/#search|gav|1|g:"com.avanza.astrix"
+[maven]:https://search.maven.org/#search|gav|1|a:"astrix-parent"
 [maven img]:https://maven-badges.herokuapp.com/maven-central/com.avanza.astrix/astrix-core/badge.svg
