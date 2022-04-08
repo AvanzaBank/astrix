@@ -16,11 +16,12 @@
 package com.avanza.astrix.remoting.server;
 
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.verify;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -28,9 +29,11 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -310,7 +313,23 @@ public class AstrixRemotingTest {
 		partitionedService.pingVoid(1,2,3,4);
 
 	}
-	
+
+	@Test
+	public void partitionedGenericEntity_can_insertPartitioned() throws Exception {
+		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver(2);
+		PartitionedGenericEntityService evenPartition = Mockito.mock(PartitionedGenericEntityService.class);
+		PartitionedGenericEntityService oddPartition = Mockito.mock(PartitionedGenericEntityService.class);
+
+		remotingDriver.registerServerPartition(0, PartitionedGenericEntityService.class, evenPartition);
+		remotingDriver.registerServerPartition(1, PartitionedGenericEntityService.class, oddPartition);
+
+		PartitionedGenericEntityService service = remotingDriver.createRemotingProxy(PartitionedGenericEntityService.class);
+		service.insertAll(Arrays.asList(new GenericEntity<>(1), new GenericEntity<>(2), new GenericEntity<>(3)));
+
+		verify(oddPartition).insertAll(Arrays.asList(new GenericEntity<>(1), new GenericEntity<>(3)));
+		verify(evenPartition).insertAll(Collections.singletonList(new GenericEntity<>(2)));
+	}
+
 	@Test
 	public void partitionedRequest_routingOnPropertyOnTargetObject() throws Exception {
 		AstrixRemotingDriver remotingDriver = new AstrixRemotingDriver(2);
@@ -912,6 +931,46 @@ public class AstrixRemotingTest {
 	
 	interface PartitionedPingServiceAsync {
 		Observable<Void> pingVoid(@AstrixPartitionedRouting Integer... nums);
+	}
+
+	interface PartitionedGenericEntityService {
+
+		void insertAll(@AstrixPartitionedRouting(routingMethod = "getIdAsInt") List<GenericEntity<Serializable>> insertMes);
+
+	}
+
+	public static class GenericEntity<T extends Serializable> implements Serializable{
+		private static final long serialVersionUID = 1L;
+		private final T value;
+
+		public GenericEntity(T value) {
+			this.value = value;
+		}
+
+		public T getValue() {
+			return value;
+		}
+
+		public int getIdAsInt() {
+			return Objects.hashCode(value);
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (!(o instanceof GenericEntity)) {
+				return false;
+			}
+			GenericEntity<?> that = (GenericEntity<?>) o;
+			return Objects.equals(value, that.value);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(value);
+		}
 	}
 
 	public static class NumPojo implements Serializable {
