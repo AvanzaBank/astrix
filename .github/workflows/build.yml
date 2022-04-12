@@ -3,8 +3,8 @@ name: Build
 on:
   push:
     branches:
-      - master
-      - gs16
+      - main
+      - gs14.5
   pull_request:
   workflow_dispatch:
 
