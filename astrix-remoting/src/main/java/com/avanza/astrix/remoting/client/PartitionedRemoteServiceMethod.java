@@ -172,8 +172,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 	}
 
 	private Class<?> getElementType(ParameterizedType parameterizedContainerType) {
-		Type[] typeArguments = parameterizedContainerType.getActualTypeArguments();
-		Type typeArgument = typeArguments[0];
+		Type typeArgument = parameterizedContainerType.getActualTypeArguments()[0];
 		if (typeArgument instanceof ParameterizedType) {
 			ParameterizedType parameterizedType = (ParameterizedType) typeArgument;
 			return (Class<?>) parameterizedType.getRawType();
