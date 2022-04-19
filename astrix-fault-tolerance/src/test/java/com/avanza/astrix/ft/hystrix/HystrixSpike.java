@@ -18,6 +18,7 @@ package com.avanza.astrix.ft.hystrix;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.context.AstrixContext;
@@ -58,12 +59,14 @@ public class HystrixSpike {
 	}
 	
 	public static class PingImpl implements Ping {
+
+		private final Logger log = LoggerFactory.getLogger(getClass());
+
 		public String ping(String msg) {
 			try {
 				Thread.sleep(10000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.warn("Interrupted", e);
 			}
 			return msg;
 		}
