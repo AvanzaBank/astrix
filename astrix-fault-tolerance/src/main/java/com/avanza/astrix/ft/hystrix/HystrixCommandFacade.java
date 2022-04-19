@@ -19,6 +19,7 @@ import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.beans.async.ContextPropagation;
 import com.avanza.astrix.core.AstrixCallStackTrace;
 import com.avanza.astrix.core.ServiceUnavailableException;
@@ -64,7 +65,7 @@ class HystrixCommandFacade<T> {
 			result = command.execute();
 		} catch (HystrixRuntimeException e) {
 			// TODO: Add unit test for this case
-			e.printStackTrace();
+			log.trace("Exception executing command", e);
 			throw new ServiceUnavailableException(e.getFailureType().toString()); 
 		}
 		throwExceptionIfExecutionFailed(result);

@@ -26,6 +26,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.executor.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.config.DynamicConfig;
@@ -44,7 +47,7 @@ import com.avanza.gs.test.RunningPu;
 import com.gigaspaces.async.AsyncFuture;
 
 public class ClusteredProxyLibraryTest {
-	
+
 	private static InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
 		set(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
 	}};
@@ -59,7 +62,9 @@ public class ClusteredProxyLibraryTest {
 	
 	@Rule
 	public AutoCloseableRule autoClosables = new AutoCloseableRule();
-	
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	private LunchService lunchService;
 
 	private AstrixConfigurer configurer = new AstrixConfigurer();
@@ -158,15 +163,15 @@ public class ClusteredProxyLibraryTest {
 			@Override
 			public void describeFailureTo(Description description) {
 				if (lastException != null) {
-					lastException.printStackTrace(); // for debug purpose
+					log.debug("Last exception", lastException);
 					description.appendText("Object count for template: " + template.toString() + "\n expected: " + expected + " \n But last invocation threw exception: " + lastException.toString());
 				}
 				description.appendText("Object count for template: " + template.toString() + "\n expected: " + expected + " \n was: " + count);
 			}
-			
+
 		};
 	}
-	
+
 	public static class ReturnOneTask implements Task<Integer> {
 		private static final long serialVersionUID = 1L;
 

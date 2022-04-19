@@ -22,6 +22,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openspaces.core.GigaSpace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.beans.core.AstrixSettings;
 import com.avanza.astrix.beans.registry.InMemoryServiceRegistry;
 import com.avanza.astrix.config.DynamicConfig;
@@ -42,7 +45,9 @@ public class LocalViewDisconnectionTest {
 	private InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry() {{
 		set(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
 	}};
-	
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	private LunchService lunchService;
 
 	private AstrixConfigurer configurer = new AstrixConfigurer();
@@ -124,7 +129,7 @@ public class LocalViewDisconnectionTest {
 			@Override
 			public void describeFailureTo(Description description) {
 				if (lastException != null) {
-					lastException.printStackTrace(); // for debug purpose
+					log.debug("Last exception", lastException);
 					description.appendText("Object count for template: " + template.toString() + "\n expected: " + expected + " \n But last invocation threw exception: " + lastException.toString());
 				}
 				description.appendText("Object count for template: " + template.toString() + "\n expected: " + expected + " \n was: " + count);

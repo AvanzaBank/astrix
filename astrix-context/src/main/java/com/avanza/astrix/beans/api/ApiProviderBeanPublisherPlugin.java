@@ -103,7 +103,7 @@ final class ApiProviderBeanPublisherPlugin implements BeanPublisherPlugin {
 				return false;
 			}
 			if (!hasMethod(targetServiceApi, reactiveMethod.getName(), reactiveMethod.getParameterTypes())) {
-				log.warn("Found reactive interface that contains methods that does not correpond to a method in the synchronous interface. reactiveInterfaceCandidate={}, invalidMethod={}"
+				log.warn("Found reactive interface that contains methods that does not correspond to a method in the synchronous interface. reactiveInterfaceCandidate={}, invalidMethod={}"
 						, reactiveInterface.getName(), reactiveMethod.getName());
 				return false;
 			}
@@ -116,7 +116,7 @@ final class ApiProviderBeanPublisherPlugin implements BeanPublisherPlugin {
 			targetServiceApi.getMethod(name, parameterTypes);
 			return true;
 		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
+			log.trace("{}.{} method not found", targetServiceApi, name, e);
 			return false;
 		}
 	}

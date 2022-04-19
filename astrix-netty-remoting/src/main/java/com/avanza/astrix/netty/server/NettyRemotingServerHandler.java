@@ -15,6 +15,9 @@
  */
 package com.avanza.astrix.netty.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.netty.client.NettyRemotingClientHandler;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
@@ -24,6 +27,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class NettyRemotingServerHandler extends ChannelInboundHandlerAdapter {
+
+	private static final Logger log = LoggerFactory.getLogger(NettyRemotingClientHandler.class);
 
 	private AstrixServiceActivator serviceActivator;
 	
@@ -46,7 +51,7 @@ public class NettyRemotingServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+		log.trace("Exception caught", cause);
         ctx.close();
     }
 }

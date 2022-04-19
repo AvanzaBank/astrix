@@ -15,16 +15,19 @@
  */
 package com.avanza.astrix.test;
 
+import java.util.function.Consumer;
+
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.config.GlobalConfigSourceRegistry;
 import com.avanza.astrix.config.MapConfigSource;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.context.Astrix;
 import com.avanza.astrix.context.AstrixContext;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
-
-import java.util.function.Consumer;
 
 /**
  * Test utility that manages an internal service registry, config-source and AstrixContext. The
@@ -67,6 +70,8 @@ import java.util.function.Consumer;
  *
  */
 public class AstrixRule implements TestRule {
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	private final AstrixTestContext astrixTestContext;
 
@@ -125,7 +130,7 @@ public class AstrixRule implements TestRule {
 					try {
 						astrixTestContext.destroy();
 					} catch (Exception e) {
-						e.printStackTrace();
+						log.warn("Error destroying AstrixTestContext", e);
 					}
 				}
 			}

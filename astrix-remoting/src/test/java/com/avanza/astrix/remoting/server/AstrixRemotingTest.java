@@ -43,6 +43,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.avanza.astrix.core.AstrixBroadcast;
 import com.avanza.astrix.core.AstrixPartitionedRouting;
@@ -66,6 +68,8 @@ import rx.Observable;
  *
  */
 public class AstrixRemotingTest {
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	@Test
 	public void supportsServiceMethodsWithMultipleArguments() throws Exception {
@@ -124,8 +128,8 @@ public class AstrixRemotingTest {
 		} catch (MyCustomServiceException e) {
 			// Expected
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail("Excpected exception of type MyCustomServiceException, but was: " + e);
+			log.debug("Unexpected exception", e);
+			fail("Expected exception of type MyCustomServiceException, but was: " + e);
 		}
 	}
 	

@@ -19,6 +19,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationRequest;
 import com.avanza.astrix.remoting.client.AstrixServiceInvocationResponse;
 
@@ -28,7 +31,8 @@ import rx.Observable;
 import rx.Subscriber;
 
 public class NettyRemotingClientHandler extends ChannelInboundHandlerAdapter {
-	
+
+	private static final Logger log = LoggerFactory.getLogger(NettyRemotingClientHandler.class);
 
 	public static final String NETTY_RESPONSE_SUBSCRIBER_ID = "netty.responseSubscriberId";
 	private volatile ChannelHandlerContext ctx;
@@ -68,7 +72,7 @@ public class NettyRemotingClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+        log.trace("Exception caught", cause);
         ctx.close();
     }
 
