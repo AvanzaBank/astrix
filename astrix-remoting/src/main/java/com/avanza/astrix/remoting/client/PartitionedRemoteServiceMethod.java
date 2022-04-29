@@ -20,7 +20,12 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import com.avanza.astrix.core.AstrixPartitionedRouting;
@@ -28,8 +33,8 @@ import com.avanza.astrix.core.AstrixRemoteResult;
 import com.avanza.astrix.core.RemoteResultReducer;
 import com.avanza.astrix.core.remoting.RoutingKey;
 import com.avanza.astrix.core.util.ReflectionUtil;
+
 import rx.Observable;
-import rx.functions.Func1;
 /**
  * 
  * @author Elias Lindholm (elilin)
@@ -97,7 +102,7 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 			throw new IllegalArgumentException("Illegal service method: " + ReflectionUtil.fullMethodName(proxiedMethod) + ".\nWhen defining a routingMethod for @AstrixPartitionedRouting the target Collection type must not be a raw type. \nwas: " + rawType);
 		}
 		ParameterizedType partitionedArgumentTypeParameters = (ParameterizedType) rawType;
-		return new CollectionContainerType(collectionFactory, (Class<?>)partitionedArgumentTypeParameters.getActualTypeArguments()[0]);
+		return new CollectionContainerType(collectionFactory, getElementType(partitionedArgumentTypeParameters));
 	}
 
 	private Class<? extends RemoteResultReducer<?>> getReducer(AstrixPartitionedRouting partitionBy, Method targetServiceMethod) {
@@ -164,6 +169,16 @@ public class PartitionedRemoteServiceMethod implements RemoteServiceMethod {
 
 	private ContainerBuilder newCollectionInstance() {
 		return partitionedArgumentContainerType.newInstance();
+	}
+
+	private Class<?> getElementType(ParameterizedType parameterizedContainerType) {
+		Type typeArgument = parameterizedContainerType.getActualTypeArguments()[0];
+		if (typeArgument instanceof ParameterizedType) {
+			ParameterizedType parameterizedType = (ParameterizedType) typeArgument;
+			return (Class<?>) parameterizedType.getRawType();
+		} else {
+			return (Class<?>) typeArgument;
+		}
 	}
 
 	private class RoutedServiceInvocationRequestBuilder {
