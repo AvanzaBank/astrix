@@ -17,7 +17,6 @@ package com.avanza.astrix.spring;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,8 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -36,9 +37,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.core.Ordered;
 
-import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
 import com.avanza.astrix.beans.core.AstrixBeanKey;
-import com.avanza.astrix.beans.core.AstrixSettings;
+import com.avanza.astrix.beans.core.AstrixBeanSettings.BeanSetting;
 import com.avanza.astrix.config.DynamicConfig;
 import com.avanza.astrix.config.Setting;
 import com.avanza.astrix.context.Astrix;
@@ -197,14 +197,13 @@ public class AstrixFrameworkBean implements BeanFactoryPostProcessor, Applicatio
 	}
 	
 	private DynamicConfig getDynamicConfig(ApplicationContext applicationContext) {
-		Collection<DynamicConfig> dynamicConfigs = applicationContext.getBeansOfType(DynamicConfig.class).values();
-		if (dynamicConfigs.isEmpty()) {
+		try {
+			return applicationContext.getBean(DynamicConfig.class);
+		} catch (NoUniqueBeanDefinitionException e) {
+			throw new IllegalArgumentException("Multiple DynamicConfig instances found in ApplicationContext: " + e);
+		} catch (NoSuchBeanDefinitionException ignored) {
 			return null;
 		}
-		if (dynamicConfigs.size() == 1) {
-			return dynamicConfigs.iterator().next();
-		}
-		throw new IllegalArgumentException("Multiple DynamicConfig instances found in ApplicationContext");
 	}
 	
 	private AstrixApplicationContext createAstrixContext(DynamicConfig optionalConfig) {
