@@ -10,6 +10,7 @@ on:
 
 jobs:
   Build:
+    name: Build (Java ${{ matrix.java-version }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
