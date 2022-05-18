@@ -74,48 +74,59 @@
 			<id>release</id>
 			<build>
 				<!--  javadoc, source and gpg plugin from above -->
-							<!-- All artifacts deployed to the central repository must be signed -->
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-gpg-plugin</artifactId>
-					<version>${maven-gpg-plugin.version}</version>
-					<executions>
-						<execution>
-							<id>sign-artifacts</id>
-							<phase>verify</phase>
-							<goals>
-								<goal>sign</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
+				<!-- All artifacts deployed to the central repository must be signed -->
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>${maven-gpg-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>${maven-javadoc-plugin.version}</version>
-					<configuration>
-						<!-- TODO: Remove failOnError once all Javadoc has been fixed -->
-						<failOnError>false</failOnError>
-						<excludePackageNames>lunch*:se*:tutorial*:runners*:com.avanza.astrix.integration.tests*</excludePackageNames>
-						<aggregate>true</aggregate>
-						<show>public</show>
-						<nohelp>true</nohelp>
-						<header>Astrix Framework ${project.version}</header>
-						<footer>Astrix Framework ${project.version}</footer>
-						<doctitle>Astrix Framework ${project.version}</doctitle>
-					</configuration>
-					<executions>
-						<execution>
-							<id>attach-javadocs</id>
-							<goals>
-								<goal>jar</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-			</plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>${maven-javadoc-plugin.version}</version>
+						<configuration>
+							<!-- TODO: Remove failOnError once all Javadoc has been fixed -->
+							<failOnError>false</failOnError>
+							<excludePackageNames>lunch*:se*:tutorial*:runners*:com.avanza.astrix.integration.tests*
+							</excludePackageNames>
+							<aggregate>true</aggregate>
+							<show>public</show>
+							<nohelp>true</nohelp>
+							<header>Astrix Framework ${project.version}</header>
+							<footer>Astrix Framework ${project.version}</footer>
+							<doctitle>Astrix Framework ${project.version}</doctitle>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
+				</plugins>
 			</build>
 		</profile>
 	</profiles>
@@ -168,6 +179,7 @@
 		<maven-site-plugin.version>3.9.1</maven-site-plugin.version>
 		<license-maven-plugin.version>2.11</license-maven-plugin.version>
 		<maven-scm-publish-plugin.version>3.0.0</maven-scm-publish-plugin.version>
+		<nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
 		<maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
 	</properties>
 
@@ -410,9 +422,7 @@
 					<artifactId>maven-failsafe-plugin</artifactId>
 					<version>${maven-failsafe-plugin.version}</version>
 					<configuration>
-						<argLine>
-							--illegal-access=permit
-						</argLine>
+						<argLine>--illegal-access=permit</argLine>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -469,6 +479,17 @@
 					<artifactId>maven-scm-publish-plugin</artifactId>
 					<version>${maven-scm-publish-plugin.version}</version>
 				</plugin>
+				<plugin>
+					<groupId>org.sonatype.plugins</groupId>
+					<artifactId>nexus-staging-maven-plugin</artifactId>
+					<version>${nexus-staging-maven-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-gpg-plugin</artifactId>
+					<version>${maven-gpg-plugin.version}</version>
+				</plugin>
+
 			</plugins>
 		</pluginManagement>
 		<plugins>
