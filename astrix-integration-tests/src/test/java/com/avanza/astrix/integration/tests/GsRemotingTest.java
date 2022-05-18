@@ -45,12 +45,12 @@ import com.avanza.astrix.provider.core.AstrixServiceExport;
 import com.avanza.astrix.provider.core.Service;
 import com.avanza.astrix.spring.AstrixFrameworkBean;
 import com.avanza.astrix.test.util.AutoCloseableRule;
-import com.avanza.gs.test.JVMGlobalLus;
+import com.avanza.gs.test.JVMGlobalGigaSpacesManager;
 import com.j_spaces.core.IJSpace;
 
 public class GsRemotingTest {
 	
-	private InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
+	private final InMemoryServiceRegistry serviceRegistry = new InMemoryServiceRegistry();
 	
 	@Rule 
 	public AutoCloseableRule autoClosables = new AutoCloseableRule();
@@ -59,7 +59,7 @@ public class GsRemotingTest {
 	public void routedServiceInvocationThrowServiceUnavailableWhenProxyIsContextIsClosed() throws Exception {
 		AnnotationConfigApplicationContext pingServer = autoClosables.add(new AnnotationConfigApplicationContext());
 		pingServer.register(PingAppConfig.class);
-		pingServer.getEnvironment().getPropertySources().addFirst(new MapPropertySource("props", new HashMap<String, Object>() {{
+		pingServer.getEnvironment().getPropertySources().addFirst(new MapPropertySource("props", new HashMap<>() {{
 			put("serviceRegistryUri", serviceRegistry.getServiceUri());
 		}}));
 		pingServer.refresh();
@@ -82,7 +82,7 @@ public class GsRemotingTest {
 	public void broadcastedServiceInvocationThrowServiceUnavailableWhenProxyIsContextIsClosed() throws Exception {
 		AnnotationConfigApplicationContext pingServer = autoClosables.add(new AnnotationConfigApplicationContext());
 		pingServer.register(PingAppConfig.class);
-		pingServer.getEnvironment().getPropertySources().addFirst(new MapPropertySource("props", new HashMap<String, Object>() {{
+		pingServer.getEnvironment().getPropertySources().addFirst(new MapPropertySource("props", new HashMap<>() {{
 			put("serviceRegistryUri", serviceRegistry.getServiceUri());
 		}}));
 		pingServer.refresh();
@@ -126,11 +126,9 @@ public class GsRemotingTest {
 		}
 	}
 
-
 	@AstrixApplication(exportsRemoteServicesFor = PingApi.class, defaultServiceComponent = AstrixServiceComponentNames.GS_REMOTING)
 	public static class PingAppConfig {
-		
-		
+
 		@Bean
 		public AstrixFrameworkBean astrix(Environment env) {
 			AstrixFrameworkBean astrix = new AstrixFrameworkBean();
@@ -143,14 +141,16 @@ public class GsRemotingTest {
 		public Ping ping() {
 			return new PingImpl();
 		}
+
 		@Bean
 		public GigaSpace gs(IJSpace space) {
 			return new GigaSpaceConfigurer(space).create();
 		}
+
 		@Bean
 		public EmbeddedSpaceFactoryBean spaceFactoryBean() {
 			EmbeddedSpaceFactoryBean spaceFactory = new EmbeddedSpaceFactoryBean(UniqueSpaceNameSeed.getSpaceName());
-			spaceFactory.setLookupGroups(JVMGlobalLus.getLookupGroupName());
+			spaceFactory.setLookupLocators(JVMGlobalGigaSpacesManager.getLookupLocator());
 			return spaceFactory;
 		}
 	}

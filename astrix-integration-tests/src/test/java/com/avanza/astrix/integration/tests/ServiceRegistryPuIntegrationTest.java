@@ -56,8 +56,8 @@ public class ServiceRegistryPuIntegrationTest {
 															.startAsync(false)
 															.configure();
 	
-	private MapConfigSource clientConfig = new MapConfigSource() {{
-		set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
+	private final MapConfigSource clientConfig = new MapConfigSource() {{
+		set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?locators=" + serviceRegistrypu.getLookupLocator());
 	}};
 	
 	private AstrixContext clientContext;

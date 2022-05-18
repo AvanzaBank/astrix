@@ -19,7 +19,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.avanza.gs</groupId>
-			<artifactId>gs-test</artifactId>
+			<artifactId>gs-test-junit4</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>${astrix.groupId}</groupId>
