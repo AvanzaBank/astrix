@@ -137,24 +137,24 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>11</java.version>
 
-		<log4j.version>2.17.1</log4j.version>
-		<spring.version>5.3.7</spring.version>
+		<log4j.version>2.17.2</log4j.version>
+		<spring.version>5.3.19</spring.version>
 		<slf4j.version>1.7.32</slf4j.version>
-		<gigaspaces.version>16.1.0</gigaspaces.version>
+		<gigaspaces.version>16.1.1</gigaspaces.version>
 		<rxjava.version>1.3.8</rxjava.version>
 		<hystrix.version>1.5.18</hystrix.version>
 		<archaius.version>0.4.1</archaius.version>
-		<jackson2.version>2.12.3</jackson2.version>
+		<jackson2.version>2.13.2.1</jackson2.version>
 		<junit.version>4.13.2</junit.version>
 		<junit-jupiter.version>5.8.2</junit-jupiter.version>
 		<hamcrest.version>2.2</hamcrest.version>
 		<mockito.version>3.12.4</mockito.version>
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-		<dropwizard.version>4.1.21</dropwizard.version>
-		<netty.version>4.1.69.Final</netty.version>
+		<dropwizard.version>4.2.9</dropwizard.version>
+		<netty.version>4.1.76.Final</netty.version>
 		<mimer-config.version>0.0.8</mimer-config.version>
 		<hystrix-multiconfig.version>0.0.3</hystrix-multiconfig.version>
-		<gs-test.version>2.1.0</gs-test.version>
+		<gs-test.version>2.1.1</gs-test.version>
 
 		<!-- Plugins -->
 		<maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
@@ -227,7 +227,7 @@
 			<dependency>
 				<groupId>org.reflections</groupId>
 				<artifactId>reflections</artifactId>
-				<version>0.9.12</version>
+				<version>0.10.2</version>
 			</dependency>
 			
             <!-- Jackson 2.x -->
