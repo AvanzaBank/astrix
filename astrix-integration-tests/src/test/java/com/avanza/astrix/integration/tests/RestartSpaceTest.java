@@ -48,16 +48,16 @@ import com.avanza.astrix.integration.tests.domain.api.LunchRestaurant;
 import com.avanza.astrix.integration.tests.domain.api.LunchService;
 import com.avanza.astrix.integration.tests.domain.api.LunchServiceAsync;
 import com.avanza.astrix.modules.ObjectCache;
-import com.avanza.gs.test.JVMGlobalLus;
+import com.avanza.gs.test.JVMGlobalGigaSpacesManager;
 import com.avanza.gs.test.PuConfigurers;
 import com.avanza.gs.test.RunningPu;
 
 public class RestartSpaceTest {
-	private final String lookupGroupName = JVMGlobalLus.getLookupGroupName();
+	private final String lookupLocator = JVMGlobalGigaSpacesManager.getLookupLocator();
 	private final String spaceName = this.getClass().getName();
-	private final String puSpaceUrl = "jini://*/*/" + spaceName + "?groups=" + lookupGroupName;
+	private final String puSpaceUrl = "jini://*/*/" + spaceName + "?locators=" + lookupLocator;
 	private final MapConfigSource configSource = new MapConfigSource() {{
-		set(AstrixSettings.SERVICE_REGISTRY_URI, "gs-remoting:jini://*/*/service-registry-space?groups=" + lookupGroupName);
+		set(AstrixSettings.SERVICE_REGISTRY_URI, "gs-remoting:jini://*/*/service-registry-space?locators=" + lookupLocator);
 		set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 250);
 		set(AstrixSettings.SERVICE_LEASE_RENEW_INTERVAL, 100);
 		set(AstrixSettings.SERVICE_REGISTRY_EXPORT_INTERVAL, 150);
@@ -66,7 +66,7 @@ public class RestartSpaceTest {
 	private final DynamicConfig dynamicConfig = new DynamicConfig(configSource);
 	@Rule
 	public final RunningPu serviceRegistryPu = PuConfigurers.partitionedPu("classpath:/META-INF/spring/service-registry-pu.xml")
-			.lookupGroup(lookupGroupName)
+			.lookupLocator(lookupLocator)
 			.startAsync(false)
 			.configure();
 	private AstrixContext astrix;
@@ -110,7 +110,7 @@ public class RestartSpaceTest {
 		Properties contextProperties = new Properties();
 		contextProperties.put("spaceName", spaceName);
 		contextProperties.put("configSourceId", configSourceId);
-		contextProperties.put("gs.space.url.arg.groups", this.lookupGroupName);
+		contextProperties.put("gs.space.url.arg.locators", this.lookupLocator);
 		BeanLevelProperties beanLevelProperties = new BeanLevelProperties();
 		beanLevelProperties.setContextProperties(contextProperties);
 

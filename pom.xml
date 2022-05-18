@@ -154,7 +154,7 @@
 		<netty.version>4.1.69.Final</netty.version>
 		<mimer-config.version>0.0.8</mimer-config.version>
 		<hystrix-multiconfig.version>0.0.3</hystrix-multiconfig.version>
-		<gs-test.version>2.0.1</gs-test.version>
+		<gs-test.version>2.1.0</gs-test.version>
 
 		<!-- Plugins -->
 		<maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
@@ -321,7 +321,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.avanza.gs</groupId>
-				<artifactId>gs-test</artifactId>
+				<artifactId>gs-test-junit4</artifactId>
 				<version>${gs-test.version}</version>
 			</dependency>
 			<dependency>
