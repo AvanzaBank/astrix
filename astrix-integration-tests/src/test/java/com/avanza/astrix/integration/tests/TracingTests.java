@@ -48,8 +48,8 @@ public class TracingTests {
             .startAsync(true)
             .configure();
 
-    private static MapConfigSource config = new MapConfigSource() {{
-        set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?groups=" + serviceRegistrypu.getLookupGroupName());
+    private static final MapConfigSource config = new MapConfigSource() {{
+        set(AstrixSettings.SERVICE_REGISTRY_URI, AstrixServiceComponentNames.GS_REMOTING + ":jini://*/*/service-registry-space?locators=" + serviceRegistrypu.getLookupLocator());
         set(AstrixSettings.SERVICE_REGISTRY_EXPORT_RETRY_INTERVAL, 250);
         set(AstrixSettings.BEAN_BIND_ATTEMPT_INTERVAL, 250);
     }};
