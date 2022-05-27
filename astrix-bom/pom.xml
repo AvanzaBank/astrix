@@ -100,6 +100,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>astrix-reactor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>astrix-remoting</artifactId>
                 <version>${project.version}</version>
             </dependency>

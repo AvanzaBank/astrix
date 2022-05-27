@@ -19,8 +19,8 @@
 		<module>astrix-test-util</module>
 		<module>astrix-spring</module>
 		<module>astrix-http</module>
-		<module>astrix-remoting</module>
 		<module>astrix-reactor</module>
+		<module>astrix-remoting</module>
 		<module>examples</module>
 		<module>doc-snippets</module>
 		<module>tutorial</module>
