@@ -15,34 +15,32 @@
  */
 package com.avanza.astrix.beans.core;
 
+import rx.Observable;
+import rx.subjects.ReplaySubject;
+
 import java.util.concurrent.CompletableFuture;
 
 public class CompletableFutureTypeHandlerPlugin implements ReactiveTypeHandlerPlugin<CompletableFuture<Object>> {
 
 	@Override
-	public void subscribe(ReactiveExecutionListener listener, CompletableFuture<Object> reactiveType) {
+	public Observable<Object> toObservable(CompletableFuture<Object> reactiveType) {
+		ReplaySubject<Object> subject = ReplaySubject.createWithSize(1);
 		reactiveType.whenComplete((result, throwable) -> {
-			if (throwable != null) {
-				listener.onError(throwable);
+			if (throwable == null) {
+				subject.onNext(result);
+				subject.onCompleted();
 			} else {
-				listener.onResult(result);
+				subject.onError(throwable);
 			}
 		});
+		return subject;
 	}
 
 	@Override
-	public void completeExceptionally(Throwable error, CompletableFuture<Object> reactiveType) {
-		reactiveType.completeExceptionally(error);
-	}
-
-	@Override
-	public void complete(Object result, CompletableFuture<Object> reactiveType) {
-		reactiveType.complete(result);
-	}
-	
-	@Override
-	public CompletableFuture<Object> newReactiveType() {
-		return new CompletableFuture<Object>();
+	public CompletableFuture<Object> toReactiveType(Observable<Object> observable) {
+		CompletableFuture<Object> reactiveType = new CompletableFuture<>();
+		observable.subscribe(reactiveType::complete, reactiveType::completeExceptionally);
+		return reactiveType;
 	}
 
 	@Override

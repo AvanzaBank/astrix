@@ -15,15 +15,13 @@
  */
 package com.avanza.astrix.contracts;
 
-import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
-import com.avanza.astrix.gs.AsyncFutureTypeHandler;
-import com.gigaspaces.async.AsyncFuture;
+import com.avanza.astrix.beans.core.RxSingleTypeHandlerPlugin;
+import rx.Single;
 
-public class AsyncFutureReactiveTypeHandlerTest extends ReactiveTypeHandlerContract<AsyncFuture<Object>> {
+public class RxSingleTypeHandlerPluginTest extends ReactiveTypeHandlerContract<Single<Object>> {
 
-	@Override
-	protected ReactiveTypeHandlerPlugin<AsyncFuture<Object>> newReactiveTypeHandler() {
-		return new AsyncFutureTypeHandler();
+	public RxSingleTypeHandlerPluginTest() {
+		super(new RxSingleTypeHandlerPlugin());
 	}
-
+	
 }

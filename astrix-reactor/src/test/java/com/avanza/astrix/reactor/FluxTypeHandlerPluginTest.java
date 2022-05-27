@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.core;
+package com.avanza.astrix.reactor;
 
-import rx.Observable;
+import com.avanza.astrix.contracts.ReactiveTypeHandlerContract;
+import reactor.core.publisher.Flux;
 
-public interface ReactiveTypeHandlerPlugin<T> {
+public class FluxTypeHandlerPluginTest extends ReactiveTypeHandlerContract<Flux<Object>> {
 
-	Observable<Object> toObservable(T reactiveType);
+    public FluxTypeHandlerPluginTest() {
+        super(new FluxTypeHandlerPlugin());
+    }
 
-	T toReactiveType(Observable<Object> observable);
-
-	Class<T> reactiveTypeHandled();
 }

@@ -15,13 +15,27 @@
  */
 package com.avanza.astrix.beans.core;
 
+import rx.Completable;
 import rx.Observable;
+import rx.subjects.ReplaySubject;
 
-public interface ReactiveTypeHandlerPlugin<T> {
+public class RxCompletableTypeHandlerPlugin implements ReactiveTypeHandlerPlugin<Completable> {
 
-	Observable<Object> toObservable(T reactiveType);
+    @Override
+    public Observable<Object> toObservable(Completable reactiveType) {
+        return reactiveType.toObservable();
+    }
 
-	T toReactiveType(Observable<Object> observable);
+    @Override
+    public Completable toReactiveType(Observable<Object> observable) {
+        ReplaySubject<Object> subject = ReplaySubject.createWithSize(1);
+        observable.subscribe(subject);
+        return subject.toCompletable();
+    }
 
-	Class<T> reactiveTypeHandled();
+    @Override
+    public Class<Completable> reactiveTypeHandled() {
+        return Completable.class;
+    }
+
 }
