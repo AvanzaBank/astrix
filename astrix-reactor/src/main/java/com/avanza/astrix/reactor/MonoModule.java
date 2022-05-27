@@ -24,6 +24,8 @@ public class MonoModule implements AstrixContextPlugin {
     @Override
     public void prepare(ModuleContext moduleContext) {
         moduleContext.bind(ReactiveTypeHandlerPlugin.class, MonoTypeHandlerPlugin.class);
+
+        moduleContext.export(ReactiveTypeHandlerPlugin.class);
     }
 
 }

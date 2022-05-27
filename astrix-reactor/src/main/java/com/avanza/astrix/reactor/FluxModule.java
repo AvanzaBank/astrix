@@ -24,6 +24,8 @@ public class FluxModule implements AstrixContextPlugin {
     @Override
     public void prepare(ModuleContext moduleContext) {
         moduleContext.bind(ReactiveTypeHandlerPlugin.class, FluxTypeHandlerPlugin.class);
+
+        moduleContext.export(ReactiveTypeHandlerPlugin.class);
     }
 
 }
