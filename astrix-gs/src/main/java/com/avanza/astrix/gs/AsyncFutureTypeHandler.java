@@ -18,8 +18,8 @@ package com.avanza.astrix.gs;
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
 import com.gigaspaces.async.AsyncFuture;
 import com.gigaspaces.async.SettableFuture;
+
 import rx.Observable;
-import rx.subjects.ReplaySubject;
 
 /**
  * 
@@ -30,17 +30,17 @@ public class AsyncFutureTypeHandler implements ReactiveTypeHandlerPlugin<AsyncFu
 
 	@Override
 	public Observable<Object> toObservable(AsyncFuture<Object> reactiveType) {
-		ReplaySubject<Object> subject = ReplaySubject.createWithSize(1);
-		reactiveType.setListener(result -> {
-			Exception exception = result.getException();
-			if(exception == null) {
-				subject.onNext(result.getResult());
-				subject.onCompleted();
-			} else {
-				subject.onError(exception);
-			}
-		});
-		return subject;
+		return Observable.unsafeCreate(
+				subscriber -> reactiveType.setListener(result -> {
+					Exception exception = result.getException();
+					if (exception == null) {
+						subscriber.onNext(result.getResult());
+						subscriber.onCompleted();
+					} else {
+						subscriber.onError(exception);
+					}
+				})
+		);
 	}
 
 	@Override

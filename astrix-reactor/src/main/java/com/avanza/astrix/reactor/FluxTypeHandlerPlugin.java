@@ -16,19 +16,19 @@
 package com.avanza.astrix.reactor;
 
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 import reactor.core.publisher.Sinks.Many;
 import rx.Observable;
-import rx.subjects.ReplaySubject;
 
 public class FluxTypeHandlerPlugin implements ReactiveTypeHandlerPlugin<Flux<Object>> {
 
     @Override
     public Observable<Object> toObservable(Flux<Object> reactiveType) {
-        ReplaySubject<Object> subject = ReplaySubject.create(1);
-        reactiveType.subscribe(subject::onNext, subject::onError, subject::onCompleted);
-        return subject;
+        return Observable.unsafeCreate(
+                subscriber -> reactiveType.subscribe(subscriber::onNext, subscriber::onError, subscriber::onCompleted)
+        );
     }
 
     @Override

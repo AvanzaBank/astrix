@@ -21,15 +21,14 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import reactor.core.publisher.Sinks.One;
 import rx.Observable;
-import rx.subjects.ReplaySubject;
 
 public class MonoTypeHandlerPlugin implements ReactiveTypeHandlerPlugin<Mono<Object>> {
 
     @Override
     public Observable<Object> toObservable(Mono<Object> reactiveType) {
-        ReplaySubject<Object> subject = ReplaySubject.createWithSize(1);
-        reactiveType.subscribe(subject::onNext, subject::onError, subject::onCompleted);
-        return subject;
+        return Observable.unsafeCreate(
+                subscriber -> reactiveType.subscribe(subscriber::onNext, subscriber::onError, subscriber::onCompleted)
+        );
     }
 
     @Override
