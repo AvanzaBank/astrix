@@ -16,6 +16,7 @@
 package com.avanza.astrix.reactor;
 
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
+
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import reactor.core.publisher.Sinks.One;
@@ -34,7 +35,7 @@ public class MonoTypeHandlerPlugin implements ReactiveTypeHandlerPlugin<Mono<Obj
     @Override
     public Mono<Object> toReactiveType(Observable<Object> observable) {
         One<Object> sink = Sinks.one();
-        observable.subscribe(sink::tryEmitValue, sink::tryEmitError);
+        observable.subscribe(sink::tryEmitValue, sink::tryEmitError, sink::tryEmitEmpty);
         return sink.asMono();
     }
 
