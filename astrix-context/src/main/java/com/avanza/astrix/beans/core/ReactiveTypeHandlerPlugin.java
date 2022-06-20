@@ -15,37 +15,30 @@
  */
 package com.avanza.astrix.beans.core;
 
+import rx.Observable;
+
+/**
+ *	Plugin for converting between {@link Observable} and a reactive type
+ *
+ * @param <T> a reactive or asynchronous type, such as {@link rx.Single Single} or {@link java.util.concurrent.CompletableFuture CompletableFuture}
+ */
 public interface ReactiveTypeHandlerPlugin<T> {
+
 	/**
-	 * Subscribes a ReactiveExecutionListener to a reactive type. 
-	 * 
-	 * @param listener
-	 * @param reactiveType
+	 *  Convert from reactive type {@code T} to {@link Observable}
+	 *  <p>
+	 *      The returned {@link Observable} should <b>not</b> be already subscribed by the method.
+	 *  </p>
 	 */
-	void subscribe(ReactiveExecutionListener listener, T reactiveType);
-	
+	Observable<Object> toObservable(T reactiveType);
+
 	/**
-	 * Completes a reactive execution created using {@link #newReactiveType()} with an error.
-	 * 
-	 * This method will only be invoked with instances created using {@link #newReactiveType()},
-	 * so its safe to downcast the reactiveType argument to the type returned by
-	 * {@link #newReactiveType()}
-	 * 
-	 * @param error
-	 * @param reactiveType
+	 * Convert from {@link Observable} to reactive type {@code T}
+	 * <p>
+	 * 		The incoming {@link Observable} <b>should</b> get subscribed by this method.
+	 * </p>
 	 */
-	void completeExceptionally(Throwable error, T reactiveType);
-	
-	/**
-	 * Successfully completes a reactive execution created using newReactiveType with
-	 * a given result.
-	 * 
-	 * @param result
-	 * @param reactiveType
-	 */
-	void complete(Object result, T reactiveType);
-	
-	T newReactiveType();
-	
+	T toReactiveType(Observable<Object> observable);
+
 	Class<T> reactiveTypeHandled();
 }

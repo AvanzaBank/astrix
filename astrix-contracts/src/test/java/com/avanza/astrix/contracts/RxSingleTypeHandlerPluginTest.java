@@ -13,9 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.beans.core;
+package com.avanza.astrix.contracts;
 
-public interface ReactiveExecutionListener {
-	void onError(Throwable t);
-	void onResult(Object result);
+import com.avanza.astrix.beans.core.RxSingleTypeHandlerPlugin;
+import rx.Single;
+
+public class RxSingleTypeHandlerPluginTest extends ReactiveTypeHandlerContract<Single<Object>> {
+
+	public RxSingleTypeHandlerPluginTest() {
+		super(new RxSingleTypeHandlerPlugin());
+	}
+	
 }

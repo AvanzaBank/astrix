@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.avanza.astrix.contracts;
+package com.avanza.astrix.reactor;
 
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
-import com.avanza.astrix.gs.AsyncFutureTypeHandler;
-import com.gigaspaces.async.AsyncFuture;
+import com.avanza.astrix.context.AstrixContextPlugin;
+import com.avanza.astrix.modules.ModuleContext;
 
-public class AsyncFutureReactiveTypeHandlerTest extends ReactiveTypeHandlerContract<AsyncFuture<Object>> {
+public class FluxModule implements AstrixContextPlugin {
 
-	@Override
-	protected ReactiveTypeHandlerPlugin<AsyncFuture<Object>> newReactiveTypeHandler() {
-		return new AsyncFutureTypeHandler();
-	}
+    @Override
+    public void prepare(ModuleContext moduleContext) {
+        moduleContext.bind(ReactiveTypeHandlerPlugin.class, FluxTypeHandlerPlugin.class);
+
+        moduleContext.export(ReactiveTypeHandlerPlugin.class);
+    }
 
 }

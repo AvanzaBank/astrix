@@ -15,87 +15,87 @@
  */
 package com.avanza.astrix.contracts;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import com.avanza.astrix.beans.core.ReactiveExecutionListener;
 import com.avanza.astrix.beans.core.ReactiveTypeConverter;
 import com.avanza.astrix.beans.core.ReactiveTypeConverterImpl;
 import com.avanza.astrix.beans.core.ReactiveTypeHandlerPlugin;
-
+import org.junit.Test;
 import rx.Observable;
-import rx.Subscriber;
+import rx.observers.TestSubscriber;
+import rx.subjects.ReplaySubject;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertEquals;
 
 public abstract class ReactiveTypeHandlerContract<T> {
-	
-	private ReactiveTypeConverter reactiveTypeConverter;
-	private ReactiveTypeHandlerPlugin<T> reactiveTypeHandler;
-	
-	@Before
-	public void setup() {
-		reactiveTypeHandler = newReactiveTypeHandler();
-		reactiveTypeConverter = new ReactiveTypeConverterImpl(Arrays.asList(reactiveTypeHandler));
+
+	private final ReactiveTypeConverter reactiveTypeConverter;
+	private final Class<T> reactiveTypeHandled;
+
+	protected ReactiveTypeHandlerContract(ReactiveTypeHandlerPlugin<T> reactiveTypeHandler) {
+		this.reactiveTypeConverter = new ReactiveTypeConverterImpl(singletonList(reactiveTypeHandler));
+		this.reactiveTypeHandled = reactiveTypeHandler.reactiveTypeHandled();
+	}
+
+	@SuppressWarnings("SameParameterValue")
+	protected <V> void assertValue(TestSubscriber<V> testSubscriber, V value) {
+		testSubscriber.assertValue(value);
 	}
 	
-	protected abstract ReactiveTypeHandlerPlugin<T> newReactiveTypeHandler();
-
-	@Test(timeout=2000)
+	@Test(timeout = 2000)
 	public final void reactiveTypeListenerIsNotifiedAsynchronouslyWhenReactiveExecutionCompletes() throws Exception {
-		T reactiveType = reactiveTypeHandler.newReactiveType();
+		ReplaySubject<Object> subject = ReplaySubject.createWithSize(1);
+		T reactiveType = toCustomReactiveType(subject);
+		Observable<Object> observable = toObservable(reactiveType);
 
-		
-		ReactiveResultSpy resultSpy = new ReactiveResultSpy();
-		reactiveTypeHandler.subscribe(resultSpy, reactiveType); // Subscribe after execution completes
-		assertFalse(resultSpy.isDone());
-		assertNull(resultSpy.error);
-		assertNull(resultSpy.lastElement);
-		
-		reactiveTypeHandler.complete("foo", reactiveType); // Complete reactive execution
-		assertTrue(resultSpy.isDone());
-		assertEquals("foo", resultSpy.lastElement);
-		assertNull(resultSpy.error);
+		TestSubscriber<Object> resultSpy = TestSubscriber.create();
+		observable.subscribe(resultSpy); // Subscribe after execution completes
+		resultSpy.assertNotCompleted();
+		resultSpy.assertNoErrors();
+		resultSpy.assertNoValues();
+
+		subject.onNext("foo");
+		subject.onCompleted();  // Complete reactive execution
+		resultSpy.assertCompleted();
+		assertValue(resultSpy, "foo");
+		resultSpy.assertNoErrors();
 	}
 	
 	@Test(timeout=2000)
 	public final void reactiveTypeListenerIsNotifiedSynchronouslyIfReactiveExecutionAlreadyCompleted() throws Exception {
-		T reactiveType = reactiveTypeHandler.newReactiveType();
+		ReplaySubject<Object> subject = ReplaySubject.createWithSize(1);
+		T reactiveType = toCustomReactiveType(subject);
+		Observable<Object> observable = toObservable(reactiveType);
 
-		reactiveTypeHandler.complete("foo", reactiveType); // Completes reactive execution
+		subject.onNext("foo");
+		subject.onCompleted();  // Completes reactive execution
+
+		TestSubscriber<Object> resultSpy = TestSubscriber.create();
+		observable.subscribe(resultSpy); // Subscribe after execution completes
 		
-		ReactiveResultSpy resultSpy = new ReactiveResultSpy();
-		reactiveTypeHandler.subscribe(resultSpy, reactiveType); // Subscribe after execution completes
-		
-		assertTrue(resultSpy.isDone());
-		assertEquals("foo", resultSpy.lastElement);
-		assertNull(resultSpy.error);
+		resultSpy.assertCompleted();
+		assertValue(resultSpy, "foo");
+		resultSpy.assertNoErrors();
 	}
 	
 	@Test(timeout=2000)
 	public final void reactiveTypeToObservableShouldNotBlock() throws Exception {
-		T reactiveType = reactiveTypeHandler.newReactiveType();
+		ReplaySubject<Object> subject = ReplaySubject.createWithSize(1);
+		T reactiveType = toCustomReactiveType(subject);
+		Observable<Object> observable = toObservable(reactiveType);
 
-		Observable<Object> observable = reactiveTypeConverter.toObservable(reactiveTypeHandler.reactiveTypeHandled(), reactiveType);
+		TestSubscriber<Object> resultSpy = TestSubscriber.create();
+		observable.subscribe(resultSpy);
 		
-		ObservableSpy reactiveResultListener = new ObservableSpy();
-		observable.subscribe(reactiveResultListener);
+		resultSpy.assertNotCompleted();
 		
-		assertFalse(reactiveResultListener.isDone());
-		
-		reactiveTypeHandler.complete("foo", reactiveType);
-		
-		assertTrue(reactiveResultListener.isDone());
-		assertEquals("foo", reactiveResultListener.lastElement);
-		assertNull(reactiveResultListener.error);
+		subject.onNext("foo");
+		subject.onCompleted();
+
+		resultSpy.assertCompleted();
+		assertValue(resultSpy, "foo");
+		resultSpy.assertNoErrors();
 	}
 	
 	@Test(timeout=1000)
@@ -110,11 +110,11 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		assertEquals(0, sourceSubscriptionCount.get());
 		T reactiveType = toCustomReactiveType(emitsFoo);
 		assertEquals(1, sourceSubscriptionCount.get());
+
+		TestSubscriber<Object> resultSpy = TestSubscriber.create();
+		toObservable(reactiveType).subscribe(resultSpy);
 		
-		ReactiveResultSpy resultSpy = new ReactiveResultSpy();
-		reactiveTypeHandler.subscribe(resultSpy, reactiveType);
-		
-		assertEquals("foo", resultSpy.lastElement);
+		assertValue(resultSpy, "foo");
 	}
 	
 	@Test
@@ -127,90 +127,43 @@ public abstract class ReactiveTypeHandlerContract<T> {
 		});
 		
 		T reactiveType = toCustomReactiveType(emitsFoo);
-		Observable<Object> reconstructedObservable = (Observable<Object>) reactiveTypeConverter.toObservable(reactiveTypeHandler.reactiveTypeHandled(), reactiveType);
+		Observable<Object> reconstructedObservable = toObservable(reactiveType);
 		reactiveType = toCustomReactiveType(reconstructedObservable);
 		
 		assertEquals(1, sourceSubscriptionCount.get());
-		ReactiveResultSpy resultSpy = new ReactiveResultSpy();
-		reactiveTypeHandler.subscribe(resultSpy, reactiveType);
+		TestSubscriber<Object> resultSpy = TestSubscriber.create();
+		toObservable(reactiveType).subscribe(resultSpy);
 		
-		assertEquals("foo", resultSpy.lastElement);
+		assertValue(resultSpy, "foo");
 	}
 	
 	@Test
 	public final void notifiesExceptionalResults() throws Exception {
-		T reactiveType = reactiveTypeHandler.newReactiveType();
+		ReplaySubject<Object> subject = ReplaySubject.createWithSize(1);
+		T reactiveType = toCustomReactiveType(subject);
+		Observable<Object> observable = toObservable(reactiveType);
 
-		ReactiveResultSpy resultSpy = new ReactiveResultSpy();
-		reactiveTypeHandler.subscribe(resultSpy, reactiveType); // Subscribe after execution completes
-		assertFalse(resultSpy.isDone());
-		assertNull(resultSpy.error);
-		assertNull(resultSpy.lastElement);
-		
-		reactiveTypeHandler.completeExceptionally(new RuntimeException("foo"), reactiveType); // Complete reactive execution
-		assertTrue(resultSpy.isDone());
-		assertNull(resultSpy.lastElement);
-		assertNotNull(resultSpy.error);
-		assertEquals("foo", resultSpy.error.getMessage());
+		TestSubscriber<Object> resultSpy = TestSubscriber.create();
+		observable.subscribe(resultSpy); // Subscribe after execution completes
+		resultSpy.assertNotCompleted();
+		resultSpy.assertNoErrors();
+		resultSpy.assertNoValues();
+
+		RuntimeException error = new RuntimeException("foo");
+		subject.onError(error); // Complete reactive execution
+		resultSpy.assertTerminalEvent();
+		resultSpy.assertNoValues();
+		resultSpy.assertError(error);
 	}
 
-	@SuppressWarnings("unchecked")
+	private Observable<Object> toObservable(T reactiveType) {
+		return reactiveTypeConverter.toObservable(reactiveTypeHandled, reactiveType);
+	}
+
 	private T toCustomReactiveType(Observable<Object> emitsFoo) {
-		return (T) reactiveTypeConverter.toCustomReactiveType(reactiveType(), emitsFoo);
+		return reactiveTypeConverter.toCustomReactiveType(reactiveTypeHandled, emitsFoo);
 	}
 
-	private Class<? super T> reactiveType() {
-		return this.reactiveTypeHandler.reactiveTypeHandled();
-	}
 	
-	
-	private static class ObservableSpy extends Subscriber<Object> {
-
-		private final CountDownLatch done = new CountDownLatch(1);
-		private Throwable error;
-		private Object lastElement;
-
-		@Override
-		public void onCompleted() {
-			done.countDown();
-		}
-
-		@Override
-		public void onError(Throwable e) {
-			this.error = e;
-		}
-
-		@Override
-		public void onNext(Object next) {
-			this.lastElement = next;
-		}
-
-		public boolean isDone() {
-			return done.getCount() == 0;
-		}
-	}
-	
-	private static class ReactiveResultSpy implements ReactiveExecutionListener {
-
-		private final CountDownLatch done = new CountDownLatch(1);
-		private Throwable error;
-		private Object lastElement;
-
-		@Override
-		public void onError(Throwable e) {
-			this.error = e;
-			done.countDown();
-		}
-		
-		@Override
-		public void onResult(Object result) {
-			this.lastElement = result;
-			done.countDown();
-		}
-
-		public boolean isDone() {
-			return done.getCount() == 0;
-		}
-	}
 	
 }
