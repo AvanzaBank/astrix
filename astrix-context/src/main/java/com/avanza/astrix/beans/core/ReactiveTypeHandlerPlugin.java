@@ -17,10 +17,27 @@ package com.avanza.astrix.beans.core;
 
 import rx.Observable;
 
+/**
+ *	Plugin for converting between {@link Observable} and a reactive type
+ *
+ * @param <T> a reactive or asynchronous type, such as {@link rx.Single Single} or {@link java.util.concurrent.CompletableFuture CompletableFuture}
+ */
 public interface ReactiveTypeHandlerPlugin<T> {
 
+	/**
+	 *  Convert from reactive type {@code T} to {@link Observable}
+	 *  <p>
+	 *      The returned {@link Observable} should <b>not</b> be already subscribed by the method.
+	 *  </p>
+	 */
 	Observable<Object> toObservable(T reactiveType);
 
+	/**
+	 * Convert from {@link Observable} to reactive type {@code T}
+	 * <p>
+	 * 		The incoming {@link Observable} <b>should</b> get subscribed by this method.
+	 * </p>
+	 */
 	T toReactiveType(Observable<Object> observable);
 
 	Class<T> reactiveTypeHandled();
