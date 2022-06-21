@@ -138,25 +138,14 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>11</java.version>
 
-		<log4j.version>2.17.2</log4j.version>
-		<spring.version>5.3.19</spring.version>
-		<slf4j.version>1.7.32</slf4j.version>
+		<spring-boot.version>2.6.7</spring-boot.version>
 		<gigaspaces.version>16.1.1</gigaspaces.version>
-		<rxjava.version>1.3.8</rxjava.version>
-		<reactor-bom.version>2020.0.18</reactor-bom.version>
 		<hystrix.version>1.5.18</hystrix.version>
 		<archaius.version>0.4.1</archaius.version>
-		<jackson2.version>2.13.2.1</jackson2.version>
-		<junit.version>4.13.2</junit.version>
-		<junit-jupiter.version>5.8.2</junit-jupiter.version>
-		<hamcrest.version>2.2</hamcrest.version>
-		<mockito.version>3.12.4</mockito.version>
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-		<dropwizard.version>4.2.9</dropwizard.version>
-		<netty.version>4.1.76.Final</netty.version>
 		<mimer-config.version>0.0.8</mimer-config.version>
 		<hystrix-multiconfig.version>0.0.3</hystrix-multiconfig.version>
-		<gs-test.version>2.1.1</gs-test.version>
+		<gs-test.version>2.1.3</gs-test.version>
 
 		<!-- Plugins -->
 		<maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
@@ -172,8 +161,8 @@
 		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
 		<maven-source-plugin.version>3.2.0</maven-source-plugin.version>
 		<maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
-		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-		<maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
+		<maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
+		<maven-failsafe-plugin.version>3.0.0-M7</maven-failsafe-plugin.version>
 		<maven-enforcer-plugin.version>3.0.0</maven-enforcer-plugin.version>
 		<maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
 		<exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
@@ -189,33 +178,9 @@
 		<!-- Third party dependencies -->
 		<dependencies>
 			<dependency>
-				<groupId>io.dropwizard.metrics</groupId>
-				<artifactId>metrics-bom</artifactId>
-				<version>${dropwizard.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<dependency>
-			    <groupId>org.apache.logging.log4j</groupId>
-			    <artifactId>log4j-bom</artifactId>
-			    <version>${log4j.version}</version>
-			    <type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-framework-bom</artifactId>
-				<version>${spring.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>io.projectreactor</groupId>
-				<artifactId>reactor-bom</artifactId>
-				<version>${reactor-bom.version}</version>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring-boot.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -226,13 +191,6 @@
 				<version>3.0.2</version>
 			</dependency>
 
-            <!-- Java 11 back-comp -->
-            <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>1.3.2</version>
-            </dependency>
-
 			<!-- Reflections for annotation scanning-->
 			<dependency>
 				<groupId>org.reflections</groupId>
@@ -240,27 +198,6 @@
 				<version>0.10.2</version>
 			</dependency>
 			
-            <!-- Jackson 2.x -->
-            <dependency>
-                <groupId>com.fasterxml.jackson</groupId>
-                <artifactId>jackson-bom</artifactId>
-                <version>${jackson2.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>${slf4j.version}</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-all</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
-
 			<dependency>
 				<groupId>org.gigaspaces</groupId>
 				<artifactId>xap-openspaces</artifactId>
@@ -283,42 +220,6 @@
 				<version>${gigaspaces.version}</version>
 			</dependency>
 
-			<!-- TEST -->
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>${junit.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.hamcrest</groupId>
-						<artifactId>hamcrest-core</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.junit</groupId>
-				<artifactId>junit-bom</artifactId>
-				<version>${junit-jupiter.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.hamcrest</groupId>
-				<artifactId>hamcrest</artifactId>
-				<version>${hamcrest.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-core</artifactId>
-				<version>${mockito.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>io.reactivex</groupId>
-				<artifactId>rxjava</artifactId>
-				<version>${rxjava.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>com.netflix.hystrix</groupId>
 				<artifactId>hystrix-core</artifactId>
