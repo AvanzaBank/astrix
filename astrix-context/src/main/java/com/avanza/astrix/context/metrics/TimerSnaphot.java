@@ -24,10 +24,7 @@ public class TimerSnaphot {
 	private final double _99thPercentileLatency;
 	private final double _50thPercentileLatency;
 	private final double maxLatency;
-	private final double meanRate;
 	private final double minLatency;
-	private final double oneMinuteRate;
-	private final TimeUnit rateUnit;
 	private final TimeUnit durationUnit;
 	
 	private TimerSnaphot(Builder builder) {
@@ -37,9 +34,6 @@ public class TimerSnaphot {
 		this._90thPercentileLatency = builder._90thPercentileLatency;
 		this.maxLatency = builder.maxLatency;
 		this.minLatency = builder.minLatency;
-		this.meanRate = builder.meanRate;
-		this.oneMinuteRate = builder.oneMinuteRate;
-		this.rateUnit = builder.rateUnit;
 		this.durationUnit = builder.durationUnit;
 	}
 
@@ -86,35 +80,16 @@ public class TimerSnaphot {
 		return this.maxLatency;
 	}
 
-	public double getMeanRate() {
-		return this.meanRate;
-	}
-
 	public double getMin() {
 		return this.minLatency;
 	}
 	
 
 	/**
-	 * Executions/second for the last minute 
-	 */
-	public double getOneMinuteRate() {
-		return this.oneMinuteRate;
-	}
-	
-	/**
 	 * The TimeUnit for all "durations" (hardcoded to 'MILLISECONDS' in current implementation)
 	 */
 	public TimeUnit getDurationUnit() {
 		return durationUnit;
-	}
-	
-	
-	/**
-	 * The TimeUnit for all "rates" (hardcoded to 'SECONDS' in current implementation)
-	 */
-	public TimeUnit getRateUnit() {
-		return rateUnit;
 	}
 
 	public static TimerSnaphot empty() {
@@ -126,24 +101,16 @@ public class TimerSnaphot {
 	}
 	
 	public static class Builder {
-		private TimeUnit rateUnit = TimeUnit.MILLISECONDS;
 		private long count;
 		private double _99thPercentileLatency;
 		private double _90thPercentileLatency;
 		private double _50thPercentileLatency;
 		private double maxLatency;
 		private double minLatency;
-		private double meanRate;
-		private double oneMinuteRate;
 		private TimeUnit durationUnit;
 		
 		public Builder count(long count) {
 			this.count = count;
-			return this;
-		}
-		
-		public Builder rateUnit(TimeUnit rateUnit) {
-			this.rateUnit = rateUnit;
 			return this;
 		}
 
@@ -167,21 +134,11 @@ public class TimerSnaphot {
 			return this;
 		}
 
-		public Builder meanRate(double meanRate) {
-			this.meanRate = meanRate;
-			return this;
-		}
-
 		public Builder minLatency(double min) {
 			this.minLatency = min;
 			return this;
 		}
 
-		public Builder oneMinuteRate(double oneMinuteRate) {
-			this.oneMinuteRate = oneMinuteRate;
-			return this;
-		}
-		
 		public TimerSnaphot build() {
 			return new TimerSnaphot(this);
 		}

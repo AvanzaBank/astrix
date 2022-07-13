@@ -1,1 +1,1 @@
-com.avanza.astrix.metrics.DropwizardPlugin
+com.avanza.astrix.metrics.AstrixMetricsPlugin

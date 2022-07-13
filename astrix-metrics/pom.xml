@@ -14,10 +14,10 @@
 			<artifactId>astrix-context</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
-			<groupId>io.dropwizard.metrics</groupId>
-			<artifactId>metrics-core</artifactId>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-core</artifactId>
 		</dependency>
 
 		<dependency>

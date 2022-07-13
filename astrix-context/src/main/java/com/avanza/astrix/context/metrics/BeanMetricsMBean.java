@@ -19,14 +19,8 @@ import java.util.concurrent.TimeUnit;
 
 public interface BeanMetricsMBean {
 
-	TimeUnit getRateUnit();
-
 	TimeUnit getDurationUnit();
 
-	double getOneMinuteRate();
-
-	double getMeanRate();
-	
 	double getMin();
 
 	double getMax();

@@ -34,10 +34,9 @@ import com.avanza.astrix.core.function.CheckedCommand;
 
 import rx.Observable;
 
-public class DropwizardMetricsTest {
+public class AstrixMetricsImplTest {
 
-	
-	private DropwizardMetrics dropwizardMetrics;
+	private AstrixMetricsImpl astrixMetrics;
 	private AstrixApplicationContext astrixContext;
 
 	@Before
@@ -45,9 +44,9 @@ public class DropwizardMetricsTest {
 		astrixContext = (AstrixApplicationContext) new TestAstrixConfigurer().configure();
 		MetricsSpi metricsSpi = astrixContext.getInstance(MetricsSpi.class);
 		
-		assertEquals(DropwizardMetrics.class, metricsSpi.getClass());
-		
-		dropwizardMetrics = (DropwizardMetrics) metricsSpi;
+		assertEquals(AstrixMetricsImpl.class, metricsSpi.getClass());
+
+		astrixMetrics = (AstrixMetricsImpl) metricsSpi;
 	}
 	
 	@After
@@ -58,7 +57,7 @@ public class DropwizardMetricsTest {
 	@Test
 	public void timeExecution() throws Throwable {
 
-		TimerSpi timer = dropwizardMetrics.createTimer();
+		TimerSpi timer = astrixMetrics.createTimer();
 		
 		CheckedCommand<String> execution = timer.timeExecution(() -> {
 			Thread.sleep(10);
@@ -76,7 +75,7 @@ public class DropwizardMetricsTest {
 
 	@Test
 	public void timeObservable() throws Throwable {
-		TimerSpi timer = dropwizardMetrics.createTimer();
+		TimerSpi timer = astrixMetrics.createTimer();
 		
 		Supplier<Observable<String>> observable = timer.timeObservable(() -> Observable.unsafeCreate(subscriber -> {
 			try {

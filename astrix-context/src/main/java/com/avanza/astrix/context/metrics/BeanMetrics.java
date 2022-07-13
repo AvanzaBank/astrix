@@ -51,28 +51,12 @@ final class BeanMetrics implements BeanMetricsMBean {
 	}
 
 	@Override
-	public double getMeanRate() {
-		return timer.getMeanRate();
-	}
-
-	@Override
 	public double getMin() {
 		return timer.getMin();
-	}
-
-	@Override
-	public double getOneMinuteRate() {
-		return timer.getOneMinuteRate();
 	}
 
 	@Override
 	public TimeUnit getDurationUnit() {
 		return timer.getDurationUnit();
 	}
-
-	@Override
-	public TimeUnit getRateUnit() {
-		return timer.getRateUnit();
-	}
-	
 }
