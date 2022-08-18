@@ -31,14 +31,8 @@ public interface ServiceInvocationMonitorMBean {
 	
 	double getMax();
 	
-	double getMeanRate();
-	
 	double getMin();
-	
-	double getOneMinuteRate();
-	
-	TimeUnit getRateUnit();
-	
+
 	TimeUnit getDurationUnit();
 	
 

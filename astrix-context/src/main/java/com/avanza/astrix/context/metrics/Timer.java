@@ -68,24 +68,12 @@ public class Timer {
 		return timerSpi.getSnapshot().getMax();
 	}
 
-	public double getMeanRate() {
-		return timerSpi.getSnapshot().getMeanRate();
-	}
-
 	public double getMin() {
 		return timerSpi.getSnapshot().getMin();
 	}
 
-	public double getOneMinuteRate() {
-		return timerSpi.getSnapshot().getOneMinuteRate();
-	}
-
 	public long getCount() {
 		return timerSpi.getSnapshot().getCount();
-	}
-
-	public TimeUnit getRateUnit() {
-		return timerSpi.getSnapshot().getRateUnit();
 	}
 
 	public TimeUnit getDurationUnit() {

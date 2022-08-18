@@ -20,7 +20,7 @@ import com.avanza.astrix.context.AstrixStrategiesConfig;
 import com.avanza.astrix.context.metrics.MetricsSpi;
 import com.avanza.astrix.modules.ModuleContext;
 
-public class DropwizardPlugin implements AstrixContextPlugin {
+public class AstrixMetricsPlugin implements AstrixContextPlugin {
 
 	@Override
 	public void prepare(ModuleContext moduleContext) {
@@ -28,7 +28,7 @@ public class DropwizardPlugin implements AstrixContextPlugin {
 
 	@Override
 	public void registerStrategies(AstrixStrategiesConfig strategiesConfig) {
-		strategiesConfig.registerStrategy(MetricsSpi.class, DropwizardMetrics.class);
+		strategiesConfig.registerStrategy(MetricsSpi.class, AstrixMetricsImpl.class);
 	}
 	
 }
