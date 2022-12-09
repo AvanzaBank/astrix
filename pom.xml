@@ -138,8 +138,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>11</java.version>
 
-		<spring-boot.version>2.6.7</spring-boot.version>
-		<gigaspaces.version>16.1.1</gigaspaces.version>
+		<!-- spring-boot 2.7.3 sets versions of spring-framework version to 5.3.22 and of
+		spring-security to 5.7.3 which matches the versions in GigaSpaces -->
+		<spring-boot.version>2.7.3</spring-boot.version>
+		<gigaspaces.version>16.2.1</gigaspaces.version>
 		<hystrix.version>1.5.18</hystrix.version>
 		<archaius.version>0.4.1</archaius.version>
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
